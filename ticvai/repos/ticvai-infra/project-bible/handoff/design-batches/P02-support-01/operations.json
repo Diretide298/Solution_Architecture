@@ -1,0 +1,64 @@
+{
+ "listMyCases": {
+  "method": "GET",
+  "path": "/my/cases",
+  "contract": "marketing-crm",
+  "summary": "The cases this guest raised",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Case"
+ },
+ "raiseMyCase": {
+  "method": "POST",
+  "path": "/my/cases",
+  "contract": "marketing-crm",
+  "summary": "Report something — lost property, a complaint, a question",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Case"
+ },
+ "replyToMyCase": {
+  "method": "POST",
+  "path": "/my/cases/{caseId}/messages",
+  "contract": "marketing-crm",
+  "summary": "Reply on a case the guest raised",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Case"
+ }
+}

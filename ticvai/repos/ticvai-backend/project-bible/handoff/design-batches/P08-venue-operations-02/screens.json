@@ -1,0 +1,1068 @@
+[
+ {
+  "id": "BO-129",
+  "name": "Software, Configuration & Version Management",
+  "module": "Venue Operations",
+  "requiresModule": "core",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/software-configuration-version-management",
+   "component": "apps/venue-management-web/src/routes/ops/SoftwareConfigurationVersionManagementList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-108",
+    "BO-128"
+   ],
+   "exitTo": [
+    "BO-108",
+    "BO-130"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-108.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-130",
+     "trigger": "Offline Policy & Rules Configuration",
+     "provenance": "flow F89 step 3→4"
+    },
+    {
+     "to": "BO-108",
+     "trigger": "Venue Operations",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-108 declares entryState.params venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Owns POS board frame(s) POS-5D** (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse off than one who has none.",
+  "density": "compact",
+  "boardFrames": [
+   "POS Board 5.dc.html#pos-5d"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listWorkstations` reads the population and `getWorkstationHealth` reads one of them — list, select, act",
+  "purpose": "Software, Configuration & Version Management — from the client design board, 20 August.",
+  "gaps": [
+   {
+    "operation": "getWorkstationHealth",
+    "why": "**1 declared operation reach no component on this screen**: getWorkstationHealth. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every software version",
+       "bindsTo": "Workstation",
+       "columns": [
+        "Workstation.id",
+        "Workstation.code",
+        "Workstation.name",
+        "Workstation.venueId",
+        "Workstation.regionId",
+        "Workstation.departmentId",
+        "Workstation.scopePath",
+        "Workstation.saleBoard",
+        "Workstation.accessPointId",
+        "Workstation.devices",
+        "Workstation.currency",
+        "Workstation.currencyScale"
+       ],
+       "operation": "listWorkstations",
+       "provenance": "contract tenancy.yaml GET /workstations"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "setConfigurationProfile",
+       "provenance": "contract tenancy.yaml PUT /configuration-profiles"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Deploy",
+       "operation": "deployConfigurationProfile",
+       "provenance": "contract tenancy.yaml POST /configuration-profiles/{profileId}/deploy"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Configure",
+       "operation": "configureWorkstation",
+       "provenance": "contract tenancy.yaml PUT /workstations/{workstationId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setConnectivityThresholds",
+       "provenance": "contract tenancy.yaml PUT /connectivity-policy"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
+       "provenance": "authored — required by check-screens"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search software, configuration",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "deployConfigurationProfile",
+       "notes": "Declares `deployConfigurationProfile`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The software version list.",
+   "error": "Could not load. Names which read failed and leaves the software version untouched.",
+   "emptyFirstRun": "No software version yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the software version are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setConfigurationProfile",
+    "contract": "tenancy",
+    "purpose": "setConfigurationProfile",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkstations"
+    ]
+   },
+   {
+    "operationId": "deployConfigurationProfile",
+    "contract": "tenancy",
+    "purpose": "deployConfigurationProfile",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkstations"
+    ]
+   },
+   {
+    "operationId": "configureWorkstation",
+    "contract": "tenancy",
+    "purpose": "Configure a workstation",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkstations"
+    ]
+   },
+   {
+    "operationId": "getWorkstationHealth",
+    "contract": "tenancy",
+    "purpose": "getWorkstationHealth",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listWorkstations",
+    "contract": "tenancy",
+    "purpose": "List workstations",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setConnectivityThresholds",
+    "contract": "tenancy",
+    "purpose": "setConnectivityThresholds",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkstations"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "profileId",
+     "from": "deepLink"
+    },
+    {
+     "name": "workstationId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first. Resolves from the session — a till is signed into."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-129",
+   "source": "Claude Design POS pack, 24 August",
+   "note": "**Drawn by Claude Design on `POS Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-130",
+  "name": "Offline Policy & Rules Configuration",
+  "module": "Venue Operations",
+  "requiresModule": "core",
+  "wave": 1,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/offline-policy-rules-configuration",
+   "component": "apps/venue-management-web/src/routes/ops/OfflinePolicyRulesConfigurationList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-108",
+    "BO-129"
+   ],
+   "exitTo": [
+    "BO-108"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-108.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-108",
+     "trigger": "Venue Operations",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-108 declares entryState.params venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Owns POS board frame(s) POS-5E** (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse off than one who has none. **Moved to wave 1 on 24 August.** F33 walks a till going offline and coming back, which is a wave-1 journey — ADR-0013 makes the POS local-first from the first release. **A venue that can trade offline and cannot resolve a sync rejection has an unbounded journal and no way to clear it**, and `check-flows` refused the flow rather than let that ship. **Resolved remotely by design.**  is venue-scoped and this is a web screen — **a supervisor at the main venue clears a mall kiosk's rejections without going there.** An IT technician restores the connection; **deciding whether a sale stands is a commercial act and they have the access without the authority.**",
+  "density": "compact",
+  "boardFrames": [
+   "POS Board 5.dc.html#pos-5e"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listSyncRejections` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Offline Policy & Rules Configuration — from the client design board, 20 August.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every offline policy rules",
+       "bindsTo": "SyncRejection",
+       "columns": [
+        "SyncRejection.id",
+        "SyncRejection.workstationId",
+        "SyncRejection.kind",
+        "SyncRejection.recordedAt",
+        "SyncRejection.rejectedAt",
+        "SyncRejection.problem",
+        "SyncRejection.payload",
+        "SyncRejection.resolvedAt",
+        "SyncRejection.resolvedByPrincipalId"
+       ],
+       "operation": "listSyncRejections",
+       "provenance": "contract orders.yaml GET /sync/rejections"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected offline policy rules",
+       "bindsTo": "SyncRejection",
+       "columns": [
+        "SyncRejection.id",
+        "SyncRejection.workstationId",
+        "SyncRejection.kind",
+        "SyncRejection.recordedAt",
+        "SyncRejection.rejectedAt",
+        "SyncRejection.problem",
+        "SyncRejection.payload",
+        "SyncRejection.resolvedAt",
+        "SyncRejection.resolvedByPrincipalId"
+       ],
+       "operation": "listSyncRejections",
+       "provenance": "contract orders.yaml GET /sync/rejections"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "setOfflinePolicy",
+       "provenance": "contract tenancy.yaml PUT /offline-policy"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Sync",
+       "operation": "syncOrders",
+       "provenance": "contract orders.yaml POST /sync/orders"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createOrder",
+       "provenance": "contract orders.yaml POST /orders"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search offline policy",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The offline policy rules list.",
+   "error": "Could not load. Names which read failed and leaves the offline policy rules untouched.",
+   "emptyFirstRun": "No offline policy rules yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the offline policy rules are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setOfflinePolicy",
+    "contract": "tenancy",
+    "purpose": "setOfflinePolicy",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSyncRejections"
+    ]
+   },
+   {
+    "operationId": "listSyncRejections",
+    "contract": "orders",
+    "purpose": "Entries the server refused",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "syncOrders",
+    "contract": "orders",
+    "purpose": "Replay orders recorded offline",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSyncRejections"
+    ]
+   },
+   {
+    "operationId": "createOrder",
+    "contract": "orders",
+    "purpose": "Post a rejected transaction at the price the guest paid",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSyncRejections"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first.",
+   "preloaded": [
+    "SyncRejection.id",
+    "SyncRejection.workstationId",
+    "SyncRejection.kind",
+    "SyncRejection.recordedAt",
+    "SyncRejection.rejectedAt"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-130",
+   "source": "Claude Design POS pack, 24 August",
+   "note": "**Drawn by Claude Design on `POS Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-131",
+  "name": "Connectivity & Auto-Switch Settings",
+  "module": "Venue Operations",
+  "requiresModule": "core",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/connectivity-auto-switch-settings",
+   "component": "apps/venue-management-web/src/routes/ops/ConnectivityAutoSwitchSettingsList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-108"
+   ],
+   "exitTo": [
+    "BO-108"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-108.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-108",
+     "trigger": "Venue Operations",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-108 declares entryState.params venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them.",
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the screen declares only writes (`setConnectivityThresholds`) and no read of a population — it is settings, not a list",
+  "purpose": "Connectivity & Auto-Switch Settings — from the client design board, 20 August.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "id",
+       "bindsTo": "ConnectivityPolicy.id",
+       "provenance": "contract tenancy.yaml PUT /connectivity-policy"
+      },
+      {
+       "kind": "textField",
+       "label": "scopePath",
+       "bindsTo": "ConnectivityPolicy.scopePath",
+       "provenance": "contract tenancy.yaml PUT /connectivity-policy"
+      },
+      {
+       "kind": "textField",
+       "label": "failuresBeforeOffline",
+       "bindsTo": "ConnectivityPolicy.failuresBeforeOffline",
+       "provenance": "contract tenancy.yaml PUT /connectivity-policy"
+      },
+      {
+       "kind": "textField",
+       "label": "probeIntervalSeconds",
+       "bindsTo": "ConnectivityPolicy.probeIntervalSeconds",
+       "provenance": "contract tenancy.yaml PUT /connectivity-policy"
+      },
+      {
+       "kind": "textField",
+       "label": "probeTimeoutMs",
+       "bindsTo": "ConnectivityPolicy.probeTimeoutMs",
+       "provenance": "contract tenancy.yaml PUT /connectivity-policy"
+      },
+      {
+       "kind": "textField",
+       "label": "successesBeforeOnline",
+       "bindsTo": "ConnectivityPolicy.successesBeforeOnline",
+       "provenance": "contract tenancy.yaml PUT /connectivity-policy"
+      },
+      {
+       "kind": "textField",
+       "label": "minimumStableSeconds",
+       "bindsTo": "ConnectivityPolicy.minimumStableSeconds",
+       "provenance": "contract tenancy.yaml PUT /connectivity-policy"
+      },
+      {
+       "kind": "textField",
+       "label": "autoSwitch",
+       "bindsTo": "ConnectivityPolicy.autoSwitch",
+       "provenance": "contract tenancy.yaml PUT /connectivity-policy"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "setConnectivityThresholds",
+       "provenance": "contract tenancy.yaml PUT /connectivity-policy"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search connectivity",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The saved connectivity auto-switch settings.",
+   "error": "Could not load. Names which read failed and leaves the connectivity auto-switch settings untouched.",
+   "emptyFirstRun": "No connectivity auto-switch settings configured. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setConnectivityThresholds",
+    "contract": "tenancy",
+    "purpose": "setConnectivityThresholds",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-131"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-132",
+  "name": "Offline Transaction Monitor & Sync Queue",
+  "module": "Venue Operations",
+  "requiresModule": "ticketing",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/offline-transaction-monitor-sync-queue",
+   "component": "apps/venue-management-web/src/routes/ops/OfflineTransactionMonitorSyncQueueList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-108"
+   ],
+   "exitTo": [
+    "BO-108"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-108.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-108",
+     "trigger": "Venue Operations",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-108 declares entryState.params venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listSyncRejections` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Offline Transaction Monitor & Sync Queue — from the client design board, 20 August.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every offline transaction sync",
+       "bindsTo": "SyncRejection",
+       "columns": [
+        "SyncRejection.id",
+        "SyncRejection.workstationId",
+        "SyncRejection.kind",
+        "SyncRejection.recordedAt",
+        "SyncRejection.rejectedAt",
+        "SyncRejection.problem",
+        "SyncRejection.payload",
+        "SyncRejection.resolvedAt",
+        "SyncRejection.resolvedByPrincipalId"
+       ],
+       "operation": "listSyncRejections",
+       "provenance": "contract orders.yaml GET /sync/rejections"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected offline transaction sync",
+       "bindsTo": "SyncRejection",
+       "columns": [
+        "SyncRejection.id",
+        "SyncRejection.workstationId",
+        "SyncRejection.kind",
+        "SyncRejection.recordedAt",
+        "SyncRejection.rejectedAt",
+        "SyncRejection.problem",
+        "SyncRejection.payload",
+        "SyncRejection.resolvedAt",
+        "SyncRejection.resolvedByPrincipalId"
+       ],
+       "operation": "listSyncRejections",
+       "provenance": "contract orders.yaml GET /sync/rejections"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Sync",
+       "operation": "syncOrders",
+       "provenance": "contract orders.yaml POST /sync/orders"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search offline transaction monitor",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The offline transaction sync list.",
+   "error": "Could not load. Names which read failed and leaves the offline transaction sync untouched.",
+   "emptyFirstRun": "No offline transaction sync yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the offline transaction sync are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listSyncRejections",
+    "contract": "orders",
+    "purpose": "Entries the server refused",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "syncOrders",
+    "contract": "orders",
+    "purpose": "Replay orders recorded offline",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSyncRejections"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first.",
+   "preloaded": [
+    "SyncRejection.id",
+    "SyncRejection.workstationId",
+    "SyncRejection.kind",
+    "SyncRejection.recordedAt",
+    "SyncRejection.rejectedAt"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-132"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-133",
+  "name": "Offline Alerts, Limits & Audit",
+  "module": "Venue Operations",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/offline-alerts-limits-audit",
+   "component": "apps/venue-management-web/src/routes/ops/OfflineAlertsLimitsAuditList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-108"
+   ],
+   "exitTo": [
+    "BO-108"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-108.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-108",
+     "trigger": "Venue Operations",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-108 declares entryState.params venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "POS-002",
+     "trigger": "The connection returns",
+     "provenance": "flow F33 step 4→5",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not. **Owns POS board frame(s) POS-5F** (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse off than one who has none. **Moved to wave 1 on 24 August.** F33 walks a till going offline and coming back, which is a wave-1 journey — ADR-0013 makes the POS local-first from the first release. **A venue that can trade offline and cannot resolve a sync rejection has an unbounded journal and no way to clear it**, and `check-flows` refused the flow rather than let that ship.",
+  "density": "compact",
+  "boardFrames": [
+   "POS Board 5.dc.html#pos-5f"
+  ],
+  "pattern": "approvalInbox",
+  "patternReason": "`decideApprovalRequest` decides items that `listSyncRejections` queues — every row is waiting for a person, so the empty state is success",
+  "purpose": "Offline Alerts, Limits & Audit — from the client design board, 20 August.",
+  "gaps": [
+   {
+    "operation": "listAlerts",
+    "why": "**2 declared operations reach no component on this screen**: listAlerts, listAuditRecords. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "queue",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Waiting for a decision",
+       "bindsTo": "SyncRejection",
+       "columns": [
+        "SyncRejection.id",
+        "SyncRejection.workstationId",
+        "SyncRejection.kind",
+        "SyncRejection.recordedAt",
+        "SyncRejection.rejectedAt",
+        "SyncRejection.problem",
+        "SyncRejection.payload",
+        "SyncRejection.resolvedAt",
+        "SyncRejection.resolvedByPrincipalId"
+       ],
+       "operation": "listSyncRejections",
+       "provenance": "contract orders.yaml GET /sync/rejections"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "item",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected offline alerts limits",
+       "bindsTo": "SyncRejection",
+       "columns": [
+        "SyncRejection.id",
+        "SyncRejection.workstationId",
+        "SyncRejection.kind",
+        "SyncRejection.recordedAt",
+        "SyncRejection.rejectedAt",
+        "SyncRejection.problem",
+        "SyncRejection.payload",
+        "SyncRejection.resolvedAt",
+        "SyncRejection.resolvedByPrincipalId"
+       ],
+       "operation": "listSyncRejections",
+       "provenance": "contract orders.yaml GET /sync/rejections"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "decision",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Decide",
+       "operation": "decideApprovalRequest",
+       "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/decide"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Run",
+       "operation": "runReport",
+       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setAlertRule",
+       "provenance": "contract reporting.yaml PUT /alert-rules"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search offline alerts, limits",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The offline alerts limits list.",
+   "error": "Could not load. Names which read failed and leaves the offline alerts limits untouched.",
+   "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
+   "emptyNoResults": "The filter narrowed it and the offline alerts limits are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listSyncRejections",
+    "contract": "orders",
+    "purpose": "Entries the server refused",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listAlerts",
+    "contract": "reporting",
+    "purpose": "What is currently raised",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listAuditRecords",
+    "contract": "tenancy",
+    "purpose": "Who did what, where, and when",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "decideApprovalRequest",
+    "contract": "approvals",
+    "purpose": "Approve or reject",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSyncRejections"
+    ]
+   },
+   {
+    "operationId": "runReport",
+    "contract": "reporting",
+    "purpose": "Run a report",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSyncRejections"
+    ]
+   },
+   {
+    "operationId": "setAlertRule",
+    "contract": "reporting",
+    "purpose": "Raise an alert when a number leaves a range",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSyncRejections"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "reportId",
+     "from": "deepLink"
+    },
+    {
+     "name": "requestId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first. An approval request opened from the queue.",
+   "preloaded": [
+    "SyncRejection.id",
+    "SyncRejection.workstationId",
+    "SyncRejection.kind",
+    "SyncRejection.recordedAt",
+    "SyncRejection.rejectedAt"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-133",
+   "source": "Claude Design POS pack, 24 August",
+   "note": "**Drawn by Claude Design on `POS Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

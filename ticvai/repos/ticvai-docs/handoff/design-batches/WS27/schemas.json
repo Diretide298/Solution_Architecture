@@ -1,0 +1,1571 @@
+{
+ "GroupBooking360HandoverWorkspaceInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Group Booking 360° & Handover Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "notes": {
+    "type": "string",
+    "description": "Notes"
+   },
+   "tasks": {
+    "type": "string",
+    "description": "Tasks"
+   },
+   "attachments": {
+    "type": "string",
+    "description": "Attachments"
+   },
+   "departmentAssignments": {
+    "type": "string",
+    "description": "Department assignments"
+   },
+   "internalMentions": {
+    "type": "string",
+    "description": "Internal mentions"
+   },
+   "handoverAcknowledgment": {
+    "type": "string",
+    "description": "Handover acknowledgment"
+   },
+   "creation": {
+    "type": "string",
+    "description": "creation"
+   },
+   "groupRequirementsAvailabilityCapacity": {
+    "type": "integer",
+    "description": "Group Requirements, Availability & Capacity"
+   },
+   "servicesTheGroup": {
+    "type": "string",
+    "description": "services the group"
+   },
+   "reconciliationPerformanceAi": {
+    "type": "string",
+    "description": "Reconciliation → Performance & AI"
+   }
+  }
+ },
+ "GroupBooking360HandoverWorkspaceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Group Booking 360° & Handover Workspace displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "arrival": {
+    "type": "string",
+    "description": "Arrival"
+   },
+   "groupCheckIn": {
+    "type": "string",
+    "description": "Group Check-In"
+   },
+   "guides": {
+    "type": "integer",
+    "description": "Guides"
+   },
+   "catering": {
+    "type": "string",
+    "description": "Catering"
+   },
+   "accessibility": {
+    "type": "string",
+    "description": "Accessibility"
+   },
+   "transport": {
+    "type": "string",
+    "description": "Transport"
+   },
+   "parking": {
+    "type": "string",
+    "description": "Parking"
+   },
+   "specialInstructions": {
+    "type": "integer",
+    "description": "Special Instructions"
+   },
+   "resources": {
+    "type": "integer",
+    "description": "Resources"
+   },
+   "originalEnquiry": {
+    "type": "string",
+    "description": "Original Enquiry"
+   },
+   "opportunity": {
+    "type": "string",
+    "description": "Opportunity"
+   },
+   "finalQuote": {
+    "type": "string",
+    "description": "Final Quote"
+   },
+   "discount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount"
+   },
+   "approval": {
+    "type": "string",
+    "description": "Approval"
+   },
+   "agreedPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Agreed Price"
+   },
+   "deposit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Deposit"
+   },
+   "balance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Balance"
+   },
+   "products": {
+    "type": "integer",
+    "description": "Products"
+   },
+   "tickets": {
+    "type": "integer",
+    "description": "Tickets"
+   },
+   "dateTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date/time"
+   },
+   "capacity": {
+    "type": "integer",
+    "description": "Capacity"
+   },
+   "seatingWhereApplicable": {
+    "type": "string",
+    "description": "Seating where applicable"
+   },
+   "packageComponents": {
+    "type": "integer",
+    "description": "Package components"
+   },
+   "organization": {
+    "type": "string",
+    "description": "Organization"
+   },
+   "mainContact": {
+    "type": "string",
+    "description": "Main Contact"
+   },
+   "financeContact": {
+    "type": "string",
+    "description": "Finance Contact"
+   },
+   "eventDayContact": {
+    "type": "string",
+    "description": "Event-Day Contact"
+   },
+   "notes": {
+    "type": "string",
+    "description": "Notes"
+   },
+   "tasks": {
+    "type": "string",
+    "description": "Tasks"
+   },
+   "attachments": {
+    "type": "string",
+    "description": "Attachments"
+   },
+   "departmentAssignments": {
+    "type": "string",
+    "description": "Department assignments"
+   },
+   "internalMentions": {
+    "type": "string",
+    "description": "Internal mentions"
+   },
+   "handoverAcknowledgment": {
+    "type": "string",
+    "description": "Handover acknowledgment"
+   },
+   "creation": {
+    "type": "string",
+    "description": "creation"
+   },
+   "groupRequirementsAvailabilityCapacity": {
+    "type": "integer",
+    "description": "Group Requirements, Availability & Capacity"
+   },
+   "servicesTheGroup": {
+    "type": "string",
+    "description": "services the group"
+   },
+   "reconciliationPerformanceAi": {
+    "type": "string",
+    "description": "Reconciliation → Performance & AI"
+   }
+  }
+ },
+ "GroupCustomerOrganizationProfileView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Group Customer & Organization Profile displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "school": {
+    "type": "string",
+    "description": "School"
+   },
+   "university": {
+    "type": "string",
+    "description": "University"
+   },
+   "company": {
+    "type": "string",
+    "description": "Company"
+   },
+   "government": {
+    "type": "string",
+    "description": "Government"
+   },
+   "sportsClub": {
+    "type": "string",
+    "description": "Sports Club"
+   },
+   "association": {
+    "type": "string",
+    "description": "Association"
+   },
+   "tourGroup": {
+    "type": "string",
+    "description": "Tour Group"
+   },
+   "privateGroup": {
+    "type": "string",
+    "description": "Private Group"
+   },
+   "eventOrganizer": {
+    "type": "string",
+    "description": "Event Organizer"
+   },
+   "charity": {
+    "type": "string",
+    "description": "Charity"
+   },
+   "organizationName": {
+    "type": "string",
+    "description": "Organization Name"
+   },
+   "customerId": {
+    "type": "string",
+    "description": "Customer ID"
+   },
+   "organizationType": {
+    "type": "string",
+    "description": "Organization Type"
+   },
+   "registrationDetailsWhereApplicable": {
+    "type": "string",
+    "description": "Registration Details where applicable"
+   },
+   "country": {
+    "type": "string",
+    "description": "Country"
+   },
+   "city": {
+    "type": "string",
+    "description": "City"
+   },
+   "address": {
+    "type": "string",
+    "description": "Address"
+   },
+   "taxVatInformation": {
+    "type": "string",
+    "description": "Tax/VAT Information"
+   },
+   "preferredLanguage": {
+    "type": "string",
+    "description": "Preferred Language"
+   },
+   "billingDetails": {
+    "type": "string",
+    "description": "Billing Details"
+   },
+   "accountOwner": {
+    "type": "string",
+    "description": "Account Owner"
+   },
+   "primaryContact": {
+    "type": "string",
+    "description": "Primary Contact"
+   },
+   "bookingContact": {
+    "type": "string",
+    "description": "Booking Contact"
+   },
+   "financeContact": {
+    "type": "string",
+    "description": "Finance Contact"
+   },
+   "eventDayContact": {
+    "type": "string",
+    "description": "Event-Day Contact"
+   },
+   "decisionMaker": {
+    "type": "string",
+    "description": "Decision Maker"
+   },
+   "previousEnquiries": {
+    "type": "integer",
+    "description": "Previous enquiries"
+   },
+   "previousQuotations": {
+    "type": "integer",
+    "description": "Previous quotations"
+   },
+   "confirmedBookings": {
+    "type": "integer",
+    "description": "Confirmed bookings"
+   },
+   "totalGuests": {
+    "type": "integer",
+    "description": "Total guests"
+   },
+   "revenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue"
+   },
+   "cancellationHistory": {
+    "type": "string",
+    "description": "Cancellation history"
+   },
+   "outstandingBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Outstanding balance"
+   },
+   "futureBookings": {
+    "type": "integer",
+    "description": "Future bookings"
+   }
+  }
+ },
+ "GroupDiscountExceptionApprovalWorkflowInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is orders.cash_movement at 5%, so this is not an update to anything the package stores today and no new table has been decided",
+  "description": "**What Group Discount, Exception & Approval Workflow submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "standardGroupDiscount10": {
+    "type": "number",
+    "description": "Standard Group Discount: 10%"
+   },
+   "requested18": {
+    "type": "number",
+    "description": "Requested: 18%"
+   },
+   "approvalRequiredCommercialDirector": {
+    "type": "string",
+    "description": "Approval required — Commercial Director"
+   },
+   "discount": {
+    "type": "number",
+    "description": "Discount %"
+   },
+   "transactionValue": {
+    "type": "string",
+    "description": "Transaction value"
+   },
+   "margin": {
+    "type": "number",
+    "description": "Margin"
+   },
+   "customerType": {
+    "type": "string",
+    "description": "Customer type"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "salesUser": {
+    "type": "string",
+    "description": "Sales user"
+   },
+   "risk": {
+    "type": "string",
+    "description": "Risk"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "opportunity": {
+    "type": "string",
+    "description": "Opportunity"
+   },
+   "quote": {
+    "type": "string",
+    "description": "Quote"
+   },
+   "standardPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Standard Price"
+   },
+   "proposedPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Proposed Price"
+   },
+   "marginImpact": {
+    "type": "number",
+    "description": "Margin Impact"
+   },
+   "historicalCustomerValue": {
+    "type": "string",
+    "description": "Historical Customer Value"
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason"
+   },
+   "capacityImpact": {
+    "type": "integer",
+    "description": "Capacity Impact"
+   }
+  }
+ },
+ "GroupDiscountExceptionApprovalWorkflowView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Group Discount, Exception & Approval Workflow displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "standardGroupDiscount10": {
+    "type": "number",
+    "description": "Standard Group Discount: 10%"
+   },
+   "requested18": {
+    "type": "number",
+    "description": "Requested: 18%"
+   },
+   "approvalRequiredCommercialDirector": {
+    "type": "string",
+    "description": "Approval required — Commercial Director"
+   },
+   "discount": {
+    "type": "number",
+    "description": "Discount %"
+   },
+   "transactionValue": {
+    "type": "string",
+    "description": "Transaction value"
+   },
+   "margin": {
+    "type": "number",
+    "description": "Margin"
+   },
+   "customerType": {
+    "type": "string",
+    "description": "Customer type"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "salesUser": {
+    "type": "string",
+    "description": "Sales user"
+   },
+   "risk": {
+    "type": "string",
+    "description": "Risk"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "opportunity": {
+    "type": "string",
+    "description": "Opportunity"
+   },
+   "quote": {
+    "type": "string",
+    "description": "Quote"
+   },
+   "standardPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Standard Price"
+   },
+   "proposedPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Proposed Price"
+   },
+   "marginImpact": {
+    "type": "number",
+    "description": "Margin Impact"
+   },
+   "historicalCustomerValue": {
+    "type": "string",
+    "description": "Historical Customer Value"
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason"
+   },
+   "capacityImpact": {
+    "type": "integer",
+    "description": "Capacity Impact"
+   }
+  }
+ },
+ "GroupEnquiryOpportunityCaptureView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Group Enquiry & Opportunity Capture displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "website": {
+    "type": "string",
+    "description": "Website"
+   },
+   "phone": {
+    "type": "string",
+    "description": "Phone"
+   },
+   "email": {
+    "type": "string",
+    "description": "Email"
+   },
+   "walkIn": {
+    "type": "string",
+    "description": "Walk-in"
+   },
+   "salesTeam": {
+    "type": "string",
+    "description": "Sales Team"
+   },
+   "crm": {
+    "type": "string",
+    "description": "CRM"
+   },
+   "referral": {
+    "type": "string",
+    "description": "Referral"
+   },
+   "campaign": {
+    "type": "string",
+    "description": "Campaign"
+   },
+   "existingCustomer": {
+    "type": "string",
+    "description": "Existing Customer"
+   },
+   "manualEntry": {
+    "type": "string",
+    "description": "Manual Entry"
+   },
+   "enquiryId": {
+    "type": "string",
+    "description": "Enquiry ID"
+   },
+   "customerOrganization": {
+    "type": "string",
+    "description": "Customer/Organization"
+   },
+   "contact": {
+    "type": "string",
+    "description": "Contact"
+   },
+   "groupType": {
+    "type": "string",
+    "description": "Group Type"
+   },
+   "requestedVenue": {
+    "type": "string",
+    "description": "Requested Venue"
+   },
+   "requestedEvent": {
+    "type": "string",
+    "description": "Requested Event"
+   },
+   "requestedExperience": {
+    "type": "string",
+    "description": "Requested Experience"
+   },
+   "preferredDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Preferred Date"
+   },
+   "alternativeDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Alternative Date"
+   },
+   "preferredTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Preferred Time"
+   },
+   "estimatedGuests": {
+    "type": "string",
+    "description": "Estimated Guests"
+   },
+   "adults": {
+    "type": "string",
+    "description": "Adults"
+   },
+   "children": {
+    "type": "string",
+    "description": "Children"
+   },
+   "students": {
+    "type": "string",
+    "description": "Students"
+   },
+   "staffTeachers": {
+    "type": "string",
+    "description": "Staff/Teachers"
+   },
+   "specialRequirements": {
+    "type": "string",
+    "description": "Special Requirements"
+   },
+   "budget": {
+    "type": "string",
+    "description": "Budget"
+   },
+   "notes": {
+    "type": "string",
+    "description": "Notes"
+   },
+   "salesOwner": {
+    "type": "string",
+    "description": "Sales Owner"
+   },
+   "priority": {
+    "type": "string",
+    "description": "Priority"
+   },
+   "expectedValue": {
+    "type": "string",
+    "description": "Expected Value"
+   },
+   "probability": {
+    "type": "string",
+    "description": "Probability"
+   },
+   "expectedCloseDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expected Close Date"
+   },
+   "leadSource": {
+    "type": "string",
+    "description": "Lead Source"
+   },
+   "nextAction": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Next Action"
+   }
+  }
+ },
+ "GroupPackageExperienceBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Group Package & Experience Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "admissionTickets": {
+    "type": "string",
+    "description": "Admission Tickets"
+   },
+   "groupTicket": {
+    "type": "string",
+    "description": "Group Ticket"
+   },
+   "guidedTour": {
+    "type": "string",
+    "description": "Guided Tour"
+   },
+   "reservedSeating": {
+    "type": "string",
+    "description": "Reserved Seating"
+   },
+   "fB": {
+    "type": "string",
+    "description": "F&B"
+   },
+   "mealVoucher": {
+    "type": "string",
+    "description": "Meal Voucher"
+   },
+   "merchandise": {
+    "type": "string",
+    "description": "Merchandise"
+   },
+   "transportation": {
+    "type": "string",
+    "description": "Transportation"
+   },
+   "parking": {
+    "type": "string",
+    "description": "Parking"
+   },
+   "workshop": {
+    "type": "string",
+    "description": "Workshop"
+   },
+   "educationProgram": {
+    "type": "string",
+    "description": "Education Program"
+   },
+   "meetingRoom": {
+    "type": "string",
+    "description": "Meeting Room"
+   },
+   "vipExperience": {
+    "type": "string",
+    "description": "VIP Experience"
+   },
+   "addOns": {
+    "type": "string",
+    "description": "Add-ons"
+   },
+   "rentalResources": {
+    "type": "string",
+    "description": "Rental Resources"
+   },
+   "educationalWorkshop": {
+    "type": "string",
+    "description": "Educational Workshop"
+   },
+   "schoolPackage": {
+    "type": "string",
+    "description": "School Package"
+   },
+   "corporatePackage": {
+    "type": "string",
+    "description": "Corporate Package"
+   },
+   "birthdayPackage": {
+    "type": "string",
+    "description": "Birthday Package"
+   },
+   "vipGroupPackage": {
+    "type": "string",
+    "description": "VIP Group Package"
+   },
+   "conferencePackage": {
+    "type": "string",
+    "description": "Conference Package"
+   }
+  }
+ },
+ "GroupPackageExperienceBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Group Package & Experience Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "admissionTickets": {
+    "type": "string",
+    "description": "Admission Tickets"
+   },
+   "groupTicket": {
+    "type": "string",
+    "description": "Group Ticket"
+   },
+   "guidedTour": {
+    "type": "string",
+    "description": "Guided Tour"
+   },
+   "reservedSeating": {
+    "type": "string",
+    "description": "Reserved Seating"
+   },
+   "fB": {
+    "type": "string",
+    "description": "F&B"
+   },
+   "mealVoucher": {
+    "type": "string",
+    "description": "Meal Voucher"
+   },
+   "merchandise": {
+    "type": "string",
+    "description": "Merchandise"
+   },
+   "transportation": {
+    "type": "string",
+    "description": "Transportation"
+   },
+   "parking": {
+    "type": "string",
+    "description": "Parking"
+   },
+   "workshop": {
+    "type": "string",
+    "description": "Workshop"
+   },
+   "educationProgram": {
+    "type": "string",
+    "description": "Education Program"
+   },
+   "meetingRoom": {
+    "type": "string",
+    "description": "Meeting Room"
+   },
+   "vipExperience": {
+    "type": "string",
+    "description": "VIP Experience"
+   },
+   "addOns": {
+    "type": "string",
+    "description": "Add-ons"
+   },
+   "rentalResources": {
+    "type": "string",
+    "description": "Rental Resources"
+   },
+   "educationalWorkshop": {
+    "type": "string",
+    "description": "Educational Workshop"
+   },
+   "standardPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Standard Price"
+   },
+   "groupRate": {
+    "type": "number",
+    "description": "Group Rate"
+   },
+   "discount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount"
+   },
+   "complimentaryQuantity": {
+    "type": "integer",
+    "description": "Complimentary Quantity"
+   },
+   "addOnPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Add-on Price"
+   },
+   "tax": {
+    "type": "string",
+    "description": "Tax"
+   },
+   "fees": {
+    "type": "integer",
+    "description": "Fees"
+   },
+   "packageTotal": {
+    "type": "string",
+    "description": "Package Total"
+   },
+   "pricePerGuest": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price Per Guest"
+   },
+   "schoolPackage": {
+    "type": "string",
+    "description": "School Package"
+   },
+   "corporatePackage": {
+    "type": "string",
+    "description": "Corporate Package"
+   },
+   "birthdayPackage": {
+    "type": "string",
+    "description": "Birthday Package"
+   },
+   "vipGroupPackage": {
+    "type": "string",
+    "description": "VIP Group Package"
+   },
+   "conferencePackage": {
+    "type": "string",
+    "description": "Conference Package"
+   }
+  }
+ },
+ "GroupQuotationBuilderProposalGenerationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is orders.cart at 3%, so this is not an update to anything the package stores today and no new table has been decided",
+  "description": "**What Group Quotation Builder & Proposal Generation submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.\n\n**The pack defines this as a record**, under *For each line* - one of only 13 drafted writes that does. That is the client writing a row rather than a screen, and it is where the table conversation should start.",
+  "properties": {
+   "quoteNumber": {
+    "type": "string",
+    "description": "Quote Number"
+   },
+   "opportunity": {
+    "type": "string",
+    "description": "Opportunity"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "contact": {
+    "type": "string",
+    "description": "Contact"
+   },
+   "quoteDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Quote Date"
+   },
+   "validUntil": {
+    "type": "string",
+    "description": "Valid Until"
+   },
+   "visitDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Visit Date"
+   },
+   "guestCount": {
+    "type": "integer",
+    "description": "Guest Count"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "salesOwner": {
+    "type": "string",
+    "description": "Sales Owner"
+   },
+   "productService": {
+    "type": "string",
+    "description": "Product/Service"
+   },
+   "description": {
+    "type": "string",
+    "description": "Description"
+   },
+   "quantity": {
+    "type": "integer",
+    "description": "Quantity"
+   },
+   "standardRate": {
+    "type": "number",
+    "description": "Standard Rate"
+   },
+   "groupRate": {
+    "type": "number",
+    "description": "Group Rate"
+   },
+   "discount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount"
+   },
+   "tax": {
+    "type": "string",
+    "description": "Tax"
+   },
+   "fee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fee"
+   },
+   "total": {
+    "type": "integer",
+    "description": "Total"
+   },
+   "quoteValidity": {
+    "type": "string",
+    "description": "Quote validity"
+   },
+   "depositRequirement": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Deposit requirement"
+   },
+   "paymentSchedule": {
+    "type": "string",
+    "description": "Payment schedule"
+   },
+   "cancellationPolicy": {
+    "type": "string",
+    "description": "Cancellation policy"
+   },
+   "amendmentConditions": {
+    "type": "string",
+    "description": "Amendment conditions"
+   },
+   "guestCountDeadline": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Guest-count deadline"
+   },
+   "operationalTerms": {
+    "type": "string",
+    "description": "Operational terms"
+   },
+   "email": {
+    "type": "string",
+    "description": "Email"
+   },
+   "pdf": {
+    "type": "string",
+    "description": "PDF"
+   },
+   "customerPortal": {
+    "type": "string",
+    "description": "Customer portal"
+   },
+   "secureDigitalLink": {
+    "type": "string",
+    "description": "Secure digital link"
+   }
+  },
+  "x-ticvai-record-definition": "For each line"
+ },
+ "GroupQuotationBuilderProposalGenerationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Group Quotation Builder & Proposal Generation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "quoteNumber": {
+    "type": "string",
+    "description": "Quote Number"
+   },
+   "opportunity": {
+    "type": "string",
+    "description": "Opportunity"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "contact": {
+    "type": "string",
+    "description": "Contact"
+   },
+   "quoteDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Quote Date"
+   },
+   "validUntil": {
+    "type": "string",
+    "description": "Valid Until"
+   },
+   "visitDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Visit Date"
+   },
+   "guestCount": {
+    "type": "integer",
+    "description": "Guest Count"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "salesOwner": {
+    "type": "string",
+    "description": "Sales Owner"
+   },
+   "productService": {
+    "type": "string",
+    "description": "Product/Service"
+   },
+   "description": {
+    "type": "string",
+    "description": "Description"
+   },
+   "quantity": {
+    "type": "integer",
+    "description": "Quantity"
+   },
+   "standardRate": {
+    "type": "number",
+    "description": "Standard Rate"
+   },
+   "groupRate": {
+    "type": "number",
+    "description": "Group Rate"
+   },
+   "discount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount"
+   },
+   "tax": {
+    "type": "string",
+    "description": "Tax"
+   },
+   "fee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fee"
+   },
+   "total": {
+    "type": "integer",
+    "description": "Total"
+   },
+   "quoteValidity": {
+    "type": "string",
+    "description": "Quote validity"
+   },
+   "depositRequirement": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Deposit requirement"
+   },
+   "paymentSchedule": {
+    "type": "string",
+    "description": "Payment schedule"
+   },
+   "cancellationPolicy": {
+    "type": "string",
+    "description": "Cancellation policy"
+   },
+   "amendmentConditions": {
+    "type": "string",
+    "description": "Amendment conditions"
+   },
+   "guestCountDeadline": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Guest-count deadline"
+   },
+   "operationalTerms": {
+    "type": "string",
+    "description": "Operational terms"
+   },
+   "email": {
+    "type": "string",
+    "description": "Email"
+   },
+   "pdf": {
+    "type": "string",
+    "description": "PDF"
+   },
+   "customerPortal": {
+    "type": "string",
+    "description": "Customer portal"
+   },
+   "secureDigitalLink": {
+    "type": "string",
+    "description": "Secure digital link"
+   }
+  }
+ },
+ "GroupRequirementsAvailabilityCapacityPlannerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Group Requirements, Availability & Capacity Planner displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "eventAttraction": {
+    "type": "string",
+    "description": "Event/Attraction"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "alternativeDates": {
+    "type": "string",
+    "description": "Alternative Dates"
+   },
+   "arrivalTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Arrival Time"
+   },
+   "departureTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Departure Time"
+   },
+   "groupSize": {
+    "type": "string",
+    "description": "Group Size"
+   },
+   "guestCategories": {
+    "type": "string",
+    "description": "Guest Categories"
+   },
+   "accessibilityRequirements": {
+    "type": "string",
+    "description": "Accessibility Requirements"
+   },
+   "seatingRequirement": {
+    "type": "string",
+    "description": "Seating Requirement"
+   },
+   "resources": {
+    "type": "string",
+    "description": "Resources"
+   },
+   "guides": {
+    "type": "string",
+    "description": "Guides"
+   },
+   "catering": {
+    "type": "string",
+    "description": "Catering"
+   },
+   "transportation": {
+    "type": "string",
+    "description": "Transportation"
+   },
+   "addOns": {
+    "type": "string",
+    "description": "Add-ons"
+   },
+   "eventCapacity": {
+    "type": "integer",
+    "description": "Event Capacity"
+   },
+   "availableCapacity": {
+    "type": "integer",
+    "description": "Available Capacity"
+   },
+   "existingGroups": {
+    "type": "integer",
+    "description": "Existing Groups"
+   },
+   "publicSales": {
+    "type": "integer",
+    "description": "Public Sales"
+   },
+   "operationalHolds": {
+    "type": "integer",
+    "description": "Operational Holds"
+   },
+   "resourceAvailability": {
+    "type": "string",
+    "description": "Resource Availability"
+   },
+   "timeslotAvailability": {
+    "type": "string",
+    "description": "Timeslot Availability"
+   },
+   "proposal": {
+    "type": "string",
+    "description": "proposal"
+   },
+   "rooms": {
+    "type": "string",
+    "description": "Rooms"
+   },
+   "equipment": {
+    "type": "string",
+    "description": "Equipment"
+   },
+   "vehicles": {
+    "type": "string",
+    "description": "Vehicles"
+   },
+   "meetingSpaces": {
+    "type": "string",
+    "description": "Meeting spaces"
+   },
+   "cateringCapacity": {
+    "type": "integer",
+    "description": "Catering capacity"
+   }
+  }
+ },
+ "GroupSalesCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Group Sales Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "newEnquiries": {
+    "type": "integer",
+    "description": "New Enquiries"
+   },
+   "quotationsOutstanding": {
+    "type": "string",
+    "description": "Quotations Outstanding"
+   },
+   "quotesAwaitingApproval": {
+    "type": "string",
+    "description": "Quotes Awaiting Approval"
+   },
+   "confirmedGroups": {
+    "type": "integer",
+    "description": "Confirmed Groups"
+   },
+   "expectedGuests": {
+    "type": "integer",
+    "description": "Expected Guests"
+   },
+   "pipelineValue": {
+    "type": "string",
+    "description": "Pipeline Value"
+   },
+   "confirmedRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Confirmed Revenue"
+   },
+   "conversionRate": {
+    "type": "number",
+    "description": "Conversion Rate"
+   },
+   "averageGroupValue": {
+    "type": "number",
+    "description": "Average Group Value"
+   },
+   "expiringQuotes": {
+    "type": "integer",
+    "description": "Expiring Quotes"
+   },
+   "salesTargetAchievement": {
+    "type": "string",
+    "description": "Sales Target Achievement"
+   },
+   "enquiryId": {
+    "type": "string",
+    "description": "Enquiry ID"
+   },
+   "organizationCustomer": {
+    "type": "string",
+    "description": "Organization/Customer"
+   },
+   "groupType": {
+    "type": "string",
+    "description": "Group Type"
+   },
+   "eventAttraction": {
+    "type": "string",
+    "description": "Event/Attraction"
+   },
+   "visitDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Visit Date"
+   },
+   "guestCount": {
+    "type": "integer",
+    "description": "Guest Count"
+   },
+   "salesOwner": {
+    "type": "string",
+    "description": "Sales Owner"
+   },
+   "estimatedValue": {
+    "type": "string",
+    "description": "Estimated Value"
+   },
+   "quoteStatus": {
+    "type": "string",
+    "description": "Quote Status"
+   },
+   "probability": {
+    "type": "string",
+    "description": "Probability"
+   },
+   "nextAction": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Next Action"
+   },
+   "expectedCloseDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expected Close Date"
+   },
+   "followUpsDue": {
+    "type": "string",
+    "description": "Follow-ups due"
+   },
+   "quotesExpiring": {
+    "type": "string",
+    "description": "Quotes expiring"
+   },
+   "customerResponses": {
+    "type": "integer",
+    "description": "Customer responses"
+   },
+   "approvalRequests": {
+    "type": "integer",
+    "description": "Approval requests"
+   },
+   "depositsPending": {
+    "type": "integer",
+    "description": "Deposits pending"
+   }
+  }
+ },
+ "QuoteRevisionNegotiationVersionManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Quote Revision, Negotiation & Version Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "v2": {
+    "type": "string",
+    "description": "v2"
+   },
+   "v3Accepted": {
+    "type": "string",
+    "description": "v3 — Accepted"
+   },
+   "v1V2V3": {
+    "type": "string",
+    "description": "v1 v2 v3"
+   },
+   "nt": {
+    "type": "string",
+    "description": "nt"
+   },
+   "customerRequest": {
+    "type": "string",
+    "description": "Customer Request"
+   },
+   "internalResponse": {
+    "type": "string",
+    "description": "Internal Response"
+   },
+   "priceChange": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price Change"
+   },
+   "quantityChange": {
+    "type": "integer",
+    "description": "Quantity Change"
+   },
+   "packageChange": {
+    "type": "string",
+    "description": "Package Change"
+   },
+   "termsChange": {
+    "type": "string",
+    "description": "Terms Change"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "user": {
+    "type": "string",
+    "description": "User"
+   }
+  }
+ },
+ "QuoteToBookingConversionConfirmationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Quote-to-Booking Conversion & Confirmation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "quoteRemainsValid": {
+    "type": "string",
+    "description": "Quote remains valid"
+   },
+   "capacityRemainsAvailable": {
+    "type": "integer",
+    "description": "Capacity remains available"
+   },
+   "resourcesRemainAvailable": {
+    "type": "string",
+    "description": "Resources remain available"
+   },
+   "priceRemainsApproved": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price remains approved"
+   },
+   "approvalRemainsValid": {
+    "type": "string",
+    "description": "Approval remains valid"
+   },
+   "customerDetailsComplete": {
+    "type": "string",
+    "description": "Customer details complete"
+   },
+   "paymentDepositRuleConfigured": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Payment/deposit rule configured"
+   },
+   "guestCountValid": {
+    "type": "integer",
+    "description": "Guest count valid"
+   },
+   "groupBookingId": {
+    "type": "string",
+    "description": "Group Booking ID"
+   },
+   "ticvaiOrder": {
+    "type": "string",
+    "description": "TICVAI Order"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "visitEvent": {
+    "type": "string",
+    "description": "Visit/Event"
+   },
+   "products": {
+    "type": "string",
+    "description": "Products"
+   },
+   "quantity": {
+    "type": "integer",
+    "description": "Quantity"
+   },
+   "agreedPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Agreed Price"
+   },
+   "paymentSchedule": {
+    "type": "string",
+    "description": "Payment Schedule"
+   },
+   "operationalRequirements": {
+    "type": "string",
+    "description": "Operational Requirements"
+   },
+   "salesOwner": {
+    "type": "string",
+    "description": "Sales Owner"
+   },
+   "applicable": {
+    "type": "string",
+    "description": "applicable"
+   },
+   "bookingConfirmation": {
+    "type": "string",
+    "description": "Booking Confirmation"
+   },
+   "paymentInstructions": {
+    "type": "string",
+    "description": "Payment Instructions"
+   },
+   "depositRequest": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Deposit Request"
+   },
+   "customerPortalLinkWhereApplicable": {
+    "type": "string",
+    "description": "Customer Portal Link where applicable"
+   },
+   "nextSteps": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Next Steps"
+   }
+  }
+ }
+}

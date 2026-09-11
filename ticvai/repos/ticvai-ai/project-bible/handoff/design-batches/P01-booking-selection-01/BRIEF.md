@@ -6,11 +6,36 @@ Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
 online only
 
+## Who this is for
+
+**guest on web.** Everything below is how you know what is
+true. **None of it is the subject.** The subject is the person in front of the screen and the one
+thing they came to do.
+
 ## What to build
 
-**A working surface, not a drawing of one.** The reference is `sources/designs/TICVAI_POS_Terminal_client_approved.html` — a Claude Design
-build from these same sources, and the one the client responded to. Open it and match its depth:
-real state, seeded data, controls that do something. Do not describe it, read it.
+**A working surface, not a drawing of one.** Two references, both built from these same sources:
+
+- `sources/designs/TICVAI_Mobile.dc.html` — 54 screens in one navigable file, 133 animations,
+  a live seat map, a five-stage payment flow. **This is the bar for finish.**
+- `sources/designs/TICVAI_POS_Terminal_client_approved.html` — the client-approved POS build. **This is the bar for operator density.**
+
+`sources/designs/ticvai-motion-and-interaction.md` names every mechanism in them. Open them and
+match their depth. Do not describe them, read them.
+
+## The one rule that outranks the rest
+
+**Nothing in this bundle may appear as text a user can read.** Not an operation id, not a schema
+field name, not a permission key, not a screen id, not a file path, not a finding reference.
+
+A homepage that prints `getTenantAppStatus → listProducts` under its header, or labels a column
+`venueId · scopePath`, has published its own homework. It happened on `WEB-001`: four products on
+sale and not a single price on the page, because the build rendered what `listProducts` returns
+instead of what a guest wants — a photo, a name, a price, and a way to book.
+
+**The test: would the person this screen is for understand every word on it?** If a line would
+confuse them, it is spec leakage, not design. `bindsTo` tells you what data to invent
+convincingly. It is never a caption.
 
 ## What is in this folder
 

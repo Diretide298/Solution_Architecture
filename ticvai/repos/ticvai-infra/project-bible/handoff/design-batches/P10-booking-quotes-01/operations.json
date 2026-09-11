@@ -1,0 +1,647 @@
+{
+ "addCartLine": {
+  "method": "POST",
+  "path": "/carts/{cartId}/lines",
+  "contract": "orders",
+  "summary": "Add something",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AddCartLineRequest",
+  "responds": "Cart"
+ },
+ "allocateBlockedSeats": {
+  "method": "POST",
+  "path": "/seat-blocks/{blockId}/allocate",
+  "contract": "seating",
+  "summary": "Issue seats from a block to a group",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatHold"
+ },
+ "analysePromotionConflicts": {
+  "method": "GET",
+  "path": "/promotions/{promotionId}/conflicts",
+  "contract": "promotions",
+  "summary": "Analyse stacking against live promotions",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ConflictAnalysis"
+ },
+ "applyManualDiscount": {
+  "method": "POST",
+  "path": "/orders/{orderId}/discounts",
+  "contract": "orders",
+  "summary": "Apply a discount a cashier chose",
+  "permission": "ORDER_DISCOUNT",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ManualDiscountRequest",
+  "responds": "Order"
+ },
+ "checkoutCart": {
+  "method": "POST",
+  "path": "/carts/{cartId}/checkout",
+  "contract": "orders",
+  "summary": "Turn the cart into an order",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Order"
+ },
+ "createOrder": {
+  "method": "POST",
+  "path": "/orders",
+  "contract": "orders",
+  "summary": "Create an order",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateOrderRequest",
+  "responds": "Order"
+ },
+ "createPartnerQuote": {
+  "method": "POST",
+  "path": "/partner-quotes",
+  "contract": "subscription",
+  "summary": "Raise a quote",
+  "permission": "PARTNER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": "PartnerQuote",
+  "responds": "PartnerQuote"
+ },
+ "createRefund": {
+  "method": "POST",
+  "path": "/orders/{orderId}/refunds",
+  "contract": "orders",
+  "summary": "Refund an order, wholly or in part",
+  "permission": "ORDER_REFUND",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateRefundRequest",
+  "responds": null
+ },
+ "createSeatBlock": {
+  "method": "POST",
+  "path": "/seat-blocks",
+  "contract": "seating",
+  "summary": "Block seats from sale",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateSeatBlockRequest",
+  "responds": "SeatBlock"
+ },
+ "evaluatePromotions": {
+  "method": "POST",
+  "path": "/promotions/evaluate",
+  "contract": "promotions",
+  "summary": "Evaluate promotions against a cart",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "EvaluatePromotionsRequest",
+  "responds": "PromotionEvaluation"
+ },
+ "exchangeOrderLines": {
+  "method": "POST",
+  "path": "/orders/{orderId}/exchanges",
+  "contract": "orders",
+  "summary": "Exchange lines for different products or dates",
+  "permission": "ORDER_EXCHANGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ExchangeOrderRequest",
+  "responds": "OrderExchangeResult"
+ },
+ "getCart": {
+  "method": "GET",
+  "path": "/carts/{cartId}",
+  "contract": "orders",
+  "summary": "The cart, priced and checked, right now",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Cart"
+ },
+ "getCommissionStatement": {
+  "method": "GET",
+  "path": "/partner-agreements/{agreementId}/commission-statement",
+  "contract": "subscription",
+  "summary": "What the partner earned and what is owed",
+  "permission": "PARTNER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CommissionStatement"
+ },
+ "getOrder": {
+  "method": "GET",
+  "path": "/orders/{orderId}",
+  "contract": "orders",
+  "summary": "Read an order",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Order"
+ },
+ "getOrderStatement": {
+  "method": "GET",
+  "path": "/orders/{orderId}/statement",
+  "contract": "orders",
+  "summary": "Full financial history of an order",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "OrderStatement"
+ },
+ "getPromotion": {
+  "method": "GET",
+  "path": "/promotions/{promotionId}",
+  "contract": "promotions",
+  "summary": "Read a promotion",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Promotion"
+ },
+ "getPromotionUsage": {
+  "method": "GET",
+  "path": "/promotions/{promotionId}/usage",
+  "contract": "promotions",
+  "summary": "Redemption count and discount given",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PromotionUsage"
+ },
+ "holdOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/hold",
+  "contract": "orders",
+  "summary": "Park a sale and free the till",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Order"
+ },
+ "listOrderRefunds": {
+  "method": "GET",
+  "path": "/orders/{orderId}/refunds",
+  "contract": "orders",
+  "summary": "List refunds against an order",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Refund"
+ },
+ "listOrders": {
+  "method": "GET",
+  "path": "/orders",
+  "contract": "orders",
+  "summary": "List orders",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "shiftId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "createdFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "createdTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listPartnerAgreements": {
+  "method": "GET",
+  "path": "/partner-agreements",
+  "contract": "subscription",
+  "summary": "Commercial agreements with B2B partners",
+  "permission": "PARTNER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "expiringWithinDays",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PartnerAgreement"
+ },
+ "listPartnerQuotes": {
+  "method": "GET",
+  "path": "/partner-quotes",
+  "contract": "subscription",
+  "summary": "Quotes offered to this partner",
+  "permission": "PARTNER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PartnerQuote"
+ },
+ "listPromotions": {
+  "method": "GET",
+  "path": "/promotions",
+  "contract": "promotions",
+  "summary": "List promotions",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "activeAt",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listSeatBlocks": {
+  "method": "GET",
+  "path": "/seat-blocks",
+  "contract": "seating",
+  "summary": "List seat blocks",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "performanceId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "reason",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "modifyOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/modify",
+  "contract": "orders",
+  "summary": "Add or remove lines on an existing order",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ModifyOrderRequest",
+  "responds": "OrderModificationResult"
+ },
+ "relinquishSeatBlock": {
+  "method": "DELETE",
+  "path": "/seat-blocks/{blockId}",
+  "contract": "seating",
+  "summary": "Release a block back to sale",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "removeCartLine": {
+  "method": "DELETE",
+  "path": "/carts/{cartId}/lines/{lineId}",
+  "contract": "orders",
+  "summary": "Take something out",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Cart"
+ },
+ "reprintOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/reprints",
+  "contract": "orders",
+  "summary": "Reprint or resend tickets",
+  "permission": "ORDER_REPRINT",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "rescheduleOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/reschedule",
+  "contract": "orders",
+  "summary": "Move an order to another performance",
+  "permission": "ORDER_RESCHEDULE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "OrderExchangeResult"
+ },
+ "resumeOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/resume",
+  "contract": "orders",
+  "summary": "Bring a parked sale back to a till",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "OrderResumeResult"
+ },
+ "updateCartLine": {
+  "method": "PATCH",
+  "path": "/carts/{cartId}/lines/{lineId}",
+  "contract": "orders",
+  "summary": "Change a quantity",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Cart"
+ },
+ "voidOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/voids",
+  "contract": "orders",
+  "summary": "Void an order",
+  "permission": "ORDER_VOID",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Order"
+ }
+}

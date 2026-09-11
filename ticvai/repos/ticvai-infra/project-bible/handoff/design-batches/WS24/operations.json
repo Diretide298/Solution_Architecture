@@ -1,0 +1,168 @@
+{
+ "listBusinessEventNotification": {
+  "method": "GET",
+  "path": "/business-event-notification",
+  "contract": "marketing-crm",
+  "summary": "Business Event & Notification Trigger Mapping",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BusinessEventNotificationTriggerMappingView"
+ },
+ "listCommunicationService": {
+  "method": "GET",
+  "path": "/communication-service",
+  "contract": "marketing-crm",
+  "summary": "Communication Service Command Center",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CommunicationServiceCommandCenterView"
+ },
+ "listConsentPreferenceCommunication": {
+  "method": "GET",
+  "path": "/consent-preference-communication",
+  "contract": "marketing-crm",
+  "summary": "Consent, Preference & Communication Policy Enforcement",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ConsentPreferenceCommunicationPolicyEnforcementView"
+ },
+ "listDeliveryCommunicationPlatform": {
+  "method": "GET",
+  "path": "/delivery-communication-platform",
+  "contract": "marketing-crm",
+  "summary": "AI Delivery Optimization & Communication Platform Diagnostics",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiDeliveryOptimizationCommunicationPlatformDiagnostiView"
+ },
+ "listDeliveryQueueFailure": {
+  "method": "GET",
+  "path": "/delivery-queue-failure",
+  "contract": "marketing-crm",
+  "summary": "Delivery Queue, Failure & Retry Management",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "DeliveryQueueFailureRetryManagementView"
+ },
+ "listProviderHealthUsage": {
+  "method": "GET",
+  "path": "/provider-health-usage",
+  "contract": "marketing-crm",
+  "summary": "Provider Health, Usage & Cost Monitoring",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "provider",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "brand",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "module",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "country",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "messageType",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProviderHealthUsageCostMonitoringView"
+ },
+ "listRoutingPriorityThrottling": {
+  "method": "GET",
+  "path": "/routing-priority-throttling",
+  "contract": "marketing-crm",
+  "summary": "Routing, Priority, Throttling & Fallback Rules",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "RoutingPriorityThrottlingFallbackRulesView"
+ },
+ "listSystemTransactionalTemplate": {
+  "method": "GET",
+  "path": "/system-transactional-template",
+  "contract": "marketing-crm",
+  "summary": "System Transactional Template Registry",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SystemTransactionalTemplateRegistryView"
+ },
+ "setChannelProvider": {
+  "method": "PUT",
+  "path": "/channel-provider",
+  "contract": "marketing-crm",
+  "summary": "Channel & Provider Configuration",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "ChannelProviderConfigurationInput",
+  "responds": "ChannelProviderConfigurationView"
+ },
+ "setSenderIdentityDomain": {
+  "method": "PUT",
+  "path": "/sender-identity-domain",
+  "contract": "marketing-crm",
+  "summary": "Sender Identity, Domain & Brand Configuration",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "SenderIdentityDomainBrandConfigurationInput",
+  "responds": "SenderIdentityDomainBrandConfigurationView"
+ }
+}

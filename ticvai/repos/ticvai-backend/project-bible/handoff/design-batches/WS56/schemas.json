@@ -1,0 +1,1163 @@
+{
+ "AiWorkflowIntelligenceAutonomousGovernanceCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over approvals state, assembled at read time from tables that already exist",
+  "description": "**What AI Workflow Intelligence & Autonomous Governance Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "rules": {
+    "type": "string",
+    "description": "Rules"
+   },
+   "workflows": {
+    "type": "string",
+    "description": "Workflows"
+   },
+   "approvals": {
+    "type": "string",
+    "description": "Approvals"
+   },
+   "executionHistory": {
+    "type": "string",
+    "description": "Execution History"
+   },
+   "sla": {
+    "type": "string",
+    "description": "SLA"
+   },
+   "exceptions": {
+    "type": "string",
+    "description": "Exceptions"
+   },
+   "automation": {
+    "type": "string",
+    "description": "Automation"
+   },
+   "processPerformance": {
+    "type": "string",
+    "description": "Process Performance"
+   },
+   "approverBehavior": {
+    "type": "string",
+    "description": "Approver Behavior"
+   },
+   "moduleActivity": {
+    "type": "string",
+    "description": "Module Activity"
+   },
+   "businessOutcomes": {
+    "type": "string",
+    "description": "Business Outcomes"
+   },
+   "clarificationExecute": {
+    "type": "string",
+    "description": "Clarification → Execute"
+   },
+   "aiIdentifiesExcessiveRework": {
+    "type": "string",
+    "description": "AI identifies excessive rework"
+   },
+   "by34Hours": {
+    "type": "string",
+    "description": "by 3.4 hours"
+   },
+   "aiModel": {
+    "type": "string",
+    "description": "AI Model"
+   },
+   "aiService": {
+    "type": "string",
+    "description": "AI Service"
+   },
+   "useCase": {
+    "type": "string",
+    "description": "Use Case"
+   },
+   "autonomyLevel": {
+    "type": "string",
+    "description": "Autonomy Level"
+   },
+   "decisionScope": {
+    "type": "string",
+    "description": "Decision Scope"
+   },
+   "confidenceThreshold": {
+    "type": "integer",
+    "description": "Confidence Threshold"
+   },
+   "humanApprovalRequirement": {
+    "type": "string",
+    "description": "Human Approval Requirement"
+   },
+   "executionVolume": {
+    "type": "integer",
+    "description": "Execution Volume"
+   },
+   "exceptionRate": {
+    "type": "number",
+    "description": "Exception Rate"
+   },
+   "lastReview": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last Review"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "humanSystemDecisionFinalAction": {
+    "type": "string",
+    "description": "Human/System Decision → Final Action"
+   },
+   "crossModuleOrchestrationMonitorMultiModuleExecution": {
+    "type": "string",
+    "description": "Cross-Module Orchestration Monitor Multi-module execution"
+   },
+   "area13CompleteArchitecture": {
+    "type": "string",
+    "description": "Area 13 — Complete Architecture"
+   },
+   "employeeApp": {
+    "type": "string",
+    "description": "Employee App"
+   }
+  }
+ },
+ "AutomationExecutionAutonomousActionMonitorInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Automation Execution & Autonomous Action Monitor submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "triggerT24Hours": {
+    "type": "string",
+    "description": "Trigger: T−24 hours"
+   },
+   "participantsEvaluated842": {
+    "type": "string",
+    "description": "Participants evaluated: 842"
+   },
+   "incomplete118": {
+    "type": "string",
+    "description": "Incomplete: 118"
+   },
+   "messagesTriggered118": {
+    "type": "string",
+    "description": "Messages triggered: 118"
+   },
+   "successful116": {
+    "type": "string",
+    "description": "Successful: 116"
+   },
+   "failed2": {
+    "type": "integer",
+    "description": "Failed: 2"
+   },
+   "inspectRule": {
+    "type": "string",
+    "description": "Inspect Rule"
+   },
+   "inspectExecution": {
+    "type": "string",
+    "description": "Inspect Execution"
+   }
+  }
+ },
+ "AutomationExecutionAutonomousActionMonitorView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over approvals state, assembled at read time from tables that already exist",
+  "description": "**What Automation Execution & Autonomous Action Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "automatedActionsToday": {
+    "type": "string",
+    "description": "Automated Actions Today"
+   },
+   "successful": {
+    "type": "string",
+    "description": "Successful"
+   },
+   "failed": {
+    "type": "integer",
+    "description": "Failed"
+   },
+   "humanConfirmationRequired": {
+    "type": "boolean",
+    "description": "Human Confirmation Required"
+   },
+   "reversed": {
+    "type": "string",
+    "description": "Reversed"
+   },
+   "suspended": {
+    "type": "string",
+    "description": "Suspended"
+   },
+   "estimatedManualActionsAvoided": {
+    "type": "string",
+    "description": "Estimated Manual Actions Avoided"
+   },
+   "estimatedTimeSaved": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Estimated Time Saved"
+   },
+   "automation": {
+    "type": "string",
+    "description": "Automation"
+   },
+   "businessObject": {
+    "type": "string",
+    "description": "Business Object"
+   },
+   "rule": {
+    "type": "string",
+    "description": "Rule"
+   },
+   "action": {
+    "type": "string",
+    "description": "Action"
+   },
+   "result": {
+    "type": "string",
+    "description": "Result"
+   },
+   "confidenceWhereAiAssisted": {
+    "type": "string",
+    "description": "Confidence where AI-assisted"
+   },
+   "executionTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Execution Time"
+   },
+   "status": {
+    "type": "integer",
+    "description": "Status"
+   },
+   "triggerT24Hours": {
+    "type": "string",
+    "description": "Trigger: T−24 hours"
+   },
+   "participantsEvaluated842": {
+    "type": "string",
+    "description": "Participants evaluated: 842"
+   },
+   "incomplete118": {
+    "type": "string",
+    "description": "Incomplete: 118"
+   },
+   "messagesTriggered118": {
+    "type": "string",
+    "description": "Messages triggered: 118"
+   },
+   "successful116": {
+    "type": "string",
+    "description": "Successful: 116"
+   },
+   "failed2": {
+    "type": "integer",
+    "description": "Failed: 2"
+   },
+   "inspectRule": {
+    "type": "string",
+    "description": "Inspect Rule"
+   },
+   "inspectExecution": {
+    "type": "string",
+    "description": "Inspect Execution"
+   }
+  }
+ },
+ "CrossModuleOrchestrationMonitorView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over approvals state, assembled at read time from tables that already exist",
+  "description": "**What Cross-Module Orchestration Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "bookingConfirmed": {
+    "type": "string",
+    "description": "Booking confirmed ✓"
+   },
+   "reserve420Tickets": {
+    "type": "string",
+    "description": "Reserve 420 tickets ✓"
+   },
+   "reserve4Guides": {
+    "type": "string",
+    "description": "Reserve 4 guides ✓"
+   },
+   "reserve420Meals": {
+    "type": "string",
+    "description": "Reserve 420 meals ✓"
+   },
+   "service": {
+    "type": "string",
+    "description": "Service"
+   },
+   "action": {
+    "type": "string",
+    "description": "Action"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status"
+   },
+   "started": {
+    "type": "string",
+    "description": "Started"
+   },
+   "completed": {
+    "type": "string",
+    "description": "Completed"
+   },
+   "duration": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Duration"
+   },
+   "inputOutput": {
+    "type": "string",
+    "description": "Input/Output"
+   },
+   "waits": {
+    "type": "string",
+    "description": "Waits"
+   },
+   "retries": {
+    "type": "integer",
+    "description": "Retries"
+   },
+   "rollsBack": {
+    "type": "string",
+    "description": "Rolls back"
+   },
+   "continuesPartially": {
+    "type": "string",
+    "description": "Continues partially"
+   },
+   "requiresHumanIntervention": {
+    "type": "string",
+    "description": "Requires human intervention"
+   },
+   "aCommonCorrelationWorkflowId": {
+    "type": "string",
+    "description": "a common correlation/workflow ID"
+   }
+  }
+ },
+ "ProcessOptimizationAutomationOpportunityCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over approvals state, assembled at read time from tables that already exist",
+  "description": "**What Process Optimization & Automation Opportunity Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "repetitiveApproval": {
+    "type": "string",
+    "description": "Repetitive Approval"
+   },
+   "unnecessaryApproval": {
+    "type": "string",
+    "description": "Unnecessary Approval"
+   },
+   "highManualWork": {
+    "type": "string",
+    "description": "High Manual Work"
+   },
+   "excessiveRework": {
+    "type": "string",
+    "description": "Excessive Rework"
+   },
+   "longWaitingTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Long Waiting Time"
+   },
+   "highFailureRate": {
+    "type": "number",
+    "description": "High Failure Rate"
+   },
+   "lowRiskManualAction": {
+    "type": "string",
+    "description": "Low-Risk Manual Action"
+   },
+   "processBottleneck": {
+    "type": "string",
+    "description": "Process Bottleneck"
+   },
+   "process": {
+    "type": "string",
+    "description": "Process"
+   },
+   "module": {
+    "type": "string",
+    "description": "Module"
+   },
+   "monthlyVolume": {
+    "type": "integer",
+    "description": "Monthly Volume"
+   },
+   "currentSteps": {
+    "type": "integer",
+    "description": "Current Steps"
+   },
+   "averageDuration": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Average Duration"
+   },
+   "manualSteps": {
+    "type": "integer",
+    "description": "Manual Steps"
+   },
+   "approvalRate": {
+    "type": "number",
+    "description": "Approval Rate"
+   },
+   "exceptionRate": {
+    "type": "number",
+    "description": "Exception Rate"
+   },
+   "estimatedOpportunity": {
+    "type": "string",
+    "description": "Estimated Opportunity"
+   },
+   "monthlyRequests4820": {
+    "type": "string",
+    "description": "Monthly Requests: 4,820"
+   },
+   "approvalRate992": {
+    "type": "number",
+    "description": "Approval Rate: 99.2%"
+   },
+   "averageApprovalDelay18Hours": {
+    "type": "number",
+    "description": "Average Approval Delay: 1.8 hours"
+   }
+  }
+ },
+ "SlaEscalationBottleneckMonitorView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over approvals state, assembled at read time from tables that already exist",
+  "description": "**What SLA, Escalation & Bottleneck Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "withinSla": {
+    "type": "string",
+    "description": "Within SLA"
+   },
+   "atRisk": {
+    "type": "string",
+    "description": "At Risk"
+   },
+   "breached": {
+    "type": "string",
+    "description": "Breached"
+   },
+   "escalated": {
+    "type": "string",
+    "description": "Escalated"
+   },
+   "averageProcessingTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Average Processing Time"
+   },
+   "averageApprovalTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Average Approval Time"
+   },
+   "longestWaitingStep": {
+    "type": "string",
+    "description": "Longest Waiting Step"
+   },
+   "workflow": {
+    "type": "string",
+    "description": "Workflow"
+   },
+   "instance": {
+    "type": "string",
+    "description": "Instance"
+   },
+   "currentStep": {
+    "type": "string",
+    "description": "Current Step"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "started": {
+    "type": "string",
+    "description": "Started"
+   },
+   "target": {
+    "type": "string",
+    "description": "Target"
+   },
+   "timeRemaining": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time Remaining"
+   },
+   "risk": {
+    "type": "string",
+    "description": "Risk"
+   },
+   "escalationLevel": {
+    "type": "string",
+    "description": "Escalation Level"
+   },
+   "averageWorkflow112Hours": {
+    "type": "number",
+    "description": "Average workflow: 11.2 hours"
+   },
+   "departmentHead42Min": {
+    "type": "string",
+    "description": "Department Head — 42 min"
+   },
+   "finance21Hrs": {
+    "type": "string",
+    "description": "Finance — 2.1 hrs"
+   },
+   "cfo78Hrs": {
+    "type": "string",
+    "description": "CFO — 7.8 hrs"
+   },
+   "execution18Min": {
+    "type": "string",
+    "description": "Execution — 18 min"
+   },
+   "primaryBottleneckCfoApproval": {
+    "type": "string",
+    "description": "Primary Bottleneck: CFO Approval"
+   },
+   "firstReminder": {
+    "type": "string",
+    "description": "First Reminder"
+   },
+   "secondReminder": {
+    "type": "string",
+    "description": "Second Reminder"
+   },
+   "managerEscalation": {
+    "type": "string",
+    "description": "Manager Escalation"
+   },
+   "executiveEscalation": {
+    "type": "string",
+    "description": "Executive Escalation"
+   },
+   "finalOutcome": {
+    "type": "string",
+    "description": "Final Outcome"
+   },
+   "reassign": {
+    "type": "string",
+    "description": "Reassign"
+   },
+   "changePriority": {
+    "type": "string",
+    "description": "Change Priority"
+   }
+  }
+ },
+ "UnifiedApprovalInboxDecisionWorkspaceInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Unified Approval Inbox & Decision Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "discountException18": {
+    "type": "number",
+    "description": "Discount Exception — 18%"
+   },
+   "purchaseOrderAed72000": {
+    "type": "string",
+    "description": "Purchase Order — AED 72,000"
+   },
+   "overtimeRequest18Hours": {
+    "type": "string",
+    "description": "Overtime Request — 18 Hours"
+   },
+   "whatIsBeingRequested": {
+    "type": "string",
+    "description": "What is being requested?"
+   },
+   "whyIsApprovalRequired": {
+    "type": "string",
+    "description": "Why is approval required?"
+   },
+   "documentsCommentsHistory": {
+    "type": "string",
+    "description": "Documents, comments, history"
+   }
+  }
+ },
+ "UnifiedApprovalInboxDecisionWorkspaceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over approvals state, assembled at read time from tables that already exist",
+  "description": "**What Unified Approval Inbox & Decision Workspace displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "approvalId": {
+    "type": "string",
+    "description": "Approval ID"
+   },
+   "requestType": {
+    "type": "string",
+    "description": "Request Type"
+   },
+   "sourceModule": {
+    "type": "string",
+    "description": "Source Module"
+   },
+   "requester": {
+    "type": "string",
+    "description": "Requester"
+   },
+   "amountImpact": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Amount/Impact"
+   },
+   "priority": {
+    "type": "string",
+    "description": "Priority"
+   },
+   "submitted": {
+    "type": "string",
+    "description": "Submitted"
+   },
+   "slaRemaining": {
+    "type": "string",
+    "description": "SLA Remaining"
+   },
+   "approvalLevel": {
+    "type": "string",
+    "description": "Approval Level"
+   },
+   "status": {
+    "type": "integer",
+    "description": "Status"
+   },
+   "discountException18": {
+    "type": "number",
+    "description": "Discount Exception — 18%"
+   },
+   "purchaseOrderAed72000": {
+    "type": "string",
+    "description": "Purchase Order — AED 72,000"
+   },
+   "overtimeRequest18Hours": {
+    "type": "string",
+    "description": "Overtime Request — 18 Hours"
+   },
+   "whatIsBeingRequested": {
+    "type": "string",
+    "description": "What is being requested?"
+   },
+   "whyIsApprovalRequired": {
+    "type": "string",
+    "description": "Why is approval required?"
+   },
+   "documentsCommentsHistory": {
+    "type": "string",
+    "description": "Documents, comments, history"
+   }
+  }
+ },
+ "WorkflowAnalyticsProcessPerformanceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over approvals state, assembled at read time from tables that already exist",
+  "description": "**What Workflow Analytics & Process Performance displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "workflowVolume": {
+    "type": "integer",
+    "description": "Workflow Volume"
+   },
+   "completionRate": {
+    "type": "number",
+    "description": "Completion Rate"
+   },
+   "failureRate": {
+    "type": "number",
+    "description": "Failure Rate"
+   },
+   "averageCompletionTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Average Completion Time"
+   },
+   "approvalTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Approval Time"
+   },
+   "automationRate": {
+    "type": "number",
+    "description": "Automation Rate"
+   },
+   "escalationRate": {
+    "type": "number",
+    "description": "Escalation Rate"
+   },
+   "rejectionRate": {
+    "type": "number",
+    "description": "Rejection Rate"
+   },
+   "reworkRate": {
+    "type": "number",
+    "description": "Rework Rate"
+   },
+   "slaCompliance": {
+    "type": "string",
+    "description": "SLA Compliance"
+   },
+   "averageApprovalTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Average Approval Time"
+   },
+   "approvalRate": {
+    "type": "number",
+    "description": "Approval Rate"
+   },
+   "requestChangesRate": {
+    "type": "number",
+    "description": "Request Changes Rate"
+   },
+   "delegationRate": {
+    "type": "number",
+    "description": "Delegation Rate"
+   },
+   "workflowV14VsV15": {
+    "type": "string",
+    "description": "Workflow v1.4 vs v1.5"
+   },
+   "v1448Hours": {
+    "type": "string",
+    "description": "v1.4 — 4.8 hours"
+   },
+   "v1529Hours": {
+    "type": "string",
+    "description": "v1.5 — 2.9 hours"
+   },
+   "manualStepsRemoved": {
+    "type": "string",
+    "description": "Manual Steps Removed"
+   },
+   "processingTimeSaved": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Processing Time Saved"
+   },
+   "workloadReduced": {
+    "type": "string",
+    "description": "Workload Reduced"
+   },
+   "costSavingWhereMeasurable": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Cost Saving where measurable"
+   }
+  }
+ },
+ "WorkflowExceptionFailureRecoveryCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over approvals state, assembled at read time from tables that already exist",
+  "description": "**What Workflow Exception, Failure & Recovery Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "businessRuleFailure": {
+    "type": "string",
+    "description": "Business Rule Failure"
+   },
+   "missingData": {
+    "type": "string",
+    "description": "Missing Data"
+   },
+   "missingApprover": {
+    "type": "string",
+    "description": "Missing Approver"
+   },
+   "permissionFailure": {
+    "type": "string",
+    "description": "Permission Failure"
+   },
+   "integrationFailure": {
+    "type": "string",
+    "description": "Integration Failure"
+   },
+   "timeout": {
+    "type": "string",
+    "description": "Timeout"
+   },
+   "actionFailure": {
+    "type": "string",
+    "description": "Action Failure"
+   },
+   "invalidState": {
+    "type": "string",
+    "description": "Invalid State"
+   },
+   "serviceUnavailable": {
+    "type": "string",
+    "description": "Service Unavailable"
+   },
+   "configurationError": {
+    "type": "string",
+    "description": "Configuration Error"
+   },
+   "exceptionId": {
+    "type": "string",
+    "description": "Exception ID"
+   },
+   "workflow": {
+    "type": "string",
+    "description": "Workflow"
+   },
+   "instance": {
+    "type": "string",
+    "description": "Instance"
+   },
+   "module": {
+    "type": "string",
+    "description": "Module"
+   },
+   "failedStep": {
+    "type": "integer",
+    "description": "Failed Step"
+   },
+   "errorType": {
+    "type": "string",
+    "description": "Error Type"
+   },
+   "time": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time"
+   },
+   "businessImpact": {
+    "type": "string",
+    "description": "Business Impact"
+   },
+   "priority": {
+    "type": "string",
+    "description": "Priority"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "reassign": {
+    "type": "string",
+    "description": "Reassign"
+   },
+   "correctData": {
+    "type": "string",
+    "description": "Correct Data"
+   },
+   "useApprovedAlternative": {
+    "type": "string",
+    "description": "Use Approved Alternative"
+   },
+   "disappear": {
+    "type": "string",
+    "description": "disappear"
+   }
+  }
+ },
+ "WorkflowInstanceMonitorProcessTimelineView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over approvals state, assembled at read time from tables that already exist",
+  "description": "**What Workflow Instance Monitor & Process Timeline displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "workflowInstance": {
+    "type": "string",
+    "description": "Workflow Instance"
+   },
+   "workflowName": {
+    "type": "string",
+    "description": "Workflow Name"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version"
+   },
+   "sourceModule": {
+    "type": "string",
+    "description": "Source Module"
+   },
+   "businessObject": {
+    "type": "string",
+    "description": "Business Object"
+   },
+   "initiatedBy": {
+    "type": "string",
+    "description": "Initiated By"
+   },
+   "startTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Start Time"
+   },
+   "currentStatus": {
+    "type": "integer",
+    "description": "Current Status"
+   },
+   "currentStep": {
+    "type": "string",
+    "description": "Current Step"
+   },
+   "sla": {
+    "type": "string",
+    "description": "SLA"
+   },
+   "step": {
+    "type": "string",
+    "description": "Step"
+   },
+   "type": {
+    "type": "string",
+    "description": "Type"
+   },
+   "started": {
+    "type": "string",
+    "description": "Started"
+   },
+   "completed": {
+    "type": "string",
+    "description": "Completed"
+   },
+   "assignedTo": {
+    "type": "string",
+    "description": "Assigned To"
+   },
+   "input": {
+    "type": "string",
+    "description": "Input"
+   },
+   "output": {
+    "type": "string",
+    "description": "Output"
+   },
+   "decision": {
+    "type": "string",
+    "description": "Decision"
+   },
+   "duration": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Duration"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status"
+   },
+   "ruleEvaluations": {
+    "type": "integer",
+    "description": "Rule evaluations"
+   },
+   "assignments": {
+    "type": "integer",
+    "description": "Assignments"
+   },
+   "approvals": {
+    "type": "integer",
+    "description": "Approvals"
+   },
+   "rejections": {
+    "type": "integer",
+    "description": "Rejections"
+   },
+   "escalations": {
+    "type": "integer",
+    "description": "Escalations"
+   },
+   "notifications": {
+    "type": "integer",
+    "description": "Notifications"
+   },
+   "apiCalls": {
+    "type": "integer",
+    "description": "API calls"
+   },
+   "systemActions": {
+    "type": "integer",
+    "description": "System actions"
+   },
+   "errors": {
+    "type": "integer",
+    "description": "Errors"
+   },
+   "reassign": {
+    "type": "string",
+    "description": "Reassign"
+   },
+   "skipStepWhereExplicitlyAllowed": {
+    "type": "boolean",
+    "description": "Skip Step where explicitly allowed"
+   }
+  }
+ },
+ "WorkflowOperationsCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over approvals state, assembled at read time from tables that already exist",
+  "description": "**What Workflow Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "workflowsRunning": {
+    "type": "string",
+    "description": "Workflows Running"
+   },
+   "startedToday": {
+    "type": "string",
+    "description": "Started Today"
+   },
+   "completedToday": {
+    "type": "string",
+    "description": "Completed Today"
+   },
+   "pendingApprovals": {
+    "type": "integer",
+    "description": "Pending Approvals"
+   },
+   "waitingTasks": {
+    "type": "integer",
+    "description": "Waiting Tasks"
+   },
+   "slaAtRisk": {
+    "type": "string",
+    "description": "SLA At Risk"
+   },
+   "slaBreached": {
+    "type": "string",
+    "description": "SLA Breached"
+   },
+   "failedWorkflows": {
+    "type": "integer",
+    "description": "Failed Workflows"
+   },
+   "escalated": {
+    "type": "string",
+    "description": "Escalated"
+   },
+   "automatedExecutions": {
+    "type": "integer",
+    "description": "Automated Executions"
+   },
+   "averageCompletionTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Average Completion Time"
+   },
+   "automationSuccessRate": {
+    "type": "number",
+    "description": "Automation Success Rate"
+   },
+   "workflowInstanceId": {
+    "type": "string",
+    "description": "Workflow Instance ID"
+   },
+   "workflow": {
+    "type": "string",
+    "description": "Workflow"
+   },
+   "module": {
+    "type": "string",
+    "description": "Module"
+   },
+   "businessObject": {
+    "type": "string",
+    "description": "Business Object"
+   },
+   "initiatedBy": {
+    "type": "string",
+    "description": "Initiated By"
+   },
+   "started": {
+    "type": "string",
+    "description": "Started"
+   },
+   "currentStep": {
+    "type": "string",
+    "description": "Current Step"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "priority": {
+    "type": "string",
+    "description": "Priority"
+   },
+   "sla": {
+    "type": "string",
+    "description": "SLA"
+   },
+   "status": {
+    "type": "integer",
+    "description": "Status"
+   },
+   "ticketing": {
+    "type": "string",
+    "description": "Ticketing"
+   },
+   "pricing": {
+    "type": "string",
+    "description": "Pricing"
+   },
+   "finance": {
+    "type": "string",
+    "description": "Finance"
+   },
+   "procurement": {
+    "type": "string",
+    "description": "Procurement"
+   },
+   "crm": {
+    "type": "string",
+    "description": "CRM"
+   },
+   "resourceManagement": {
+    "type": "string",
+    "description": "Resource Management"
+   },
+   "fB": {
+    "type": "string",
+    "description": "F&B"
+   },
+   "retail": {
+    "type": "string",
+    "description": "Retail"
+   },
+   "groupSales": {
+    "type": "integer",
+    "description": "Group Sales"
+   },
+   "customerService": {
+    "type": "string",
+    "description": "Customer Service"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "wallet": {
+    "type": "string",
+    "description": "Wallet"
+   },
+   "waiver": {
+    "type": "string",
+    "description": "Waiver"
+   },
+   "subscriptionLicensing": {
+    "type": "string",
+    "description": "Subscription & Licensing"
+   }
+  }
+ }
+}

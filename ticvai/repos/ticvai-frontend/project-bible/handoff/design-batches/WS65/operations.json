@@ -1,0 +1,184 @@
+{
+ "createUpgradeCredentialRegeneration": {
+  "method": "POST",
+  "path": "/upgrade-credential-regeneration",
+  "contract": "orders",
+  "summary": "Upgrade Execution, Credential Regeneration & Channel Controls",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "UpgradeExecutionCredentialRegenerationChannelControlInput",
+  "responds": "UpgradeExecutionCredentialRegenerationChannelControlView"
+ },
+ "listBulkGroupAssisted": {
+  "method": "GET",
+  "path": "/bulk-group-assisted",
+  "contract": "orders",
+  "summary": "Bulk, Group & Assisted Upgrade Operations",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BulkGroupAssistedUpgradeOperationsView"
+ },
+ "listPersonTypeProduct": {
+  "method": "GET",
+  "path": "/person-type-product",
+  "contract": "orders",
+  "summary": "Person-Type, Product & Entitlement Conversion Rules",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PersonTypeProductEntitlementConversionRulesView"
+ },
+ "listUpgradeConversion": {
+  "method": "GET",
+  "path": "/upgrade-conversion",
+  "contract": "orders",
+  "summary": "Upgrade & Conversion Command Center",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerSegment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ruleStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "effectiveDate",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "UpgradeConversionCommandCenterView"
+ },
+ "listUpgradeEligibilityQualification": {
+  "method": "GET",
+  "path": "/upgrade-eligibility-qualification",
+  "contract": "orders",
+  "summary": "Upgrade Eligibility & Qualification Rules",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "UpgradeEligibilityQualificationRulesView"
+ },
+ "listUpgradeException": {
+  "method": "GET",
+  "path": "/upgrade-exception",
+  "contract": "orders",
+  "summary": "Upgrade History, Exception Management & Audit Explorer",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "ticket",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "date",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "exception",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "UpgradeHistoryExceptionManagementAuditExplorerView"
+ },
+ "listUpgradeFinancialTreatment": {
+  "method": "GET",
+  "path": "/upgrade-financial-treatment",
+  "contract": "orders",
+  "summary": "Upgrade Financial Treatment & Price Difference Rules",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "UpgradeFinancialTreatmentPriceDifferenceRulesView"
+ },
+ "listUpgradeTimingUsage": {
+  "method": "GET",
+  "path": "/upgrade-timing-usage",
+  "contract": "orders",
+  "summary": "Upgrade Timing, Usage & Ticket Status Rules",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "UpgradeTimingUsageTicketStatusRulesView"
+ },
+ "setProRataResidual": {
+  "method": "PUT",
+  "path": "/pro-rata-residual",
+  "contract": "orders",
+  "summary": "Pro-Rata, Residual Value & Entitlement Credit Configuration",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "ProRataResidualValueEntitlementCreditConfigurationInput",
+  "responds": "ProRataResidualValueEntitlementCreditConfigurationView"
+ },
+ "setUpgradeConversionPath": {
+  "method": "PUT",
+  "path": "/upgrade-conversion-path",
+  "contract": "orders",
+  "summary": "Upgrade & Conversion Path Builder",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "UpgradeConversionPathBuilderInput",
+  "responds": "UpgradeConversionPathBuilderView"
+ }
+}

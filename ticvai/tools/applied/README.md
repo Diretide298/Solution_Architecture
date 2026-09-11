@@ -57,3 +57,15 @@ Added `matchGuest`, `mergeGuests` and the duplicate-match components to EMP-055 
 ## `wire-pack-boards.py`
 
 Wired the fourteen September pack board groups, collapsed ANL-011, and gave the 140 unreachable pack screens a hub. Applied.
+
+## `wire-pack-boards-11-september.py`
+
+Wired the 34 boards of the four books in `Latest Docs.zip` — Digital Asset Management, Game & Ride, Rental Management, Subscription Licensing & AI Self-Service — the same hub-and-spoke way, and gave all 340 screens a route `derive-board-flows.py` could read. **A sibling rather than a re-run:** the original groups by `(platform, board)`, which would have merged Game & Ride and Rental board for board on P08, and its collapse path would have promoted a new hub now that `ANL-011` is gone. Applied 11 September.
+
+## `apply-rental-staff-app.py`
+
+Put Rental Management boards 6–8 — checkout, active rentals, returns — on P06 as well as P08, decided 11 September: "they can go to staff app and also in venue management". Thirty screens, `EMP-071`–`EMP-100`, one hub per board off `EMP-003`. Each names its P08 twin in `source.sameAs` instead of `source.pack`, because three tools would do the wrong thing with two claimants of one pack entry. **Unlike the others here it is meant to be re-run**: it re-copies layout, states and gaps from the twin, so after `generate-screens-from-pack.py` touches Rentals, run it again or the handheld drifts from the desk. Offline states are `TODO` on purpose. Applied 11 September.
+
+## `apply-subscription-placement.py`
+
+Placed the Subscription book by who works each screen, decided 11 September after reading all 100. **Moved** boards 7 (AI Setup) and 8 (Go-Live) and screen 6.10 from P09 to P08, `ADM-428`–`ADM-448` → `BO-594`–`BO-614`, because they are the new customer's own admin inside their tenant; the old ids are retired and `F213`/`F214` were rewritten in place. **Created P17 TICVAI Sign-up**, a public face of TICVAI Control, with `sameAs` copies of the 24 screens a prospect sees in boards 2, 4 and 5 — P09 keeps all of them for the operator-led sale. Also rewrote the sibling list and note on P09, P10, P11 and P14. **Re-run it after `generate-screens-from-pack.py` touches Tenants & Licensing**, or P17 drifts from its twins. Applied 11 September.

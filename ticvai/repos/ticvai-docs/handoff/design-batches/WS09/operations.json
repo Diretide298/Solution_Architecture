@@ -1,0 +1,173 @@
+{
+ "approveManualOverrideSupervisor": {
+  "method": "PUT",
+  "path": "/manual-override-supervisor",
+  "contract": "access",
+  "summary": "Manual Override & Supervisor Approval",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "ManualOverrideSupervisorApprovalInput",
+  "responds": "ManualOverrideSupervisorApprovalView"
+ },
+ "listCredentialDisableBlacklist": {
+  "method": "GET",
+  "path": "/credential-disable-blacklist",
+  "contract": "access",
+  "summary": "Credential Disable, Blacklist & Whitelist Operations",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CredentialDisableBlacklistWhitelistOperationsView"
+ },
+ "listLiveAccess": {
+  "method": "GET",
+  "path": "/live-access",
+  "contract": "access",
+  "summary": "Live Access Operations Command Center",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "LiveAccessOperationsCommandCenterView"
+ },
+ "listLiveGateMode": {
+  "method": "GET",
+  "path": "/live-gate-mode",
+  "contract": "access",
+  "summary": "Live Gate Mode & Lane Control",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "LiveGateModeLaneControlView"
+ },
+ "listPodiumConsole": {
+  "method": "GET",
+  "path": "/podium-console",
+  "contract": "access",
+  "summary": "Podium Operations Console",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PodiumOperationsConsoleView"
+ },
+ "listQueueThroughputLane": {
+  "method": "GET",
+  "path": "/queue-throughput-lane",
+  "contract": "access",
+  "summary": "Queue, Throughput & Lane Optimization",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "QueueThroughputLaneOptimizationView"
+ },
+ "listShiftHandoverSummary": {
+  "method": "GET",
+  "path": "/shift-handover-summary",
+  "contract": "access",
+  "summary": "Operations Audit, Shift Handover & Control Summary",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "OperationsAuditShiftHandoverControlSummaryView"
+ },
+ "listTicketCredentialInvestigation": {
+  "method": "GET",
+  "path": "/ticket-credential-investigation",
+  "contract": "access",
+  "summary": "Ticket & Credential Investigation Console",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "ticketId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "qr",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "barcode",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "rfid",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "nfc",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "virtualCredentialId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "orderNumber",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "membership",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "TicketCredentialInvestigationConsoleView"
+ },
+ "listValidationExceptionReason": {
+  "method": "GET",
+  "path": "/validation-exception-reason",
+  "contract": "access",
+  "summary": "Validation Exception & Reason Code Manager",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ValidationExceptionReasonCodeManagerView"
+ },
+ "setOperationalIncidentException": {
+  "method": "PUT",
+  "path": "/operational-incident-exception",
+  "contract": "access",
+  "summary": "Operational Incident & Exception Workspace",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "OperationalIncidentExceptionWorkspaceInput",
+  "responds": "OperationalIncidentExceptionWorkspaceView"
+ }
+}

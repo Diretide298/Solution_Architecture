@@ -1,0 +1,509 @@
+{
+ "adjustLoyaltyPoints": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/loyalty/adjust",
+  "contract": "marketing-crm",
+  "summary": "Manually adjust points",
+  "permission": "LEDGER_POST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "LoyaltyPosition"
+ },
+ "claimCustomDomain": {
+  "method": "POST",
+  "path": "/tenant-domains",
+  "contract": "white-label",
+  "summary": "Claim a domain and get a verification token",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CustomDomain"
+ },
+ "diffConfigVersion": {
+  "method": "GET",
+  "path": "/tenant-config/versions/{version}/diff",
+  "contract": "white-label",
+  "summary": "Compare a version against the working draft",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "against",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ConfigDiff"
+ },
+ "getConsentHistory": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/consents/history",
+  "contract": "marketing-crm",
+  "summary": "Full consent history",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "getGuestConsents": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/consents",
+  "contract": "marketing-crm",
+  "summary": "Read a guest's consent state",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ConsentState"
+ },
+ "getGuestLoyalty": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/loyalty",
+  "contract": "marketing-crm",
+  "summary": "A guest's loyalty position",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "LoyaltyPosition"
+ },
+ "getGuestProfile": {
+  "method": "GET",
+  "path": "/guests/{subjectId}",
+  "contract": "marketing-crm",
+  "summary": "Read a guest profile",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestProfileDetail"
+ },
+ "getTenantAppStatus": {
+  "method": "GET",
+  "path": "/tenant-config/status",
+  "contract": "white-label",
+  "summary": "App status and recent changes",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "TenantAppStatus"
+ },
+ "getTenantConfig": {
+  "method": "GET",
+  "path": "/tenant-config",
+  "contract": "white-label",
+  "summary": "Full working configuration",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "version",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TenantConfig"
+ },
+ "getWishlist": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/wishlist",
+  "contract": "marketing-crm",
+  "summary": "Read a guest's saved items",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Wishlist"
+ },
+ "listConfigVersions": {
+  "method": "GET",
+  "path": "/tenant-config/versions",
+  "contract": "white-label",
+  "summary": "Version history",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listCustomDomains": {
+  "method": "GET",
+  "path": "/tenant-domains",
+  "contract": "white-label",
+  "summary": "The domains this tenant has claimed",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CustomDomain"
+ },
+ "listGuestDevices": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/devices",
+  "contract": "marketing-crm",
+  "summary": "A guest's registered devices",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestDevice"
+ },
+ "listPrincipals": {
+  "method": "GET",
+  "path": "/principals",
+  "contract": "identity",
+  "summary": "List principals",
+  "permission": "USER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "isActive",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listRoles": {
+  "method": "GET",
+  "path": "/roles",
+  "contract": "identity",
+  "summary": "List roles",
+  "permission": "ROLE_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "mergeGuestProfiles": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/merge",
+  "contract": "marketing-crm",
+  "summary": "Merge a duplicate profile into this one",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MergeResult"
+ },
+ "publishTenantConfig": {
+  "method": "POST",
+  "path": "/tenant-config/publish",
+  "contract": "white-label",
+  "summary": "Publish the working draft",
+  "permission": "TENANT_PUBLISH",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ConfigVersion"
+ },
+ "recordConsent": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/consents",
+  "contract": "marketing-crm",
+  "summary": "Record a consent decision",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RecordConsentRequest",
+  "responds": "ConsentState"
+ },
+ "relinquishCustomDomain": {
+  "method": "DELETE",
+  "path": "/tenant-domains/{domainId}",
+  "contract": "white-label",
+  "summary": "Give the domain up",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
+ "restoreConfigVersion": {
+  "method": "POST",
+  "path": "/tenant-config/versions/{version}/restore",
+  "contract": "white-label",
+  "summary": "Restore a previous version",
+  "permission": "TENANT_PUBLISH",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TenantConfig"
+ },
+ "searchGuests": {
+  "method": "GET",
+  "path": "/guests",
+  "contract": "marketing-crm",
+  "summary": "Search guest profiles",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "segmentId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "hasConsentFor",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "setLanguages": {
+  "method": "PUT",
+  "path": "/tenant-config/languages",
+  "contract": "white-label",
+  "summary": "Set enabled languages and default",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "LanguageConfig"
+ },
+ "setSeoMetadata": {
+  "method": "PUT",
+  "path": "/seo-metadata",
+  "contract": "marketing-crm",
+  "summary": "Titles, descriptions, canonicals and hreflang",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SeoMetadata",
+  "responds": "SeoMetadata"
+ },
+ "updateGuestProfile": {
+  "method": "PATCH",
+  "path": "/guests/{subjectId}",
+  "contract": "marketing-crm",
+  "summary": "Amend a guest profile",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestProfileDetail"
+ },
+ "validateTenantConfig": {
+  "method": "POST",
+  "path": "/tenant-config/validate",
+  "contract": "white-label",
+  "summary": "Validate the working draft",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ConfigValidationReport"
+ },
+ "verifyCustomDomain": {
+  "method": "POST",
+  "path": "/tenant-domains/{domainId}/verify",
+  "contract": "white-label",
+  "summary": "Check the record and issue the certificate",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CustomDomain"
+ }
+}

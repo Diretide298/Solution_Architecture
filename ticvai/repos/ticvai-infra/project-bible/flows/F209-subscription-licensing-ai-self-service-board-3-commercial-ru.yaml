@@ -1,0 +1,134 @@
+id: F209
+name: 'Subscription Licensing AI Self Service board 3: Commercial Rules Engine Overview'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Subscription Licensing AI Self Service board 3. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-389
+  entryPoints:
+  - Arrives at Commercial Rules Engine Overview
+steps:
+- step: 1
+  screen: ADM-389
+  action: Opens Commercial Rules Engine Overview
+  operations: []
+  outcome: Provide TICVAI administrators with the central configuration overview for all commercial and
+    licensing rules.
+- step: 2
+  screen: ADM-390
+  action: Works in VSI Model Builder
+  operations: []
+  outcome: Configure how TICVAI determines the operational size and complexity of a customer. VSI remains
+    important even where VSI does not determine customer pricing.
+- step: 3
+  screen: ADM-389
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-391
+  action: Works in VSI Scoring & Tier Threshold Configuration
+  operations: []
+  outcome: Translate actual customer characteristics into a standardized VSI score and recommended operational
+    tier.
+- step: 5
+  screen: ADM-389
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-392
+  action: Works in Subscription Tier Configuration
+  operations: []
+  outcome: Configure TICVAI's standard subscription tiers for customers using tier-based commercial models.
+- step: 7
+  screen: ADM-389
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-393
+  action: Works in Tier Included Allowances
+  operations: []
+  outcome: Configure the resources included within each standard subscription tier.
+- step: 9
+  screen: ADM-389
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-394
+  action: Works in Commercial & Licensing Model Configuration
+  operations: []
+  outcome: This is the major revised screen. Configure how TICVAI charges a customer independently from
+    how TICVAI technically licenses the customer. A. Commercial Charging Model
+- step: 11
+  screen: ADM-389
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-395
+  action: Works in Billable Unit, Minimum Guarantee & Enforcement Rules
+  operations: []
+  outcome: Define exactly what TICVAI counts commercially and what happens when contractual or technical
+    thresholds are reached.
+- step: 13
+  screen: ADM-389
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-396
+  action: Works in Overage Pricing & Capacity Packs
+  operations: []
+  outcome: Configure additional consumption pricing and purchasable capacity.
+- step: 15
+  screen: ADM-389
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-397
+  action: Works in Commercial Model & Rule Simulation
+  operations: []
+  outcome: Allow TICVAI to test commercial models before applying them. This screen now becomes more powerful
+    than the original Board 3 simulator.
+- step: 17
+  screen: ADM-389
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-398
+  action: Works in Rule Versioning, Approval & Publication
+  operations: []
+  outcome: Govern changes to all commercial, VSI, licensing, billable-unit and pricing rules.
+branches:
+- at: 1
+  condition: Nothing has been set up on Commercial Rules Engine Overview yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Subscription Licensing AI Self Service board 3 visited
+primaryContract: unknown
+contracts:
+- unknown

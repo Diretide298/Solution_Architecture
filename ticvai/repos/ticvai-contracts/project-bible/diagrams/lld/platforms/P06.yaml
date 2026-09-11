@@ -1,5 +1,5 @@
 id: LLD-P06
-title: P06 Venue Staff App — Operations — 66 screens
+title: P06 Venue Staff App — Operations — 96 screens
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 audience: staff
@@ -19,6 +19,8 @@ deployment:
   releaseCadence: fortnightly
 why: null
 modulesUsed:
+- module: resources
+  screens: 30
 - module: core
   screens: 18
 - module: fnb
@@ -65,9 +67,9 @@ servicesCalled:
 - service: ReportingService
   operationCalls: 2
 coverage:
-  screens: 66
+  screens: 96
   inAFlow: 43
-  drawn: 66
+  drawn: 96
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
@@ -193,6 +195,9 @@ screens:
   - EMP-068
   - EMP-069
   - EMP-070
+  - EMP-071
+  - EMP-081
+  - EMP-091
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-003
   inFlows:
@@ -2091,4 +2096,661 @@ screens:
   boardFrames:
   - Inventory Board 1.dc.html#inv-10
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-070
+  inFlows: null
+- screen: EMP-071
+  name: Rental Checkout Command Center
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-003
+  - EMP-072
+  - EMP-073
+  - EMP-074
+  - EMP-075
+  - EMP-076
+  - EMP-077
+  - EMP-078
+  - EMP-079
+  - EMP-080
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-071
+  inFlows: null
+- screen: EMP-072
+  name: Voucher Scan & Reservation Retrieval
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-071
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-072
+  inFlows: null
+- screen: EMP-073
+  name: Checkout Readiness Validation
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-071
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-073
+  inFlows: null
+- screen: EMP-074
+  name: Equipment Assignment Workspace
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-071
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-074
+  inFlows: null
+- screen: EMP-075
+  name: Equipment Scan & Validation
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-071
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-075
+  inFlows: null
+- screen: EMP-076
+  name: Pre-Rental Condition Inspection
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-071
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-076
+  inFlows: null
+- screen: EMP-077
+  name: Safety & Handover Checklist
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-071
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-077
+  inFlows: null
+- screen: EMP-078
+  name: Deposit & Financial Handover Validation
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-071
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-078
+  inFlows: null
+- screen: EMP-079
+  name: Group & Multi-Item Checkout
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-071
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-079
+  inFlows: null
+- screen: EMP-080
+  name: Checkout Confirmation & Rental Activation
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-071
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-080
+  inFlows: null
+- screen: EMP-081
+  name: Active Rental Operations Command Center
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-003
+  - EMP-082
+  - EMP-083
+  - EMP-084
+  - EMP-085
+  - EMP-086
+  - EMP-087
+  - EMP-088
+  - EMP-089
+  - EMP-090
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-081
+  inFlows: null
+- screen: EMP-082
+  name: Active Rental Detail & Live Timeline
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-081
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-082
+  inFlows: null
+- screen: EMP-083
+  name: Rental Extension Request
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-081
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-083
+  inFlows: null
+- screen: EMP-084
+  name: Extension Pricing & Confirmation
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-081
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-084
+  inFlows: null
+- screen: EMP-085
+  name: Equipment Swap / Replacement
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-081
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-085
+  inFlows: null
+- screen: EMP-086
+  name: Rental Incident & Operational Exception
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-081
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-086
+  inFlows: null
+- screen: EMP-087
+  name: Due Soon & Customer Notification Management
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-081
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-087
+  inFlows: null
+- screen: EMP-088
+  name: Overdue Rental Management
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-081
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-088
+  inFlows: null
+- screen: EMP-089
+  name: Active Group Rental Management
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-081
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-089
+  inFlows: null
+- screen: EMP-090
+  name: Active Rental Intelligence & Operational Alerts
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-081
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-090
+  inFlows: null
+- screen: EMP-091
+  name: Rental Return Command Center
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-003
+  - EMP-092
+  - EMP-093
+  - EMP-094
+  - EMP-095
+  - EMP-096
+  - EMP-097
+  - EMP-098
+  - EMP-099
+  - EMP-100
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-091
+  inFlows: null
+- screen: EMP-092
+  name: Return Scan & Rental Retrieval
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-091
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-092
+  inFlows: null
+- screen: EMP-093
+  name: Return Summary & Actual Return Time
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-091
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-093
+  inFlows: null
+- screen: EMP-094
+  name: Post-Rental Condition Inspection
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-091
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-094
+  inFlows: null
+- screen: EMP-095
+  name: Before vs After Condition Comparison
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-091
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-095
+  inFlows: null
+- screen: EMP-096
+  name: Damage Assessment & Charge Workflow
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-091
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-096
+  inFlows: null
+- screen: EMP-097
+  name: Partial Return & Missing Equipment
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-091
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-097
+  inFlows: null
+- screen: EMP-098
+  name: Late Fees, Damage Fees & Final Settlement
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-091
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-098
+  inFlows: null
+- screen: EMP-099
+  name: Deposit Release, Capture & Customer Confirmation
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-091
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-099
+  inFlows: null
+- screen: EMP-100
+  name: Return Completion & Equipment Disposition
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: comfortable
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - EMP-091
+  boardFrames: null
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-100
   inFlows: null

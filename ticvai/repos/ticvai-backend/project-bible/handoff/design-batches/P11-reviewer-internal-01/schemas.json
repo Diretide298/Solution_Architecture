@@ -1,0 +1,337 @@
+{
+ "AccreditationBadge": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.accreditation_badge",
+  "description": "**Drafted 4 September.** The credential an approved application produces. **Its lifetime is not the approval's** - a badge is revoked, lost or expires while the decision that authorised it still stands.",
+  "required": [
+   "id"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "holderName": {
+    "type": "string"
+   },
+   "zones": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Where this badge admits, which is the whole point of it."
+   },
+   "state": {
+    "type": "string",
+    "enum": [
+     "issued",
+     "collected",
+     "suspended",
+     "revoked",
+     "expired"
+    ]
+   },
+   "issuedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "revokedReason": {
+    "type": "string"
+   }
+  }
+ },
+ "ApprovalDecision": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.decision",
+  "required": [
+   "level",
+   "principalId",
+   "decision",
+   "decidedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "level": {
+    "type": "integer"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "displayName": {
+    "type": "string"
+   },
+   "isDelegate": {
+    "type": "boolean"
+   },
+   "delegatedFrom": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "decision": {
+    "type": "string",
+    "enum": [
+     "approve",
+     "reject"
+    ]
+   },
+   "comment": {
+    "type": "string",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "usedMfa": {
+    "type": "boolean"
+   },
+   "signatureRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "ApprovalKind": {
+  "type": "string",
+  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n",
+  "enum": [
+   "refund",
+   "priceOverride",
+   "discountOverride",
+   "complimentaryTicket",
+   "membershipCancellation",
+   "accessPermissionChange",
+   "configurationChange",
+   "aiRecommendation",
+   "shiftVariance",
+   "releasePromotion",
+   "requisition",
+   "stockWriteOff",
+   "journalEntry",
+   "periodReopen",
+   "tenantMigration"
+  ]
+ },
+ "ApprovalMode": {
+  "type": "string",
+  "description": "11.1.43–11.1.46. **Sequential** asks one at a time, **parallel** asks everyone at once, **consensus** needs all of them, **majority** needs more than half.\nParallel and consensus differ in when it completes: parallel completes on the first approval, consensus waits for all. Conflating them is how a four-eyes rule turns into a one-eye rule.\n",
+  "enum": [
+   "sequential",
+   "parallel",
+   "consensus",
+   "majority"
+  ]
+ },
+ "ApprovalRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.request",
+  "required": [
+   "id",
+   "kind",
+   "status",
+   "requestedByPrincipalId",
+   "requestedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/ApprovalKind"
+   },
+   "rerouteOnNoApprover": {
+    "type": "boolean",
+    "default": true,
+    "description": "BL-154. **An approver on leave is an approval that waits for them to come back.** Reroutes to the next in the chain rather than stalling — `workforce` already knows who is on leave, and an approval queue nobody is watching is the thing that stops a venue.\n"
+   },
+   "outOfOfficeDelegateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "allowEmailApproval": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Approving from an email link with no second factor is the weakest path in the system**, so it is off by default and available only below a configured value.\n"
+   },
+   "reopenedFrom": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Reopening a decided approval creates a new one that points back.** Editing a decision in place destroys the record of what was originally approved, which is the only thing an audit wants.\n"
+   },
+   "status": {
+    "$ref": "#/components/schemas/ApprovalStatus"
+   },
+   "subjectContract": {
+    "type": "string"
+   },
+   "subjectType": {
+    "type": "string"
+   },
+   "subjectId": {
+    "type": "string"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "summary": {
+    "type": "string"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "justification": {
+    "type": "string",
+    "nullable": true
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "matrixVersion": {
+    "type": "integer"
+   },
+   "mode": {
+    "$ref": "#/components/schemas/ApprovalMode"
+   },
+   "currentLevel": {
+    "type": "integer"
+   },
+   "totalLevels": {
+    "type": "integer"
+   },
+   "pendingApprovers": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "principalId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "displayName": {
+       "type": "string"
+      },
+      "isDelegate": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "decisions": {
+    "type": "array",
+    "description": "Every decision at every level, in order. **Immutable once the request completes** (11.1.56) — an approval is evidence, and amending one is a different fact.\n",
+    "items": {
+     "$ref": "#/components/schemas/ApprovalDecision"
+    }
+   },
+   "escalations": {
+    "type": "array",
+    "description": "11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver rather than replacing one**, so the original stays in the record.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "reason": {
+       "type": "string"
+      },
+      "fromLevel": {
+       "type": "integer"
+      },
+      "toLevel": {
+       "type": "integer"
+      },
+      "wasAutomatic": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "resubmittedFromId": {
+    "type": "string",
+    "nullable": true
+   },
+   "reopenedFromId": {
+    "type": "string",
+    "nullable": true
+   },
+   "slaDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "slaBreached": {
+    "type": "boolean"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "requestedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "ApprovalStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "pending",
+   "escalated",
+   "approved",
+   "rejected",
+   "withdrawn",
+   "expired",
+   "cancelled"
+  ]
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ }
+}

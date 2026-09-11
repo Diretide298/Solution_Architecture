@@ -1,0 +1,135 @@
+id: F199
+name: 'Rental Management board 3: Availability Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Rental Management board 3. **This route is read from the
+    screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-514
+  entryPoints:
+  - Arrives at Availability Command Center
+steps:
+- step: 1
+  screen: BO-514
+  action: Opens Availability Command Center
+  operations: []
+  outcome: Provide management and operators with a real-time overview of rental availability across all
+    locations.
+- step: 2
+  screen: BO-515
+  action: Works in Availability Rule Configuration
+  operations: []
+  outcome: Define the fundamental rules used by the availability engine for each rental product.
+- step: 3
+  screen: BO-514
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-516
+  action: Works in Operating Hours & Rental Windows
+  operations: []
+  outcome: Control when rental products can actually be booked and used. The source specifically requires
+    inventory allocation according to operating hours.
+- step: 5
+  screen: BO-514
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-517
+  action: Works in Timeslot & Duration Availability Setup
+  operations: []
+  outcome: Configure how rental availability is presented to customers. The source supports both fixed
+    and customer-defined rental periods.
+- step: 7
+  screen: BO-514
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-518
+  action: Works in Real-Time Availability Calendar
+  operations: []
+  outcome: Provide the operational calendar explicitly required by the source.
+- step: 9
+  screen: BO-514
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-519
+  action: Works in Resource / Equipment Calendar
+  operations: []
+  outcome: Provide asset-level availability for serialized inventory.
+- step: 11
+  screen: BO-514
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-520
+  action: Works in Blackout, Closure & Capacity Blocking
+  operations: []
+  outcome: Allow authorized users to deliberately remove inventory from sale. The original scope requires
+    seasonal availability, blackout dates and maintenance periods.
+- step: 13
+  screen: BO-514
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-521
+  action: Works in Overlap & Conflict Engine
+  operations: []
+  outcome: 'Provide transparency into one of the most important calculations in the rental system. The
+    original requirement explicitly states: Calculate overlapping rentals and prevent inventory conflicts.'
+- step: 15
+  screen: BO-514
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-522
+  action: Works in Inventory Holds, Buffers & Release Rules
+  operations: []
+  outcome: Control inventory that should temporarily or permanently be withheld from normal sales. The
+    source explicitly requires configurable inventory buffers.
+- step: 17
+  screen: BO-514
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-523
+  action: Works in Availability Intelligence & AI Forecasting
+  operations: []
+  outcome: Use AI to forecast demand and proactively optimize rental availability. The source recommends
+    AI-based utilization and demand forecasting.
+branches:
+- at: 1
+  condition: Nothing has been set up on Availability Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Rental Management board 3 visited
+primaryContract: unknown
+contracts:
+- unknown

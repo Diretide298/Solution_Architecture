@@ -1,0 +1,173 @@
+{
+ "listAudienceDiscoveryTargeting": {
+  "method": "GET",
+  "path": "/audience-discovery-targeting",
+  "contract": "promotions",
+  "summary": "AI Audience Discovery & Targeting Optimization",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiAudienceDiscoveryTargetingOptimizationView"
+ },
+ "listAudiencePreviewReach": {
+  "method": "GET",
+  "path": "/audience-preview-reach",
+  "contract": "promotions",
+  "summary": "Audience Preview, Reach & Eligibility Simulator",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AudiencePreviewReachEligibilitySimulatorView"
+ },
+ "listBehavioralTransactionTargeting": {
+  "method": "GET",
+  "path": "/behavioral-transaction-targeting",
+  "contract": "promotions",
+  "summary": "Behavioral & Transaction Targeting",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BehavioralTransactionTargetingView"
+ },
+ "listContextLocationChannel": {
+  "method": "GET",
+  "path": "/context-location-channel",
+  "contract": "promotions",
+  "summary": "Context, Location, Channel & Time Targeting",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ContextLocationChannelTimeTargetingView"
+ },
+ "listCrmCustomerSegment": {
+  "method": "GET",
+  "path": "/crm-customer-segment",
+  "contract": "promotions",
+  "summary": "CRM & Customer Segment Manager",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CrmCustomerSegmentManagerView"
+ },
+ "listMembershipLoyaltyGuest": {
+  "method": "GET",
+  "path": "/membership-loyalty-guest",
+  "contract": "promotions",
+  "summary": "Membership, Loyalty & Guest Eligibility",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MembershipLoyaltyGuestEligibilityView"
+ },
+ "listPartnerPaymentEligibility": {
+  "method": "GET",
+  "path": "/partner-payment-eligibility",
+  "contract": "promotions",
+  "summary": "Partner, B2B & Payment Eligibility",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PartnerB2bPaymentEligibilityView"
+ },
+ "listTargetingConflictFrequency": {
+  "method": "GET",
+  "path": "/targeting-conflict-frequency",
+  "contract": "promotions",
+  "summary": "Targeting Conflict, Frequency & Exclusion Controls",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "TargetingConflictFrequencyExclusionControlsView"
+ },
+ "listTargetingEligibility": {
+  "method": "GET",
+  "path": "/targeting-eligibility",
+  "contract": "promotions",
+  "summary": "Targeting & Eligibility Command Center",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "guestType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "crmSegment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "membership",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "loyalty",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "demographic",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "behavioral",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "transaction",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "geographic",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "TargetingEligibilityCommandCenterView"
+ },
+ "setEligibilityRule": {
+  "method": "PUT",
+  "path": "/eligibility-rule",
+  "contract": "promotions",
+  "summary": "Eligibility Rule Builder",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "EligibilityRuleBuilderInput",
+  "responds": "EligibilityRuleBuilderView"
+ }
+}

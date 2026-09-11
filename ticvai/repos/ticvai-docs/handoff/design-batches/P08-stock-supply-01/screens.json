@@ -1,0 +1,2902 @@
+[
+ {
+  "id": "BO-049",
+  "name": "Stock Levels",
+  "module": "Stock & Supply",
+  "requiresModule": "inventory",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/stock-levels",
+   "component": "apps/venue-management-web/src/routes/venue-operations/StockLevelsDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-007",
+    "BO-008",
+    "BO-009",
+    "BO-079",
+    "BO-080",
+    "BO-081",
+    "BO-082"
+   ],
+   "inferred": true,
+   "entryFrom": [
+    "BO-105"
+   ],
+   "transitions": [
+    {
+     "to": "BO-082",
+     "trigger": "The four orders are sourced from another store instead",
+     "provenance": "flow F35 step 6→7",
+     "operation": "createStockMovement"
+    },
+    {
+     "to": "BO-081",
+     "trigger": "Inventory Items",
+     "provenance": "flow F92 step 1→2"
+    },
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-007",
+     "trigger": "Product Directory",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "carries": [
+      "productId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Pricing Rules",
+     "carries": [
+      "priceListId"
+     ],
+     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-079",
+     "trigger": "Stock Count",
+     "carries": [
+      "countId"
+     ],
+     "provenance": "derived — BO-079 declares entryState.params countId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-080",
+     "trigger": "Stock Transfers",
+     "carries": [
+      "transferId"
+     ],
+     "provenance": "derived — BO-080 declares entryState.params transferId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-065",
+     "trigger": "The delivery arrives",
+     "provenance": "flow F35 step 1→2",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved 20 August against the client design board**, answering 2 board screen(s): F&B Stock & Operations Command Center; Outlet Stock & Ingredient Availability. **The id, flows and navigation are unchanged** — a board specifies a screen further; it does not replace it.",
+  "density": "compact",
+  "boardFrames": [
+   "FnB Board 5.dc.html#fnb-5a",
+   "FnB Board 5.dc.html#fnb-5b",
+   "Retail Board 4.dc.html#ret-4a",
+   "Retail Board 4.dc.html#ret-4h"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listStockLocations` reads the population and `getStockPositions` reads one of them — list, select, act",
+  "purpose": "Know what is on the shelf and what is on order.",
+  "gaps": [
+   {
+    "operation": "getStockValuation",
+    "why": "**1 declared operation reach no component on this screen**: getStockValuation. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every stock levels",
+       "bindsTo": "StockLocation",
+       "columns": [
+        "StockLocation.id",
+        "StockLocation.code",
+        "StockLocation.name",
+        "StockLocation.venueId",
+        "StockLocation.kind",
+        "StockLocation.parentLocationId",
+        "StockLocation.isActive"
+       ],
+       "operation": "listStockLocations",
+       "provenance": "contract inventory.yaml GET /stock-locations"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected stock levels",
+       "bindsTo": "StockPosition",
+       "columns": [
+        "StockPosition.itemId",
+        "StockPosition.itemName",
+        "StockPosition.sku",
+        "StockPosition.locationId",
+        "StockPosition.locationName",
+        "StockPosition.onHand",
+        "StockPosition.allocated",
+        "StockPosition.available",
+        "StockPosition.unit",
+        "StockPosition.value",
+        "StockPosition.lastCountedAt",
+        "StockPosition.lastMovementAt"
+       ],
+       "operation": "getStockPositions",
+       "provenance": "contract inventory.yaml GET /stock"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "setItemAvailability",
+       "provenance": "contract fnb.yaml PUT /menu-items/{itemId}/availability"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createStockTransfer",
+       "provenance": "contract inventory.yaml POST /stock-transfers"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createStockMovement",
+       "provenance": "contract inventory.yaml POST /stock-movements"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setItemAvailability",
+       "label": "Save item availability",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listStockLocations",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setItemAvailability",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The stock levels list.",
+   "error": "Could not load. Names which read failed and leaves the stock levels untouched.",
+   "emptyFirstRun": "No stock levels yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the stock levels are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getStockPositions",
+    "contract": "inventory",
+    "purpose": "Stock on hand by item and location",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getStockValuation",
+    "contract": "inventory",
+    "purpose": "Stock value by location and category",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setItemAvailability",
+    "contract": "fnb",
+    "purpose": "Mark an item available or eighty-sixed",
+    "trigger": "onAction",
+    "invalidates": [
+     "listStockLocations"
+    ]
+   },
+   {
+    "operationId": "createStockTransfer",
+    "contract": "inventory",
+    "purpose": "Send stock to another location",
+    "trigger": "onAction",
+    "invalidates": [
+     "listStockLocations"
+    ]
+   },
+   {
+    "operationId": "createStockMovement",
+    "contract": "inventory",
+    "purpose": "Record an issue, return or adjustment",
+    "trigger": "onAction",
+    "invalidates": [
+     "listStockLocations"
+    ]
+   },
+   {
+    "operationId": "listStockLocations",
+    "contract": "inventory",
+    "purpose": "List stock locations",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "itemId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "An item opened from the catalogue.",
+   "preloaded": [
+    "StockPosition.itemId",
+    "StockPosition.itemName",
+    "StockPosition.sku",
+    "StockPosition.locationId",
+    "StockPosition.locationName"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-049",
+   "source": "Claude Design Retail pack, 24 August",
+   "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-050",
+  "name": "Stock Position & Valuation",
+  "module": "Stock & Supply",
+  "requiresModule": "inventory",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/stock-count",
+   "component": "apps/venue-management-web/src/routes/venue-operations/StockCountDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-007",
+    "BO-008",
+    "BO-009"
+   ],
+   "inferred": true,
+   "entryFrom": [
+    "BO-105"
+   ],
+   "transitions": [
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-007",
+     "trigger": "Product Directory",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "carries": [
+      "productId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Pricing Rules",
+     "carries": [
+      "priceListId"
+     ],
+     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Named `Stock Count` and carrying `getStockPositions` and `getStockValuation`** — two screens with one name, while `BO-079 Stock Count` holds the actual counting operations. Renamed 20 August; the operations were right.",
+  "density": "compact",
+  "pattern": "statusTracker",
+  "patternReason": "`getStockPositions` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Count the shelf and account for the difference.",
+  "gaps": [
+   {
+    "operation": "getStockValuation",
+    "why": "**1 declared operation reach no component on this screen**: getStockValuation. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected stock position valuation",
+       "bindsTo": "StockPosition",
+       "columns": [
+        "StockPosition.itemId",
+        "StockPosition.itemName",
+        "StockPosition.sku",
+        "StockPosition.locationId",
+        "StockPosition.locationName",
+        "StockPosition.onHand",
+        "StockPosition.allocated",
+        "StockPosition.available",
+        "StockPosition.unit",
+        "StockPosition.value",
+        "StockPosition.lastCountedAt",
+        "StockPosition.lastMovementAt"
+       ],
+       "operation": "getStockPositions",
+       "provenance": "contract inventory.yaml GET /stock"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The stock position valuation list.",
+   "error": "Could not load. Names which read failed and leaves the stock position valuation untouched.",
+   "emptyFirstRun": "No stock position valuation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the stock position valuation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getStockPositions",
+    "contract": "inventory",
+    "purpose": "Stock on hand by item and location",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getStockValuation",
+    "contract": "inventory",
+    "purpose": "Stock value by location and category",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-050"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-052",
+  "name": "Goods Receipt",
+  "module": "Stock & Supply",
+  "requiresModule": "inventory",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/goods-receipt",
+   "component": "apps/venue-management-web/src/routes/venue-operations/GoodsReceiptDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-007",
+    "BO-008",
+    "BO-009",
+    "BO-049"
+   ],
+   "inferred": true,
+   "fromFlows": true,
+   "entryFrom": [
+    "BO-080",
+    "BO-105"
+   ],
+   "transitions": [
+    {
+     "to": "BO-049",
+     "trigger": "The website has already sold four of the damaged units",
+     "provenance": "flow F35 step 4→5"
+    },
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-007",
+     "trigger": "Product Directory",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "carries": [
+      "productId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Pricing Rules",
+     "carries": [
+      "priceListId"
+     ],
+     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-005",
+     "trigger": "The technician resumes",
+     "provenance": "flow F15 step 4→5",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Pulled to Wave 2 (CF-101). Requisitions are Wave 1 and receipt was Wave 3 — **the end of the chain arriving two waves after the start.** **Cross-platform navigation removed 24 August**: EMP-005. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.",
+  "density": "compact",
+  "boardFrames": [
+   "Retail Board 4.dc.html#ret-4e"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listPurchaseOrders` reads the population and `getPurchaseOrder` reads one of them — list, select, act",
+  "purpose": "Book in what actually arrived.",
+  "gaps": [
+   {
+    "operation": "listGoodsReceipts",
+    "why": "**2 declared operations reach no component on this screen**: listGoodsReceipts, getStockTransfer. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every goods receipt",
+       "bindsTo": "PurchaseOrder",
+       "columns": [
+        "PurchaseOrder.id",
+        "PurchaseOrder.purchaseOrderNumber",
+        "PurchaseOrder.requisitionId",
+        "PurchaseOrder.supplierId",
+        "PurchaseOrder.supplierName",
+        "PurchaseOrder.kind",
+        "PurchaseOrder.blanketParentId",
+        "PurchaseOrder.contractPriceValidUntil",
+        "PurchaseOrder.rfqId",
+        "PurchaseOrder.supplierInvoiceRef",
+        "PurchaseOrder.matchStatus",
+        "PurchaseOrder.status"
+       ],
+       "operation": "listPurchaseOrders",
+       "provenance": "contract inventory.yaml GET /purchase-orders"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected goods receipt",
+       "bindsTo": "PurchaseOrder",
+       "columns": [
+        "PurchaseOrder.id",
+        "PurchaseOrder.purchaseOrderNumber",
+        "PurchaseOrder.requisitionId",
+        "PurchaseOrder.supplierId",
+        "PurchaseOrder.supplierName",
+        "PurchaseOrder.kind",
+        "PurchaseOrder.blanketParentId",
+        "PurchaseOrder.contractPriceValidUntil",
+        "PurchaseOrder.rfqId",
+        "PurchaseOrder.supplierInvoiceRef",
+        "PurchaseOrder.matchStatus",
+        "PurchaseOrder.status",
+        "PurchaseOrder.deliverToLocationId",
+        "PurchaseOrder.lines",
+        "PurchaseOrder.subtotal",
+        "PurchaseOrder.taxAmount"
+       ],
+       "operation": "getPurchaseOrder",
+       "provenance": "contract inventory.yaml GET /purchase-orders/{purchaseOrderId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createGoodsReceipt",
+       "provenance": "contract inventory.yaml POST /goods-receipts"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Acknowledge",
+       "operation": "acknowledgePurchaseOrder",
+       "provenance": "contract inventory.yaml POST /purchase-orders/{purchaseOrderId}/acknowledge"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Cancel",
+       "operation": "cancelPurchaseOrder",
+       "provenance": "contract inventory.yaml POST /purchase-orders/{purchaseOrderId}/cancel"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Close",
+       "operation": "closePurchaseOrderShort",
+       "provenance": "contract inventory.yaml POST /purchase-orders/{purchaseOrderId}/close-short"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createPurchaseOrder",
+       "provenance": "contract inventory.yaml POST /purchase-orders"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Reject",
+       "operation": "rejectReceivedGoods",
+       "provenance": "contract inventory.yaml POST /goods-receipts/{receiptId}/reject"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Send",
+       "operation": "sendPurchaseOrder",
+       "provenance": "contract inventory.yaml POST /purchase-orders/{purchaseOrderId}/send"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Close",
+       "operation": "closeTransferShort",
+       "provenance": "contract inventory.yaml POST /stock-transfers/{transferId}/close-short"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createGoodsReceipt",
+       "label": "Create goods receipt",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listPurchaseOrders",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "destructiveButton",
+       "derived": true,
+       "impliedBy": "cancelPurchaseOrder",
+       "label": "Cancel purchase order",
+       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createGoodsReceipt",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmCancelPurchaseOrder",
+    "component": "confirmDialog",
+    "trigger": "Cancel",
+    "body": "**Names what `cancelPurchaseOrder` changes and what it leaves alone**, in the consequence rather than the verb. A goods receipt this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract inventory.yaml POST /purchase-orders/{purchaseOrderId}/cancel"
+   },
+   {
+    "id": "confirmClosePurchaseOrderShort",
+    "component": "confirmDialog",
+    "trigger": "Close",
+    "body": "**Names what `closePurchaseOrderShort` changes and what it leaves alone**, in the consequence rather than the verb. A goods receipt this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract inventory.yaml POST /purchase-orders/{purchaseOrderId}/close-short"
+   },
+   {
+    "id": "confirmRejectReceivedGoods",
+    "component": "confirmDialog",
+    "trigger": "Reject",
+    "body": "**Names what `rejectReceivedGoods` changes and what it leaves alone**, in the consequence rather than the verb. A goods receipt this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract inventory.yaml POST /goods-receipts/{receiptId}/reject"
+   },
+   {
+    "id": "confirmCloseTransferShort",
+    "component": "confirmDialog",
+    "trigger": "Close",
+    "body": "**Names what `closeTransferShort` changes and what it leaves alone**, in the consequence rather than the verb. A goods receipt this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract inventory.yaml POST /stock-transfers/{transferId}/close-short"
+   }
+  ],
+  "states": {
+   "loading": "The goods receipt list.",
+   "error": "Could not load. Names which read failed and leaves the goods receipt untouched.",
+   "emptyFirstRun": "No goods receipt yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the goods receipt are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "createGoodsReceipt",
+    "contract": "inventory",
+    "purpose": "Receive goods against a purchase order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPurchaseOrders"
+    ]
+   },
+   {
+    "operationId": "listPurchaseOrders",
+    "contract": "inventory",
+    "purpose": "List purchase orders",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "acknowledgePurchaseOrder",
+    "contract": "inventory",
+    "purpose": "Record the supplier acknowledgement",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPurchaseOrders"
+    ]
+   },
+   {
+    "operationId": "cancelPurchaseOrder",
+    "contract": "inventory",
+    "purpose": "Cancel a purchase order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPurchaseOrders"
+    ]
+   },
+   {
+    "operationId": "closePurchaseOrderShort",
+    "contract": "inventory",
+    "purpose": "Close an order accepting the balance will not arrive",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPurchaseOrders"
+    ]
+   },
+   {
+    "operationId": "createPurchaseOrder",
+    "contract": "inventory",
+    "purpose": "Raise a purchase order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPurchaseOrders"
+    ]
+   },
+   {
+    "operationId": "getPurchaseOrder",
+    "contract": "inventory",
+    "purpose": "Read a purchase order with receipt progress",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listGoodsReceipts",
+    "contract": "inventory",
+    "purpose": "List goods receipts",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "rejectReceivedGoods",
+    "contract": "inventory",
+    "purpose": "Reject received goods",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPurchaseOrders"
+    ]
+   },
+   {
+    "operationId": "sendPurchaseOrder",
+    "contract": "inventory",
+    "purpose": "Issue the order to the supplier",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPurchaseOrders"
+    ]
+   },
+   {
+    "operationId": "closeTransferShort",
+    "contract": "inventory",
+    "purpose": "Close a transfer accepting the balance will not arrive",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPurchaseOrders"
+    ]
+   },
+   {
+    "operationId": "getStockTransfer",
+    "contract": "inventory",
+    "purpose": "One transfer, its manifest and where it is",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "purchaseOrderId",
+     "from": "deepLink"
+    },
+    {
+     "name": "receiptId",
+     "from": "deepLink"
+    },
+    {
+     "name": "transferId",
+     "from": "deepLink",
+     "optional": true
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `purchaseOrderId`, `receiptId`, `transferId`.",
+   "preloaded": [
+    "PurchaseOrder.id",
+    "PurchaseOrder.purchaseOrderNumber",
+    "PurchaseOrder.requisitionId",
+    "PurchaseOrder.supplierId",
+    "PurchaseOrder.supplierName"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-052",
+   "source": "Claude Design Retail pack, 24 August",
+   "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 12 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-078",
+  "name": "Requisitions",
+  "module": "Stock & Supply",
+  "requiresModule": "inventory",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/inventory/requisitions",
+   "component": "apps/venue-management-web/src/routes/inventory/Requisitions.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-079",
+    "BO-080",
+    "BO-081",
+    "BO-084"
+   ],
+   "inferred": true,
+   "fromFlows": true,
+   "entryFrom": [
+    "BO-105"
+   ],
+   "transitions": [
+    {
+     "to": "BO-080",
+     "trigger": "Stock Transfers",
+     "provenance": "flow F76 step 3→4, F92 step 3→4"
+    },
+    {
+     "to": "BO-084",
+     "trigger": "A manager approves it",
+     "provenance": "flow F15 step 2→3",
+     "operation": "createRequisition"
+    },
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-079",
+     "trigger": "Stock Count",
+     "carries": [
+      "countId"
+     ],
+     "provenance": "derived — BO-079 declares entryState.params countId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-081",
+     "trigger": "Inventory Items",
+     "carries": [
+      "itemId"
+     ],
+     "provenance": "derived — BO-081 declares entryState.params itemId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. **Improved 20 August against the client design board**, answering 2 board screen(s): Requisition & Smart Replenishment; Store Inventory & Replenishment Configuration. **The id, flows and navigation are unchanged** — a board specifies a screen further; it does not replace it. **Retail board operations wired 24 August.**",
+  "density": "compact",
+  "boardFrames": [
+   "FnB Board 5.dc.html#fnb-5f",
+   "Retail Board 4.dc.html#ret-4c",
+   "Retail Board 4.dc.html#ret-4k"
+  ],
+  "pattern": "approvalInbox",
+  "patternReason": "`approveRequisition` decides items that `listRequisitions` queues — every row is waiting for a person, so the empty state is success",
+  "purpose": "Raise, track and approve a request to buy something.",
+  "gaps": [
+   {
+    "operation": "listStockLocations",
+    "why": "**1 declared operation reach no component on this screen**: listStockLocations. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "queue",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Waiting for a decision",
+       "bindsTo": "Requisition",
+       "columns": [
+        "Requisition.id",
+        "Requisition.requisitionNumber",
+        "Requisition.venueId",
+        "Requisition.departmentId",
+        "Requisition.status",
+        "Requisition.lines",
+        "Requisition.estimatedTotal",
+        "Requisition.raisedByPrincipalId",
+        "Requisition.approvedByPrincipalId",
+        "Requisition.approvalNote",
+        "Requisition.requiredBy",
+        "Requisition.approvedAt"
+       ],
+       "operation": "listRequisitions",
+       "provenance": "contract inventory.yaml GET /requisitions"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "item",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected requisitions",
+       "bindsTo": "RequisitionSuggestion",
+       "columns": [
+        "RequisitionSuggestion.itemId",
+        "RequisitionSuggestion.itemName",
+        "RequisitionSuggestion.sku",
+        "RequisitionSuggestion.onHand",
+        "RequisitionSuggestion.reorderPoint",
+        "RequisitionSuggestion.parLevel",
+        "RequisitionSuggestion.suggestedQuantity",
+        "RequisitionSuggestion.averageDailyConsumption",
+        "RequisitionSuggestion.daysOfCoverRemaining",
+        "RequisitionSuggestion.preferredSupplierId",
+        "RequisitionSuggestion.leadTimeDays"
+       ],
+       "operation": "getSuggestedRequisitions",
+       "provenance": "contract inventory.yaml GET /requisitions/suggested"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "decision",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createRequisition",
+       "provenance": "contract inventory.yaml POST /requisitions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Approve",
+       "operation": "approveRequisition",
+       "provenance": "contract inventory.yaml POST /requisitions/{requisitionId}/approve"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Reject",
+       "operation": "rejectRequisition",
+       "provenance": "contract inventory.yaml POST /requisitions/{requisitionId}/reject"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Return",
+       "operation": "returnRequisition",
+       "provenance": "contract inventory.yaml POST /requisitions/{requisitionId}/return"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Cancel",
+       "operation": "cancelRequisition",
+       "provenance": "contract inventory.yaml POST /requisitions/{requisitionId}/cancel"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Compare",
+       "operation": "compareQuotations",
+       "provenance": "contract inventory.yaml GET /requisitions/{requisitionId}/quotations"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateRequisitionLines",
+       "provenance": "contract inventory.yaml PUT /requisitions/{requisitionId}/lines"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmRejectRequisition",
+    "component": "confirmDialog",
+    "trigger": "Reject",
+    "body": "**Names what `rejectRequisition` changes and what it leaves alone**, in the consequence rather than the verb. A requisitions this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract inventory.yaml POST /requisitions/{requisitionId}/reject"
+   },
+   {
+    "id": "confirmCancelRequisition",
+    "component": "confirmDialog",
+    "trigger": "Cancel",
+    "body": "**Names what `cancelRequisition` changes and what it leaves alone**, in the consequence rather than the verb. A requisitions this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract inventory.yaml POST /requisitions/{requisitionId}/cancel"
+   }
+  ],
+  "states": {
+   "loading": "The requisitions list.",
+   "error": "Could not load. Names which read failed and leaves the requisitions untouched.",
+   "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
+   "emptyNoResults": "The filter narrowed it and the requisitions are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listRequisitions",
+    "contract": "inventory",
+    "purpose": "List requisitions",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createRequisition",
+    "contract": "inventory",
+    "purpose": "Raise a requisition",
+    "trigger": "onAction",
+    "invalidates": [
+     "listRequisitions"
+    ]
+   },
+   {
+    "operationId": "approveRequisition",
+    "contract": "inventory",
+    "purpose": "Approve or reject a requisition",
+    "trigger": "onAction",
+    "invalidates": [
+     "listRequisitions"
+    ]
+   },
+   {
+    "operationId": "rejectRequisition",
+    "contract": "inventory",
+    "purpose": "Reject a requisition",
+    "trigger": "onAction",
+    "invalidates": [
+     "listRequisitions"
+    ]
+   },
+   {
+    "operationId": "returnRequisition",
+    "contract": "inventory",
+    "purpose": "Return a requisition for more information",
+    "trigger": "onAction",
+    "invalidates": [
+     "listRequisitions"
+    ]
+   },
+   {
+    "operationId": "cancelRequisition",
+    "contract": "inventory",
+    "purpose": "Cancel a requisition",
+    "trigger": "onAction",
+    "invalidates": [
+     "listRequisitions"
+    ]
+   },
+   {
+    "operationId": "getSuggestedRequisitions",
+    "contract": "inventory",
+    "purpose": "Draft requisitions from reorder points",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "compareQuotations",
+    "contract": "inventory",
+    "purpose": "Compare quotations for a requisition",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listStockLocations",
+    "contract": "inventory",
+    "purpose": "List stock locations",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateRequisitionLines",
+    "contract": "inventory",
+    "purpose": "Change what an outlet is asking for, before it is approved",
+    "trigger": "onAction",
+    "invalidates": [
+     "listRequisitions"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "requisitionId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `requisitionId`.",
+   "preloaded": [
+    "RequisitionSuggestion.itemId",
+    "RequisitionSuggestion.itemName",
+    "RequisitionSuggestion.sku",
+    "RequisitionSuggestion.onHand",
+    "RequisitionSuggestion.reorderPoint"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-078",
+   "source": "Claude Design Retail pack, 24 August",
+   "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-079",
+  "name": "Stock Count",
+  "module": "Stock & Supply",
+  "requiresModule": "inventory",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/inventory/stock-count",
+   "component": "apps/venue-management-web/src/routes/inventory/StockCount.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-049",
+    "BO-078",
+    "BO-080",
+    "BO-081",
+    "BO-137"
+   ],
+   "inferred": true,
+   "entryFrom": [
+    "BO-105"
+   ],
+   "transitions": [
+    {
+     "to": "BO-081",
+     "trigger": "Inventory Items",
+     "provenance": "flow F76 step 1→2"
+    },
+    {
+     "to": "BO-137",
+     "trigger": "The variance feeds theoretical-against-actual",
+     "provenance": "flow F30 step 7→8",
+     "operation": "postStockCount"
+    },
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-049",
+     "trigger": "Stock Levels",
+     "carries": [
+      "itemId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-049 declares entryState.params itemId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-078",
+     "trigger": "Requisitions",
+     "carries": [
+      "requisitionId"
+     ],
+     "provenance": "derived — BO-078 declares entryState.params requisitionId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-080",
+     "trigger": "Stock Transfers",
+     "carries": [
+      "transferId"
+     ],
+     "provenance": "derived — BO-080 declares entryState.params transferId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-066",
+     "trigger": "The lines are recounted and re-entered",
+     "provenance": "flow F30 step 5→6",
+     "operation": "requestRecount",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. **Improved 20 August against the client design board**, answering 1 board screen(s): Stock Count, Reconciliation & Variance. **The id, flows and navigation are unchanged** — a board specifies a screen further; it does not replace it. **Operations from the 24 August F&B build wired here** — the contract grew and the screens had not caught up, which is how 92 operations reached 49% of screens.",
+  "density": "compact",
+  "boardFrames": [
+   "FnB Board 5.dc.html#fnb-5h",
+   "Retail Board 4.dc.html#ret-4f"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listStockCounts` reads the population and `getCountVariance` reads one of them — list, select, act",
+  "purpose": "Count what is there, blind, and resolve the variance.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every stock count",
+       "bindsTo": "StockCount",
+       "columns": [
+        "StockCount.id",
+        "StockCount.locationId",
+        "StockCount.locationName",
+        "StockCount.kind",
+        "StockCount.status",
+        "StockCount.isBlind",
+        "StockCount.lineCount",
+        "StockCount.countedCount",
+        "StockCount.varianceLineCount",
+        "StockCount.varianceValue",
+        "StockCount.startedByPrincipalId",
+        "StockCount.postedByPrincipalId"
+       ],
+       "operation": "listStockCounts",
+       "provenance": "contract inventory.yaml GET /stock-counts"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected stock count",
+       "bindsTo": "CountVariance",
+       "columns": [
+        "CountVariance.countId",
+        "CountVariance.totalVarianceValue",
+        "CountVariance.exceptionCount",
+        "CountVariance.lines"
+       ],
+       "operation": "getCountVariance",
+       "provenance": "contract inventory.yaml GET /stock-counts/{countId}/variance"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Start",
+       "operation": "startStockCount",
+       "provenance": "contract inventory.yaml POST /stock-counts"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Post",
+       "operation": "postStockCount",
+       "provenance": "contract inventory.yaml POST /stock-counts/{countId}/post"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Recount",
+       "operation": "recountStockCount",
+       "provenance": "contract inventory.yaml POST /stock-counts/{countId}/recount"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Cancel",
+       "operation": "cancelStockCount",
+       "provenance": "contract inventory.yaml POST /stock-counts/{countId}/cancel"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Enter",
+       "operation": "enterCountLine",
+       "provenance": "contract fnb.yaml POST /stock-counts/{countId}/lines"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request",
+       "operation": "requestRecount",
+       "provenance": "contract fnb.yaml POST /stock-counts/{countId}/recount"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmCancelStockCount",
+    "component": "confirmDialog",
+    "trigger": "Cancel",
+    "body": "**Names what `cancelStockCount` changes and what it leaves alone**, in the consequence rather than the verb. A stock count this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract inventory.yaml POST /stock-counts/{countId}/cancel"
+   }
+  ],
+  "states": {
+   "loading": "The stock count list.",
+   "error": "Could not load. Names which read failed and leaves the stock count untouched.",
+   "emptyFirstRun": "No stock count yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the stock count are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listStockCounts",
+    "contract": "inventory",
+    "purpose": "List stock counts",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "startStockCount",
+    "contract": "inventory",
+    "purpose": "Start a stock count",
+    "trigger": "onAction",
+    "invalidates": [
+     "listStockCounts"
+    ]
+   },
+   {
+    "operationId": "postStockCount",
+    "contract": "inventory",
+    "purpose": "Post a count and adjust stock",
+    "trigger": "onAction",
+    "invalidates": [
+     "listStockCounts"
+    ]
+   },
+   {
+    "operationId": "recountStockCount",
+    "contract": "inventory",
+    "purpose": "Send a count back to be recounted",
+    "trigger": "onAction",
+    "invalidates": [
+     "listStockCounts"
+    ]
+   },
+   {
+    "operationId": "cancelStockCount",
+    "contract": "inventory",
+    "purpose": "Abandon a count",
+    "trigger": "onAction",
+    "invalidates": [
+     "listStockCounts"
+    ]
+   },
+   {
+    "operationId": "getCountVariance",
+    "contract": "inventory",
+    "purpose": "Variance between counted and expected",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "enterCountLine",
+    "contract": "fnb",
+    "purpose": "What was actually on the shelf",
+    "trigger": "onAction",
+    "invalidates": [
+     "listStockCounts"
+    ]
+   },
+   {
+    "operationId": "requestRecount",
+    "contract": "fnb",
+    "purpose": "Send a line back to be counted again",
+    "trigger": "onAction",
+    "invalidates": [
+     "listStockCounts"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "countId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `countId`.",
+   "preloaded": [
+    "CountVariance.countId",
+    "CountVariance.totalVarianceValue",
+    "CountVariance.exceptionCount",
+    "CountVariance.lines"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-079",
+   "source": "Claude Design Retail pack, 24 August",
+   "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-080",
+  "name": "Stock Transfers",
+  "module": "Stock & Supply",
+  "requiresModule": "inventory",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/inventory/stock-transfers",
+   "component": "apps/venue-management-web/src/routes/inventory/StockTransfers.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-052",
+    "BO-078",
+    "BO-079",
+    "BO-081"
+   ],
+   "inferred": true,
+   "entryFrom": [
+    "BO-105"
+   ],
+   "transitions": [
+    {
+     "to": "BO-052",
+     "trigger": "Goods Receipt",
+     "provenance": "flow F76 step 4→5, F92 step 4→5"
+    },
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-078",
+     "trigger": "Requisitions",
+     "carries": [
+      "requisitionId"
+     ],
+     "provenance": "derived — BO-078 declares entryState.params requisitionId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-079",
+     "trigger": "Stock Count",
+     "carries": [
+      "countId"
+     ],
+     "provenance": "derived — BO-079 declares entryState.params countId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-081",
+     "trigger": "Inventory Items",
+     "carries": [
+      "itemId"
+     ],
+     "provenance": "derived — BO-081 declares entryState.params itemId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. **Improved 20 August against the client design board**, answering 1 board screen(s): Transfers, Distribution & Outlet Receiving. **The id, flows and navigation are unchanged** — a board specifies a screen further; it does not replace it. **Retail board operations wired 24 August.**",
+  "density": "compact",
+  "boardFrames": [
+   "Retail Board 4.dc.html#ret-4d"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listStockTransfers` reads the population and `getStockTransfer` reads one of them — list, select, act",
+  "purpose": "Move stock between venues, and receive what arrives.",
+  "gaps": [
+   {
+    "operation": "getStockTransfer",
+    "why": "**1 declared operation reach no component on this screen**: getStockTransfer. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every stock transfers",
+       "bindsTo": "StockTransfer",
+       "columns": [
+        "StockTransfer.id",
+        "StockTransfer.transferNumber",
+        "StockTransfer.fromLocationId",
+        "StockTransfer.toLocationId",
+        "StockTransfer.status",
+        "StockTransfer.lines",
+        "StockTransfer.dispatchedByPrincipalId",
+        "StockTransfer.receivedByPrincipalId",
+        "StockTransfer.dispatchedAt",
+        "StockTransfer.receivedAt",
+        "StockTransfer.scopePath"
+       ],
+       "operation": "listStockTransfers",
+       "provenance": "contract inventory.yaml GET /stock-transfers"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createStockTransfer",
+       "provenance": "contract inventory.yaml POST /stock-transfers"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Receive",
+       "operation": "receiveStockTransfer",
+       "provenance": "contract inventory.yaml POST /stock-transfers/{transferId}/receive"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Close",
+       "operation": "closeTransferShort",
+       "provenance": "contract inventory.yaml POST /stock-transfers/{transferId}/close-short"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createGoodsReceipt",
+       "provenance": "contract inventory.yaml POST /goods-receipts"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmCloseTransferShort",
+    "component": "confirmDialog",
+    "trigger": "Close",
+    "body": "**Names what `closeTransferShort` changes and what it leaves alone**, in the consequence rather than the verb. A stock transfers this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract inventory.yaml POST /stock-transfers/{transferId}/close-short"
+   }
+  ],
+  "states": {
+   "loading": "The stock transfers list.",
+   "error": "Could not load. Names which read failed and leaves the stock transfers untouched.",
+   "emptyFirstRun": "No stock transfers yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the stock transfers are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listStockTransfers",
+    "contract": "inventory",
+    "purpose": "List transfers",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createStockTransfer",
+    "contract": "inventory",
+    "purpose": "Send stock to another location",
+    "trigger": "onAction",
+    "invalidates": [
+     "listStockTransfers"
+    ]
+   },
+   {
+    "operationId": "receiveStockTransfer",
+    "contract": "inventory",
+    "purpose": "Receive a transfer",
+    "trigger": "onAction",
+    "invalidates": [
+     "listStockTransfers"
+    ]
+   },
+   {
+    "operationId": "closeTransferShort",
+    "contract": "inventory",
+    "purpose": "Close a transfer accepting the balance will not arrive",
+    "trigger": "onAction",
+    "invalidates": [
+     "listStockTransfers"
+    ]
+   },
+   {
+    "operationId": "createGoodsReceipt",
+    "contract": "inventory",
+    "purpose": "Receive goods against a purchase order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listStockTransfers"
+    ]
+   },
+   {
+    "operationId": "getStockTransfer",
+    "contract": "inventory",
+    "purpose": "One transfer, its manifest and where it is",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "transferId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `transferId`."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-080",
+   "source": "Claude Design Retail pack, 24 August",
+   "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-081",
+  "name": "Inventory Items",
+  "module": "Stock & Supply",
+  "requiresModule": "inventory",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/inventory/inventory-items",
+   "component": "apps/venue-management-web/src/routes/inventory/InventoryItems.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-078",
+    "BO-079",
+    "BO-080"
+   ],
+   "inferred": true,
+   "entryFrom": [
+    "BO-049",
+    "BO-105"
+   ],
+   "transitions": [
+    {
+     "to": "BO-078",
+     "trigger": "Requisitions",
+     "provenance": "flow F76 step 2→3, F92 step 2→3"
+    },
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-079",
+     "trigger": "Stock Count",
+     "carries": [
+      "countId"
+     ],
+     "provenance": "derived — BO-079 declares entryState.params countId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-080",
+     "trigger": "Stock Transfers",
+     "carries": [
+      "transferId"
+     ],
+     "provenance": "derived — BO-080 declares entryState.params transferId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing.",
+  "density": "compact",
+  "boardFrames": [
+   "Retail Board 4.dc.html#ret-4b"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listInventoryItems` reads the population and `getInventoryItem` reads one of them — list, select, act",
+  "purpose": "What the venue stocks, and where.",
+  "gaps": [
+   {
+    "operation": "listStockLocations",
+    "why": "**1 declared operation reach no component on this screen**: listStockLocations. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every inventory items",
+       "bindsTo": "InventoryItem",
+       "columns": [
+        "InventoryItem.sku",
+        "InventoryItem.barcode",
+        "InventoryItem.name",
+        "InventoryItem.venueId",
+        "InventoryItem.categoryId",
+        "InventoryItem.baseUnit",
+        "InventoryItem.purchaseUnit",
+        "InventoryItem.purchaseUnitFactor",
+        "InventoryItem.costingMethod",
+        "InventoryItem.reorderPoint",
+        "InventoryItem.reorderQuantity",
+        "InventoryItem.parLevel"
+       ],
+       "operation": "listInventoryItems",
+       "provenance": "contract inventory.yaml GET /inventory-items"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected inventory items",
+       "bindsTo": "InventoryItem",
+       "columns": [
+        "InventoryItem.sku",
+        "InventoryItem.barcode",
+        "InventoryItem.name",
+        "InventoryItem.venueId",
+        "InventoryItem.categoryId",
+        "InventoryItem.baseUnit",
+        "InventoryItem.purchaseUnit",
+        "InventoryItem.purchaseUnitFactor",
+        "InventoryItem.costingMethod",
+        "InventoryItem.reorderPoint",
+        "InventoryItem.reorderQuantity",
+        "InventoryItem.parLevel",
+        "InventoryItem.preferredSupplierId",
+        "InventoryItem.allowNegativeStock",
+        "InventoryItem.isPerishable",
+        "InventoryItem.shelfLifeDays"
+       ],
+       "operation": "getInventoryItem",
+       "provenance": "contract inventory.yaml GET /inventory-items/{itemId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createInventoryItem",
+       "provenance": "contract inventory.yaml POST /inventory-items"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateInventoryItem",
+       "provenance": "contract inventory.yaml PATCH /inventory-items/{itemId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Lookup",
+       "operation": "lookupInventoryItem",
+       "provenance": "contract inventory.yaml GET /inventory-items/lookup"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createStockLocation",
+       "provenance": "contract inventory.yaml POST /stock-locations"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The inventory items list.",
+   "error": "Could not load. Names which read failed and leaves the inventory items untouched.",
+   "emptyFirstRun": "No inventory items yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the inventory items are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listInventoryItems",
+    "contract": "inventory",
+    "purpose": "List inventory items",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getInventoryItem",
+    "contract": "inventory",
+    "purpose": "Read an item with stock position",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createInventoryItem",
+    "contract": "inventory",
+    "purpose": "Create an inventory item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listInventoryItems"
+    ]
+   },
+   {
+    "operationId": "updateInventoryItem",
+    "contract": "inventory",
+    "purpose": "Amend an item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listInventoryItems"
+    ]
+   },
+   {
+    "operationId": "lookupInventoryItem",
+    "contract": "inventory",
+    "purpose": "Look up by barcode or SKU",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listStockLocations",
+    "contract": "inventory",
+    "purpose": "List stock locations",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createStockLocation",
+    "contract": "inventory",
+    "purpose": "Create a stock location",
+    "trigger": "onAction",
+    "invalidates": [
+     "listInventoryItems"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "itemId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `itemId`.",
+   "preloaded": [
+    "InventoryItem.sku",
+    "InventoryItem.barcode",
+    "InventoryItem.name",
+    "InventoryItem.venueId",
+    "InventoryItem.categoryId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-081",
+   "source": "Claude Design Retail pack, 24 August",
+   "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-082",
+  "name": "Stock Movements",
+  "module": "Stock & Supply",
+  "requiresModule": "inventory",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/inventory/stock-movements",
+   "component": "apps/venue-management-web/src/routes/inventory/StockMovements.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-078",
+    "BO-079",
+    "BO-080"
+   ],
+   "inferred": true,
+   "entryFrom": [
+    "BO-105"
+   ],
+   "transitions": [
+    {
+     "to": "BO-079",
+     "trigger": "A cycle count on that line is triggered to confirm the position",
+     "provenance": "flow F35 step 7→8"
+    },
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-078",
+     "trigger": "Requisitions",
+     "carries": [
+      "requisitionId"
+     ],
+     "provenance": "derived — BO-078 declares entryState.params requisitionId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-080",
+     "trigger": "Stock Transfers",
+     "carries": [
+      "transferId"
+     ],
+     "provenance": "derived — BO-080 declares entryState.params transferId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. **Moved to wave 1 on 24 August.** F34 walks a retail sale and its return, which is a wave-1 journey — **a venue that can take a return and cannot disposition the item puts damaged stock back on the shelf**, and the count finds it three weeks later.",
+  "density": "compact",
+  "boardFrames": [
+   "Retail Board 4.dc.html#ret-4g"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listStockMovements` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Every movement, and why it happened.",
+  "gaps": [
+   {
+    "operation": "listOrders",
+    "why": "**1 declared operation reach no component on this screen**: listOrders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every stock movements",
+       "bindsTo": "StockMovement",
+       "columns": [
+        "StockMovement.id",
+        "StockMovement.itemId",
+        "StockMovement.locationId",
+        "StockMovement.kind",
+        "StockMovement.quantity",
+        "StockMovement.unit",
+        "StockMovement.reason",
+        "StockMovement.costCenterId",
+        "StockMovement.recordedAt",
+        "StockMovement.balanceAfter",
+        "StockMovement.unitCost",
+        "StockMovement.totalCost"
+       ],
+       "operation": "listStockMovements",
+       "provenance": "contract inventory.yaml GET /stock-movements"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected stock movements",
+       "bindsTo": "StockMovement",
+       "columns": [
+        "StockMovement.id",
+        "StockMovement.itemId",
+        "StockMovement.locationId",
+        "StockMovement.kind",
+        "StockMovement.quantity",
+        "StockMovement.unit",
+        "StockMovement.reason",
+        "StockMovement.costCenterId",
+        "StockMovement.recordedAt",
+        "StockMovement.balanceAfter",
+        "StockMovement.unitCost",
+        "StockMovement.totalCost",
+        "StockMovement.principalId",
+        "StockMovement.sourceType",
+        "StockMovement.sourceId",
+        "StockMovement.journalEntryId"
+       ],
+       "operation": "listStockMovements",
+       "provenance": "contract inventory.yaml GET /stock-movements"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createStockMovement",
+       "provenance": "contract inventory.yaml POST /stock-movements"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createStockTransfer",
+       "provenance": "contract inventory.yaml POST /stock-transfers"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The stock movements list.",
+   "error": "Could not load. Names which read failed and leaves the stock movements untouched.",
+   "emptyFirstRun": "No stock movements yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the stock movements are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listStockMovements",
+    "contract": "inventory",
+    "purpose": "The movement ledger",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createStockMovement",
+    "contract": "inventory",
+    "purpose": "Record an issue, return or adjustment",
+    "trigger": "onAction",
+    "invalidates": [
+     "listStockMovements"
+    ]
+   },
+   {
+    "operationId": "createStockTransfer",
+    "contract": "inventory",
+    "purpose": "Send stock to another location",
+    "trigger": "onAction",
+    "invalidates": [
+     "listStockMovements"
+    ]
+   },
+   {
+    "operationId": "listOrders",
+    "contract": "orders",
+    "purpose": "List orders",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "StockMovement.id",
+    "StockMovement.itemId",
+    "StockMovement.locationId",
+    "StockMovement.kind",
+    "StockMovement.quantity"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-082",
+   "source": "Claude Design Retail pack, 24 August",
+   "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-083",
+  "name": "Suppliers",
+  "module": "Stock & Supply",
+  "requiresModule": "inventory",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/inventory/suppliers",
+   "component": "apps/venue-management-web/src/routes/inventory/Suppliers.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-007",
+    "BO-078",
+    "BO-079",
+    "BO-080"
+   ],
+   "inferred": true,
+   "entryFrom": [
+    "BO-105"
+   ],
+   "transitions": [
+    {
+     "to": "BO-007",
+     "trigger": "Product Directory",
+     "provenance": "flow F78 step 1→2"
+    },
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-078",
+     "trigger": "Requisitions",
+     "carries": [
+      "requisitionId"
+     ],
+     "provenance": "derived — BO-078 declares entryState.params requisitionId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-079",
+     "trigger": "Stock Count",
+     "carries": [
+      "countId"
+     ],
+     "provenance": "derived — BO-079 declares entryState.params countId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-080",
+     "trigger": "Stock Transfers",
+     "carries": [
+      "transferId"
+     ],
+     "provenance": "derived — BO-080 declares entryState.params transferId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. **Retail board operations wired 24 August.**",
+  "density": "compact",
+  "boardFrames": [
+   "Retail Board 2.dc.html#ret-2g"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listSuppliers` reads the population and `getSupplierPerformance` reads one of them — list, select, act",
+  "purpose": "Who we buy from, and what they quoted.",
+  "gaps": [
+   {
+    "operation": "getSupplierPerformance",
+    "why": "**1 declared operation reach no component on this screen**: getSupplierPerformance. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every suppliers",
+       "bindsTo": "Supplier",
+       "columns": [
+        "Supplier.id",
+        "Supplier.code",
+        "Supplier.name",
+        "Supplier.contactName",
+        "Supplier.contactEmail",
+        "Supplier.contactPhone",
+        "Supplier.taxRegistrationNumber",
+        "Supplier.paymentTermsDays",
+        "Supplier.leadTimeDays",
+        "Supplier.currency",
+        "Supplier.accountId",
+        "Supplier.isActive"
+       ],
+       "operation": "listSuppliers",
+       "provenance": "contract inventory.yaml GET /suppliers"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createSupplier",
+       "provenance": "contract inventory.yaml POST /suppliers"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordQuotation",
+       "provenance": "contract inventory.yaml POST /suppliers/{supplierId}/quotations"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateSupplier",
+       "provenance": "contract inventory.yaml PUT /suppliers/{supplierId}"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The suppliers list.",
+   "error": "Could not load. Names which read failed and leaves the suppliers untouched.",
+   "emptyFirstRun": "No suppliers yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the suppliers are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listSuppliers",
+    "contract": "inventory",
+    "purpose": "List suppliers",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createSupplier",
+    "contract": "inventory",
+    "purpose": "Create a supplier",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSuppliers"
+    ]
+   },
+   {
+    "operationId": "recordQuotation",
+    "contract": "inventory",
+    "purpose": "Record a supplier quotation",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSuppliers"
+    ]
+   },
+   {
+    "operationId": "updateSupplier",
+    "contract": "inventory",
+    "purpose": "Change terms, or stop buying from them",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSuppliers"
+    ]
+   },
+   {
+    "operationId": "getSupplierPerformance",
+    "contract": "reporting",
+    "purpose": "getSupplierPerformance",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "supplierId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `supplierId`."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-083",
+   "source": "Claude Design Retail pack, 24 August",
+   "note": "**Drawn by Claude Design on `Retail Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-105",
+  "name": "Stock & Supply",
+  "module": "Stock & Supply",
+  "requiresModule": "core",
+  "wave": 1,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/stock-supply",
+   "component": "apps/venue-management-web/src/routes/home/StockSupplyList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-049",
+    "BO-050",
+    "BO-052",
+    "BO-078",
+    "BO-079",
+    "BO-080",
+    "BO-081",
+    "BO-082",
+    "BO-083",
+    "BO-137",
+    "BO-138",
+    "BO-139",
+    "BO-140",
+    "BO-141"
+   ],
+   "transitions": [
+    {
+     "to": "BO-049",
+     "trigger": "Stock Levels",
+     "carries": [
+      "itemId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-049 declares entryState.params itemId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-052",
+     "trigger": "Goods Receipt",
+     "carries": [
+      "purchaseOrderId",
+      "receiptId",
+      "transferId"
+     ],
+     "provenance": "derived — BO-052 declares entryState.params purchaseOrderId, receiptId, transferId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-078",
+     "trigger": "Requisitions",
+     "carries": [
+      "requisitionId"
+     ],
+     "provenance": "derived — BO-078 declares entryState.params requisitionId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-079",
+     "trigger": "Stock Count",
+     "carries": [
+      "countId"
+     ],
+     "provenance": "derived — BO-079 declares entryState.params countId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-080",
+     "trigger": "Stock Transfers",
+     "carries": [
+      "transferId"
+     ],
+     "provenance": "derived — BO-080 declares entryState.params transferId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-081",
+     "trigger": "Inventory Items",
+     "carries": [
+      "itemId"
+     ],
+     "provenance": "derived — BO-081 declares entryState.params itemId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-083",
+     "trigger": "Suppliers",
+     "carries": [
+      "supplierId"
+     ],
+     "provenance": "derived — BO-083 declares entryState.params supplierId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-137",
+     "trigger": "Recipe Consumption & Theoretical Inventory",
+     "carries": [
+      "countId",
+      "runId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-137 declares entryState.params countId, runId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-138",
+     "trigger": "Production Execution & Batch Management",
+     "carries": [
+      "runId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-138 declares entryState.params runId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-139",
+     "trigger": "Wastage, Spoilage, Returns & Write-Off",
+     "carries": [
+      "outletId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-139 declares entryState.params outletId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-140",
+     "trigger": "Product Availability, 86 & Operational Food Safety",
+     "carries": [
+      "itemId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-140 declares entryState.params itemId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-141",
+     "trigger": "Operational Alerts, AI Replenishment & Action Center",
+     "carries": [
+      "alertId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-141 declares entryState.params alertId, venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Section landing. **9 screens reach the entry point through here** — before 20 August they reached it through nothing.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listInventoryItems` reads the population and `getVenueSettings` reads one of them — list, select, act",
+  "purpose": "Everything in stock & supply, and what in it needs attention.",
+  "gaps": [
+   {
+    "operation": "listPurchaseOrders",
+    "why": "**1 declared operation reach no component on this screen**: listPurchaseOrders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every stock supply",
+       "bindsTo": "InventoryItem",
+       "columns": [
+        "InventoryItem.sku",
+        "InventoryItem.barcode",
+        "InventoryItem.name",
+        "InventoryItem.venueId",
+        "InventoryItem.categoryId",
+        "InventoryItem.baseUnit",
+        "InventoryItem.purchaseUnit",
+        "InventoryItem.purchaseUnitFactor",
+        "InventoryItem.costingMethod",
+        "InventoryItem.reorderPoint",
+        "InventoryItem.reorderQuantity",
+        "InventoryItem.parLevel"
+       ],
+       "operation": "listInventoryItems",
+       "provenance": "contract inventory.yaml GET /inventory-items"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected stock supply",
+       "bindsTo": "VenueSettings",
+       "columns": [
+        "VenueSettings.id",
+        "VenueSettings.venueId",
+        "VenueSettings.supportHours",
+        "VenueSettings.quietHours",
+        "VenueSettings.segregatedAccess",
+        "VenueSettings.alerting"
+       ],
+       "operation": "getVenueSettings",
+       "provenance": "contract tenancy.yaml GET /venues/{venueId}/settings"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createInventoryItem",
+       "provenance": "contract inventory.yaml POST /inventory-items"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "cardList",
+       "bindsTo": "screens",
+       "notes": "9 screens, each with what needs attention.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search stock & supply",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The list, with counts.",
+   "error": "Could not load. Venue Home is still reachable.",
+   "emptyFirstRun": "**Nothing configured in stock & supply yet.** The action is the first thing to set up, not a blank list.",
+   "emptyNoResults": "Nothing matches the filter.",
+   "emptyNoAccess": "You do not have permission for stock & supply. **Said plainly** — an empty section reads as broken."
+  },
+  "apis": [
+   {
+    "operationId": "getVenueSettings",
+    "contract": "tenancy",
+    "purpose": "What is enabled here",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listInventoryItems",
+    "contract": "inventory",
+    "purpose": "Stock on hand",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPurchaseOrders",
+    "contract": "inventory",
+    "purpose": "Orders placed with suppliers",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createInventoryItem",
+    "contract": "inventory",
+    "purpose": "Add an item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listInventoryItems"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "**Resolves from the session, so a cold arrival is the ordinary case** — a manager bookmarks the back office and opens it every morning. A principal with more than one venue is asked which before the page renders, rather than shown the first one.",
+   "preloaded": [
+    "VenueSettings.id",
+    "VenueSettings.venueId",
+    "VenueSettings.supportHours",
+    "VenueSettings.quietHours",
+    "VenueSettings.segregatedAccess"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-105"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

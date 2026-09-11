@@ -1,0 +1,133 @@
+id: F215
+name: 'Subscription Licensing AI Self Service board 9: Usage & License Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Subscription Licensing AI Self Service board 9. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-449
+  entryPoints:
+  - Arrives at Usage & License Command Center
+steps:
+- step: 1
+  screen: ADM-449
+  action: Opens Usage & License Command Center
+  operations: []
+  outcome: Provide a real-time consolidated view of technical usage, commercial consumption and license
+    health.
+- step: 2
+  screen: ADM-450
+  action: Works in Entitlement & License Inventory
+  operations: []
+  outcome: Show exactly what the customer is technically entitled to use independently of the commercial
+    charging model.
+- step: 3
+  screen: ADM-449
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-451
+  action: Works in Commercial Consumption & Billable Event Metering
+  operations: []
+  outcome: This is the major new Board 9 screen. Meter the events that determine the customer's variable
+    commercial charges.
+- step: 5
+  screen: ADM-449
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-452
+  action: Works in Operational Usage & Threshold Monitor
+  operations: []
+  outcome: Monitor technical and operational consumption against licensed capacity.
+- step: 7
+  screen: ADM-449
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-453
+  action: Works in License Enforcement & Decision Engine
+  operations: []
+  outcome: Apply the correct technical enforcement behavior when licensed resources reach or exceed limits.
+- step: 9
+  screen: ADM-449
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-454
+  action: Works in Minimum Guarantee & Variable Consumption Monitor
+  operations: []
+  outcome: Track the commercial consumption position against contractual minimum guarantees. This screen
+    does not issue the invoice. It provides Board 10 with the reconciled consumption basis.
+- step: 11
+  screen: ADM-449
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-455
+  action: Works in Overage, Capacity & Temporary Exception Management
+  operations: []
+  outcome: Manage technical capacity above standard entitlement and temporary operational requirements.
+- step: 13
+  screen: ADM-449
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-456
+  action: Works in Usage Alerts, Reconciliation & Exception Center
+  operations: []
+  outcome: Provide a central operational center for consumption alerts and commercial metering exceptions.
+- step: 15
+  screen: ADM-449
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-457
+  action: Works in AI Usage Forecast & Commercial Optimization
+  operations: []
+  outcome: Use AI to forecast operational and commercial consumption and recommend appropriate action.
+- step: 17
+  screen: ADM-449
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-458
+  action: Works in License, Metering & Commercial Synchronization Audit
+  operations: []
+  outcome: Ensure that the approved contract, subscription, license and actual metering configuration
+    remain synchronized.
+branches:
+- at: 1
+  condition: Nothing has been set up on Usage & License Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Subscription Licensing AI Self Service board 9 visited
+primaryContract: unknown
+contracts:
+- unknown

@@ -4,13 +4,13 @@
 
 | | |
 |---|---|
-| Screens | 367 |
+| Screens | 446 |
 | Operations | 404 |
 | Contracts | 15 |
 | Modules | 13 |
 | Undrawn | 0 |
 | Operations with no screen | 150 |
-| Waves | wave1 12 · wave2 16 · wave3 339 |
+| Waves | wave1 12 · wave2 16 · wave3 418 |
 
 ## Gaps
 
@@ -76,9 +76,9 @@
 | Module | Screens | Waves |
 |---|---|---|
 | Commercial | 230 | 3 |
+| Tenants & Licensing | 88 | 1, 2, 3 |
 | Platform | 79 | 3 |
 | Catalogue | 20 | 3 |
-| Tenants & Licensing | 9 | 1, 2, 3 |
 | Releases & Environments | 7 | 1, 2, 3 |
 | Overview & Health | 5 | 1, 2 |
 | Infrastructure & Resilience | 4 | 2, 3 |
@@ -460,4 +460,83 @@
 | `ADM-366` | AI Approval Intelligence Center | Platform | 3 | 0 | yes |
 | `ADM-367` | AI Optimization & What-If Simulator | Platform | 3 | 0 | yes |
 | `ADM-368` | AI Governance Executive Advisor | Platform | 3 | 0 | yes |
+| `ADM-369` | Commercial Command Center | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-370` | Customer Subscription & Commercial Portfolio | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-371` | Customer Commercial 360° | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-372` | Operational Profile, VSI & Commercial Model Intelligence | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-373` | Revenue & Commercial Model Analytics | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-374` | Trial & Conversion Monitor | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-375` | Renewal & Retention Center | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-376` | Commercial Optimization & Expansion Opportunities | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-377` | Subscription Exceptions & Commercial Alerts | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-378` | Executive AI Commercial Intelligence | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-379` | Welcome & Start Your TICVAI Journey | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-380` | Customer & Organization Registration | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-381` | Venue Type & Business Profile | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-382` | Visitor, Capacity & Operational Scale | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-383` | Sales Channel Assessment | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-384` | Ticketing & Product Requirements | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-385` | Access, Queue & Visitor Experience Assessment | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-386` | Additional Business Module Assessment | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-387` | Integration, Payment & Technical Readiness | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-388` | AI Assessment Summary & Handoff | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-389` | Commercial Rules Engine Overview | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-390` | VSI Model Builder | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-391` | VSI Scoring & Tier Threshold Configuration | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-392` | Subscription Tier Configuration | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-393` | Tier Included Allowances | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-394` | Commercial & Licensing Model Configuration | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-395` | Billable Unit, Minimum Guarantee & Enforcement Rules | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-396` | Overage Pricing & Capacity Packs | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-397` | Commercial Model & Rule Simulation | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-398` | Rule Versioning, Approval & Publication | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-399` | Recommended Package Overview | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-400` | Commercial Model & Tier Selection | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-401` | Module Marketplace | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-402` | AI Module & Package Recommendations | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-403` | Module Detail & Commercial Treatment | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-404` | Module Dependency & Compatibility Manager | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-405` | Add-Ons, Capacity & Commercial Options | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-406` | Commercial Package Simulator | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-407` | Package Review & Commercial Summary | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-408` | Final Package Approval & Handoff | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-409` | Purchase / Trial Journey Selection | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-410` | Contract & Billing Cycle Selection | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-411` | Billing & Legal Entity Information | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-412` | Payment Method & Settlement Setup | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-413` | Trial Configuration & Conversion Rules | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-414` | Order & Commercial Pricing Review | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-415` | Commercial Agreement, Billable Definition & Customer Acceptance | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-416` | Payment, Contract & Commercial Validation | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-417` | Subscription Confirmation & Commercial Activation | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-418` | Subscription Lifecycle & Trial-to-Paid Handoff | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-419` | Provisioning Command Center | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-420` | Tenant & Organization Provisioning | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-421` | Venue & Operational Structure Creation | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-422` | Administrator & Security Initialization | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-423` | License & Entitlement Activation | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-424` | Module Activation & Dependency Validation | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-425` | Venue Template Application | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-426` | Initial Configuration & Regional Defaults | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-427` | Provisioning Validation & Exception Management | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-449` | Usage & License Command Center | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-450` | Entitlement & License Inventory | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-451` | Commercial Consumption & Billable Event Metering | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-452` | Operational Usage & Threshold Monitor | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-453` | License Enforcement & Decision Engine | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-454` | Minimum Guarantee & Variable Consumption Monitor | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-455` | Overage, Capacity & Temporary Exception Management | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-456` | Usage Alerts, Reconciliation & Exception Center | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-457` | AI Usage Forecast & Commercial Optimization | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-458` | License, Metering & Commercial Synchronization Audit | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-459` | Billing & Commercial Command Center | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-460` | Billing Calculation & Charge Breakdown | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-461` | Consumption Reconciliation & Billing Approval | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-462` | Invoice & Payment Management | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-463` | Subscription & Commercial Change Management | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-464` | Renewal Management Center | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-465` | AI Upgrade, Downgrade & Commercial Right-Sizing | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-466` | Commercial Scenario Simulator | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-467` | Discount, Credit & Commercial Override Management | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-468` | Renewal Approval, Activation & Commercial Handoff | Tenants & Licensing | 3 | 0 | yes |
 

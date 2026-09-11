@@ -7,20 +7,20 @@
  "audience": "staff",
  "formFactor": "mobileApp",
  "offlineCapable": true,
- "generated": "2026-09-10",
+ "generated": "2026-09-11",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
-  "screens": 66,
+  "screens": 96,
   "operations": 184,
   "contracts": 17,
-  "modules": 3,
+  "modules": 4,
   "undrawn": 0,
   "operationsWithNoScreen": 125
  },
  "waves": {
   "wave1": 25,
   "wave2": 40,
-  "wave3": 1
+  "wave3": 31
  },
  "modules": [
   {
@@ -29,6 +29,13 @@
    "waves": [
     1,
     2,
+    3
+   ]
+  },
+  {
+   "module": "Rentals",
+   "screens": 30,
+   "waves": [
     3
    ]
   },
@@ -97,7 +104,7 @@
    "operations": 4
   },
   {
-   "contract": "venue-map",
+   "contract": "tenancy",
    "operations": 2
   },
   {
@@ -105,7 +112,7 @@
    "operations": 2
   },
   {
-   "contract": "tenancy",
+   "contract": "venue-map",
    "operations": 2
   },
   {
@@ -710,6 +717,276 @@
    "wave": 2,
    "route": "/operations/inventory-exceptions-ai-replenishment-action-cen",
    "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "EMP-071",
+   "name": "Rental Checkout Command Center",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/rental-checkout-command-center-emp-071",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-072",
+   "name": "Voucher Scan & Reservation Retrieval",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/voucher-scan-reservation-retrieval-emp-072",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-073",
+   "name": "Checkout Readiness Validation",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/checkout-readiness-validation-emp-073",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-074",
+   "name": "Equipment Assignment Workspace",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/equipment-assignment-workspace-emp-074",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-075",
+   "name": "Equipment Scan & Validation",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/equipment-scan-validation-emp-075",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-076",
+   "name": "Pre-Rental Condition Inspection",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/pre-rental-condition-inspection-emp-076",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-077",
+   "name": "Safety & Handover Checklist",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/safety-handover-checklist-emp-077",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-078",
+   "name": "Deposit & Financial Handover Validation",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/deposit-financial-handover-validation-emp-078",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-079",
+   "name": "Group & Multi-Item Checkout",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/group-multi-item-checkout-emp-079",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-080",
+   "name": "Checkout Confirmation & Rental Activation",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/checkout-confirmation-rental-activation-emp-080",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-081",
+   "name": "Active Rental Operations Command Center",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/active-rental-operations-command-center-emp-081",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-082",
+   "name": "Active Rental Detail & Live Timeline",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/active-rental-detail-live-timeline-emp-082",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-083",
+   "name": "Rental Extension Request",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/rental-extension-request-emp-083",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-084",
+   "name": "Extension Pricing & Confirmation",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/extension-pricing-confirmation-emp-084",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-085",
+   "name": "Equipment Swap / Replacement",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/equipment-swap-replacement-emp-085",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-086",
+   "name": "Rental Incident & Operational Exception",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/rental-incident-operational-exception-emp-086",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-087",
+   "name": "Due Soon & Customer Notification Management",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/due-soon-customer-notification-management-emp-087",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-088",
+   "name": "Overdue Rental Management",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/overdue-rental-management-emp-088",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-089",
+   "name": "Active Group Rental Management",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/active-group-rental-management-emp-089",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-090",
+   "name": "Active Rental Intelligence & Operational Alerts",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/active-rental-intelligence-operational-alerts-emp-090",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-091",
+   "name": "Rental Return Command Center",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/rental-return-command-center-emp-091",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-092",
+   "name": "Return Scan & Rental Retrieval",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/return-scan-rental-retrieval-emp-092",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-093",
+   "name": "Return Summary & Actual Return Time",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/return-summary-actual-return-time-emp-093",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-094",
+   "name": "Post-Rental Condition Inspection",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/post-rental-condition-inspection-emp-094",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-095",
+   "name": "Before vs After Condition Comparison",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/before-vs-after-condition-comparison-emp-095",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-096",
+   "name": "Damage Assessment & Charge Workflow",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/damage-assessment-charge-workflow-emp-096",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-097",
+   "name": "Partial Return & Missing Equipment",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/partial-return-missing-equipment-emp-097",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-098",
+   "name": "Late Fees, Damage Fees & Final Settlement",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/late-fees-damage-fees-final-settlement-emp-098",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-099",
+   "name": "Deposit Release, Capture & Customer Confirmation",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/deposit-release-capture-customer-confirmation-emp-099",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "EMP-100",
+   "name": "Return Completion & Equipment Disposition",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/return-completion-equipment-disposition-emp-100",
+   "operations": 0,
    "drawn": true
   }
  ],

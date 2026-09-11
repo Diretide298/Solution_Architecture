@@ -1,0 +1,158 @@
+{
+ "listCompetitorPricingMarket": {
+  "method": "GET",
+  "path": "/competitor-pricing-market",
+  "contract": "catalogue",
+  "summary": "Competitor Pricing & Market Position Intelligence",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CompetitorPricingMarketPositionIntelligenceView"
+ },
+ "listDemandBookingCurve": {
+  "method": "GET",
+  "path": "/demand-booking-curve",
+  "contract": "catalogue",
+  "summary": "AI Demand Forecasting & Booking Curve Studio",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiDemandForecastingBookingCurveStudioView"
+ },
+ "listInternalDemandBooking": {
+  "method": "GET",
+  "path": "/internal-demand-booking",
+  "contract": "catalogue",
+  "summary": "Internal Demand & Booking Signal Hub",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "InternalDemandBookingSignalHubView"
+ },
+ "listMarketTourismHoliday": {
+  "method": "GET",
+  "path": "/market-tourism-holiday",
+  "contract": "catalogue",
+  "summary": "Market, Tourism, Holiday & Contextual Signal Hub",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MarketTourismHolidayContextualSignalHubView"
+ },
+ "listNearbyEventExhibition": {
+  "method": "GET",
+  "path": "/nearby-event-exhibition",
+  "contract": "catalogue",
+  "summary": "Nearby Event, Exhibition & Local Demand Intelligence",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "NearbyEventExhibitionLocalDemandIntelligenceView"
+ },
+ "listPriceElasticityRevenue": {
+  "method": "GET",
+  "path": "/price-elasticity-revenue",
+  "contract": "catalogue",
+  "summary": "Price Elasticity & Revenue Response Intelligence",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "weekdayWeekend",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "peakOffPeak",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "eventProximity",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "season",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "PriceElasticityRevenueResponseIntelligenceView"
+ },
+ "listPricing": {
+  "method": "GET",
+  "path": "/pricing",
+  "contract": "catalogue",
+  "summary": "AI Pricing Intelligence Command Center",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiPricingIntelligenceCommandCenterView"
+ },
+ "listPricingRecommendationExplainability": {
+  "method": "GET",
+  "path": "/pricing-recommendation-explainability",
+  "contract": "catalogue",
+  "summary": "AI Pricing Recommendation & Explainability Center",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiPricingRecommendationExplainabilityCenterView"
+ },
+ "listSignalDataQuality": {
+  "method": "GET",
+  "path": "/signal-data-quality",
+  "contract": "catalogue",
+  "summary": "AI Signal Registry, Data Quality & Model Governance",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiSignalRegistryDataQualityModelGovernanceView"
+ },
+ "listWeatherDemandImpact": {
+  "method": "GET",
+  "path": "/weather-demand-impact",
+  "contract": "catalogue",
+  "summary": "Weather Intelligence & Demand Impact Configuration",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WeatherIntelligenceDemandImpactConfigurationView"
+ }
+}

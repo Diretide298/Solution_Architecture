@@ -1,0 +1,1965 @@
+[
+ {
+  "id": "EMP-061",
+  "name": "Retail Inventory Command Center",
+  "module": "Stock on the Floor",
+  "requiresModule": "inventory",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/retail-inventory-command-center",
+   "component": "apps/venue-staff-app/src/routes/operations/RetailInventoryCommandCenterDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "EMP-003",
+    "EMP-060"
+   ],
+   "exitTo": [
+    "EMP-003"
+   ],
+   "inferred": false,
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Named in the board contents and not written up in it.**",
+  "density": "comfortable",
+  "boardFrames": [
+   "FnB Board 4.dc.html#fnb-4d",
+   "FnB Board 4.dc.html#fnb-4e"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listStockMovements` reads the population and `getStockPositions` reads one of them — list, select, act",
+  "purpose": "Retail Inventory Command Center — from the client design board, 20 August.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every retail inventory",
+       "bindsTo": "StockMovement",
+       "columns": [
+        "StockMovement.id",
+        "StockMovement.itemId",
+        "StockMovement.locationId",
+        "StockMovement.kind",
+        "StockMovement.quantity",
+        "StockMovement.unit",
+        "StockMovement.reason",
+        "StockMovement.costCenterId",
+        "StockMovement.recordedAt",
+        "StockMovement.balanceAfter",
+        "StockMovement.unitCost",
+        "StockMovement.totalCost"
+       ],
+       "operation": "listStockMovements",
+       "provenance": "contract inventory.yaml GET /stock-movements"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected retail inventory",
+       "bindsTo": "StockPosition",
+       "columns": [
+        "StockPosition.itemId",
+        "StockPosition.itemName",
+        "StockPosition.sku",
+        "StockPosition.locationId",
+        "StockPosition.locationName",
+        "StockPosition.onHand",
+        "StockPosition.allocated",
+        "StockPosition.available",
+        "StockPosition.unit",
+        "StockPosition.value",
+        "StockPosition.lastCountedAt",
+        "StockPosition.lastMovementAt"
+       ],
+       "operation": "getStockPositions",
+       "provenance": "contract inventory.yaml GET /stock"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search retail inventory command center",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The retail inventory list.",
+   "error": "Could not load. Names which read failed and leaves the retail inventory untouched.",
+   "emptyFirstRun": "No retail inventory yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the retail inventory are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
+  },
+  "apis": [
+   {
+    "operationId": "getStockPositions",
+    "contract": "inventory",
+    "purpose": "Stock on hand by item and location",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listStockMovements",
+    "contract": "inventory",
+    "purpose": "The movement ledger",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to.",
+   "preloaded": [
+    "StockPosition.itemId",
+    "StockPosition.itemName",
+    "StockPosition.sku",
+    "StockPosition.locationId",
+    "StockPosition.locationName"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-061",
+   "source": "Claude Design F&B pack, 24 August",
+   "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-062",
+  "name": "Store Stock & SKU Availability",
+  "module": "Stock on the Floor",
+  "requiresModule": "fnb",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/store-stock-sku-availability",
+   "component": "apps/venue-staff-app/src/routes/operations/StoreStockSkuAvailabilityDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "EMP-003"
+   ],
+   "exitTo": [
+    "EMP-067"
+   ],
+   "transitions": [
+    {
+     "to": "EMP-067",
+     "trigger": "They read the unit and record the temperature",
+     "provenance": "flow F28 step 1→2",
+     "operation": "getHaccpStatus"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Named in the board contents and not written up in it.** **Food-safety operations wired 20 August** — boards 5G and 5J of the client F&B pack, and **HACCP is a regulatory obligation nothing in the package touched.** **Links to EMP-067 for the reading itself** — F28 step 1 to step 2, and a due-checks list that cannot reach the recording screen is a list nobody acts on.",
+  "density": "comfortable",
+  "boardFrames": [
+   "FnB Board 5.dc.html#fnb-5j"
+  ],
+  "pattern": "statusTracker",
+  "patternReason": "`getStockPositions` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Store Stock & SKU Availability — from the client design board, 20 August.",
+  "gaps": [
+   {
+    "operation": "getHaccpStatus",
+    "why": "**1 declared operation reach no component on this screen**: getHaccpStatus. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected store stock sku",
+       "bindsTo": "StockPosition",
+       "columns": [
+        "StockPosition.itemId",
+        "StockPosition.itemName",
+        "StockPosition.sku",
+        "StockPosition.locationId",
+        "StockPosition.locationName",
+        "StockPosition.onHand",
+        "StockPosition.allocated",
+        "StockPosition.available",
+        "StockPosition.unit",
+        "StockPosition.value",
+        "StockPosition.lastCountedAt",
+        "StockPosition.lastMovementAt"
+       ],
+       "operation": "getStockPositions",
+       "provenance": "contract inventory.yaml GET /stock"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "setItemAvailability",
+       "provenance": "contract fnb.yaml PUT /menu-items/{itemId}/availability"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Log",
+       "operation": "logTemperature",
+       "provenance": "contract fnb.yaml POST /food-safety/temperature-logs"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search store stock",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The store stock sku list.",
+   "error": "Could not load. Names which read failed and leaves the store stock sku untouched.",
+   "emptyFirstRun": "No store stock sku yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the store stock sku are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
+  },
+  "apis": [
+   {
+    "operationId": "getStockPositions",
+    "contract": "inventory",
+    "purpose": "Stock on hand by item and location",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setItemAvailability",
+    "contract": "fnb",
+    "purpose": "Mark an item available or eighty-sixed",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getHaccpStatus",
+    "contract": "fnb",
+    "purpose": "getHaccpStatus",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "logTemperature",
+    "contract": "fnb",
+    "purpose": "logTemperature",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "itemId",
+     "from": "EMP-003"
+    }
+   ],
+   "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-062",
+   "source": "Claude Design F&B pack, 24 August",
+   "note": "**Drawn by Claude Design on `FnB Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-063",
+  "name": "Requisition & Smart Store Replenishment",
+  "module": "Stock on the Floor",
+  "requiresModule": "inventory",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/requisition-smart-store-replenishment",
+   "component": "apps/venue-staff-app/src/routes/operations/RequisitionSmartStoreReplenishmentDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "EMP-003"
+   ],
+   "exitTo": [
+    "EMP-003"
+   ],
+   "inferred": false,
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed.",
+  "density": "comfortable",
+  "boardFrames": [
+   "FnB Board 4.dc.html#fnb-4f"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listRequisitions` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Requisition & Smart Store Replenishment — from the client design board, 20 August.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every requisition smart store",
+       "bindsTo": "Requisition",
+       "columns": [
+        "Requisition.id",
+        "Requisition.requisitionNumber",
+        "Requisition.venueId",
+        "Requisition.departmentId",
+        "Requisition.status",
+        "Requisition.lines",
+        "Requisition.estimatedTotal",
+        "Requisition.raisedByPrincipalId",
+        "Requisition.approvedByPrincipalId",
+        "Requisition.approvalNote",
+        "Requisition.requiredBy",
+        "Requisition.approvedAt"
+       ],
+       "operation": "listRequisitions",
+       "provenance": "contract inventory.yaml GET /requisitions"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected requisition smart store",
+       "bindsTo": "Requisition",
+       "columns": [
+        "Requisition.id",
+        "Requisition.requisitionNumber",
+        "Requisition.venueId",
+        "Requisition.departmentId",
+        "Requisition.status",
+        "Requisition.lines",
+        "Requisition.estimatedTotal",
+        "Requisition.raisedByPrincipalId",
+        "Requisition.approvedByPrincipalId",
+        "Requisition.approvalNote",
+        "Requisition.requiredBy",
+        "Requisition.approvedAt"
+       ],
+       "operation": "listRequisitions",
+       "provenance": "contract inventory.yaml GET /requisitions"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createRequisition",
+       "provenance": "contract inventory.yaml POST /requisitions"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search requisition",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The requisition smart store list.",
+   "error": "Could not load. Names which read failed and leaves the requisition smart store untouched.",
+   "emptyFirstRun": "No requisition smart store yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the requisition smart store are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
+  },
+  "apis": [
+   {
+    "operationId": "createRequisition",
+    "contract": "inventory",
+    "purpose": "Raise a requisition",
+    "trigger": "onAction",
+    "invalidates": [
+     "listRequisitions"
+    ]
+   },
+   {
+    "operationId": "listRequisitions",
+    "contract": "inventory",
+    "purpose": "List requisitions",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to.",
+   "preloaded": [
+    "Requisition.id",
+    "Requisition.requisitionNumber",
+    "Requisition.venueId",
+    "Requisition.departmentId",
+    "Requisition.status"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-063",
+   "source": "Claude Design F&B pack, 24 August",
+   "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-064",
+  "name": "Store-to-Store & Warehouse Transfers",
+  "module": "Stock on the Floor",
+  "requiresModule": "inventory",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/store-to-store-warehouse-transfers",
+   "component": "apps/venue-staff-app/src/routes/operations/StoreToStoreWarehouseTransfersDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "EMP-003"
+   ],
+   "exitTo": [
+    "EMP-003"
+   ],
+   "inferred": false,
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed.",
+  "density": "comfortable",
+  "boardFrames": [
+   "FnB Board 4.dc.html#fnb-4g"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listStockLocations` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Store-to-Store & Warehouse Transfers — from the client design board, 20 August.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every store-to-store warehouse transfers",
+       "bindsTo": "StockLocation",
+       "columns": [
+        "StockLocation.id",
+        "StockLocation.code",
+        "StockLocation.name",
+        "StockLocation.venueId",
+        "StockLocation.kind",
+        "StockLocation.parentLocationId",
+        "StockLocation.isActive"
+       ],
+       "operation": "listStockLocations",
+       "provenance": "contract inventory.yaml GET /stock-locations"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected store-to-store warehouse transfers",
+       "bindsTo": "StockLocation",
+       "columns": [
+        "StockLocation.id",
+        "StockLocation.code",
+        "StockLocation.name",
+        "StockLocation.venueId",
+        "StockLocation.kind",
+        "StockLocation.parentLocationId",
+        "StockLocation.isActive"
+       ],
+       "operation": "listStockLocations",
+       "provenance": "contract inventory.yaml GET /stock-locations"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createStockTransfer",
+       "provenance": "contract inventory.yaml POST /stock-transfers"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search store-to-store",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The store-to-store warehouse transfers list.",
+   "error": "Could not load. Names which read failed and leaves the store-to-store warehouse transfers untouched.",
+   "emptyFirstRun": "No store-to-store warehouse transfers yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the store-to-store warehouse transfers are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
+  },
+  "apis": [
+   {
+    "operationId": "createStockTransfer",
+    "contract": "inventory",
+    "purpose": "Send stock to another location",
+    "trigger": "onAction",
+    "invalidates": [
+     "listStockLocations"
+    ]
+   },
+   {
+    "operationId": "listStockLocations",
+    "contract": "inventory",
+    "purpose": "List stock locations",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to.",
+   "preloaded": [
+    "StockLocation.id",
+    "StockLocation.code",
+    "StockLocation.name",
+    "StockLocation.venueId",
+    "StockLocation.kind"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-064",
+   "source": "Claude Design F&B pack, 24 August",
+   "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-065",
+  "name": "Receiving & Store Put-Away",
+  "module": "Stock on the Floor",
+  "requiresModule": "inventory",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/receiving-store-put-away",
+   "component": "apps/venue-staff-app/src/routes/operations/ReceivingStorePutAwayDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "EMP-003"
+   ],
+   "exitTo": [
+    "EMP-003"
+   ],
+   "inferred": false,
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-052",
+     "trigger": "The rest is received and the transfer closes short",
+     "provenance": "flow F35 step 3→4",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Food-safety operations wired 20 August** — boards 5G and 5J of the client F&B pack, and **HACCP is a regulatory obligation nothing in the package touched.**",
+  "density": "comfortable",
+  "boardFrames": [
+   "FnB Board 5.dc.html#fnb-5g"
+  ],
+  "pattern": "statusTracker",
+  "patternReason": "`getStockTransfer` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Receiving & Store Put-Away — from the client design board, 20 August.",
+  "gaps": [
+   {
+    "operation": "getStockTransfer",
+    "why": "**1 declared operation reach no component on this screen**: getStockTransfer. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createGoodsReceipt",
+       "provenance": "contract inventory.yaml POST /goods-receipts"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Reject",
+       "operation": "rejectReceivedGoods",
+       "provenance": "contract inventory.yaml POST /goods-receipts/{receiptId}/reject"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Log",
+       "operation": "logColdChain",
+       "provenance": "contract fnb.yaml POST /food-safety/cold-chain"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search receiving",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmRejectReceivedGoods",
+    "component": "confirmDialog",
+    "trigger": "Reject",
+    "body": "**Names what `rejectReceivedGoods` changes and what it leaves alone**, in the consequence rather than the verb. A receiving store put-away this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract inventory.yaml POST /goods-receipts/{receiptId}/reject"
+   }
+  ],
+  "states": {
+   "loading": "The receiving store put-away list.",
+   "error": "Could not load. Names which read failed and leaves the receiving store put-away untouched.",
+   "emptyFirstRun": "No receiving store put-away yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the receiving store put-away are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
+  },
+  "apis": [
+   {
+    "operationId": "createGoodsReceipt",
+    "contract": "inventory",
+    "purpose": "Receive goods against a purchase order",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "rejectReceivedGoods",
+    "contract": "inventory",
+    "purpose": "Reject received goods",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "logColdChain",
+    "contract": "fnb",
+    "purpose": "logColdChain",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getStockTransfer",
+    "contract": "inventory",
+    "purpose": "One transfer, its manifest and where it is",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "receiptId",
+     "from": "EMP-003"
+    },
+    {
+     "name": "transferId",
+     "from": "deepLink",
+     "optional": true
+    }
+   ],
+   "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to. A transfer opened from the list, or scanned from the delivery note. **The receiver opens the manifest before touching the delivery** — a store that accepts first and reads after has already accepted the shortfall."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-065",
+   "source": "Claude Design F&B pack, 24 August",
+   "note": "**Drawn by Claude Design on `FnB Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-066",
+  "name": "Stock Count & Cycle Count Management",
+  "module": "Stock on the Floor",
+  "requiresModule": "inventory",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/stock-count-cycle-count-management",
+   "component": "apps/venue-staff-app/src/routes/operations/StockCountCycleCountManagementDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "EMP-003"
+   ],
+   "exitTo": [
+    "EMP-003"
+   ],
+   "inferred": false,
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-079",
+     "trigger": "The supervisor reviews the variance",
+     "provenance": "flow F30 step 3→4, F30 step 6→7",
+     "operation": "enterCountLine",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Operations from the 24 August F&B build wired here** — the contract grew and the screens had not caught up, which is how 92 operations reached 49% of screens. **Drawn 31 August** — `Retail Board 4.dc.html` frame `ret-4f`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Stock Count &amp; Cycle Count Management* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
+  "density": "comfortable",
+  "boardFrames": [
+   "Retail Board 4.dc.html#ret-4f"
+  ],
+  "pattern": "statusTracker",
+  "patternReason": "`getCountVariance` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Stock Count & Cycle Count Management — from the client design board, 20 August.",
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected stock count cycle",
+       "bindsTo": "CountVariance",
+       "columns": [
+        "CountVariance.countId",
+        "CountVariance.totalVarianceValue",
+        "CountVariance.exceptionCount",
+        "CountVariance.lines"
+       ],
+       "operation": "getCountVariance",
+       "provenance": "contract inventory.yaml GET /stock-counts/{countId}/variance"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Start",
+       "operation": "startStockCount",
+       "provenance": "contract inventory.yaml POST /stock-counts"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Post",
+       "operation": "postStockCount",
+       "provenance": "contract inventory.yaml POST /stock-counts/{countId}/post"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Enter",
+       "operation": "enterCountLine",
+       "provenance": "contract fnb.yaml POST /stock-counts/{countId}/lines"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request",
+       "operation": "requestRecount",
+       "provenance": "contract fnb.yaml POST /stock-counts/{countId}/recount"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setDailyCount",
+       "provenance": "contract inventory.yaml PUT /stock-counts/daily"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search stock count",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The stock count cycle list.",
+   "error": "Could not load. Names which read failed and leaves the stock count cycle untouched.",
+   "emptyFirstRun": "No stock count cycle yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the stock count cycle are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
+  },
+  "apis": [
+   {
+    "operationId": "startStockCount",
+    "contract": "inventory",
+    "purpose": "Start a stock count",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "postStockCount",
+    "contract": "inventory",
+    "purpose": "Post a count and adjust stock",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getCountVariance",
+    "contract": "inventory",
+    "purpose": "Variance between counted and expected",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "enterCountLine",
+    "contract": "fnb",
+    "purpose": "What was actually on the shelf",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "requestRecount",
+    "contract": "fnb",
+    "purpose": "Send a line back to be counted again",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "setDailyCount",
+    "contract": "inventory",
+    "purpose": "Which items get counted every day",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "countId",
+     "from": "EMP-003"
+    }
+   ],
+   "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-066",
+   "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-067",
+  "name": "Damage, Loss, Shrinkage & Stock Adjustment",
+  "module": "Stock on the Floor",
+  "requiresModule": "fnb",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/damage-loss-shrinkage-stock-adjustment",
+   "component": "apps/venue-staff-app/src/routes/operations/DamageLossShrinkageStockAdjustmentDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "EMP-003"
+   ],
+   "exitTo": [
+    "EMP-003"
+   ],
+   "inferred": false,
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-044",
+     "trigger": "The venue manager reviews open and unsigned findings before service",
+     "provenance": "flow F28 step 5→6",
+     "operation": "signCorrectiveAction",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Food-safety operations wired 20 August** — boards 5G and 5J of the client F&B pack, and **HACCP is a regulatory obligation nothing in the package touched.**",
+  "density": "comfortable",
+  "boardFrames": [
+   "FnB Board 5.dc.html#fnb-5e"
+  ],
+  "pattern": "configEditor",
+  "patternReason": "the screen declares only writes (`recordWaste`, `createStockMovement`, `logTemperature`) and no read of a population — it is settings, not a list",
+  "purpose": "Damage, Loss, Shrinkage & Stock Adjustment — from the client design board, 20 August.",
+  "gaps": [
+   {
+    "operation": "recordWaste",
+    "why": "**`recordWaste` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
+    "source": "contract fnb.yaml POST /outlets/{outletId}/waste"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Record",
+       "operation": "recordWaste",
+       "provenance": "contract fnb.yaml POST /outlets/{outletId}/waste"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createStockMovement",
+       "provenance": "contract inventory.yaml POST /stock-movements"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Log",
+       "operation": "logTemperature",
+       "provenance": "contract fnb.yaml POST /food-safety/temperature-logs"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Sign",
+       "operation": "signCorrectiveAction",
+       "provenance": "contract fnb.yaml POST /food-safety/corrective-actions/{actionId}/sign"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search damage, loss, shrinkage",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The saved damage loss shrinkage.",
+   "error": "Could not load. Names which read failed and leaves the damage loss shrinkage untouched.",
+   "emptyFirstRun": "No damage loss shrinkage configured. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
+  },
+  "apis": [
+   {
+    "operationId": "recordWaste",
+    "contract": "fnb",
+    "purpose": "Record waste",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "createStockMovement",
+    "contract": "inventory",
+    "purpose": "Record an issue, return or adjustment",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "logTemperature",
+    "contract": "fnb",
+    "purpose": "logTemperature",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "signCorrectiveAction",
+    "contract": "fnb",
+    "purpose": "signCorrectiveAction",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "outletId",
+     "from": "EMP-003"
+    },
+    {
+     "name": "actionId",
+     "from": "deepLink",
+     "optional": true
+    }
+   ],
+   "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to. A corrective action opened from the food-safety list or an alert. **An action opened from an alert is the common path** — the platform raises it, somebody signs it, and the link is how they get there."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-067",
+   "source": "Claude Design F&B pack, 24 August",
+   "note": "**Drawn by Claude Design on `FnB Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-068",
+  "name": "Reservation, Allocation & Omnichannel Inventory",
+  "module": "Stock on the Floor",
+  "requiresModule": "inventory",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/reservation-allocation-omnichannel-inventory",
+   "component": "apps/venue-staff-app/src/routes/operations/ReservationAllocationOmnichannelInDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "EMP-003"
+   ],
+   "exitTo": [
+    "EMP-003"
+   ],
+   "inferred": false,
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Named in the board contents and not written up in it.** **Drawn 31 August** — `Retail Board 4.dc.html` frame `ret-4h`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Reservation, Allocation &amp; Omnichannel Inventory* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
+  "density": "comfortable",
+  "boardFrames": [
+   "Retail Board 4.dc.html#ret-4h"
+  ],
+  "pattern": "statusTracker",
+  "patternReason": "`getStockPositions` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Reservation, Allocation & Omnichannel Inventory — from the client design board, 20 August.",
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected reservation allocation omnichannel",
+       "bindsTo": "StockPosition",
+       "columns": [
+        "StockPosition.itemId",
+        "StockPosition.itemName",
+        "StockPosition.sku",
+        "StockPosition.locationId",
+        "StockPosition.locationName",
+        "StockPosition.onHand",
+        "StockPosition.allocated",
+        "StockPosition.available",
+        "StockPosition.unit",
+        "StockPosition.value",
+        "StockPosition.lastCountedAt",
+        "StockPosition.lastMovementAt"
+       ],
+       "operation": "getStockPositions",
+       "provenance": "contract inventory.yaml GET /stock"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Reserve",
+       "operation": "reserveMerchandise",
+       "provenance": "contract retail.yaml POST /outlets/{outletId}/reserve"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search reservation, allocation",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The reservation allocation omnichannel list.",
+   "error": "Could not load. Names which read failed and leaves the reservation allocation omnichannel untouched.",
+   "emptyFirstRun": "No reservation allocation omnichannel yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the reservation allocation omnichannel are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
+  },
+  "apis": [
+   {
+    "operationId": "getStockPositions",
+    "contract": "inventory",
+    "purpose": "Stock on hand by item and location",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "reserveMerchandise",
+    "contract": "retail",
+    "purpose": "Reserve an item for collection",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "outletId",
+     "from": "EMP-003"
+    }
+   ],
+   "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-068",
+   "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-069",
+  "name": "Barcode, RFID, Serialized Stock & Traceability",
+  "module": "Stock on the Floor",
+  "requiresModule": "inventory",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/barcode-rfid-serialized-stock-traceability",
+   "component": "apps/venue-staff-app/src/routes/operations/BarcodeRfidSerializedStockTraceabiDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "EMP-003"
+   ],
+   "exitTo": [
+    "EMP-003"
+   ],
+   "inferred": false,
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Drawn 31 August** — `Retail Board 4.dc.html` frame `ret-4j`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Barcode, RFID, Serialized Stock &amp; Traceability* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
+  "density": "comfortable",
+  "boardFrames": [
+   "Retail Board 4.dc.html#ret-4j"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listSerialisedItems` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Barcode, RFID, Serialized Stock & Traceability — from the client design board, 20 August.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every barcode rfid serialized",
+       "bindsTo": "SerialisedItem",
+       "columns": [
+        "SerialisedItem.id",
+        "SerialisedItem.itemId",
+        "SerialisedItem.batchId",
+        "SerialisedItem.serial",
+        "SerialisedItem.locationId",
+        "SerialisedItem.status",
+        "SerialisedItem.soldOnOrderLineId",
+        "SerialisedItem.warrantyUntil",
+        "SerialisedItem.receivedAt"
+       ],
+       "operation": "listSerialisedItems",
+       "provenance": "contract inventory.yaml GET /serialised-items"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected barcode rfid serialized",
+       "bindsTo": "SerialisedItem",
+       "columns": [
+        "SerialisedItem.id",
+        "SerialisedItem.itemId",
+        "SerialisedItem.batchId",
+        "SerialisedItem.serial",
+        "SerialisedItem.locationId",
+        "SerialisedItem.status",
+        "SerialisedItem.soldOnOrderLineId",
+        "SerialisedItem.warrantyUntil",
+        "SerialisedItem.receivedAt"
+       ],
+       "operation": "listSerialisedItems",
+       "provenance": "contract inventory.yaml GET /serialised-items"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Lookup",
+       "operation": "lookupMerchandise",
+       "provenance": "contract retail.yaml GET /merchandise/lookup"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search barcode, rfid, serialized stock",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The barcode rfid serialized list.",
+   "error": "Could not load. Names which read failed and leaves the barcode rfid serialized untouched.",
+   "emptyFirstRun": "No barcode rfid serialized yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the barcode rfid serialized are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
+  },
+  "apis": [
+   {
+    "operationId": "listSerialisedItems",
+    "contract": "inventory",
+    "purpose": "listSerialisedItems",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "lookupMerchandise",
+    "contract": "retail",
+    "purpose": "Price and stock check by barcode",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to.",
+   "preloaded": [
+    "SerialisedItem.id",
+    "SerialisedItem.itemId",
+    "SerialisedItem.batchId",
+    "SerialisedItem.serial",
+    "SerialisedItem.locationId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-069",
+   "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-070",
+  "name": "Inventory Exceptions, AI Replenishment & Action Center",
+  "module": "Stock on the Floor",
+  "requiresModule": "analytics",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/inventory-exceptions-ai-replenishment-action-cen",
+   "component": "apps/venue-staff-app/src/routes/operations/InventoryExceptionsAiReplenishmentDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "EMP-003"
+   ],
+   "exitTo": [
+    "EMP-003"
+   ],
+   "inferred": false,
+   "notes": "**Returns to EMP-003.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Named in the board contents and not written up in it.** **Drawn 31 August** — `Inventory Board 1.dc.html` frame `inv-10` (*Inventory Exceptions, Data Quality & AI*). **Inventory Board 1 is the only one of the seven that maps onto screens this package has** — item master, categories, UoM, locations, statuses, movement history. Boards 2 to 7 draw a warehouse and procurement suite the contracts do not contain.",
+  "density": "comfortable",
+  "boardFrames": [
+   "Inventory Board 1.dc.html#inv-10"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listAlerts` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Inventory Exceptions, AI Replenishment & Action Center — from the client design board, 20 August.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every inventory exceptions replenishment",
+       "bindsTo": "Alert",
+       "columns": [
+        "Alert.id",
+        "Alert.ruleId",
+        "Alert.raisedAt",
+        "Alert.severity",
+        "Alert.status",
+        "Alert.observedValue",
+        "Alert.threshold",
+        "Alert.scopePath",
+        "Alert.acknowledgedByPrincipalId",
+        "Alert.acknowledgedAt",
+        "Alert.resolvedAt",
+        "Alert.escalatedAt"
+       ],
+       "operation": "listAlerts",
+       "provenance": "contract reporting.yaml GET /alerts"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected inventory exceptions replenishment",
+       "bindsTo": "Alert",
+       "columns": [
+        "Alert.id",
+        "Alert.ruleId",
+        "Alert.raisedAt",
+        "Alert.severity",
+        "Alert.status",
+        "Alert.observedValue",
+        "Alert.threshold",
+        "Alert.scopePath",
+        "Alert.acknowledgedByPrincipalId",
+        "Alert.acknowledgedAt",
+        "Alert.resolvedAt",
+        "Alert.escalatedAt"
+       ],
+       "operation": "listAlerts",
+       "provenance": "contract reporting.yaml GET /alerts"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Acknowledge",
+       "operation": "acknowledgeAlert",
+       "provenance": "contract reporting.yaml POST /alerts/{alertId}/acknowledge"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createRequisition",
+       "provenance": "contract inventory.yaml POST /requisitions"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search inventory exceptions, ai replenishment",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "notes": "**Cards rather than a table.** One thumb, arm’s length, and a person who is walking.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Confirm",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The inventory exceptions replenishment list.",
+   "error": "Could not load. Names which read failed and leaves the inventory exceptions replenishment untouched.",
+   "emptyFirstRun": "No inventory exceptions replenishment yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the inventory exceptions replenishment are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Not available offline.** `listAlerts` reads the analytical replica (ADR-0016). **Corrected 24 August** — the shared \"works from cache and queues what it records\" wording was applied to a screen whose only operation is an analytical read."
+  },
+  "apis": [
+   {
+    "operationId": "listAlerts",
+    "contract": "reporting",
+    "purpose": "What is currently raised",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "acknowledgeAlert",
+    "contract": "reporting",
+    "purpose": "Take responsibility for it",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAlerts"
+    ]
+   },
+   {
+    "operationId": "createRequisition",
+    "contract": "inventory",
+    "purpose": "Raise a requisition",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAlerts"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "alertId",
+     "from": "EMP-003"
+    }
+   ],
+   "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to.",
+   "preloaded": [
+    "Alert.id",
+    "Alert.ruleId",
+    "Alert.raisedAt",
+    "Alert.severity",
+    "Alert.status"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-070",
+   "note": "**Drawn by Claude Design on `Inventory Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

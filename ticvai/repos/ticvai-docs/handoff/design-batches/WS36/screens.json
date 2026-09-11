@@ -1,0 +1,1802 @@
+[
+ {
+  "id": "ADM-068",
+  "name": "Tax, Fee & Calculation Command Center",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "3",
+   "number": "10.3.1",
+   "page": 39
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/tax-fee-calculation-command-center-adm-068",
+   "component": "apps/ticvai-web/src/routes/commercial/TaxFeeCalculationCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "exitTo": [
+    "ADM-002",
+    "ADM-069",
+    "ADM-070",
+    "ADM-071",
+    "ADM-072",
+    "ADM-073",
+    "ADM-074",
+    "ADM-075",
+    "ADM-076",
+    "ADM-077"
+   ],
+   "inferred": false,
+   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
+   "transitions": [
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-069",
+     "trigger": "Works in Tax Profile & Jurisdiction Configuration",
+     "provenance": "flow F145 step 1→2",
+     "operation": "listTaxFeeCalculation"
+    },
+    {
+     "to": "ADM-070",
+     "trigger": "Works in Tax Rule & Treatment Builder",
+     "provenance": "flow F145 step 3→4",
+     "operation": "listTaxFeeCalculation"
+    },
+    {
+     "to": "ADM-071",
+     "trigger": "Works in Fee & Surcharge Library",
+     "provenance": "flow F145 step 5→6",
+     "operation": "listTaxFeeCalculation"
+    },
+    {
+     "to": "ADM-072",
+     "trigger": "Works in Fee Applicability & Charging Rule Builder",
+     "provenance": "flow F145 step 7→8",
+     "operation": "listTaxFeeCalculation"
+    },
+    {
+     "to": "ADM-073",
+     "trigger": "Works in Fee Waiver, Tax Exemption & Exception Rules",
+     "provenance": "flow F145 step 9→10",
+     "operation": "listTaxFeeCalculation"
+    },
+    {
+     "to": "ADM-074",
+     "trigger": "Works in Price Calculation Sequence & Formula Engine",
+     "provenance": "flow F145 step 11→12",
+     "operation": "listTaxFeeCalculation"
+    },
+    {
+     "to": "ADM-075",
+     "trigger": "Works in Currency Precision, Rounding & Monetary Rules",
+     "provenance": "flow F145 step 13→14",
+     "operation": "listTaxFeeCalculation"
+    },
+    {
+     "to": "ADM-076",
+     "trigger": "Works in Price Breakdown, Calculation Simulation & Explainability",
+     "provenance": "flow F145 step 15→16",
+     "operation": "listTaxFeeCalculation"
+    },
+    {
+     "to": "ADM-077",
+     "trigger": "Works in Calculation Validation, Reconciliation & Service Interface",
+     "provenance": "flow F145 step 17→18",
+     "operation": "listTaxFeeCalculation"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Provide Finance, Commercial and Pricing administrators with one central view of TICVAI's price-calculation configuration.",
+  "purposeNote": "Authorized administrators can understand the complete status and health of TICVAI tax, fee and price-calculation configuration from one workspace.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Create Tax Profile, Create Fee, Create Calculation Profile, Run Simulation, Validate Configuration, View Dependencies. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 39 §Quick Actions"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search tax fee calculation",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 39 §Filter by"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "Tax",
+        "Fee",
+        "Surcharge",
+        "Waiver",
+        "Exemption",
+        "Calculation Profile",
+        "Rounding Profile"
+       ],
+       "notes": "The pack filters this screen by tax, fee, surcharge, waiver, exemption, calculation profile and 1 more — which are present is a decision the pack already made.",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 39 §Filter by"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every tax fee calculation",
+       "columns": [
+        "TaxFeeCalculationCommandCenterView.activeTaxProfiles",
+        "TaxFeeCalculationCommandCenterView.taxJurisdictions",
+        "TaxFeeCalculationCommandCenterView.activeFeeProfiles",
+        "TaxFeeCalculationCommandCenterView.activeSurcharges",
+        "TaxFeeCalculationCommandCenterView.exemptionRules",
+        "TaxFeeCalculationCommandCenterView.calculationProfiles",
+        "TaxFeeCalculationCommandCenterView.productsMissingTax",
+        "TaxFeeCalculationCommandCenterView.productsMissingCalculationProfile",
+        "TaxFeeCalculationCommandCenterView.configurationConflicts",
+        "TaxFeeCalculationCommandCenterView.upcomingTaxChanges",
+        "TaxFeeCalculationCommandCenterView.validationIssues",
+        "TaxFeeCalculationCommandCenterView.recentlyModifiedRules",
+        "TaxFeeCalculationCommandCenterView.profileName",
+        "TaxFeeCalculationCommandCenterView.type",
+        "TaxFeeCalculationCommandCenterView.country",
+        "TaxFeeCalculationCommandCenterView.legalEntity",
+        "TaxFeeCalculationCommandCenterView.market",
+        "TaxFeeCalculationCommandCenterView.currency",
+        "TaxFeeCalculationCommandCenterView.productScope",
+        "TaxFeeCalculationCommandCenterView.effectivePeriod",
+        "TaxFeeCalculationCommandCenterView.status",
+        "TaxFeeCalculationCommandCenterView.owner"
+       ],
+       "bindsTo": "TaxFeeCalculationCommandCenterView",
+       "operation": "listTaxFeeCalculation",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 39 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected tax fee calculation",
+       "bindsTo": "TaxFeeCalculationCommandCenterView",
+       "columns": [
+        "TaxFeeCalculationCommandCenterView.activeTaxProfiles",
+        "TaxFeeCalculationCommandCenterView.taxJurisdictions",
+        "TaxFeeCalculationCommandCenterView.activeFeeProfiles",
+        "TaxFeeCalculationCommandCenterView.activeSurcharges",
+        "TaxFeeCalculationCommandCenterView.exemptionRules",
+        "TaxFeeCalculationCommandCenterView.calculationProfiles",
+        "TaxFeeCalculationCommandCenterView.productsMissingTax",
+        "TaxFeeCalculationCommandCenterView.productsMissingCalculationProfile",
+        "TaxFeeCalculationCommandCenterView.configurationConflicts",
+        "TaxFeeCalculationCommandCenterView.upcomingTaxChanges",
+        "TaxFeeCalculationCommandCenterView.validationIssues",
+        "TaxFeeCalculationCommandCenterView.recentlyModifiedRules",
+        "TaxFeeCalculationCommandCenterView.profileName",
+        "TaxFeeCalculationCommandCenterView.type",
+        "TaxFeeCalculationCommandCenterView.country",
+        "TaxFeeCalculationCommandCenterView.legalEntity",
+        "TaxFeeCalculationCommandCenterView.market",
+        "TaxFeeCalculationCommandCenterView.currency",
+        "TaxFeeCalculationCommandCenterView.productScope",
+        "TaxFeeCalculationCommandCenterView.effectivePeriod",
+        "TaxFeeCalculationCommandCenterView.status",
+        "TaxFeeCalculationCommandCenterView.owner"
+       ],
+       "notes": null,
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 39 §Display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create Tax Profile",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 39 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create Fee",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 39 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create Calculation Profile",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 39 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Run Simulation",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 39 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Validate Configuration",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 39 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "View Dependencies",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 39 §Quick Actions"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The tax fee calculation list.",
+   "error": "Could not load. Names which read failed and leaves the tax fee calculation untouched.",
+   "emptyFirstRun": "No tax fee calculation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the tax fee calculation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listTaxFeeCalculation",
+    "contract": "catalogue",
+    "purpose": "Tax, Fee & Calculation Command Center",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "TaxFeeCalculationCommandCenterView.activeTaxProfiles",
+    "TaxFeeCalculationCommandCenterView.taxJurisdictions",
+    "TaxFeeCalculationCommandCenterView.activeFeeProfiles",
+    "TaxFeeCalculationCommandCenterView.activeSurcharges",
+    "TaxFeeCalculationCommandCenterView.exemptionRules",
+    "TaxFeeCalculationCommandCenterView.calculationProfiles"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-068"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 39. 22 of 29 labels bound to a contract property; 35 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-069",
+  "name": "Tax Profile & Jurisdiction Configuration",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "3",
+   "number": "10.3.2",
+   "page": 40
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/tax-profile-jurisdiction-configuration-adm-069",
+   "component": "apps/ticvai-web/src/routes/commercial/TaxProfileJurisdictionConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-068"
+   ],
+   "exitTo": [
+    "ADM-068"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-068, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-068",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F145 step 2→3",
+     "operation": "setTaxProfileJurisdiction"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Define reusable tax profiles according to legal entity, country, jurisdiction and commercial context.",
+  "purposeNote": "jurisdictions.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Sales Tax, Entertainment Tax, Tourism Tax, Municipality Tax, Service Tax. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Support"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Tax Profile Name",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tax Profile Code",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tax Type",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Country",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Region/Jurisdiction",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Legal Entity",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tax Registration Number",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Currency",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Effective From",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Effective To",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Status",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Owner",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Sales Tax",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Entertainment Tax",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Tourism Tax",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Municipality Tax",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Service Tax",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 40 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The tax profile jurisdiction configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the tax profile jurisdiction untouched.",
+   "emptyFirstRun": "No tax profile jurisdiction configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setTaxProfileJurisdiction",
+    "contract": "catalogue",
+    "purpose": "Tax Profile & Jurisdiction Configuration",
+    "trigger": "onAction",
+    "invalidates": [
+     "setTaxProfileJurisdiction"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-069"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 40. 0 of 0 labels bound to a contract property; 17 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-070",
+  "name": "Tax Rule & Treatment Builder",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "3",
+   "number": "10.3.3",
+   "page": 41
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/tax-rule-treatment-builder-adm-070",
+   "component": "apps/ticvai-web/src/routes/commercial/TaxRuleTreatmentBuilder.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-068"
+   ],
+   "exitTo": [
+    "ADM-068"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-068, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-068",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F145 step 4→5",
+     "operation": "setTaxRuleTreatment"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Define how taxes are applied to products and transactions.",
+  "purposeNote": "taxable commercial transaction.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Fixed Tax. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 41 §Support"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 41"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 41"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Tax Inclusive",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 41 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Tax Exclusive",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 41 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Tax Exempt",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 41 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Fixed Tax",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 41 §Support"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The tax rule treatment list.",
+   "error": "Could not load. Names which read failed and leaves the tax rule treatment untouched.",
+   "emptyFirstRun": "No tax rule treatment yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the tax rule treatment are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setTaxRuleTreatment",
+    "contract": "catalogue",
+    "purpose": "Tax Rule & Treatment Builder",
+    "trigger": "onAction",
+    "invalidates": [
+     "setTaxRuleTreatment"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-070"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 41. 0 of 0 labels bound to a contract property; 4 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-071",
+  "name": "Fee & Surcharge Library",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "3",
+   "number": "10.3.4",
+   "page": 43
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/fee-surcharge-library-adm-071",
+   "component": "apps/ticvai-web/src/routes/commercial/FeeSurchargeLibrary.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-068"
+   ],
+   "exitTo": [
+    "ADM-068"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-068, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-068",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F145 step 6→7",
+     "operation": "listFeeSurcharge"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Capture; Configure whether the fee is) and no display directory — it is settings, not a population",
+  "purpose": "Create standardized reusable non-base-price charges.",
+  "purposeNote": "than defining them separately within sales channels.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 16 actions on this screen and the screen declares 1 operation.** Unserved: Booking Fee, Transaction Fee, Service Fee, Convenience Fee, Delivery Fee, Handling Fee, Modification Fee, Rescheduling Fee …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 43 §Support"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Fee Name",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 43 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Fee Code",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 43 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Fee Type",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 43 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Description",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 43 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Calculation Method",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 43 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Value",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 43 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Currency",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 43 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tax Treatment",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 43 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Refundability",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 43 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Effective Period",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 43 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Status",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 43 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer Visible",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 43 §Configure whether the fee is"
+      },
+      {
+       "kind": "textField",
+       "label": "Included in Display Price",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 43 §Configure whether the fee is"
+      },
+      {
+       "kind": "selectField",
+       "label": "Shown Separately",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 43 §Configure whether the fee is"
+      },
+      {
+       "kind": "selectField",
+       "label": "Internal Only",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 43 §Configure whether the fee is"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Booking Fee",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 43 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Transaction Fee",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 43 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Service Fee",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 43 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Convenience Fee",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 43 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Delivery Fee",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 43 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Handling Fee",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 43 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Modification Fee",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 43 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Rescheduling Fee",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 43 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The fee surcharge configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the fee surcharge untouched.",
+   "emptyFirstRun": "No fee surcharge configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listFeeSurcharge",
+    "contract": "catalogue",
+    "purpose": "Fee & Surcharge Library",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-071"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 43. 0 of 0 labels bound to a contract property; 31 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-072",
+  "name": "Fee Applicability & Charging Rule Builder",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "3",
+   "number": "10.3.5",
+   "page": 44
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/fee-applicability-charging-rule-builder-adm-072",
+   "component": "apps/ticvai-web/src/routes/commercial/FeeApplicabilityChargingRuleBuilder.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-068"
+   ],
+   "exitTo": [
+    "ADM-068"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-068, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-068",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F145 step 8→9",
+     "operation": "setFeeApplicabilityCharging"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure whether fees can) and no display directory — it is settings, not a population",
+  "purpose": "Determine when a fee or surcharge should apply. Screen 10.3.4 defines the fee. Screen 10.3.5 defines the conditions that trigger it.",
+  "purposeNote": "satisfied.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Channel, Customer Type, Membership, Delivery Method, Order Value, Rule Priority, Stop Processing, Continue Processing. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Stack",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Configure whether fees can"
+      },
+      {
+       "kind": "selectField",
+       "label": "Replace",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Configure whether fees can"
+      },
+      {
+       "kind": "selectField",
+       "label": "Exclude Another Fee",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Configure whether fees can"
+      },
+      {
+       "kind": "selectField",
+       "label": "Apply Once",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Configure whether fees can"
+      },
+      {
+       "kind": "selectField",
+       "label": "Apply Per Item",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Configure whether fees can"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Channel",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Customer Type",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Membership",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Delivery Method",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Order Value",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Rule Priority",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Stop Processing",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Continue Processing",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmStopProcessing",
+    "component": "confirmDialog",
+    "trigger": "Stop Processing",
+    "body": "**Stop Processing on a fee applicability charging is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
+    "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 44 §Support"
+   }
+  ],
+  "states": {
+   "loading": "The fee applicability charging configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the fee applicability charging untouched.",
+   "emptyFirstRun": "No fee applicability charging configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setFeeApplicabilityCharging",
+    "contract": "catalogue",
+    "purpose": "Fee Applicability & Charging Rule Builder",
+    "trigger": "onAction",
+    "invalidates": [
+     "setFeeApplicabilityCharging"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-072"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 44. 0 of 0 labels bound to a contract property; 13 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-073",
+  "name": "Fee Waiver, Tax Exemption & Exception Rules",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "3",
+   "number": "10.3.6",
+   "page": 46
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/fee-waiver-tax-exemption-exception-rules-adm-073",
+   "component": "apps/ticvai-web/src/routes/commercial/FeeWaiverTaxExemptionExceptionRules.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-068"
+   ],
+   "exitTo": [
+    "ADM-068"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-068, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-068",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F145 step 10→11",
+     "operation": "listFeeWaiverTax"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure by) and no display directory — it is settings, not a population",
+  "purpose": "Govern circumstances under which a normally applicable tax or fee may be reduced, waived or exempted.",
+  "purposeNote": "Fees and taxes can only be waived or exempted through explicitly authorized rules or governed manual exceptions.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Zero-Rated Tax, Operational Waiver, Contractual Waiver. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 46 §Support"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Membership Benefit",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 46 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Loyalty Tier",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 46 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Corporate Agreement",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 46 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "B2B Contract",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 46 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer Segment",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 46 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Staff Role",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 46 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Promotion",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 46 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Service Recovery",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 46 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Operational Issue",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 46 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Legal Exemption",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 46 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Supervisor Override",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 46 §Configure by"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Fee Waiver",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 46 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Fee Reduction",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 46 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Tax Exemption",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 46 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Zero-Rated Tax",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 46 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Operational Waiver",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 46 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Contractual Waiver",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 46 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The fee waiver tax configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the fee waiver tax untouched.",
+   "emptyFirstRun": "No fee waiver tax configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listFeeWaiverTax",
+    "contract": "catalogue",
+    "purpose": "Fee Waiver, Tax Exemption & Exception Rules",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-073"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 46. 0 of 0 labels bound to a contract property; 17 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-074",
+  "name": "Price Calculation Sequence & Formula Engine",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "3",
+   "number": "10.3.7",
+   "page": 47
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/price-calculation-sequence-formula-engine-adm-074",
+   "component": "apps/ticvai-web/src/routes/commercial/PriceCalculationSequenceFormulaEngine.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-068"
+   ],
+   "exitTo": [
+    "ADM-068"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-068, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-068",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F145 step 12→13",
+     "operation": "listPriceCalculationSequence"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Each step should define) and no display directory — it is settings, not a population",
+  "purpose": "Define the exact sequence TICVAI follows to calculate the final payable amount. This is the heart of Board 3.",
+  "purposeNote": "The system can deterministically calculate the final payable amount using a governed and traceable sequence of commercial components.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Input",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 47 §Each step should define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Formula",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 47 §Each step should define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Sequence",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 47 §Each step should define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Taxability",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 47 §Each step should define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Rounding",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 47 §Each step should define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Dependency",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 47 §Each step should define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Output",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 47 §Each step should define"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The price calculation sequence configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the price calculation sequence untouched.",
+   "emptyFirstRun": "No price calculation sequence configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listPriceCalculationSequence",
+    "contract": "catalogue",
+    "purpose": "Price Calculation Sequence & Formula Engine",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-074"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 47. 0 of 0 labels bound to a contract property; 7 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-075",
+  "name": "Currency Precision, Rounding & Monetary Rules",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "3",
+   "number": "10.3.8",
+   "page": 49
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/currency-precision-rounding-monetary-rules-adm-075",
+   "component": "apps/ticvai-web/src/routes/commercial/CurrencyPrecisionRoundingMonetaryRules.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-068"
+   ],
+   "exitTo": [
+    "ADM-068"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-068, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-068",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F145 step 14→15",
+     "operation": "listCurrencyPrecisionRounding"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Ensure monetary calculations remain consistent across countries, currencies, channels and payment systems.",
+  "purposeNote": "currency precision and rounding rules.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every currency precision rounding",
+       "columns": [
+        "AED 199.50"
+       ],
+       "bindsTo": "CurrencyPrecisionRoundingMonetaryRulesView",
+       "operation": "listCurrencyPrecisionRounding",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 49 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected currency precision rounding",
+       "bindsTo": "CurrencyPrecisionRoundingMonetaryRulesView",
+       "columns": [
+        "AED 199.50"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Calculated”, “Calculated Total”, “Cash Payable”, “The engine should ensure”, “Currency Conversion”.",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 49 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The currency precision rounding list.",
+   "error": "Could not load. Names which read failed and leaves the currency precision rounding untouched.",
+   "emptyFirstRun": "No currency precision rounding yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the currency precision rounding are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCurrencyPrecisionRounding",
+    "contract": "catalogue",
+    "purpose": "Currency Precision, Rounding & Monetary Rules",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "AED 199.50"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-075"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 49. 0 of 1 labels bound to a contract property; 12 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-076",
+  "name": "Price Breakdown, Calculation Simulation & Explainability",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "3",
+   "number": "10.3.9",
+   "page": 50
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/price-breakdown-calculation-simulation-explainability-adm-076",
+   "component": "apps/ticvai-web/src/routes/commercial/PriceBreakdownCalculationSimulationExplainabilit.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-068"
+   ],
+   "exitTo": [
+    "ADM-068"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-068, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-068",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F145 step 16→17",
+     "operation": "simulatePriceBreakdownCalculation"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Select) and no display directory — it is settings, not a population",
+  "purpose": "Allow administrators to test the complete calculation before releasing configuration into production.",
+  "purposeNote": "Authorized users can reproduce and explain every monetary component contributing to the final payable amount before configuration goes live.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Customer",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 50 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Product",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 50 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Quantity",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 50 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 50 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Event",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 50 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Channel",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 50 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Date",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 50 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Timeslot",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 50 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Membership",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 50 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Promotion",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 50 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Payment Method",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 50 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Delivery Method",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 50 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Currency",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 50 §Select"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Run simulation",
+       "provenance": "contract operation simulatePriceBreakdownCalculation"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The price breakdown calculation configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the price breakdown calculation untouched.",
+   "emptyFirstRun": "No price breakdown calculation configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "simulatePriceBreakdownCalculation",
+    "contract": "catalogue",
+    "purpose": "Price Breakdown, Calculation Simulation & Explainability",
+    "trigger": "onAction",
+    "invalidates": [
+     "simulatePriceBreakdownCalculation"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-076"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 50. 0 of 0 labels bound to a contract property; 13 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-077",
+  "name": "Calculation Validation, Reconciliation & Service Interface",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "3",
+   "number": "10.3.10",
+   "page": 52
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/calculation-validation-reconciliation-service-interface-adm-077",
+   "component": "apps/ticvai-web/src/routes/commercial/CalculationValidationReconciliationServiceInterf.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-068"
+   ],
+   "exitTo": [
+    "ADM-068"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-068, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide final technical and commercial validation of the pricing calculation engine and define how other TICVAI modules consume it. Boards 1–3 established the commercial and calculation engines: Board 1: What prices exist? Board 2: Which price applies? Board 3: How is the final payable amount calculated?",
+  "purposeNote": "The calculation engine passes configured reconciliation and regression tests and exposes one authoritative calculation service to all TICVAI sales and operational modules. Board 3 — Final Screen Register # Backend Screen Core Responsibility 10.3. Calculation configuration Tax, Fee & Calculation Command Center 1 health 10.3. Tax Profile & Jurisdiction Configuration Tax master configuration 2 10.3. Tax Rule & Treatment Builder Tax applicability/calculation 3 10.3. Fee & Surcharge Library Reusable fee definitions 4 10.3. Fee Applicability & Charging Rule Builder Fee conditions 5 10.3. Fee Waiver,",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 52"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 52"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listCalculationValidationReconciliation",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The calculation validation reconciliation list.",
+   "error": "Could not load. Names which read failed and leaves the calculation validation reconciliation untouched.",
+   "emptyFirstRun": "No calculation validation reconciliation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the calculation validation reconciliation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCalculationValidationReconciliation",
+    "contract": "catalogue",
+    "purpose": "Calculation Validation, Reconciliation & Service Interface",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "CalculationValidationReconciliationServiceInterfaceView.missingProfile",
+    "CalculationValidationReconciliationServiceInterfaceView.invalidRate",
+    "CalculationValidationReconciliationServiceInterfaceView.expiredRule",
+    "CalculationValidationReconciliationServiceInterfaceView.overlappingRule",
+    "CalculationValidationReconciliationServiceInterfaceView.conflictingRule"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-077"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 52. 0 of 0 labels bound to a contract property; 0 of 121 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

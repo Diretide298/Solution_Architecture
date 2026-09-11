@@ -1,0 +1,124 @@
+id: F212
+name: 'Subscription Licensing AI Self Service board 6: Provisioning Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Subscription Licensing AI Self Service board 6. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-419
+  entryPoints:
+  - Arrives at Provisioning Command Center
+steps:
+- step: 1
+  screen: ADM-419
+  action: Opens Provisioning Command Center
+  operations: []
+  outcome: Show the overall status of the customer's environment creation.
+- step: 2
+  screen: ADM-420
+  action: Works in Tenant & Organization Provisioning
+  operations: []
+  outcome: Create the customer's isolated TICVAI environment and primary organization structure.
+- step: 3
+  screen: ADM-419
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-421
+  action: Works in Venue & Operational Structure Creation
+  operations: []
+  outcome: Automatically create the initial venue structure using information collected during onboarding.
+- step: 5
+  screen: ADM-419
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-422
+  action: Works in Administrator & Security Initialization
+  operations: []
+  outcome: Create the initial authorized customer administrator and establish the tenant security baseline.
+- step: 7
+  screen: ADM-419
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-423
+  action: Works in License & Entitlement Activation
+  operations: []
+  outcome: Translate the commercial subscription purchased in Board 5 into enforceable technical entitlements.
+- step: 9
+  screen: ADM-419
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-424
+  action: Works in Module Activation & Dependency Validation
+  operations: []
+  outcome: Activate the modules purchased in Board 4/5 and verify all required dependencies.
+- step: 11
+  screen: ADM-419
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-425
+  action: Works in Venue Template Application
+  operations: []
+  outcome: Apply an appropriate initial configuration template based on the venue assessment from Board
+    2.
+- step: 13
+  screen: ADM-419
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-426
+  action: Works in Initial Configuration & Regional Defaults
+  operations: []
+  outcome: Apply safe initial defaults using information already provided during onboarding.
+- step: 15
+  screen: ADM-419
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-427
+  action: Works in Provisioning Validation & Exception Management
+  operations: []
+  outcome: Validate that the environment has been created correctly before handing it to customer configuration.
+- step: 17
+  screen: ADM-419
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+branches:
+- at: 1
+  condition: Nothing has been set up on Provisioning Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Subscription Licensing AI Self Service board 6 visited
+primaryContract: unknown
+contracts:
+- unknown

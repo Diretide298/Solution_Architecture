@@ -1,0 +1,1365 @@
+[
+ {
+  "id": "ADM-118",
+  "name": "Product Lifecycle Command Center",
+  "module": "Catalogue",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
+   "board": "1",
+   "number": "1",
+   "page": 3
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/catalogue/product-lifecycle-command-center-adm-118",
+   "component": "apps/ticvai-web/src/routes/catalogue/ProductLifecycleCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "exitTo": [
+    "ADM-002",
+    "ADM-119",
+    "ADM-120",
+    "ADM-121",
+    "ADM-122",
+    "ADM-123",
+    "ADM-124",
+    "ADM-125",
+    "ADM-126",
+    "ADM-127"
+   ],
+   "inferred": false,
+   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
+   "transitions": [
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-119",
+     "trigger": "Works in Product Creation Workspace",
+     "provenance": "flow F152 step 1→2",
+     "operation": "listProductLifecycle"
+    },
+    {
+     "to": "ADM-120",
+     "trigger": "Works in Lifecycle Status & Workflow Configuration",
+     "provenance": "flow F152 step 3→4",
+     "operation": "listProductLifecycle"
+    },
+    {
+     "to": "ADM-121",
+     "trigger": "Works in Bulk Product Creation & Catalogue Import",
+     "provenance": "flow F152 step 5→6",
+     "operation": "listProductLifecycle"
+    },
+    {
+     "to": "ADM-122",
+     "trigger": "Works in Product Import / Export & Environment Transfer",
+     "provenance": "flow F152 step 7→8",
+     "operation": "listProductLifecycle"
+    },
+    {
+     "to": "ADM-123",
+     "trigger": "Works in Product Context, Ownership & Assignment",
+     "provenance": "flow F152 step 9→10",
+     "operation": "listProductLifecycle"
+    },
+    {
+     "to": "ADM-124",
+     "trigger": "Works in Channel Publication & Availability",
+     "provenance": "flow F152 step 11→12",
+     "operation": "listProductLifecycle"
+    },
+    {
+     "to": "ADM-125",
+     "trigger": "Works in Publication & Activation Scheduler",
+     "provenance": "flow F152 step 13→14",
+     "operation": "listProductLifecycle"
+    },
+    {
+     "to": "ADM-126",
+     "trigger": "Works in Product Duplication & Template Library",
+     "provenance": "flow F152 step 15→16",
+     "operation": "listProductLifecycle"
+    },
+    {
+     "to": "ADM-127",
+     "trigger": "Works in AI Catalogue Builder & Configuration Review",
+     "provenance": "flow F152 step 17→18",
+     "operation": "listProductLifecycle"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide administrators with a centralized operational view of every product and its current lifecycle state.",
+  "purposeNote": "An authorized administrator can locate any product, identify its exact lifecycle state and determine the next required operational action from one screen.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 3"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 3"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listProductLifecycle",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The product lifecycle list.",
+   "error": "Could not load. Names which read failed and leaves the product lifecycle untouched.",
+   "emptyFirstRun": "No product lifecycle yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the product lifecycle are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listProductLifecycle",
+    "contract": "catalogue",
+    "purpose": "Product Lifecycle Command Center",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "ProductLifecycleCommandCenterView.showCurrentLifecycleStatus",
+    "ProductLifecycleCommandCenterView.oDraft",
+    "ProductLifecycleCommandCenterView.oInConfiguration",
+    "ProductLifecycleCommandCenterView.oPendingApproval",
+    "ProductLifecycleCommandCenterView.oApproved"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-118"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 3. 0 of 0 labels bound to a contract property; 0 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-119",
+  "name": "Product Creation Workspace",
+  "module": "Catalogue",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
+   "board": "1",
+   "number": "2",
+   "page": 4
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/catalogue/product-creation-workspace-adm-119",
+   "component": "apps/ticvai-web/src/routes/catalogue/ProductCreationWorkspace.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-118"
+   ],
+   "exitTo": [
+    "ADM-118"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-118, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-118",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F152 step 2→3",
+     "operation": "createProduct"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide a governed starting point for creating a new ticketing product.",
+  "purposeNote": "A new product can be created and saved in Draft without becoming commercially available until all required configuration and governance conditions are satisfied.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 4"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 4"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "provenance": "contract operation createProduct"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createProduct"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The product creation list.",
+   "error": "Could not load. Names which read failed and leaves the product creation untouched.",
+   "emptyFirstRun": "No product creation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the product creation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "createProduct",
+    "contract": "catalogue",
+    "purpose": "Create a product",
+    "trigger": "onAction",
+    "invalidates": [
+     "createProduct"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-119"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 4. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-120",
+  "name": "Lifecycle Status & Workflow Configuration",
+  "module": "Catalogue",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
+   "board": "1",
+   "number": "3",
+   "page": 5
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/catalogue/lifecycle-status-workflow-configuration-adm-120",
+   "component": "apps/ticvai-web/src/routes/catalogue/LifecycleStatusWorkflowConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-118"
+   ],
+   "exitTo": [
+    "ADM-118"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-118, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-118",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F152 step 4→5",
+     "operation": "setLifecycleStatuWorkflow"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure how products move between lifecycle states.",
+  "purposeNote": "Administrators can configure a controlled product lifecycle without development or database changes.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 5"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 5"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "provenance": "contract operation setLifecycleStatuWorkflow"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setLifecycleStatuWorkflow"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The lifecycle status workflow list.",
+   "error": "Could not load. Names which read failed and leaves the lifecycle status workflow untouched.",
+   "emptyFirstRun": "No lifecycle status workflow yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the lifecycle status workflow are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setLifecycleStatuWorkflow",
+    "contract": "catalogue",
+    "purpose": "Lifecycle Status & Workflow Configuration",
+    "trigger": "onAction",
+    "invalidates": [
+     "setLifecycleStatuWorkflow"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-120"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 5. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-121",
+  "name": "Bulk Product Creation & Catalogue Import",
+  "module": "Catalogue",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
+   "board": "1",
+   "number": "4",
+   "page": 6
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/catalogue/bulk-product-creation-catalogue-import-adm-121",
+   "component": "apps/ticvai-web/src/routes/catalogue/BulkProductCreationCatalogueImport.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-118"
+   ],
+   "exitTo": [
+    "ADM-118"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-118, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-118",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F152 step 6→7",
+     "operation": "createBulkProductCatalogue"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Allow large catalogues to be created efficiently rather than configuring every product manually. This directly addresses the matrix requirement for catalogue creation through bulk-file upload.",
+  "purposeNote": "An administrator can convert a large existing catalogue into draft TICVAI products through a controlled import and validation process.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 6"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 6"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "provenance": "contract operation createBulkProductCatalogue"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createBulkProductCatalogue"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The bulk product creation list.",
+   "error": "Could not load. Names which read failed and leaves the bulk product creation untouched.",
+   "emptyFirstRun": "No bulk product creation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the bulk product creation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "createBulkProductCatalogue",
+    "contract": "catalogue",
+    "purpose": "Bulk Product Creation & Catalogue Import",
+    "trigger": "onAction",
+    "invalidates": [
+     "createBulkProductCatalogue"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-121"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 6. 0 of 0 labels bound to a contract property; 0 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-122",
+  "name": "Product Import / Export & Environment Transfer",
+  "module": "Catalogue",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
+   "board": "1",
+   "number": "5",
+   "page": 7
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/catalogue/product-import-export-environment-transfer-adm-122",
+   "component": "apps/ticvai-web/src/routes/catalogue/ProductImportExportEnvironmentTransfer.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-118"
+   ],
+   "exitTo": [
+    "ADM-118"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-118, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-118",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F152 step 8→9",
+     "operation": "listProductImportExport"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Allow controlled movement of product configurations between TICVAI environments. This covers the matrix requirement for importing/exporting catalogue products between different environments.",
+  "purposeNote": "Products can be moved between authorized environments without manually recreating their configuration and without silently overwriting incompatible production settings.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 7"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 7"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listProductImportExport",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The product import export list.",
+   "error": "Could not load. Names which read failed and leaves the product import export untouched.",
+   "emptyFirstRun": "No product import export yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the product import export are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listProductImportExport",
+    "contract": "catalogue",
+    "purpose": "Product Import / Export & Environment Transfer",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "ProductImportExportEnvironmentTransferView.mapVenueLocationReferences",
+    "ProductImportExportEnvironmentTransferView.mapDependencies",
+    "ProductImportExportEnvironmentTransferView.detectMissingReferences",
+    "ProductImportExportEnvironmentTransferView.previewChanges",
+    "ProductImportExportEnvironmentTransferView.executeTransfer"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-122"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 0 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-123",
+  "name": "Product Context, Ownership & Assignment",
+  "module": "Catalogue",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
+   "board": "1",
+   "number": "6",
+   "page": 8
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/catalogue/product-context-ownership-assignment-adm-123",
+   "component": "apps/ticvai-web/src/routes/catalogue/ProductContextOwnershipAssignment.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-118"
+   ],
+   "exitTo": [
+    "ADM-118"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-118, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-118",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F152 step 10→11",
+     "operation": "setProductContextOwnership"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Define where the product belongs and who is responsible for it.",
+  "purposeNote": "Every governed product has clearly defined ownership, organizational context and operational/commercial assignment.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 8"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 8"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "provenance": "contract operation setProductContextOwnership"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setProductContextOwnership"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The product context ownership list.",
+   "error": "Could not load. Names which read failed and leaves the product context ownership untouched.",
+   "emptyFirstRun": "No product context ownership yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the product context ownership are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setProductContextOwnership",
+    "contract": "catalogue",
+    "purpose": "Product Context, Ownership & Assignment",
+    "trigger": "onAction",
+    "invalidates": [
+     "setProductContextOwnership"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-123"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-124",
+  "name": "Channel Publication & Availability",
+  "module": "Catalogue",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
+   "board": "1",
+   "number": "7",
+   "page": 9
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/catalogue/channel-publication-availability-adm-124",
+   "component": "apps/ticvai-web/src/routes/catalogue/ChannelPublicationAvailability.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-118"
+   ],
+   "exitTo": [
+    "ADM-118"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-118, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-118",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F152 step 12→13",
+     "operation": "publishChannelAvailability"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Control where a product may be exposed for sale.",
+  "purposeNote": "An authorized user can control precisely which approved channels expose a product while previously issued valid entitlements remain unaffected unless a separate governed action explicitly changes them.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 9"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 9"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Publish",
+       "provenance": "contract operation publishChannelAvailability"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
+       "provenance": "authored — required by check-screens for publishChannelAvailability"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The channel publication availability list.",
+   "error": "Could not load. Names which read failed and leaves the channel publication availability untouched.",
+   "emptyFirstRun": "No channel publication availability yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the channel publication availability are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "publishChannelAvailability",
+    "contract": "catalogue",
+    "purpose": "Channel Publication & Availability",
+    "trigger": "onAction",
+    "invalidates": [
+     "publishChannelAvailability"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-124"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-125",
+  "name": "Publication & Activation Scheduler",
+  "module": "Catalogue",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
+   "board": "1",
+   "number": "8",
+   "page": 10
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/catalogue/publication-activation-scheduler-adm-125",
+   "component": "apps/ticvai-web/src/routes/catalogue/PublicationActivationScheduler.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-118"
+   ],
+   "exitTo": [
+    "ADM-118"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-118, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-118",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F152 step 14→15",
+     "operation": "publishActivationScheduler"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Automate future product lifecycle actions.",
+  "purposeNote": "Products can automatically enter or leave defined commercial lifecycle states at configured times without manual intervention.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 10"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 10"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Publish",
+       "provenance": "contract operation publishActivationScheduler"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
+       "provenance": "authored — required by check-screens for publishActivationScheduler"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The publication activation scheduler list.",
+   "error": "Could not load. Names which read failed and leaves the publication activation scheduler untouched.",
+   "emptyFirstRun": "No publication activation scheduler yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the publication activation scheduler are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "publishActivationScheduler",
+    "contract": "catalogue",
+    "purpose": "Publication & Activation Scheduler",
+    "trigger": "onAction",
+    "invalidates": [
+     "publishActivationScheduler"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-125"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 10. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-126",
+  "name": "Product Duplication & Template Library",
+  "module": "Catalogue",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
+   "board": "1",
+   "number": "9",
+   "page": 11
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/catalogue/product-duplication-template-library-adm-126",
+   "component": "apps/ticvai-web/src/routes/catalogue/ProductDuplicationTemplateLibrary.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-118"
+   ],
+   "exitTo": [
+    "ADM-118"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-118, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-118",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F152 step 16→17",
+     "operation": "listProductDuplicationTemplate"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Duplication Options) and no display directory — it is settings, not a population",
+  "purpose": "Accelerate product configuration by allowing administrators to reuse proven configurations. The source matrix explicitly requires duplication of products together with associated configuration, rules, pricing and entitlements.",
+  "purposeNote": "Users can create a new Draft product from an existing product/template while preventing accidental reuse of inappropriate dates, venues, prices or other context-sensitive values.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Core product details",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 11 §Duplication Options"
+      },
+      {
+       "kind": "selectField",
+       "label": "Validity",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 11 §Duplication Options"
+      },
+      {
+       "kind": "selectField",
+       "label": "Pricing references",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 11 §Duplication Options"
+      },
+      {
+       "kind": "selectField",
+       "label": "Entitlements",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 11 §Duplication Options"
+      },
+      {
+       "kind": "selectField",
+       "label": "Capacity references",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 11 §Duplication Options"
+      },
+      {
+       "kind": "selectField",
+       "label": "Eligibility",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 11 §Duplication Options"
+      },
+      {
+       "kind": "selectField",
+       "label": "Sales channels",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 11 §Duplication Options"
+      },
+      {
+       "kind": "selectField",
+       "label": "Media",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 11 §Duplication Options"
+      },
+      {
+       "kind": "selectField",
+       "label": "Policies",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 11 §Duplication Options"
+      },
+      {
+       "kind": "selectField",
+       "label": "Rules",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 11 §Duplication Options"
+      },
+      {
+       "kind": "selectField",
+       "label": "Content",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 11 §Duplication Options"
+      },
+      {
+       "kind": "selectField",
+       "label": "Images",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 11 §Duplication Options"
+      },
+      {
+       "kind": "selectField",
+       "label": "Relationships",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 11 §Duplication Options"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The product duplication template configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the product duplication template untouched.",
+   "emptyFirstRun": "No product duplication template configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listProductDuplicationTemplate",
+    "contract": "catalogue",
+    "purpose": "Product Duplication & Template Library",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-126"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 13 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-127",
+  "name": "AI Catalogue Builder & Configuration Review",
+  "module": "Catalogue",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
+   "board": "1",
+   "number": "10",
+   "page": 12
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/catalogue/ai-catalogue-builder-configuration-review-adm-127",
+   "component": "apps/ticvai-web/src/routes/catalogue/AiCatalogueBuilderConfigurationReview.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-118"
+   ],
+   "exitTo": [
+    "ADM-118"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-118, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide TICVAI's AI-first interface for accelerating product creation and configuration. This directly supports the matrix requirement allowing administrators to upload spreadsheets, brochures, PDFs or existing catalogues and use AI to generate product structures, pricing, rules, entitlements and configurations. Board 2 governs what happens after a product has been created or while an existing product is being changed.",
+  "purposeNote": "An administrator can transform unstructured or semi-structured commercial information into a structured Draft product configuration, review every AI-generated recommendation and approve or modify it before the normal lifecycle workflow begins. Board 1 — Final Screen Register",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 12"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 12"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "provenance": "contract operation setCatalogueReview"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setCatalogueReview"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The catalogue review list.",
+   "error": "Could not load. Names which read failed and leaves the catalogue review untouched.",
+   "emptyFirstRun": "No catalogue review yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the catalogue review are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setCatalogueReview",
+    "contract": "catalogue",
+    "purpose": "AI Catalogue Builder & Configuration Review",
+    "trigger": "onAction",
+    "invalidates": [
+     "setCatalogueReview"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-127"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 12. 0 of 0 labels bound to a contract property; 0 of 68 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

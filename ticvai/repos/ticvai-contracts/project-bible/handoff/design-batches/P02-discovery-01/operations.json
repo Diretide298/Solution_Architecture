@@ -1,0 +1,36 @@
+{
+ "searchCatalogue": {
+  "method": "GET",
+  "path": "/search",
+  "contract": "catalogue",
+  "summary": "Find something by name",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "q",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ }
+}

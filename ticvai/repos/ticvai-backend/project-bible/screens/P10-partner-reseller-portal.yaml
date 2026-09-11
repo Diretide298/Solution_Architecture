@@ -46,9 +46,12 @@ platform:
     - P09
     - P11
     - P14
-    note: '**TICVAI operates all four**, whoever signs in. The partner portal, the accreditation intake
-      and the developer portal are outward faces of the control plane, not separate products — but their
-      users are not TICVAI staff, and the permission model has to hold that line.'
+    - P17
+    note: '**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake,
+      the developer portal and the sign-up are outward faces of the control plane, not separate products
+      — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added
+      11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is
+      the only thing that can serve them.'
     decided: 10 September 2026
 screens:
 - id: PTR-001

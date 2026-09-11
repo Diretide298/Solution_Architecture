@@ -1,0 +1,508 @@
+{
+ "abandonCart": {
+  "method": "DELETE",
+  "path": "/carts/{cartId}",
+  "contract": "orders",
+  "summary": "Empty it deliberately",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "addCartLine": {
+  "method": "POST",
+  "path": "/carts/{cartId}/lines",
+  "contract": "orders",
+  "summary": "Add something",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AddCartLineRequest",
+  "responds": "Cart"
+ },
+ "addToWishlist": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/wishlist",
+  "contract": "marketing-crm",
+  "summary": "Save an item",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Wishlist"
+ },
+ "checkoutCart": {
+  "method": "POST",
+  "path": "/carts/{cartId}/checkout",
+  "contract": "orders",
+  "summary": "Turn the cart into an order",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Order"
+ },
+ "createOrder": {
+  "method": "POST",
+  "path": "/orders",
+  "contract": "orders",
+  "summary": "Create an order",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateOrderRequest",
+  "responds": "Order"
+ },
+ "createPayment": {
+  "method": "POST",
+  "path": "/payments",
+  "contract": "orders",
+  "summary": "Take a payment against an order",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreatePaymentRequest",
+  "responds": "Payment"
+ },
+ "evaluatePromotions": {
+  "method": "POST",
+  "path": "/promotions/evaluate",
+  "contract": "promotions",
+  "summary": "Evaluate promotions against a cart",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "EvaluatePromotionsRequest",
+  "responds": "PromotionEvaluation"
+ },
+ "extendCart": {
+  "method": "POST",
+  "path": "/carts/{cartId}/extend",
+  "contract": "orders",
+  "summary": "Give the guest more time",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Cart"
+ },
+ "getCart": {
+  "method": "GET",
+  "path": "/carts/{cartId}",
+  "contract": "orders",
+  "summary": "The cart, priced and checked, right now",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Cart"
+ },
+ "getCouponCode": {
+  "method": "GET",
+  "path": "/coupon-codes/{code}",
+  "contract": "promotions",
+  "summary": "Look up a code",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CouponCode"
+ },
+ "getGuestProfile": {
+  "method": "GET",
+  "path": "/guests/{subjectId}",
+  "contract": "marketing-crm",
+  "summary": "Read a guest profile",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestProfileDetail"
+ },
+ "getOrder": {
+  "method": "GET",
+  "path": "/orders/{orderId}",
+  "contract": "orders",
+  "summary": "Read an order",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Order"
+ },
+ "getPaymentLink": {
+  "method": "GET",
+  "path": "/payment-links/{token}",
+  "contract": "orders",
+  "summary": "What a guest holding a link is being asked to pay for",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
+ "getWishlist": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/wishlist",
+  "contract": "marketing-crm",
+  "summary": "Read a guest's saved items",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Wishlist"
+ },
+ "inquirePaymentStatus": {
+  "method": "POST",
+  "path": "/payments/{paymentId}/inquiry",
+  "contract": "orders",
+  "summary": "Ask the provider what actually happened",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Payment"
+ },
+ "listConsentPurposes": {
+  "method": "GET",
+  "path": "/consent-purposes",
+  "contract": "marketing-crm",
+  "summary": "Configured consent purposes",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ConsentPurposeConfig"
+ },
+ "listGuestDevices": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/devices",
+  "contract": "marketing-crm",
+  "summary": "A guest's registered devices",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestDevice"
+ },
+ "payByLink": {
+  "method": "POST",
+  "path": "/payment-links/{token}/pay",
+  "contract": "orders",
+  "summary": "Pay for a booking taken at a till",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "recordConsent": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/consents",
+  "contract": "marketing-crm",
+  "summary": "Record a consent decision",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RecordConsentRequest",
+  "responds": "ConsentState"
+ },
+ "registerGuestDevice": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/devices",
+  "contract": "marketing-crm",
+  "summary": "Register a device for push",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestDevice"
+ },
+ "removeCartLine": {
+  "method": "DELETE",
+  "path": "/carts/{cartId}/lines/{lineId}",
+  "contract": "orders",
+  "summary": "Take something out",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Cart"
+ },
+ "removeFromWishlist": {
+  "method": "DELETE",
+  "path": "/guests/{subjectId}/wishlist/{itemId}",
+  "contract": "marketing-crm",
+  "summary": "Remove a saved item",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "reprintOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/reprints",
+  "contract": "orders",
+  "summary": "Reprint or resend tickets",
+  "permission": "ORDER_REPRINT",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "revokeGuestDevice": {
+  "method": "DELETE",
+  "path": "/guests/{subjectId}/devices/{deviceId}",
+  "contract": "marketing-crm",
+  "summary": "Revoke a device registration",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "transferOrderTickets": {
+  "method": "POST",
+  "path": "/orders/{orderId}/transfer",
+  "contract": "orders",
+  "summary": "Transfer tickets to another guest",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "updateCartLine": {
+  "method": "PATCH",
+  "path": "/carts/{cartId}/lines/{lineId}",
+  "contract": "orders",
+  "summary": "Change a quantity",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Cart"
+ },
+ "updateMyProfile": {
+  "method": "PATCH",
+  "path": "/guests/me/profile",
+  "contract": "marketing-crm",
+  "summary": "A guest correcting their own details",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestProfile"
+ },
+ "uploadGuestDocument": {
+  "method": "POST",
+  "path": "/guest-documents",
+  "contract": "marketing-crm",
+  "summary": "Store a guest photo, ID or signed document",
+  "permission": "GUEST_VIEW_PII",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "GuestDocument",
+  "responds": "GuestDocument"
+ }
+}

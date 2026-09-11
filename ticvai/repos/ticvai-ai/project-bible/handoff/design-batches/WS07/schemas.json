@@ -1,0 +1,768 @@
+{
+ "ConnectivityFailureDegradedModePolicyView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Connectivity Failure & Degraded Mode Policy displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "centralServicesReachable": {
+    "type": "string",
+    "description": "Central services reachable"
+   },
+   "someServicesUnavailable": {
+    "type": "string",
+    "description": "Some services unavailable"
+   },
+   "onlyDeviceLocalProcessingAvailable": {
+    "type": "string",
+    "description": "Only device-local processing available"
+   }
+  }
+ },
+ "EdgeNodeLocalProcessingConfigurationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Edge Node & Local Processing Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "localProcessingAtGateLevel": {
+    "type": "string",
+    "description": "Local processing at gate level"
+   },
+   "embeddedDeviceProcessing": {
+    "type": "string",
+    "description": "Embedded device processing"
+   },
+   "mobileOfflineProcessing": {
+    "type": "string",
+    "description": "Mobile offline processing"
+   },
+   "edgeNodeId": {
+    "type": "string",
+    "description": "Edge Node ID"
+   },
+   "tenant": {
+    "type": "string",
+    "description": "Tenant"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "network": {
+    "type": "string",
+    "description": "Network"
+   },
+   "deviceGroup": {
+    "type": "string",
+    "description": "Device Group"
+   },
+   "processingMode": {
+    "type": "string",
+    "description": "Processing Mode"
+   },
+   "storageAllocation": {
+    "type": "string",
+    "description": "Storage allocation"
+   },
+   "redundancy": {
+    "type": "string",
+    "description": "redundancy"
+   },
+   "lastHeartbeat": {
+    "type": "string",
+    "format": "date-time",
+    "description": "last heartbeat"
+   },
+   "softwareVersion": {
+    "type": "string",
+    "description": "software version"
+   },
+   "securityStatus": {
+    "type": "string",
+    "description": "security status"
+   },
+   "failure": {
+    "type": "string",
+    "description": "failure"
+   }
+  }
+ },
+ "EdgeNodeLocalProcessingConfigurationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Edge Node & Local Processing Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "localProcessingAtGateLevel": {
+    "type": "string",
+    "description": "Local processing at gate level"
+   },
+   "embeddedDeviceProcessing": {
+    "type": "string",
+    "description": "Embedded device processing"
+   },
+   "mobileOfflineProcessing": {
+    "type": "string",
+    "description": "Mobile offline processing"
+   },
+   "edgeNodeId": {
+    "type": "string",
+    "description": "Edge Node ID"
+   },
+   "tenant": {
+    "type": "string",
+    "description": "Tenant"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "network": {
+    "type": "string",
+    "description": "Network"
+   },
+   "deviceGroup": {
+    "type": "string",
+    "description": "Device Group"
+   },
+   "processingMode": {
+    "type": "string",
+    "description": "Processing Mode"
+   },
+   "storageAllocation": {
+    "type": "string",
+    "description": "Storage allocation"
+   },
+   "redundancy": {
+    "type": "string",
+    "description": "redundancy"
+   },
+   "lastHeartbeat": {
+    "type": "string",
+    "format": "date-time",
+    "description": "last heartbeat"
+   },
+   "softwareVersion": {
+    "type": "string",
+    "description": "software version"
+   },
+   "securityStatus": {
+    "type": "string",
+    "description": "security status"
+   },
+   "failure": {
+    "type": "string",
+    "description": "failure"
+   }
+  }
+ },
+ "EdgePackageDataDistributionView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Edge Package & Data Distribution displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "venues": {
+    "type": "string",
+    "description": "venues"
+   },
+   "zones": {
+    "type": "string",
+    "description": "zones"
+   },
+   "gates": {
+    "type": "string",
+    "description": "gates"
+   },
+   "accessRules": {
+    "type": "string",
+    "description": "access rules"
+   },
+   "calendars": {
+    "type": "string",
+    "description": "calendars"
+   },
+   "mediaProfiles": {
+    "type": "string",
+    "description": "media profiles"
+   },
+   "verificationProfiles": {
+    "type": "string",
+    "description": "verification profiles"
+   },
+   "entitlementDefinitions": {
+    "type": "string",
+    "description": "entitlement definitions"
+   },
+   "trustedVerificationMaterial": {
+    "type": "string",
+    "description": "trusted verification material"
+   },
+   "revocationInformation": {
+    "type": "string",
+    "description": "revocation information"
+   },
+   "credentialSecurityParameters": {
+    "type": "string",
+    "description": "credential security parameters"
+   },
+   "reasonCodes": {
+    "type": "string",
+    "description": "reason codes"
+   },
+   "gateResponses": {
+    "type": "string",
+    "description": "gate responses"
+   },
+   "languages": {
+    "type": "string",
+    "description": "languages"
+   },
+   "operatorPermissions": {
+    "type": "string",
+    "description": "operator permissions"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version (the pack shows 24.6, 89 | Pag e)"
+   },
+   "devices": {
+    "type": "integer",
+    "description": "Devices (the pack shows 84)"
+   },
+   "signatureValid": {
+    "type": "string",
+    "description": "✓ Signature valid"
+   },
+   "packageComplete": {
+    "type": "string",
+    "description": "✓ Package complete"
+   },
+   "versionValid": {
+    "type": "string",
+    "description": "✓ Version valid"
+   },
+   "deviceAuthorized": {
+    "type": "string",
+    "description": "✓ Device authorized"
+   }
+  }
+ },
+ "EdgeSecurityAuditDeploymentView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Edge Security, Audit & Deployment displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "edgeCertificates": {
+    "type": "integer",
+    "description": "Edge certificates"
+   },
+   "edgeCredentials": {
+    "type": "integer",
+    "description": "Edge credentials"
+   },
+   "packageSignatures": {
+    "type": "integer",
+    "description": "Package signatures"
+   },
+   "authorizedDevices": {
+    "type": "integer",
+    "description": "Authorized devices"
+   },
+   "revokedDevices": {
+    "type": "integer",
+    "description": "Revoked devices"
+   },
+   "failedPackageValidation": {
+    "type": "integer",
+    "description": "Failed package validation"
+   },
+   "unauthorizedConnectionAttempts": {
+    "type": "integer",
+    "description": "unauthorized connection attempts"
+   },
+   "configurationChanges": {
+    "type": "integer",
+    "description": "configuration changes"
+   },
+   "offlineOverrideActivity": {
+    "type": "integer",
+    "description": "offline override activity"
+   },
+   "tenant": {
+    "type": "string",
+    "description": "Tenant"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "park": {
+    "type": "string",
+    "description": "Park"
+   },
+   "edgeCluster": {
+    "type": "string",
+    "description": "Edge Cluster"
+   },
+   "gateGroup": {
+    "type": "string",
+    "description": "Gate Group"
+   },
+   "deviceGroup": {
+    "type": "string",
+    "description": "Device Group"
+   },
+   "individualDevice": {
+    "type": "string",
+    "description": "Individual Device"
+   },
+   "v47": {
+    "type": "string",
+    "description": "V4.7"
+   },
+   "v48Tonight0200": {
+    "type": "string",
+    "description": "V4.8 — Tonight 02:00"
+   },
+   "rollbackToV47": {
+    "type": "string",
+    "description": "ROLLBACK TO V4.7"
+   },
+   "offlineRules": {
+    "type": "integer",
+    "description": "Offline rules"
+   },
+   "deviceConfiguration": {
+    "type": "string",
+    "description": "Device configuration"
+   },
+   "securityPolicy": {
+    "type": "string",
+    "description": "Security policy"
+   },
+   "edgePackageDefinitions": {
+    "type": "string",
+    "description": "edge package definitions"
+   },
+   "whereOperationallyAppropriate": {
+    "type": "string",
+    "description": "where operationally appropriate"
+   },
+   "theCloudGoesDown": {
+    "type": "string",
+    "description": "the cloud goes down"
+   },
+   "venueEdgeActive": {
+    "type": "string",
+    "description": "VENUE EDGE — ACTIVE ✓"
+   },
+   "venueExecutives": {
+    "type": "string",
+    "description": "venue executives"
+   },
+   "processesOnSpecialDates": {
+    "type": "string",
+    "description": "processes on special dates"
+   },
+   "definesTheUnderlyingRules": {
+    "type": "string",
+    "description": "defines the underlying rules"
+   },
+   "thisTicketAllows3Entries": {
+    "type": "string",
+    "description": "\"This ticket allows 3 entries.\""
+   }
+  }
+ },
+ "OfflineCredentialRevocationCacheView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Offline Credential & Revocation Cache displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "fraudLock": {
+    "type": "string",
+    "description": "Fraud Lock"
+   },
+   "cancellation": {
+    "type": "string",
+    "description": "Cancellation"
+   },
+   "lostCredential": {
+    "type": "string",
+    "description": "Lost Credential"
+   },
+   "manualInvalidation": {
+    "type": "string",
+    "description": "Manual Invalidation"
+   },
+   "canTrigger": {
+    "type": "boolean",
+    "description": "can trigger"
+   },
+   "continue": {
+    "type": "string",
+    "description": "Continue"
+   },
+   "continueWithWarning": {
+    "type": "string",
+    "description": "Continue with warning"
+   },
+   "restrictedProductsOnly": {
+    "type": "string",
+    "description": "Restricted products only"
+   },
+   "supervisorMode": {
+    "type": "string",
+    "description": "Supervisor mode"
+   },
+   "denySelectedCredentialClasses": {
+    "type": "string",
+    "description": "Deny selected credential classes"
+   },
+   "failClosed": {
+    "type": "integer",
+    "description": "Fail closed"
+   }
+  }
+ },
+ "OfflineEdgeOperationsCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Offline & Edge Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "offlineReadyDevices": {
+    "type": "integer",
+    "description": "Offline-Ready Devices"
+   },
+   "currentlyOnline": {
+    "type": "integer",
+    "description": "Currently Online"
+   },
+   "currentlyOffline": {
+    "type": "integer",
+    "description": "Currently Offline"
+   },
+   "devicesInDegradedMode": {
+    "type": "string",
+    "description": "Devices in Degraded Mode"
+   },
+   "edgeNodesOnline": {
+    "type": "integer",
+    "description": "Edge Nodes Online"
+   },
+   "packagesCurrent": {
+    "type": "string",
+    "description": "Packages Current"
+   },
+   "packagesExpiring": {
+    "type": "string",
+    "description": "Packages Expiring"
+   },
+   "pendingOfflineTransactions": {
+    "type": "integer",
+    "description": "Pending Offline Transactions"
+   },
+   "offlineSecurityAlerts": {
+    "type": "integer",
+    "description": "Offline Security Alerts"
+   },
+   "rulesCached": {
+    "type": "string",
+    "description": "✓ Rules cached"
+   },
+   "verificationMaterialCurrent": {
+    "type": "string",
+    "description": "✓ Verification material current"
+   },
+   "revocationDataCurrent": {
+    "type": "string",
+    "description": "✓ Revocation data current"
+   },
+   "credentialDefinitionsAvailable": {
+    "type": "string",
+    "description": "✓ Credential definitions available"
+   },
+   "deviceStorageHealthy": {
+    "type": "string",
+    "description": "✓ Device storage healthy"
+   },
+   "lastSynchronizationSuccessful": {
+    "type": "string",
+    "description": "✓ Last synchronization successful"
+   }
+  }
+ },
+ "OfflineEntitlementUsageLedgerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Offline Entitlement & Usage Ledger displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "fastPassRemaining3": {
+    "type": "string",
+    "description": "Fast Pass Remaining: 3"
+   },
+   "rideA1": {
+    "type": "string",
+    "description": "Ride A → -1"
+   },
+   "rideB1": {
+    "type": "string",
+    "description": "Ride B → -1"
+   },
+   "credential": {
+    "type": "string",
+    "description": "Credential"
+   },
+   "device": {
+    "type": "string",
+    "description": "Device"
+   },
+   "gate": {
+    "type": "string",
+    "description": "Gate"
+   },
+   "entitlement": {
+    "type": "string",
+    "description": "Entitlement"
+   },
+   "quantity": {
+    "type": "integer",
+    "description": "Quantity"
+   },
+   "timestamp": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Timestamp"
+   },
+   "localSequence": {
+    "type": "string",
+    "description": "local sequence"
+   },
+   "operator": {
+    "type": "string",
+    "description": "operator"
+   },
+   "decision": {
+    "type": "string",
+    "description": "decision"
+   },
+   "packageVersion": {
+    "type": "string",
+    "description": "package version"
+   },
+   "shareCurrentUsageState": {
+    "type": "number",
+    "description": "share current usage state"
+   },
+   "offlineAllowedMaximum1": {
+    "type": "integer",
+    "description": "Offline Allowed — Maximum 1"
+   }
+  }
+ },
+ "OfflinePolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "platform.offline_policy",
+  "description": "Board 5 of the client's POS set. **ADR-0013 makes the POS local-first and nothing configured the policy** — one of only two things in 36 board screens the package genuinely could not do.\nCF-115 reframed offline into three data classes: catalogue and policy always local, contended inventory leased, transactional facts journalled. **This is where a venue says how far that goes for them.**\n",
+  "required": [
+   "id",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "maxOfflineHours": {
+    "type": "integer",
+    "default": 24,
+    "description": "**After which the workstation refuses to sell rather than keep journalling.** A till three days offline holding 900 unsynced sales is a reconciliation nobody can do and a fraud nobody can detect.\n"
+   },
+   "allowedOffline": {
+    "type": "array",
+    "description": "**What may happen with no network**, by data class. Selling from a cached catalogue is safe; issuing a refund is not, because the original sale cannot be verified.\n",
+    "items": {
+     "type": "string",
+     "enum": [
+      "sale",
+      "refund",
+      "exchange",
+      "entitlementIssue",
+      "entitlementValidate",
+      "loyaltyAccrual",
+      "loyaltyRedemption",
+      "walletSpend",
+      "priceOverride",
+      "discount",
+      "voidLine",
+      "noSale"
+     ]
+    }
+   },
+   "offlineValueCeiling": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "offlineTransactionCeiling": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**A ceiling on count as well as value.** Nine hundred small sales and one large one are different risks, and a value ceiling alone catches only the second.\n"
+   },
+   "onCeilingBreach": {
+    "type": "string",
+    "enum": [
+     "warn",
+     "blockNewSales",
+     "blockAll"
+    ],
+    "default": "blockNewSales"
+   },
+   "requiresManagerToExtend": {
+    "type": "boolean",
+    "default": true
+   }
+  }
+ },
+ "OfflineSimulationResilienceTestingInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Offline Simulation & Resilience Testing submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "dynamicQrVerifiedLocally": {
+    "type": "string",
+    "description": "✓ Dynamic QR verified locally"
+   },
+   "ticketDateVerified": {
+    "type": "string",
+    "format": "date-time",
+    "description": "✓ Ticket date verified"
+   },
+   "entryEntitlementVerified": {
+    "type": "string",
+    "description": "✓ Entry entitlement verified"
+   },
+   "antiPassbackEnforced": {
+    "type": "string",
+    "description": "✓ Anti-passback enforced"
+   },
+   "gateOpens": {
+    "type": "string",
+    "description": "✓ Gate opens"
+   },
+   "attendanceStoredLocally": {
+    "type": "integer",
+    "description": "✓ Attendance stored locally"
+   },
+   "transactionQueued": {
+    "type": "string",
+    "description": "✓ Transaction queued"
+   }
+  }
+ },
+ "OfflineSimulationResilienceTestingView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Offline Simulation & Resilience Testing displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "dynamicQrVerifiedLocally": {
+    "type": "string",
+    "description": "✓ Dynamic QR verified locally"
+   },
+   "ticketDateVerified": {
+    "type": "string",
+    "format": "date-time",
+    "description": "✓ Ticket date verified"
+   },
+   "entryEntitlementVerified": {
+    "type": "string",
+    "description": "✓ Entry entitlement verified"
+   },
+   "antiPassbackEnforced": {
+    "type": "string",
+    "description": "✓ Anti-passback enforced"
+   },
+   "gateOpens": {
+    "type": "string",
+    "description": "✓ Gate opens"
+   },
+   "attendanceStoredLocally": {
+    "type": "integer",
+    "description": "✓ Attendance stored locally"
+   },
+   "transactionQueued": {
+    "type": "string",
+    "description": "✓ Transaction queued"
+   }
+  }
+ },
+ "ReconnectionSynchronizationConflictResolutionView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Reconnection, Synchronization & Conflict Resolution displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "returnOnline": {
+    "type": "integer",
+    "description": "Return Online"
+   },
+   "pendingScans4821": {
+    "type": "integer",
+    "description": "Pending Scans: 4,821"
+   },
+   "entitlementEvents682": {
+    "type": "string",
+    "description": "Entitlement Events: 682"
+   },
+   "entries3240": {
+    "type": "string",
+    "description": "Entries: 3,240"
+   },
+   "exits1204": {
+    "type": "string",
+    "description": "Exits: 1,204"
+   },
+   "overrides18": {
+    "type": "string",
+    "description": "Overrides: 18"
+   },
+   "securityEvents7": {
+    "type": "string",
+    "description": "Security Events: 7"
+   },
+   "centralRemainingBalanceBeforeOutage": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Central remaining balance before outage (the pack shows 1)"
+   },
+   "preserveBothFlag": {
+    "type": "boolean",
+    "description": "Preserve both + flag"
+   },
+   "earliestTransactionWins": {
+    "type": "string",
+    "description": "earliest transaction wins"
+   },
+   "configuredBusinessRule": {
+    "type": "string",
+    "description": "configured business rule"
+   },
+   "supervisorReview": {
+    "type": "string",
+    "description": "supervisor review"
+   },
+   "securityInvestigation": {
+    "type": "string",
+    "description": "security investigation"
+   }
+  }
+ }
+}

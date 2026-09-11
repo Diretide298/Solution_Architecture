@@ -1,0 +1,296 @@
+{
+ "applyManualDiscount": {
+  "method": "POST",
+  "path": "/orders/{orderId}/discounts",
+  "contract": "orders",
+  "summary": "Apply a discount a cashier chose",
+  "permission": "ORDER_DISCOUNT",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ManualDiscountRequest",
+  "responds": "Order"
+ },
+ "createOrder": {
+  "method": "POST",
+  "path": "/orders",
+  "contract": "orders",
+  "summary": "Create an order",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateOrderRequest",
+  "responds": "Order"
+ },
+ "createRefund": {
+  "method": "POST",
+  "path": "/orders/{orderId}/refunds",
+  "contract": "orders",
+  "summary": "Refund an order, wholly or in part",
+  "permission": "ORDER_REFUND",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateRefundRequest",
+  "responds": null
+ },
+ "exchangeOrderLines": {
+  "method": "POST",
+  "path": "/orders/{orderId}/exchanges",
+  "contract": "orders",
+  "summary": "Exchange lines for different products or dates",
+  "permission": "ORDER_EXCHANGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ExchangeOrderRequest",
+  "responds": "OrderExchangeResult"
+ },
+ "getOrder": {
+  "method": "GET",
+  "path": "/orders/{orderId}",
+  "contract": "orders",
+  "summary": "Read an order",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Order"
+ },
+ "getOrderStatement": {
+  "method": "GET",
+  "path": "/orders/{orderId}/statement",
+  "contract": "orders",
+  "summary": "Full financial history of an order",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "OrderStatement"
+ },
+ "holdOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/hold",
+  "contract": "orders",
+  "summary": "Park a sale and free the till",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Order"
+ },
+ "listOrderRefunds": {
+  "method": "GET",
+  "path": "/orders/{orderId}/refunds",
+  "contract": "orders",
+  "summary": "List refunds against an order",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Refund"
+ },
+ "listOrders": {
+  "method": "GET",
+  "path": "/orders",
+  "contract": "orders",
+  "summary": "List orders",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "shiftId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "createdFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "createdTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "modifyOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/modify",
+  "contract": "orders",
+  "summary": "Add or remove lines on an existing order",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ModifyOrderRequest",
+  "responds": "OrderModificationResult"
+ },
+ "reprintOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/reprints",
+  "contract": "orders",
+  "summary": "Reprint or resend tickets",
+  "permission": "ORDER_REPRINT",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "rescheduleOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/reschedule",
+  "contract": "orders",
+  "summary": "Move an order to another performance",
+  "permission": "ORDER_RESCHEDULE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "OrderExchangeResult"
+ },
+ "resumeOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/resume",
+  "contract": "orders",
+  "summary": "Bring a parked sale back to a till",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "OrderResumeResult"
+ },
+ "voidOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/voids",
+  "contract": "orders",
+  "summary": "Void an order",
+  "permission": "ORDER_VOID",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Order"
+ }
+}

@@ -1,0 +1,682 @@
+{
+ "Announcement": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.announcement",
+  "required": [
+   "title",
+   "body",
+   "kind",
+   "publishedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "title": {
+    "type": "string",
+    "maxLength": 140
+   },
+   "body": {
+    "type": "string",
+    "maxLength": 4000
+   },
+   "kind": {
+    "$ref": "#/components/schemas/AnnouncementKind"
+   },
+   "venueIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "departmentIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "roleIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "requiresAcknowledgement": {
+    "type": "boolean"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "publishedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "locale": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "AnnouncementKind": {
+  "type": "string",
+  "description": "`emergency` is not a louder `operational`. It overrides the home screen, bypasses quiet hours, requires acknowledgement, and carries a separate permission.\n",
+  "enum": [
+   "operational",
+   "safety",
+   "emergency",
+   "hr",
+   "celebration"
+  ]
+ },
+ "AnnouncementReach": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed from workforce.announcement_receipt",
+  "properties": {
+   "announcementId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "targeted": {
+    "type": "integer"
+   },
+   "delivered": {
+    "type": "integer"
+   },
+   "acknowledged": {
+    "type": "integer"
+   },
+   "outstanding": {
+    "type": "array",
+    "description": "**The list that matters.** For an operational notice it measures whether anyone read it; during an emergency it is the roll call.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "principalId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "displayName": {
+       "type": "string"
+      },
+      "onShift": {
+       "type": "boolean"
+      }
+     }
+    }
+   }
+  }
+ },
+ "Incident": {
+  "x-ticvai-persistence": "maintenance.incident",
+  "type": "object",
+  "required": [
+   "id",
+   "incidentNumber",
+   "kind",
+   "severity",
+   "status",
+   "venueId",
+   "occurredAt",
+   "reportedByPrincipalId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "incidentNumber": {
+    "type": "string"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/IncidentKind"
+   },
+   "severity": {
+    "$ref": "#/components/schemas/IncidentSeverity"
+   },
+   "status": {
+    "$ref": "#/components/schemas/IncidentStatus"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "locationDescription": {
+    "type": "string",
+    "nullable": true
+   },
+   "isReportable": {
+    "type": "boolean",
+    "description": "Requires notification to an external authority within a statutory window."
+   },
+   "notificationDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "notifiedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "assignedToPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "reportedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "correctiveWorkOrderId": {
+    "type": "string",
+    "nullable": true
+   },
+   "occurredAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "closedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "IncidentDetail": {
+  "x-ticvai-persistence": "maintenance.incident",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/Incident"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "description": {
+      "type": "string",
+      "description": "The original report. Never edited — investigation adds to the record."
+     },
+     "investigationNote": {
+      "type": "string",
+      "nullable": true
+     },
+     "rootCause": {
+      "type": "string",
+      "nullable": true
+     },
+     "correctiveActions": {
+      "type": "string",
+      "nullable": true
+     },
+     "firstAidGiven": {
+      "type": "boolean"
+     },
+     "emergencyServicesCalled": {
+      "type": "boolean"
+     },
+     "witnessCount": {
+      "type": "integer"
+     },
+     "attachmentRefs": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "authorityNotifications": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "authority": {
+         "type": "string"
+        },
+        "reference": {
+         "type": "string",
+         "nullable": true
+        },
+        "notifiedAt": {
+         "type": "string",
+         "format": "date-time"
+        },
+        "notifiedByPrincipalId": {
+         "type": "string",
+         "format": "uuid"
+        }
+       }
+      }
+     }
+    }
+   }
+  ]
+ },
+ "IncidentKind": {
+  "type": "string",
+  "enum": [
+   "guestInjury",
+   "staffInjury",
+   "nearMiss",
+   "propertyDamage",
+   "equipmentFailure",
+   "securityIncident",
+   "fireOrEvacuation",
+   "foodSafety",
+   "environmental",
+   "other"
+  ]
+ },
+ "IncidentSeverity": {
+  "type": "string",
+  "enum": [
+   "nearMiss",
+   "minor",
+   "moderate",
+   "major",
+   "critical"
+  ]
+ },
+ "IncidentStatus": {
+  "type": "string",
+  "enum": [
+   "reported",
+   "underInvestigation",
+   "actionRequired",
+   "closed"
+  ]
+ },
+ "Inspection": {
+  "x-ticvai-persistence": "maintenance.inspection + maintenance.inspection_response",
+  "type": "object",
+  "required": [
+   "id",
+   "templateId",
+   "venueId",
+   "outcome",
+   "performedByPrincipalId",
+   "performedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "templateId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "templateName": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "outcome": {
+    "$ref": "#/components/schemas/InspectionOutcome"
+   },
+   "failedItemCount": {
+    "type": "integer"
+   },
+   "failedSafetyCriticalCount": {
+    "type": "integer"
+   },
+   "performedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "An inspection nobody signed is not an inspection."
+   },
+   "performedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "retainUntil": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   }
+  }
+ },
+ "InspectionItemKind": {
+  "type": "string",
+  "enum": [
+   "passFail",
+   "yesNo",
+   "numeric",
+   "text",
+   "photo",
+   "signature"
+  ]
+ },
+ "InspectionResult": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "inspection",
+   "consequences"
+  ],
+  "properties": {
+   "inspection": {
+    "$ref": "#/components/schemas/Inspection"
+   },
+   "consequences": {
+    "type": "object",
+    "description": "What the submission triggered. A failed safety-critical item takes the asset out of service without waiting for anyone to decide.\n",
+    "properties": {
+     "assetTakenOutOfService": {
+      "type": "boolean"
+     },
+     "workOrdersRaised": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "productsSuspended": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "escalatedToPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     }
+    }
+   }
+  }
+ },
+ "InspectionTemplate": {
+  "x-ticvai-persistence": "maintenance.inspection_template + maintenance.inspection_template_item",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "items"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "appliesToAssetCategoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "frequency": {
+    "type": "string",
+    "enum": [
+     "preOpening",
+     "postClosing",
+     "daily",
+     "weekly",
+     "monthly",
+     "annual",
+     "adHoc"
+    ]
+   },
+   "items": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "key",
+      "label",
+      "kind",
+      "isRequired"
+     ],
+     "properties": {
+      "key": {
+       "type": "string"
+      },
+      "label": {
+       "type": "string"
+      },
+      "kind": {
+       "$ref": "#/components/schemas/InspectionItemKind"
+      },
+      "isRequired": {
+       "type": "boolean"
+      },
+      "isSafetyCritical": {
+       "type": "boolean",
+       "default": false,
+       "description": "A failed safety-critical item **blocks the inspection from passing** and cannot be overridden by completing the rest.\n"
+      },
+      "requiresPhotoOnFail": {
+       "type": "boolean",
+       "default": true
+      },
+      "minValue": {
+       "type": "number",
+       "nullable": true
+      },
+      "maxValue": {
+       "type": "number",
+       "nullable": true
+      },
+      "guidance": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "retentionYears": {
+    "type": "integer",
+    "default": 7,
+    "description": "Compliance inspections are retained alongside the financial trail."
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "ScanOutcome": {
+  "type": "string",
+  "enum": [
+   "admitted",
+   "denied",
+   "overridden"
+  ]
+ },
+ "ScanSyncResult": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "accepted",
+   "results"
+  ],
+  "properties": {
+   "accepted": {
+    "type": "integer",
+    "description": "Entries processed before any stop."
+   },
+   "stoppedAtSequence": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Sequence of the first entry that could not be processed. Null when the whole batch succeeded. The client retries from here — never past it.\n"
+   },
+   "results": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "id",
+      "sequence",
+      "status"
+     ],
+     "properties": {
+      "id": {
+       "type": "string"
+      },
+      "sequence": {
+       "type": "integer"
+      },
+      "status": {
+       "type": "string",
+       "enum": [
+        "accepted",
+        "duplicate",
+        "reconciled",
+        "rejected"
+       ]
+      },
+      "serverOutcome": {
+       "$ref": "#/components/schemas/ScanOutcome"
+      },
+      "divergence": {
+       "type": "string",
+       "nullable": true,
+       "description": "Present when `reconciled` — the device admitted and the server would have denied, or vice versa. Surfaced to the operator, not swallowed.\n"
+      },
+      "error": {
+       "$ref": "../shared/common.yaml#/components/schemas/Problem"
+      }
+     }
+    }
+   }
+  }
+ },
+ "SubmitInspectionRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "templateId",
+   "venueId",
+   "responses",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "templateId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "responses": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "key",
+      "value"
+     ],
+     "properties": {
+      "key": {
+       "type": "string"
+      },
+      "value": {},
+      "passed": {
+       "type": "boolean",
+       "nullable": true
+      },
+      "note": {
+       "type": "string",
+       "maxLength": 1000
+      },
+      "attachmentRefs": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      }
+     }
+    }
+   },
+   "signatureRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ }
+}

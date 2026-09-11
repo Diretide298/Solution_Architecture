@@ -1,0 +1,1759 @@
+{
+ "CostingMethod": {
+  "type": "string",
+  "description": "Fixed at item creation. Immutable once movements exist.",
+  "enum": [
+   "weightedAverage",
+   "fifo",
+   "standardCost",
+   "lastPurchasePrice"
+  ]
+ },
+ "CountStatus": {
+  "type": "string",
+  "enum": [
+   "open",
+   "counting",
+   "closed",
+   "variancePending",
+   "posted",
+   "cancelled"
+  ]
+ },
+ "CountVariance": {
+  "x-ticvai-persistence": "none — computed at close",
+  "type": "object",
+  "required": [
+   "countId",
+   "totalVarianceValue",
+   "lines"
+  ],
+  "properties": {
+   "countId": {
+    "type": "string"
+   },
+   "totalVarianceValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "exceptionCount": {
+    "type": "integer",
+    "description": "Lines beyond tolerance, requiring review before posting."
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "itemId",
+      "expectedQuantity",
+      "countedQuantity",
+      "variance",
+      "isException"
+     ],
+     "properties": {
+      "itemId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "itemName": {
+       "type": "string"
+      },
+      "sku": {
+       "type": "string"
+      },
+      "expectedQuantity": {
+       "type": "number"
+      },
+      "countedQuantity": {
+       "type": "number"
+      },
+      "variance": {
+       "type": "number"
+      },
+      "variancePercentage": {
+       "type": "number"
+      },
+      "varianceValue": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "isException": {
+       "type": "boolean"
+      },
+      "recountCount": {
+       "type": "integer",
+       "description": "A line counted several times is itself a finding."
+      },
+      "note": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "CreateGoodsReceiptRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "purchaseOrderId",
+   "locationId",
+   "lines",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "purchaseOrderId": {
+    "type": "string"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "deliveryNoteReference": {
+    "type": "string",
+    "maxLength": 128
+   },
+   "lines": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "itemId",
+      "receivedQuantity"
+     ],
+     "properties": {
+      "itemId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "receivedQuantity": {
+       "type": "number",
+       "minimum": 0
+      },
+      "unit": {
+       "type": "string"
+      },
+      "batchNumber": {
+       "type": "string",
+       "maxLength": 64
+      },
+      "expiryDate": {
+       "type": "string",
+       "format": "date",
+       "description": "Required for perishable items."
+      },
+      "note": {
+       "type": "string",
+       "maxLength": 200
+      }
+     }
+    }
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "CreateInventoryItemRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "sku",
+   "name",
+   "venueId",
+   "baseUnit",
+   "costingMethod"
+  ],
+  "properties": {
+   "sku": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "barcode": {
+    "type": "string",
+    "maxLength": 128
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "baseUnit": {
+    "type": "string",
+    "description": "The unit stock is held in. Immutable once movements exist."
+   },
+   "purchaseUnit": {
+    "type": "string",
+    "description": "How the supplier sells it — a case of 24 against a base unit of one."
+   },
+   "purchaseUnitFactor": {
+    "type": "number",
+    "minimum": 0,
+    "default": 1
+   },
+   "costingMethod": {
+    "$ref": "#/components/schemas/CostingMethod"
+   },
+   "reorderPoint": {
+    "type": "number",
+    "minimum": 0
+   },
+   "reorderQuantity": {
+    "type": "number",
+    "minimum": 0
+   },
+   "parLevel": {
+    "type": "number",
+    "minimum": 0
+   },
+   "preferredSupplierId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "allowNegativeStock": {
+    "type": "boolean",
+    "default": false,
+    "description": "True permits issue beyond on-hand. Occasionally needed at a bar mid-service; dangerous everywhere else.\n"
+   },
+   "isPerishable": {
+    "type": "boolean",
+    "default": false
+   },
+   "shelfLifeDays": {
+    "type": "integer",
+    "nullable": true
+   }
+  }
+ },
+ "CreatePurchaseOrderRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "requisitionId",
+   "supplierId",
+   "quotationId",
+   "lines",
+   "expectedDelivery"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "requisitionId": {
+    "type": "string"
+   },
+   "supplierId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "quotationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "deliverToLocationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "lines": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "itemId",
+      "quantity",
+      "unitPrice"
+     ],
+     "properties": {
+      "itemId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "quantity": {
+       "type": "number",
+       "minimum": 0
+      },
+      "unit": {
+       "type": "string"
+      },
+      "unitPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "expectedDelivery": {
+    "type": "string",
+    "format": "date"
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 1000
+   }
+  }
+ },
+ "CreateQuotationRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "requisitionId",
+   "lines",
+   "validUntil"
+  ],
+  "properties": {
+   "requisitionId": {
+    "type": "string"
+   },
+   "reference": {
+    "type": "string",
+    "maxLength": 128
+   },
+   "lines": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "itemId",
+      "unitPrice",
+      "quantity"
+     ],
+     "properties": {
+      "itemId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "quantity": {
+       "type": "number",
+       "minimum": 0
+      },
+      "unitPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "unit": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "leadTimeDays": {
+    "type": "integer"
+   },
+   "validUntil": {
+    "type": "string",
+    "format": "date"
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 1000
+   }
+  }
+ },
+ "CreateRequisitionRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "venueId",
+   "lines",
+   "requiredBy"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "departmentId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "costCenterId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "lines": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "itemId",
+      "quantity"
+     ],
+     "properties": {
+      "itemId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "quantity": {
+       "type": "number",
+       "minimum": 0
+      },
+      "unit": {
+       "type": "string"
+      },
+      "note": {
+       "type": "string",
+       "maxLength": 200
+      }
+     }
+    }
+   },
+   "requiredBy": {
+    "type": "string",
+    "format": "date"
+   },
+   "justification": {
+    "type": "string",
+    "maxLength": 1000
+   }
+  }
+ },
+ "CreateStockMovementRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "itemId",
+   "locationId",
+   "kind",
+   "quantity",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "itemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/MovementKind"
+   },
+   "quantity": {
+    "type": "number",
+    "description": "Positive increases stock, negative decreases it."
+   },
+   "unit": {
+    "type": "string"
+   },
+   "reason": {
+    "type": "string",
+    "maxLength": 500,
+    "description": "Required for adjustments, which are reported separately."
+   },
+   "costCenterId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "CreateStockTransferRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "fromLocationId",
+   "toLocationId",
+   "lines",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "fromLocationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "toLocationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "lines": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "itemId",
+      "quantity"
+     ],
+     "properties": {
+      "itemId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "quantity": {
+       "type": "number",
+       "minimum": 0
+      },
+      "unit": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 500
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "GoodsReceipt": {
+  "x-ticvai-persistence": "inventory.goods_receipt + inventory.goods_receipt_line",
+  "type": "object",
+  "required": [
+   "id",
+   "receiptNumber",
+   "purchaseOrderId",
+   "locationId",
+   "lines",
+   "receivedByPrincipalId",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "receiptNumber": {
+    "type": "string"
+   },
+   "purchaseOrderId": {
+    "type": "string"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "deliveryNoteReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "itemId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "itemName": {
+       "type": "string"
+      },
+      "orderedQuantity": {
+       "type": "number"
+      },
+      "receivedQuantity": {
+       "type": "number"
+      },
+      "rejectedQuantity": {
+       "type": "number"
+      },
+      "batchNumber": {
+       "type": "string",
+       "nullable": true
+      },
+      "expiryDate": {
+       "type": "string",
+       "format": "date",
+       "nullable": true
+      },
+      "unitCost": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "totalValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "receivedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "journalEntryId": {
+    "type": "string",
+    "nullable": true,
+    "description": "The accrual the supplier invoice will later match against."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "InventoryItem": {
+  "x-ticvai-persistence": "inventory.item",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateInventoryItemRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "onHand",
+     "isActive"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "onHand": {
+      "type": "number",
+      "description": "Derived from movements. Not directly editable."
+     },
+     "onOrder": {
+      "type": "number"
+     },
+     "inTransit": {
+      "type": "number"
+     },
+     "available": {
+      "type": "number"
+     },
+     "averageCost": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "lastPurchasePrice": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "isBelowReorderPoint": {
+      "type": "boolean"
+     },
+     "hasMovements": {
+      "type": "boolean",
+      "description": "True locks costing method and base unit."
+     },
+     "isActive": {
+      "type": "boolean"
+     }
+    }
+   }
+  ]
+ },
+ "LocationKind": {
+  "type": "string",
+  "enum": [
+   "mainStore",
+   "subStore",
+   "kitchen",
+   "bar",
+   "retailFloor",
+   "cellar",
+   "transit"
+  ]
+ },
+ "MenuItem": {
+  "x-ticvai-persistence": "fnb.menu_item",
+  "type": "object",
+  "required": [
+   "id",
+   "productVariantId",
+   "name",
+   "price",
+   "isAvailable"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "productVariantId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The catalogue variant this item sells. Pricing and tax come from there — a menu is a presentation of the catalogue, not a second catalogue.\n"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "price": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "sortOrder": {
+    "type": "integer"
+   },
+   "modifierGroupIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "stationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "isStockTracked": {
+    "type": "boolean",
+    "description": "True where a recipe exists. Stock-tracked items cannot be sold offline."
+   },
+   "isAvailable": {
+    "type": "boolean"
+   },
+   "unavailableReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "preparationMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "allergens": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   }
+  }
+ },
+ "MovementKind": {
+  "type": "string",
+  "enum": [
+   "receipt",
+   "issue",
+   "saleDepletion",
+   "waste",
+   "adjustment",
+   "transferOut",
+   "transferIn",
+   "countAdjustment",
+   "supplierReturn",
+   "production"
+  ]
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PurchaseOrder": {
+  "x-ticvai-persistence": "inventory.purchase_order + inventory.purchase_order_line",
+  "type": "object",
+  "required": [
+   "id",
+   "purchaseOrderNumber",
+   "supplierId",
+   "status",
+   "lines",
+   "total",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "purchaseOrderNumber": {
+    "type": "string"
+   },
+   "requisitionId": {
+    "type": "string"
+   },
+   "supplierId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "supplierName": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "standard",
+     "blanket",
+     "release",
+     "rfqAward"
+    ],
+    "default": "standard",
+    "description": "BL-159. **A blanket order is a price and a commitment, not a delivery.** Releases draw against it, and modelling each release as its own purchase order loses the contract that makes the price valid.\n"
+   },
+   "blanketParentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "contractPriceValidUntil": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "rfqId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where this order came from a quotation round. **Keeping the link is what lets a venue show it took the best of three**, which is usually the procurement rule rather than a preference.\n"
+   },
+   "supplierInvoiceRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "BL-123. **Purchase orders and goods receipts both existed — the third leg did not.** A three-way match with two legs is a two-way match, and it is the supplier invoice that carries the price nobody has checked yet.\n"
+   },
+   "matchStatus": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "unmatched",
+     "matched",
+     "priceVariance",
+     "quantityVariance",
+     "bothVariance"
+    ],
+    "description": "**The variance kinds are separated because they have different owners** — a price variance is a buyer's problem and a quantity variance is a receiving one.\n"
+   },
+   "status": {
+    "$ref": "#/components/schemas/PurchaseOrderStatus"
+   },
+   "deliverToLocationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Scoped 31 August.** A purchase order is raised by somebody, for somewhere, and carried neither. `requisitionId` reaches a venue through a join, but **a purchase order raised without a requisition — a blanket order, an RFQ award — had no scope at all**, so nothing could answer *whose budget is this* without guessing.\n\n**`deliverToLocationId` is separate from `venueId` on purpose.** A tenant buying centrally and delivering to three venues is one order and three destinations; collapsing them would force one order per venue and lose the volume the tenant negotiated for."
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "lineId": {
+       "type": "string"
+      },
+      "itemId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "itemName": {
+       "type": "string"
+      },
+      "orderedQuantity": {
+       "type": "number"
+      },
+      "receivedQuantity": {
+       "type": "number"
+      },
+      "outstandingQuantity": {
+       "type": "number"
+      },
+      "unitPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "lineTotal": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "subtotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "total": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "expectedDelivery": {
+    "type": "string",
+    "format": "date"
+   },
+   "raisedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "closedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Which venue is buying. **Null on a tenant-level order** — see `deliverToLocationId`."
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Present on every order regardless of whether a venue is named, because a tenant-level order still belongs to a tenant."
+   }
+  }
+ },
+ "PurchaseOrderStatus": {
+  "type": "string",
+  "enum": [
+   "raised",
+   "sent",
+   "acknowledged",
+   "partiallyReceived",
+   "received",
+   "closedShort",
+   "cancelled"
+  ]
+ },
+ "Quotation": {
+  "x-ticvai-persistence": "inventory.quotation + inventory.quotation_line",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateQuotationRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "supplierId",
+     "total",
+     "receivedAt"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "supplierId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "supplierName": {
+      "type": "string"
+     },
+     "total": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "isSelected": {
+      "type": "boolean"
+     },
+     "receivedAt": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "scopePath": {
+      "type": "string",
+      "description": "The partition key. A quotation is sought by somebody and the scope says who."
+     }
+    }
+   }
+  ]
+ },
+ "QuotationComparison": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "requisitionId",
+   "quotations",
+   "lowestTotalSupplierId"
+  ],
+  "properties": {
+   "requisitionId": {
+    "type": "string"
+   },
+   "quotations": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/Quotation"
+    }
+   },
+   "lowestTotalSupplierId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "shortestLeadTimeSupplierId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "byLine": {
+    "type": "array",
+    "description": "Per-line comparison. The cheapest total is not always the cheapest line.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "itemId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "itemName": {
+       "type": "string"
+      },
+      "prices": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "properties": {
+         "supplierId": {
+          "type": "string",
+          "format": "uuid"
+         },
+         "unitPrice": {
+          "$ref": "../shared/common.yaml#/components/schemas/Money"
+         },
+         "isLowest": {
+          "type": "boolean"
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "Requisition": {
+  "x-ticvai-persistence": "inventory.requisition + inventory.requisition_line",
+  "type": "object",
+  "required": [
+   "id",
+   "requisitionNumber",
+   "venueId",
+   "status",
+   "lines",
+   "raisedByPrincipalId",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "requisitionNumber": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "departmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "status": {
+    "$ref": "#/components/schemas/RequisitionStatus"
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "lineId": {
+       "type": "string"
+      },
+      "itemId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "itemName": {
+       "type": "string"
+      },
+      "requestedQuantity": {
+       "type": "number"
+      },
+      "approvedQuantity": {
+       "type": "number",
+       "nullable": true
+      },
+      "orderedQuantity": {
+       "type": "number",
+       "nullable": true
+      },
+      "unit": {
+       "type": "string"
+      },
+      "estimatedCost": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "estimatedTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "raisedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "approvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "approvalNote": {
+    "type": "string",
+    "nullable": true
+   },
+   "requiredBy": {
+    "type": "string",
+    "format": "date"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "approvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "RequisitionStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "pendingApproval",
+   "approved",
+   "rejected",
+   "returnedForInfo",
+   "ordered",
+   "closed",
+   "cancelled"
+  ]
+ },
+ "StartStockCountRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "locationId",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "full",
+     "cycle",
+     "spot"
+    ]
+   },
+   "categoryIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "For cycle counts — restrict to these categories."
+   },
+   "isBlind": {
+    "type": "boolean",
+    "default": true,
+    "description": "Expected quantities withheld from the counting device. Defaults true because a counter who can see the figure reconciles to it rather than to the shelf.\n"
+   }
+  }
+ },
+ "StockCount": {
+  "x-ticvai-persistence": "inventory.count + inventory.count_line",
+  "type": "object",
+  "required": [
+   "id",
+   "locationId",
+   "kind",
+   "status",
+   "isBlind",
+   "lineCount",
+   "countedCount",
+   "startedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "locationName": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/CountStatus"
+   },
+   "isBlind": {
+    "type": "boolean"
+   },
+   "lineCount": {
+    "type": "integer"
+   },
+   "countedCount": {
+    "type": "integer"
+   },
+   "varianceLineCount": {
+    "type": "integer"
+   },
+   "varianceValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "startedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "postedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "journalEntryId": {
+    "type": "string",
+    "nullable": true
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "closedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "postedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "StockLocation": {
+  "x-ticvai-persistence": "inventory.location",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "venueId",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/LocationKind"
+   },
+   "parentLocationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "StockMovement": {
+  "x-ticvai-persistence": "inventory.movement",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateStockMovementRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "balanceAfter",
+     "principalId",
+     "createdAt"
+    ],
+    "properties": {
+     "balanceAfter": {
+      "type": "number"
+     },
+     "unitCost": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "totalCost": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "principalId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "sourceType": {
+      "type": "string",
+      "nullable": true,
+      "description": "What generated it — an order, a count, a transfer."
+     },
+     "sourceId": {
+      "type": "string",
+      "nullable": true
+     },
+     "journalEntryId": {
+      "type": "string",
+      "nullable": true
+     },
+     "createdAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  ]
+ },
+ "StockTransfer": {
+  "x-ticvai-persistence": "inventory.transfer + inventory.transfer_line",
+  "type": "object",
+  "required": [
+   "id",
+   "fromLocationId",
+   "toLocationId",
+   "status",
+   "lines",
+   "dispatchedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "transferNumber": {
+    "type": "string"
+   },
+   "fromLocationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "toLocationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "status": {
+    "$ref": "#/components/schemas/TransferStatus"
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "itemId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "itemName": {
+       "type": "string"
+      },
+      "dispatchedQuantity": {
+       "type": "number"
+      },
+      "receivedQuantity": {
+       "type": "number",
+       "nullable": true
+      },
+      "discrepancy": {
+       "type": "number",
+       "nullable": true
+      },
+      "discrepancyReason": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "dispatchedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "receivedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "dispatchedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "receivedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). `fromLocationId` and `toLocationId` give the endpoints; **this gives the owner.** A transfer between two venues belongs to the tenant above both, and without it the row is addressable from neither end."
+   }
+  }
+ },
+ "StockValuation": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "asAt",
+   "total",
+   "byLocation"
+  ],
+  "properties": {
+   "asAt": {
+    "type": "string",
+    "format": "date"
+   },
+   "total": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "byLocation": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "locationId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "locationName": {
+       "type": "string"
+      },
+      "value": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "itemCount": {
+       "type": "integer"
+      }
+     }
+    }
+   },
+   "byCategory": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "categoryId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "categoryName": {
+       "type": "string"
+      },
+      "value": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   }
+  }
+ },
+ "Supplier": {
+  "x-ticvai-persistence": "inventory.supplier",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "contactName": {
+    "type": "string",
+    "nullable": true
+   },
+   "contactEmail": {
+    "type": "string",
+    "nullable": true
+   },
+   "contactPhone": {
+    "type": "string",
+    "nullable": true
+   },
+   "taxRegistrationNumber": {
+    "type": "string",
+    "nullable": true
+   },
+   "paymentTermsDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "leadTimeDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "accountId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `region`, `tenant` scope.**"
+   }
+  }
+ },
+ "TransferStatus": {
+  "type": "string",
+  "enum": [
+   "dispatched",
+   "inTransit",
+   "received",
+   "partiallyReceived",
+   "cancelled"
+  ]
+ },
+ "VenueSettings": {
+  "type": "object",
+  "x-ticvai-persistence": "platform.venue_settings",
+  "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "supportHours": {
+    "type": "object",
+    "description": "CF-100. **A venue decides whether its support desk is 24/7 or bounded, and the platform does not.** This was recorded as an open question for eleven days and was never one — the code is identical either way, and what was missing was somewhere to put the answer.\n",
+    "properties": {
+     "mode": {
+      "type": "string",
+      "enum": [
+       "alwaysOn",
+       "businessHours",
+       "custom",
+       "none"
+      ]
+     },
+     "timezone": {
+      "type": "string"
+     },
+     "windows": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "day": {
+         "type": "string",
+         "enum": [
+          "mon",
+          "tue",
+          "wed",
+          "thu",
+          "fri",
+          "sat",
+          "sun"
+         ]
+        },
+        "from": {
+         "type": "string"
+        },
+        "to": {
+         "type": "string"
+        }
+       }
+      }
+     },
+     "outOfHoursMessage": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   },
+   "quietHours": {
+    "type": "object",
+    "nullable": true,
+    "description": "**When the platform does not send.** A wallet low-balance alert at 3am is a complaint, and journeys and message triggers both respect this.\n**Operational messages ignore it** — a queue-turn alert is why a guest is holding the phone.\n",
+    "properties": {
+     "from": {
+      "type": "string"
+     },
+     "to": {
+      "type": "string"
+     }
+    }
+   },
+   "segregatedAccess": {
+    "type": "object",
+    "nullable": true,
+    "description": "CF-130. **Configured at venue level because it changes by region and the venue is where it is known** — a Ladies Night, a family session, a prayer-time closure.\n**The platform does not infer gender.** 3.2.45 asks for automatic gender recognition and 3.2.46 for rule-based facial recognition validation, and neither is built. Two reasons, and the second is the one that decided it:\n**A Ladies Night ticket is already gendered at the point of sale**, so the gate checks the entitlement the platform issued rather than the face in front of it — deterministic, auditable, and already contracted through `admissionRules`.\n**And these events are staffed.** A steward at the entrance is making the judgment anyway, and a classifier that overrules a person who can see more than it can is a machine and a human disagreeing while a guest waits.\n**`genderVerification` is a switch, not an implementation.** Where a venue's access hardware offers the capability and the venue chooses to use it, this turns it on — following ADR-0015's standards-first driver model, where the device does what the device does. **Not everything needs to be built.**\n",
+    "properties": {
+     "isEnabled": {
+      "type": "boolean",
+      "default": false
+     },
+     "appliesToAccessPointIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "schedule": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "day": {
+         "type": "string"
+        },
+        "from": {
+         "type": "string"
+        },
+        "to": {
+         "type": "string"
+        },
+        "admits": {
+         "type": "string",
+         "enum": [
+          "all",
+          "women",
+          "womenAndChildren",
+          "families",
+          "members"
+         ]
+        }
+       }
+      }
+     },
+     "entitlementGated": {
+      "type": "boolean",
+      "default": true,
+      "readOnly": true,
+      "description": "**Always true, and stated rather than assumed.** The gate admits on the entitlement. Everything below is advisory on top of that, and nothing replaces it.\n"
+     },
+     "genderVerification": {
+      "type": "string",
+      "enum": [
+       false,
+       "staffAssisted",
+       "deviceAssisted"
+      ],
+      "default": false,
+      "description": "`off` — the entitlement decides and a steward handles exceptions. **The default, and what is contracted.**\n`staffAssisted` — the steward's screen shows the ticket type so they can ask. No inference anywhere.\n`deviceAssisted` — **the venue's access hardware performs the check, not the platform.** Available only where the driver reports the capability, and the result is **advisory to the steward rather than decisive at the turnstile** (3.2.45 asks for rejection; this deviates deliberately).\n"
+     },
+     "overrideRateAlertThreshold": {
+      "type": "number",
+      "nullable": true,
+      "description": "Where `deviceAssisted` is on. **An override rate near zero means the steward has stopped deciding**, and that is the number that says whether the human safeguard is working or decorative.\n"
+     }
+    }
+   },
+   "alerting": {
+    "type": "object",
+    "description": "CF-134. **On-platform notification, marked as read.** Six contracts detect their own trouble and none told a person.\n**The panel is the default and email or WhatsApp only where the matrix names them** — an operational alert that arrives by email is an alert nobody sees in time.\n",
+    "properties": {
+     "channel": {
+      "type": "string",
+      "enum": [
+       "dashboardPanel",
+       "dashboardAndEmail",
+       "dashboardAndWhatsapp"
+      ],
+      "default": "dashboardPanel"
+     },
+     "acknowledgementRequired": {
+      "type": "boolean",
+      "default": true
+     },
+     "escalateAfterMinutes": {
+      "type": "integer",
+      "nullable": true
+     }
+    }
+   }
+  }
+ }
+}

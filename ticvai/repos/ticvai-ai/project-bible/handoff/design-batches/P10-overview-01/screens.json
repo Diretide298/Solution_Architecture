@@ -1,0 +1,408 @@
+[
+ {
+  "id": "PTR-002",
+  "name": "Partner Dashboard",
+  "module": "Overview",
+  "requiresModule": "partner",
+  "wave": 2,
+  "capability": "C34",
+  "implementation": {
+   "app": "partner-web",
+   "route": "/general/partner-dashboard",
+   "component": "apps/partner-web/src/routes/general/PartnerDashboard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "PTR-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "PTR-001",
+    "PTR-003",
+    "PTR-004",
+    "PTR-007"
+   ],
+   "flowDerived": true,
+   "transitions": [
+    {
+     "to": "PTR-007",
+     "trigger": "Searches availability",
+     "provenance": "flow F03 step 1→2",
+     "operation": "getB2bCredit"
+    },
+    {
+     "to": "PTR-001",
+     "trigger": "Partner Login / MFA",
+     "carries": [
+      "accountId",
+      "sessionId"
+     ],
+     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-003",
+     "trigger": "Profile & Company Details",
+     "carries": [
+      "principalId"
+     ],
+     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-004",
+     "trigger": "Notifications",
+     "carries": [
+      "messageId"
+     ],
+     "provenance": "derived — PTR-004 declares entryState.params messageId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **createRefund removed 18 August** — attached by module resemblance, not by what this screen does. A screen that does not handle money should not be able to move it (CF-87's class). **Drawn 26 August** — `Dashboards Board` frame `ptr-002`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.",
+  "density": "compact",
+  "boardFrames": [
+   "Dashboards Board.dc.html#ptr-002"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listOrders` reads the population and `getB2bCredit` reads one of them — list, select, act",
+  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
+  "gaps": [
+   {
+    "operation": "getOrder",
+    "why": "**3 declared operations reach no component on this screen**: getOrder, getOrderStatement, listOrderRefunds. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every partner",
+       "bindsTo": "OrderSummary",
+       "columns": [
+        "OrderSummary.id",
+        "OrderSummary.orderNumber",
+        "OrderSummary.status",
+        "OrderSummary.grossAmount",
+        "OrderSummary.refundedAmount",
+        "OrderSummary.channel",
+        "OrderSummary.lineCount"
+       ],
+       "operation": "listOrders",
+       "provenance": "contract orders.yaml GET /orders"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected partner",
+       "bindsTo": "CreditPosition",
+       "columns": [
+        "CreditPosition.id",
+        "CreditPosition.accountId",
+        "CreditPosition.accountName",
+        "CreditPosition.creditLimit",
+        "CreditPosition.used",
+        "CreditPosition.available",
+        "CreditPosition.isOverLimit",
+        "CreditPosition.isSuspended",
+        "CreditPosition.paymentTermsDays",
+        "CreditPosition.oldestUnpaidInvoiceAt",
+        "CreditPosition.daysOverdue",
+        "CreditPosition.activeOverrides",
+        "CreditPosition.scopePath"
+       ],
+       "operation": "getB2bCredit",
+       "provenance": "contract orders.yaml GET /b2b-accounts/{accountId}/credit"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Apply",
+       "operation": "applyManualDiscount",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createOrder",
+       "provenance": "contract orders.yaml POST /orders"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Exchange",
+       "operation": "exchangeOrderLines",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Hold",
+       "operation": "holdOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Modify",
+       "operation": "modifyOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Override",
+       "operation": "overrideCreditLimit",
+       "provenance": "contract orders.yaml POST /b2b-accounts/{accountId}/credit/override"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reprint",
+       "operation": "reprintOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reschedule",
+       "operation": "rescheduleOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resume",
+       "operation": "resumeOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/resume"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setB2bCreditLimit",
+       "provenance": "contract orders.yaml PUT /b2b-accounts/{accountId}/credit"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Void",
+       "operation": "voidOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmOverrideCreditLimit",
+    "component": "confirmDialog",
+    "trigger": "Override",
+    "body": "**Names what `overrideCreditLimit` changes and what it leaves alone**, in the consequence rather than the verb. A partner this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract orders.yaml POST /b2b-accounts/{accountId}/credit/override"
+   },
+   {
+    "id": "confirmVoidOrder",
+    "component": "confirmDialog",
+    "trigger": "Void",
+    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A partner this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
+   }
+  ],
+  "states": {
+   "loading": "The partner list.",
+   "error": "Could not load. Names which read failed and leaves the partner untouched.",
+   "emptyFirstRun": "No partner yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the partner are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listOrders",
+    "contract": "orders",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getB2bCredit",
+    "contract": "orders",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "applyManualDiscount",
+    "contract": "orders",
+    "purpose": "Apply a discount a cashier chose",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "createOrder",
+    "contract": "orders",
+    "purpose": "Create an order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "exchangeOrderLines",
+    "contract": "orders",
+    "purpose": "Exchange lines for different products or dates",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "getOrder",
+    "contract": "orders",
+    "purpose": "Read an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getOrderStatement",
+    "contract": "orders",
+    "purpose": "Full financial history of an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "holdOrder",
+    "contract": "orders",
+    "purpose": "Park a sale and free the till",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "listOrderRefunds",
+    "contract": "orders",
+    "purpose": "List refunds against an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "modifyOrder",
+    "contract": "orders",
+    "purpose": "Add or remove lines on an existing order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "overrideCreditLimit",
+    "contract": "orders",
+    "purpose": "Authorise an order beyond the credit limit",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "reprintOrder",
+    "contract": "orders",
+    "purpose": "Reprint or resend tickets",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "rescheduleOrder",
+    "contract": "orders",
+    "purpose": "Move an order to another performance",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "resumeOrder",
+    "contract": "orders",
+    "purpose": "Bring a parked sale back to a till",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "setB2bCreditLimit",
+    "contract": "orders",
+    "purpose": "Set a partner credit limit",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "voidOrder",
+    "contract": "orders",
+    "purpose": "Void an order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "accountId",
+     "from": "PTR-001"
+    },
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
+   "preloaded": [
+    "CreditPosition.id",
+    "CreditPosition.accountId",
+    "CreditPosition.accountName",
+    "CreditPosition.creditLimit",
+    "CreditPosition.used"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-002",
+   "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 16 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P10",
+   "audience": "partner",
+   "formFactor": "web",
+   "shortName": "Partner Web",
+   "name": "Partner Web — Reseller Portal",
+   "offlineCapable": false,
+   "app": "partner-web",
+   "operator": "partner",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P09",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

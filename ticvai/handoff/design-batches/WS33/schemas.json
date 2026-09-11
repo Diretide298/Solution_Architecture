@@ -1,0 +1,1189 @@
+{
+ "DepositPartialPaymentOutstandingBalanceManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Deposit, Partial Payment & Outstanding Balance Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "groups": {
+    "type": "string",
+    "description": "Groups"
+   },
+   "b2b": {
+    "type": "string",
+    "description": "B2B"
+   },
+   "corporateSales": {
+    "type": "string",
+    "description": "Corporate Sales"
+   },
+   "schools": {
+    "type": "string",
+    "description": "Schools"
+   },
+   "events": {
+    "type": "string",
+    "description": "Events"
+   },
+   "largeReservations": {
+    "type": "string",
+    "description": "Large Reservations"
+   },
+   "fullPayment": {
+    "type": "string",
+    "description": "Full Payment"
+   },
+   "fixedDeposit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fixed Deposit"
+   },
+   "percentageDeposit": {
+    "type": "number",
+    "description": "Percentage Deposit"
+   },
+   "stagedPayment": {
+    "type": "string",
+    "description": "Staged Payment"
+   },
+   "balanceBeforeVisit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Balance Before Visit"
+   },
+   "balanceByFixedDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Balance by Fixed Date"
+   },
+   "creditAccount": {
+    "type": "string",
+    "description": "Credit Account"
+   },
+   "payOnCollectionWherePermitted": {
+    "type": "string",
+    "description": "Pay on Collection where permitted"
+   },
+   "requiredDeposit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Required Deposit (the pack shows 20% = AED 5,000)"
+   },
+   "total": {
+    "type": "integer",
+    "description": "Total"
+   },
+   "depositRequired": {
+    "type": "boolean",
+    "description": "Deposit Required"
+   },
+   "depositPaid": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Deposit Paid"
+   },
+   "remainingBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Remaining Balance"
+   },
+   "dueDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Due Date"
+   },
+   "daysRemaining": {
+    "type": "string",
+    "description": "Days Remaining"
+   },
+   "status": {
+    "type": "integer",
+    "description": "Status"
+   },
+   "warning": {
+    "type": "string",
+    "description": "Warning"
+   },
+   "gracePeriod": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Grace Period"
+   },
+   "requireApproval": {
+    "type": "boolean",
+    "description": "Require Approval"
+   },
+   "paymentReminder": {
+    "type": "string",
+    "description": "Payment Reminder"
+   },
+   "dueSoon": {
+    "type": "string",
+    "description": "Due Soon"
+   },
+   "overdue": {
+    "type": "string",
+    "description": "Overdue"
+   },
+   "finalNotice": {
+    "type": "string",
+    "description": "Final Notice"
+   }
+  }
+ },
+ "ExternalPaymentPartnerSettlementReferenceMappingView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What External Payment, Partner & Settlement Reference Mapping displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "paymentGateways": {
+    "type": "string",
+    "description": "Payment Gateways"
+   },
+   "acquirers": {
+    "type": "string",
+    "description": "Acquirers"
+   },
+   "banks": {
+    "type": "string",
+    "description": "Banks"
+   },
+   "posTerminals": {
+    "type": "string",
+    "description": "POS Terminals"
+   },
+   "b2bPartners": {
+    "type": "string",
+    "description": "B2B Partners"
+   },
+   "resellers": {
+    "type": "string",
+    "description": "Resellers"
+   },
+   "otas": {
+    "type": "string",
+    "description": "OTAs"
+   },
+   "erp": {
+    "type": "string",
+    "description": "ERP"
+   },
+   "financeSystems": {
+    "type": "string",
+    "description": "Finance Systems"
+   },
+   "walletProviders": {
+    "type": "string",
+    "description": "Wallet Providers"
+   },
+   "ticvaiOrderId": {
+    "type": "string",
+    "description": "TICVAI Order ID"
+   },
+   "ticvaiPaymentId": {
+    "type": "string",
+    "description": "TICVAI Payment ID"
+   },
+   "provider": {
+    "type": "string",
+    "description": "Provider"
+   },
+   "merchantId": {
+    "type": "string",
+    "description": "Merchant ID"
+   },
+   "externalTransactionId": {
+    "type": "string",
+    "description": "External Transaction ID"
+   },
+   "authorizationCode": {
+    "type": "string",
+    "description": "Authorization Code"
+   },
+   "partnerOrderId": {
+    "type": "string",
+    "description": "Partner Order ID"
+   },
+   "settlementBatch": {
+    "type": "string",
+    "description": "Settlement Batch"
+   },
+   "settlementDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Settlement Date"
+   },
+   "erpReference": {
+    "type": "string",
+    "description": "ERP Reference"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Amount"
+   },
+   "multiplePayments": {
+    "type": "string",
+    "description": "Multiple Payments"
+   },
+   "multipleGatewayTransactions": {
+    "type": "string",
+    "description": "Multiple Gateway Transactions"
+   },
+   "multipleRefunds": {
+    "type": "string",
+    "description": "Multiple Refunds"
+   },
+   "multiplePartnerReferences": {
+    "type": "string",
+    "description": "Multiple Partner References"
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason"
+   },
+   "user": {
+    "type": "string",
+    "description": "User"
+   },
+   "timestamp": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Timestamp"
+   },
+   "approvalWhereRequired": {
+    "type": "boolean",
+    "description": "Approval where required"
+   }
+  }
+ },
+ "FinancialTraceabilityControlAuditExplorerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Financial Traceability, Control & Audit Explorer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Amount"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "priceVersion": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price Version"
+   },
+   "tax": {
+    "type": "string",
+    "description": "Tax"
+   },
+   "fee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fee"
+   },
+   "discount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount"
+   },
+   "paymentMethod": {
+    "type": "string",
+    "description": "Payment Method"
+   },
+   "provider": {
+    "type": "string",
+    "description": "Provider"
+   },
+   "user": {
+    "type": "string",
+    "description": "User"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "timestamp": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Timestamp"
+   },
+   "manualPaymentAdjustment": {
+    "type": "string",
+    "description": "Manual Payment Adjustment"
+   },
+   "manualAllocation": {
+    "type": "string",
+    "description": "Manual Allocation"
+   },
+   "manualReconciliation": {
+    "type": "string",
+    "description": "Manual Reconciliation"
+   },
+   "manualRefund": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Manual Refund"
+   },
+   "feeWaiver": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fee Waiver"
+   },
+   "creditOverride": {
+    "type": "string",
+    "description": "Credit Override"
+   },
+   "manualSettlementMapping": {
+    "type": "string",
+    "description": "Manual Settlement Mapping"
+   },
+   "finance": {
+    "type": "string",
+    "description": "Finance"
+   },
+   "internalAudit": {
+    "type": "string",
+    "description": "Internal Audit"
+   },
+   "externalAudit": {
+    "type": "string",
+    "description": "External Audit"
+   },
+   "compliance": {
+    "type": "string",
+    "description": "Compliance"
+   },
+   "management": {
+    "type": "string",
+    "description": "Management"
+   }
+  }
+ },
+ "MultiPaymentSplitTenderPaymentAllocationConfiguratioInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.channel_allocation at 6%, so this is not an update to anything the package stores today and no new table has been decided",
+  "description": "**What Multi-Payment, Split Tender & Payment Allocation Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "terminal": {
+    "type": "string",
+    "description": "Terminal"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "orderType": {
+    "type": "string",
+    "description": "Order Type"
+   },
+   "customerType": {
+    "type": "string",
+    "description": "Customer Type"
+   },
+   "walletAed250": {
+    "type": "string",
+    "description": "Wallet — AED 250"
+   },
+   "voucherAed150": {
+    "type": "string",
+    "description": "Voucher — AED 150"
+   },
+   "visaAed600": {
+    "type": "string",
+    "description": "Visa — AED 600"
+   },
+   "orderLevel": {
+    "type": "string",
+    "description": "Order Level"
+   },
+   "orderLineLevel": {
+    "type": "string",
+    "description": "Order-Line Level"
+   },
+   "productLevel": {
+    "type": "string",
+    "description": "Product Level"
+   },
+   "taxFeeComponent": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Tax/Fee Component"
+   },
+   "specificTicket": {
+    "type": "string",
+    "description": "Specific Ticket"
+   },
+   "deposit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Deposit"
+   },
+   "destination": {
+    "type": "string",
+    "description": "destination"
+   }
+  }
+ },
+ "MultiPaymentSplitTenderPaymentAllocationConfiguratioView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Multi-Payment, Split Tender & Payment Allocation Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "terminal": {
+    "type": "string",
+    "description": "Terminal"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "orderType": {
+    "type": "string",
+    "description": "Order Type"
+   },
+   "customerType": {
+    "type": "string",
+    "description": "Customer Type"
+   },
+   "walletAed250": {
+    "type": "string",
+    "description": "Wallet — AED 250"
+   },
+   "voucherAed150": {
+    "type": "string",
+    "description": "Voucher — AED 150"
+   },
+   "visaAed600": {
+    "type": "string",
+    "description": "Visa — AED 600"
+   },
+   "orderLevel": {
+    "type": "string",
+    "description": "Order Level"
+   },
+   "orderLineLevel": {
+    "type": "string",
+    "description": "Order-Line Level"
+   },
+   "productLevel": {
+    "type": "string",
+    "description": "Product Level"
+   },
+   "taxFeeComponent": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Tax/Fee Component"
+   },
+   "specificTicket": {
+    "type": "string",
+    "description": "Specific Ticket"
+   },
+   "deposit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Deposit"
+   },
+   "destination": {
+    "type": "string",
+    "description": "destination"
+   }
+  }
+ },
+ "OrderFinancialAnalyticsAiReconciliationIntelligenceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Order Financial Analytics & AI Reconciliation Intelligence displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "grossOrderValue": {
+    "type": "string",
+    "description": "Gross Order Value"
+   },
+   "netCollected": {
+    "type": "string",
+    "description": "Net Collected"
+   },
+   "outstandingBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Outstanding Balance"
+   },
+   "collectionRate": {
+    "type": "number",
+    "description": "Collection Rate"
+   },
+   "paymentFailureRate": {
+    "type": "number",
+    "description": "Payment Failure Rate"
+   },
+   "reconciliationRate": {
+    "type": "number",
+    "description": "Reconciliation Rate"
+   },
+   "settlementVariance": {
+    "type": "string",
+    "description": "Settlement Variance"
+   },
+   "averagePaymentMethodsPerOrder": {
+    "type": "number",
+    "description": "Average Payment Methods per Order"
+   },
+   "depositExposure": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Deposit Exposure"
+   },
+   "overdueBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Overdue Balance"
+   },
+   "current": {
+    "type": "string",
+    "description": "Current"
+   },
+   "approvalRate": {
+    "type": "number",
+    "description": "Approval Rate"
+   },
+   "failureRate": {
+    "type": "number",
+    "description": "Failure Rate"
+   },
+   "settlementDelay": {
+    "type": "string",
+    "description": "Settlement Delay"
+   },
+   "reconciliationExceptions": {
+    "type": "string",
+    "description": "Reconciliation Exceptions"
+   },
+   "backendScreenCoreResponsibility": {
+    "type": "string",
+    "description": "# Backend Screen Core Responsibility"
+   },
+   "area12FinalArchitecture": {
+    "type": "string",
+    "description": "Area 12 — Final Architecture"
+   },
+   "orderReservation": {
+    "type": "string",
+    "description": "order/reservation"
+   },
+   "paymentGatewayModules": {
+    "type": "string",
+    "description": "Payment Gateway modules"
+   },
+   "sow": {
+    "type": "string",
+    "description": "SOW"
+   }
+  }
+ },
+ "OrderPaymentDetailTransactionLedgerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Order Payment Detail & Transaction Ledger displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "orderNumber": {
+    "type": "string",
+    "description": "Order Number"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "orderTotal": {
+    "type": "string",
+    "description": "Order Total"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "paid": {
+    "type": "string",
+    "description": "Paid"
+   },
+   "refunded": {
+    "type": "string",
+    "description": "Refunded"
+   },
+   "outstanding": {
+    "type": "string",
+    "description": "Outstanding"
+   },
+   "creditApplied": {
+    "type": "string",
+    "description": "Credit Applied"
+   },
+   "paymentStatus": {
+    "type": "integer",
+    "description": "Payment Status"
+   },
+   "settlementStatus": {
+    "type": "integer",
+    "description": "Settlement Status"
+   },
+   "onOdNt": {
+    "type": "string",
+    "description": "on od nt"
+   },
+   "nt300": {
+    "type": "string",
+    "description": "nt 300"
+   },
+   "nt100": {
+    "type": "string",
+    "description": "nt 100"
+   },
+   "aedComplete": {
+    "type": "string",
+    "description": "AED Complete"
+   },
+   "authorization": {
+    "type": "string",
+    "description": "Authorization"
+   },
+   "capture": {
+    "type": "string",
+    "description": "Capture"
+   },
+   "payment": {
+    "type": "string",
+    "description": "Payment"
+   },
+   "deposit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Deposit"
+   },
+   "additionalCollection": {
+    "type": "string",
+    "description": "Additional Collection"
+   },
+   "partialRefund": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Partial Refund"
+   },
+   "reversal": {
+    "type": "string",
+    "description": "Reversal"
+   },
+   "walletCredit": {
+    "type": "string",
+    "description": "Wallet Credit"
+   },
+   "voucher": {
+    "type": "string",
+    "description": "Voucher"
+   },
+   "creditNote": {
+    "type": "string",
+    "description": "Credit Note"
+   },
+   "adjustment": {
+    "type": "string",
+    "description": "Adjustment"
+   },
+   "gateway": {
+    "type": "string",
+    "description": "Gateway"
+   },
+   "merchant": {
+    "type": "string",
+    "description": "Merchant"
+   },
+   "terminal": {
+    "type": "string",
+    "description": "Terminal"
+   },
+   "authorizationCode": {
+    "type": "string",
+    "description": "Authorization Code"
+   },
+   "gatewayTransactionId": {
+    "type": "string",
+    "description": "Gateway Transaction ID"
+   },
+   "settlementReference": {
+    "type": "string",
+    "description": "Settlement Reference"
+   },
+   "externalReference": {
+    "type": "string",
+    "description": "External Reference"
+   }
+  }
+ },
+ "OrderSplitMergeTransactionRelationshipManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Order Split, Merge & Transaction Relationship Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "orderA4Tickets": {
+    "type": "string",
+    "description": "Order A — 4 Tickets"
+   },
+   "orderB2Tickets": {
+    "type": "string",
+    "description": "Order B — 2 Tickets"
+   },
+   "ticket": {
+    "type": "string",
+    "description": "Ticket"
+   },
+   "attendee": {
+    "type": "string",
+    "description": "Attendee"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "orderLine": {
+    "type": "string",
+    "description": "Order Line"
+   },
+   "paymentResponsibility": {
+    "type": "string",
+    "description": "Payment Responsibility"
+   },
+   "department": {
+    "type": "string",
+    "description": "Department"
+   },
+   "corporateCostCenter": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Corporate Cost Center"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "legalEntity": {
+    "type": "string",
+    "description": "Legal Entity"
+   },
+   "taxContext": {
+    "type": "string",
+    "description": "Tax Context"
+   },
+   "paymentStatus": {
+    "type": "string",
+    "description": "Payment Status"
+   },
+   "productCompatibility": {
+    "type": "string",
+    "description": "Product Compatibility"
+   },
+   "parentOrder": {
+    "type": "string",
+    "description": "Parent Order"
+   },
+   "childOrder": {
+    "type": "string",
+    "description": "Child Order"
+   },
+   "mergedInto": {
+    "type": "string",
+    "description": "Merged Into"
+   },
+   "replacementOrder": {
+    "type": "string",
+    "description": "Replacement Order"
+   },
+   "amendedFrom": {
+    "type": "string",
+    "description": "Amended From"
+   },
+   "convertedFrom": {
+    "type": "string",
+    "description": "Converted From"
+   },
+   "reissuedFrom": {
+    "type": "string",
+    "description": "Reissued From"
+   },
+   "basePrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Base Price"
+   },
+   "discount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount"
+   },
+   "fees": {
+    "type": "string",
+    "description": "Fees"
+   },
+   "tax": {
+    "type": "string",
+    "description": "Tax"
+   },
+   "payments": {
+    "type": "string",
+    "description": "Payments"
+   },
+   "refunds": {
+    "type": "string",
+    "description": "Refunds"
+   },
+   "credits": {
+    "type": "string",
+    "description": "Credits"
+   },
+   "correctlyAcrossDerivedOrders": {
+    "type": "string",
+    "description": "correctly across derived orders"
+   },
+   "neverEraseTheOriginalRelationship": {
+    "type": "string",
+    "description": "Never erase the original relationship"
+   }
+  }
+ },
+ "PaymentOrderFinancialCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Payment & Order Financial Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "grossOrderValue": {
+    "type": "string",
+    "description": "Gross Order Value"
+   },
+   "fullyPaidOrders": {
+    "type": "integer",
+    "description": "Fully Paid Orders"
+   },
+   "partiallyPaidOrders": {
+    "type": "integer",
+    "description": "Partially Paid Orders"
+   },
+   "unpaidOrders": {
+    "type": "integer",
+    "description": "Unpaid Orders"
+   },
+   "outstandingBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Outstanding Balance"
+   },
+   "paymentsToday": {
+    "type": "string",
+    "description": "Payments Today"
+   },
+   "failedPayments": {
+    "type": "integer",
+    "description": "Failed Payments"
+   },
+   "pendingPayments": {
+    "type": "integer",
+    "description": "Pending Payments"
+   },
+   "refundsPending": {
+    "type": "integer",
+    "description": "Refunds Pending"
+   },
+   "reconciliationExceptions": {
+    "type": "integer",
+    "description": "Reconciliation Exceptions"
+   },
+   "unallocatedPayments": {
+    "type": "integer",
+    "description": "Unallocated Payments"
+   },
+   "settlementVariance": {
+    "type": "string",
+    "description": "Settlement Variance"
+   },
+   "orderId": {
+    "type": "string",
+    "description": "Order ID"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "orderValue": {
+    "type": "string",
+    "description": "Order Value"
+   },
+   "amountPaid": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Amount Paid"
+   },
+   "refunded": {
+    "type": "string",
+    "description": "Refunded"
+   },
+   "outstanding": {
+    "type": "string",
+    "description": "Outstanding"
+   },
+   "paymentMethods": {
+    "type": "integer",
+    "description": "Payment Methods"
+   },
+   "paymentStatus": {
+    "type": "integer",
+    "description": "Payment Status"
+   },
+   "settlementStatus": {
+    "type": "integer",
+    "description": "Settlement Status"
+   },
+   "reconciliationStatus": {
+    "type": "integer",
+    "description": "Reconciliation Status"
+   },
+   "notRequired": {
+    "type": "boolean",
+    "description": "Not Required"
+   },
+   "unpaid": {
+    "type": "string",
+    "description": "Unpaid"
+   },
+   "paymentInitiated": {
+    "type": "string",
+    "description": "Payment Initiated"
+   },
+   "authorized": {
+    "type": "string",
+    "description": "Authorized"
+   },
+   "partiallyPaid": {
+    "type": "string",
+    "description": "Partially Paid"
+   },
+   "paid": {
+    "type": "string",
+    "description": "Paid"
+   },
+   "overpaid": {
+    "type": "string",
+    "description": "Overpaid"
+   },
+   "partiallyRefunded": {
+    "type": "string",
+    "description": "Partially Refunded"
+   },
+   "failed": {
+    "type": "integer",
+    "description": "Failed"
+   },
+   "reversed": {
+    "type": "string",
+    "description": "Reversed"
+   },
+   "reconciliationRequired": {
+    "type": "boolean",
+    "description": "Reconciliation Required"
+   },
+   "by": {
+    "type": "string",
+    "description": "By"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "paymentMethod": {
+    "type": "string",
+    "description": "Payment Method"
+   },
+   "paymentProvider": {
+    "type": "string",
+    "description": "Payment Provider"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "orderStatus": {
+    "type": "string",
+    "description": "Order Status"
+   }
+  }
+ },
+ "PaymentReconciliationExceptionManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Payment Reconciliation & Exception Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "paymentGateway": {
+    "type": "string",
+    "description": "Payment Gateway"
+   },
+   "acquirer": {
+    "type": "string",
+    "description": "Acquirer"
+   },
+   "bank": {
+    "type": "string",
+    "description": "Bank"
+   },
+   "pos": {
+    "type": "string",
+    "description": "POS"
+   },
+   "ota": {
+    "type": "string",
+    "description": "OTA"
+   },
+   "reseller": {
+    "type": "string",
+    "description": "Reseller"
+   },
+   "wallet": {
+    "type": "string",
+    "description": "Wallet"
+   },
+   "erp": {
+    "type": "string",
+    "description": "ERP"
+   },
+   "transactionId": {
+    "type": "string",
+    "description": "Transaction ID"
+   },
+   "externalReference": {
+    "type": "string",
+    "description": "External Reference"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Amount"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "merchant": {
+    "type": "string",
+    "description": "Merchant"
+   },
+   "order": {
+    "type": "string",
+    "description": "Order"
+   },
+   "authorizationCode": {
+    "type": "string",
+    "description": "Authorization Code"
+   },
+   "mismatch500480": {
+    "type": "string",
+    "description": "mismatch 500 480"
+   },
+   "aed250": {
+    "type": "string",
+    "description": "AED 250"
+   },
+   "settlement250": {
+    "type": "string",
+    "description": "settlement 250"
+   },
+   "match": {
+    "type": "string",
+    "description": "Match"
+   },
+   "remap": {
+    "type": "string",
+    "description": "Remap"
+   },
+   "investigate": {
+    "type": "string",
+    "description": "Investigate"
+   },
+   "markPending": {
+    "type": "integer",
+    "description": "Mark Pending"
+   }
+  }
+ },
+ "RelatedOrderTransactionRelationshipExplorerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Related Order & Transaction Relationship Explorer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "amendment": {
+    "type": "string",
+    "description": "↓ Amendment"
+   },
+   "ticketUpgrade": {
+    "type": "string",
+    "description": "↓ Ticket Upgrade"
+   },
+   "additionalPayment": {
+    "type": "string",
+    "description": "↓ Additional Payment"
+   },
+   "partialCancellation": {
+    "type": "string",
+    "description": "↓ Partial Cancellation"
+   },
+   "refund": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "↓ Refund"
+   },
+   "original": {
+    "type": "string",
+    "description": "Original"
+   },
+   "conversion": {
+    "type": "number",
+    "description": "Conversion"
+   },
+   "exchange": {
+    "type": "string",
+    "description": "Exchange"
+   },
+   "cancellation": {
+    "type": "string",
+    "description": "Cancellation"
+   },
+   "payment": {
+    "type": "string",
+    "description": "Payment"
+   },
+   "chargebackWhereIntegrated": {
+    "type": "string",
+    "description": "Chargeback where integrated"
+   },
+   "externalTransaction": {
+    "type": "string",
+    "description": "External Transaction"
+   }
+  }
+ }
+}

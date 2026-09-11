@@ -1187,6 +1187,12 @@
    "mentions": 1
   },
   {
+   "file": "docs\\active\\workshop-contract-gap.md",
+   "title": "Workshop pack \u2014 what the new screens need from the contracts",
+   "status": "",
+   "mentions": 1
+  },
+  {
    "file": "docs\\active\\workshop-pack-log.md",
    "title": "Workshop pack \u2014 what was done, and how to re-verify it",
    "status": "",
@@ -1427,7 +1433,7 @@
   "tables": 51,
   "screens": 34,
   "flows": 11,
-  "documents": 22,
+  "documents": 23,
   "openConflicts": 1
  }
 }

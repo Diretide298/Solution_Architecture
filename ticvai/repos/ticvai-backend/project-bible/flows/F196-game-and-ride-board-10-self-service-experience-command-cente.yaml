@@ -1,0 +1,134 @@
+id: F196
+name: 'Game and Ride board 10: Self-Service Experience Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Game and Ride board 10. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-484
+  entryPoints:
+  - Arrives at Self-Service Experience Command Center
+steps:
+- step: 1
+  screen: BO-484
+  action: Opens Self-Service Experience Command Center
+  operations: []
+  outcome: Provide administrators with a centralized view of all customer-facing game wallet kiosks, balance
+    stations, and enabled self-service channels.
+- step: 2
+  screen: BO-485
+  action: Works in Self-Service Kiosk Profile & Channel Configuration
+  operations: []
+  outcome: Define the business role of each kiosk or customer-facing station.
+- step: 3
+  screen: BO-484
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-486
+  action: Works in Customer Card / Wallet Identification
+  operations: []
+  outcome: 'Configure the first customer step: identifying the customer''s game card or digital wallet
+    securely.'
+- step: 5
+  screen: BO-484
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-487
+  action: Works in Customer Wallet & Balance Summary
+  operations: []
+  outcome: Present all relevant wallet balances clearly to the customer. The source specifically requires
+    customers' stored credits to be viewable through self-service kiosks.
+- step: 7
+  screen: BO-484
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-488
+  action: Works in Self-Service Wallet Top-Up
+  operations: []
+  outcome: Allow customers to add value to their game wallet through an enabled kiosk/channel.
+- step: 9
+  screen: BO-484
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-489
+  action: Works in Bonus, Free Game & Benefit View
+  operations: []
+  outcome: Help customers understand promotional value and benefits available in their wallet.
+- step: 11
+  screen: BO-484
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-490
+  action: Works in Game & Ride Eligibility / “What Can I Play?”
+  operations: []
+  outcome: Allow guests to see which games and rides they can currently access based on their wallet,
+    packages, free plays and entitlements.
+- step: 13
+  screen: BO-484
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-491
+  action: Works in Redemption Balance & Prize Discovery
+  operations: []
+  outcome: Allow customers to check redemption credits and browse prizes they can afford before visiting
+    the redemption counter.
+- step: 15
+  screen: BO-484
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-492
+  action: Works in Customer Game & Wallet Transaction History
+  operations: []
+  outcome: Allow the customer to review recent activity associated with the card/wallet.
+- step: 17
+  screen: BO-484
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-493
+  action: Works in Self-Service UI Theme, Language & Journey Configuration
+  operations: []
+  outcome: Allow TICVAI administrators to configure the customer-facing kiosk experience without changing
+    business logic.
+branches:
+- at: 1
+  condition: Nothing has been set up on Self-Service Experience Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Game and Ride board 10 visited
+primaryContract: unknown
+contracts:
+- unknown

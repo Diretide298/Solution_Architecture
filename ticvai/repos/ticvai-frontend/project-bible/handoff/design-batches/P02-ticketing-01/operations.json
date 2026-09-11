@@ -1,0 +1,233 @@
+{
+ "cancelReservation": {
+  "method": "DELETE",
+  "path": "/reservations/{reservationId}",
+  "contract": "orders",
+  "summary": "Cancel a reservation",
+  "permission": "ORDER_CANCEL",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "claimTicketTransfer": {
+  "method": "POST",
+  "path": "/ticket-transfers/{transferId}/claim",
+  "contract": "orders",
+  "summary": "Claim transferred tickets",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TicketTransfer"
+ },
+ "getReservation": {
+  "method": "GET",
+  "path": "/reservations/{reservationId}",
+  "contract": "orders",
+  "summary": "Read a reservation",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Reservation"
+ },
+ "listFxRates": {
+  "method": "GET",
+  "path": "/fx-rates",
+  "contract": "finance",
+  "summary": "The rates in force",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": "asAt",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "purpose",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "FxRate"
+ },
+ "listOrders": {
+  "method": "GET",
+  "path": "/orders",
+  "contract": "orders",
+  "summary": "List orders",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "shiftId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "createdFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "createdTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listProducts": {
+  "method": "GET",
+  "path": "/products",
+  "contract": "catalogue",
+  "summary": "List products",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "isSellable",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listReservations": {
+  "method": "GET",
+  "path": "/reservations",
+  "contract": "orders",
+  "summary": "List reservations",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "expiringWithinMinutes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "transferOrderTickets": {
+  "method": "POST",
+  "path": "/orders/{orderId}/transfer",
+  "contract": "orders",
+  "summary": "Transfer tickets to another guest",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ }
+}

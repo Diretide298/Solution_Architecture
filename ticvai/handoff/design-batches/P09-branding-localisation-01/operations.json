@@ -1,0 +1,409 @@
+{
+ "claimCustomDomain": {
+  "method": "POST",
+  "path": "/tenant-domains",
+  "contract": "white-label",
+  "summary": "Claim a domain and get a verification token",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CustomDomain"
+ },
+ "createPlan": {
+  "method": "POST",
+  "path": "/plans",
+  "contract": "subscription",
+  "summary": "Create a subscription plan",
+  "permission": "PLATFORM_PLAN_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreatePlanRequest",
+  "responds": "Plan"
+ },
+ "createPlanVersion": {
+  "method": "POST",
+  "path": "/plans/{planId}",
+  "contract": "subscription",
+  "summary": "Publish a new version of a plan",
+  "permission": "PLATFORM_PLAN_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreatePlanRequest",
+  "responds": "Plan"
+ },
+ "createPreview": {
+  "method": "POST",
+  "path": "/tenant-config/preview",
+  "contract": "white-label",
+  "summary": "Generate a preview link",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Preview"
+ },
+ "diffConfigVersion": {
+  "method": "GET",
+  "path": "/tenant-config/versions/{version}/diff",
+  "contract": "white-label",
+  "summary": "Compare a version against the working draft",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "against",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ConfigDiff"
+ },
+ "getAppIcons": {
+  "method": "GET",
+  "path": "/tenant-config/app-icons",
+  "contract": "white-label",
+  "summary": "Read app icon set",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AppIcons"
+ },
+ "getBrandIdentity": {
+  "method": "GET",
+  "path": "/tenant-config/brand",
+  "contract": "white-label",
+  "summary": "Read brand identity",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BrandIdentity"
+ },
+ "getPlan": {
+  "method": "GET",
+  "path": "/plans/{planId}",
+  "contract": "subscription",
+  "summary": "Read a plan",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Plan"
+ },
+ "getTheme": {
+  "method": "GET",
+  "path": "/tenant-config/theme",
+  "contract": "white-label",
+  "summary": "Read colour theme",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Theme"
+ },
+ "listConfigVersions": {
+  "method": "GET",
+  "path": "/tenant-config/versions",
+  "contract": "white-label",
+  "summary": "Version history",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listCustomDomains": {
+  "method": "GET",
+  "path": "/tenant-domains",
+  "contract": "white-label",
+  "summary": "The domains this tenant has claimed",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CustomDomain"
+ },
+ "listFaqs": {
+  "method": "GET",
+  "path": "/tenant-config/faqs",
+  "contract": "white-label",
+  "summary": "List FAQs",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "FaqCategory"
+ },
+ "listPlans": {
+  "method": "GET",
+  "path": "/plans",
+  "contract": "subscription",
+  "summary": "List subscription plans",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Plan"
+ },
+ "listPolicies": {
+  "method": "GET",
+  "path": "/tenant-config/policies",
+  "contract": "white-label",
+  "summary": "List legal policies",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Policy"
+ },
+ "publishTenantConfig": {
+  "method": "POST",
+  "path": "/tenant-config/publish",
+  "contract": "white-label",
+  "summary": "Publish the working draft",
+  "permission": "TENANT_PUBLISH",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ConfigVersion"
+ },
+ "relinquishCustomDomain": {
+  "method": "DELETE",
+  "path": "/tenant-domains/{domainId}",
+  "contract": "white-label",
+  "summary": "Give the domain up",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
+ "restoreConfigVersion": {
+  "method": "POST",
+  "path": "/tenant-config/versions/{version}/restore",
+  "contract": "white-label",
+  "summary": "Restore a previous version",
+  "permission": "TENANT_PUBLISH",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TenantConfig"
+ },
+ "setAppIcons": {
+  "method": "PUT",
+  "path": "/tenant-config/app-icons",
+  "contract": "white-label",
+  "summary": "Set app icons",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AppIcons"
+ },
+ "setBrandIdentity": {
+  "method": "PUT",
+  "path": "/tenant-config/brand",
+  "contract": "white-label",
+  "summary": "Set logo, favicon and splash",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "BrandIdentity",
+  "responds": "BrandIdentity"
+ },
+ "setFaqs": {
+  "method": "PUT",
+  "path": "/tenant-config/faqs",
+  "contract": "white-label",
+  "summary": "Set FAQ categories and entries",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "FaqCategory"
+ },
+ "setLanguages": {
+  "method": "PUT",
+  "path": "/tenant-config/languages",
+  "contract": "white-label",
+  "summary": "Set enabled languages and default",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "LanguageConfig"
+ },
+ "setPolicy": {
+  "method": "PUT",
+  "path": "/tenant-config/policies/{policyKind}",
+  "contract": "white-label",
+  "summary": "Publish a policy version",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Policy"
+ },
+ "setTheme": {
+  "method": "PUT",
+  "path": "/tenant-config/theme",
+  "contract": "white-label",
+  "summary": "Set colour theme",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Theme",
+  "responds": "Theme"
+ },
+ "verifyCustomDomain": {
+  "method": "POST",
+  "path": "/tenant-domains/{domainId}/verify",
+  "contract": "white-label",
+  "summary": "Check the record and issue the certificate",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CustomDomain"
+ }
+}

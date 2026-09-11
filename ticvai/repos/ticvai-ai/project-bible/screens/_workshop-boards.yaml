@@ -1,0 +1,109 @@
+# Issued by tools/workshop_boards.py. A code is never renumbered or reused — see there.
+boards:
+  WS01: Access Control board 1
+  WS02: Access Control board 2
+  WS03: Access Control board 3
+  WS04: Access Control board 4
+  WS05: Access Control board 5
+  WS06: Access Control board 6
+  WS07: Access Control board 7
+  WS08: Access Control board 8
+  WS09: Access Control board 9
+  WS10: Access Control board 10
+  WS11: Access Control board 11
+  WS12: Access Control board 12
+  WS13: Approval Workflows and Governance board 1
+  WS14: Approval Workflows and Governance board 2
+  WS15: Approval Workflows and Governance board 3
+  WS16: Approval Workflows and Governance board 4
+  WS17: Approval Workflows and Governance board 5
+  WS18: Approval Workflows and Governance board 6
+  WS19: Approval Workflows and Governance board 7
+  WS20: Approval Workflows and Governance board 8
+  WS21: B2B, Reseller & OTA Partner Management board 1
+  WS22: B2B, Reseller & OTA Partner Management board 2
+  WS23: B2B, Reseller & OTA Partner Management board 3
+  WS24: Communication & Notification Platform Services board 1
+  WS25: Customer Service board 1
+  WS26: Customer Service board 2
+  WS27: Group Sales   Corporate Booking Management board 1
+  WS28: Group Sales   Corporate Booking Management board 2
+  WS29: Membership   Annual Pass Management board 1
+  WS30: Membership   Annual Pass Management board 2
+  WS31: Order   Reservation Management board 1
+  WS32: Order   Reservation Management board 2
+  WS33: Order   Reservation Management board 3
+  WS34: Pricing   Revenue Management board 1
+  WS35: Pricing   Revenue Management board 2
+  WS36: Pricing   Revenue Management board 3
+  WS37: Pricing   Revenue Management board 4
+  WS38: Pricing   Revenue Management board 5
+  WS39: Pricing   Revenue Management board 6
+  WS40: Pricing   Revenue Management board 7
+  WS41: Privacy  Consent   Preference Management board 1
+  WS42: Privacy  Consent   Preference Management board 2
+  WS43: Product Lifecycle   Catalogue Governance board 1
+  WS44: Product Lifecycle   Catalogue Governance board 2
+  WS45: Promotions   Bundles Management board 1
+  WS46: Promotions   Bundles Management board 2
+  WS47: Promotions   Bundles Management board 3
+  WS48: Promotions   Bundles Management board 4
+  WS49: Promotions   Bundles Management board 5
+  WS50: Promotions   Bundles Management board 6
+  WS51: Promotions   Bundles Management board 7
+  WS52: Promotions   Bundles Management board 8
+  WS53: Promotions   Bundles Management board 9
+  WS54: Promotions   Bundles Management board 10
+  WS55: Rules  Workflow  Approval   Automation Engine board 1
+  WS56: Rules  Workflow  Approval   Automation Engine board 2
+  WS57: Sales Channel Management board 1
+  WS58: Sales Channel Management board 2
+  WS59: Ticket Media   Credential Management board 1
+  WS60: Ticket Media   Credential Management board 2
+  WS61: Ticket Media   Credential Management board 3
+  WS62: Ticket Resale Marketplace board 1
+  WS63: Ticket Resale Marketplace board 2
+  WS64: Ticket Resale Marketplace board 3
+  WS65: Ticket Upgrade, Exchange & Conversion board 1
+  WS66: Unified BI Reporting and AI Analytics Platform board 1
+  WS67: Unified BI Reporting and AI Analytics Platform board 2
+  WS68: Unified BI Reporting and AI Analytics Platform board 3
+  WS69: Unified BI Reporting and AI Analytics Platform board 4
+  WS70: Unified BI Reporting and AI Analytics Platform board 9
+  WS71: Unified BI Reporting and AI Analytics Platform board 10
+  WS72: Waiver, Consent & Digital Form Management board 1
+  WS73: Waiver, Consent & Digital Form Management board 2
+  WS74: Digital Asset Management DAM board 1
+  WS75: Digital Asset Management DAM board 2
+  WS76: Digital Asset Management DAM board 3
+  WS77: Digital Asset Management DAM board 4
+  WS78: Game and Ride board 1
+  WS79: Game and Ride board 2
+  WS80: Game and Ride board 3
+  WS81: Game and Ride board 4
+  WS82: Game and Ride board 5
+  WS83: Game and Ride board 6
+  WS84: Game and Ride board 7
+  WS85: Game and Ride board 8
+  WS86: Game and Ride board 9
+  WS87: Game and Ride board 10
+  WS88: Rental Management board 1
+  WS89: Rental Management board 2
+  WS90: Rental Management board 3
+  WS91: Rental Management board 4
+  WS92: Rental Management board 5
+  WS93: Rental Management board 6
+  WS94: Rental Management board 7
+  WS95: Rental Management board 8
+  WS96: Rental Management board 9
+  WS97: Rental Management board 10
+  WS98: Subscription Licensing AI Self Service board 1
+  WS99: Subscription Licensing AI Self Service board 2
+  WS100: Subscription Licensing AI Self Service board 3
+  WS101: Subscription Licensing AI Self Service board 4
+  WS102: Subscription Licensing AI Self Service board 5
+  WS103: Subscription Licensing AI Self Service board 6
+  WS104: Subscription Licensing AI Self Service board 7
+  WS105: Subscription Licensing AI Self Service board 8
+  WS106: Subscription Licensing AI Self Service board 9
+  WS107: Subscription Licensing AI Self Service board 10

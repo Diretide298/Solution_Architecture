@@ -36,7 +36,7 @@ lld:
   files: 16
   folder: diagrams/lld/services/
 - set: platforms
-  files: 15
+  files: 16
   folder: diagrams/lld/platforms/
 - set: contracts
   files: 30

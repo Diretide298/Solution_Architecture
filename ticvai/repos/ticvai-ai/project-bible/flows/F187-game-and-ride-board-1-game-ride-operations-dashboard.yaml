@@ -1,0 +1,136 @@
+id: F187
+name: 'Game and Ride board 1: Game & Ride Operations Dashboard'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Game and Ride board 1. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-394
+  entryPoints:
+  - Arrives at Game & Ride Operations Dashboard
+steps:
+- step: 1
+  screen: BO-394
+  action: Opens Game & Ride Operations Dashboard
+  operations: []
+  outcome: Provide management with one central view of the operational and configuration status of all
+    games, rides, skill games, video games and redemption games.
+- step: 2
+  screen: BO-395
+  action: Works in Game & Ride Directory
+  operations: []
+  outcome: Maintain the master catalogue of all attractions participating in the payment/redemption ecosystem.
+- step: 3
+  screen: BO-394
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-396
+  action: Works in Attraction Profile
+  operations: []
+  outcome: Create or maintain the master record for an individual game or ride.
+- step: 5
+  screen: BO-394
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-397
+  action: Works in Attraction Type Configuration
+  operations: []
+  outcome: Configure reusable categories for games and rides so common rules do not have to be configured
+    separately for every attraction.
+- step: 7
+  screen: BO-394
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-398
+  action: Works in Game & Ride Operational Configuration
+  operations: []
+  outcome: Configure whether an attraction is currently available for customer transactions.
+- step: 9
+  screen: BO-394
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-399
+  action: Works in Wallet & Credit Acceptance Mapping
+  operations: []
+  outcome: Define at attraction level which payment/value mechanisms are accepted. The source specifically
+    requires digital-wallet credits to support pay-as-you-go for redemption games, skill games, rides
+    and video games.
+- step: 11
+  screen: BO-394
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-400
+  action: Works in Attraction / Reader Mapping
+  operations: []
+  outcome: 'Provide a high-level association between games/rides and their reader configurations. Important:
+    This screen only performs the mapping. Detailed reader properties belong to Board 2 – Game Reader
+    & Device Configuration.'
+- step: 13
+  screen: BO-394
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-401
+  action: Works in Game Package & Entitlement Association
+  operations: []
+  outcome: Show which packages, tickets and entitlements provide access to each game or ride. The source
+    requires packages containing specific games with configurable entitlement validity, plus products
+    that can allow all games/rides, specific games/r
+- step: 15
+  screen: BO-394
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-402
+  action: Works in Configuration Health & Validation
+  operations: []
+  outcome: Prevent incomplete or conflicting game/ride configurations from becoming operational.
+- step: 17
+  screen: BO-394
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-403
+  action: Works in Attraction Audit, Dependencies & Governed Actions
+  operations: []
+  outcome: Provide traceability and controlled management of attraction configuration changes.
+branches:
+- at: 1
+  condition: Nothing has been set up on Game & Ride Operations Dashboard yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Game and Ride board 1 visited
+primaryContract: unknown
+contracts:
+- unknown

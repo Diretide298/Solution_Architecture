@@ -1,0 +1,189 @@
+{
+ "listCodeEligibilityRestriction": {
+  "method": "GET",
+  "path": "/code-eligibility-restriction",
+  "contract": "promotions",
+  "summary": "Code Eligibility & Restriction Manager",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CodeEligibilityRestrictionManagerView"
+ },
+ "listCodeSecurityFraud": {
+  "method": "GET",
+  "path": "/code-security-fraud",
+  "contract": "promotions",
+  "summary": "Code Security, Fraud & Exception Center",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CodeSecurityFraudExceptionCenterView"
+ },
+ "listCouponCodes": {
+  "method": "GET",
+  "path": "/coupon-campaigns/{campaignId}/codes",
+  "contract": "promotions",
+  "summary": "List generated codes",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listRedemption": {
+  "method": "GET",
+  "path": "/redemption",
+  "contract": "promotions",
+  "summary": "Redemption Analytics, Audit & AI Optimization",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "campaign",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "code",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "batch",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerSegment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partner",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "RedemptionAnalyticsAuditAiOptimizationView"
+ },
+ "listRedemptionCodeLookup": {
+  "method": "GET",
+  "path": "/redemption-code-lookup",
+  "contract": "promotions",
+  "summary": "Redemption Monitor & Code Lookup",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "RedemptionMonitorCodeLookupView"
+ },
+ "listUniqueCodeGeneration": {
+  "method": "GET",
+  "path": "/unique-code-generation",
+  "contract": "promotions",
+  "summary": "Unique Code Generation & Batch Manager",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "UniqueCodeGenerationBatchManagerView"
+ },
+ "listUsageCapacityFrequency": {
+  "method": "GET",
+  "path": "/usage-capacity-frequency",
+  "contract": "promotions",
+  "summary": "Usage, Capacity & Frequency Control",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "UsageCapacityFrequencyControlView"
+ },
+ "listValidityDateTime": {
+  "method": "GET",
+  "path": "/validity-date-time",
+  "contract": "promotions",
+  "summary": "Validity, Date & Time Control",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ValidityDateTimeControlView"
+ },
+ "setCodeDistributionManager": {
+  "method": "PUT",
+  "path": "/code-distribution-manager",
+  "contract": "promotions",
+  "summary": "Code Distribution & Assignment Manager",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "CodeDistributionAssignmentManagerInput",
+  "responds": "CodeDistributionAssignmentManagerView"
+ },
+ "setCouponPromoCode": {
+  "method": "PUT",
+  "path": "/coupon-promo-code",
+  "contract": "promotions",
+  "summary": "Coupon & Promo Code Builder",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "CouponPromoCodeBuilderInput",
+  "responds": "CouponPromoCodeBuilderView"
+ }
+}

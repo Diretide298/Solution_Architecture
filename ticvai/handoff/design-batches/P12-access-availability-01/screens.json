@@ -1,0 +1,409 @@
+[
+ {
+  "id": "SUP-001",
+  "name": "Venue Management Sign In",
+  "module": "Access & Availability",
+  "requiresModule": "core",
+  "wave": 3,
+  "capability": "C35",
+  "implementation": {
+   "app": "venue-support-web",
+   "route": "/general/agent-login",
+   "component": "apps/venue-support-web/src/routes/general/AgentLoginList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "isEntryPoint": true,
+   "inferred": true,
+   "exitTo": [
+    "SUP-002",
+    "SUP-003",
+    "SUP-004",
+    "BO-001",
+    "CMS-001",
+    "ANL-001"
+   ],
+   "transitions": [
+    {
+     "to": "SUP-002",
+     "trigger": "Agent Dashboard",
+     "provenance": "structural — SUP-001 is P12's home screen and its exits are its launcher"
+    },
+    {
+     "to": "SUP-003",
+     "trigger": "Availability & Routing Settings",
+     "provenance": "structural — SUP-001 is P12's home screen and its exits are its launcher"
+    },
+    {
+     "to": "SUP-004",
+     "trigger": "Conversation Queue",
+     "provenance": "structural — SUP-001 is P12's home screen and its exits are its launcher"
+    },
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "provenance": "structural — SUP-001 is P12's home screen and its exits are its launcher"
+    },
+    {
+     "to": "CMS-001",
+     "trigger": "Tenant Workspace",
+     "provenance": "structural — SUP-001 is P12's home screen and its exits are its launcher"
+    },
+    {
+     "to": "ANL-001",
+     "trigger": "Executive Command Center",
+     "provenance": "structural — SUP-001 is P12's home screen and its exits are its launcher"
+    }
+   ]
+  },
+  "notes": "**Generalised on 10 September 2026 from `Agent Login`.** It was the only door into an application of 550 screens - P08 back office, P13 CMS, P16 analytics and this console - and it was named for one of the four. A venue manager signing in through a screen called *Agent Login* is being told they are in the wrong place.\n\n**Nothing about the screen changed except what it admits to.** It already called the whole identity set - `login`, `forceLogout`, `listSsoProviders`, `revokeAllSessions`, `listMfaMethods` - and its purpose already read *get someone into the app, fast, on a device that may be shared*. The work was the name and the exits.\n\n**`implementation.app` stays `venue-support-web`.** That is the build unit, one of twelve frontends `check-frontend` and `check-package` validate against; `venue-management` is the shipped unit, one of five. Moving the route would break the join for a rename.\n\n**It keeps `listMfaMethods` where `POS-000` does not**, and the difference is the point: this signs somebody into the ledger, the pricing and the tenant's own content from a desk, while a till is bounded by the terminal it is bolted to.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listActiveSessions` reads the population and `getCurrentSession` reads one of them — list, select, act",
+  "purpose": "Get someone into venue management, fast, on a device that may be shared, and resolve the session the back office, the CMS and analytics all read.",
+  "gaps": [
+   {
+    "operation": "getGuestSession",
+    "why": "**3 declared operations reach no component on this screen**: getGuestSession, listMfaMethods, listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every agent login",
+       "bindsTo": "ActiveSession",
+       "columns": [
+        "ActiveSession.sessionId",
+        "ActiveSession.principalId",
+        "ActiveSession.principalName",
+        "ActiveSession.roleId",
+        "ActiveSession.roleName",
+        "ActiveSession.workstationId",
+        "ActiveSession.workstationName",
+        "ActiveSession.venueId",
+        "ActiveSession.ipAddress",
+        "ActiveSession.deviceInfo",
+        "ActiveSession.hasOpenShift",
+        "ActiveSession.mfaSatisfied"
+       ],
+       "operation": "listActiveSessions",
+       "provenance": "contract identity.yaml GET /auth/sessions"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected agent login",
+       "bindsTo": "Session",
+       "columns": [
+        "Session.sessionId",
+        "Session.principalId",
+        "Session.roleId",
+        "Session.displayName",
+        "Session.scope",
+        "Session.effectivePermissions",
+        "Session.permissionsByScope",
+        "Session.saleBoardId",
+        "Session.workstation",
+        "Session.openedAt",
+        "Session.expiresAt"
+       ],
+       "operation": "getCurrentSession",
+       "provenance": "contract identity.yaml GET /auth/session"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Login",
+       "operation": "login",
+       "provenance": "contract identity.yaml POST /auth/login"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Force",
+       "operation": "forceLogout",
+       "provenance": "contract identity.yaml POST /auth/sessions/{sessionId}/force-logout"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Revoke",
+       "operation": "revokeAllSessions",
+       "provenance": "contract identity.yaml POST /auth/sessions/revoke-all"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmForceLogout",
+    "component": "confirmDialog",
+    "trigger": "Force",
+    "body": "**Names what `forceLogout` changes and what it leaves alone**, in the consequence rather than the verb. A agent login this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract identity.yaml POST /auth/sessions/{sessionId}/force-logout"
+   },
+   {
+    "id": "confirmRevokeAllSessions",
+    "component": "confirmDialog",
+    "trigger": "Revoke",
+    "body": "**Names what `revokeAllSessions` changes and what it leaves alone**, in the consequence rather than the verb. A agent login this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract identity.yaml POST /auth/sessions/revoke-all"
+   }
+  ],
+  "states": {
+   "loading": "The agent login list.",
+   "error": "Could not load. Names which read failed and leaves the agent login untouched.",
+   "emptyFirstRun": "No agent login yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the agent login are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "login",
+    "contract": "identity",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "forceLogout",
+    "contract": "identity",
+    "purpose": "Supervisor termination of an abandoned session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listActiveSessions"
+    ]
+   },
+   {
+    "operationId": "getCurrentSession",
+    "contract": "identity",
+    "purpose": "Current session and effective permissions",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getGuestSession",
+    "contract": "identity",
+    "purpose": "Read the current guest session",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listActiveSessions",
+    "contract": "identity",
+    "purpose": "List active sessions",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listMfaMethods",
+    "contract": "identity",
+    "purpose": "Enrolled MFA methods",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listSsoProviders",
+    "contract": "identity",
+    "purpose": "Identity providers configured for this tenant",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "revokeAllSessions",
+    "contract": "identity",
+    "purpose": "Revoke every session in scope",
+    "trigger": "onAction",
+    "invalidates": [
+     "listActiveSessions"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "Session.sessionId",
+    "Session.principalId",
+    "Session.roleId",
+    "Session.displayName",
+    "Session.scope"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P12 Venue Support.dc.html#sup-001"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P12",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Support",
+   "name": "Venue Support — Agent Console",
+   "offlineCapable": false,
+   "app": "venue-support-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "SUP-003",
+  "name": "Availability & Routing Settings",
+  "module": "Access & Availability",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "implementation": {
+   "app": "venue-support-web",
+   "route": "/general/availability-and-routing-settings",
+   "component": "apps/venue-support-web/src/routes/general/AvailabilityAndRoutingSettingsForm.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "SUP-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "SUP-001",
+    "SUP-002",
+    "SUP-004"
+   ],
+   "transitions": [
+    {
+     "to": "SUP-001",
+     "trigger": "Agent Login",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "SUP-002",
+     "trigger": "Agent Dashboard",
+     "carries": [
+      "caseId"
+     ],
+     "provenance": "derived — SUP-002 declares entryState.params caseId, so an edge into it must carry them"
+    },
+    {
+     "to": "SUP-004",
+     "trigger": "Conversation Queue",
+     "carries": [
+      "caseId",
+      "conversationId"
+     ],
+     "provenance": "derived — SUP-004 declares entryState.params caseId, conversationId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "openQuestions": [
+   "No contract — agent routing not modelled"
+  ],
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the screen declares only writes (`setAgentAvailability`) and no read of a population — it is settings, not a list",
+  "purpose": "Change how availability behaves here, and see which level the current value came from.",
+  "gaps": [
+   {
+    "operation": "setAgentAvailability",
+    "why": "**`setAgentAvailability` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
+    "source": "contract marketing-crm.yaml PUT /agent-availability"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "setAgentAvailability",
+       "provenance": "contract marketing-crm.yaml PUT /agent-availability"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setAgentAvailability"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The saved availability routing settings.",
+   "error": "Could not load. Names which read failed and leaves the availability routing settings untouched.",
+   "emptyFirstRun": "No availability routing settings configured. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setAgentAvailability",
+    "contract": "marketing-crm",
+    "purpose": "An agent goes available, away or offline",
+    "trigger": "onAction"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P12 Venue Support.dc.html#sup-003"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P12",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Support",
+   "name": "Venue Support — Agent Console",
+   "offlineCapable": false,
+   "app": "venue-support-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

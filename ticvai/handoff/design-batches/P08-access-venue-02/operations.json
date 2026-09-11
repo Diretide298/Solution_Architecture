@@ -1,0 +1,1095 @@
+{
+ "acceptVenueLabelProposals": {
+  "method": "POST",
+  "path": "/venue-maps/{mapId}/proposals",
+  "contract": "venue-map",
+  "summary": "Accept, edit or reject what the assistant suggested",
+  "permission": "VENUE_MAP_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "VenuePoint"
+ },
+ "callNextParties": {
+  "method": "POST",
+  "path": "/queues/{queueId}/call-next",
+  "contract": "queue",
+  "summary": "Call the next parties forward",
+  "permission": "QUEUE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "createAsset": {
+  "method": "POST",
+  "path": "/assets",
+  "contract": "maintenance",
+  "summary": "Register an asset",
+  "permission": "ASSET_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateAssetRequest",
+  "responds": "Asset"
+ },
+ "createMaintenancePlan": {
+  "method": "POST",
+  "path": "/maintenance-plans",
+  "contract": "maintenance",
+  "summary": "Create a planned maintenance schedule",
+  "permission": "ASSET_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MaintenancePlan",
+  "responds": "MaintenancePlan"
+ },
+ "createQueue": {
+  "method": "POST",
+  "path": "/queues",
+  "contract": "queue",
+  "summary": "Create a queue",
+  "permission": "QUEUE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateQueueRequest",
+  "responds": "Queue"
+ },
+ "createResource": {
+  "method": "POST",
+  "path": "/resources",
+  "contract": "resources",
+  "summary": "Define a bookable resource",
+  "permission": "RESOURCE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Resource",
+  "responds": "Resource"
+ },
+ "createVenueMap": {
+  "method": "POST",
+  "path": "/venue-maps",
+  "contract": "venue-map",
+  "summary": "Start a map",
+  "permission": "VENUE_MAP_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VenueMap",
+  "responds": "VenueMap"
+ },
+ "getAsset": {
+  "method": "GET",
+  "path": "/assets/{assetId}",
+  "contract": "maintenance",
+  "summary": "Read an asset with history and documents",
+  "permission": "ASSET_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AssetDetail"
+ },
+ "getAssetHistory": {
+  "method": "GET",
+  "path": "/assets/{assetId}/history",
+  "contract": "maintenance",
+  "summary": "Service history",
+  "permission": "ASSET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "getDueMaintenance": {
+  "method": "GET",
+  "path": "/maintenance-plans/due",
+  "contract": "maintenance",
+  "summary": "Planned tasks due or overdue",
+  "permission": "ASSET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "withinDays",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DueMaintenanceTask"
+ },
+ "getIncident": {
+  "method": "GET",
+  "path": "/incidents/{incidentId}",
+  "contract": "maintenance",
+  "summary": "Read an incident",
+  "permission": "INCIDENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "IncidentDetail"
+ },
+ "getOfflinePackage": {
+  "method": "GET",
+  "path": "/access/offline-package",
+  "contract": "access",
+  "summary": "Entitlement and rule set for offline validation",
+  "permission": "ACCESS_VALIDATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": "validFrom",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "validTo",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "If-None-Match",
+    "in": "header",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "OfflinePackage"
+ },
+ "getQueue": {
+  "method": "GET",
+  "path": "/queues/{queueId}",
+  "contract": "queue",
+  "summary": "Read a queue with live position",
+  "permission": "QUEUE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "QueueDetail"
+ },
+ "getVenueMap": {
+  "method": "GET",
+  "path": "/venue-maps/{mapId}",
+  "contract": "venue-map",
+  "summary": "A map with its points and paths",
+  "permission": "VENUE_MAP_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "version",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "VenueMapDetail"
+ },
+ "getVenueMapGraph": {
+  "method": "GET",
+  "path": "/venue-maps/{mapId}/graph",
+  "contract": "venue-map",
+  "summary": "The navigation graph, ready to route over",
+  "permission": "VENUE_MAP_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "stepFreeOnly",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "VenueMapGraph"
+ },
+ "getWaitTimes": {
+  "method": "GET",
+  "path": "/queues/wait-times",
+  "contract": "queue",
+  "summary": "Wait times across a venue",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "category",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WaitTime"
+ },
+ "importVenueGeometry": {
+  "method": "POST",
+  "path": "/venue-maps/{mapId}/import",
+  "contract": "venue-map",
+  "summary": "Read a drawing into shapes",
+  "permission": "VENUE_MAP_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "listAssets": {
+  "method": "GET",
+  "path": "/assets",
+  "contract": "maintenance",
+  "summary": "List assets",
+  "permission": "ASSET_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "maintenanceDue",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAuditRecords": {
+  "method": "GET",
+  "path": "/audit-records",
+  "contract": "tenancy",
+  "summary": "Who did what, where, and when",
+  "permission": "AI_AUDIT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "orgUnitId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "action",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "subjectRef",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "listGames": {
+  "method": "GET",
+  "path": "/games",
+  "contract": "games",
+  "summary": "List games",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Game"
+ },
+ "listIncidents": {
+  "method": "GET",
+  "path": "/incidents",
+  "contract": "maintenance",
+  "summary": "List incidents",
+  "permission": "INCIDENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "severity",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "isReportable",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMaintenancePlans": {
+  "method": "GET",
+  "path": "/maintenance-plans",
+  "contract": "maintenance",
+  "summary": "List planned maintenance schedules",
+  "permission": "ASSET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listQueueEntries": {
+  "method": "GET",
+  "path": "/queues/{queueId}/entries",
+  "contract": "queue",
+  "summary": "List entries in a queue",
+  "permission": "QUEUE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listQueues": {
+  "method": "GET",
+  "path": "/queues",
+  "contract": "queue",
+  "summary": "List queues",
+  "permission": "QUEUE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "openOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listResources": {
+  "method": "GET",
+  "path": "/resources",
+  "contract": "resources",
+  "summary": "Resources at this venue",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "availableFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "availableTo",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Resource"
+ },
+ "listScans": {
+  "method": "GET",
+  "path": "/access/scans",
+  "contract": "access",
+  "summary": "List scan events",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "accessPointId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "ticketId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "outcome",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "recordedFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "recordedTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listVenueMaps": {
+  "method": "GET",
+  "path": "/venue-maps",
+  "contract": "venue-map",
+  "summary": "Maps for this venue",
+  "permission": "VENUE_MAP_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VenueMap"
+ },
+ "lookupAsset": {
+  "method": "GET",
+  "path": "/assets/lookup",
+  "contract": "maintenance",
+  "summary": "Find an asset by tag or QR",
+  "permission": "ASSET_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "assetTag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "serialNumber",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AssetDetail"
+ },
+ "lookupTicket": {
+  "method": "GET",
+  "path": "/access/lookup",
+  "contract": "access",
+  "summary": "Read-only validity check without admitting",
+  "permission": "TICKET_LOOKUP",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "mediaCode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "ticketId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TicketStatus"
+ },
+ "overrideAccess": {
+  "method": "POST",
+  "path": "/access/override",
+  "contract": "access",
+  "summary": "Admit against a failed validation",
+  "permission": "ACCESS_OVERRIDE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ValidationResult"
+ },
+ "proposeVenueLabels": {
+  "method": "POST",
+  "path": "/ai/venue-map/{mapId}/propose-labels",
+  "contract": "ai",
+  "summary": "Suggest what each extracted shape is",
+  "permission": "VENUE_MAP_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "publishVenueMap": {
+  "method": "POST",
+  "path": "/venue-maps/{mapId}/publish",
+  "contract": "venue-map",
+  "summary": "Make the draft the one guests see",
+  "permission": "VENUE_MAP_PUBLISH",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "VenueMap"
+ },
+ "recordAuthorityNotification": {
+  "method": "POST",
+  "path": "/incidents/{incidentId}/notify-authority",
+  "contract": "maintenance",
+  "summary": "Record notification to an external authority",
+  "permission": "INCIDENT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Incident"
+ },
+ "recordGamePlay": {
+  "method": "POST",
+  "path": "/game-plays",
+  "contract": "games",
+  "summary": "Record a play",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RecordPlayRequest",
+  "responds": "PlayResult"
+ },
+ "reportIncident": {
+  "method": "POST",
+  "path": "/incidents",
+  "contract": "maintenance",
+  "summary": "Report an incident",
+  "permission": "INCIDENT_REPORT",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ReportIncidentRequest",
+  "responds": "Incident"
+ },
+ "setAssetStatus": {
+  "method": "PUT",
+  "path": "/assets/{assetId}/status",
+  "contract": "maintenance",
+  "summary": "Take an asset out of service or return it",
+  "permission": "ASSET_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SetAssetStatusRequest",
+  "responds": "AssetStatusResult"
+ },
+ "setPathClosure": {
+  "method": "POST",
+  "path": "/venue-maps/{mapId}/paths/{pathId}/closure",
+  "contract": "venue-map",
+  "summary": "Close a route during works or an incident",
+  "permission": "VENUE_MAP_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "VenuePath"
+ },
+ "setQueueStatus": {
+  "method": "PUT",
+  "path": "/queues/{queueId}/status",
+  "contract": "queue",
+  "summary": "Open, pause or close a queue",
+  "permission": "QUEUE_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "QueueStatusResult"
+ },
+ "setRolePermissions": {
+  "method": "PUT",
+  "path": "/roles/{roleId}/permissions",
+  "contract": "tenancy",
+  "summary": "What this role may do",
+  "permission": "ROLE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setVenuePoint": {
+  "method": "POST",
+  "path": "/venue-maps/{mapId}/points",
+  "contract": "venue-map",
+  "summary": "Place or amend a point of interest",
+  "permission": "VENUE_MAP_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VenuePoint",
+  "responds": "VenuePoint"
+ },
+ "setWaitTime": {
+  "method": "PUT",
+  "path": "/queues/{queueId}/wait-time",
+  "contract": "queue",
+  "summary": "Manually set a wait time",
+  "permission": "QUEUE_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WaitTime"
+ },
+ "syncGamePlays": {
+  "method": "POST",
+  "path": "/game-plays/sync",
+  "contract": "games",
+  "summary": "Replay plays recorded offline",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
+ "syncScans": {
+  "method": "POST",
+  "path": "/access/scans",
+  "contract": "access",
+  "summary": "Replay scans recorded offline",
+  "permission": "ACCESS_VALIDATE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ScanSyncResult"
+ },
+ "updateAsset": {
+  "method": "PATCH",
+  "path": "/assets/{assetId}",
+  "contract": "maintenance",
+  "summary": "Amend an asset",
+  "permission": "ASSET_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Asset"
+ },
+ "updateGame": {
+  "method": "PATCH",
+  "path": "/games/{gameId}",
+  "contract": "games",
+  "summary": "Amend a game",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Game"
+ },
+ "updateIncident": {
+  "method": "PATCH",
+  "path": "/incidents/{incidentId}",
+  "contract": "maintenance",
+  "summary": "Investigate, escalate or close an incident",
+  "permission": "INCIDENT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Incident"
+ },
+ "updateQueue": {
+  "method": "PATCH",
+  "path": "/queues/{queueId}",
+  "contract": "queue",
+  "summary": "Amend queue configuration",
+  "permission": "QUEUE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Queue"
+ },
+ "validateAccess": {
+  "method": "POST",
+  "path": "/access/validate",
+  "contract": "access",
+  "summary": "Validate media at an access point and admit or deny",
+  "permission": "ACCESS_VALIDATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ValidateRequest",
+  "responds": "ValidationResult"
+ },
+ "validateGroupAccess": {
+  "method": "POST",
+  "path": "/access/group-validate",
+  "contract": "access",
+  "summary": "Admit a group on one read",
+  "permission": "ACCESS_VALIDATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ValidationResult"
+ },
+ "validateVenueMapGraph": {
+  "method": "POST",
+  "path": "/venue-maps/{mapId}/validate-graph",
+  "contract": "venue-map",
+  "summary": "What is unreachable, before anyone publishes it",
+  "permission": "VENUE_MAP_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GraphValidation"
+ }
+}

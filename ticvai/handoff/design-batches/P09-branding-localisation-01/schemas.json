@@ -1,0 +1,1220 @@
+{
+ "AccessibilitySettings": {
+  "type": "object",
+  "description": "BL-065, 2.1.27. **POS and kiosk accessibility, which is a legal obligation in most jurisdictions and was unstated.**\n**A kiosk is the hard case.** A guest with low vision using a website brings their own assistive technology; a guest at a kiosk gets whatever the kiosk offers, so the settings have to be on the device rather than in the browser.\n",
+  "properties": {
+   "largeTextAvailable": {
+    "type": "boolean",
+    "default": true
+   },
+   "highContrastAvailable": {
+    "type": "boolean",
+    "default": true
+   },
+   "simplifiedNavigationAvailable": {
+    "type": "boolean",
+    "default": true
+   },
+   "screenReaderSupported": {
+    "type": "boolean",
+    "default": true
+   },
+   "reachableHeightModeAvailable": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Moves the interface to the lower half of the screen** for a guest using a wheelchair. A kiosk mounted at standing height is unusable otherwise, and no software setting fixes the mounting — this is the mitigation.\n"
+   },
+   "sessionTimeoutMultiplier": {
+    "type": "number",
+    "default": 1,
+    "description": "**Timeouts are an accessibility barrier nobody counts.** A guest who needs three times as long to read a screen should not lose their basket to a 90-second inactivity timer.\n"
+   }
+  }
+ },
+ "AppIcons": {
+  "x-ticvai-persistence": "none — embedded in tenant_config",
+  "type": "object",
+  "required": [
+   "sourceAssetRef",
+   "changeScope"
+  ],
+  "properties": {
+   "sourceAssetRef": {
+    "type": "string"
+   },
+   "derived": {
+    "type": "array",
+    "readOnly": true,
+    "items": {
+     "type": "object",
+     "properties": {
+      "platform": {
+       "type": "string"
+      },
+      "size": {
+       "type": "string"
+      },
+      "assetRef": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "changeScope": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ChangeScope"
+     }
+    ],
+    "readOnly": true
+   },
+   "liveVersion": {
+    "type": "string",
+    "nullable": true,
+    "description": "Icon currently shipped. Differs from the draft until the next release."
+   },
+   "requiresRebuild": {
+    "type": "boolean",
+    "readOnly": true
+   }
+  }
+ },
+ "BrandIdentity": {
+  "x-ticvai-persistence": "none — embedded in tenant_config",
+  "type": "object",
+  "required": [
+   "logoAssetRef"
+  ],
+  "properties": {
+   "logoAssetRef": {
+    "type": "string"
+   },
+   "logoDarkAssetRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "Used on dark backgrounds. Falls back to the primary logo."
+   },
+   "faviconAssetRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "splashImageAssetRefs": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "splashDurationSeconds": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 10,
+    "default": 3
+   },
+   "splashBackgroundColour": {
+    "type": "string",
+    "pattern": "^#[0-9A-Fa-f]{6}$"
+   },
+   "showLoadingIndicator": {
+    "type": "boolean",
+    "default": true
+   },
+   "splashChangeScope": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ChangeScope"
+     }
+    ],
+    "readOnly": true,
+    "description": "Always `buildTime` for native apps."
+   }
+  }
+ },
+ "CellTier": {
+  "type": "string",
+  "enum": [
+   "shared",
+   "dedicated",
+   "isolated",
+   "clientHosted"
+  ]
+ },
+ "ChangeScope": {
+  "type": "string",
+  "description": "Whether a change reaches guests on publish or needs a store release.\n",
+  "enum": [
+   "runtime",
+   "buildTime"
+  ]
+ },
+ "ConfigDiff": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "fromVersion",
+   "toVersion",
+   "changes"
+  ],
+  "properties": {
+   "fromVersion": {
+    "type": "string"
+   },
+   "toVersion": {
+    "type": "string"
+   },
+   "changes": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "area",
+      "path",
+      "changeKind"
+     ],
+     "properties": {
+      "area": {
+       "type": "string"
+      },
+      "path": {
+       "type": "string"
+      },
+      "changeKind": {
+       "type": "string",
+       "enum": [
+        "added",
+        "removed",
+        "modified"
+       ]
+      },
+      "before": {
+       "type": "string",
+       "nullable": true
+      },
+      "after": {
+       "type": "string",
+       "nullable": true
+      },
+      "changeScope": {
+       "$ref": "#/components/schemas/ChangeScope"
+      }
+     }
+    }
+   }
+  }
+ },
+ "ConfigVersion": {
+  "x-ticvai-persistence": "whitelabel.config_version",
+  "type": "object",
+  "required": [
+   "version",
+   "publishedAt",
+   "publishedByPrincipalId",
+   "note",
+   "isCurrent"
+  ],
+  "properties": {
+   "version": {
+    "type": "string"
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "publishedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "publishedByName": {
+    "type": "string"
+   },
+   "note": {
+    "type": "string"
+   },
+   "isCurrent": {
+    "type": "boolean"
+   },
+   "scheduledFor": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "contentHash": {
+    "type": "string"
+   },
+   "pendingBuildTimeChanges": {
+    "type": "array",
+    "description": "Changes in this version that will not reach guests until the next store release. Surfaced at publish so nobody expects a new icon tomorrow.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "area": {
+       "type": "string"
+      },
+      "description": {
+       "type": "string"
+      },
+      "platforms": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+   }
+  }
+ },
+ "CreatePlanRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "code",
+   "name",
+   "cellTier",
+   "licensedModules",
+   "limits",
+   "basePrice"
+  ],
+  "properties": {
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 1000
+   },
+   "cellTier": {
+    "$ref": "#/components/schemas/CellTier"
+   },
+   "licensedModules": {
+    "type": "array",
+    "minItems": 1,
+    "description": "**A closed set as of 24 August.** `moduleKey` was a free string, so nothing could join a licence to a screen — **a tenant without an F&B licence was still served every F&B screen**, because no screen said which module it belonged to in a form the licence could match.\n**The key is the join.** `screen.requiresModule` names one of these, and navigation is built from the intersection of what a tenant licensed and what their role permits.\n",
+    "items": {
+     "$ref": "#/components/schemas/ModuleKey"
+    }
+   },
+   "limits": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/EntitlementLimit"
+    }
+   },
+   "basePrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "billingPeriod": {
+    "type": "string",
+    "enum": [
+     "monthly",
+     "quarterly",
+     "annual"
+    ]
+   },
+   "includesBrandedApp": {
+    "type": "boolean",
+    "description": "Branded native publishing carries per-tenant operational cost and is priced, not absorbed.\n"
+   },
+   "includedAiTokens": {
+    "type": "integer",
+    "nullable": true
+   }
+  }
+ },
+ "CustomDomain": {
+  "type": "object",
+  "x-ticvai-persistence": "whitelabel.custom_domain",
+  "description": "24 August. **`ADM-017 Domain & Certificate Management` declared 41 operations and not one of them was about a domain** — it carried the same bulk-attached set as every other white-label screen, and **no domain or certificate operation existed anywhere in 1,010.**\nA white-label platform whose tenants cannot use their own domain is a white-label platform in name only.\n**Verification before issuance, always.** A certificate issued for a domain the tenant does not control is a certificate issued to whoever asked.\n",
+  "required": [
+   "id",
+   "tenantId",
+   "hostname",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "hostname": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "guestWeb",
+     "guestApp",
+     "partnerPortal",
+     "developerPortal"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "verifying",
+     "verified",
+     "issuing",
+     "active",
+     "failed",
+     "expired",
+     "revoked"
+    ]
+   },
+   "verificationMethod": {
+    "type": "string",
+    "enum": [
+     "dnsTxt",
+     "cname",
+     "httpFile"
+    ]
+   },
+   "verificationToken": {
+    "type": "string",
+    "readOnly": true
+   },
+   "certificateExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**Renewal is a job, not a reminder.** A certificate that expires on a Saturday takes a tenant's storefront down, and nobody reads a reminder email on a Saturday.\n"
+   },
+   "lastCheckedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "failureReason": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "EntitlementLimit": {
+  "type": "object",
+  "required": [
+   "metric",
+   "limit"
+  ],
+  "properties": {
+   "metric": {
+    "$ref": "#/components/schemas/UsageMetric"
+   },
+   "limit": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Null means unlimited."
+   },
+   "overageAllowed": {
+    "type": "boolean",
+    "default": false
+   },
+   "overageUnitPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  }
+ },
+ "FaqCategory": {
+  "x-ticvai-persistence": "whitelabel.faq_category + whitelabel.faq_entry",
+  "type": "object",
+  "required": [
+   "code",
+   "name",
+   "entries"
+  ],
+  "properties": {
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "sortOrder": {
+    "type": "integer"
+   },
+   "entries": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "id",
+      "question",
+      "answer"
+     ],
+     "properties": {
+      "id": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "question": {
+       "$ref": "#/components/schemas/LocalisedText"
+      },
+      "answer": {
+       "$ref": "#/components/schemas/LocalisedRichText"
+      },
+      "sortOrder": {
+       "type": "integer"
+      },
+      "isPublished": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+   }
+  }
+ },
+ "FeatureToggle": {
+  "x-ticvai-persistence": "whitelabel.feature_toggle",
+  "type": "object",
+  "required": [
+   "featureKey",
+   "isEnabled",
+   "changeScope"
+  ],
+  "properties": {
+   "featureKey": {
+    "type": "string",
+    "enum": [
+     "digitalCompanionMode",
+     "aiConciergeChat",
+     "lostAndFound",
+     "pushNotifications",
+     "socialSharing",
+     "multiLanguage",
+     "appleWallet",
+     "googlePay",
+     "applePay",
+     "cashOnDelivery",
+     "guestCheckout",
+     "uaePassLogin"
+    ]
+   },
+   "displayName": {
+    "type": "string"
+   },
+   "isEnabled": {
+    "type": "boolean"
+   },
+   "changeScope": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ChangeScope"
+     }
+    ],
+    "readOnly": true,
+    "description": "Wallet and payment integrations are `buildTime` on native apps — enabling one needs a release, not a publish.\n"
+   },
+   "requiresConfiguration": {
+    "type": "boolean",
+    "description": "True where the feature needs credentials or setup elsewhere first."
+   }
+  }
+ },
+ "FontConfig": {
+  "x-ticvai-persistence": "none — embedded in tenant_config",
+  "type": "object",
+  "required": [
+   "primaryLatin"
+  ],
+  "properties": {
+   "primaryLatin": {
+    "type": "string"
+   },
+   "primaryArabic": {
+    "type": "string",
+    "nullable": true,
+    "description": "Required when Arabic is enabled. A Latin face alone leaves Arabic in a system fallback that will not match.\n"
+   },
+   "secondaryLatin": {
+    "type": "string",
+    "nullable": true
+   },
+   "secondaryArabic": {
+    "type": "string",
+    "nullable": true
+   },
+   "customFontAssetRefs": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "changeScope": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ChangeScope"
+     }
+    ],
+    "readOnly": true,
+    "description": "Custom font files are `buildTime`; selecting a bundled face is `runtime`."
+   }
+  }
+ },
+ "FooterConfig": {
+  "type": "object",
+  "x-ticvai-persistence": "control.footer_config",
+  "description": "BL-002. **`setHeader` and `HeaderConfig` exist and the footer does not**, which looked like symmetry until you notice it is not: **a header is chrome and a footer is a link surface.**\nA footer carries the legal links — terms, privacy, accessibility statement, cookie preferences — and **those are the ones a regulator checks.** Treating it as a mirror of the header would have given it a logo and no way to reach a privacy notice.\n",
+  "required": [
+   "id",
+   "scopePath"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "columns": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "heading": {
+       "type": "string"
+      },
+      "links": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "properties": {
+         "label": {
+          "type": "string"
+         },
+         "url": {
+          "type": "string"
+         },
+         "opensCookiePreferences": {
+          "type": "boolean",
+          "default": false
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "legalLinks": {
+    "type": "object",
+    "description": "**Required links, held separately from the free-form columns** — a tenant reorganising their footer must not be able to remove the privacy notice by accident.\n",
+    "properties": {
+     "termsUrl": {
+      "type": "string"
+     },
+     "privacyUrl": {
+      "type": "string"
+     },
+     "accessibilityUrl": {
+      "type": "string",
+      "nullable": true
+     },
+     "cookiePolicyUrl": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   },
+   "copyrightText": {
+    "type": "string"
+   },
+   "socialLinks": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "platform": {
+       "type": "string"
+      },
+      "url": {
+       "type": "string"
+      }
+     }
+    }
+   }
+  }
+ },
+ "HeaderConfig": {
+  "x-ticvai-persistence": "none — embedded in tenant_config",
+  "type": "object",
+  "required": [
+   "layout"
+  ],
+  "properties": {
+   "layout": {
+    "type": "string",
+    "enum": [
+     "logoLeft",
+     "logoCentre",
+     "logoWithMenu"
+    ]
+   },
+   "showLogo": {
+    "type": "boolean",
+    "default": true
+   },
+   "showMenu": {
+    "type": "boolean",
+    "default": true
+   },
+   "showNotifications": {
+    "type": "boolean",
+    "default": true
+   },
+   "backgroundColour": {
+    "type": "string",
+    "pattern": "^#[0-9A-Fa-f]{6}$"
+   }
+  }
+ },
+ "HomepageLayout": {
+  "x-ticvai-persistence": "whitelabel.homepage_section",
+  "type": "object",
+  "required": [
+   "sections"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "sections": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "sortOrder",
+      "isVisible"
+     ],
+     "properties": {
+      "id": {
+       "type": "string",
+       "format": "uuid",
+       "readOnly": true,
+       "description": "**Added 20 August.** The table had no key at all — no id, no parent and no natural key, so **no row could be addressed, updated or deleted.** The response schema returned everything a caller needs and not the row's own identity, which is the difference between an API response and a table.\n"
+      },
+      "kind": {
+       "$ref": "#/components/schemas/HomepageSectionKind"
+      },
+      "title": {
+       "$ref": "#/components/schemas/LocalisedText"
+      },
+      "sortOrder": {
+       "type": "integer"
+      },
+      "isVisible": {
+       "type": "boolean"
+      },
+      "contentPageId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "maxItems": {
+       "type": "integer",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "LanguageConfig": {
+  "x-ticvai-persistence": "none — embedded in tenant_config",
+  "type": "object",
+  "required": [
+   "languages",
+   "defaultLanguage"
+  ],
+  "properties": {
+   "languages": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "defaultLanguage": {
+    "type": "string"
+   },
+   "rtlLanguages": {
+    "type": "array",
+    "readOnly": true,
+    "items": {
+     "type": "string"
+    }
+   },
+   "translationGaps": {
+    "type": "array",
+    "readOnly": true,
+    "description": "Content lacking a version in an enabled language.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "language": {
+       "type": "string"
+      },
+      "missingCount": {
+       "type": "integer"
+      },
+      "areas": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "LocalisedRichText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "description": "Keyed by language code. Values are sanitised HTML.",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
+ "ModuleEnablement": {
+  "x-ticvai-persistence": "whitelabel.module_enablement",
+  "type": "object",
+  "required": [
+   "moduleKey",
+   "isLicensed",
+   "isEnabled"
+  ],
+  "properties": {
+   "moduleKey": {
+    "$ref": "#/components/schemas/ModuleKey"
+   },
+   "displayName": {
+    "type": "string"
+   },
+   "isLicensed": {
+    "type": "boolean",
+    "description": "From the tenant's subscription. False makes enablement impossible."
+   },
+   "isEnabled": {
+    "type": "boolean"
+   },
+   "referencedBy": {
+    "type": "array",
+    "readOnly": true,
+    "description": "Navigation items and homepage sections pointing at this module.",
+    "items": {
+     "type": "string"
+    }
+   }
+  }
+ },
+ "ModuleKey": {
+  "type": "string",
+  "description": "What a tenant buys, and what a screen belongs to. **One vocabulary for both sides of the join**, because two lists that must agree are one list somebody forgets to update.\n**Grain chosen to match how a venue buys, not how the package is built.** `fnb` is one module even though it spans four contracts; `ticketing` and `access` are separate because a venue can run a museum with no gates and a stadium with no shop.\n",
+  "enum": [
+   "core",
+   "ticketing",
+   "access",
+   "fnb",
+   "retail",
+   "inventory",
+   "seating",
+   "membership",
+   "marketing",
+   "resources",
+   "queue",
+   "games",
+   "maintenance",
+   "accreditation",
+   "partner",
+   "developerApi",
+   "analytics",
+   "ai"
+  ],
+  "x-ticvai-note": "**`core` is listed and cannot be unlicensed.** It exists so a screen can say it belongs to no optional module rather than leaving the field empty — **an empty field and *always on* look identical, and only one of them is a decision.**\n"
+ },
+ "NavigationConfig": {
+  "x-ticvai-persistence": "whitelabel.navigation_item",
+  "type": "object",
+  "required": [
+   "kind",
+   "items"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "bottomNavigation",
+     "drawer",
+     "tabs"
+    ]
+   },
+   "items": {
+    "type": "array",
+    "maxItems": 12,
+    "items": {
+     "type": "object",
+     "required": [
+      "label",
+      "target",
+      "isVisible",
+      "sortOrder"
+     ],
+     "properties": {
+      "id": {
+       "type": "string",
+       "format": "uuid",
+       "readOnly": true,
+       "description": "**Added 20 August.** The table had no key at all — no id, no parent and no natural key, so **no row could be addressed, updated or deleted.** The response schema returned everything a caller needs and not the row's own identity, which is the difference between an API response and a table.\n"
+      },
+      "label": {
+       "$ref": "#/components/schemas/LocalisedText"
+      },
+      "icon": {
+       "type": "string"
+      },
+      "target": {
+       "$ref": "#/components/schemas/LinkTarget"
+      },
+      "isVisible": {
+       "type": "boolean",
+       "description": "At most five may be visible in bottom navigation; the rest overflow."
+      },
+      "sortOrder": {
+       "type": "integer"
+      }
+     }
+    }
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Plan": {
+  "x-ticvai-persistence": "control.subscription_plan",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreatePlanRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "version",
+     "isActive",
+     "subscriberCount"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "version": {
+      "type": "string",
+      "description": "Existing subscribers stay on the version they were sold. A price change never applies retroactively.\n"
+     },
+     "isActive": {
+      "type": "boolean"
+     },
+     "subscriberCount": {
+      "type": "integer"
+     },
+     "publishedAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  ]
+ },
+ "Policy": {
+  "x-ticvai-persistence": "whitelabel.policy",
+  "type": "object",
+  "required": [
+   "kind",
+   "version",
+   "body",
+   "effectiveFrom",
+   "publishedAt"
+  ],
+  "properties": {
+   "kind": {
+    "$ref": "#/components/schemas/PolicyKind"
+   },
+   "version": {
+    "type": "string",
+    "description": "Immutable. A guest who consented to version 3 consented to version 3, and a policy that changes under a recorded consent is a compliance failure.\n"
+   },
+   "body": {
+    "$ref": "#/components/schemas/LocalisedRichText"
+   },
+   "requiresReconsent": {
+    "type": "boolean"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "publishedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+   }
+  }
+ },
+ "PolicyKind": {
+  "type": "string",
+  "enum": [
+   "privacy",
+   "termsAndConditions",
+   "refund",
+   "cookie",
+   "accessibility"
+  ]
+ },
+ "Preview": {
+  "x-ticvai-persistence": "none — short-lived, cache only",
+  "type": "object",
+  "required": [
+   "previewId",
+   "url",
+   "expiresAt"
+  ],
+  "properties": {
+   "previewId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "url": {
+    "type": "string"
+   },
+   "platform": {
+    "type": "string"
+   },
+   "theme": {
+    "type": "string"
+   },
+   "language": {
+    "type": "string"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "TenantConfig": {
+  "x-ticvai-persistence": "whitelabel.tenant_config",
+  "type": "object",
+  "required": [
+   "tenantId",
+   "version",
+   "brand",
+   "theme",
+   "fonts",
+   "navigation",
+   "homepage",
+   "languages"
+  ],
+  "properties": {
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "version": {
+    "type": "string"
+   },
+   "isDraft": {
+    "type": "boolean"
+   },
+   "brand": {
+    "$ref": "#/components/schemas/BrandIdentity"
+   },
+   "appIcons": {
+    "$ref": "#/components/schemas/AppIcons"
+   },
+   "theme": {
+    "$ref": "#/components/schemas/Theme"
+   },
+   "fonts": {
+    "$ref": "#/components/schemas/FontConfig"
+   },
+   "footer": {
+    "$ref": "#/components/schemas/FooterConfig"
+   },
+   "notificationBranding": {
+    "type": "object",
+    "nullable": true,
+    "description": "BL-003. **`marketing-crm` holds the templates and nothing said whose identity they wear.** A message sent on behalf of a venue carries that venue's sender name, reply-to and logo — **an operational alert arriving from `noreply@ticvai.com` is one a guest marks as spam.**\nResolved on the template at send time rather than duplicated per template.\n",
+    "properties": {
+     "senderName": {
+      "type": "string"
+     },
+     "replyToEmail": {
+      "type": "string",
+      "format": "email"
+     },
+     "smsSenderId": {
+      "type": "string",
+      "nullable": true
+     },
+     "whatsappBusinessId": {
+      "type": "string",
+      "nullable": true
+     },
+     "logoAssetId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     }
+    }
+   },
+   "enabledPaymentMethods": {
+    "type": "array",
+    "nullable": true,
+    "description": "BL-004. **`FeatureToggle` could turn Apple Pay on and could not say which cards a tenant accepts.** Resolved against `orders.PaymentProvider.supportedMethods` — the tenant's choice within what the gateway offers, and **a tenant enabling a method their provider does not support should fail here rather than at checkout.**\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "accessibility": {
+    "$ref": "#/components/schemas/AccessibilitySettings"
+   },
+   "header": {
+    "$ref": "#/components/schemas/HeaderConfig"
+   },
+   "navigation": {
+    "$ref": "#/components/schemas/NavigationConfig"
+   },
+   "homepage": {
+    "$ref": "#/components/schemas/HomepageLayout"
+   },
+   "modules": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ModuleEnablement"
+    }
+   },
+   "features": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/FeatureToggle"
+    }
+   },
+   "languages": {
+    "$ref": "#/components/schemas/LanguageConfig"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "Theme": {
+  "x-ticvai-persistence": "none — embedded in tenant_config",
+  "type": "object",
+  "required": [
+   "primaryColour",
+   "secondaryColour",
+   "backgroundColour",
+   "textColour"
+  ],
+  "properties": {
+   "primaryColour": {
+    "type": "string",
+    "pattern": "^#[0-9A-Fa-f]{6}$"
+   },
+   "secondaryColour": {
+    "type": "string",
+    "pattern": "^#[0-9A-Fa-f]{6}$"
+   },
+   "accentColour": {
+    "type": "string",
+    "pattern": "^#[0-9A-Fa-f]{6}$"
+   },
+   "backgroundColour": {
+    "type": "string",
+    "pattern": "^#[0-9A-Fa-f]{6}$"
+   },
+   "textColour": {
+    "type": "string",
+    "pattern": "^#[0-9A-Fa-f]{6}$"
+   },
+   "darkMode": {
+    "type": "object",
+    "description": "Optional dark variant. Derived from the light theme when absent.",
+    "properties": {
+     "primaryColour": {
+      "type": "string"
+     },
+     "backgroundColour": {
+      "type": "string"
+     },
+     "textColour": {
+      "type": "string"
+     }
+    }
+   },
+   "cornerRadius": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 32
+   }
+  }
+ }
+}

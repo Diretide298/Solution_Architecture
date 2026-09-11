@@ -1,6 +1,6 @@
 {
  "scope": "platform",
- "generated": "2026-09-10",
+ "generated": "2026-09-11",
  "note": "Derived on every run by tools/build-status.py. A hand-maintained status page is worse than none, because somebody plans against it.",
  "counts": {
   "operations": 1628,
@@ -8,19 +8,19 @@
   "tables": 388,
   "stores": 5,
   "foreignKeys": 574,
-  "indexes": 278,
+  "indexes": 279,
   "tablesWritten": 388,
   "relationships": 978,
   "states": 125,
   "events": 29,
   "flows": 96,
-  "flowsDerived": 72,
+  "flowsDerived": 106,
   "adrs": 44,
-  "screens": 1235,
-  "platforms": 15,
-  "frontends": 12,
+  "screens": 1629,
+  "platforms": 16,
+  "frontends": 13,
   "apps": 5,
-  "boards": 21
+  "boards": 22
  },
  "metrics": {
   "design": [
@@ -40,8 +40,8 @@
    },
    {
     "name": "Screens defined, specified and given a purpose",
-    "done": 1235,
-    "total": 1235,
+    "done": 1629,
+    "total": 1629,
     "percent": 100,
     "note": "Loading, empty and error states written for each."
    },
@@ -54,8 +54,8 @@
    },
    {
     "name": "Platforms with a unique name",
-    "done": 15,
-    "total": 15,
+    "done": 16,
+    "total": 16,
     "percent": 100,
     "note": "No two platforms share a name in any document."
    },
@@ -83,8 +83,8 @@
    {
     "name": "Screens with operations",
     "done": 1089,
-    "total": 1235,
-    "percent": 88,
+    "total": 1629,
+    "percent": 67,
     "note": "The remainder are static, workshop-blocked, or navigation shells."
    },
    {
@@ -172,13 +172,13 @@
   }
  },
  "headline": {
-  "design": 89,
+  "design": 87,
   "build": 33
  },
  "waves": {
   "wave1": 176,
   "wave2": 261,
-  "wave3": 798
+  "wave3": 1192
  },
  "platformBreakdown": [
   {
@@ -219,7 +219,7 @@
    "app": "venue-staff-app",
    "targetApp": "venue-staff-mobile",
    "operator": "venue",
-   "screens": 66
+   "screens": 96
   },
   {
    "code": "P07",
@@ -235,7 +235,7 @@
    "app": "venue-management-web",
    "targetApp": "venue-management",
    "operator": "venue",
-   "screens": 393
+   "screens": 614
   },
   {
    "code": "P09",
@@ -243,7 +243,7 @@
    "app": "ticvai-web",
    "targetApp": "ticvai-control",
    "operator": "ticvai",
-   "screens": 367
+   "screens": 446
   },
   {
    "code": "P10",
@@ -275,7 +275,7 @@
    "app": "venue-management-web",
    "targetApp": "venue-management",
    "operator": "venue",
-   "screens": 60
+   "screens": 100
   },
   {
    "code": "P14",
@@ -300,6 +300,14 @@
    "targetApp": "venue-management",
    "operator": "venue",
    "screens": 69
+  },
+  {
+   "code": "P17",
+   "name": "TICVAI Sign-up",
+   "app": "signup-web",
+   "targetApp": "ticvai-control",
+   "operator": "public",
+   "screens": 24
   }
  ],
  "conflicts": {

@@ -80,6 +80,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 from collections import Counter, defaultdict
@@ -328,6 +329,18 @@ MEASURE = re.compile(
     r"overdue|unassigned|available|booked|used|remaining|new|at risk|breached|within)\s+\S",
     re.I)
 
+# A `tiles` heading that names the metric row itself, as against a bare `Display` or `Track`.
+# **Named, not merely mentioned.** The first cut took any heading containing `KPI` or `cards`, and
+# that promoted `For each KPI` (Target · Minimum · Maximum — a table's columns), `KPI Categories`
+# and `KPI Components` (lists of kinds), and `Display dashboard cards/table containing` (a library
+# of dashboards) into metric rows. Those are headings *about* KPIs; these are headings *of* them.
+EXPLICIT_TILES = re.compile(
+    # `Revenue Metrics`, `Performance KPIs`, `KPIs & Dashboards` name a row; `Card Information`
+    # on the Game & Ride book is an RFID card, which is why `card` alone is no longer enough.
+    r"\bkpi (cards?|tiles?|row|strip|bar)\b|\bkpis\b|\bmetrics\s*$|"
+    r"\b(metric|summary|stat|statistic|headline)s? (cards?|tiles?)\b",
+    re.I)
+
 AUTHORING = re.compile(r"\b(builder|configurator|editor|designer|setup|manager|wizard|"
                        r"studio|composer|authoring|creation)\b", re.I)
 
@@ -403,8 +416,27 @@ def sort_sections(entry: dict, report: Counter) -> tuple[dict, int, int]:
     # Half is the threshold because these blocks mix: a KPI list often ends with a sentence, and a
     # column list often opens with a count. `My Approval Inbox` scores 0.09 and stays a table,
     # which is right — its labels are `Request ID`, `Requested by`, `Venue`.
+    #
+    # **Unless the heading already says so.** `KPI Cards`, `Header KPIs`, `Performance KPIs` are
+    # the pack naming a metric row, and the share test is a guess for when it has not. Found on 11
+    # September on `BO-494 Rental Product Command Center`: `Active Products`, `Serialized Products`
+    # and `Products Awaiting Approval` score 2 in 8 as measures and became the column headers of a
+    # product table. 15 screens older than that day carried it and were rebuilt with `--only`.
+    #
+    # **The heading vouches for itself, not for its neighbours.** This first kept the whole block
+    # as tiles when any one heading named KPIs, so `BO-454 Card Lifecycle Command Center` drew its
+    # `Card Activity Table` as eight more tiles and no table. Now a named heading stays a tile, and
+    # the headings beside it take the same measure test a block with no named heading would.
     if roles.get("tiles") and not roles.get("rowColumns"):
-        if measure_share(roles["tiles"]) >= 0.5:
+        named = {h: v for h, v in roles["tiles"].items() if EXPLICIT_TILES.search(h)}
+        rest = {h: v for h, v in roles["tiles"].items() if h not in named}
+        if named:
+            report["display kept as metrics"] += 1
+            if rest and measure_share(rest) < 0.5:
+                roles["tiles"] = named
+                roles["rowColumns"] = rest
+                report["named KPIs kept, the rest read as columns"] += 1
+        elif measure_share(roles["tiles"]) >= 0.5:
             report["display kept as metrics"] += 1
         else:
             roles["rowColumns"] = roles.pop("tiles")
@@ -857,7 +889,12 @@ def main() -> int:
     ap.add_argument("--module")
     ap.add_argument("--write", action="store_true")
     ap.add_argument("--sample", default="")
+    # **A module is the wrong unit for a repair.** P09 Commercial is 230 screens; fixing the 13 a
+    # rule change reaches should not rebuild the 217 it does not. Added 11 September for the KPI-card
+    # screens, whose layouts predate the rule.
+    ap.add_argument("--only", default="", help="comma-separated screen ids; rebuild these and no others")
     args = ap.parse_args()
+    only = {i.strip() for i in args.only.split(",") if i.strip()}
 
     path = next(SCREENS.glob(f"{args.platform}-*.yaml"))
     doc = yaml.safe_load(path.read_text(encoding="utf-8"))
@@ -873,6 +910,8 @@ def main() -> int:
         # nothing to say about them.
         if args.module and screen.get("module") != args.module:
             continue
+        if only and screen["id"] not in only:
+            continue
         src = screen.get("source") or {}
         key = (src.get("pack"), str(src.get("number")), str(src.get("page")))
         if key not in pack:
@@ -881,6 +920,9 @@ def main() -> int:
         doc["screens"][i] = build(screen, pack[key], ops, schemas, report, verbs)
         rebuilt += 1
 
+    if only - {s["id"] for s in doc["screens"]}:
+        print("not on this platform:", ", ".join(sorted(only - {s["id"] for s in doc["screens"]})))
+        return 1
     print(f"{rebuilt} screens rebuilt from the pack, {missing} with no pack entry\n")
     for k in sorted(report):
         print(f"  {k:<26} {report[k]}")
@@ -896,8 +938,10 @@ def main() -> int:
                 print(yaml.safe_dump(screen, sort_keys=False, allow_unicode=True, width=100))
 
     if args.write:
-        path.write_text(yaml.safe_dump(doc, sort_keys=False, allow_unicode=True, width=100),
-                        encoding="utf-8")
+        tmp = path.with_suffix(".yaml.tmp")
+        tmp.write_text(yaml.safe_dump(doc, sort_keys=False, allow_unicode=True, width=100),
+                       encoding="utf-8")
+        os.replace(tmp, path)
         print(f"\nwritten: {path.name}")
     else:
         print("\n(dry run — pass --write)")

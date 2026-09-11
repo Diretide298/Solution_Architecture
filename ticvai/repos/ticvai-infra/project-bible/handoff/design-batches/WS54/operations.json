@@ -1,0 +1,173 @@
+{
+ "listBundleBogoAdvanced": {
+  "method": "GET",
+  "path": "/bundle-bogo-advanced",
+  "contract": "promotions",
+  "summary": "Bundle, BOGO & Advanced Offer Analytics",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BundleBogoAdvancedOfferAnalyticsView"
+ },
+ "listCampaignPromotionPerformance": {
+  "method": "GET",
+  "path": "/campaign-promotion-performance",
+  "contract": "promotions",
+  "summary": "Campaign & Promotion Performance Explorer",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CampaignPromotionPerformanceExplorerView"
+ },
+ "listCustomerSegmentChannel": {
+  "method": "GET",
+  "path": "/customer-segment-channel",
+  "contract": "promotions",
+  "summary": "Customer, Segment, Channel & Partner Analytics",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CustomerSegmentChannelPartnerAnalyticsView"
+ },
+ "listDiscountMarginProfitability": {
+  "method": "GET",
+  "path": "/discount-margin-profitability",
+  "contract": "promotions",
+  "summary": "Discount, Margin & Profitability Analytics",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "DiscountMarginProfitabilityAnalyticsView"
+ },
+ "listExecutivePromotionReporting": {
+  "method": "GET",
+  "path": "/executive-promotion-reporting",
+  "contract": "promotions",
+  "summary": "Executive Promotion Intelligence & Reporting Studio",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ExecutivePromotionIntelligenceReportingStudioView"
+ },
+ "listIncrementalityAttributionCannibalization": {
+  "method": "GET",
+  "path": "/incrementality-attribution-cannibalization",
+  "contract": "promotions",
+  "summary": "Incrementality, Attribution & Cannibalization Analysis",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "IncrementalityAttributionCannibalizationAnalysisView"
+ },
+ "listNextBestAction": {
+  "method": "GET",
+  "path": "/next-best-action",
+  "contract": "promotions",
+  "summary": "AI Optimization & Next-Best-Action Center",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiOptimizationNextBestActionCenterView"
+ },
+ "listPromotionPerformance": {
+  "method": "GET",
+  "path": "/promotion-performance",
+  "contract": "promotions",
+  "summary": "Promotion Performance Command Center",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PromotionPerformanceCommandCenterView"
+ },
+ "listRedemptionConversionFunnel": {
+  "method": "GET",
+  "path": "/redemption-conversion-funnel",
+  "contract": "promotions",
+  "summary": "Redemption, Conversion & Funnel Analytics",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerSegment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "membershipTier",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "campaign",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "promotionType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "dayTime",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "RedemptionConversionFunnelAnalyticsView"
+ },
+ "listUpsellCrossSell": {
+  "method": "GET",
+  "path": "/upsell-cross-sell",
+  "contract": "promotions",
+  "summary": "Upsell, Cross-Sell & Attach-Rate Analytics",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "UpsellCrossSellAttachRateAnalyticsView"
+ }
+}

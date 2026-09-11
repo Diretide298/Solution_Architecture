@@ -1,0 +1,2051 @@
+[
+ {
+  "id": "GST-012",
+  "name": "My Tickets",
+  "module": "Account & Self-Service",
+  "requiresModule": "access",
+  "wave": 1,
+  "capability": "C02",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/general/my-tickets",
+   "component": "apps/guest-app/src/routes/general/MyTicketsList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-001",
+    "GST-028"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "GST-001",
+    "GST-002",
+    "GST-003",
+    "GST-013"
+   ],
+   "transitions": [
+    {
+     "to": "GST-013",
+     "trigger": "They open the one for now",
+     "provenance": "flow F50 step 3→4"
+    },
+    {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-003",
+     "trigger": "Event & Attraction Listing",
+     "carries": [
+      "eventId"
+     ],
+     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. My Tickets. **Declared only `transferOrderTickets` until 20 August** — a guest could give a ticket away and could not read one. Raised by Pranay. **Rewired on the 20 August review.** **Cross-surface parity, 31 August**: added getEntitlementCredential, getEntitlementHistory, listEntitlements. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
+  "openQuestions": [
+   "Inventory cites `GET /tickets` — no matching operation. Written before the contracts existed."
+  ],
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act",
+  "purpose": "Find my tickets for this venue.",
+  "gaps": [
+   {
+    "operation": "getEntitlementCredential",
+    "why": "**3 declared operations reach no component on this screen**: getEntitlementCredential, getEntitlementHistory, listEntitlements. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every tickets",
+       "bindsTo": "Entitlement",
+       "columns": [
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom"
+       ],
+       "operation": "listMyEntitlements",
+       "provenance": "contract access.yaml GET /guests/me/entitlements"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected tickets",
+       "bindsTo": "Entitlement",
+       "columns": [
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom",
+        "Entitlement.validTo",
+        "Entitlement.entriesUsed",
+        "Entitlement.entriesAllowed",
+        "Entitlement.lastEntryAt"
+       ],
+       "operation": "getEntitlement",
+       "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The tickets list.",
+   "error": "Could not load. Names which read failed and leaves the tickets untouched.",
+   "emptyFirstRun": "No tickets yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the tickets are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+  },
+  "apis": [
+   {
+    "operationId": "listMyEntitlements",
+    "contract": "access",
+    "purpose": "Every ticket, pass and membership this guest holds",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlement",
+    "contract": "access",
+    "purpose": "One entitlement, with what remains on it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyEntitlements"
+    ]
+   },
+   {
+    "operationId": "getEntitlementCredential",
+    "contract": "access",
+    "purpose": "The thing that gets scanned",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementHistory",
+    "contract": "access",
+    "purpose": "Every scan, freeze, share and reissue against it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listEntitlements",
+    "contract": "access",
+    "purpose": "Every entitlement this guest holds, including expired",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "entitlementId",
+     "from": "deepLink"
+    },
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A ticket link opened after the event.** Shows the entitlement with its status — expired, used, transferred — because *not found* to somebody holding a ticket is the wrong answer. **A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
+   "preloaded": [
+    "Entitlement.id",
+    "Entitlement.templateId",
+    "Entitlement.productId",
+    "Entitlement.orderId",
+    "Entitlement.orderLineId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-012"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-013",
+  "name": "Ticket Details",
+  "module": "Account & Self-Service",
+  "requiresModule": "access",
+  "wave": 1,
+  "capability": "C02",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/general/ticket-details",
+   "component": "apps/guest-app/src/routes/general/TicketDetailsDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-001",
+    "GST-012"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "GST-001",
+    "GST-002",
+    "GST-003",
+    "GST-055"
+   ],
+   "transitions": [
+    {
+     "to": "GST-055",
+     "trigger": "The QR rotates as they walk to the gate",
+     "provenance": "flow F50 step 4→5"
+    },
+    {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-003",
+     "trigger": "Event & Attraction Listing",
+     "carries": [
+      "eventId"
+     ],
+     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Ticket Details. **The credential is a separate call** — a list of tickets is a convenience and the credential admits somebody. **Rewired on the 20 August review.**",
+  "openQuestions": [
+   "Inventory cites `GET /tickets/{id}` — no matching operation. Written before the contracts existed."
+  ],
+  "density": "comfortable",
+  "pattern": "statusTracker",
+  "patternReason": "`getEntitlement` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Find ticket details for this venue.",
+  "gaps": [
+   {
+    "operation": "getEntitlementCredential",
+    "why": "**2 declared operations reach no component on this screen**: getEntitlementCredential, getEntitlementHistory. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected ticket",
+       "bindsTo": "Entitlement",
+       "columns": [
+        "Entitlement.id",
+        "Entitlement.templateId",
+        "Entitlement.productId",
+        "Entitlement.orderId",
+        "Entitlement.orderLineId",
+        "Entitlement.subjectId",
+        "Entitlement.venueId",
+        "Entitlement.scopePath",
+        "Entitlement.mediaCode",
+        "Entitlement.status",
+        "Entitlement.statusNote",
+        "Entitlement.validFrom",
+        "Entitlement.validTo",
+        "Entitlement.entriesUsed",
+        "Entitlement.entriesAllowed",
+        "Entitlement.lastEntryAt"
+       ],
+       "operation": "getEntitlement",
+       "provenance": "contract access.yaml GET /entitlements/{entitlementId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Availability is live, never cached",
+   "error": "Availability unavailable. **Selection is blocked** — overselling is worse than waiting",
+   "emptyFirstRun": "**Sold out is a real answer.** Offers the next available rather than a dead end",
+   "emptyNoResults": "The filter narrowed it and the ticket are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+  },
+  "apis": [
+   {
+    "operationId": "getEntitlement",
+    "contract": "access",
+    "purpose": "One entitlement, with what remains on it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementCredential",
+    "contract": "access",
+    "purpose": "The thing that gets scanned",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getEntitlementHistory",
+    "contract": "access",
+    "purpose": "Every scan, freeze, share and reissue against it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "entitlementId",
+     "from": "deepLink"
+    },
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A ticket link opened after the event.** Shows the entitlement with its status — expired, used, transferred — because *not found* to somebody holding a ticket is the wrong answer. **A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-013"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-018",
+  "name": "Add to Calendar / Reminders",
+  "module": "Account & Self-Service",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "capability": "C02",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/general/add-to-calendar-reminders",
+   "component": "apps/guest-app/src/routes/general/AddToCalendarRemindersDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "GST-001",
+    "GST-002",
+    "GST-003"
+   ],
+   "transitions": [
+    {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-003",
+     "trigger": "Event & Attraction Listing",
+     "carries": [
+      "eventId"
+     ],
+     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Add to Calendar and Reminders. **`issueWalletPass` is the operation this screen is for** — a wallet pass is the calendar entry. **Rewired on the 20 August review.**",
+  "openQuestions": [
+   "Inventory cites `local` — no matching operation. Written before the contracts existed."
+  ],
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listOrders` reads the population and `getOrder` reads one of them — list, select, act",
+  "purpose": "Find add to calendar / reminders for this venue.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every add calendar reminders",
+       "bindsTo": "OrderSummary",
+       "columns": [
+        "OrderSummary.id",
+        "OrderSummary.orderNumber",
+        "OrderSummary.status",
+        "OrderSummary.grossAmount",
+        "OrderSummary.refundedAmount",
+        "OrderSummary.channel",
+        "OrderSummary.lineCount"
+       ],
+       "operation": "listOrders",
+       "provenance": "contract orders.yaml GET /orders"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected add calendar reminders",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount",
+        "Order.totalPriceVariance",
+        "Order.lines",
+        "Order.payments",
+        "Order.principalId"
+       ],
+       "operation": "getOrder",
+       "provenance": "contract orders.yaml GET /orders/{orderId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Issue",
+       "operation": "issueWalletPass",
+       "provenance": "contract orders.yaml POST /wallet-passes"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The add calendar reminders list.",
+   "error": "Could not load. Names which read failed and leaves the add calendar reminders untouched.",
+   "emptyFirstRun": "No add calendar reminders yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the add calendar reminders are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+  },
+  "apis": [
+   {
+    "operationId": "getOrder",
+    "contract": "orders",
+    "purpose": "Read an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOrders",
+    "contract": "orders",
+    "purpose": "List orders",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "issueWalletPass",
+    "contract": "orders",
+    "purpose": "Generate an Apple or Google wallet pass",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
+   "preloaded": [
+    "Order.id",
+    "Order.orderNumber",
+    "Order.channel",
+    "Order.venueId",
+    "Order.scopePath"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-018"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-019",
+  "name": "Order History",
+  "module": "Account & Self-Service",
+  "requiresModule": "ticketing",
+  "wave": 2,
+  "capability": "C21",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/general/order-history-wallet",
+   "component": "apps/guest-app/src/routes/general/OrderHistoryWalletDashboard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "GST-001",
+    "GST-002",
+    "GST-003"
+   ],
+   "transitions": [
+    {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-003",
+     "trigger": "Event & Attraction Listing",
+     "carries": [
+      "eventId"
+     ],
+     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Order History. **`transferOrderTickets` was the only declared operation**, which is not history. Raised by Pranay. **Rewired on the 20 August review.** **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a guest is one parameter away from somebody else’s. **Renamed 31 August** from *Order History (Wallet)*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added transferOrderTickets. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listOrders` reads the population and `getOrder` reads one of them — list, select, act",
+  "purpose": "Find order history (wallet) for this venue.",
+  "gaps": [
+   {
+    "operation": "listMyOrders",
+    "why": "**1 declared operation reach no component on this screen**: listMyOrders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every order history",
+       "bindsTo": "OrderSummary",
+       "columns": [
+        "OrderSummary.id",
+        "OrderSummary.orderNumber",
+        "OrderSummary.status",
+        "OrderSummary.grossAmount",
+        "OrderSummary.refundedAmount",
+        "OrderSummary.channel",
+        "OrderSummary.lineCount"
+       ],
+       "operation": "listOrders",
+       "provenance": "contract orders.yaml GET /orders"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected order history",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount",
+        "Order.totalPriceVariance",
+        "Order.lines",
+        "Order.payments",
+        "Order.principalId"
+       ],
+       "operation": "getOrder",
+       "provenance": "contract orders.yaml GET /orders/{orderId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The order history list.",
+   "error": "Could not load. Names which read failed and leaves the order history untouched.",
+   "emptyFirstRun": "No order history yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the order history are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+  },
+  "apis": [
+   {
+    "operationId": "listOrders",
+    "contract": "orders",
+    "purpose": "List orders",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getOrder",
+    "contract": "orders",
+    "purpose": "Read an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listMyOrders",
+    "contract": "orders",
+    "purpose": "The orders this guest placed",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
+   "preloaded": [
+    "Order.id",
+    "Order.orderNumber",
+    "Order.channel",
+    "Order.venueId",
+    "Order.scopePath"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-019"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-020",
+  "name": "Saved Items / Wishlist",
+  "module": "Account & Self-Service",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "capability": "C58",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/general/saved-items-wishlist",
+   "component": "apps/guest-app/src/routes/general/SavedItemsWishlistList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-001",
+    "GST-011"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "GST-001",
+    "GST-002",
+    "GST-003"
+   ],
+   "transitions": [
+    {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-003",
+     "trigger": "Event & Attraction Listing",
+     "carries": [
+      "eventId"
+     ],
+     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Wishlist. **Device and consent operations removed 20 August** — Pranay asked why they were here, and the answer is that seven operations were attached in bulk to three unrelated screens. **Rewired on the 20 August review.**",
+  "openQuestions": [
+   "Inventory cites `GET /wishlist` — no matching operation. Written before the contracts existed."
+  ],
+  "density": "comfortable",
+  "pattern": "statusTracker",
+  "patternReason": "`getWishlist` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Find the right one quickly, and act on it without opening it.",
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected saved items wishlist",
+       "bindsTo": "Wishlist",
+       "columns": [
+        "Wishlist.subjectId",
+        "Wishlist.items"
+       ],
+       "operation": "getWishlist",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add",
+       "operation": "addToWishlist",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeFromWishlist",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmRemoveFromWishlist",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A saved items wishlist this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+   }
+  ],
+  "states": {
+   "loading": "The saved items wishlist list.",
+   "error": "Could not load. Names which read failed and leaves the saved items wishlist untouched.",
+   "emptyFirstRun": "No saved items wishlist yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the saved items wishlist are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+  },
+  "apis": [
+   {
+    "operationId": "getWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest's saved items",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "addToWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Save an item",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "removeFromWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Remove a saved item",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "itemId",
+     "from": "deepLink"
+    },
+    {
+     "name": "subjectId",
+     "from": "GST-001"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `itemId`."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-020"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-039",
+  "name": "Profile",
+  "module": "Account & Self-Service",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C58",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/general/profile",
+   "component": "apps/guest-app/src/routes/general/ProfileDashboard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "GST-001",
+    "GST-002",
+    "GST-003",
+    "GST-065"
+   ],
+   "transitions": [
+    {
+     "to": "GST-065",
+     "trigger": "And their marketing preferences",
+     "provenance": "flow F56 step 4→5"
+    },
+    {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-003",
+     "trigger": "Event & Attraction Listing",
+     "carries": [
+      "eventId"
+     ],
+     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "openQuestions": [
+   "Inventory cites `GET /guests/me` — no matching operation. Written before the contracts existed."
+  ],
+  "density": "comfortable",
+  "pattern": "configEditor",
+  "patternReason": "the screen declares only writes (`recordConsent`) and no read of a population — it is settings, not a list",
+  "purpose": "What we hold about a guest, and what they can change.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "purpose",
+       "bindsTo": "RecordConsentRequest.purpose",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "textField",
+       "label": "decision",
+       "bindsTo": "RecordConsentRequest.decision",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "textField",
+       "label": "channels",
+       "bindsTo": "RecordConsentRequest.channels",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "textField",
+       "label": "noticeVersion",
+       "bindsTo": "RecordConsentRequest.noticeVersion",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "textField",
+       "label": "source",
+       "bindsTo": "RecordConsentRequest.source",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "textField",
+       "label": "recordedAt",
+       "bindsTo": "RecordConsentRequest.recordedAt",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The saved profile.",
+   "error": "Could not load. Names which read failed and leaves the profile untouched.",
+   "emptyFirstRun": "No profile configured. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+  },
+  "apis": [
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "updateMyProfile",
+    "contract": "marketing-crm",
+    "purpose": "Change name, contact and preferences",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "GST-001"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-039"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-042",
+  "name": "Simple Registration & OTP",
+  "module": "Account & Self-Service",
+  "requiresModule": "core",
+  "wave": 1,
+  "capability": "C56",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/general/simple-registration-and-otp",
+   "component": "apps/guest-app/src/routes/general/SimpleRegistrationAndOtpDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "GST-001",
+    "GST-002",
+    "GST-003"
+   ],
+   "transitions": [
+    {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-003",
+     "trigger": "Event & Attraction Listing",
+     "carries": [
+      "eventId"
+     ],
+     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-016",
+     "trigger": "A guest who checked out anonymously links their order",
+     "provenance": "flow F56 step 2→3",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own logout.** `selectRole` is ADR-0002 staff authorisation; `getCurrentSession` is the staff session. `guestLogout` and `getGuestSession` already existed — the screen was reaching into the staff identity surface because nothing checked that a guest platform only calls guest operations.",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listMfaMethods` reads the population and `getGuestSession` reads one of them — list, select, act",
+  "purpose": "Work with simple registration & otp for this venue.",
+  "gaps": [
+   {
+    "operation": "listSsoProviders",
+    "why": "**1 declared operation reach no component on this screen**: listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every simple registration otp",
+       "bindsTo": "MfaMethod",
+       "columns": [
+        "MfaMethod.id",
+        "MfaMethod.kind",
+        "MfaMethod.label",
+        "MfaMethod.maskedTarget",
+        "MfaMethod.isActive",
+        "MfaMethod.isPrimary",
+        "MfaMethod.enrolledAt",
+        "MfaMethod.lastUsedAt"
+       ],
+       "operation": "listMfaMethods",
+       "provenance": "contract identity.yaml GET /auth/mfa/methods"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected simple registration otp",
+       "bindsTo": "GuestSession",
+       "columns": [
+        "GuestSession.subjectId",
+        "GuestSession.displayName",
+        "GuestSession.tokens",
+        "GuestSession.isVerified",
+        "GuestSession.identityProviders",
+        "GuestSession.guestLinkId",
+        "GuestSession.homeCellName",
+        "GuestSession.preferredLanguage",
+        "GuestSession.expiresAt"
+       ],
+       "operation": "getGuestSession",
+       "provenance": "contract identity.yaml GET /auth/guest/session"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Request",
+       "operation": "requestGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Complete",
+       "operation": "completeSsoAuthorization",
+       "provenance": "contract identity.yaml POST /auth/sso/{providerId}/callback"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Enrol",
+       "operation": "enrolMfaMethod",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestLogout",
+       "provenance": "contract identity.yaml DELETE /auth/guest/session"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestSocialLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/social"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Guest",
+       "operation": "guestUaePassLogin",
+       "provenance": "contract identity.yaml POST /auth/guest/uae-pass"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Link",
+       "operation": "linkGuestCheckout",
+       "provenance": "contract identity.yaml POST /auth/guest/link-checkout"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Login",
+       "operation": "login",
+       "provenance": "contract identity.yaml POST /auth/login"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Refresh",
+       "operation": "refreshToken",
+       "provenance": "contract identity.yaml POST /auth/refresh"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Register",
+       "operation": "registerGuest",
+       "provenance": "contract identity.yaml POST /auth/guest/register"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeMfaMethod",
+       "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Start",
+       "operation": "startSsoAuthorization",
+       "provenance": "contract identity.yaml GET /auth/sso/{providerId}/authorize"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyGuestOtp",
+       "provenance": "contract identity.yaml POST /auth/guest/otp/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaChallenge",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge/{challengeId}/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyMfaEnrolment",
+       "provenance": "contract identity.yaml POST /auth/mfa/methods/{methodId}"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmRemoveMfaMethod",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeMfaMethod` changes and what it leaves alone**, in the consequence rather than the verb. A simple registration otp this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract identity.yaml DELETE /auth/mfa/methods/{methodId}"
+   }
+  ],
+  "states": {
+   "loading": "The simple registration otp list.",
+   "error": "Could not load. Names which read failed and leaves the simple registration otp untouched.",
+   "emptyFirstRun": "No simple registration otp yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the simple registration otp are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+  },
+  "apis": [
+   {
+    "operationId": "requestGuestOtp",
+    "contract": "identity",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "completeSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Exchange an SSO code for a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "enrolMfaMethod",
+    "contract": "identity",
+    "purpose": "Enrol an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "getGuestSession",
+    "contract": "identity",
+    "purpose": "Read the current guest session",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "guestLogout",
+    "contract": "identity",
+    "purpose": "End a guest session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "guestSocialLogin",
+    "contract": "identity",
+    "purpose": "Sign in with Apple or Google",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "guestUaePassLogin",
+    "contract": "identity",
+    "purpose": "Sign in with a national identity provider",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "linkGuestCheckout",
+    "contract": "identity",
+    "purpose": "Attach a guest checkout to an account",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "listMfaMethods",
+    "contract": "identity",
+    "purpose": "Enrolled MFA methods",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listSsoProviders",
+    "contract": "identity",
+    "purpose": "Identity providers configured for this tenant",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "login",
+    "contract": "identity",
+    "purpose": "Authenticate and open a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "refreshToken",
+    "contract": "identity",
+    "purpose": "Rotate the access token",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "registerGuest",
+    "contract": "identity",
+    "purpose": "Create a guest account",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "removeMfaMethod",
+    "contract": "identity",
+    "purpose": "Remove an MFA method",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "startSsoAuthorization",
+    "contract": "identity",
+    "purpose": "Begin an SSO flow",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "verifyGuestOtp",
+    "contract": "identity",
+    "purpose": "Verify a one-time code and issue a session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaChallenge",
+    "contract": "identity",
+    "purpose": "Complete a step-up challenge",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   },
+   {
+    "operationId": "verifyMfaEnrolment",
+    "contract": "identity",
+    "purpose": "Complete enrolment",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMfaMethods"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "challengeId",
+     "from": "deepLink"
+    },
+    {
+     "name": "methodId",
+     "from": "deepLink"
+    },
+    {
+     "name": "providerId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `challengeId`, `methodId`, `providerId`.",
+   "preloaded": [
+    "GuestSession.subjectId",
+    "GuestSession.displayName",
+    "GuestSession.tokens",
+    "GuestSession.isVerified",
+    "GuestSession.identityProviders"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-042"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 18 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-045",
+  "name": "Ticket Delivery & Sharing",
+  "module": "Account & Self-Service",
+  "requiresModule": "ticketing",
+  "wave": 2,
+  "capability": "C02",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/general/ticket-delivery-and-sharing",
+   "component": "apps/guest-app/src/routes/general/TicketDeliveryAndSharingDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "GST-001",
+    "GST-002",
+    "GST-003"
+   ],
+   "transitions": [
+    {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-003",
+     "trigger": "Event & Attraction Listing",
+     "carries": [
+      "eventId"
+     ],
+     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "openQuestions": [
+   "Inventory cites `POST /tickets/{id}/share` — no matching operation. Written before the contracts existed."
+  ],
+  "density": "comfortable",
+  "pattern": "configEditor",
+  "patternReason": "the screen declares only writes (`transferOrderTickets`) and no read of a population — it is settings, not a list",
+  "purpose": "Find ticket delivery & sharing for this venue.",
+  "gaps": [
+   {
+    "operation": "transferOrderTickets",
+    "why": "**`transferOrderTickets` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
+    "source": "contract orders.yaml POST /orders/{orderId}/transfer"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "transferOrderTickets"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Availability is live, never cached",
+   "error": "Availability unavailable. **Selection is blocked** — overselling is worse than waiting",
+   "emptyFirstRun": "**Sold out is a real answer.** Offers the next available rather than a dead end",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+  },
+  "apis": [
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-045"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-055",
+  "name": "Dynamic QR Ticket",
+  "module": "Account & Self-Service",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C09",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/general/dynamic-qr-ticket",
+   "component": "apps/guest-app/src/routes/general/DynamicQrTicketCanvas.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-001",
+    "GST-013"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "GST-001",
+    "GST-002",
+    "GST-003"
+   ],
+   "transitions": [
+    {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-003",
+     "trigger": "Event & Attraction Listing",
+     "carries": [
+      "eventId"
+     ],
+     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "openQuestions": [
+   "Inventory cites `GET /tickets/{id}/dynamic-qr` — no matching operation. Written before the contracts existed."
+  ],
+  "density": "comfortable",
+  "pattern": "configEditor",
+  "patternReason": "the screen declares only writes (`transferOrderTickets`) and no read of a population — it is settings, not a list",
+  "purpose": "Find dynamic qr ticket for this venue.",
+  "gaps": [
+   {
+    "operation": "transferOrderTickets",
+    "why": "**`transferOrderTickets` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
+    "source": "contract orders.yaml POST /orders/{orderId}/transfer"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "transferOrderTickets",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Availability is live, never cached",
+   "error": "Availability unavailable. **Selection is blocked** — overselling is worse than waiting",
+   "emptyFirstRun": "**Sold out is a real answer.** Offers the next available rather than a dead end",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+  },
+  "apis": [
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-055"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-066",
+  "name": "Privacy & My Data",
+  "module": "Account & Self-Service",
+  "requiresModule": "core",
+  "wave": 2,
+  "capability": "read-write",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/account/privacy-my-data",
+   "component": "apps/guest-app/src/routes/account/PrivacyMyData.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "GST-039"
+   ],
+   "entryFrom": [
+    "GST-039"
+   ],
+   "inferred": false,
+   "notes": "**Reached from GST-039** — privacy is a setting on the profile. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "GST-039",
+     "trigger": "Profile",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-039 declares entryState.params subjectId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**A guest can legally demand their data and its erasure, and had nowhere to ask.** `exportSubjectData` and `deleteGuestAccount` existed as guest-callable operations reachable from no guest surface — a promise the contracts made and the product did not keep.\n\n**Erasure is not a button.** `platform.dsar_request` carries a legal clock and a lifecycle; this screen starts it and shows where it has got to. **A request that silently fails is a regulatory failure with a timestamp on it** (ADR-0033).",
+  "density": "comfortable",
+  "offline": false,
+  "pattern": "statusTracker",
+  "patternReason": "`getGuestConsents` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "**A guest can legally demand their data and its erasure, and had nowhere to ask.** `exportSubjectData` and `deleteGuestAccount` existed as guest-callable operations reachable from no guest surface — a",
+  "gaps": [
+   {
+    "operation": "exportSubjectData",
+    "why": "**1 declared operation reach no component on this screen**: exportSubjectData. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected privacy data",
+       "bindsTo": "ConsentState",
+       "columns": [
+        "ConsentState.subjectId",
+        "ConsentState.purposes"
+       ],
+       "operation": "getGuestConsents",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/consents"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "destructiveButton",
+       "label": "Delete",
+       "operation": "deleteGuestAccount",
+       "provenance": "contract identity.yaml DELETE /auth/guest/account"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateGuestPreferences",
+       "provenance": "contract marketing-crm.yaml PUT /guests/{subjectId}/preferences"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Upload",
+       "operation": "uploadGuestDocument",
+       "provenance": "contract marketing-crm.yaml POST /guest-documents"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmDeleteGuestAccount",
+    "component": "confirmDialog",
+    "trigger": "Delete",
+    "body": "**Names what `deleteGuestAccount` changes and what it leaves alone**, in the consequence rather than the verb. A privacy data this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract identity.yaml DELETE /auth/guest/account"
+   }
+  ],
+  "states": {
+   "loading": "Content loads.",
+   "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
+   "emptyFirstRun": "**Nothing requested yet.** No export, no erasure, no document — and that is the ordinary state. **The screen explains what each request means before offering it**, because an erasure a guest did not understand is one they will phone about.",
+   "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Nothing here works offline and it says so.** An erasure request queued on a phone and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, not when the guest taps."
+  },
+  "apis": [
+   {
+    "operationId": "exportSubjectData",
+    "contract": "identity",
+    "purpose": "Everything the platform holds about one guest",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "deleteGuestAccount",
+    "contract": "identity",
+    "purpose": "Self-service account deletion",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getGuestConsents",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest's consent state",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateGuestPreferences",
+    "contract": "marketing-crm",
+    "purpose": "The things a regular should not have to say twice",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "uploadGuestDocument",
+    "contract": "marketing-crm",
+    "purpose": "Store a guest photo, ID or signed document",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "**Resolves from the session.** A guest arriving cold is asked to sign in and returned here afterwards — never a 404, and never a screen that silently shows somebody else's data (ADR-0030)."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-066"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

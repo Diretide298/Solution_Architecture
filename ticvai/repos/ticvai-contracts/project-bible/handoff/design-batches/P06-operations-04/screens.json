@@ -1,0 +1,2096 @@
+[
+ {
+  "id": "EMP-035",
+  "name": "Payment on device",
+  "module": "Operations",
+  "requiresModule": "ticketing",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/payment-on-device",
+   "component": "apps/venue-staff-app/src/routes/operations/PaymentOnDeviceDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "EMP-001",
+    "EMP-002",
+    "EMP-003",
+    "EMP-036"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "EMP-034"
+   ],
+   "notes": "**Reached from EMP-034** — payment follows the sale that needs it. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "EMP-036",
+     "trigger": "Media is issued on the spot",
+     "provenance": "flow F66 step 2→3"
+    },
+    {
+     "to": "EMP-001",
+     "trigger": "Sign in",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-002",
+     "trigger": "Select venue & role",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. Card on a handheld. **Tender currency equals base currency** — a staff member taking payment away from a till has no float and cannot accept foreign cash.",
+  "density": "comfortable",
+  "pattern": "configEditor",
+  "patternReason": "the screen declares only writes (`createPayment`, `inquirePaymentStatus`, `addTip`) and no read of a population — it is settings, not a list",
+  "purpose": "Take a card payment on the handheld.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "id",
+       "bindsTo": "CreatePaymentRequest.id",
+       "provenance": "contract orders.yaml POST /payments"
+      },
+      {
+       "kind": "textField",
+       "label": "orderId",
+       "bindsTo": "CreatePaymentRequest.orderId",
+       "provenance": "contract orders.yaml POST /payments"
+      },
+      {
+       "kind": "textField",
+       "label": "tender",
+       "bindsTo": "CreatePaymentRequest.tender",
+       "provenance": "contract orders.yaml POST /payments"
+      },
+      {
+       "kind": "textField",
+       "label": "amount",
+       "bindsTo": "CreatePaymentRequest.amount",
+       "provenance": "contract orders.yaml POST /payments"
+      },
+      {
+       "kind": "textField",
+       "label": "tenderedAmount",
+       "bindsTo": "CreatePaymentRequest.tenderedAmount",
+       "provenance": "contract orders.yaml POST /payments"
+      },
+      {
+       "kind": "textField",
+       "label": "walletAuthorisationId",
+       "bindsTo": "CreatePaymentRequest.walletAuthorisationId",
+       "provenance": "contract orders.yaml POST /payments"
+      },
+      {
+       "kind": "textField",
+       "label": "deviceId",
+       "bindsTo": "CreatePaymentRequest.deviceId",
+       "provenance": "contract orders.yaml POST /payments"
+      },
+      {
+       "kind": "textField",
+       "label": "recordedAt",
+       "bindsTo": "CreatePaymentRequest.recordedAt",
+       "provenance": "contract orders.yaml POST /payments"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createPayment",
+       "provenance": "contract orders.yaml POST /payments"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Inquire",
+       "operation": "inquirePaymentStatus",
+       "provenance": "contract orders.yaml POST /payments/{paymentId}/inquiry"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Add",
+       "operation": "addTip",
+       "provenance": "contract orders.yaml POST /payments/{paymentId}/tip"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Capture",
+       "operation": "capturePayment",
+       "provenance": "contract orders.yaml POST /payments/{paymentId}/capture"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createPayment",
+       "label": "Create payment",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createPayment",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The saved payment device.",
+   "error": "Could not load. Names which read failed and leaves the payment device untouched.",
+   "emptyFirstRun": "No payment device configured. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Not available for card"
+  },
+  "apis": [
+   {
+    "operationId": "createPayment",
+    "contract": "orders",
+    "purpose": "Take a payment against an order",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "inquirePaymentStatus",
+    "contract": "orders",
+    "purpose": "Ask the provider what actually happened",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "addTip",
+    "contract": "orders",
+    "purpose": "Record a tip against a payment",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "capturePayment",
+    "contract": "orders",
+    "purpose": "Capture a previously authorised payment",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "paymentId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `paymentId`."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-035"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-036",
+  "name": "Issue media",
+  "module": "Operations",
+  "requiresModule": "ticketing",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/issue-media",
+   "component": "apps/venue-staff-app/src/routes/operations/IssueMediaDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "EMP-001",
+    "EMP-002",
+    "EMP-003"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "EMP-034",
+    "EMP-035"
+   ],
+   "notes": "**Reached from EMP-034** — media is issued for the sale that bought it. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "EMP-001",
+     "trigger": "Sign in",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-002",
+     "trigger": "Select venue & role",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **9 assets operations removed 18 August (CF-114).** The whole media contract was attached to this screen. **A till adding an item to a ticket does not manage a media library** — it reads the asset it needs and nothing else. Same shape as CF-87, one level up: that attached sibling operations, this attached a whole contract.",
+  "density": "comfortable",
+  "pattern": "statusTracker",
+  "patternReason": "`getMediaEntitlements` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Give the guest something the gate can read.",
+  "gaps": [
+   {
+    "operation": "getMediaAsset",
+    "why": "**1 declared operation reach no component on this screen**: getMediaAsset. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected issue media",
+       "bindsTo": "MediaEntitlements",
+       "columns": [
+        "MediaEntitlements.mediaCode",
+        "MediaEntitlements.mediaKind",
+        "MediaEntitlements.subjectId",
+        "MediaEntitlements.isValid",
+        "MediaEntitlements.invalidReason",
+        "MediaEntitlements.canAcceptMore",
+        "MediaEntitlements.entitlements"
+       ],
+       "operation": "getMediaEntitlements",
+       "provenance": "contract orders.yaml GET /media/{mediaCode}/entitlements"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Append",
+       "operation": "appendEntitlementToMedia",
+       "provenance": "contract orders.yaml POST /media/{mediaCode}/entitlements"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "appendEntitlementToMedia",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The issue media list.",
+   "error": "Could not load. Names which read failed and leaves the issue media untouched.",
+   "emptyFirstRun": "No issue media yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the issue media are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Issues from the local range allocated at shift start"
+  },
+  "apis": [
+   {
+    "operationId": "getMediaEntitlements",
+    "contract": "orders",
+    "purpose": "What is already on this media",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "appendEntitlementToMedia",
+    "contract": "orders",
+    "purpose": "Add something to a ticket the guest already holds",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getMediaAsset",
+    "contract": "assets",
+    "purpose": "Read an asset with derivatives and usage",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "mediaCode",
+     "from": "deepLink"
+    },
+    {
+     "name": "mediaId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `mediaCode`, `mediaId`."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-036"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-037",
+  "name": "Notifications",
+  "module": "Operations",
+  "requiresModule": "core",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/notifications",
+   "component": "apps/venue-staff-app/src/routes/operations/NotificationsDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "EMP-001",
+    "EMP-002",
+    "EMP-003"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "EMP-003"
+   ],
+   "notes": "**Reached from EMP-003** — the screen the device sits on between tasks. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "EMP-001",
+     "trigger": "Sign in",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-002",
+     "trigger": "Select venue & role",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listAnnouncements` reads the population and `getAnnouncementReach` reads one of them — list, select, act",
+  "purpose": "Tell the right person the right thing.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every notifications",
+       "bindsTo": "Announcement",
+       "columns": [
+        "Announcement.id",
+        "Announcement.title",
+        "Announcement.body",
+        "Announcement.kind",
+        "Announcement.venueIds",
+        "Announcement.departmentIds",
+        "Announcement.roleIds",
+        "Announcement.requiresAcknowledgement",
+        "Announcement.expiresAt",
+        "Announcement.publishedByPrincipalId",
+        "Announcement.publishedAt",
+        "Announcement.locale"
+       ],
+       "operation": "listAnnouncements",
+       "provenance": "contract workforce.yaml GET /announcements"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected notifications",
+       "bindsTo": "AnnouncementReach",
+       "columns": [
+        "AnnouncementReach.announcementId",
+        "AnnouncementReach.targeted",
+        "AnnouncementReach.delivered",
+        "AnnouncementReach.acknowledged",
+        "AnnouncementReach.outstanding"
+       ],
+       "operation": "getAnnouncementReach",
+       "provenance": "contract workforce.yaml GET /announcements/{announcementId}/reach"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Acknowledge",
+       "operation": "acknowledgeAnnouncement",
+       "provenance": "contract workforce.yaml POST /announcements/{announcementId}/acknowledge"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Publish",
+       "operation": "publishAnnouncement",
+       "provenance": "contract workforce.yaml POST /announcements"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
+       "provenance": "authored — required by check-screens"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listAnnouncements",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "acknowledgeAnnouncement",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishAnnouncement",
+       "notes": "Declares `publishAnnouncement`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The notifications list.",
+   "error": "Could not load. Names which read failed and leaves the notifications untouched.",
+   "emptyFirstRun": "No notifications yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the notifications are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached, with age. Acknowledgements queue"
+  },
+  "apis": [
+   {
+    "operationId": "listAnnouncements",
+    "contract": "workforce",
+    "purpose": "What staff have been told",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "acknowledgeAnnouncement",
+    "contract": "workforce",
+    "purpose": "Confirm you have read it",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAnnouncements"
+    ]
+   },
+   {
+    "operationId": "getAnnouncementReach",
+    "contract": "workforce",
+    "purpose": "Who has acknowledged, and who has not",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "publishAnnouncement",
+    "contract": "workforce",
+    "purpose": "Tell staff something",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAnnouncements"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "announcementId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `announcementId`.",
+   "preloaded": [
+    "AnnouncementReach.announcementId",
+    "AnnouncementReach.targeted",
+    "AnnouncementReach.delivered",
+    "AnnouncementReach.acknowledged",
+    "AnnouncementReach.outstanding"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-037"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-039",
+  "name": "Announcements",
+  "module": "Operations",
+  "requiresModule": "core",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/announcements",
+   "component": "apps/venue-staff-app/src/routes/operations/AnnouncementsDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "EMP-001",
+    "EMP-002",
+    "EMP-003"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "EMP-003"
+   ],
+   "notes": "**Reached from EMP-003** — the screen the device sits on between tasks. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "EMP-001",
+     "trigger": "Sign in",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-002",
+     "trigger": "Select venue & role",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listAnnouncements` reads the population and `getAnnouncementReach` reads one of them — list, select, act",
+  "purpose": "Read what the venue told everybody.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every announcements",
+       "bindsTo": "Announcement",
+       "columns": [
+        "Announcement.id",
+        "Announcement.title",
+        "Announcement.body",
+        "Announcement.kind",
+        "Announcement.venueIds",
+        "Announcement.departmentIds",
+        "Announcement.roleIds",
+        "Announcement.requiresAcknowledgement",
+        "Announcement.expiresAt",
+        "Announcement.publishedByPrincipalId",
+        "Announcement.publishedAt",
+        "Announcement.locale"
+       ],
+       "operation": "listAnnouncements",
+       "provenance": "contract workforce.yaml GET /announcements"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected announcements",
+       "bindsTo": "AnnouncementReach",
+       "columns": [
+        "AnnouncementReach.announcementId",
+        "AnnouncementReach.targeted",
+        "AnnouncementReach.delivered",
+        "AnnouncementReach.acknowledged",
+        "AnnouncementReach.outstanding"
+       ],
+       "operation": "getAnnouncementReach",
+       "provenance": "contract workforce.yaml GET /announcements/{announcementId}/reach"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Acknowledge",
+       "operation": "acknowledgeAnnouncement",
+       "provenance": "contract workforce.yaml POST /announcements/{announcementId}/acknowledge"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Publish",
+       "operation": "publishAnnouncement",
+       "provenance": "contract workforce.yaml POST /announcements"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
+       "provenance": "authored — required by check-screens"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listAnnouncements",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "acknowledgeAnnouncement",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishAnnouncement",
+       "notes": "Declares `publishAnnouncement`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The announcements list.",
+   "error": "Could not load. Names which read failed and leaves the announcements untouched.",
+   "emptyFirstRun": "No announcements yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the announcements are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached. **Acknowledgement queues** — an emergency acknowledgement needing a network does not arrive when it matters"
+  },
+  "apis": [
+   {
+    "operationId": "listAnnouncements",
+    "contract": "workforce",
+    "purpose": "What staff have been told",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "acknowledgeAnnouncement",
+    "contract": "workforce",
+    "purpose": "Confirm you have read it",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAnnouncements"
+    ]
+   },
+   {
+    "operationId": "getAnnouncementReach",
+    "contract": "workforce",
+    "purpose": "Who has acknowledged, and who has not",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "publishAnnouncement",
+    "contract": "workforce",
+    "purpose": "Tell staff something",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAnnouncements"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "announcementId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `announcementId`.",
+   "preloaded": [
+    "AnnouncementReach.announcementId",
+    "AnnouncementReach.targeted",
+    "AnnouncementReach.delivered",
+    "AnnouncementReach.acknowledged",
+    "AnnouncementReach.outstanding"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-039"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-038",
+  "name": "Broadcast to team",
+  "module": "Operations",
+  "requiresModule": "core",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/broadcast-to-team",
+   "component": "apps/venue-staff-app/src/routes/operations/BroadcastToTeamDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "EMP-001",
+    "EMP-002",
+    "EMP-003"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "EMP-003"
+   ],
+   "notes": "**Reached from EMP-003** — the screen the device sits on between tasks. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "EMP-001",
+     "trigger": "Sign in",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-002",
+     "trigger": "Select venue & role",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listAnnouncements` reads the population and `getAnnouncementReach` reads one of them — list, select, act",
+  "purpose": "Reach everybody on shift at once.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every broadcast team",
+       "bindsTo": "Announcement",
+       "columns": [
+        "Announcement.id",
+        "Announcement.title",
+        "Announcement.body",
+        "Announcement.kind",
+        "Announcement.venueIds",
+        "Announcement.departmentIds",
+        "Announcement.roleIds",
+        "Announcement.requiresAcknowledgement",
+        "Announcement.expiresAt",
+        "Announcement.publishedByPrincipalId",
+        "Announcement.publishedAt",
+        "Announcement.locale"
+       ],
+       "operation": "listAnnouncements",
+       "provenance": "contract workforce.yaml GET /announcements"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected broadcast team",
+       "bindsTo": "AnnouncementReach",
+       "columns": [
+        "AnnouncementReach.announcementId",
+        "AnnouncementReach.targeted",
+        "AnnouncementReach.delivered",
+        "AnnouncementReach.acknowledged",
+        "AnnouncementReach.outstanding"
+       ],
+       "operation": "getAnnouncementReach",
+       "provenance": "contract workforce.yaml GET /announcements/{announcementId}/reach"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Publish",
+       "operation": "publishAnnouncement",
+       "provenance": "contract workforce.yaml POST /announcements"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Acknowledge",
+       "operation": "acknowledgeAnnouncement",
+       "provenance": "contract workforce.yaml POST /announcements/{announcementId}/acknowledge"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
+       "provenance": "authored — required by check-screens"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "publishAnnouncement",
+       "label": "Publish announcement",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listAnnouncements",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "publishAnnouncement",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishAnnouncement",
+       "notes": "Declares `publishAnnouncement`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The broadcast team list.",
+   "error": "Could not load. Names which read failed and leaves the broadcast team untouched.",
+   "emptyFirstRun": "No broadcast team yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the broadcast team are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Queues, and states that it has not gone yet"
+  },
+  "apis": [
+   {
+    "operationId": "publishAnnouncement",
+    "contract": "workforce",
+    "purpose": "Tell staff something",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAnnouncements"
+    ]
+   },
+   {
+    "operationId": "getAnnouncementReach",
+    "contract": "workforce",
+    "purpose": "Who has acknowledged, and who has not",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "acknowledgeAnnouncement",
+    "contract": "workforce",
+    "purpose": "Confirm you have read it",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAnnouncements"
+    ]
+   },
+   {
+    "operationId": "listAnnouncements",
+    "contract": "workforce",
+    "purpose": "What staff have been told",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "announcementId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `announcementId`.",
+   "preloaded": [
+    "AnnouncementReach.announcementId",
+    "AnnouncementReach.targeted",
+    "AnnouncementReach.delivered",
+    "AnnouncementReach.acknowledged",
+    "AnnouncementReach.outstanding"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-038"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-040",
+  "name": "Knowledge base",
+  "module": "Operations",
+  "requiresModule": "ai",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/knowledge-base",
+   "component": "apps/venue-staff-app/src/routes/operations/KnowledgeBaseDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "EMP-001",
+    "EMP-002",
+    "EMP-003"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "EMP-003",
+    "EMP-020"
+   ],
+   "notes": "**Reached from EMP-003** — the screen the device sits on between tasks. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "EMP-001",
+     "trigger": "Sign in",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-002",
+     "trigger": "Select venue & role",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "density": "comfortable",
+  "pattern": "configEditor",
+  "patternReason": "the screen declares only writes (`semanticSearch`) and no read of a population — it is settings, not a list",
+  "purpose": "Look up the rule rather than guess it.",
+  "gaps": [
+   {
+    "operation": "semanticSearch",
+    "why": "**`semanticSearch` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
+    "source": "contract ai.yaml POST /search"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Semantic",
+       "operation": "semanticSearch",
+       "provenance": "contract ai.yaml POST /search"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "semanticSearch",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The saved knowledge base.",
+   "error": "Could not load. Names which read failed and leaves the knowledge base untouched.",
+   "emptyFirstRun": "No knowledge base configured. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Cached articles only**, with a note that newer ones may exist"
+  },
+  "apis": [
+   {
+    "operationId": "semanticSearch",
+    "contract": "ai",
+    "purpose": "Search meaning, not words",
+    "trigger": "onAction"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-040"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-041",
+  "name": "Training",
+  "module": "Operations",
+  "requiresModule": "ai",
+  "wave": 3,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/training",
+   "component": "apps/venue-staff-app/src/routes/operations/TrainingDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "EMP-001",
+    "EMP-002",
+    "EMP-003"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "EMP-040"
+   ],
+   "notes": "**Reached from EMP-040** — training is reached from the knowledge it extends. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "EMP-001",
+     "trigger": "Sign in",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-002",
+     "trigger": "Select venue & role",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listTrainingRecords` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Do the module that unlocks the role.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every training",
+       "bindsTo": "TrainingRecord",
+       "columns": [
+        "TrainingRecord.id",
+        "TrainingRecord.principalId",
+        "TrainingRecord.courseName",
+        "TrainingRecord.required",
+        "TrainingRecord.completedAt",
+        "TrainingRecord.expiresAt",
+        "TrainingRecord.state",
+        "TrainingRecord.evidenceRef"
+       ],
+       "operation": "listTrainingRecords",
+       "provenance": "contract workforce.yaml GET /training-records"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected training",
+       "bindsTo": "TrainingRecord",
+       "columns": [
+        "TrainingRecord.id",
+        "TrainingRecord.principalId",
+        "TrainingRecord.courseName",
+        "TrainingRecord.required",
+        "TrainingRecord.completedAt",
+        "TrainingRecord.expiresAt",
+        "TrainingRecord.state",
+        "TrainingRecord.evidenceRef"
+       ],
+       "operation": "listTrainingRecords",
+       "provenance": "contract workforce.yaml GET /training-records"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Semantic",
+       "operation": "semanticSearch",
+       "provenance": "contract ai.yaml POST /search"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "semanticSearch",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The training list.",
+   "error": "Could not load. Names which read failed and leaves the training untouched.",
+   "emptyFirstRun": "No training yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the training are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached progress; completions queue"
+  },
+  "apis": [
+   {
+    "operationId": "semanticSearch",
+    "contract": "ai",
+    "purpose": "Search meaning, not words",
+    "trigger": "onAction",
+    "invalidates": [
+     "listTrainingRecords"
+    ]
+   },
+   {
+    "operationId": "listTrainingRecords",
+    "contract": "workforce",
+    "purpose": "Training completed and what is expiring",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "TrainingRecord.id",
+    "TrainingRecord.principalId",
+    "TrainingRecord.courseName",
+    "TrainingRecord.required",
+    "TrainingRecord.completedAt"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-041"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-042",
+  "name": "Profile",
+  "module": "Operations",
+  "requiresModule": "core",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/profile",
+   "component": "apps/venue-staff-app/src/routes/operations/ProfileDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "EMP-001",
+    "EMP-002",
+    "EMP-003"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "EMP-003"
+   ],
+   "notes": "**Reached from EMP-003** — the screen the device sits on between tasks. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "EMP-001",
+     "trigger": "Sign in",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-002",
+     "trigger": "Select venue & role",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Removed 24 August**: forceLogout, listActiveSessions, revokeAllSessions. **Bulk-attach residue** — the 18 August defect that put identical operation sets on unrelated screens. A till does not cancel a performance, a staff app does not create roles, and **a scanner does not run a cash shift.**",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listMfaMethods` reads the population and `getCurrentSession` reads one of them — list, select, act",
+  "purpose": "Change what this person controls about themselves.",
+  "gaps": [
+   {
+    "operation": "getGuestSession",
+    "why": "**2 declared operations reach no component on this screen**: getGuestSession, listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every profile",
+       "bindsTo": "MfaMethod",
+       "columns": [
+        "MfaMethod.id",
+        "MfaMethod.kind",
+        "MfaMethod.label",
+        "MfaMethod.maskedTarget",
+        "MfaMethod.isActive",
+        "MfaMethod.isPrimary",
+        "MfaMethod.enrolledAt",
+        "MfaMethod.lastUsedAt"
+       ],
+       "operation": "listMfaMethods",
+       "provenance": "contract identity.yaml GET /auth/mfa/methods"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected profile",
+       "bindsTo": "Session",
+       "columns": [
+        "Session.sessionId",
+        "Session.principalId",
+        "Session.roleId",
+        "Session.displayName",
+        "Session.scope",
+        "Session.effectivePermissions",
+        "Session.permissionsByScope",
+        "Session.saleBoardId",
+        "Session.workstation",
+        "Session.openedAt",
+        "Session.expiresAt"
+       ],
+       "operation": "getCurrentSession",
+       "provenance": "contract identity.yaml GET /auth/session"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listMfaMethods",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The profile list.",
+   "error": "Could not load. Names which read failed and leaves the profile untouched.",
+   "emptyFirstRun": "No profile yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the profile are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached"
+  },
+  "apis": [
+   {
+    "operationId": "getCurrentSession",
+    "contract": "identity",
+    "purpose": "Current session and effective permissions",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listMfaMethods",
+    "contract": "identity",
+    "purpose": "Enrolled MFA methods",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getGuestSession",
+    "contract": "identity",
+    "purpose": "Read the current guest session",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listSsoProviders",
+    "contract": "identity",
+    "purpose": "Identity providers configured for this tenant",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "sessionId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "Session.sessionId",
+    "Session.principalId",
+    "Session.roleId",
+    "Session.displayName",
+    "Session.scope"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-042"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-043",
+  "name": "Device settings",
+  "module": "Operations",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/device-settings",
+   "component": "apps/venue-staff-app/src/routes/operations/DeviceSettingsDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "EMP-001",
+    "EMP-002",
+    "EMP-003",
+    "EMP-018"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "EMP-003"
+   ],
+   "notes": "**Reached from EMP-003** — the screen the device sits on between tasks. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "EMP-018",
+     "trigger": "It pulls its offline package",
+     "provenance": "flow F71 step 1→2",
+     "operation": "listDevices"
+    },
+    {
+     "to": "EMP-001",
+     "trigger": "Sign in",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-002",
+     "trigger": "Select venue & role",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Removed 24 August**: listGuestDevices, adjustLoyaltyPoints, getConsentHistory, getGuestConsents, getGuestLoyalty, getGuestProfile, getWishlist. **Bulk-attach residue, found by walking a journey.** A device-settings screen does not read guest loyalty, a venue map does not set a refund policy, a shift summary does not close the shift, and **a rota a steward can rewrite is not a rota.** **Removed 24 August**: mergeGuestProfiles, searchGuests, updateGuestProfile. **Bulk-attach residue.** A device-settings screen does not merge guest profiles, a rota view does not author the rota, a shift summary does not open a shift, and **authority notification belongs where the incident is raised, not where it is read.**",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listDevices` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Set how this handheld behaves.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every device settings",
+       "bindsTo": "RegisteredDevice",
+       "columns": [
+        "RegisteredDevice.id",
+        "RegisteredDevice.kind",
+        "RegisteredDevice.driver",
+        "RegisteredDevice.identifier",
+        "RegisteredDevice.workstationId",
+        "RegisteredDevice.model",
+        "RegisteredDevice.pushToken",
+        "RegisteredDevice.pushPlatform",
+        "RegisteredDevice.pushFailureCount",
+        "RegisteredDevice.offlineScope",
+        "RegisteredDevice.firmwareVersion",
+        "RegisteredDevice.isRequired"
+       ],
+       "operation": "listDevices",
+       "provenance": "contract tenancy.yaml GET /devices"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected device settings",
+       "bindsTo": "RegisteredDevice",
+       "columns": [
+        "RegisteredDevice.id",
+        "RegisteredDevice.kind",
+        "RegisteredDevice.driver",
+        "RegisteredDevice.identifier",
+        "RegisteredDevice.workstationId",
+        "RegisteredDevice.model",
+        "RegisteredDevice.pushToken",
+        "RegisteredDevice.pushPlatform",
+        "RegisteredDevice.pushFailureCount",
+        "RegisteredDevice.offlineScope",
+        "RegisteredDevice.firmwareVersion",
+        "RegisteredDevice.isRequired",
+        "RegisteredDevice.status",
+        "RegisteredDevice.batteryPercent",
+        "RegisteredDevice.lastCheckedAt",
+        "RegisteredDevice.health"
+       ],
+       "operation": "listDevices",
+       "provenance": "contract tenancy.yaml GET /devices"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Register",
+       "operation": "registerDevice",
+       "provenance": "contract tenancy.yaml POST /devices"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listDevices",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "registerDevice",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The device settings list.",
+   "error": "Could not load. Names which read failed and leaves the device settings untouched.",
+   "emptyFirstRun": "No device settings yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the device settings are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Fully offline** — device settings are local by definition"
+  },
+  "apis": [
+   {
+    "operationId": "listDevices",
+    "contract": "tenancy",
+    "purpose": "List registered devices",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "registerDevice",
+    "contract": "tenancy",
+    "purpose": "Register a device",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDevices"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "RegisteredDevice.id",
+    "RegisteredDevice.kind",
+    "RegisteredDevice.driver",
+    "RegisteredDevice.identifier",
+    "RegisteredDevice.workstationId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-043"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-044",
+  "name": "Accessibility",
+  "module": "Operations",
+  "requiresModule": "core",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/accessibility",
+   "component": "apps/venue-staff-app/src/routes/operations/AccessibilityDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "EMP-001",
+    "EMP-002",
+    "EMP-003"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "EMP-043"
+   ],
+   "notes": "**Reached from EMP-043** — accessibility is a device setting. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "EMP-001",
+     "trigger": "Sign in",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-002",
+     "trigger": "Select venue & role",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "**the screen's operations choose no pattern** — no list, no get, no write that groups. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Make the app usable in the conditions it is used in.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen declares no operation the contracts recognise.** Nothing fills it, nothing it does is committed anywhere, and its shape below is a default rather than a reading.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "—",
+   "error": "—",
+   "emptyFirstRun": "—",
+   "emptyNoResults": "The filter narrowed it and the accessibility are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Fully offline.** Accessibility settings are device-local and must never depend on a network"
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-044"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 0 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

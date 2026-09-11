@@ -1,0 +1,1135 @@
+{
+ "acknowledgePurchaseOrder": {
+  "method": "POST",
+  "path": "/purchase-orders/{purchaseOrderId}/acknowledge",
+  "contract": "inventory",
+  "summary": "Record the supplier acknowledgement",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "approveRequisition": {
+  "method": "POST",
+  "path": "/requisitions/{requisitionId}/approve",
+  "contract": "inventory",
+  "summary": "Approve or reject a requisition",
+  "permission": "APPROVAL_ACT",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Requisition"
+ },
+ "cancelPurchaseOrder": {
+  "method": "POST",
+  "path": "/purchase-orders/{purchaseOrderId}/cancel",
+  "contract": "inventory",
+  "summary": "Cancel a purchase order",
+  "permission": "ORDER_CANCEL",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PurchaseOrder"
+ },
+ "cancelRequisition": {
+  "method": "POST",
+  "path": "/requisitions/{requisitionId}/cancel",
+  "contract": "inventory",
+  "summary": "Cancel a requisition",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "cancelStockCount": {
+  "method": "POST",
+  "path": "/stock-counts/{countId}/cancel",
+  "contract": "inventory",
+  "summary": "Abandon a count",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "closePurchaseOrderShort": {
+  "method": "POST",
+  "path": "/purchase-orders/{purchaseOrderId}/close-short",
+  "contract": "inventory",
+  "summary": "Close an order accepting the balance will not arrive",
+  "permission": "LEDGER_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "closeTransferShort": {
+  "method": "POST",
+  "path": "/stock-transfers/{transferId}/close-short",
+  "contract": "inventory",
+  "summary": "Close a transfer accepting the balance will not arrive",
+  "permission": "LEDGER_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "compareQuotations": {
+  "method": "GET",
+  "path": "/requisitions/{requisitionId}/quotations",
+  "contract": "inventory",
+  "summary": "Compare quotations for a requisition",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "QuotationComparison"
+ },
+ "createGoodsReceipt": {
+  "method": "POST",
+  "path": "/goods-receipts",
+  "contract": "inventory",
+  "summary": "Receive goods against a purchase order",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateGoodsReceiptRequest",
+  "responds": "GoodsReceipt"
+ },
+ "createInventoryItem": {
+  "method": "POST",
+  "path": "/inventory-items",
+  "contract": "inventory",
+  "summary": "Create an inventory item",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateInventoryItemRequest",
+  "responds": "InventoryItem"
+ },
+ "createPurchaseOrder": {
+  "method": "POST",
+  "path": "/purchase-orders",
+  "contract": "inventory",
+  "summary": "Raise a purchase order",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreatePurchaseOrderRequest",
+  "responds": "PurchaseOrder"
+ },
+ "createRequisition": {
+  "method": "POST",
+  "path": "/requisitions",
+  "contract": "inventory",
+  "summary": "Raise a requisition",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateRequisitionRequest",
+  "responds": "Requisition"
+ },
+ "createStockLocation": {
+  "method": "POST",
+  "path": "/stock-locations",
+  "contract": "inventory",
+  "summary": "Create a stock location",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "StockLocation"
+ },
+ "createStockMovement": {
+  "method": "POST",
+  "path": "/stock-movements",
+  "contract": "inventory",
+  "summary": "Record an issue, return or adjustment",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateStockMovementRequest",
+  "responds": "StockMovement"
+ },
+ "createStockTransfer": {
+  "method": "POST",
+  "path": "/stock-transfers",
+  "contract": "inventory",
+  "summary": "Send stock to another location",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateStockTransferRequest",
+  "responds": "StockTransfer"
+ },
+ "createSupplier": {
+  "method": "POST",
+  "path": "/suppliers",
+  "contract": "inventory",
+  "summary": "Create a supplier",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Supplier",
+  "responds": "Supplier"
+ },
+ "enterCountLine": {
+  "method": "POST",
+  "path": "/stock-counts/{countId}/lines",
+  "contract": "fnb",
+  "summary": "What was actually on the shelf",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getCountVariance": {
+  "method": "GET",
+  "path": "/stock-counts/{countId}/variance",
+  "contract": "inventory",
+  "summary": "Variance between counted and expected",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CountVariance"
+ },
+ "getInventoryItem": {
+  "method": "GET",
+  "path": "/inventory-items/{itemId}",
+  "contract": "inventory",
+  "summary": "Read an item with stock position",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "InventoryItem"
+ },
+ "getPurchaseOrder": {
+  "method": "GET",
+  "path": "/purchase-orders/{purchaseOrderId}",
+  "contract": "inventory",
+  "summary": "Read a purchase order with receipt progress",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PurchaseOrder"
+ },
+ "getStockPositions": {
+  "method": "GET",
+  "path": "/stock",
+  "contract": "inventory",
+  "summary": "Stock on hand by item and location",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "locationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "itemId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "includeZero",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "getStockTransfer": {
+  "method": "GET",
+  "path": "/stock-transfers/{transferId}",
+  "contract": "inventory",
+  "summary": "One transfer, its manifest and where it is",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
+ "getStockValuation": {
+  "method": "GET",
+  "path": "/stock/valuation",
+  "contract": "inventory",
+  "summary": "Stock value by location and category",
+  "permission": "LEDGER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "asAt",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "locationId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "StockValuation"
+ },
+ "getSuggestedRequisitions": {
+  "method": "GET",
+  "path": "/requisitions/suggested",
+  "contract": "inventory",
+  "summary": "Draft requisitions from reorder points",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "locationId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getSupplierPerformance": {
+  "method": "GET",
+  "path": "/suppliers/{supplierId}/performance",
+  "contract": "reporting",
+  "summary": "On-time, in-full, and what was rejected",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getVenueSettings": {
+  "method": "GET",
+  "path": "/venues/{venueId}/settings",
+  "contract": "tenancy",
+  "summary": "Operational settings for this venue",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VenueSettings"
+ },
+ "listGoodsReceipts": {
+  "method": "GET",
+  "path": "/goods-receipts",
+  "contract": "inventory",
+  "summary": "List goods receipts",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "purchaseOrderId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listInventoryItems": {
+  "method": "GET",
+  "path": "/inventory-items",
+  "contract": "inventory",
+  "summary": "List inventory items",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "belowReorderPoint",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listOrders": {
+  "method": "GET",
+  "path": "/orders",
+  "contract": "orders",
+  "summary": "List orders",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "shiftId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "createdFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "createdTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listPurchaseOrders": {
+  "method": "GET",
+  "path": "/purchase-orders",
+  "contract": "inventory",
+  "summary": "List purchase orders",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "supplierId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listRequisitions": {
+  "method": "GET",
+  "path": "/requisitions",
+  "contract": "inventory",
+  "summary": "List requisitions",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "raisedByPrincipalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listStockCounts": {
+  "method": "GET",
+  "path": "/stock-counts",
+  "contract": "inventory",
+  "summary": "List stock counts",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "locationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listStockLocations": {
+  "method": "GET",
+  "path": "/stock-locations",
+  "contract": "inventory",
+  "summary": "List stock locations",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "StockLocation"
+ },
+ "listStockMovements": {
+  "method": "GET",
+  "path": "/stock-movements",
+  "contract": "inventory",
+  "summary": "The movement ledger",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "itemId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "locationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "recordedFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "recordedTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listStockTransfers": {
+  "method": "GET",
+  "path": "/stock-transfers",
+  "contract": "inventory",
+  "summary": "List transfers",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listSuppliers": {
+  "method": "GET",
+  "path": "/suppliers",
+  "contract": "inventory",
+  "summary": "List suppliers",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "lookupInventoryItem": {
+  "method": "GET",
+  "path": "/inventory-items/lookup",
+  "contract": "inventory",
+  "summary": "Look up by barcode or SKU",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "barcode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "sku",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "InventoryItem"
+ },
+ "postStockCount": {
+  "method": "POST",
+  "path": "/stock-counts/{countId}/post",
+  "contract": "inventory",
+  "summary": "Post a count and adjust stock",
+  "permission": "LEDGER_POST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "StockCount"
+ },
+ "receiveStockTransfer": {
+  "method": "POST",
+  "path": "/stock-transfers/{transferId}/receive",
+  "contract": "inventory",
+  "summary": "Receive a transfer",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "StockTransfer"
+ },
+ "recordQuotation": {
+  "method": "POST",
+  "path": "/suppliers/{supplierId}/quotations",
+  "contract": "inventory",
+  "summary": "Record a supplier quotation",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateQuotationRequest",
+  "responds": "Quotation"
+ },
+ "recountStockCount": {
+  "method": "POST",
+  "path": "/stock-counts/{countId}/recount",
+  "contract": "inventory",
+  "summary": "Send a count back to be recounted",
+  "permission": "LEDGER_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "rejectReceivedGoods": {
+  "method": "POST",
+  "path": "/goods-receipts/{receiptId}/reject",
+  "contract": "inventory",
+  "summary": "Reject received goods",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GoodsReceipt"
+ },
+ "rejectRequisition": {
+  "method": "POST",
+  "path": "/requisitions/{requisitionId}/reject",
+  "contract": "inventory",
+  "summary": "Reject a requisition",
+  "permission": "LEDGER_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "requestRecount": {
+  "method": "POST",
+  "path": "/stock-counts/{countId}/recount",
+  "contract": "fnb",
+  "summary": "Send a line back to be counted again",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "returnRequisition": {
+  "method": "POST",
+  "path": "/requisitions/{requisitionId}/return",
+  "contract": "inventory",
+  "summary": "Return a requisition for more information",
+  "permission": "LEDGER_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "sendPurchaseOrder": {
+  "method": "POST",
+  "path": "/purchase-orders/{purchaseOrderId}/send",
+  "contract": "inventory",
+  "summary": "Issue the order to the supplier",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setItemAvailability": {
+  "method": "PUT",
+  "path": "/menu-items/{itemId}/availability",
+  "contract": "fnb",
+  "summary": "Mark an item available or eighty-sixed",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MenuItem"
+ },
+ "startStockCount": {
+  "method": "POST",
+  "path": "/stock-counts",
+  "contract": "inventory",
+  "summary": "Start a stock count",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "StartStockCountRequest",
+  "responds": "StockCount"
+ },
+ "updateInventoryItem": {
+  "method": "PATCH",
+  "path": "/inventory-items/{itemId}",
+  "contract": "inventory",
+  "summary": "Amend an item",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "InventoryItem"
+ },
+ "updateRequisitionLines": {
+  "method": "PUT",
+  "path": "/requisitions/{requisitionId}/lines",
+  "contract": "inventory",
+  "summary": "Change what an outlet is asking for, before it is approved",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "updateSupplier": {
+  "method": "PUT",
+  "path": "/suppliers/{supplierId}",
+  "contract": "inventory",
+  "summary": "Change terms, or stop buying from them",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ }
+}

@@ -1,0 +1,659 @@
+{
+ "addLicenceAddOn": {
+  "method": "POST",
+  "path": "/tenants/{tenantId}/licences/add-ons",
+  "contract": "subscription",
+  "summary": "License a module outside the plan",
+  "permission": "PLATFORM_TENANT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "LicenceAddOn",
+  "responds": "LicencePosition"
+ },
+ "createOrgUnit": {
+  "method": "POST",
+  "path": "/org-units",
+  "contract": "tenancy",
+  "summary": "Create a scope node",
+  "permission": "SCOPE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "brand",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateScopeNodeRequest",
+  "responds": "OrgUnit"
+ },
+ "createPartnerAgreement": {
+  "method": "POST",
+  "path": "/partner-agreements",
+  "contract": "subscription",
+  "summary": "Agree commercial terms with a partner",
+  "permission": "PARTNER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PartnerAgreement",
+  "responds": "PartnerAgreement"
+ },
+ "createPlan": {
+  "method": "POST",
+  "path": "/plans",
+  "contract": "subscription",
+  "summary": "Create a subscription plan",
+  "permission": "PLATFORM_PLAN_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreatePlanRequest",
+  "responds": "Plan"
+ },
+ "createPlanVersion": {
+  "method": "POST",
+  "path": "/plans/{planId}",
+  "contract": "subscription",
+  "summary": "Publish a new version of a plan",
+  "permission": "PLATFORM_PLAN_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreatePlanRequest",
+  "responds": "Plan"
+ },
+ "createTenant": {
+  "method": "POST",
+  "path": "/tenants",
+  "contract": "subscription",
+  "summary": "Create a tenant",
+  "permission": "PLATFORM_TENANT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateTenantRequest",
+  "responds": "Tenant"
+ },
+ "generateInvoice": {
+  "method": "POST",
+  "path": "/tenants/{tenantId}/invoices",
+  "contract": "subscription",
+  "summary": "Generate an invoice for a period",
+  "permission": "PLATFORM_BILLING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SubscriptionInvoice"
+ },
+ "getApiUsage": {
+  "method": "GET",
+  "path": "/api-usage",
+  "contract": "public-api",
+  "summary": "Calls, errors, latency and success rate",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApiUsageSummary"
+ },
+ "getCellCapacity": {
+  "method": "GET",
+  "path": "/cells/{cellId}/capacity",
+  "contract": "subscription",
+  "summary": "Load against headroom",
+  "permission": "PLATFORM_CELL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "window",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CellCapacity"
+ },
+ "getEntitlementUsage": {
+  "method": "GET",
+  "path": "/tenants/{tenantId}/entitlement-usage",
+  "contract": "subscription",
+  "summary": "Usage against licensed limits",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "EntitlementUsage"
+ },
+ "getPlan": {
+  "method": "GET",
+  "path": "/plans/{planId}",
+  "contract": "subscription",
+  "summary": "Read a plan",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Plan"
+ },
+ "getSsoConfig": {
+  "method": "GET",
+  "path": "/tenants/sso-config",
+  "contract": "identity",
+  "summary": "Read SSO configuration",
+  "permission": "USER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SsoProviderConfig"
+ },
+ "getSubscription": {
+  "method": "GET",
+  "path": "/tenants/{tenantId}/subscription",
+  "contract": "subscription",
+  "summary": "Read the current subscription",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Subscription"
+ },
+ "getTenant": {
+  "method": "GET",
+  "path": "/tenants/{tenantId}",
+  "contract": "subscription",
+  "summary": "Read a tenant with cells and subscription",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "TenantDetail"
+ },
+ "getTenantLicences": {
+  "method": "GET",
+  "path": "/tenants/{tenantId}/licences",
+  "contract": "subscription",
+  "summary": "What a tenant is licensed to use",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "LicencePosition"
+ },
+ "getUsageMetering": {
+  "method": "GET",
+  "path": "/tenants/{tenantId}/usage",
+  "contract": "subscription",
+  "summary": "Metered usage for a period",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "periodStart",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "periodEnd",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "metric",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "UsageReport"
+ },
+ "listApiClients": {
+  "method": "GET",
+  "path": "/api-clients",
+  "contract": "public-api",
+  "summary": "Registered clients for this developer",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ApiClient"
+ },
+ "listOrgUnits": {
+  "method": "GET",
+  "path": "/org-units",
+  "contract": "tenancy",
+  "summary": "List scope nodes visible to the session",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "under",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "level",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "includeInactive",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listPartnerAgreements": {
+  "method": "GET",
+  "path": "/partner-agreements",
+  "contract": "subscription",
+  "summary": "Commercial agreements with B2B partners",
+  "permission": "PARTNER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "expiringWithinDays",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PartnerAgreement"
+ },
+ "listPlans": {
+  "method": "GET",
+  "path": "/plans",
+  "contract": "subscription",
+  "summary": "List subscription plans",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Plan"
+ },
+ "listSubscriptionInvoices": {
+  "method": "GET",
+  "path": "/tenants/{tenantId}/invoices",
+  "contract": "subscription",
+  "summary": "List subscription invoices",
+  "permission": "PLATFORM_BILLING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listTenantCells": {
+  "method": "GET",
+  "path": "/tenants/{tenantId}/cells",
+  "contract": "subscription",
+  "summary": "List a tenant's cells",
+  "permission": "PLATFORM_CELL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Cell"
+ },
+ "listTenants": {
+  "method": "GET",
+  "path": "/tenants",
+  "contract": "subscription",
+  "summary": "List tenants",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "planId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "previewSubscriptionChange": {
+  "method": "POST",
+  "path": "/tenants/{tenantId}/subscription/preview",
+  "contract": "subscription",
+  "summary": "Preview the effect of a plan change",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SetSubscriptionRequest",
+  "responds": "SubscriptionPreview"
+ },
+ "provisionCell": {
+  "method": "POST",
+  "path": "/tenants/{tenantId}/cells",
+  "contract": "subscription",
+  "summary": "Provision a cell for a region",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ProvisionCellRequest",
+  "responds": null
+ },
+ "reactivateTenant": {
+  "method": "POST",
+  "path": "/tenants/{tenantId}/reactivate",
+  "contract": "subscription",
+  "summary": "Lift a suspension",
+  "permission": "PLATFORM_TENANT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Tenant"
+ },
+ "removeLicenceAddOn": {
+  "method": "DELETE",
+  "path": "/tenants/{tenantId}/licences/add-ons",
+  "contract": "subscription",
+  "summary": "Remove an add-on",
+  "permission": "PLATFORM_TENANT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "LicencePosition"
+ },
+ "setApiQuota": {
+  "method": "PUT",
+  "path": "/api-quotas",
+  "contract": "public-api",
+  "summary": "Rate limits and throttling per client",
+  "permission": "DEVELOPER_ADMIN",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApiQuota",
+  "responds": "ApiQuota"
+ },
+ "setSsoConfig": {
+  "method": "PUT",
+  "path": "/tenants/sso-config",
+  "contract": "identity",
+  "summary": "Configure an identity provider",
+  "permission": "USER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SsoProviderConfig",
+  "responds": "SsoProviderConfig"
+ },
+ "setSubscription": {
+  "method": "PUT",
+  "path": "/tenants/{tenantId}/subscription",
+  "contract": "subscription",
+  "summary": "Assign or change a subscription",
+  "permission": "PLATFORM_TENANT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SetSubscriptionRequest",
+  "responds": "Subscription"
+ },
+ "suspendTenant": {
+  "method": "POST",
+  "path": "/tenants/{tenantId}/suspend",
+  "contract": "subscription",
+  "summary": "Suspend a tenant",
+  "permission": "PLATFORM_TENANT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Tenant"
+ },
+ "terminateTenant": {
+  "method": "POST",
+  "path": "/tenants/{tenantId}/terminate",
+  "contract": "subscription",
+  "summary": "Begin termination",
+  "permission": "PLATFORM_TENANT_TERMINATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "updatePartnerAgreement": {
+  "method": "PATCH",
+  "path": "/partner-agreements/{agreementId}",
+  "contract": "subscription",
+  "summary": "Amend, suspend or terminate",
+  "permission": "PARTNER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "PartnerAgreement",
+  "responds": "PartnerAgreement"
+ },
+ "updateTenant": {
+  "method": "PATCH",
+  "path": "/tenants/{tenantId}",
+  "contract": "subscription",
+  "summary": "Amend tenant details",
+  "permission": "PLATFORM_TENANT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Tenant"
+ }
+}

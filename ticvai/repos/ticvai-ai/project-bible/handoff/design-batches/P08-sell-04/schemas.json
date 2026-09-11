@@ -1,0 +1,798 @@
+{
+ "Alert": {
+  "type": "object",
+  "x-ticvai-persistence": "reporting.alert",
+  "description": "A raised alert. **Acknowledged rather than dismissed** — CF-134 asked for it markable, and the difference is that an acknowledgement records who saw it.\n",
+  "required": [
+   "id",
+   "ruleId",
+   "raisedAt",
+   "severity",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "ruleId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "raisedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "info",
+     "warning",
+     "critical"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "raised",
+     "acknowledged",
+     "resolved",
+     "expired"
+    ]
+   },
+   "observedValue": {
+    "type": "number"
+   },
+   "threshold": {
+    "type": "number"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "acknowledgedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "acknowledgedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**Set when the metric returns to range, automatically.** An alert that only a person can close is an alert list that only grows.\n"
+   },
+   "escalatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Where `VenueSettings.alerting.escalateAfterMinutes` passed with no acknowledgement. **A critical alert nobody acknowledged is the case escalation exists for.**\n"
+   }
+  }
+ },
+ "FieldType": {
+  "type": "string",
+  "enum": [
+   "string",
+   "integer",
+   "decimal",
+   "money",
+   "boolean",
+   "date",
+   "dateTime",
+   "uuid",
+   "enum"
+  ]
+ },
+ "Incident": {
+  "x-ticvai-persistence": "maintenance.incident",
+  "type": "object",
+  "required": [
+   "id",
+   "incidentNumber",
+   "kind",
+   "severity",
+   "status",
+   "venueId",
+   "occurredAt",
+   "reportedByPrincipalId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "incidentNumber": {
+    "type": "string"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/IncidentKind"
+   },
+   "severity": {
+    "$ref": "#/components/schemas/IncidentSeverity"
+   },
+   "status": {
+    "$ref": "#/components/schemas/IncidentStatus"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "locationDescription": {
+    "type": "string",
+    "nullable": true
+   },
+   "isReportable": {
+    "type": "boolean",
+    "description": "Requires notification to an external authority within a statutory window."
+   },
+   "notificationDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "notifiedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "assignedToPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "reportedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "correctiveWorkOrderId": {
+    "type": "string",
+    "nullable": true
+   },
+   "occurredAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "closedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "IncidentKind": {
+  "type": "string",
+  "enum": [
+   "guestInjury",
+   "staffInjury",
+   "nearMiss",
+   "propertyDamage",
+   "equipmentFailure",
+   "securityIncident",
+   "fireOrEvacuation",
+   "foodSafety",
+   "environmental",
+   "other"
+  ]
+ },
+ "IncidentSeverity": {
+  "type": "string",
+  "enum": [
+   "nearMiss",
+   "minor",
+   "moderate",
+   "major",
+   "critical"
+  ]
+ },
+ "IncidentStatus": {
+  "type": "string",
+  "enum": [
+   "reported",
+   "underInvestigation",
+   "actionRequired",
+   "closed"
+  ]
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "ProfileDeployment": {
+  "type": "object",
+  "x-ticvai-persistence": "platform.profile_deployment",
+  "description": "**A deployment is an event with a date, a target and an outcome** — the client's board shows recent deployments with all three and the package had no record of any.\n**Staged rather than all-at-once by default.** Pushing a profile to 1,248 workstations simultaneously is how a venue discovers a bad profile at every till at the same moment.\n",
+  "required": [
+   "id",
+   "profileId",
+   "version",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "profileId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "version": {
+    "type": "integer"
+   },
+   "targetWorkstationIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "targetFilter": {
+    "type": "object",
+    "nullable": true,
+    "description": "By department, type or venue, where the target is a set rather than a list.",
+    "additionalProperties": true
+   },
+   "strategy": {
+    "type": "string",
+    "enum": [
+     "immediate",
+     "staged",
+     "onNextIdle"
+    ],
+    "default": "onNextIdle"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "queued",
+     "inProgress",
+     "completed",
+     "partiallyFailed",
+     "rolledBack"
+    ]
+   },
+   "succeededCount": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "failedCount": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "failureReasons": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "integer"
+    },
+    "description": "**Grouped, because 40 workstations failing for one reason is one problem** and a list of 40 rows is forty.\n"
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "ReportIncidentRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "kind",
+   "severity",
+   "venueId",
+   "description",
+   "occurredAt",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/IncidentKind"
+   },
+   "severity": {
+    "$ref": "#/components/schemas/IncidentSeverity"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "locationDescription": {
+    "type": "string",
+    "maxLength": 500
+   },
+   "description": {
+    "type": "string",
+    "minLength": 3,
+    "maxLength": 10000
+   },
+   "involvedSubjectIds": {
+    "type": "array",
+    "description": "Opaque references. Personal details live in the erasable store, so the incident record survives an erasure request intact.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "involvedStaffPrincipalIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "witnessCount": {
+    "type": "integer"
+   },
+   "firstAidGiven": {
+    "type": "boolean",
+    "default": false
+   },
+   "emergencyServicesCalled": {
+    "type": "boolean",
+    "default": false
+   },
+   "attachmentRefs": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "occurredAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "ReportResult": {
+  "x-ticvai-persistence": "none — result set, cached in object storage",
+  "type": "object",
+  "required": [
+   "executionId",
+   "columns",
+   "rows"
+  ],
+  "properties": {
+   "executionId": {
+    "type": "string"
+   },
+   "columns": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "key": {
+       "type": "string"
+      },
+      "label": {
+       "type": "string"
+      },
+      "type": {
+       "$ref": "#/components/schemas/FieldType"
+      }
+     }
+    }
+   },
+   "rows": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "additionalProperties": true
+    }
+   },
+   "totals": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "rowCount": {
+    "type": "integer"
+   },
+   "nextCursor": {
+    "type": "string",
+    "nullable": true
+   },
+   "generatedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "dataAsOf": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it prevents an argument about a figure that moved.\n"
+   }
+  }
+ },
+ "RunReportRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "properties": {
+   "parameters": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Narrows to one venue. Omitting it returns everything the caller's scope permits — it cannot be used to reach beyond that.\n"
+   },
+   "dateFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "dateTo": {
+    "type": "string",
+    "format": "date"
+   },
+   "forceAsync": {
+    "type": "boolean",
+    "default": false,
+    "description": "Queue regardless of size, for a result to be collected later."
+   }
+  }
+ },
+ "SaleBoard": {
+  "x-ticvai-persistence": "platform.sale_board",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "venueId",
+   "kind",
+   "pages"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/SaleBoardKind"
+   },
+   "pages": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "name",
+      "sortOrder",
+      "tiles"
+     ],
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "sortOrder": {
+       "type": "integer"
+      },
+      "tiles": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "required": [
+         "position",
+         "kind"
+        ],
+        "properties": {
+         "position": {
+          "type": "integer"
+         },
+         "kind": {
+          "type": "string",
+          "enum": [
+           "product",
+           "category",
+           "action",
+           "spacer"
+          ]
+         },
+         "variantId": {
+          "type": "string",
+          "format": "uuid",
+          "nullable": true
+         },
+         "label": {
+          "type": "string"
+         },
+         "colour": {
+          "type": "string",
+          "nullable": true
+         },
+         "imageAssetRef": {
+          "type": "string",
+          "nullable": true
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "SaleBoardKind": {
+  "type": "string",
+  "enum": [
+   "ticketing",
+   "fnb",
+   "retail",
+   "mixed"
+  ]
+ },
+ "StoreRule": {
+  "type": "object",
+  "x-ticvai-persistence": "retail.store_rule",
+  "description": "**Drafted 4 September.** One rule or control in force in a store - a discount limit, a refund threshold, an age check, a manager override. **A row rather than a config value** because somebody has to be able to say who changed a limit and when.",
+  "required": [
+   "id"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "discountLimit",
+     "refundThreshold",
+     "ageCheck",
+     "managerOverride",
+     "priceOverride"
+    ]
+   },
+   "thresholdMinor": {
+    "type": "integer"
+   },
+   "requiresPermission": {
+    "type": "string",
+    "description": "The permission a person needs to act past this rule."
+   },
+   "enabled": {
+    "type": "boolean"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "VenueSettings": {
+  "type": "object",
+  "x-ticvai-persistence": "platform.venue_settings",
+  "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "supportHours": {
+    "type": "object",
+    "description": "CF-100. **A venue decides whether its support desk is 24/7 or bounded, and the platform does not.** This was recorded as an open question for eleven days and was never one — the code is identical either way, and what was missing was somewhere to put the answer.\n",
+    "properties": {
+     "mode": {
+      "type": "string",
+      "enum": [
+       "alwaysOn",
+       "businessHours",
+       "custom",
+       "none"
+      ]
+     },
+     "timezone": {
+      "type": "string"
+     },
+     "windows": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "day": {
+         "type": "string",
+         "enum": [
+          "mon",
+          "tue",
+          "wed",
+          "thu",
+          "fri",
+          "sat",
+          "sun"
+         ]
+        },
+        "from": {
+         "type": "string"
+        },
+        "to": {
+         "type": "string"
+        }
+       }
+      }
+     },
+     "outOfHoursMessage": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   },
+   "quietHours": {
+    "type": "object",
+    "nullable": true,
+    "description": "**When the platform does not send.** A wallet low-balance alert at 3am is a complaint, and journeys and message triggers both respect this.\n**Operational messages ignore it** — a queue-turn alert is why a guest is holding the phone.\n",
+    "properties": {
+     "from": {
+      "type": "string"
+     },
+     "to": {
+      "type": "string"
+     }
+    }
+   },
+   "segregatedAccess": {
+    "type": "object",
+    "nullable": true,
+    "description": "CF-130. **Configured at venue level because it changes by region and the venue is where it is known** — a Ladies Night, a family session, a prayer-time closure.\n**The platform does not infer gender.** 3.2.45 asks for automatic gender recognition and 3.2.46 for rule-based facial recognition validation, and neither is built. Two reasons, and the second is the one that decided it:\n**A Ladies Night ticket is already gendered at the point of sale**, so the gate checks the entitlement the platform issued rather than the face in front of it — deterministic, auditable, and already contracted through `admissionRules`.\n**And these events are staffed.** A steward at the entrance is making the judgment anyway, and a classifier that overrules a person who can see more than it can is a machine and a human disagreeing while a guest waits.\n**`genderVerification` is a switch, not an implementation.** Where a venue's access hardware offers the capability and the venue chooses to use it, this turns it on — following ADR-0015's standards-first driver model, where the device does what the device does. **Not everything needs to be built.**\n",
+    "properties": {
+     "isEnabled": {
+      "type": "boolean",
+      "default": false
+     },
+     "appliesToAccessPointIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "schedule": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "day": {
+         "type": "string"
+        },
+        "from": {
+         "type": "string"
+        },
+        "to": {
+         "type": "string"
+        },
+        "admits": {
+         "type": "string",
+         "enum": [
+          "all",
+          "women",
+          "womenAndChildren",
+          "families",
+          "members"
+         ]
+        }
+       }
+      }
+     },
+     "entitlementGated": {
+      "type": "boolean",
+      "default": true,
+      "readOnly": true,
+      "description": "**Always true, and stated rather than assumed.** The gate admits on the entitlement. Everything below is advisory on top of that, and nothing replaces it.\n"
+     },
+     "genderVerification": {
+      "type": "string",
+      "enum": [
+       false,
+       "staffAssisted",
+       "deviceAssisted"
+      ],
+      "default": false,
+      "description": "`off` — the entitlement decides and a steward handles exceptions. **The default, and what is contracted.**\n`staffAssisted` — the steward's screen shows the ticket type so they can ask. No inference anywhere.\n`deviceAssisted` — **the venue's access hardware performs the check, not the platform.** Available only where the driver reports the capability, and the result is **advisory to the steward rather than decisive at the turnstile** (3.2.45 asks for rejection; this deviates deliberately).\n"
+     },
+     "overrideRateAlertThreshold": {
+      "type": "number",
+      "nullable": true,
+      "description": "Where `deviceAssisted` is on. **An override rate near zero means the steward has stopped deciding**, and that is the number that says whether the human safeguard is working or decorative.\n"
+     }
+    }
+   },
+   "alerting": {
+    "type": "object",
+    "description": "CF-134. **On-platform notification, marked as read.** Six contracts detect their own trouble and none told a person.\n**The panel is the default and email or WhatsApp only where the matrix names them** — an operational alert that arrives by email is an alert nobody sees in time.\n",
+    "properties": {
+     "channel": {
+      "type": "string",
+      "enum": [
+       "dashboardPanel",
+       "dashboardAndEmail",
+       "dashboardAndWhatsapp"
+      ],
+      "default": "dashboardPanel"
+     },
+     "acknowledgementRequired": {
+      "type": "boolean",
+      "default": true
+     },
+     "escalateAfterMinutes": {
+      "type": "integer",
+      "nullable": true
+     }
+    }
+   }
+  }
+ }
+}

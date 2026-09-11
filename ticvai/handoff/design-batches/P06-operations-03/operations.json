@@ -1,0 +1,1150 @@
+{
+ "addCaseMessage": {
+  "method": "POST",
+  "path": "/cases/{caseId}/messages",
+  "contract": "marketing-crm",
+  "summary": "Add a message or internal note",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CaseMessage"
+ },
+ "applyManualDiscount": {
+  "method": "POST",
+  "path": "/orders/{orderId}/discounts",
+  "contract": "orders",
+  "summary": "Apply a discount a cashier chose",
+  "permission": "ORDER_DISCOUNT",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ManualDiscountRequest",
+  "responds": "Order"
+ },
+ "callNextParties": {
+  "method": "POST",
+  "path": "/queues/{queueId}/call-next",
+  "contract": "queue",
+  "summary": "Call the next parties forward",
+  "permission": "QUEUE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "createCase": {
+  "method": "POST",
+  "path": "/cases",
+  "contract": "marketing-crm",
+  "summary": "Raise a service case",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateCaseRequest",
+  "responds": "Case"
+ },
+ "createChannelCapacity": {
+  "method": "POST",
+  "path": "/channel-capacities",
+  "contract": "catalogue",
+  "summary": "Create a capacity envelope",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateEnvelopeRequest",
+  "responds": "ChannelCapacity"
+ },
+ "createOrder": {
+  "method": "POST",
+  "path": "/orders",
+  "contract": "orders",
+  "summary": "Create an order",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateOrderRequest",
+  "responds": "Order"
+ },
+ "createRefund": {
+  "method": "POST",
+  "path": "/orders/{orderId}/refunds",
+  "contract": "orders",
+  "summary": "Refund an order, wholly or in part",
+  "permission": "ORDER_REFUND",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateRefundRequest",
+  "responds": null
+ },
+ "escalateCase": {
+  "method": "POST",
+  "path": "/cases/{caseId}/escalate",
+  "contract": "marketing-crm",
+  "summary": "Escalate a case",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Case"
+ },
+ "exchangeOrderLines": {
+  "method": "POST",
+  "path": "/orders/{orderId}/exchanges",
+  "contract": "orders",
+  "summary": "Exchange lines for different products or dates",
+  "permission": "ORDER_EXCHANGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ExchangeOrderRequest",
+  "responds": "OrderExchangeResult"
+ },
+ "getCase": {
+  "method": "GET",
+  "path": "/cases/{caseId}",
+  "contract": "marketing-crm",
+  "summary": "Read a case with its thread",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CaseDetail"
+ },
+ "getChannelAllocations": {
+  "method": "GET",
+  "path": "/channel-capacities/{channelCapacityId}/channel-allocations",
+  "contract": "catalogue",
+  "summary": "Capacity allocated to each channel",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ChannelAllocationSet"
+ },
+ "getIncident": {
+  "method": "GET",
+  "path": "/incidents/{incidentId}",
+  "contract": "maintenance",
+  "summary": "Read an incident",
+  "permission": "INCIDENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "IncidentDetail"
+ },
+ "getOrder": {
+  "method": "GET",
+  "path": "/orders/{orderId}",
+  "contract": "orders",
+  "summary": "Read an order",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Order"
+ },
+ "getOrderStatement": {
+  "method": "GET",
+  "path": "/orders/{orderId}/statement",
+  "contract": "orders",
+  "summary": "Full financial history of an order",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "OrderStatement"
+ },
+ "getProduct": {
+  "method": "GET",
+  "path": "/products/{productId}",
+  "contract": "catalogue",
+  "summary": "Read a product",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Product"
+ },
+ "getQueue": {
+  "method": "GET",
+  "path": "/queues/{queueId}",
+  "contract": "queue",
+  "summary": "Read a queue with live position",
+  "permission": "QUEUE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "QueueDetail"
+ },
+ "getVenueMap": {
+  "method": "GET",
+  "path": "/venue-maps/{mapId}",
+  "contract": "venue-map",
+  "summary": "A map with its points and paths",
+  "permission": "VENUE_MAP_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "version",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "VenueMapDetail"
+ },
+ "getVenueMapLive": {
+  "method": "GET",
+  "path": "/venue-maps/{mapId}/live",
+  "contract": "venue-map",
+  "summary": "The map with live operational state on it",
+  "permission": "VENUE_MAP_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
+ "getWaitTimes": {
+  "method": "GET",
+  "path": "/queues/wait-times",
+  "contract": "queue",
+  "summary": "Wait times across a venue",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "category",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WaitTime"
+ },
+ "holdOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/hold",
+  "contract": "orders",
+  "summary": "Park a sale and free the till",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Order"
+ },
+ "listAlternativeCodes": {
+  "method": "GET",
+  "path": "/products/{productId}/alternative-codes",
+  "contract": "catalogue",
+  "summary": "External identifiers for a product",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AlternativeCode"
+ },
+ "listAttendance": {
+  "method": "GET",
+  "path": "/attendance",
+  "contract": "workforce",
+  "summary": "Who was here",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "date",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "exceptionsOnly",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AttendanceRecord"
+ },
+ "listCases": {
+  "method": "GET",
+  "path": "/cases",
+  "contract": "marketing-crm",
+  "summary": "List service cases",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "assignedToPrincipalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "breachedSla",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "priority",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listChannelCapacities": {
+  "method": "GET",
+  "path": "/channel-capacities",
+  "contract": "catalogue",
+  "summary": "List capacity envelopes",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "performanceId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listDeliveryLocations": {
+  "method": "GET",
+  "path": "/venues/{venueId}/delivery-locations",
+  "contract": "fnb",
+  "summary": "Where an order can be delivered",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "servingOutletId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DeliveryLocation"
+ },
+ "listDiningOutlets": {
+  "method": "GET",
+  "path": "/venues/{venueId}/dining",
+  "contract": "fnb",
+  "summary": "Where a guest can eat, right now",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "openNow",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "orderingMethod",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DiningOutlet"
+ },
+ "listIncidents": {
+  "method": "GET",
+  "path": "/incidents",
+  "contract": "maintenance",
+  "summary": "List incidents",
+  "permission": "INCIDENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "severity",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "isReportable",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listOrderRefunds": {
+  "method": "GET",
+  "path": "/orders/{orderId}/refunds",
+  "contract": "orders",
+  "summary": "List refunds against an order",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Refund"
+ },
+ "listOrders": {
+  "method": "GET",
+  "path": "/orders",
+  "contract": "orders",
+  "summary": "List orders",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "shiftId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "createdFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "createdTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listProductVariants": {
+  "method": "GET",
+  "path": "/products/{productId}/variants",
+  "contract": "catalogue",
+  "summary": "List generated variants",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listProducts": {
+  "method": "GET",
+  "path": "/products",
+  "contract": "catalogue",
+  "summary": "List products",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "isSellable",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listQueueEntries": {
+  "method": "GET",
+  "path": "/queues/{queueId}/entries",
+  "contract": "queue",
+  "summary": "List entries in a queue",
+  "permission": "QUEUE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listQueues": {
+  "method": "GET",
+  "path": "/queues",
+  "contract": "queue",
+  "summary": "List queues",
+  "permission": "QUEUE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "openOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "modifyOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/modify",
+  "contract": "orders",
+  "summary": "Add or remove lines on an existing order",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ModifyOrderRequest",
+  "responds": "OrderModificationResult"
+ },
+ "recordAttendance": {
+  "method": "POST",
+  "path": "/attendance/clock",
+  "contract": "workforce",
+  "summary": "Clock in, clock out, or take a break",
+  "permission": "ATTENDANCE_RECORD",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AttendanceRecord"
+ },
+ "recordAuthorityNotification": {
+  "method": "POST",
+  "path": "/incidents/{incidentId}/notify-authority",
+  "contract": "maintenance",
+  "summary": "Record notification to an external authority",
+  "permission": "INCIDENT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Incident"
+ },
+ "relinquishChannelAllocation": {
+  "method": "POST",
+  "path": "/channel-capacities/{channelCapacityId}/channel-allocations/release",
+  "contract": "catalogue",
+  "summary": "Return unsold channel allocation to the general pool",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ChannelAllocationSet"
+ },
+ "reopenCase": {
+  "method": "POST",
+  "path": "/cases/{caseId}/reopen",
+  "contract": "marketing-crm",
+  "summary": "Reopen a resolved case",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "reportIncident": {
+  "method": "POST",
+  "path": "/incidents",
+  "contract": "maintenance",
+  "summary": "Report an incident",
+  "permission": "INCIDENT_REPORT",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ReportIncidentRequest",
+  "responds": "Incident"
+ },
+ "reprintOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/reprints",
+  "contract": "orders",
+  "summary": "Reprint or resend tickets",
+  "permission": "ORDER_REPRINT",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "rescheduleOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/reschedule",
+  "contract": "orders",
+  "summary": "Move an order to another performance",
+  "permission": "ORDER_RESCHEDULE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "OrderExchangeResult"
+ },
+ "resolveProductByCode": {
+  "method": "GET",
+  "path": "/products/resolve",
+  "contract": "catalogue",
+  "summary": "Resolve a partner code to a product",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "code",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProductVariant"
+ },
+ "resumeOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/resume",
+  "contract": "orders",
+  "summary": "Bring a parked sale back to a till",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "OrderResumeResult"
+ },
+ "setAlternativeCodes": {
+  "method": "PUT",
+  "path": "/products/{productId}/alternative-codes",
+  "contract": "catalogue",
+  "summary": "Set external identifiers",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AlternativeCode"
+ },
+ "setChannelAllocations": {
+  "method": "PUT",
+  "path": "/channel-capacities/{channelCapacityId}/channel-allocations",
+  "contract": "catalogue",
+  "summary": "Allocate envelope capacity across channels",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ChannelAllocationSet"
+ },
+ "setProductAttributes": {
+  "method": "PUT",
+  "path": "/products/{productId}/attributes",
+  "contract": "catalogue",
+  "summary": "Set the attribute axes for a product",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setQueueStatus": {
+  "method": "PUT",
+  "path": "/queues/{queueId}/status",
+  "contract": "queue",
+  "summary": "Open, pause or close a queue",
+  "permission": "QUEUE_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "QueueStatusResult"
+ },
+ "setWaitTime": {
+  "method": "PUT",
+  "path": "/queues/{queueId}/wait-time",
+  "contract": "queue",
+  "summary": "Manually set a wait time",
+  "permission": "QUEUE_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WaitTime"
+ },
+ "transitionProductLifecycle": {
+  "method": "POST",
+  "path": "/products/{productId}/lifecycle",
+  "contract": "catalogue",
+  "summary": "Move a product through its lifecycle",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Product"
+ },
+ "updateCase": {
+  "method": "PATCH",
+  "path": "/cases/{caseId}",
+  "contract": "marketing-crm",
+  "summary": "Assign, reprioritise or resolve a case",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Case"
+ },
+ "updateChannelCapacity": {
+  "method": "PATCH",
+  "path": "/channel-capacities/{channelCapacityId}",
+  "contract": "catalogue",
+  "summary": "Amend an envelope",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ChannelCapacity"
+ },
+ "updateIncident": {
+  "method": "PATCH",
+  "path": "/incidents/{incidentId}",
+  "contract": "maintenance",
+  "summary": "Investigate, escalate or close an incident",
+  "permission": "INCIDENT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Incident"
+ },
+ "voidOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/voids",
+  "contract": "orders",
+  "summary": "Void an order",
+  "permission": "ORDER_VOID",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Order"
+ }
+}

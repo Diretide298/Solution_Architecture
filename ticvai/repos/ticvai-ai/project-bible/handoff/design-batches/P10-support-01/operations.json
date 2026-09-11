@@ -1,0 +1,154 @@
+{
+ "addCaseMessage": {
+  "method": "POST",
+  "path": "/cases/{caseId}/messages",
+  "contract": "marketing-crm",
+  "summary": "Add a message or internal note",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CaseMessage"
+ },
+ "createCase": {
+  "method": "POST",
+  "path": "/cases",
+  "contract": "marketing-crm",
+  "summary": "Raise a service case",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateCaseRequest",
+  "responds": "Case"
+ },
+ "escalateCase": {
+  "method": "POST",
+  "path": "/cases/{caseId}/escalate",
+  "contract": "marketing-crm",
+  "summary": "Escalate a case",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Case"
+ },
+ "getCase": {
+  "method": "GET",
+  "path": "/cases/{caseId}",
+  "contract": "marketing-crm",
+  "summary": "Read a case with its thread",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CaseDetail"
+ },
+ "listCases": {
+  "method": "GET",
+  "path": "/cases",
+  "contract": "marketing-crm",
+  "summary": "List service cases",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "assignedToPrincipalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "breachedSla",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "priority",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "reopenCase": {
+  "method": "POST",
+  "path": "/cases/{caseId}/reopen",
+  "contract": "marketing-crm",
+  "summary": "Reopen a resolved case",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "updateCase": {
+  "method": "PATCH",
+  "path": "/cases/{caseId}",
+  "contract": "marketing-crm",
+  "summary": "Assign, reprioritise or resolve a case",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Case"
+ }
+}

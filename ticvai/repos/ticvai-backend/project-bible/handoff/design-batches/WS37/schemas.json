@@ -1,0 +1,1405 @@
+{
+ "BulkPricingUpdateImportMassMaintenanceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Bulk Pricing Update, Import & Mass Maintenance displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "byType": {
+    "type": "string",
+    "enum": [
+     "priceList",
+     "product",
+     "productFamily",
+     "category",
+     "venue",
+     "market",
+     "currency",
+     "rateType",
+     "channel",
+     "effectivePeriod"
+    ],
+    "description": "Vocabulary listed under Select by."
+   },
+   "increaseBy": {
+    "type": "number",
+    "description": "Increase by %"
+   },
+   "decreaseBy": {
+    "type": "number",
+    "description": "Decrease by %"
+   },
+   "increaseFixedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Increase Fixed Amount"
+   },
+   "decreaseFixedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Decrease Fixed Amount"
+   },
+   "changeCurrency": {
+    "type": "string",
+    "description": "Change Currency"
+   },
+   "activateDeactivate": {
+    "type": "string",
+    "description": "Activate/Deactivate"
+   },
+   "increase5": {
+    "type": "number",
+    "description": "Increase 5%"
+   },
+   "csvXlsxPricingFiles": {
+    "type": "string",
+    "description": "CSV/XLSX pricing files"
+   },
+   "priceLists": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price lists"
+   },
+   "rateValues": {
+    "type": "number",
+    "description": "Rate values"
+   },
+   "effectiveDates": {
+    "type": "string",
+    "description": "Effective dates"
+   },
+   "mappings": {
+    "type": "string",
+    "description": "Mappings"
+   },
+   "invalidProduct": {
+    "type": "string",
+    "description": "Invalid Product"
+   },
+   "unknownRateCode": {
+    "type": "number",
+    "description": "Unknown Rate Code"
+   },
+   "unsupportedCurrency": {
+    "type": "string",
+    "description": "Unsupported Currency"
+   },
+   "missingMandatoryField": {
+    "type": "string",
+    "description": "Missing Mandatory Field"
+   },
+   "invalidDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Invalid Date"
+   },
+   "invalidAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Invalid Amount"
+   },
+   "recordsRead5420": {
+    "type": "string",
+    "description": "Records Read: 5,420"
+   },
+   "valid5371": {
+    "type": "string",
+    "description": "Valid: 5,371"
+   },
+   "warnings37": {
+    "type": "string",
+    "description": "Warnings: 37"
+   },
+   "errors12": {
+    "type": "integer",
+    "description": "Errors: 12"
+   }
+  }
+ },
+ "PricingApprovalWorkflowAuthorityMatrixInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.channel_allocation at 4%, so this is not an update to anything the package stores today and no new table has been decided",
+  "description": "**What Pricing Approval Workflow & Authority Matrix submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.\n\n**The pack defines this as a record**, under *Every approval action records* - one of only 13 drafted writes that does. That is the client writing a row rather than a screen, and it is where the table conversation should start.",
+  "properties": {
+   "change": {
+    "type": "number",
+    "description": "Change %"
+   },
+   "monetaryImpact": {
+    "type": "string",
+    "description": "Monetary Impact"
+   },
+   "revenueImpact": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue Impact"
+   },
+   "priceList": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price List"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "legalEntity": {
+    "type": "string",
+    "description": "Legal Entity"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "taxChange": {
+    "type": "string",
+    "description": "Tax Change"
+   },
+   "feeChange": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fee Change"
+   },
+   "emergencyStatus": {
+    "type": "string",
+    "description": "Emergency Status"
+   },
+   "commercialDirector": {
+    "type": "string",
+    "description": "Commercial Director +"
+   },
+   "financeCompliance": {
+    "type": "string",
+    "description": "Finance + Compliance"
+   },
+   "returnForModification": {
+    "type": "string",
+    "description": "Return for Modification"
+   },
+   "requestInformation": {
+    "type": "string",
+    "description": "Request Information"
+   },
+   "delegate": {
+    "type": "string",
+    "description": "Delegate"
+   },
+   "expectedApprovalTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expected Approval Time"
+   },
+   "escalation": {
+    "type": "string",
+    "description": "Escalation"
+   },
+   "reminder": {
+    "type": "string",
+    "description": "Reminder"
+   },
+   "alternateApprover": {
+    "type": "string",
+    "description": "Alternate Approver"
+   },
+   "user": {
+    "type": "string",
+    "description": "User"
+   },
+   "role": {
+    "type": "string",
+    "description": "Role"
+   },
+   "dateTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date/Time"
+   },
+   "decision": {
+    "type": "string",
+    "description": "Decision"
+   },
+   "comment": {
+    "type": "string",
+    "description": "Comment"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version"
+   }
+  },
+  "x-ticvai-record-definition": "Every approval action records"
+ },
+ "PricingApprovalWorkflowAuthorityMatrixView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Pricing Approval Workflow & Authority Matrix displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "change": {
+    "type": "number",
+    "description": "Change %"
+   },
+   "monetaryImpact": {
+    "type": "string",
+    "description": "Monetary Impact"
+   },
+   "revenueImpact": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue Impact"
+   },
+   "priceList": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price List"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "legalEntity": {
+    "type": "string",
+    "description": "Legal Entity"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "taxChange": {
+    "type": "string",
+    "description": "Tax Change"
+   },
+   "feeChange": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fee Change"
+   },
+   "emergencyStatus": {
+    "type": "string",
+    "description": "Emergency Status"
+   },
+   "commercialDirector": {
+    "type": "string",
+    "description": "Commercial Director +"
+   },
+   "financeCompliance": {
+    "type": "string",
+    "description": "Finance + Compliance"
+   },
+   "returnForModification": {
+    "type": "string",
+    "description": "Return for Modification"
+   },
+   "requestInformation": {
+    "type": "string",
+    "description": "Request Information"
+   },
+   "delegate": {
+    "type": "string",
+    "description": "Delegate"
+   },
+   "expectedApprovalTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expected Approval Time"
+   },
+   "escalation": {
+    "type": "string",
+    "description": "Escalation"
+   },
+   "reminder": {
+    "type": "string",
+    "description": "Reminder"
+   },
+   "alternateApprover": {
+    "type": "string",
+    "description": "Alternate Approver"
+   },
+   "user": {
+    "type": "string",
+    "description": "User"
+   },
+   "role": {
+    "type": "string",
+    "description": "Role"
+   },
+   "dateTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date/Time"
+   },
+   "decision": {
+    "type": "string",
+    "description": "Decision"
+   },
+   "comment": {
+    "type": "string",
+    "description": "Comment"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version"
+   }
+  }
+ },
+ "PricingChangeImpactAnalysisView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Pricing Change Impact Analysis displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "products": {
+    "type": "string",
+    "description": "Products"
+   },
+   "events": {
+    "type": "string",
+    "description": "Events"
+   },
+   "performances": {
+    "type": "string",
+    "description": "Performances"
+   },
+   "venues": {
+    "type": "string",
+    "description": "Venues"
+   },
+   "markets": {
+    "type": "string",
+    "description": "Markets"
+   },
+   "channels": {
+    "type": "string",
+    "description": "Channels"
+   },
+   "b2bPartners": {
+    "type": "string",
+    "description": "B2B Partners"
+   },
+   "memberships": {
+    "type": "string",
+    "description": "Memberships"
+   },
+   "packages": {
+    "type": "string",
+    "description": "Packages"
+   },
+   "existingReservations": {
+    "type": "string",
+    "description": "Existing Reservations"
+   },
+   "futureReservations": {
+    "type": "string",
+    "description": "Future Reservations"
+   },
+   "apis": {
+    "type": "string",
+    "description": "APIs"
+   },
+   "integrations": {
+    "type": "string",
+    "description": "Integrations"
+   },
+   "currentRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Current Revenue"
+   },
+   "projectedRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Projected Revenue"
+   },
+   "averagePriceChange": {
+    "type": "number",
+    "description": "Average Price Change"
+   },
+   "maximumChange": {
+    "type": "string",
+    "description": "Maximum Change"
+   },
+   "minimumChange": {
+    "type": "string",
+    "description": "Minimum Change"
+   },
+   "marginImpact": {
+    "type": "number",
+    "description": "Margin Impact"
+   },
+   "customerExposure": {
+    "type": "string",
+    "description": "Customer Exposure"
+   },
+   "transactionVolume": {
+    "type": "integer",
+    "description": "Transaction Volume"
+   },
+   "aed34m": {
+    "type": "string",
+    "description": "+AED 3.4M"
+   },
+   "derivedRates": {
+    "type": "integer",
+    "description": "Derived Rates"
+   },
+   "contractRates": {
+    "type": "integer",
+    "description": "Contract Rates"
+   },
+   "membershipRates": {
+    "type": "integer",
+    "description": "Membership Rates"
+   },
+   "groupRates": {
+    "type": "integer",
+    "description": "Group Rates"
+   },
+   "promotions": {
+    "type": "integer",
+    "description": "Promotions"
+   },
+   "dynamicPricingGuardrails": {
+    "type": "integer",
+    "description": "Dynamic Pricing Guardrails"
+   },
+   "existingOrdersNo": {
+    "type": "string",
+    "description": "Existing Orders: No"
+   },
+   "existingReservationsNo": {
+    "type": "string",
+    "description": "Existing Reservations: No"
+   },
+   "futureUnsoldInventoryYes": {
+    "type": "string",
+    "description": "Future Unsold Inventory: Yes"
+   },
+   "basedOnConfigurableCriteria": {
+    "type": "string",
+    "description": "based on configurable criteria"
+   }
+  }
+ },
+ "PricingChangeRequestWorkspaceInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.entitlement_template at 3%, so this is not an update to anything the package stores today and no new table has been decided",
+  "description": "**What Pricing Change Request & Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "changeId": {
+    "type": "string",
+    "description": "Change ID"
+   },
+   "changeName": {
+    "type": "string",
+    "description": "Change Name"
+   },
+   "changeType": {
+    "type": "string",
+    "description": "Change Type"
+   },
+   "businessReason": {
+    "type": "string",
+    "description": "Business Reason"
+   },
+   "requestedBy": {
+    "type": "string",
+    "description": "Requested By"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "businessUnit": {
+    "type": "string",
+    "description": "Business Unit"
+   },
+   "legalEntity": {
+    "type": "string",
+    "description": "Legal Entity"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "effectiveDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Effective Date"
+   },
+   "expiryDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry Date"
+   },
+   "priority": {
+    "type": "string",
+    "description": "Priority"
+   },
+   "supportingNotes": {
+    "type": "string",
+    "description": "Supporting Notes"
+   },
+   "attachments": {
+    "type": "string",
+    "description": "Attachments"
+   },
+   "priceChange": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price Change"
+   },
+   "newRate": {
+    "type": "integer",
+    "description": "New Rate"
+   },
+   "rateRemoval": {
+    "type": "number",
+    "description": "Rate Removal"
+   },
+   "priceListChange": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price List Change"
+   },
+   "eligibilityRuleChange": {
+    "type": "string",
+    "description": "Eligibility Rule Change"
+   },
+   "taxChange": {
+    "type": "string",
+    "description": "Tax Change"
+   },
+   "feeChange": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fee Change"
+   },
+   "formulaChange": {
+    "type": "string",
+    "description": "Formula Change"
+   },
+   "currencyRoundingChange": {
+    "type": "string",
+    "description": "Currency/Rounding Change"
+   },
+   "emergencyChange": {
+    "type": "string",
+    "description": "Emergency Change"
+   },
+   "multipleProducts": {
+    "type": "string",
+    "description": "Multiple Products"
+   },
+   "multipleRates": {
+    "type": "string",
+    "description": "Multiple Rates"
+   },
+   "multipleVenues": {
+    "type": "string",
+    "description": "Multiple Venues"
+   },
+   "multipleMarkets": {
+    "type": "string",
+    "description": "Multiple Markets"
+   },
+   "reasonsType": {
+    "type": "string",
+    "enum": [
+     "annualPriceReview",
+     "newSeason",
+     "commercialStrategy",
+     "contractUpdate",
+     "regulatoryChange",
+     "costIncrease",
+     "marketAdjustment",
+     "correction",
+     "emergency"
+    ],
+    "description": "Vocabulary listed under Standard reasons."
+   }
+  }
+ },
+ "PricingChangeRequestWorkspaceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Pricing Change Request & Workspace displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "changeId": {
+    "type": "string",
+    "description": "Change ID"
+   },
+   "changeName": {
+    "type": "string",
+    "description": "Change Name"
+   },
+   "changeType": {
+    "type": "string",
+    "description": "Change Type"
+   },
+   "businessReason": {
+    "type": "string",
+    "description": "Business Reason"
+   },
+   "requestedBy": {
+    "type": "string",
+    "description": "Requested By"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "businessUnit": {
+    "type": "string",
+    "description": "Business Unit"
+   },
+   "legalEntity": {
+    "type": "string",
+    "description": "Legal Entity"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "effectiveDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Effective Date"
+   },
+   "expiryDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry Date"
+   },
+   "priority": {
+    "type": "string",
+    "description": "Priority"
+   },
+   "supportingNotes": {
+    "type": "string",
+    "description": "Supporting Notes"
+   },
+   "attachments": {
+    "type": "string",
+    "description": "Attachments"
+   },
+   "priceChange": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price Change"
+   },
+   "newRate": {
+    "type": "integer",
+    "description": "New Rate"
+   },
+   "rateRemoval": {
+    "type": "number",
+    "description": "Rate Removal"
+   },
+   "priceListChange": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price List Change"
+   },
+   "eligibilityRuleChange": {
+    "type": "string",
+    "description": "Eligibility Rule Change"
+   },
+   "taxChange": {
+    "type": "string",
+    "description": "Tax Change"
+   },
+   "feeChange": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fee Change"
+   },
+   "formulaChange": {
+    "type": "string",
+    "description": "Formula Change"
+   },
+   "currencyRoundingChange": {
+    "type": "string",
+    "description": "Currency/Rounding Change"
+   },
+   "emergencyChange": {
+    "type": "string",
+    "description": "Emergency Change"
+   },
+   "difference": {
+    "type": "string",
+    "description": "Difference (the pack shows +AED 25 / +10%)"
+   },
+   "multipleProducts": {
+    "type": "string",
+    "description": "Multiple Products"
+   },
+   "multipleRates": {
+    "type": "string",
+    "description": "Multiple Rates"
+   },
+   "multipleVenues": {
+    "type": "string",
+    "description": "Multiple Venues"
+   },
+   "multipleMarkets": {
+    "type": "string",
+    "description": "Multiple Markets"
+   },
+   "reasonsType": {
+    "type": "string",
+    "enum": [
+     "annualPriceReview",
+     "newSeason",
+     "commercialStrategy",
+     "contractUpdate",
+     "regulatoryChange",
+     "costIncrease",
+     "marketAdjustment",
+     "correction",
+     "emergency"
+    ],
+    "description": "Vocabulary listed under Standard reasons."
+   }
+  }
+ },
+ "PricingDistributionSynchronizationPublicationMonitorView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Pricing Distribution, Synchronization & Publication Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "b2c": {
+    "type": "string",
+    "description": "B2C"
+   },
+   "mobileApp": {
+    "type": "string",
+    "description": "Mobile App"
+   },
+   "pos": {
+    "type": "integer",
+    "description": "POS"
+   },
+   "mobilePos": {
+    "type": "integer",
+    "description": "Mobile POS"
+   },
+   "kiosk": {
+    "type": "string",
+    "description": "Kiosk"
+   },
+   "callCenter": {
+    "type": "string",
+    "description": "Call Center"
+   },
+   "b2b": {
+    "type": "string",
+    "description": "B2B"
+   },
+   "reseller": {
+    "type": "string",
+    "description": "Reseller"
+   },
+   "ota": {
+    "type": "string",
+    "description": "OTA"
+   },
+   "apis": {
+    "type": "integer",
+    "description": "APIs"
+   },
+   "cacheCdnWhereApplicable": {
+    "type": "string",
+    "description": "Cache/CDN where applicable"
+   },
+   "externalIntegratedSystems": {
+    "type": "integer",
+    "description": "External Integrated Systems"
+   },
+   "queue": {
+    "type": "string",
+    "description": "Queue"
+   },
+   "investigate": {
+    "type": "string",
+    "description": "Investigate"
+   },
+   "rollbackTarget": {
+    "type": "string",
+    "description": "Rollback Target"
+   },
+   "channels": {
+    "type": "string",
+    "description": "channels"
+   },
+   "publicationStarted": {
+    "type": "string",
+    "description": "Publication Started"
+   },
+   "lastUpdated": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last Updated"
+   },
+   "recordsPublished": {
+    "type": "string",
+    "description": "Records Published"
+   },
+   "recordsFailed": {
+    "type": "integer",
+    "description": "Records Failed"
+   },
+   "latency": {
+    "type": "string",
+    "description": "Latency"
+   },
+   "targetVersion": {
+    "type": "string",
+    "description": "Target Version"
+   }
+  }
+ },
+ "PricingGovernanceCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Pricing Governance Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "pricingChangesInDraft": {
+    "type": "string",
+    "description": "Pricing Changes in Draft"
+   },
+   "pendingValidation": {
+    "type": "integer",
+    "description": "Pending Validation"
+   },
+   "pendingApproval": {
+    "type": "integer",
+    "description": "Pending Approval"
+   },
+   "approvedChanges": {
+    "type": "integer",
+    "description": "Approved Changes"
+   },
+   "scheduledPublications": {
+    "type": "integer",
+    "description": "Scheduled Publications"
+   },
+   "publishedToday": {
+    "type": "string",
+    "description": "Published Today"
+   },
+   "failedPublications": {
+    "type": "integer",
+    "description": "Failed Publications"
+   },
+   "emergencyChanges": {
+    "type": "integer",
+    "description": "Emergency Changes"
+   },
+   "rollbacks": {
+    "type": "integer",
+    "description": "Rollbacks"
+   },
+   "expiringPrices": {
+    "type": "integer",
+    "description": "Expiring Prices"
+   },
+   "governanceExceptions": {
+    "type": "integer",
+    "description": "Governance Exceptions"
+   },
+   "highRiskChanges": {
+    "type": "integer",
+    "description": "High-Risk Changes"
+   },
+   "by": {
+    "type": "string",
+    "description": "By"
+   },
+   "aed": {
+    "type": "string",
+    "description": "−AED"
+   },
+   "bulkUpdate": {
+    "type": "string",
+    "description": "Bulk Update"
+   }
+  }
+ },
+ "PricingHistoryAuditComplianceExplorerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Pricing History, Audit & Compliance Explorer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "oldValueNewValue": {
+    "type": "string",
+    "description": "Old Value → New Value"
+   },
+   "plus": {
+    "type": "string",
+    "description": "plus"
+   },
+   "changedBy": {
+    "type": "string",
+    "description": "Changed By"
+   },
+   "dateTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date/Time"
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason"
+   },
+   "source": {
+    "type": "string",
+    "description": "Source"
+   },
+   "effectiveDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Effective Date"
+   },
+   "publication": {
+    "type": "string",
+    "description": "Publication"
+   },
+   "configurationAudit": {
+    "type": "string",
+    "description": "Configuration Audit"
+   },
+   "approvalAudit": {
+    "type": "string",
+    "description": "Approval Audit"
+   },
+   "publicationAudit": {
+    "type": "string",
+    "description": "Publication Audit"
+   },
+   "synchronizationAudit": {
+    "type": "string",
+    "description": "Synchronization Audit"
+   },
+   "rollbackAudit": {
+    "type": "string",
+    "description": "Rollback Audit"
+   },
+   "emergencyActionAudit": {
+    "type": "string",
+    "description": "Emergency Action Audit"
+   },
+   "internalAudit": {
+    "type": "string",
+    "description": "Internal Audit"
+   },
+   "finance": {
+    "type": "string",
+    "description": "Finance"
+   },
+   "compliance": {
+    "type": "string",
+    "description": "Compliance"
+   },
+   "regulatoryReview": {
+    "type": "string",
+    "description": "Regulatory Review"
+   },
+   "producedThisPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "produced this price?"
+   },
+   "whatPricesExist": {
+    "type": "string",
+    "description": "What prices exist?"
+   },
+   "price": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "price?"
+   },
+   "inBoards6And7": {
+    "type": "string",
+    "description": "in Boards 6 and 7"
+   },
+   "respectingCommercialGuardrails": {
+    "type": "string",
+    "description": "respecting commercial guardrails"
+   },
+   "guardrailsResolvedDynamicPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Guardrails → Resolved Dynamic Price"
+   }
+  }
+ },
+ "PricingPublicationEffectiveDateSchedulerInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Pricing Publication & Effective-Date Scheduler submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "scheduledPublication": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Scheduled Publication"
+   },
+   "futureEffectiveDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Future Effective Date"
+   },
+   "stagedPublication": {
+    "type": "string",
+    "description": "Staged Publication"
+   },
+   "marketByMarket": {
+    "type": "string",
+    "description": "Market-by-Market"
+   },
+   "venueByVenue": {
+    "type": "string",
+    "description": "Venue-by-Venue"
+   },
+   "channelByChannel": {
+    "type": "string",
+    "description": "Channel-by-Channel"
+   },
+   "theseDatesMayDiffer": {
+    "type": "string",
+    "description": "These dates may differ"
+   },
+   "approvalComplete": {
+    "type": "string",
+    "description": "Approval Complete"
+   },
+   "validationPassed": {
+    "type": "string",
+    "description": "Validation Passed"
+   },
+   "noCriticalConflicts": {
+    "type": "string",
+    "description": "No Critical Conflicts"
+   },
+   "dependenciesAvailable": {
+    "type": "string",
+    "description": "Dependencies Available"
+   },
+   "channelsReady": {
+    "type": "string",
+    "description": "Channels Ready"
+   },
+   "effectiveDatesValid": {
+    "type": "string",
+    "description": "Effective Dates Valid"
+   }
+  }
+ },
+ "PricingPublicationEffectiveDateSchedulerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Pricing Publication & Effective-Date Scheduler displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "scheduledPublication": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Scheduled Publication"
+   },
+   "futureEffectiveDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Future Effective Date"
+   },
+   "stagedPublication": {
+    "type": "string",
+    "description": "Staged Publication"
+   },
+   "marketByMarket": {
+    "type": "string",
+    "description": "Market-by-Market"
+   },
+   "venueByVenue": {
+    "type": "string",
+    "description": "Venue-by-Venue"
+   },
+   "channelByChannel": {
+    "type": "string",
+    "description": "Channel-by-Channel"
+   },
+   "publicationDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Publication Date"
+   },
+   "effectiveDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Effective Date"
+   },
+   "expiryDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry Date"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version"
+   },
+   "theseDatesMayDiffer": {
+    "type": "string",
+    "description": "These dates may differ"
+   },
+   "approvalComplete": {
+    "type": "string",
+    "description": "Approval Complete"
+   },
+   "validationPassed": {
+    "type": "string",
+    "description": "Validation Passed"
+   },
+   "noCriticalConflicts": {
+    "type": "string",
+    "description": "No Critical Conflicts"
+   },
+   "dependenciesAvailable": {
+    "type": "string",
+    "description": "Dependencies Available"
+   },
+   "channelsReady": {
+    "type": "string",
+    "description": "Channels Ready"
+   },
+   "effectiveDatesValid": {
+    "type": "string",
+    "description": "Effective Dates Valid"
+   }
+  }
+ },
+ "PricingRollbackEmergencyControlCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Pricing Rollback & Emergency Control Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "previousVersion": {
+    "type": "string",
+    "description": "Previous Version"
+   },
+   "selectedVersion": {
+    "type": "string",
+    "description": "Selected Version"
+   },
+   "previousPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Previous Price"
+   },
+   "commercialBaseline": {
+    "type": "string",
+    "description": "Commercial Baseline"
+   },
+   "selectedProducts": {
+    "type": "string",
+    "description": "Selected Products"
+   },
+   "selectedVenue": {
+    "type": "string",
+    "description": "Selected Venue"
+   },
+   "selectedMarket": {
+    "type": "string",
+    "description": "Selected Market"
+   },
+   "selectedChannel": {
+    "type": "string",
+    "description": "Selected Channel"
+   },
+   "entirePublication": {
+    "type": "string",
+    "description": "Entire Publication"
+   },
+   "version53": {
+    "type": "string",
+    "description": "Version 5.3"
+   },
+   "incorrectAdultRate": {
+    "type": "number",
+    "description": "Incorrect Adult Rate"
+   },
+   "version52": {
+    "type": "string",
+    "description": "Version 5.2"
+   },
+   "dubaiVenueOnly": {
+    "type": "string",
+    "description": "Dubai Venue only"
+   },
+   "productsAffected": {
+    "type": "string",
+    "description": "Products Affected"
+   },
+   "channelsAffected": {
+    "type": "string",
+    "description": "Channels Affected"
+   },
+   "transactionsSinceActivation": {
+    "type": "string",
+    "description": "Transactions Since Activation"
+   },
+   "revenueExposure": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue Exposure"
+   },
+   "existingOrders": {
+    "type": "string",
+    "description": "Existing Orders"
+   },
+   "futureSales": {
+    "type": "string",
+    "description": "Future Sales"
+   },
+   "stopScheduledPublication": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Stop Scheduled Publication"
+   },
+   "stopDistribution": {
+    "type": "string",
+    "description": "Stop Distribution"
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason"
+   },
+   "authorizedRole": {
+    "type": "string",
+    "description": "Authorized Role"
+   },
+   "incidentReference": {
+    "type": "string",
+    "description": "Incident Reference"
+   },
+   "timestamp": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Timestamp"
+   }
+  }
+ },
+ "PricingVersionBaselineManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Pricing Version & Baseline Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "version": {
+    "type": "string",
+    "description": "Version"
+   },
+   "priceList": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price List"
+   },
+   "createdDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Created Date"
+   },
+   "effectiveDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Effective Date"
+   },
+   "createdBy": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Created By"
+   },
+   "changeRequest": {
+    "type": "string",
+    "description": "Change Request"
+   },
+   "productCount": {
+    "type": "integer",
+    "description": "Product Count"
+   },
+   "changeCount": {
+    "type": "integer",
+    "description": "Change Count"
+   },
+   "status": {
+    "type": "integer",
+    "description": "Status"
+   },
+   "version42": {
+    "type": "string",
+    "description": "Version 4.2"
+   },
+   "version43": {
+    "type": "string",
+    "description": "Version 4.3"
+   },
+   "added": {
+    "type": "string",
+    "description": "Added"
+   },
+   "removed": {
+    "type": "string",
+    "description": "Removed"
+   },
+   "modified": {
+    "type": "string",
+    "description": "Modified"
+   },
+   "unchanged": {
+    "type": "string",
+    "description": "Unchanged"
+   },
+   "rateV42V43": {
+    "type": "number",
+    "description": "Rate V4.2 V4.3"
+   },
+   "ce": {
+    "type": "string",
+    "description": "ce"
+   },
+   "adult10": {
+    "type": "number",
+    "description": "Adult +10%"
+   },
+   "child83": {
+    "type": "number",
+    "description": "Child +8.3%"
+   },
+   "r190200": {
+    "type": "string",
+    "description": "r 190 200"
+   },
+   "transactionOccurred": {
+    "type": "string",
+    "description": "transaction occurred"
+   }
+  }
+ }
+}

@@ -1,0 +1,134 @@
+id: F203
+name: 'Rental Management board 7: Active Rental Operations Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Rental Management board 7. **This route is read from the
+    screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-554
+  entryPoints:
+  - Arrives at Active Rental Operations Command Center
+steps:
+- step: 1
+  screen: BO-554
+  action: Opens Active Rental Operations Command Center
+  operations: []
+  outcome: Provide operators and supervisors with a real-time view of every rental currently in progress.
+- step: 2
+  screen: BO-555
+  action: Works in Active Rental Detail & Live Timeline
+  operations: []
+  outcome: Provide the complete operational view of one active rental.
+- step: 3
+  screen: BO-554
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-556
+  action: Works in Rental Extension Request
+  operations: []
+  outcome: Allow the customer or operator to request additional rental time. This is one of the important
+    capabilities I recommend formally adding to the rental scope.
+- step: 5
+  screen: BO-554
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-557
+  action: Works in Extension Pricing & Confirmation
+  operations: []
+  outcome: Calculate the commercial impact of an approved extension. Once Board 3 confirms availability,
+    Board 4 calculates the extension charge.
+- step: 7
+  screen: BO-554
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-558
+  action: Works in Equipment Swap / Replacement
+  operations: []
+  outcome: Replace equipment during an active rental without terminating and recreating the rental. This
+    is another capability I strongly recommend adding.
+- step: 9
+  screen: BO-554
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-559
+  action: Works in Rental Incident & Operational Exception
+  operations: []
+  outcome: Capture incidents occurring while equipment is in customer possession.
+- step: 11
+  screen: BO-554
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-560
+  action: Works in Due Soon & Customer Notification Management
+  operations: []
+  outcome: Proactively communicate with customers before their rental becomes overdue. The original matrix
+    requires overdue rental notifications.
+- step: 13
+  screen: BO-554
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-561
+  action: Works in Overdue Rental Management
+  operations: []
+  outcome: Provide operators with a dedicated workflow for rentals that have exceeded their expected return
+    time. The original requirement calls for automatic late-fee calculation, configurable grace periods
+    and overdue notifications.
+- step: 15
+  screen: BO-554
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-562
+  action: Works in Active Group Rental Management
+  operations: []
+  outcome: Manage group rentals where multiple pieces of equipment may have different operational states.
+- step: 17
+  screen: BO-554
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-563
+  action: Works in Active Rental Intelligence & Operational Alerts
+  operations: []
+  outcome: Use AI and real-time operational data to identify risks before they become operational problems.
+branches:
+- at: 1
+  condition: Nothing has been set up on Active Rental Operations Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Rental Management board 7 visited
+primaryContract: unknown
+contracts:
+- unknown

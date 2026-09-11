@@ -1,0 +1,224 @@
+{
+ "cancelDecommission": {
+  "method": "POST",
+  "path": "/cells/{cellId}/cancel-decommission",
+  "contract": "subscription",
+  "summary": "Halt a decommission",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "createDashboard": {
+  "method": "POST",
+  "path": "/dashboards",
+  "contract": "reporting",
+  "summary": "Create a dashboard",
+  "permission": "REPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateDashboardRequest",
+  "responds": "Dashboard"
+ },
+ "decommissionCell": {
+  "method": "POST",
+  "path": "/cells/{cellId}/decommission",
+  "contract": "subscription",
+  "summary": "Begin decommissioning a cell",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getCell": {
+  "method": "GET",
+  "path": "/cells/{cellId}",
+  "contract": "subscription",
+  "summary": "Read a cell",
+  "permission": "PLATFORM_CELL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CellDetail"
+ },
+ "getCellCapacity": {
+  "method": "GET",
+  "path": "/cells/{cellId}/capacity",
+  "contract": "subscription",
+  "summary": "Load against headroom",
+  "permission": "PLATFORM_CELL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "window",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CellCapacity"
+ },
+ "getCellHealth": {
+  "method": "GET",
+  "path": "/cells/{cellId}/health",
+  "contract": "subscription",
+  "summary": "Cell health and schema version",
+  "permission": "PLATFORM_CELL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CellHealth"
+ },
+ "getDashboard": {
+  "method": "GET",
+  "path": "/dashboards/{dashboardId}",
+  "contract": "reporting",
+  "summary": "Read a dashboard with tile data",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "refresh",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DashboardData"
+ },
+ "listCellJobs": {
+  "method": "GET",
+  "path": "/cells/{cellId}/jobs",
+  "contract": "subscription",
+  "summary": "Provisioning, migration and maintenance jobs",
+  "permission": "PLATFORM_CELL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listDashboards": {
+  "method": "GET",
+  "path": "/dashboards",
+  "contract": "reporting",
+  "summary": "List dashboards",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Dashboard"
+ },
+ "listWafRules": {
+  "method": "GET",
+  "path": "/waf-policies",
+  "contract": "platform-ops",
+  "summary": "Web application firewall rules in force",
+  "permission": "PLATFORM_CELL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WafRule"
+ },
+ "setWafPolicy": {
+  "method": "PUT",
+  "path": "/waf-policies",
+  "contract": "platform-ops",
+  "summary": "Change the firewall policy",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [],
+  "requestBody": "WafRule",
+  "responds": "WafRule"
+ },
+ "updateCellTier": {
+  "method": "PATCH",
+  "path": "/cells/{cellId}",
+  "contract": "subscription",
+  "summary": "Change a cell's tier",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "updateDashboard": {
+  "method": "PUT",
+  "path": "/dashboards/{dashboardId}",
+  "contract": "reporting",
+  "summary": "Update a dashboard",
+  "permission": "REPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateDashboardRequest",
+  "responds": "Dashboard"
+ }
+}

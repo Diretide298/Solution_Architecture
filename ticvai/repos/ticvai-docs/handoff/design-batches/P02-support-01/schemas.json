@@ -1,0 +1,103 @@
+{
+ "Case": {
+  "x-ticvai-persistence": "marketing.case",
+  "type": "object",
+  "required": [
+   "id",
+   "caseNumber",
+   "subject",
+   "status",
+   "priority",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "caseNumber": {
+    "type": "string"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "guestName": {
+    "type": "string",
+    "nullable": true
+   },
+   "subject": {
+    "type": "string"
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "status": {
+    "$ref": "#/components/schemas/CaseStatus"
+   },
+   "priority": {
+    "$ref": "#/components/schemas/CasePriority"
+   },
+   "assignedToPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "relatedOrderId": {
+    "type": "string",
+    "nullable": true
+   },
+   "slaDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "isSlaBreached": {
+    "type": "boolean"
+   },
+   "slaPausedSeconds": {
+    "type": "integer",
+    "description": "Accrued only while awaiting the guest. Waiting on an internal team does not pause the clock.\n"
+   },
+   "escalationCount": {
+    "type": "integer"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "CasePriority": {
+  "type": "string",
+  "enum": [
+   "low",
+   "normal",
+   "high",
+   "urgent"
+  ]
+ },
+ "CaseStatus": {
+  "type": "string",
+  "enum": [
+   "open",
+   "inProgress",
+   "awaitingGuest",
+   "escalated",
+   "resolved",
+   "closed"
+  ]
+ }
+}

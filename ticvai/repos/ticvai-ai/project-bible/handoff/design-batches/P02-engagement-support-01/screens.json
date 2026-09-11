@@ -1,0 +1,1936 @@
+[
+ {
+  "id": "GST-030",
+  "name": "In-Venue Notifications",
+  "module": "Engagement & Support",
+  "requiresModule": "fnb",
+  "wave": 2,
+  "capability": "C61",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/general/in-venue-notifications",
+   "component": "apps/guest-app/src/routes/general/InVenueNotificationsDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-001",
+    "GST-025"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "GST-001",
+    "GST-002",
+    "GST-003",
+    "GST-031"
+   ],
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-003",
+     "trigger": "Event & Attraction Listing",
+     "carries": [
+      "eventId"
+     ],
+     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-031",
+     "trigger": "AI Concierge – Home",
+     "carries": [
+      "conversationId",
+      "outletId"
+     ],
+     "provenance": "derived — GST-031 declares entryState.params conversationId, outletId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "openQuestions": [
+   "Inventory cites `GET /notifications` — no matching operation. Written before the contracts existed."
+  ],
+  "density": "comfortable",
+  "pattern": "configEditor",
+  "patternReason": "the screen declares only writes (`claimLocationSession`) and no read of a population — it is settings, not a list",
+  "purpose": "Work with in-venue notifications for this venue.",
+  "gaps": [
+   {
+    "operation": "claimLocationSession",
+    "why": "**`claimLocationSession` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
+    "source": "contract fnb.yaml POST /location-sessions"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Claim",
+       "operation": "claimLocationSession",
+       "provenance": "contract fnb.yaml POST /location-sessions"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "claimLocationSession"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The saved in-venue notifications.",
+   "error": "Could not load. Names which read failed and leaves the in-venue notifications untouched.",
+   "emptyFirstRun": "No in-venue notifications configured. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+  },
+  "apis": [
+   {
+    "operationId": "claimLocationSession",
+    "contract": "fnb",
+    "purpose": "From the flow it appears in",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-030"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-031",
+  "name": "AI Concierge – Home",
+  "module": "Engagement & Support",
+  "requiresModule": "fnb",
+  "wave": 2,
+  "capability": "AI-02",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/general/ai-concierge-home",
+   "component": "apps/guest-app/src/routes/general/AiConciergeHomeDashboard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "GST-001",
+    "GST-002",
+    "GST-003",
+    "GST-032"
+   ],
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-003",
+     "trigger": "Event & Attraction Listing",
+     "carries": [
+      "eventId"
+     ],
+     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-032",
+     "trigger": "AI Concierge – Chat",
+     "carries": [
+      "cartId",
+      "conversationId",
+      "orderId"
+     ],
+     "provenance": "derived — GST-032 declares entryState.params cartId, conversationId, orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Guest concierge confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.** Still degrades to the manual planner rather than to an error. **Cross-surface parity, 31 August**: added createAiConversation, handoverToAgent, requestSuggestion. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
+  "openQuestions": [
+   "Inventory cites `POST /ai/concierge` — no matching operation. Written before the contracts existed."
+  ],
+  "density": "comfortable",
+  "pattern": "statusTracker",
+  "patternReason": "`getGuestMenu` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected concierge home",
+       "bindsTo": "GuestMenu",
+       "columns": [
+        "GuestMenu.outletId",
+        "GuestMenu.menuId",
+        "GuestMenu.name",
+        "GuestMenu.inForceUntil",
+        "GuestMenu.currency",
+        "GuestMenu.currencyScale",
+        "GuestMenu.sections"
+       ],
+       "operation": "getGuestMenu",
+       "provenance": "contract fnb.yaml GET /outlets/{outletId}/guest-menu"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Send",
+       "operation": "sendAiMessage",
+       "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createAiConversation",
+       "provenance": "contract ai.yaml POST /conversations"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Handover",
+       "operation": "handoverToAgent",
+       "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/handover"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request",
+       "operation": "requestSuggestion",
+       "provenance": "contract ai.yaml POST /ai/suggestions"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The concierge home list.",
+   "error": "Could not load. Names which read failed and leaves the concierge home untouched.",
+   "emptyFirstRun": "No concierge home yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the concierge home are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+  },
+  "apis": [
+   {
+    "operationId": "getGuestMenu",
+    "contract": "fnb",
+    "purpose": "From the flow it appears in",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "sendAiMessage",
+    "contract": "ai",
+    "purpose": "Ask",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "createAiConversation",
+    "contract": "ai",
+    "purpose": "Open a conversation",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "handoverToAgent",
+    "contract": "marketing-crm",
+    "purpose": "Pass an assistant conversation to a person",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "requestSuggestion",
+    "contract": "ai",
+    "purpose": "requestSuggestion",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "conversationId",
+     "from": "deepLink"
+    },
+    {
+     "name": "outletId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-031"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-032",
+  "name": "AI Concierge – Chat",
+  "module": "Engagement & Support",
+  "requiresModule": "ticketing",
+  "wave": 2,
+  "capability": "AI-02",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/general/ai-concierge-chat",
+   "component": "apps/guest-app/src/routes/general/AiConciergeChatDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "GST-001",
+    "GST-002",
+    "GST-003",
+    "GST-033"
+   ],
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-003",
+     "trigger": "Event & Attraction Listing",
+     "carries": [
+      "eventId"
+     ],
+     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-033",
+     "trigger": "AI Concierge – Contextual Help",
+     "carries": [
+      "conversationId"
+     ],
+     "provenance": "derived — GST-033 declares entryState.params conversationId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Guest concierge confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.** Still degrades to the manual planner rather than to an error.",
+  "openQuestions": [
+   "Inventory cites `POST /ai/concierge` — no matching operation. Written before the contracts existed."
+  ],
+  "density": "comfortable",
+  "pattern": "statusTracker",
+  "patternReason": "`getGuestOrderStatus` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Add ai concierge – chat for this venue.",
+  "gaps": [
+   {
+    "operation": "getCart",
+    "why": "**1 declared operation reach no component on this screen**: getCart. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected concierge chat",
+       "bindsTo": "GuestOrderStatus",
+       "columns": [
+        "GuestOrderStatus.orderId",
+        "GuestOrderStatus.orderNumber",
+        "GuestOrderStatus.status",
+        "GuestOrderStatus.estimatedReadyAt",
+        "GuestOrderStatus.isReadyForCollection",
+        "GuestOrderStatus.lines"
+       ],
+       "operation": "getGuestOrderStatus",
+       "provenance": "contract fnb.yaml GET /guest-orders/{orderId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createGuestFnbOrder",
+       "provenance": "contract fnb.yaml POST /guest-orders"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Add",
+       "operation": "addCartLine",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Checkout",
+       "operation": "checkoutCart",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/checkout"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Send",
+       "operation": "sendAiMessage",
+       "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Send",
+       "operation": "sendConversationMessage",
+       "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/messages"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Handover",
+       "operation": "handoverToAgent",
+       "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/handover"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The concierge chat list.",
+   "error": "Could not load. Names which read failed and leaves the concierge chat untouched.",
+   "emptyFirstRun": "No concierge chat yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the concierge chat are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+  },
+  "apis": [
+   {
+    "operationId": "createGuestFnbOrder",
+    "contract": "fnb",
+    "purpose": "From the flow it appears in",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getGuestOrderStatus",
+    "contract": "fnb",
+    "purpose": "Track an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getCart",
+    "contract": "orders",
+    "purpose": "The cart, priced and checked, right now",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "addCartLine",
+    "contract": "orders",
+    "purpose": "Add something",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "checkoutCart",
+    "contract": "orders",
+    "purpose": "Turn the cart into an order",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "sendAiMessage",
+    "contract": "ai",
+    "purpose": "Ask",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "sendConversationMessage",
+    "contract": "marketing-crm",
+    "purpose": "Say something, as a guest or an agent",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "handoverToAgent",
+    "contract": "marketing-crm",
+    "purpose": "Pass an assistant conversation to a person",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "cartId",
+     "from": "session"
+    },
+    {
+     "name": "conversationId",
+     "from": "deepLink"
+    },
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom. **A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-032"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-033",
+  "name": "AI Concierge – Contextual Help",
+  "module": "Engagement & Support",
+  "requiresModule": "ai",
+  "wave": 2,
+  "capability": "AI-02",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/general/ai-concierge-contextual-help",
+   "component": "apps/guest-app/src/routes/general/AiConciergeContextualHelpDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "GST-001",
+    "GST-002",
+    "GST-003"
+   ],
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-003",
+     "trigger": "Event & Attraction Listing",
+     "carries": [
+      "eventId"
+     ],
+     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Guest concierge confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.** Still degrades to the manual planner rather than to an error. **createPayment removed 18 August** — attached by module resemblance, not by what this screen does. A screen that does not handle money should not be able to move it (CF-87's class). **Navigation repointed to P15 on 20 August** — the F&B screens it linked to moved out of the back office when the client board was adopted. **Cross-platform navigation removed 24 August**: BO-020. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.",
+  "openQuestions": [
+   "Inventory cites `POST /ai/concierge` — no matching operation. Written before the contracts existed."
+  ],
+  "density": "comfortable",
+  "pattern": "configEditor",
+  "patternReason": "the screen declares only writes (`sendAiMessage`) and no read of a population — it is settings, not a list",
+  "purpose": "Answer a question without needing a person.",
+  "gaps": [
+   {
+    "operation": "sendAiMessage",
+    "why": "**`sendAiMessage` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
+    "source": "contract ai.yaml POST /conversations/{conversationId}/messages"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Send",
+       "operation": "sendAiMessage",
+       "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "sendAiMessage"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The saved concierge contextual help.",
+   "error": "Could not load. Names which read failed and leaves the concierge contextual help untouched.",
+   "emptyFirstRun": "No concierge contextual help configured. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+  },
+  "apis": [
+   {
+    "operationId": "sendAiMessage",
+    "contract": "ai",
+    "purpose": "Ask",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "conversationId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-033"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-035",
+  "name": "Feedback & Ratings",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "capability": "C62",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/general/feedback-and-ratings",
+   "component": "apps/guest-app/src/routes/general/FeedbackAndRatingsList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "GST-001",
+    "GST-002",
+    "GST-003"
+   ],
+   "transitions": [
+    {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-003",
+     "trigger": "Event & Attraction Listing",
+     "carries": [
+      "eventId"
+     ],
+     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Guest case operations wired 24 August.** **No case operation was guest-callable** — a guest could raise nothing and read nothing, and `check-screens` refused the staff-permissioned ones on a guest surface. `listMyCases`, `raiseMyCase` and `replyToMyCase` are scoped to the caller rather than filtered by a subject parameter.",
+  "density": "comfortable",
+  "pattern": "configEditor",
+  "patternReason": "the screen declares only writes (`submitReview`, `raiseMyCase`) and no read of a population — it is settings, not a list",
+  "purpose": "Work with feedback & ratings for this venue.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "id",
+       "bindsTo": "SubmitReviewRequest.id",
+       "provenance": "contract marketing-crm.yaml POST /reviews"
+      },
+      {
+       "kind": "textField",
+       "label": "subjectId",
+       "bindsTo": "SubmitReviewRequest.subjectId",
+       "provenance": "contract marketing-crm.yaml POST /reviews"
+      },
+      {
+       "kind": "textField",
+       "label": "venueId",
+       "bindsTo": "SubmitReviewRequest.venueId",
+       "provenance": "contract marketing-crm.yaml POST /reviews"
+      },
+      {
+       "kind": "textField",
+       "label": "relatedOrderId",
+       "bindsTo": "SubmitReviewRequest.relatedOrderId",
+       "provenance": "contract marketing-crm.yaml POST /reviews"
+      },
+      {
+       "kind": "textField",
+       "label": "rating",
+       "bindsTo": "SubmitReviewRequest.rating",
+       "provenance": "contract marketing-crm.yaml POST /reviews"
+      },
+      {
+       "kind": "textField",
+       "label": "body",
+       "bindsTo": "SubmitReviewRequest.body",
+       "provenance": "contract marketing-crm.yaml POST /reviews"
+      },
+      {
+       "kind": "textField",
+       "label": "aspects",
+       "bindsTo": "SubmitReviewRequest.aspects",
+       "provenance": "contract marketing-crm.yaml POST /reviews"
+      },
+      {
+       "kind": "textField",
+       "label": "recordedAt",
+       "bindsTo": "SubmitReviewRequest.recordedAt",
+       "provenance": "contract marketing-crm.yaml POST /reviews"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Submit",
+       "operation": "submitReview",
+       "provenance": "contract marketing-crm.yaml POST /reviews"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Raise",
+       "operation": "raiseMyCase",
+       "provenance": "contract marketing-crm.yaml POST /my/cases"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The saved feedback ratings.",
+   "error": "Could not load. Names which read failed and leaves the feedback ratings untouched.",
+   "emptyFirstRun": "No feedback ratings configured. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+  },
+  "apis": [
+   {
+    "operationId": "submitReview",
+    "contract": "marketing-crm",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "raiseMyCase",
+    "contract": "marketing-crm",
+    "purpose": "Report something — lost property, a complaint, a question",
+    "trigger": "onAction"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-035"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-040",
+  "name": "Help & Support",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 2,
+  "capability": "C17",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/general/help-and-support",
+   "component": "apps/guest-app/src/routes/general/HelpAndSupportDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "GST-001",
+    "GST-002",
+    "GST-003"
+   ],
+   "transitions": [
+    {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-003",
+     "trigger": "Event & Attraction Listing",
+     "carries": [
+      "eventId"
+     ],
+     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-034",
+     "trigger": "They report something lost",
+     "provenance": "flow F54 step 2→3",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Guest case operations wired 24 August.** **No case operation was guest-callable** — a guest could raise nothing and read nothing, and `check-screens` refused the staff-permissioned ones on a guest surface. `listMyCases`, `raiseMyCase` and `replyToMyCase` are scoped to the caller rather than filtered by a subject parameter.",
+  "openQuestions": [
+   "Inventory cites `GET /support` — no matching operation. Written before the contracts existed."
+  ],
+  "density": "comfortable",
+  "pattern": "commandCentre",
+  "patternReason": "3 independent reads and no read of one record — the screen watches a population rather than working one",
+  "purpose": "Answer a question without needing a person.",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Faqs",
+       "bindsTo": "FaqCategory",
+       "operation": "listFaqs",
+       "provenance": "contract white-label.yaml GET /tenant-config/faqs"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Content pages",
+       "bindsTo": "ContentPage",
+       "operation": "listContentPages",
+       "provenance": "contract white-label.yaml GET /tenant-config/pages"
+      },
+      {
+       "kind": "metricTile",
+       "label": "My cases",
+       "bindsTo": "Case",
+       "operation": "listMyCases",
+       "provenance": "contract marketing-crm.yaml GET /my/cases"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every help support",
+       "bindsTo": "FaqCategory",
+       "columns": [
+        "FaqCategory.code",
+        "FaqCategory.name",
+        "FaqCategory.sortOrder",
+        "FaqCategory.entries",
+        "FaqCategory.scopePath"
+       ],
+       "operation": "listFaqs",
+       "provenance": "contract white-label.yaml GET /tenant-config/faqs"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Raise",
+       "operation": "raiseMyCase",
+       "provenance": "contract marketing-crm.yaml POST /my/cases"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reply",
+       "operation": "replyToMyCase",
+       "provenance": "contract marketing-crm.yaml POST /my/cases/{caseId}/messages"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The help support list.",
+   "error": "Could not load. Names which read failed and leaves the help support untouched.",
+   "emptyFirstRun": "No help support yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the help support are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+  },
+  "apis": [
+   {
+    "operationId": "listFaqs",
+    "contract": "white-label",
+    "purpose": "List FAQs",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listContentPages",
+    "contract": "white-label",
+    "purpose": "List custom content pages",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listMyCases",
+    "contract": "marketing-crm",
+    "purpose": "The cases this guest raised",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "raiseMyCase",
+    "contract": "marketing-crm",
+    "purpose": "Report something — lost property, a complaint, a question",
+    "trigger": "onAction",
+    "invalidates": [
+     "listFaqs"
+    ]
+   },
+   {
+    "operationId": "replyToMyCase",
+    "contract": "marketing-crm",
+    "purpose": "Reply on a case the guest raised",
+    "trigger": "onAction",
+    "invalidates": [
+     "listFaqs"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "caseId",
+     "from": "deepLink",
+     "optional": true
+    }
+   ],
+   "coldEntry": "A case opened from a notification or the list. **Optional** — the ordinary way in is to raise a new one, not to open an old one."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-040"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-051",
+  "name": "Plan Your Adventure – Start",
+  "module": "Engagement & Support",
+  "requiresModule": "queue",
+  "wave": 3,
+  "capability": "AI-35",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/general/plan-your-adventure-start",
+   "component": "apps/guest-app/src/routes/general/PlanYourAdventureStartDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "GST-001",
+    "GST-002",
+    "GST-003",
+    "GST-052"
+   ],
+   "transitions": [
+    {
+     "to": "GST-052",
+     "trigger": "Suggested itineraries are offered",
+     "provenance": "flow F49 step 1→2",
+     "operation": "listProducts"
+    },
+    {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-003",
+     "trigger": "Event & Attraction Listing",
+     "carries": [
+      "eventId"
+     ],
+     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Minuted 10 Aug §4.9. Benchmarked against Skidata. Tied to a ticket purchase and saved as a personal visit profile.",
+  "openQuestions": [
+   "Inventory cites `POST /ai/itinerary` — no matching operation. Written before the contracts existed."
+  ],
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listProducts` reads the population and `getWaitTimes` reads one of them — list, select, act",
+  "purpose": "Start a plan for the visit — which attractions, in what order — before arriving.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every plan your adventure",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo"
+       ],
+       "operation": "listProducts",
+       "provenance": "contract catalogue.yaml GET /products"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected plan your adventure",
+       "bindsTo": "WaitTime",
+       "columns": [
+        "WaitTime.queueId",
+        "WaitTime.queueName",
+        "WaitTime.attractionProductId",
+        "WaitTime.status",
+        "WaitTime.waitMinutes",
+        "WaitTime.source",
+        "WaitTime.isStale",
+        "WaitTime.heightRequirementCm",
+        "WaitTime.zone",
+        "WaitTime.asOf"
+       ],
+       "operation": "getWaitTimes",
+       "provenance": "contract queue.yaml GET /queues/wait-times"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The plan your adventure list.",
+   "error": "Could not load. Names which read failed and leaves the plan your adventure untouched.",
+   "emptyFirstRun": "No plan your adventure yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the plan your adventure are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+  },
+  "apis": [
+   {
+    "operationId": "getWaitTimes",
+    "contract": "queue",
+    "purpose": "Wait times across a venue",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listProducts",
+    "contract": "catalogue",
+    "purpose": "List products",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "WaitTime.queueId",
+    "WaitTime.queueName",
+    "WaitTime.attractionProductId",
+    "WaitTime.status",
+    "WaitTime.waitMinutes"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-051"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-052",
+  "name": "Suggested Itineraries",
+  "module": "Engagement & Support",
+  "requiresModule": "ai",
+  "wave": 3,
+  "capability": "AI-35",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/general/suggested-itineraries",
+   "component": "apps/guest-app/src/routes/general/SuggestedItinerariesDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-001",
+    "GST-051"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "GST-001",
+    "GST-002",
+    "GST-003",
+    "GST-053"
+   ],
+   "transitions": [
+    {
+     "to": "GST-053",
+     "trigger": "They build their own instead",
+     "provenance": "flow F49 step 2→3",
+     "operation": "listProducts"
+    },
+    {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-003",
+     "trigger": "Event & Attraction Listing",
+     "carries": [
+      "eventId"
+     ],
+     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Minuted 10 Aug §4.9. ** wired 24 August.** The board drew four bespoke AI endpoints for itinerary planning; **one operation with a kind answers all of them** (ADR-0028), and recording the outcome is what lets a model replace the heuristic later. **`recordSuggestionOutcome` removed from the guest surface.** `check-screens` refused it and was right: **a guest does not record an outcome — the platform observes what they did.** A guest app that self-reports whether it took the advice is a training label the guest could forge, and the observation belongs server-side where the plan and the visit can be compared.",
+  "openQuestions": [
+   "Inventory cites `GET /itineraries/suggested` — no matching operation. Written before the contracts existed."
+  ],
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listProducts` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Curated plans a guest can take rather than build.",
+  "gaps": [
+   {
+    "operation": "listCatalogueBundles",
+    "why": "**1 declared operation reach no component on this screen**: listCatalogueBundles. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every suggested itineraries",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo"
+       ],
+       "operation": "listProducts",
+       "provenance": "contract catalogue.yaml GET /products"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected suggested itineraries",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo",
+        "Product.lifecycleState",
+        "Product.isSellable",
+        "Product.hasVariants",
+        "Product.variantCount"
+       ],
+       "operation": "listProducts",
+       "provenance": "contract catalogue.yaml GET /products"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Request",
+       "operation": "requestSuggestion",
+       "provenance": "contract ai.yaml POST /ai/suggestions"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The suggested itineraries list.",
+   "error": "Could not load. Names which read failed and leaves the suggested itineraries untouched.",
+   "emptyFirstRun": "No suggested itineraries yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the suggested itineraries are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+  },
+  "apis": [
+   {
+    "operationId": "listProducts",
+    "contract": "catalogue",
+    "purpose": "List products",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCatalogueBundles",
+    "contract": "catalogue",
+    "purpose": "List published bundles",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "requestSuggestion",
+    "contract": "ai",
+    "purpose": "",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProducts"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "suggestionId",
+     "from": "deepLink",
+     "optional": true
+    }
+   ],
+   "coldEntry": "A suggestion opened from a saved plan.",
+   "preloaded": [
+    "Product.id",
+    "Product.code",
+    "Product.name",
+    "Product.description",
+    "Product.kind"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-052"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-053",
+  "name": "Build Your Own Itinerary",
+  "module": "Engagement & Support",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "capability": "C02",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/general/build-your-own-itinerary",
+   "component": "apps/guest-app/src/routes/general/BuildYourOwnItineraryDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-001",
+    "GST-052"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "GST-001",
+    "GST-002",
+    "GST-003",
+    "GST-054"
+   ],
+   "transitions": [
+    {
+     "to": "GST-054",
+     "trigger": "An optimised order is proposed",
+     "provenance": "flow F49 step 3→4",
+     "operation": "listProducts"
+    },
+    {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-003",
+     "trigger": "Event & Attraction Listing",
+     "carries": [
+      "eventId"
+     ],
+     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Minuted 10 Aug §4.9. **Group sharing agreed** — an in-app QR a friend scans to join the itinerary (Chinmay raised, Qossai confirmed).",
+  "openQuestions": [
+   "Inventory cites `POST /itineraries` — no matching operation. Written before the contracts existed."
+  ],
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listProducts` reads the population and `getCart` reads one of them — list, select, act",
+  "purpose": "Choose the attractions and the order yourself.",
+  "gaps": [
+   {
+    "operation": "getWaitTimes",
+    "why": "**1 declared operation reach no component on this screen**: getWaitTimes. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every build your own",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo"
+       ],
+       "operation": "listProducts",
+       "provenance": "contract catalogue.yaml GET /products"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected build your own",
+       "bindsTo": "Cart",
+       "columns": [
+        "Cart.id",
+        "Cart.token",
+        "Cart.venueId",
+        "Cart.channel",
+        "Cart.subjectId",
+        "Cart.status",
+        "Cart.lines",
+        "Cart.conflicts",
+        "Cart.subtotal",
+        "Cart.discountTotal",
+        "Cart.taxTotal",
+        "Cart.total",
+        "Cart.appliedPromotionIds",
+        "Cart.expiresAt",
+        "Cart.extensionsUsed",
+        "Cart.maxExtensions"
+       ],
+       "operation": "getCart",
+       "provenance": "contract orders.yaml GET /carts/{cartId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add",
+       "operation": "addCartLine",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The build your own list.",
+   "error": "Could not load. Names which read failed and leaves the build your own untouched.",
+   "emptyFirstRun": "No build your own yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the build your own are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+  },
+  "apis": [
+   {
+    "operationId": "addCartLine",
+    "contract": "orders",
+    "purpose": "Add something",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProducts"
+    ]
+   },
+   {
+    "operationId": "getCart",
+    "contract": "orders",
+    "purpose": "The cart, priced and checked, right now",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listProducts",
+    "contract": "catalogue",
+    "purpose": "List products",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getWaitTimes",
+    "contract": "queue",
+    "purpose": "Wait times across a venue",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "cartId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "Cart.id",
+    "Cart.token",
+    "Cart.venueId",
+    "Cart.channel",
+    "Cart.subjectId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-053"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-054",
+  "name": "AI Optimized Itinerary",
+  "module": "Engagement & Support",
+  "requiresModule": "ai",
+  "wave": 3,
+  "capability": "AI-35",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/general/ai-optimized-itinerary",
+   "component": "apps/guest-app/src/routes/general/AiOptimizedItineraryDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-001",
+    "GST-053"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "GST-001",
+    "GST-002",
+    "GST-003",
+    "GST-059"
+   ],
+   "transitions": [
+    {
+     "to": "GST-059",
+     "trigger": "They follow it through the day",
+     "provenance": "flow F49 step 4→5",
+     "operation": "requestSuggestion"
+    },
+    {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-003",
+     "trigger": "Event & Attraction Listing",
+     "carries": [
+      "eventId"
+     ],
+     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Minuted 10 Aug §4.9. **The AI half is Wave 2** — the manual planner must work without it (CF-41). **Guest concierge confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.** Still degrades to the manual planner rather than to an error. ** wired 24 August.** The board drew four bespoke AI endpoints for itinerary planning; **one operation with a kind answers all of them** (ADR-0028), and recording the outcome is what lets a model replace the heuristic later. **`recordSuggestionOutcome` removed from the guest surface.** `check-screens` refused it and was right: **a guest does not record an outcome — the platform observes what they did.** A guest app that self-reports whether it took the advice is a training label the guest could forge, and the observation belongs server-side where the plan and the visit can be compared.",
+  "openQuestions": [
+   "Inventory cites `POST /ai/itinerary/optimise` — no matching operation. Written before the contracts existed."
+  ],
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listProducts` reads the population and `getWaitTimes` reads one of them — list, select, act",
+  "purpose": "Let the assistant order the day around waits and opening times.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every optimized itinerary",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo"
+       ],
+       "operation": "listProducts",
+       "provenance": "contract catalogue.yaml GET /products"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected optimized itinerary",
+       "bindsTo": "WaitTime",
+       "columns": [
+        "WaitTime.queueId",
+        "WaitTime.queueName",
+        "WaitTime.attractionProductId",
+        "WaitTime.status",
+        "WaitTime.waitMinutes",
+        "WaitTime.source",
+        "WaitTime.isStale",
+        "WaitTime.heightRequirementCm",
+        "WaitTime.zone",
+        "WaitTime.asOf"
+       ],
+       "operation": "getWaitTimes",
+       "provenance": "contract queue.yaml GET /queues/wait-times"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Send",
+       "operation": "sendAiMessage",
+       "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request",
+       "operation": "requestSuggestion",
+       "provenance": "contract ai.yaml POST /ai/suggestions"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The optimized itinerary list.",
+   "error": "Could not load. Names which read failed and leaves the optimized itinerary untouched.",
+   "emptyFirstRun": "No optimized itinerary yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the optimized itinerary are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+  },
+  "apis": [
+   {
+    "operationId": "getWaitTimes",
+    "contract": "queue",
+    "purpose": "Wait times across a venue",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listProducts",
+    "contract": "catalogue",
+    "purpose": "List products",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "sendAiMessage",
+    "contract": "ai",
+    "purpose": "Ask",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProducts"
+    ]
+   },
+   {
+    "operationId": "requestSuggestion",
+    "contract": "ai",
+    "purpose": "",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProducts"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "conversationId",
+     "from": "deepLink"
+    },
+    {
+     "name": "suggestionId",
+     "from": "deepLink",
+     "optional": true
+    }
+   ],
+   "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom. A suggestion opened from a saved plan.",
+   "preloaded": [
+    "WaitTime.queueId",
+    "WaitTime.queueName",
+    "WaitTime.attractionProductId",
+    "WaitTime.status",
+    "WaitTime.waitMinutes"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-054"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

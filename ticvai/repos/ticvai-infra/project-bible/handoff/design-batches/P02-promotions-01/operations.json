@@ -1,0 +1,86 @@
+{
+ "evaluatePromotions": {
+  "method": "POST",
+  "path": "/promotions/evaluate",
+  "contract": "promotions",
+  "summary": "Evaluate promotions against a cart",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "EvaluatePromotionsRequest",
+  "responds": "PromotionEvaluation"
+ },
+ "getCouponCode": {
+  "method": "GET",
+  "path": "/coupon-codes/{code}",
+  "contract": "promotions",
+  "summary": "Look up a code",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CouponCode"
+ },
+ "getPromotion": {
+  "method": "GET",
+  "path": "/promotions/{promotionId}",
+  "contract": "promotions",
+  "summary": "Read a promotion",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Promotion"
+ },
+ "listPromotions": {
+  "method": "GET",
+  "path": "/promotions",
+  "contract": "promotions",
+  "summary": "List promotions",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "activeAt",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ }
+}

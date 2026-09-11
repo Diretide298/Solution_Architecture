@@ -1,0 +1,1025 @@
+{
+ "Announcement": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.announcement",
+  "required": [
+   "title",
+   "body",
+   "kind",
+   "publishedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "title": {
+    "type": "string",
+    "maxLength": 140
+   },
+   "body": {
+    "type": "string",
+    "maxLength": 4000
+   },
+   "kind": {
+    "$ref": "#/components/schemas/AnnouncementKind"
+   },
+   "venueIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "departmentIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "roleIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "requiresAcknowledgement": {
+    "type": "boolean"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "publishedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "locale": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "AnnouncementKind": {
+  "type": "string",
+  "description": "`emergency` is not a louder `operational`. It overrides the home screen, bypasses quiet hours, requires acknowledgement, and carries a separate permission.\n",
+  "enum": [
+   "operational",
+   "safety",
+   "emergency",
+   "hr",
+   "celebration"
+  ]
+ },
+ "AnnouncementReach": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed from workforce.announcement_receipt",
+  "properties": {
+   "announcementId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "targeted": {
+    "type": "integer"
+   },
+   "delivered": {
+    "type": "integer"
+   },
+   "acknowledged": {
+    "type": "integer"
+   },
+   "outstanding": {
+    "type": "array",
+    "description": "**The list that matters.** For an operational notice it measures whether anyone read it; during an emergency it is the roll call.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "principalId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "displayName": {
+       "type": "string"
+      },
+      "onShift": {
+       "type": "boolean"
+      }
+     }
+    }
+   }
+  }
+ },
+ "ApprovalDecision": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.decision",
+  "required": [
+   "level",
+   "principalId",
+   "decision",
+   "decidedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "level": {
+    "type": "integer"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "displayName": {
+    "type": "string"
+   },
+   "isDelegate": {
+    "type": "boolean"
+   },
+   "delegatedFrom": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "decision": {
+    "type": "string",
+    "enum": [
+     "approve",
+     "reject"
+    ]
+   },
+   "comment": {
+    "type": "string",
+    "nullable": true
+   },
+   "reason": {
+    "type": "string",
+    "nullable": true
+   },
+   "usedMfa": {
+    "type": "boolean"
+   },
+   "signatureRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "ApprovalDelegation": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.delegation",
+  "required": [
+   "delegatorPrincipalId",
+   "delegatePrincipalId",
+   "from",
+   "to"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "delegatorPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "delegatePrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kinds": {
+    "type": "array",
+    "description": "Absent means everything the delegator may approve.",
+    "items": {
+     "$ref": "#/components/schemas/ApprovalKind"
+    }
+   },
+   "maxAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "A delegate may be given less authority than the delegator, never more."
+   },
+   "from": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "to": {
+    "type": "string",
+    "format": "date-time",
+    "description": "**Required.** An open-ended delegation is an approver who quietly stopped approving and a delegate who does not know they still hold it.\n"
+   },
+   "reason": {
+    "type": "string"
+   },
+   "isActive": {
+    "type": "boolean",
+    "readOnly": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "ApprovalKind": {
+  "type": "string",
+  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n",
+  "enum": [
+   "refund",
+   "priceOverride",
+   "discountOverride",
+   "complimentaryTicket",
+   "membershipCancellation",
+   "accessPermissionChange",
+   "configurationChange",
+   "aiRecommendation",
+   "shiftVariance",
+   "releasePromotion",
+   "requisition",
+   "stockWriteOff",
+   "journalEntry",
+   "periodReopen",
+   "tenantMigration"
+  ]
+ },
+ "ApprovalMatrix": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.matrix",
+  "required": [
+   "kind",
+   "scopeLevel",
+   "rules"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "kind": {
+    "$ref": "#/components/schemas/ApprovalKind"
+   },
+   "scopeLevel": {
+    "type": "string",
+    "enum": [
+     "tenant",
+     "region",
+     "venue"
+    ]
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true
+   },
+   "version": {
+    "type": "integer",
+    "readOnly": true,
+    "description": "11.1.80. **A request is decided by the rules it was raised under.** Changing the matrix mid-flight would mean an approver answering a question that changed while they read it.\n"
+   },
+   "rules": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ApprovalRule"
+    }
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "ApprovalMode": {
+  "type": "string",
+  "description": "11.1.43–11.1.46. **Sequential** asks one at a time, **parallel** asks everyone at once, **consensus** needs all of them, **majority** needs more than half.\nParallel and consensus differ in when it completes: parallel completes on the first approval, consensus waits for all. Conflating them is how a four-eyes rule turns into a one-eye rule.\n",
+  "enum": [
+   "sequential",
+   "parallel",
+   "consensus",
+   "majority"
+  ]
+ },
+ "ApprovalRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.request",
+  "required": [
+   "id",
+   "kind",
+   "status",
+   "requestedByPrincipalId",
+   "requestedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/ApprovalKind"
+   },
+   "rerouteOnNoApprover": {
+    "type": "boolean",
+    "default": true,
+    "description": "BL-154. **An approver on leave is an approval that waits for them to come back.** Reroutes to the next in the chain rather than stalling — `workforce` already knows who is on leave, and an approval queue nobody is watching is the thing that stops a venue.\n"
+   },
+   "outOfOfficeDelegateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "allowEmailApproval": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Approving from an email link with no second factor is the weakest path in the system**, so it is off by default and available only below a configured value.\n"
+   },
+   "reopenedFrom": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Reopening a decided approval creates a new one that points back.** Editing a decision in place destroys the record of what was originally approved, which is the only thing an audit wants.\n"
+   },
+   "status": {
+    "$ref": "#/components/schemas/ApprovalStatus"
+   },
+   "subjectContract": {
+    "type": "string"
+   },
+   "subjectType": {
+    "type": "string"
+   },
+   "subjectId": {
+    "type": "string"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "summary": {
+    "type": "string"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "justification": {
+    "type": "string",
+    "nullable": true
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "matrixVersion": {
+    "type": "integer"
+   },
+   "mode": {
+    "$ref": "#/components/schemas/ApprovalMode"
+   },
+   "currentLevel": {
+    "type": "integer"
+   },
+   "totalLevels": {
+    "type": "integer"
+   },
+   "pendingApprovers": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "principalId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "displayName": {
+       "type": "string"
+      },
+      "isDelegate": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "decisions": {
+    "type": "array",
+    "description": "Every decision at every level, in order. **Immutable once the request completes** (11.1.56) — an approval is evidence, and amending one is a different fact.\n",
+    "items": {
+     "$ref": "#/components/schemas/ApprovalDecision"
+    }
+   },
+   "escalations": {
+    "type": "array",
+    "description": "11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver rather than replacing one**, so the original stays in the record.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "at": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "reason": {
+       "type": "string"
+      },
+      "fromLevel": {
+       "type": "integer"
+      },
+      "toLevel": {
+       "type": "integer"
+      },
+      "wasAutomatic": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "resubmittedFromId": {
+    "type": "string",
+    "nullable": true
+   },
+   "reopenedFromId": {
+    "type": "string",
+    "nullable": true
+   },
+   "slaDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "slaBreached": {
+    "type": "boolean"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "requestedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "ApprovalRequirement": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed",
+  "description": "The answer to \"does this need approval\", returned before the action.",
+  "required": [
+   "isRequired"
+  ],
+  "properties": {
+   "isRequired": {
+    "type": "boolean"
+   },
+   "matchedRule": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ApprovalRule"
+     }
+    ],
+    "nullable": true
+   },
+   "matrixVersion": {
+    "type": "integer",
+    "nullable": true
+   },
+   "approvers": {
+    "type": "array",
+    "description": "Resolved, with delegations applied. **Named so the caller can say \"this needs Sara\"** rather than \"this needs approval\".\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "principalId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "displayName": {
+       "type": "string"
+      },
+      "level": {
+       "type": "integer"
+      },
+      "isDelegate": {
+       "type": "boolean"
+      },
+      "delegatedFrom": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "slaMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "noApproverAvailable": {
+    "type": "boolean",
+    "description": "**The case that must not fail silently.** A rule requiring a role nobody at this venue holds means the action is blocked forever, and the caller needs to know that now rather than after raising a request nobody can decide.\n"
+   }
+  }
+ },
+ "ApprovalRule": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.rule",
+  "required": [
+   "order",
+   "approverRoleIds",
+   "mode"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "order": {
+    "type": "integer",
+    "description": "**First match wins.** Explicit ordering is what makes a matrix reviewable — an unordered set of overlapping rules is one nobody can reason about.\n"
+   },
+   "minAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "maxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "riskScoreAbove": {
+    "type": "number",
+    "nullable": true,
+    "description": "11.1.12. **Nothing supplies this yet** — risk scoring is parked with the model-dependent AI. The field exists so adding the engine later is configuration rather than a schema change.\n"
+   },
+   "condition": {
+    "type": "string",
+    "nullable": true,
+    "description": "11.1.13. Evaluated against the attributes the caller supplied."
+   },
+   "approverRoleIds": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "approverScopeLevel": {
+    "type": "string",
+    "enum": [
+     "venue",
+     "department",
+     "region",
+     "tenant"
+    ],
+    "description": "11.1.39. Which organisational level the approver must sit at."
+   },
+   "mode": {
+    "$ref": "#/components/schemas/ApprovalMode"
+   },
+   "levels": {
+    "type": "integer",
+    "default": 1,
+    "description": "11.1.3. Multi-level chains ask each level in turn."
+   },
+   "requiresMfa": {
+    "type": "boolean",
+    "default": false
+   },
+   "requiresSignature": {
+    "type": "boolean",
+    "default": false
+   },
+   "slaMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "description": "11.1.14. Null means no SLA, which is different from a long one."
+   },
+   "escalateAfterMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "escalateToRoleIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "expiresAfterMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "description": "11.1.53. An unanswered request eventually stops waiting."
+   }
+  }
+ },
+ "ApprovalStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "pending",
+   "escalated",
+   "approved",
+   "rejected",
+   "withdrawn",
+   "expired",
+   "cancelled"
+  ]
+ },
+ "AttendanceRecord": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.attendance",
+  "required": [
+   "id",
+   "principalId",
+   "kind",
+   "occurredAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "assignmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "clockIn",
+     "clockOut",
+     "breakStart",
+     "breakEnd"
+    ]
+   },
+   "occurredAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Device time — when it happened."
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "When the server received it. **Both are kept**: a steward clocking in offline at a gate is not late because the sync was.\n"
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "latitude": {
+    "type": "number",
+    "nullable": true
+   },
+   "longitude": {
+    "type": "number",
+    "nullable": true
+   },
+   "isAmended": {
+    "type": "boolean",
+    "readOnly": true
+   },
+   "amendedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "amendmentReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "originalOccurredAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**The original is never overwritten.** Attendance feeds pay, and a record that can be quietly rewritten is not evidence.\n"
+   },
+   "exception": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "late",
+     "earlyLeave",
+     "missingClockOut",
+     "noShow",
+     "outOfGeofence",
+     "unscheduled"
+    ],
+    "description": "Computed against the rota. Null where the record matches what was expected."
+   }
+  }
+ },
+ "CreatePrincipalRequest": {
+  "type": "object",
+  "required": [
+   "username",
+   "displayName"
+  ],
+  "properties": {
+   "username": {
+    "type": "string",
+    "maxLength": 256
+   },
+   "displayName": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "initialCredential": {
+    "type": "string",
+    "maxLength": 512
+   },
+   "mustChangeCredential": {
+    "type": "boolean",
+    "default": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "roleIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Principal": {
+  "x-ticvai-persistence": "identity.principal",
+  "type": "object",
+  "required": [
+   "id",
+   "username",
+   "displayName",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "username": {
+    "type": "string"
+   },
+   "displayName": {
+    "type": "string"
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Past this, resolution returns DENY regardless of grants."
+   },
+   "primaryRoleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Determines the landing screen when the principal holds several roles and picks one at login.\n"
+   },
+   "roles": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/RoleSummary"
+    }
+   },
+   "lastLoginAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "Role": {
+  "x-ticvai-persistence": "identity.role",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string"
+   },
+   "permissions": {
+    "type": "array",
+    "description": "**A role that grants no permissions is not a role.** `Role` carried a code, a name and two counts until 18 August, and `identity.role_permission` derived from it with exactly one column — `role_id`. **A join table that joins to nothing**, found by Hrushikant in review and missed by the schema audit that ran the same day.\n**The audit asked whether every table had columns, a relationship and an owner, and this table had all three.** What it did not ask is whether a table with one column can do the job its name claims.\n",
+    "items": {
+     "$ref": "../shared/permissions.yaml#/components/schemas/Permission"
+    }
+   },
+   "inheritsFromRoleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Role composition, one level deep and no deeper.** A supervisor role that is a cashier plus three permissions is how venues actually describe them.\n**Cycles are refused and depth is capped at one**, because a permission set nobody can read off the screen is a permission set nobody audits.\n"
+   },
+   "isSystem": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Seeded roles ship and are editable; deleting one is refused.** A venue that removes `cashier` and rebuilds it has two roles with one name in the audit log.\n"
+   },
+   "principalCount": {
+    "type": "integer"
+   },
+   "grantCount": {
+    "type": "integer"
+   }
+  }
+ },
+ "RoleSummary": {
+  "x-ticvai-persistence": "none — projection over role",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "isPrimary": {
+    "type": "boolean"
+   }
+  }
+ },
+ "RotaAssignment": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.rota_assignment",
+  "required": [
+   "principalId",
+   "venueId",
+   "startsAt",
+   "endsAt",
+   "position"
+  ],
+  "properties": {
+   "overtimeMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "description": "BL-044, 1.2.83. **UAE labour law limits working hours and mandates rest periods**, and nothing in the package counted either. Derived from attendance against the shift.\n"
+   },
+   "restPeriodBefore": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Minutes since the previous shift ended. **The check that stops a closing shift followed by an opening one**, which is legal in most places and unsafe in all of them.\n"
+   },
+   "breachesWorkingHourLimit": {
+    "type": "boolean",
+    "default": false,
+    "readOnly": true,
+    "description": "**Flagged at assignment, not discovered at payroll.** A rota that breaches a statutory limit is a rota somebody has to redo, and finding out a month later means it was worked.\n"
+   },
+   "labourCost": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "**Cost at the point of scheduling.** A manager building a rota without seeing its cost is a manager who finds out from finance.\n"
+   },
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "displayName": {
+    "type": "string",
+    "readOnly": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "departmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "position": {
+    "type": "string",
+    "description": "What they are rostered to do — gate steward, cashier, lifeguard, technician. **Most positions never touch a till**, which is why a rota assignment is not a shift.\n"
+   },
+   "requiredRoleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Checked on assignment. A rota naming someone unqualified is a rota that gets overridden."
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where the position needs a till. **The link between a rota and a cash session**, without merging the two.\n"
+   },
+   "startsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "endsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "status": {
+    "$ref": "#/components/schemas/RotaStatus"
+   },
+   "breakMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "RotaStatus": {
+  "type": "string",
+  "enum": [
+   "planned",
+   "published",
+   "confirmed",
+   "swapPending",
+   "cancelled",
+   "completed",
+   "noShow"
+  ]
+ }
+}

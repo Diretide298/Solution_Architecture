@@ -1,0 +1,121 @@
+{
+ "AiCapability": {
+  "type": "string",
+  "description": "What a capability needs, not which provider serves it. This indirection is what makes \"no provider SDK in capability code\" enforceable.\n**`speechToText` and `textToSpeech` added 18 August (BL-164)** — voice added rather than declined. **Speech is the capability where UAE residency is hardest to satisfy**: the major providers run it in fewer regions than text, and a guest speaking into a kiosk is producing personal data in the moment. `AiProvider.residency` already carries the constraint and **speech is the capability most likely to fail it**, which is why it is separate rather than folded into `chat`.\n",
+  "enum": [
+   "chat",
+   "embedding",
+   "vision",
+   "rerank",
+   "speechToText",
+   "textToSpeech"
+  ]
+ },
+ "AiProvider": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.provider",
+  "required": [
+   "kind",
+   "capability",
+   "priority",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "kind": {
+    "$ref": "#/components/schemas/AiProviderKind"
+   },
+   "capability": {
+    "$ref": "#/components/schemas/AiCapability"
+   },
+   "model": {
+    "type": "string"
+   },
+   "failoverProviderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "BL-151. **A provider outage with no fallback is every AI surface going dark at once**, and the surfaces most likely to be noticed are the guest-facing ones.\n**Failover is declared per capability because a provider is** — a fallback covering chat and not embedding leaves search broken while the concierge works, which reads as a stranger failure than a clean outage.\n"
+   },
+   "degradeGracefully": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Where no fallback answers, the surface degrades rather than errors.** Semantic search falls back to keyword, the concierge offers a human, a recommendation returns the rule-based set — **an AI feature that returns a 500 is worse than one that quietly becomes ordinary software.**\n"
+   },
+   "priority": {
+    "type": "integer",
+    "description": "Failover order (8.4.26). Lower is tried first."
+   },
+   "scopeLevel": {
+    "type": "string",
+    "enum": [
+     "platform",
+     "tenant",
+     "venue"
+    ],
+    "description": "**Where this provider configuration applies, and therefore whose token pays for it.** A tenant-scoped provider means that tenant's usage bills against their own key at the provider — **an independent reconciliation source against our own meter**, which is the point of per-tenant tokens rather than one platform key.\n`venue` exists for the case where one venue's volume justifies its own key, or where a venue is billed separately from the rest of its tenant.\n"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "Resolved scope node. Nearest ancestor wins (ADR-0018)."
+   },
+   "tenantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Null only where `scopeLevel` is `platform`."
+   },
+   "credentialRef": {
+    "type": "string",
+    "description": "A key-vault reference, never the key. A key typed into a form ends up in a screenshot.\n"
+   },
+   "credentialRotatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
+   },
+   "credentialExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Where the provider issues expiring keys. **A key that lapses silently takes the assistant down without an error anyone reads** — the expiry is surfaced so it can be chased before it bites.\n"
+   },
+   "lastVerifiedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When `testAiProvider` last confirmed the key works."
+   },
+   "endpoint": {
+    "type": "string",
+    "nullable": true
+   },
+   "residency": {
+    "type": "string",
+    "description": "Where inference physically happens. **A prompt reaching a provider hosted elsewhere is a cross-border transfer** (ADR-0009), and this field is what makes that auditable rather than assumed.\n"
+   },
+   "maxTokens": {
+    "type": "integer"
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "AiProviderKind": {
+  "type": "string",
+  "enum": [
+   "openai",
+   "gemini",
+   "anthropic",
+   "azureOpenai",
+   "localLlm"
+  ]
+ }
+}

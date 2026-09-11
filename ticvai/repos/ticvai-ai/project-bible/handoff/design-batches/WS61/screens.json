@@ -1,0 +1,2034 @@
+[
+ {
+  "id": "BO-354",
+  "name": "Credential Operations Command Center",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "3",
+   "number": "15.3.1",
+   "page": 41
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/credential-operations-command-center-bo-354",
+   "component": "apps/venue-management-web/src/routes/access-venue/CredentialOperationsCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-355",
+    "BO-356",
+    "BO-357",
+    "BO-358",
+    "BO-359",
+    "BO-360",
+    "BO-361",
+    "BO-362",
+    "BO-363"
+   ],
+   "inferred": false,
+   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Venue Home",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-355",
+     "trigger": "Works in Virtual Ticket & Credential 360° Workspace",
+     "provenance": "flow F170 step 1→2",
+     "operation": "listCredential"
+    },
+    {
+     "to": "BO-356",
+     "trigger": "Works in Credential Generation & Issuance Monitor",
+     "provenance": "flow F170 step 3→4",
+     "operation": "listCredential"
+    },
+    {
+     "to": "BO-357",
+     "trigger": "Works in Credential Delivery & Distribution Operations",
+     "provenance": "flow F170 step 5→6",
+     "operation": "listCredential"
+    },
+    {
+     "to": "BO-358",
+     "trigger": "Works in Media Binding, Activation & Assignment Operations",
+     "provenance": "flow F170 step 7→8",
+     "operation": "listCredential"
+    },
+    {
+     "to": "BO-359",
+     "trigger": "Works in Credential Replacement, Reissue, Revocation & Recovery",
+     "provenance": "flow F170 step 9→10",
+     "operation": "listCredential"
+    },
+    {
+     "to": "BO-360",
+     "trigger": "Works in Failed Generation, Delivery & Credential Exception Management",
+     "provenance": "flow F170 step 11→12",
+     "operation": "listCredential"
+    },
+    {
+     "to": "BO-361",
+     "trigger": "Works in Credential Usage & Cross-Media Traceability",
+     "provenance": "flow F170 step 13→14",
+     "operation": "listCredential"
+    },
+    {
+     "to": "BO-362",
+     "trigger": "Works in Credential Security, Audit & Operational Evidence",
+     "provenance": "flow F170 step 15→16",
+     "operation": "listCredential"
+    },
+    {
+     "to": "BO-363",
+     "trigger": "Works in Ticket Media Analytics & AI Operations Intelligence",
+     "provenance": "flow F170 step 17→18",
+     "operation": "listCredential"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each record should show) — counts over a population, then the population",
+  "purpose": "Provide Operations, Ticketing, Customer Service and Technical teams with a real-time command center covering all issued credential media. This is the operational starting point for Area 15.",
+  "purposeNote": "Operations can understand the health, status and exceptions of all issued credentials from one central workspace.",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search credential operations",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Filter by"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "Brand",
+        "Venue",
+        "CredentialOperationsCommandCenterView.event",
+        "CredentialOperationsCommandCenterView.product",
+        "Date",
+        "Media",
+        "CredentialOperationsCommandCenterView.provider",
+        "Status",
+        "Channel",
+        "CredentialOperationsCommandCenterView.exception",
+        "Customer"
+       ],
+       "notes": "The pack filters this screen by brand, venue, event, product, date, media and 5 more — which are present is a decision the pack already made.",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Filter by"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Virtual Tickets Issued",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display",
+       "bindsTo": "CredentialOperationsCommandCenterView.virtualTicketsIssued"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Credentials Generated",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display",
+       "bindsTo": "CredentialOperationsCommandCenterView.credentialsGenerated"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Active Credentials",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display",
+       "bindsTo": "CredentialOperationsCommandCenterView.activeCredentials"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pending Generation",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display",
+       "bindsTo": "CredentialOperationsCommandCenterView.pendingGeneration"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pending Delivery",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display",
+       "bindsTo": "CredentialOperationsCommandCenterView.pendingDelivery"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pending Binding",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display",
+       "bindsTo": "CredentialOperationsCommandCenterView.pendingBinding"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pending Activation",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display",
+       "bindsTo": "CredentialOperationsCommandCenterView.pendingActivation"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Suspended",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display",
+       "bindsTo": "CredentialOperationsCommandCenterView.suspended"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Revoked",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display",
+       "bindsTo": "CredentialOperationsCommandCenterView.revoked"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Expired",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display",
+       "bindsTo": "CredentialOperationsCommandCenterView.expired"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Failed Generation",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display",
+       "bindsTo": "CredentialOperationsCommandCenterView.failedGeneration"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Failed Delivery",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display",
+       "bindsTo": "CredentialOperationsCommandCenterView.failedDelivery"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Synchronization Exceptions",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display",
+       "bindsTo": "CredentialOperationsCommandCenterView.synchronizationExceptions"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Multi-Media Virtual Tickets",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display",
+       "bindsTo": "CredentialOperationsCommandCenterView.multiMediaVirtualTickets"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Virtual Tickets Without Active Media",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "moduleTiles",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every credential operations",
+       "columns": [
+        "CredentialOperationsCommandCenterView.virtualTicketId",
+        "CredentialOperationsCommandCenterView.credentialId",
+        "CredentialOperationsCommandCenterView.mediaType",
+        "CredentialOperationsCommandCenterView.customerParticipant",
+        "CredentialOperationsCommandCenterView.product",
+        "CredentialOperationsCommandCenterView.event",
+        "CredentialOperationsCommandCenterView.credentialStatus",
+        "CredentialOperationsCommandCenterView.deliveryStatus",
+        "CredentialOperationsCommandCenterView.activationStatus",
+        "CredentialOperationsCommandCenterView.bindingStatus",
+        "CredentialOperationsCommandCenterView.provider",
+        "CredentialOperationsCommandCenterView.lastActivity",
+        "CredentialOperationsCommandCenterView.exception",
+        "CredentialOperationsCommandCenterView.owner"
+       ],
+       "bindsTo": "CredentialOperationsCommandCenterView",
+       "operation": "listCredential",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Each record should show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected credential operations",
+       "bindsTo": "CredentialOperationsCommandCenterView",
+       "columns": [
+        "CredentialOperationsCommandCenterView.virtualTicketId",
+        "CredentialOperationsCommandCenterView.credentialId",
+        "CredentialOperationsCommandCenterView.mediaType",
+        "CredentialOperationsCommandCenterView.customerParticipant",
+        "CredentialOperationsCommandCenterView.product",
+        "CredentialOperationsCommandCenterView.event",
+        "CredentialOperationsCommandCenterView.credentialStatus",
+        "CredentialOperationsCommandCenterView.deliveryStatus",
+        "CredentialOperationsCommandCenterView.activationStatus",
+        "CredentialOperationsCommandCenterView.bindingStatus",
+        "CredentialOperationsCommandCenterView.provider",
+        "CredentialOperationsCommandCenterView.lastActivity",
+        "CredentialOperationsCommandCenterView.exception",
+        "CredentialOperationsCommandCenterView.owner"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Display credentials by”, “Provide indicators such as”.",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Each record should show"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "banner",
+       "label": "Permissions this screen separates",
+       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Open Virtual Ticket, Generate Credential, Resend, Activate, Suspend Media, Replace, Revoke, Diagnose, View History. Each needs attaching to the control it gates, or the screen needs the control.",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Authorized users can"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The credential operations list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the credential operations untouched.",
+   "emptyFirstRun": "No credential operations yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the credential operations are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCredential",
+    "contract": "access",
+    "purpose": "Credential Operations Command Center",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-354"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 41. 32 of 39 labels bound to a contract property; 49 of 72 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-355",
+  "name": "Virtual Ticket & Credential 360° Workspace",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "3",
+   "number": "15.3.2",
+   "page": 43
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/virtual-ticket-credential-360-workspace-bo-355",
+   "component": "apps/venue-management-web/src/routes/access-venue/VirtualTicketCredential360Workspace.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-354"
+   ],
+   "exitTo": [
+    "BO-354"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-354, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-354",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F170 step 2→3",
+     "operation": "setVirtualTicketCredential"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen both a metric directory (§Display; Identify) and a per-row directory (§For each media show) — counts over a population, then the population",
+  "purpose": "Provide a complete operational view of one Virtual Ticket and every media credential currently or historically associated with it. This is one of the most important operational screens.",
+  "purposeNote": "Staff can view and manage the complete multi-media credential history of a Virtual Ticket without treating each credential as a separate ticket.",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Virtual Ticket ID",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
+       "bindsTo": "VirtualTicketCredential360WorkspaceView.virtualTicketId"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Ticket Holder",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
+       "bindsTo": "VirtualTicketCredential360WorkspaceView.ticketHolder"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Participant",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
+       "bindsTo": "VirtualTicketCredential360WorkspaceView.participant"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Product",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
+       "bindsTo": "VirtualTicketCredential360WorkspaceView.product"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Event",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
+       "bindsTo": "VirtualTicketCredential360WorkspaceView.event"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Performance",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
+       "bindsTo": "VirtualTicketCredential360WorkspaceView.performance"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Venue",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
+       "bindsTo": "VirtualTicketCredential360WorkspaceView.venue"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Seat",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
+       "bindsTo": "VirtualTicketCredential360WorkspaceView.seat"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Order",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
+       "bindsTo": "VirtualTicketCredential360WorkspaceView.order"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Ticket Status",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
+       "bindsTo": "VirtualTicketCredential360WorkspaceView.ticketStatus"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Usage Status",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
+       "bindsTo": "VirtualTicketCredential360WorkspaceView.usageStatus"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Validity",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
+       "bindsTo": "VirtualTicketCredential360WorkspaceView.validity"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Entitlements",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
+       "bindsTo": "VirtualTicketCredential360WorkspaceView.entitlements"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Primary",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Identify",
+       "bindsTo": "VirtualTicketCredential360WorkspaceView.primary"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Secondary",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Identify",
+       "bindsTo": "VirtualTicketCredential360WorkspaceView.secondary"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Fallback",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Identify",
+       "bindsTo": "VirtualTicketCredential360WorkspaceView.fallback"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Temporary",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Identify",
+       "bindsTo": "VirtualTicketCredential360WorkspaceView.temporary"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Revoked historical media",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Identify",
+       "bindsTo": "VirtualTicketCredential360WorkspaceView.revokedHistoricalMedia"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "moduleTiles",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every virtual ticket credential",
+       "columns": [
+        "VirtualTicketCredential360WorkspaceView.bindingId",
+        "VirtualTicketCredential360WorkspaceView.mediaType",
+        "VirtualTicketCredential360WorkspaceView.provider",
+        "VirtualTicketCredential360WorkspaceView.issued",
+        "VirtualTicketCredential360WorkspaceView.delivered",
+        "VirtualTicketCredential360WorkspaceView.activated",
+        "Valid From/To",
+        "VirtualTicketCredential360WorkspaceView.lastUpdate",
+        "Last presentation/use",
+        "VirtualTicketCredential360WorkspaceView.deviceReferenceWhereAppropriate",
+        "VirtualTicketCredential360WorkspaceView.status"
+       ],
+       "bindsTo": "VirtualTicketCredential360WorkspaceView",
+       "operation": "setVirtualTicketCredential",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §For each media show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected virtual ticket credential",
+       "bindsTo": "VirtualTicketCredential360WorkspaceView",
+       "columns": [
+        "VirtualTicketCredential360WorkspaceView.bindingId",
+        "VirtualTicketCredential360WorkspaceView.mediaType",
+        "VirtualTicketCredential360WorkspaceView.provider",
+        "VirtualTicketCredential360WorkspaceView.issued",
+        "VirtualTicketCredential360WorkspaceView.delivered",
+        "VirtualTicketCredential360WorkspaceView.activated",
+        "Valid From/To",
+        "VirtualTicketCredential360WorkspaceView.lastUpdate",
+        "Last presentation/use",
+        "VirtualTicketCredential360WorkspaceView.deviceReferenceWhereAppropriate",
+        "VirtualTicketCredential360WorkspaceView.status"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Credential Wallet”, “Media Status”, “Dynamic QR Active”, “Apple Wallet Active”, “Old RFID RF-88410”, “Provide one chronological timeline”.",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §For each media show"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "provenance": "contract operation setVirtualTicketCredential"
+      },
+      {
+       "kind": "banner",
+       "label": "Permissions this screen separates",
+       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Generate Additional Media, Bind RFID, Add Wallet Pass, Initiate Face Enrollment, Replace Media, Suspend, Revoke, Resend, Refresh, Diagnose. Each needs attaching to the control it gates, or the screen needs the control.",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Depending on permission"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The virtual ticket credential list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the virtual ticket credential untouched.",
+   "emptyFirstRun": "No virtual ticket credential yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the virtual ticket credential are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setVirtualTicketCredential",
+    "contract": "access",
+    "purpose": "Virtual Ticket & Credential 360° Workspace",
+    "trigger": "onAction",
+    "invalidates": [
+     "setVirtualTicketCredential"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-355"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 43. 27 of 29 labels bound to a contract property; 39 of 53 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-356",
+  "name": "Credential Generation & Issuance Monitor",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "3",
+   "number": "15.3.3",
+   "page": 45
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/credential-generation-issuance-monitor-bo-356",
+   "component": "apps/venue-management-web/src/routes/access-venue/CredentialGenerationIssuanceMonitor.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-354"
+   ],
+   "exitTo": [
+    "BO-354"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-354, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-354",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F170 step 4→5",
+     "operation": "listCredentialGenerationIssuance"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Show; Display) and no metric row",
+  "purpose": "Manage and monitor generation of credential instances from approved Board 2 media templates.",
+  "purposeNote": "operational visibility into successful and failed issuance.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Automatic Retry, Manual Retry, Retry Selected, Retry All Eligible, Escalate. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 45 §Support"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every credential generation issuance",
+       "columns": [
+        "→ Bound → Ready → Delivered",
+        "CredentialGenerationIssuanceMonitorView.requestId",
+        "CredentialGenerationIssuanceMonitorView.virtualTicket",
+        "CredentialGenerationIssuanceMonitorView.media",
+        "CredentialGenerationIssuanceMonitorView.template",
+        "CredentialGenerationIssuanceMonitorView.templateVersion",
+        "CredentialGenerationIssuanceMonitorView.product",
+        "CredentialGenerationIssuanceMonitorView.customer",
+        "Trigger",
+        "CredentialGenerationIssuanceMonitorView.provider",
+        "CredentialGenerationIssuanceMonitorView.requestedAt",
+        "CredentialGenerationIssuanceMonitorView.generatedAt",
+        "CredentialGenerationIssuanceMonitorView.status",
+        "CredentialGenerationIssuanceMonitorView.error"
+       ],
+       "bindsTo": "CredentialGenerationIssuanceMonitorView",
+       "operation": "listCredentialGenerationIssuance",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 45 §Show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected credential generation issuance",
+       "bindsTo": "CredentialGenerationIssuanceMonitorView",
+       "columns": [
+        "→ Bound → Ready → Delivered",
+        "CredentialGenerationIssuanceMonitorView.requestId",
+        "CredentialGenerationIssuanceMonitorView.virtualTicket",
+        "CredentialGenerationIssuanceMonitorView.media",
+        "CredentialGenerationIssuanceMonitorView.template",
+        "CredentialGenerationIssuanceMonitorView.templateVersion",
+        "CredentialGenerationIssuanceMonitorView.product",
+        "CredentialGenerationIssuanceMonitorView.customer",
+        "Trigger",
+        "CredentialGenerationIssuanceMonitorView.provider",
+        "CredentialGenerationIssuanceMonitorView.requestedAt",
+        "CredentialGenerationIssuanceMonitorView.generatedAt",
+        "CredentialGenerationIssuanceMonitorView.status",
+        "CredentialGenerationIssuanceMonitorView.error"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Generation Sources”, “Template Resolution”, “Bulk Generation”, “Failures may include”.",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 45 §Show"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Automatic Retry",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 45 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Manual Retry",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 45 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Retry Selected",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 45 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Retry All Eligible",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 45 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Escalate",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 45 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The credential generation issuance list.",
+   "error": "Could not load. Names which read failed and leaves the credential generation issuance untouched.",
+   "emptyFirstRun": "No credential generation issuance yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the credential generation issuance are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCredentialGenerationIssuance",
+    "contract": "access",
+    "purpose": "Credential Generation & Issuance Monitor",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "→ Bound → Ready → Delivered",
+    "CredentialGenerationIssuanceMonitorView.requestId",
+    "CredentialGenerationIssuanceMonitorView.virtualTicket",
+    "CredentialGenerationIssuanceMonitorView.media",
+    "CredentialGenerationIssuanceMonitorView.template",
+    "CredentialGenerationIssuanceMonitorView.templateVersion"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-356"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 45. 12 of 14 labels bound to a contract property; 19 of 57 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-357",
+  "name": "Credential Delivery & Distribution Operations",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "3",
+   "number": "15.3.4",
+   "page": 47
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/credential-delivery-distribution-operations-bo-357",
+   "component": "apps/venue-management-web/src/routes/access-venue/CredentialDeliveryDistributionOperations.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-354"
+   ],
+   "exitTo": [
+    "BO-354"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-354, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-354",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F170 step 6→7",
+     "operation": "listCredentialDeliveryDistribution"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
+  "purpose": "Manage how generated ticket media are delivered or made available to customers, participants and operational staff.",
+  "purposeNote": "delivery tracking.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: SMS Link, Send All, Send Selected, Resend Failed, Send Group, Export Status. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 47 §Support as applicable"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every credential delivery distribution",
+       "columns": [
+        "CredentialDeliveryDistributionOperationsView.virtualTicket",
+        "CredentialDeliveryDistributionOperationsView.media",
+        "CredentialDeliveryDistributionOperationsView.recipient",
+        "CredentialDeliveryDistributionOperationsView.channel",
+        "CredentialDeliveryDistributionOperationsView.destination",
+        "CredentialDeliveryDistributionOperationsView.sentAt",
+        "CredentialDeliveryDistributionOperationsView.deliveredAt",
+        "CredentialDeliveryDistributionOperationsView.openedDownloaded",
+        "CredentialDeliveryDistributionOperationsView.attempt",
+        "CredentialDeliveryDistributionOperationsView.status"
+       ],
+       "bindsTo": "CredentialDeliveryDistributionOperationsView",
+       "operation": "listCredentialDeliveryDistribution",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 47 §Show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected credential delivery distribution",
+       "bindsTo": "CredentialDeliveryDistributionOperationsView",
+       "columns": [
+        "CredentialDeliveryDistributionOperationsView.virtualTicket",
+        "CredentialDeliveryDistributionOperationsView.media",
+        "CredentialDeliveryDistributionOperationsView.recipient",
+        "CredentialDeliveryDistributionOperationsView.channel",
+        "CredentialDeliveryDistributionOperationsView.destination",
+        "CredentialDeliveryDistributionOperationsView.sentAt",
+        "CredentialDeliveryDistributionOperationsView.deliveredAt",
+        "CredentialDeliveryDistributionOperationsView.openedDownloaded",
+        "CredentialDeliveryDistributionOperationsView.attempt",
+        "CredentialDeliveryDistributionOperationsView.status"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Alternative states”, “Where allowed, support”.",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 47 §Show"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "SMS Link",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 47 §Support as applicable"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Send All",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 47 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Send Selected",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 47 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resend Failed",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 47 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Send Group",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 47 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Export Status",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 47 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The credential delivery distribution list.",
+   "error": "Could not load. Names which read failed and leaves the credential delivery distribution untouched.",
+   "emptyFirstRun": "No credential delivery distribution yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the credential delivery distribution are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCredentialDeliveryDistribution",
+    "contract": "access",
+    "purpose": "Credential Delivery & Distribution Operations",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "CredentialDeliveryDistributionOperationsView.virtualTicket",
+    "CredentialDeliveryDistributionOperationsView.media",
+    "CredentialDeliveryDistributionOperationsView.recipient",
+    "CredentialDeliveryDistributionOperationsView.channel",
+    "CredentialDeliveryDistributionOperationsView.destination",
+    "CredentialDeliveryDistributionOperationsView.sentAt"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-357"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 47. 10 of 10 labels bound to a contract property; 22 of 50 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-358",
+  "name": "Media Binding, Activation & Assignment Operations",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "3",
+   "number": "15.3.5",
+   "page": 48
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/media-binding-activation-assignment-operations-bo-358",
+   "component": "apps/venue-management-web/src/routes/access-venue/MediaBindingActivationAssignmentOperations.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-354"
+   ],
+   "exitTo": [
+    "BO-354"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-354, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-354",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F170 step 8→9",
+     "operation": "setMediaBindingActivation"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Manage credentials that require operational assignment or activation after ticket issuance.",
+  "purposeNote": "Operational staff can securely assign and activate supported physical, digital and biometric credential media against the correct Virtual Ticket.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Activate Now, Schedule, Activate on First Use, Activate on Collection. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 48 §Allow"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every media binding activation",
+       "columns": [
+        "MediaBindingActivationAssignmentOperationsView.virtualTicket",
+        "MediaBindingActivationAssignmentOperationsView.customer",
+        "MediaBindingActivationAssignmentOperationsView.product",
+        "MediaBindingActivationAssignmentOperationsView.existingMedia",
+        "MediaBindingActivationAssignmentOperationsView.newMediaType",
+        "MediaBindingActivationAssignmentOperationsView.credentialIdUid",
+        "MediaBindingActivationAssignmentOperationsView.provider",
+        "MediaBindingActivationAssignmentOperationsView.activation",
+        "MediaBindingActivationAssignmentOperationsView.validity",
+        "MediaBindingActivationAssignmentOperationsView.bindingRule"
+       ],
+       "bindsTo": "MediaBindingActivationAssignmentOperationsView",
+       "operation": "setMediaBindingActivation",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 48 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected media binding activation",
+       "bindsTo": "MediaBindingActivationAssignmentOperationsView",
+       "columns": [
+        "MediaBindingActivationAssignmentOperationsView.virtualTicket",
+        "MediaBindingActivationAssignmentOperationsView.customer",
+        "MediaBindingActivationAssignmentOperationsView.product",
+        "MediaBindingActivationAssignmentOperationsView.existingMedia",
+        "MediaBindingActivationAssignmentOperationsView.newMediaType",
+        "MediaBindingActivationAssignmentOperationsView.credentialIdUid",
+        "MediaBindingActivationAssignmentOperationsView.provider",
+        "MediaBindingActivationAssignmentOperationsView.activation",
+        "MediaBindingActivationAssignmentOperationsView.validity",
+        "MediaBindingActivationAssignmentOperationsView.bindingRule"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “This is especially important for”, “Scan Virtual Ticket QR”, “Scan Wristband UID”, “Resolve Virtual Ticket”, “Bind”, “Activate”.",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 48 §Display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Activate Now",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 48 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Schedule",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 48 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Activate on First Use",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 48 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Activate on Collection",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 48 §Allow"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The media binding activation list.",
+   "error": "Could not load. Names which read failed and leaves the media binding activation untouched.",
+   "emptyFirstRun": "No media binding activation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the media binding activation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setMediaBindingActivation",
+    "contract": "access",
+    "purpose": "Media Binding, Activation & Assignment Operations",
+    "trigger": "onAction",
+    "invalidates": [
+     "setMediaBindingActivation"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "MediaBindingActivationAssignmentOperationsView.virtualTicket",
+    "MediaBindingActivationAssignmentOperationsView.customer",
+    "MediaBindingActivationAssignmentOperationsView.product",
+    "MediaBindingActivationAssignmentOperationsView.existingMedia",
+    "MediaBindingActivationAssignmentOperationsView.newMediaType",
+    "MediaBindingActivationAssignmentOperationsView.credentialIdUid"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-358"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 48. 10 of 10 labels bound to a contract property; 15 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-359",
+  "name": "Credential Replacement, Reissue, Revocation & Recovery",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "3",
+   "number": "15.3.6",
+   "page": 50
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/credential-replacement-reissue-revocation-recovery-bo-359",
+   "component": "apps/venue-management-web/src/routes/access-venue/CredentialReplacementReissueRevocationRecovery.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-354"
+   ],
+   "exitTo": [
+    "BO-354"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-354, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-354",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F170 step 10→11",
+     "operation": "listCredentialReplacementReissue"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure/reference) and no display directory — it is settings, not a population",
+  "purpose": "Manage operational credential changes while preserving the underlying Virtual Ticket.",
+  "purposeNote": "Ticket and without losing historical traceability.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Customer changed phone. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 50 §Support"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Immediate old-media revocation",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 50 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Grace period",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 50 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum replacements",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 50 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Identity verification",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 50 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Supervisor approval",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 50 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Reason codes",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 50 §Configure/reference"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Customer changed phone",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 50 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The credential replacement reissue configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the credential replacement reissue untouched.",
+   "emptyFirstRun": "No credential replacement reissue configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCredentialReplacementReissue",
+    "contract": "access",
+    "purpose": "Credential Replacement, Reissue, Revocation & Recovery",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-359"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 50. 0 of 0 labels bound to a contract property; 7 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-360",
+  "name": "Failed Generation, Delivery & Credential Exception Management",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "3",
+   "number": "15.3.7",
+   "page": 51
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/failed-generation-delivery-credential-exception-manageme-bo-360",
+   "component": "apps/venue-management-web/src/routes/access-venue/FailedGenerationDeliveryCredentialExceptionManag.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-354"
+   ],
+   "exitTo": [
+    "BO-354"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-354, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-354",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F170 step 12→13",
+     "operation": "listFailedGenerationDelivery"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Provide one dedicated operational queue for credential-related failures.",
+  "purposeNote": "Credential failures are centrally identified, prioritized and resolved before unnecessarily impacting customer admission or fulfillment.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Retry, Escalate, Assign Owner, Open Technical Case. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 51 §Allow"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every failed generation delivery",
+       "columns": [
+        "FailedGenerationDeliveryCredentialExceptionManagemenView.severity",
+        "FailedGenerationDeliveryCredentialExceptionManagemenView.virtualTicket",
+        "FailedGenerationDeliveryCredentialExceptionManagemenView.credential",
+        "FailedGenerationDeliveryCredentialExceptionManagemenView.media",
+        "FailedGenerationDeliveryCredentialExceptionManagemenView.customer",
+        "FailedGenerationDeliveryCredentialExceptionManagemenView.event",
+        "FailedGenerationDeliveryCredentialExceptionManagemenView.failure",
+        "FailedGenerationDeliveryCredentialExceptionManagemenView.time",
+        "FailedGenerationDeliveryCredentialExceptionManagemenView.operationalImpact",
+        "Retry Status",
+        "FailedGenerationDeliveryCredentialExceptionManagemenView.owner"
+       ],
+       "bindsTo": "FailedGenerationDeliveryCredentialExceptionManagemenView",
+       "operation": "listFailedGenerationDelivery",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 51 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected failed generation delivery",
+       "bindsTo": "FailedGenerationDeliveryCredentialExceptionManagemenView",
+       "columns": [
+        "FailedGenerationDeliveryCredentialExceptionManagemenView.severity",
+        "FailedGenerationDeliveryCredentialExceptionManagemenView.virtualTicket",
+        "FailedGenerationDeliveryCredentialExceptionManagemenView.credential",
+        "FailedGenerationDeliveryCredentialExceptionManagemenView.media",
+        "FailedGenerationDeliveryCredentialExceptionManagemenView.customer",
+        "FailedGenerationDeliveryCredentialExceptionManagemenView.event",
+        "FailedGenerationDeliveryCredentialExceptionManagemenView.failure",
+        "FailedGenerationDeliveryCredentialExceptionManagemenView.time",
+        "FailedGenerationDeliveryCredentialExceptionManagemenView.operationalImpact",
+        "Retry Status",
+        "FailedGenerationDeliveryCredentialExceptionManagemenView.owner"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Include”, “Consider”.",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 51 §Display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Retry",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 51 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Escalate",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 51 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Assign Owner",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 51 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Open Technical Case",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 51 §Allow"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The failed generation delivery list.",
+   "error": "Could not load. Names which read failed and leaves the failed generation delivery untouched.",
+   "emptyFirstRun": "No failed generation delivery yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the failed generation delivery are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listFailedGenerationDelivery",
+    "contract": "access",
+    "purpose": "Failed Generation, Delivery & Credential Exception Management",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "FailedGenerationDeliveryCredentialExceptionManagemenView.severity",
+    "FailedGenerationDeliveryCredentialExceptionManagemenView.virtualTicket",
+    "FailedGenerationDeliveryCredentialExceptionManagemenView.credential",
+    "FailedGenerationDeliveryCredentialExceptionManagemenView.media",
+    "FailedGenerationDeliveryCredentialExceptionManagemenView.customer",
+    "FailedGenerationDeliveryCredentialExceptionManagemenView.event"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-360"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 51. 10 of 11 labels bound to a contract property; 15 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-361",
+  "name": "Credential Usage & Cross-Media Traceability",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "3",
+   "number": "15.3.8",
+   "page": 53
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/credential-usage-cross-media-traceability-bo-361",
+   "component": "apps/venue-management-web/src/routes/access-venue/CredentialUsageCrossMediaTraceability.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-354"
+   ],
+   "exitTo": [
+    "BO-354"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-354, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-354",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F170 step 14→15",
+     "operation": "listCredentialUsageCross"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Capture/reference) and no display directory — it is settings, not a population",
+  "purpose": "Provide end-to-end visibility into how the different media attached to one Virtual Ticket have been presented or used. This screen is for credential traceability, while Area 16 remains responsible for the actual access-control decision.",
+  "purposeNote": "authoritative admission decision engine.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: What happened to the master entitlement?. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 53 §Allow administrators to understand"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Virtual Ticket",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 53 §Capture/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Credential",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 53 §Capture/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Media",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 53 §Capture/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Presentation timestamp",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 53 §Capture/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Location",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 53 §Capture/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Device",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 53 §Capture/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "External system",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 53 §Capture/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Transaction type",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 53 §Capture/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Result",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 53 §Capture/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Entitlement impact",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 53 §Capture/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Synchronization status",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 53 §Capture/reference"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "What happened to the master entitlement?",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 53 §Allow administrators to understand"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The credential usage cross-media configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the credential usage cross-media untouched.",
+   "emptyFirstRun": "No credential usage cross-media configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCredentialUsageCross",
+    "contract": "access",
+    "purpose": "Credential Usage & Cross-Media Traceability",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-361"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 53. 0 of 0 labels bound to a contract property; 12 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-362",
+  "name": "Credential Security, Audit & Operational Evidence",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "3",
+   "number": "15.3.9",
+   "page": 54
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/credential-security-audit-operational-evidence-bo-362",
+   "component": "apps/venue-management-web/src/routes/access-venue/CredentialSecurityAuditOperationalEvidence.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-354"
+   ],
+   "exitTo": [
+    "BO-354"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-354, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-354",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F170 step 16→17",
+     "operation": "listCredentialSecurityOperational"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Identify) and no metric row",
+  "purpose": "Maintain complete evidence of credential creation and lifecycle activity.",
+  "purposeNote": "Every significant credential lifecycle action is traceable with sufficient evidence to reconstruct who did what, when, why and to which Virtual Ticket.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every credential security audit",
+       "columns": [
+        "CredentialSecurityAuditOperationalEvidenceView.excessiveRegeneration",
+        "CredentialSecurityAuditOperationalEvidenceView.repeatedReplacement",
+        "CredentialSecurityAuditOperationalEvidenceView.suspiciousRebinding",
+        "CredentialSecurityAuditOperationalEvidenceView.multipleCredentialAssignments",
+        "CredentialSecurityAuditOperationalEvidenceView.unexpectedProviderTokenChanges",
+        "CredentialSecurityAuditOperationalEvidenceView.unauthorizedAdministrativeActions"
+       ],
+       "bindsTo": "CredentialSecurityAuditOperationalEvidenceView",
+       "operation": "listCredentialSecurityOperational",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 54 §Identify"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected credential security audit",
+       "bindsTo": "CredentialSecurityAuditOperationalEvidenceView",
+       "columns": [
+        "CredentialSecurityAuditOperationalEvidenceView.excessiveRegeneration",
+        "CredentialSecurityAuditOperationalEvidenceView.repeatedReplacement",
+        "CredentialSecurityAuditOperationalEvidenceView.suspiciousRebinding",
+        "CredentialSecurityAuditOperationalEvidenceView.multipleCredentialAssignments",
+        "CredentialSecurityAuditOperationalEvidenceView.unexpectedProviderTokenChanges",
+        "CredentialSecurityAuditOperationalEvidenceView.unauthorizedAdministrativeActions"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Record”, “RFID-1001”, “Access Control”, “Evidence Export”.",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 54 §Identify"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The credential security audit list.",
+   "error": "Could not load. Names which read failed and leaves the credential security audit untouched.",
+   "emptyFirstRun": "No credential security audit yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the credential security audit are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCredentialSecurityOperational",
+    "contract": "access",
+    "purpose": "Credential Security, Audit & Operational Evidence",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "CredentialSecurityAuditOperationalEvidenceView.excessiveRegeneration",
+    "CredentialSecurityAuditOperationalEvidenceView.repeatedReplacement",
+    "CredentialSecurityAuditOperationalEvidenceView.suspiciousRebinding",
+    "CredentialSecurityAuditOperationalEvidenceView.multipleCredentialAssignments",
+    "CredentialSecurityAuditOperationalEvidenceView.unexpectedProviderTokenChanges",
+    "CredentialSecurityAuditOperationalEvidenceView.unauthorizedAdministrativeActions"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-362"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 54. 6 of 6 labels bound to a contract property; 21 of 55 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-363",
+  "name": "Ticket Media Analytics & AI Operations Intelligence",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "3",
+   "number": "15.3.10",
+   "page": 56
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/ticket-media-analytics-ai-operations-intelligence-bo-363",
+   "component": "apps/venue-management-web/src/routes/access-venue/TicketMediaAnalyticsAiOperationsIntelligence.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-354"
+   ],
+   "exitTo": [
+    "BO-354"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-354, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Analyze; Compare) and no metric row",
+  "purpose": "Provide management and operations with analytics and AI intelligence across Virtual Tickets and credential media. This should be a serious operational intelligence layer—not simply a chatbot.",
+  "purposeNote": "and operational performance without transferring authoritative ticket or security decisions to generative AI. Board 3 — Final Screen Register",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search ticket media analytics",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 56 §Analyze by"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "Brand",
+        "Venue",
+        "Event",
+        "Product",
+        "Channel",
+        "Media",
+        "Provider",
+        "Device",
+        "Customer segment",
+        "Time period"
+       ],
+       "notes": "The pack filters this screen by brand, venue, event, product, channel, media and 4 more — which are present is a decision the pack already made.",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 56 §Analyze by"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every ticket media analytics",
+       "columns": [
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.credentialsGenerated",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.generationSuccess",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.deliverySuccess",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.activation",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.walletAdoption",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.rfidAdoption",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.faceCredentialAdoption",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.multiMediaAdoption",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.replacementRate",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.revocationRate",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.generationFailure",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.deliveryFailure",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.averageGenerationTime",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.averageResolutionTime",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.mediaUsageDistribution",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.providerUptime",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.generationFailures",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.encodingFailures",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.deliveryFailures",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.synchronizationDelay",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.replacementFrequency"
+       ],
+       "bindsTo": "TicketMediaAnalyticsAiOperationsIntelligenceView",
+       "operation": "listTicketMedia",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 56 §Analyze"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected ticket media analytics",
+       "bindsTo": "TicketMediaAnalyticsAiOperationsIntelligenceView",
+       "columns": [
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.credentialsGenerated",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.generationSuccess",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.deliverySuccess",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.activation",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.walletAdoption",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.rfidAdoption",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.faceCredentialAdoption",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.multiMediaAdoption",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.replacementRate",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.revocationRate",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.generationFailure",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.deliveryFailure",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.averageGenerationTime",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.averageResolutionTime",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.mediaUsageDistribution",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.providerUptime",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.generationFailures",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.encodingFailures",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.deliveryFailures",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.synchronizationDelay",
+        "TicketMediaAnalyticsAiOperationsIntelligenceView.replacementFrequency"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Eligible customers”, “Backend Screen”, “Credential Operations Command Center”, “Operational exceptions”, “ONE VIRTUAL TICKET”.",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 56 §Analyze"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The ticket media analytics list.",
+   "error": "Could not load. Names which read failed and leaves the ticket media analytics untouched.",
+   "emptyFirstRun": "No ticket media analytics yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the ticket media analytics are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listTicketMedia",
+    "contract": "access",
+    "purpose": "Ticket Media Analytics & AI Operations Intelligence",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "TicketMediaAnalyticsAiOperationsIntelligenceView.credentialsGenerated",
+    "TicketMediaAnalyticsAiOperationsIntelligenceView.generationSuccess",
+    "TicketMediaAnalyticsAiOperationsIntelligenceView.deliverySuccess",
+    "TicketMediaAnalyticsAiOperationsIntelligenceView.activation",
+    "TicketMediaAnalyticsAiOperationsIntelligenceView.walletAdoption",
+    "TicketMediaAnalyticsAiOperationsIntelligenceView.rfidAdoption"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-363"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 56. 21 of 31 labels bound to a contract property; 31 of 133 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

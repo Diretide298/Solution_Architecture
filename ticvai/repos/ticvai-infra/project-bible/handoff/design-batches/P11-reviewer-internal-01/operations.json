@@ -1,0 +1,83 @@
+{
+ "decideApprovalRequest": {
+  "method": "POST",
+  "path": "/approval-requests/{requestId}/decide",
+  "contract": "approvals",
+  "summary": "Approve or reject",
+  "permission": "APPROVAL_DECIDE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalRequest"
+ },
+ "listAccreditationBadges": {
+  "method": "GET",
+  "path": "/accreditation-badges",
+  "contract": "approvals",
+  "summary": "Badges issued and their state",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AccreditationBadge"
+ },
+ "listApprovalRequests": {
+  "method": "GET",
+  "path": "/approval-requests",
+  "contract": "approvals",
+  "summary": "Requests awaiting a decision, or already decided",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "assignedToMe",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "raisedByMe",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "breachingWithinMinutes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ }
+}

@@ -1,0 +1,163 @@
+{
+ "approvePartnerStatuLifecycle": {
+  "method": "PUT",
+  "path": "/partner-statu-lifecycle",
+  "contract": "subscription",
+  "summary": "Partner Approval, Status & Lifecycle Management",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": "PartnerApprovalStatusLifecycleManagementInput",
+  "responds": "PartnerApprovalStatusLifecycleManagementView"
+ },
+ "listPartner": {
+  "method": "GET",
+  "path": "/partner",
+  "contract": "subscription",
+  "summary": "Partner Management Command Center",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "brand",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "accountManager",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "integrationType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "risk",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "PartnerManagementCommandCenterView"
+ },
+ "listPartnerAccessRole": {
+  "method": "GET",
+  "path": "/partner-access-role",
+  "contract": "subscription",
+  "summary": "Partner Access, Roles & Permission Profile",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PartnerAccessRolesPermissionProfileView"
+ },
+ "listPartnerContactUser": {
+  "method": "GET",
+  "path": "/partner-contact-user",
+  "contract": "subscription",
+  "summary": "Partner Contacts & User Administration",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PartnerContactsUserAdministrationView"
+ },
+ "listPartnerDocumentationCompliance": {
+  "method": "GET",
+  "path": "/partner-documentation-compliance",
+  "contract": "subscription",
+  "summary": "Partner Documentation & Compliance Repository",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PartnerDocumentationComplianceRepositoryView"
+ },
+ "listPartnerOnboardingApplication": {
+  "method": "GET",
+  "path": "/partner-onboarding-application",
+  "contract": "subscription",
+  "summary": "Partner Onboarding & Application Workflow",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PartnerOnboardingApplicationWorkflowView"
+ },
+ "listPartnerProfileReadiness": {
+  "method": "GET",
+  "path": "/partner-profile-readiness",
+  "contract": "subscription",
+  "summary": "Partner 360° Profile, Readiness & AI Review",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Partner360ProfileReadinessAiReviewView"
+ },
+ "listTerritoryMarketDistribution": {
+  "method": "GET",
+  "path": "/territory-market-distribution",
+  "contract": "subscription",
+  "summary": "Territory, Market & Distribution Rights",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "TerritoryMarketDistributionRightsView"
+ },
+ "setPartnerBrandVenue": {
+  "method": "PUT",
+  "path": "/partner-brand-venue",
+  "contract": "subscription",
+  "summary": "Partner Brand, Venue & Business Scope Assignment",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": "PartnerBrandVenueBusinessScopeAssignmentInput",
+  "responds": "PartnerBrandVenueBusinessScopeAssignmentView"
+ },
+ "setPartnerProfileOrganization": {
+  "method": "PUT",
+  "path": "/partner-profile-organization",
+  "contract": "subscription",
+  "summary": "Partner Profile & Organization Setup",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": "PartnerProfileOrganizationSetupInput",
+  "responds": "PartnerProfileOrganizationSetupView"
+ }
+}

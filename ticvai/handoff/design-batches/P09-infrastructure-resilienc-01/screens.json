@@ -1,0 +1,1068 @@
+[
+ {
+  "id": "ADM-014",
+  "name": "Auto-Scaling Configuration",
+  "module": "Infrastructure & Resilience",
+  "requiresModule": "membership",
+  "wave": 3,
+  "capability": "C96",
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/general/auto-scaling-configuration",
+   "component": "apps/ticvai-web/src/routes/general/AutoScalingConfigurationForm.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002",
+    "ADM-013"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "ADM-001",
+    "ADM-002",
+    "ADM-003"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-001",
+     "trigger": "Platform Login / MFA",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-003",
+     "trigger": "Cross-Tenant Health Dashboard",
+     "carries": [
+      "cellId",
+      "rightId"
+     ],
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "openQuestions": [
+   "No contract — infrastructure, Terraform not API"
+  ],
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listCellJobs` reads the population and `getCellCapacity` reads one of them — list, select, act",
+  "purpose": "Change how auto-scaling behaves here, and see which level the current value came from.",
+  "gaps": [
+   {
+    "operation": "getCell",
+    "why": "**3 declared operations reach no component on this screen**: getCell, getCellHealth, getScalingPolicy. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every auto-scaling",
+       "bindsTo": "CellJob",
+       "columns": [
+        "CellJob.id",
+        "CellJob.kind",
+        "CellJob.status",
+        "CellJob.progressPercent",
+        "CellJob.message",
+        "CellJob.error",
+        "CellJob.scheduledFor",
+        "CellJob.completedAt"
+       ],
+       "operation": "listCellJobs",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}/jobs"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected auto-scaling",
+       "bindsTo": "CellCapacity",
+       "columns": [
+        "CellCapacity.kind",
+        "CellCapacity.tenantCount",
+        "CellCapacity.isConstrained",
+        "CellCapacity.constrainedDimension",
+        "CellCapacity.dimensions",
+        "CellCapacity.forecastBreachAt",
+        "CellCapacity.measuredAt"
+       ],
+       "operation": "getCellCapacity",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}/capacity"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "destructiveButton",
+       "label": "Cancel",
+       "operation": "cancelDecommission",
+       "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Decommission",
+       "operation": "decommissionCell",
+       "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateCellTier",
+       "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmCancelDecommission",
+    "component": "confirmDialog",
+    "trigger": "Cancel",
+    "body": "**Names what `cancelDecommission` changes and what it leaves alone**, in the consequence rather than the verb. A auto-scaling this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
+   }
+  ],
+  "states": {
+   "loading": "The auto-scaling list.",
+   "error": "Could not load. Names which read failed and leaves the auto-scaling untouched.",
+   "emptyFirstRun": "No auto-scaling yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the auto-scaling are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getCellCapacity",
+    "contract": "subscription",
+    "purpose": "Load against headroom",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "cancelDecommission",
+    "contract": "subscription",
+    "purpose": "Halt a decommission",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCellJobs"
+    ]
+   },
+   {
+    "operationId": "decommissionCell",
+    "contract": "subscription",
+    "purpose": "Begin decommissioning a cell",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCellJobs"
+    ]
+   },
+   {
+    "operationId": "getCell",
+    "contract": "subscription",
+    "purpose": "Read a cell",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getCellHealth",
+    "contract": "subscription",
+    "purpose": "Cell health and schema version",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCellJobs",
+    "contract": "subscription",
+    "purpose": "Provisioning, migration and maintenance jobs",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateCellTier",
+    "contract": "subscription",
+    "purpose": "Change a cell's tier",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCellJobs"
+    ]
+   },
+   {
+    "operationId": "getScalingPolicy",
+    "contract": "platform-ops",
+    "purpose": "Floors, ceilings and target utilisation",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "cellId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `cellId`.",
+   "preloaded": [
+    "CellCapacity.kind",
+    "CellCapacity.tenantCount",
+    "CellCapacity.isConstrained",
+    "CellCapacity.constrainedDimension",
+    "CellCapacity.dimensions"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-014"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-030",
+  "name": "Infrastructure Sizing & Scaling Policy",
+  "module": "Infrastructure & Resilience",
+  "requiresModule": "membership",
+  "wave": 3,
+  "capability": "C96",
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/general/infrastructure-sizing-and-scaling-policy",
+   "component": "apps/ticvai-web/src/routes/general/InfrastructureSizingAndScalingPolicyForm.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "ADM-001",
+    "ADM-002",
+    "ADM-003"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-001",
+     "trigger": "Platform Login / MFA",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-003",
+     "trigger": "Cross-Tenant Health Dashboard",
+     "carries": [
+      "cellId",
+      "rightId"
+     ],
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "openQuestions": [
+   "No contract — Terraform"
+  ],
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listCellJobs` reads the population and `getCellCapacity` reads one of them — list, select, act",
+  "purpose": "See infrastructure sizing & scaling policy for this venue.",
+  "gaps": [
+   {
+    "operation": "getCell",
+    "why": "**3 declared operations reach no component on this screen**: getCell, getCellHealth, getScalingPolicy. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every infrastructure sizing scaling",
+       "bindsTo": "CellJob",
+       "columns": [
+        "CellJob.id",
+        "CellJob.kind",
+        "CellJob.status",
+        "CellJob.progressPercent",
+        "CellJob.message",
+        "CellJob.error",
+        "CellJob.scheduledFor",
+        "CellJob.completedAt"
+       ],
+       "operation": "listCellJobs",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}/jobs"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected infrastructure sizing scaling",
+       "bindsTo": "CellCapacity",
+       "columns": [
+        "CellCapacity.kind",
+        "CellCapacity.tenantCount",
+        "CellCapacity.isConstrained",
+        "CellCapacity.constrainedDimension",
+        "CellCapacity.dimensions",
+        "CellCapacity.forecastBreachAt",
+        "CellCapacity.measuredAt"
+       ],
+       "operation": "getCellCapacity",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}/capacity"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "destructiveButton",
+       "label": "Cancel",
+       "operation": "cancelDecommission",
+       "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Decommission",
+       "operation": "decommissionCell",
+       "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateCellTier",
+       "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setScalingPolicy",
+       "provenance": "contract platform-ops.yaml PUT /scaling-policies"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmCancelDecommission",
+    "component": "confirmDialog",
+    "trigger": "Cancel",
+    "body": "**Names what `cancelDecommission` changes and what it leaves alone**, in the consequence rather than the verb. A infrastructure sizing scaling this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
+   }
+  ],
+  "states": {
+   "loading": "The infrastructure sizing scaling list.",
+   "error": "Could not load. Names which read failed and leaves the infrastructure sizing scaling untouched.",
+   "emptyFirstRun": "No infrastructure sizing scaling yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the infrastructure sizing scaling are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getCellCapacity",
+    "contract": "subscription",
+    "purpose": "Load against headroom",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "cancelDecommission",
+    "contract": "subscription",
+    "purpose": "Halt a decommission",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCellJobs"
+    ]
+   },
+   {
+    "operationId": "decommissionCell",
+    "contract": "subscription",
+    "purpose": "Begin decommissioning a cell",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCellJobs"
+    ]
+   },
+   {
+    "operationId": "getCell",
+    "contract": "subscription",
+    "purpose": "Read a cell",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getCellHealth",
+    "contract": "subscription",
+    "purpose": "Cell health and schema version",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCellJobs",
+    "contract": "subscription",
+    "purpose": "Provisioning, migration and maintenance jobs",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateCellTier",
+    "contract": "subscription",
+    "purpose": "Change a cell's tier",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCellJobs"
+    ]
+   },
+   {
+    "operationId": "getScalingPolicy",
+    "contract": "platform-ops",
+    "purpose": "The policy as it stands",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setScalingPolicy",
+    "contract": "platform-ops",
+    "purpose": "Change it",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCellJobs"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "cellId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `cellId`.",
+   "preloaded": [
+    "CellCapacity.kind",
+    "CellCapacity.tenantCount",
+    "CellCapacity.isConstrained",
+    "CellCapacity.constrainedDimension",
+    "CellCapacity.dimensions"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-030"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-033",
+  "name": "Backup & DR Status",
+  "module": "Infrastructure & Resilience",
+  "requiresModule": "membership",
+  "wave": 2,
+  "capability": "C96",
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/general/backup-and-dr-status",
+   "component": "apps/ticvai-web/src/routes/general/BackupAndDrStatusDashboard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "ADM-001",
+    "ADM-002",
+    "ADM-003"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-001",
+     "trigger": "Platform Login / MFA",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-003",
+     "trigger": "Cross-Tenant Health Dashboard",
+     "carries": [
+      "cellId",
+      "rightId"
+     ],
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listCellJobs` reads the population and `getCellHealth` reads one of them — list, select, act",
+  "purpose": "See backup & dr status for this venue.",
+  "gaps": [
+   {
+    "operation": "getCell",
+    "why": "**3 declared operations reach no component on this screen**: getCell, getCellCapacity, listBackupRuns. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every backup status",
+       "bindsTo": "CellJob",
+       "columns": [
+        "CellJob.id",
+        "CellJob.kind",
+        "CellJob.status",
+        "CellJob.progressPercent",
+        "CellJob.message",
+        "CellJob.error",
+        "CellJob.scheduledFor",
+        "CellJob.completedAt"
+       ],
+       "operation": "listCellJobs",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}/jobs"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected backup status",
+       "bindsTo": "CellHealth",
+       "columns": [
+        "CellHealth.isHealthy",
+        "CellHealth.isSchemaBehind",
+        "CellHealth.databaseStatus",
+        "CellHealth.replicationLagSeconds",
+        "CellHealth.lastBackupAt",
+        "CellHealth.lastRestoreDrillAt",
+        "CellHealth.checkedAt"
+       ],
+       "operation": "getCellHealth",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}/health"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "destructiveButton",
+       "label": "Cancel",
+       "operation": "cancelDecommission",
+       "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Decommission",
+       "operation": "decommissionCell",
+       "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateCellTier",
+       "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmCancelDecommission",
+    "component": "confirmDialog",
+    "trigger": "Cancel",
+    "body": "**Names what `cancelDecommission` changes and what it leaves alone**, in the consequence rather than the verb. A backup status this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
+   }
+  ],
+  "states": {
+   "loading": "The backup status list.",
+   "error": "Could not load. Names which read failed and leaves the backup status untouched.",
+   "emptyFirstRun": "No backup status yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the backup status are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getCellHealth",
+    "contract": "subscription",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "cancelDecommission",
+    "contract": "subscription",
+    "purpose": "Halt a decommission",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCellJobs"
+    ]
+   },
+   {
+    "operationId": "decommissionCell",
+    "contract": "subscription",
+    "purpose": "Begin decommissioning a cell",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCellJobs"
+    ]
+   },
+   {
+    "operationId": "getCell",
+    "contract": "subscription",
+    "purpose": "Read a cell",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getCellCapacity",
+    "contract": "subscription",
+    "purpose": "Load against headroom",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCellJobs",
+    "contract": "subscription",
+    "purpose": "Provisioning, migration and maintenance jobs",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateCellTier",
+    "contract": "subscription",
+    "purpose": "Change a cell's tier",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCellJobs"
+    ]
+   },
+   {
+    "operationId": "listBackupRuns",
+    "contract": "platform-ops",
+    "purpose": "Backups taken and how old the newest is",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "cellId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `cellId`.",
+   "preloaded": [
+    "CellHealth.isHealthy",
+    "CellHealth.isSchemaBehind",
+    "CellHealth.databaseStatus",
+    "CellHealth.replicationLagSeconds",
+    "CellHealth.lastBackupAt"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-033"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-034",
+  "name": "Archival Job Monitor",
+  "module": "Infrastructure & Resilience",
+  "requiresModule": "membership",
+  "wave": 3,
+  "capability": "C96",
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/general/archival-job-monitor",
+   "component": "apps/ticvai-web/src/routes/general/ArchivalJobMonitorDashboard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "ADM-001",
+    "ADM-002",
+    "ADM-003"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-001",
+     "trigger": "Platform Login / MFA",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-003",
+     "trigger": "Cross-Tenant Health Dashboard",
+     "carries": [
+      "cellId",
+      "rightId"
+     ],
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "openQuestions": [
+   "No contract — retention not specified"
+  ],
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listCellJobs` reads the population and `getCell` reads one of them — list, select, act",
+  "purpose": "Find archival job monitor for this venue.",
+  "gaps": [
+   {
+    "operation": "getCellCapacity",
+    "why": "**3 declared operations reach no component on this screen**: getCellCapacity, getCellHealth, listArchivalJobs. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every archival job",
+       "bindsTo": "CellJob",
+       "columns": [
+        "CellJob.id",
+        "CellJob.kind",
+        "CellJob.status",
+        "CellJob.progressPercent",
+        "CellJob.message",
+        "CellJob.error",
+        "CellJob.scheduledFor",
+        "CellJob.completedAt"
+       ],
+       "operation": "listCellJobs",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}/jobs"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected archival job",
+       "bindsTo": "CellDetail",
+       "columns": [
+        "CellDetail.id",
+        "CellDetail.name",
+        "CellDetail.kind",
+        "CellDetail.clusterId",
+        "CellDetail.isReachable",
+        "CellDetail.lastContactAt",
+        "CellDetail.licenceExpiresAt",
+        "CellDetail.participatesInCrossCell",
+        "CellDetail.regionId",
+        "CellDetail.regionName",
+        "CellDetail.countryCode",
+        "CellDetail.tier",
+        "CellDetail.status",
+        "CellDetail.cloudProvider",
+        "CellDetail.cloudRegion",
+        "CellDetail.apiEndpoint"
+       ],
+       "operation": "getCell",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "destructiveButton",
+       "label": "Cancel",
+       "operation": "cancelDecommission",
+       "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Decommission",
+       "operation": "decommissionCell",
+       "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateCellTier",
+       "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmCancelDecommission",
+    "component": "confirmDialog",
+    "trigger": "Cancel",
+    "body": "**Names what `cancelDecommission` changes and what it leaves alone**, in the consequence rather than the verb. A archival job this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
+   }
+  ],
+  "states": {
+   "loading": "The archival job list.",
+   "error": "Could not load. Names which read failed and leaves the archival job untouched.",
+   "emptyFirstRun": "No archival job yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the archival job are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCellJobs",
+    "contract": "subscription",
+    "purpose": "Provisioning, migration and maintenance jobs",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "cancelDecommission",
+    "contract": "subscription",
+    "purpose": "Halt a decommission",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCellJobs"
+    ]
+   },
+   {
+    "operationId": "decommissionCell",
+    "contract": "subscription",
+    "purpose": "Begin decommissioning a cell",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCellJobs"
+    ]
+   },
+   {
+    "operationId": "getCell",
+    "contract": "subscription",
+    "purpose": "Read a cell",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getCellCapacity",
+    "contract": "subscription",
+    "purpose": "Load against headroom",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getCellHealth",
+    "contract": "subscription",
+    "purpose": "Cell health and schema version",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateCellTier",
+    "contract": "subscription",
+    "purpose": "Change a cell's tier",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCellJobs"
+    ]
+   },
+   {
+    "operationId": "listArchivalJobs",
+    "contract": "platform-ops",
+    "purpose": "Archival and retention jobs",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "cellId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `cellId`.",
+   "preloaded": [
+    "CellDetail.id",
+    "CellDetail.name",
+    "CellDetail.kind",
+    "CellDetail.clusterId",
+    "CellDetail.isReachable"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-034"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

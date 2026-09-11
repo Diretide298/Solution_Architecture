@@ -1,0 +1,3337 @@
+[
+ {
+  "id": "BO-001",
+  "name": "Queue Directory",
+  "module": "Access & Venue",
+  "requiresModule": "queue",
+  "wave": 1,
+  "capability": "C05",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/queue-management/queue-directory",
+   "component": "apps/venue-management-web/src/routes/queue-management/QueueDirectoryList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-002",
+    "BO-003",
+    "BO-004",
+    "BO-005"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "BO-002",
+     "trigger": "Cancels it and states the reason",
+     "provenance": "flow F09 step 1→2",
+     "operation": "listPerformances"
+    },
+    {
+     "to": "BO-003",
+     "trigger": "Queue Integration Setup",
+     "carries": [
+      "feedId",
+      "orderId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-003 declares entryState.params feedId, orderId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-004",
+     "trigger": "Manual Wait Time Entry",
+     "carries": [
+      "queueId",
+      "refundId"
+     ],
+     "provenance": "derived — BO-004 declares entryState.params queueId, refundId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-005",
+     "trigger": "Queue Monitor",
+     "carries": [
+      "campaignId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-005 declares entryState.params campaignId, queueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "A queue on the manual adaptor shows \"manual\" rather than \"no feed\". It is configured and working; treating it as unconfigured makes the health view lie. **Was the declared entry point to the whole back office until 20 August**, which is why 93 screens were unreachable. Now reached from BO-100 through its section.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listQueues` reads the population and `getEvent` reads one of them — list, select, act",
+  "purpose": "See every queue in the venue and whether its data is arriving.",
+  "gaps": [
+   {
+    "operation": "listQueueFeeds",
+    "why": "**7 declared operations reach no component on this screen**: listQueueFeeds, listPerformances, getQueue, getQueueFeedHealth, getWaitTimes, listEvents, listQueueEntries. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every queue",
+       "bindsTo": "Queue",
+       "columns": [
+        "Queue.code",
+        "Queue.name",
+        "Queue.venueId",
+        "Queue.attractionProductId",
+        "Queue.assetId",
+        "Queue.accessPointId",
+        "Queue.kind",
+        "Queue.operatingWindows",
+        "Queue.parentQueueId",
+        "Queue.loadBalanceWithQueueIds",
+        "Queue.inQueueOfferEnabled",
+        "Queue.notifyBeforeCallMinutes"
+       ],
+       "operation": "listQueues",
+       "provenance": "contract queue.yaml GET /queues"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected queue",
+       "bindsTo": "Event",
+       "columns": [
+        "Event.id",
+        "Event.code",
+        "Event.name",
+        "Event.venueId",
+        "Event.scopePath",
+        "Event.parentEventId",
+        "Event.performanceCount",
+        "Event.isActive"
+       ],
+       "operation": "getEvent",
+       "provenance": "contract catalogue.yaml GET /events/{eventId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Call",
+       "operation": "callNextParties",
+       "provenance": "contract queue.yaml POST /queues/{queueId}/call-next"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Configure",
+       "operation": "configureQueueFeed",
+       "provenance": "contract queue.yaml PUT /queue-feeds"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createEvent",
+       "provenance": "contract catalogue.yaml POST /events"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createPerformances",
+       "provenance": "contract catalogue.yaml POST /events/{eventId}/performances"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createQueue",
+       "provenance": "contract queue.yaml POST /queues"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setQueueStatus",
+       "provenance": "contract queue.yaml PUT /queues/{queueId}/status"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setWaitTime",
+       "provenance": "contract queue.yaml PUT /queues/{queueId}/wait-time"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Test",
+       "operation": "testQueueFeed",
+       "provenance": "contract queue.yaml POST /queue-feeds/{feedId}/test"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateEvent",
+       "provenance": "contract catalogue.yaml PATCH /events/{eventId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateQueue",
+       "provenance": "contract queue.yaml PATCH /queues/{queueId}"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "dataTable",
+       "bindsTo": "Queue[]",
+       "notes": "Current wait, source, feed health, status",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "banner",
+       "notes": "Queues whose feed has gone quiet. The first thing a duty manager checks",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The queue list.",
+   "error": "Could not load. Names which read failed and leaves the queue untouched.",
+   "emptyFirstRun": "No queue yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the queue are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listQueues",
+    "contract": "queue",
+    "purpose": "Every queue with its current wait",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listQueueFeeds",
+    "contract": "queue",
+    "purpose": "Feed health per queue",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPerformances",
+    "contract": "catalogue",
+    "purpose": "From the flow it appears in",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "callNextParties",
+    "contract": "queue",
+    "purpose": "Call the next parties forward",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueues"
+    ]
+   },
+   {
+    "operationId": "configureQueueFeed",
+    "contract": "queue",
+    "purpose": "Configure a sensor feed",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueues"
+    ]
+   },
+   {
+    "operationId": "createEvent",
+    "contract": "catalogue",
+    "purpose": "Create an event",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueues"
+    ]
+   },
+   {
+    "operationId": "createPerformances",
+    "contract": "catalogue",
+    "purpose": "Create performances, singly or by schedule",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueues"
+    ]
+   },
+   {
+    "operationId": "createQueue",
+    "contract": "queue",
+    "purpose": "Create a queue",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueues"
+    ]
+   },
+   {
+    "operationId": "getEvent",
+    "contract": "catalogue",
+    "purpose": "Read an event",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getQueue",
+    "contract": "queue",
+    "purpose": "Read a queue with live position",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getQueueFeedHealth",
+    "contract": "queue",
+    "purpose": "Feed health",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getWaitTimes",
+    "contract": "queue",
+    "purpose": "Wait times across a venue",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listEvents",
+    "contract": "catalogue",
+    "purpose": "List events",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listQueueEntries",
+    "contract": "queue",
+    "purpose": "List entries in a queue",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setQueueStatus",
+    "contract": "queue",
+    "purpose": "Open, pause or close a queue",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueues"
+    ]
+   },
+   {
+    "operationId": "setWaitTime",
+    "contract": "queue",
+    "purpose": "Manually set a wait time",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueues"
+    ]
+   },
+   {
+    "operationId": "testQueueFeed",
+    "contract": "queue",
+    "purpose": "Test a feed before trusting it",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueues"
+    ]
+   },
+   {
+    "operationId": "updateEvent",
+    "contract": "catalogue",
+    "purpose": "Amend an event",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueues"
+    ]
+   },
+   {
+    "operationId": "updateQueue",
+    "contract": "queue",
+    "purpose": "Amend queue configuration",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueues"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "eventId",
+     "from": "deepLink"
+    },
+    {
+     "name": "feedId",
+     "from": "deepLink"
+    },
+    {
+     "name": "queueId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `eventId`, `feedId`, `queueId`.",
+   "preloaded": [
+    "Event.id",
+    "Event.code",
+    "Event.name",
+    "Event.venueId",
+    "Event.scopePath"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-001"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-002",
+  "name": "Queue Configuration",
+  "module": "Access & Venue",
+  "requiresModule": "queue",
+  "wave": 1,
+  "capability": "C05",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/queue-management/queue-configuration",
+   "component": "apps/venue-management-web/src/routes/queue-management/QueueConfigurationForm.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "BO-001",
+    "BO-003",
+    "BO-004",
+    "BO-023"
+   ],
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "BO-023",
+     "trigger": "Reviews the refund exposure",
+     "provenance": "flow F09 step 2→3",
+     "operation": "cancelPerformance"
+    },
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-003",
+     "trigger": "Queue Integration Setup",
+     "carries": [
+      "feedId",
+      "orderId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-003 declares entryState.params feedId, orderId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-004",
+     "trigger": "Manual Wait Time Entry",
+     "carries": [
+      "queueId",
+      "refundId"
+     ],
+     "provenance": "derived — BO-004 declares entryState.params queueId, refundId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Drawn 26 August** — `Seat Board 2.dc.html` frame `seat-2c`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**",
+  "density": "compact",
+  "boardFrames": [
+   "Seat Board 2.dc.html#seat-2c"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listQueueEntries` reads the population and `getPerformance` reads one of them — list, select, act",
+  "purpose": "Create a queue and set how it behaves.",
+  "gaps": [
+   {
+    "operation": "getQueue",
+    "why": "**4 declared operations reach no component on this screen**: getQueue, getSeatAvailability, getWaitTimes, listQueues. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every queue",
+       "bindsTo": "WaitingGuest",
+       "columns": [
+        "WaitingGuest.id",
+        "WaitingGuest.queueId",
+        "WaitingGuest.queueName",
+        "WaitingGuest.subjectId",
+        "WaitingGuest.partyNumber",
+        "WaitingGuest.partySize",
+        "WaitingGuest.status",
+        "WaitingGuest.positionInQueue",
+        "WaitingGuest.partiesAhead",
+        "WaitingGuest.estimatedCallAt",
+        "WaitingGuest.isFastPass",
+        "WaitingGuest.entitlementId"
+       ],
+       "operation": "listQueueEntries",
+       "provenance": "contract queue.yaml GET /queues/{queueId}/entries"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected queue",
+       "bindsTo": "Performance",
+       "columns": [
+        "Performance.id",
+        "Performance.eventId",
+        "Performance.startsAt",
+        "Performance.endsAt",
+        "Performance.approvalRequestId",
+        "Performance.requiresApprovalToCancel",
+        "Performance.status",
+        "Performance.admissionRulesId",
+        "Performance.seatMapId"
+       ],
+       "operation": "getPerformance",
+       "provenance": "contract catalogue.yaml GET /performances/{performanceId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createQueue",
+       "provenance": "contract queue.yaml POST /queues"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateQueue",
+       "provenance": "contract queue.yaml PATCH /queues/{queueId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Cancel",
+       "operation": "cancelPerformance",
+       "provenance": "contract catalogue.yaml POST /performances/{performanceId}/cancel"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Call",
+       "operation": "callNextParties",
+       "provenance": "contract queue.yaml POST /queues/{queueId}/call-next"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Recommend",
+       "operation": "recommendSeats",
+       "provenance": "contract seating.yaml POST /performances/{performanceId}/seat-recommendations"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setQueueStatus",
+       "provenance": "contract queue.yaml PUT /queues/{queueId}/status"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setWaitTime",
+       "provenance": "contract queue.yaml PUT /queues/{queueId}/wait-time"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updatePerformance",
+       "provenance": "contract catalogue.yaml PATCH /performances/{performanceId}"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "Name",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "selectField",
+       "label": "Attraction or resource",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "numberField",
+       "label": "Capacity per call",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "toggle",
+       "label": "Guests may join from the app",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "numberField",
+       "label": "Redemption window (minutes)",
+       "notes": "How long after being called before the entry expires",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmCancelPerformance",
+    "component": "confirmDialog",
+    "trigger": "Cancel",
+    "body": "**Names what `cancelPerformance` changes and what it leaves alone**, in the consequence rather than the verb. A queue this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract catalogue.yaml POST /performances/{performanceId}/cancel"
+   }
+  ],
+  "states": {
+   "loading": "The queue list.",
+   "error": "Could not load. Names which read failed and leaves the queue untouched.",
+   "emptyFirstRun": "No queue yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the queue are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "createQueue",
+    "contract": "queue",
+    "purpose": "Create",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueueEntries"
+    ]
+   },
+   {
+    "operationId": "updateQueue",
+    "contract": "queue",
+    "purpose": "Amend",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueueEntries"
+    ]
+   },
+   {
+    "operationId": "cancelPerformance",
+    "contract": "catalogue",
+    "purpose": "From the flow it appears in",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "callNextParties",
+    "contract": "queue",
+    "purpose": "Call the next parties forward",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueueEntries"
+    ]
+   },
+   {
+    "operationId": "getPerformance",
+    "contract": "catalogue",
+    "purpose": "Read a performance",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getQueue",
+    "contract": "queue",
+    "purpose": "Read a queue with live position",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getSeatAvailability",
+    "contract": "seating",
+    "purpose": "Seat status for a performance",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getWaitTimes",
+    "contract": "queue",
+    "purpose": "Wait times across a venue",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listQueueEntries",
+    "contract": "queue",
+    "purpose": "List entries in a queue",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listQueues",
+    "contract": "queue",
+    "purpose": "List queues",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "recommendSeats",
+    "contract": "seating",
+    "purpose": "Recommend seats for a party",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueueEntries"
+    ]
+   },
+   {
+    "operationId": "setQueueStatus",
+    "contract": "queue",
+    "purpose": "Open, pause or close a queue",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueueEntries"
+    ]
+   },
+   {
+    "operationId": "setWaitTime",
+    "contract": "queue",
+    "purpose": "Manually set a wait time",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueueEntries"
+    ]
+   },
+   {
+    "operationId": "updatePerformance",
+    "contract": "catalogue",
+    "purpose": "Amend a performance",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueueEntries"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "performanceId",
+     "from": "BO-001"
+    },
+    {
+     "name": "queueId",
+     "from": "BO-001"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "Performance.id",
+    "Performance.eventId",
+    "Performance.startsAt",
+    "Performance.endsAt",
+    "Performance.approvalRequestId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-002",
+   "note": "**Drawn by Claude Design on `Seat Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-003",
+  "name": "Queue Integration Setup",
+  "module": "Access & Venue",
+  "requiresModule": "queue",
+  "wave": 1,
+  "capability": "C05",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/queue-management/queue-integration-setup",
+   "component": "apps/venue-management-web/src/routes/queue-management/QueueIntegrationSetupForm.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "BO-001",
+    "BO-002",
+    "BO-004"
+   ],
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-002",
+     "trigger": "Queue Configuration",
+     "carries": [
+      "performanceId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-002 declares entryState.params performanceId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-004",
+     "trigger": "Manual Wait Time Entry",
+     "carries": [
+      "queueId",
+      "refundId"
+     ],
+     "provenance": "derived — BO-004 declares entryState.params queueId, refundId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "ADR-0012, adaptor-first. A named vendor is a driver behind a stable inbound shape, so adding one is configuration plus a driver rather than a core change. Vendor selection is CF-33a and deliberately late. **createRefund removed 18 August** — attached by module resemblance, not by what this screen does. A screen that does not handle money should not be able to move it (CF-87's class). **Corrected 24 August**: removed applyManualDiscount, createOrder, exchangeOrderLines, getOrder, getOrderStatement, getRefundPolicy and 11 more. **A queue integration screen carried 15 order operations** — create an order, apply a discount, exchange lines, hold, refund — and four queue ones. Bulk-attach residue, and `requiresModule` was `ticketing` to match the operations rather than the screen.\n\n**Found by deriving the empty states.** `emptyNoAccess` came out reading *\"needs `ORDER_CREATE` to create orders\"* on a screen called Queue Integration Setup — **a generated sentence that was accurate to the data and absurd about the screen**, which is exactly what made it visible.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listQueueFeeds` reads the population and `getQueueFeedHealth` reads one of them — list, select, act",
+  "purpose": "Connect a queue to an on-site system, or leave it on manual entry.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every queue integration",
+       "bindsTo": "QueueFeed",
+       "columns": [
+        "QueueFeed.id",
+        "QueueFeed.queueId",
+        "QueueFeed.adaptor",
+        "QueueFeed.adaptorName",
+        "QueueFeed.credentialsRef",
+        "QueueFeed.expectedIntervalSeconds",
+        "QueueFeed.isEnabled"
+       ],
+       "operation": "listQueueFeeds",
+       "provenance": "contract queue.yaml GET /queue-feeds"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected queue integration",
+       "bindsTo": "QueueFeedHealth",
+       "columns": [
+        "QueueFeedHealth.feedId",
+        "QueueFeedHealth.adaptor",
+        "QueueFeedHealth.isHealthy",
+        "QueueFeedHealth.isQuiet",
+        "QueueFeedHealth.lastReadingAt",
+        "QueueFeedHealth.readingsLastHour",
+        "QueueFeedHealth.discardedLastHour"
+       ],
+       "operation": "getQueueFeedHealth",
+       "provenance": "contract queue.yaml GET /queue-feeds/{feedId}/health"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Configure",
+       "operation": "configureQueueFeed",
+       "provenance": "contract queue.yaml PUT /queue-feeds"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Test",
+       "operation": "testQueueFeed",
+       "provenance": "contract queue.yaml POST /queue-feeds/{feedId}/test"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Source",
+       "notes": "Manual, sensor API, webhook, MQTT, vendor poll, turnstile count, CV camera. Manual is the default and a valid end state",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "textField",
+       "label": "Endpoint or topic",
+       "notes": "Hidden when the source is manual",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "textField",
+       "label": "Credential reference",
+       "notes": "A key vault reference, never the secret. A secret typed into a form ends up in a screenshot",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "numberField",
+       "label": "Expected interval (seconds)",
+       "notes": "Drives the went-quiet alarm. Too tight and a duty manager learns to ignore it",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Test connection",
+       "notes": "Runs testQueueFeed. Configuring an integration without a test is configuring it blind",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "detailPanel",
+       "bindsTo": "FeedTestResult",
+       "notes": "Five checks, plus the mapped sample reading and the raw payload. A source that is reachable and returns a shape nobody mapped looks like silence, not an error",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "toggle",
+       "label": "Enabled",
+       "notes": "Disabled by default. A feed goes live only after a passing test",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The queue integration list.",
+   "error": "Could not load. Names which read failed and leaves the queue integration untouched.",
+   "emptyFirstRun": "No queue integration yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the queue integration are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "configureQueueFeed",
+    "contract": "queue",
+    "purpose": "Set the source",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueueFeeds"
+    ]
+   },
+   {
+    "operationId": "testQueueFeed",
+    "contract": "queue",
+    "purpose": "One exchange with the configured source",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueueFeeds"
+    ]
+   },
+   {
+    "operationId": "getQueueFeedHealth",
+    "contract": "queue",
+    "purpose": "Current feed state",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listQueueFeeds",
+    "contract": "queue",
+    "purpose": "List configured sensor feeds",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "feedId",
+     "from": "BO-001"
+    },
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    },
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
+   "preloaded": [
+    "QueueFeedHealth.feedId",
+    "QueueFeedHealth.adaptor",
+    "QueueFeedHealth.isHealthy",
+    "QueueFeedHealth.isQuiet",
+    "QueueFeedHealth.lastReadingAt"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-003"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-004",
+  "name": "Manual Wait Time Entry",
+  "module": "Access & Venue",
+  "requiresModule": "queue",
+  "wave": 1,
+  "capability": "C05",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/queue-management/manual-wait-time-entry",
+   "component": "apps/venue-management-web/src/routes/queue-management/ManualWaitTimeEntryForm.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-001",
+    "BO-023"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "BO-001",
+    "BO-002",
+    "BO-003",
+    "BO-005"
+   ],
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "BO-005",
+     "trigger": "Confirms guests were notified",
+     "provenance": "flow F09 step 4→5",
+     "operation": "createBulkRefund"
+    },
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-002",
+     "trigger": "Queue Configuration",
+     "carries": [
+      "performanceId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-002 declares entryState.params performanceId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-003",
+     "trigger": "Queue Integration Setup",
+     "carries": [
+      "feedId",
+      "orderId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-003 declares entryState.params feedId, orderId, venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "The screen the client asked for on 14 August. Available regardless of integration state — a venue with no sensors runs entirely from here, and a venue whose sensor failed falls back to it.",
+  "density": "compact",
+  "pattern": "approvalInbox",
+  "patternReason": "`approveRefund` decides items that `listQueues` queues — every row is waiting for a person, so the empty state is success",
+  "purpose": "Set a wait time by hand, whether or not a feed exists.",
+  "gaps": [
+   {
+    "operation": "getWaitTimes",
+    "why": "**2 declared operations reach no component on this screen**: getWaitTimes, listQueueEntries. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "queue",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Waiting for a decision",
+       "bindsTo": "Queue",
+       "columns": [
+        "Queue.code",
+        "Queue.name",
+        "Queue.venueId",
+        "Queue.attractionProductId",
+        "Queue.assetId",
+        "Queue.accessPointId",
+        "Queue.kind",
+        "Queue.operatingWindows",
+        "Queue.parentQueueId",
+        "Queue.loadBalanceWithQueueIds",
+        "Queue.inQueueOfferEnabled",
+        "Queue.notifyBeforeCallMinutes"
+       ],
+       "operation": "listQueues",
+       "provenance": "contract queue.yaml GET /queues"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "item",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected manual wait time",
+       "bindsTo": "QueueDetail",
+       "columns": [
+        "QueueDetail.nowServingPartyNumber",
+        "QueueDetail.lastCalledAt",
+        "QueueDetail.throughputLastHour",
+        "QueueDetail.noShowRatePercent",
+        "QueueDetail.feed"
+       ],
+       "operation": "getQueue",
+       "provenance": "contract queue.yaml GET /queues/{queueId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "decision",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "setWaitTime",
+       "provenance": "contract queue.yaml PUT /queues/{queueId}/wait-time"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createBulkRefund",
+       "provenance": "contract orders.yaml POST /refunds/bulk"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Approve",
+       "operation": "approveRefund",
+       "provenance": "contract orders.yaml POST /refunds/{refundId}/approve"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Call",
+       "operation": "callNextParties",
+       "provenance": "contract queue.yaml POST /queues/{queueId}/call-next"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createQueue",
+       "provenance": "contract queue.yaml POST /queues"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setQueueStatus",
+       "provenance": "contract queue.yaml PUT /queues/{queueId}/status"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateQueue",
+       "provenance": "contract queue.yaml PATCH /queues/{queueId}"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "cardList",
+       "bindsTo": "Queue[]",
+       "notes": "One row per queue with a stepper and the current value",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "banner",
+       "notes": "Where a feed is live, a manual entry overrides it for a stated period and then reverts. A permanent silent override is how a broken sensor goes unnoticed for a season",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Publish",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The manual wait time list.",
+   "error": "Could not load. Names which read failed and leaves the manual wait time untouched.",
+   "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
+   "emptyNoResults": "The filter narrowed it and the manual wait time are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setWaitTime",
+    "contract": "queue",
+    "purpose": "Set or override the wait",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueues"
+    ]
+   },
+   {
+    "operationId": "listQueues",
+    "contract": "queue",
+    "purpose": "Current values",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createBulkRefund",
+    "contract": "orders",
+    "purpose": "From the flow it appears in",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "approveRefund",
+    "contract": "orders",
+    "purpose": "Approve a refund held for approval",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueues"
+    ]
+   },
+   {
+    "operationId": "callNextParties",
+    "contract": "queue",
+    "purpose": "Call the next parties forward",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueues"
+    ]
+   },
+   {
+    "operationId": "createQueue",
+    "contract": "queue",
+    "purpose": "Create a queue",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueues"
+    ]
+   },
+   {
+    "operationId": "getQueue",
+    "contract": "queue",
+    "purpose": "Read a queue with live position",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getWaitTimes",
+    "contract": "queue",
+    "purpose": "Wait times across a venue",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listQueueEntries",
+    "contract": "queue",
+    "purpose": "List entries in a queue",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setQueueStatus",
+    "contract": "queue",
+    "purpose": "Open, pause or close a queue",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueues"
+    ]
+   },
+   {
+    "operationId": "updateQueue",
+    "contract": "queue",
+    "purpose": "Amend queue configuration",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueues"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "queueId",
+     "from": "BO-001"
+    },
+    {
+     "name": "refundId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `refundId`.",
+   "preloaded": [
+    "QueueDetail.nowServingPartyNumber",
+    "QueueDetail.lastCalledAt",
+    "QueueDetail.throughputLastHour",
+    "QueueDetail.noShowRatePercent",
+    "QueueDetail.feed"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-004"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-005",
+  "name": "Queue Monitor",
+  "module": "Access & Venue",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C05",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/queue-management/queue-monitor",
+   "component": "apps/venue-management-web/src/routes/queue-management/QueueMonitorDashboard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "BO-001",
+    "BO-002",
+    "BO-003"
+   ],
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-002",
+     "trigger": "Queue Configuration",
+     "carries": [
+      "performanceId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-002 declares entryState.params performanceId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-003",
+     "trigger": "Queue Integration Setup",
+     "carries": [
+      "feedId",
+      "orderId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-003 declares entryState.params feedId, orderId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-032",
+     "trigger": "The feed dies and a supervisor types the wait",
+     "provenance": "flow F21 step 3→4",
+     "operation": "listQueues",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "Pulled to Wave 1 on 17 August (CF-101): F09 closes a cancelled event’s queue, and a Wave 1 flow cannot step through a Wave 2 screen. **Cross-platform navigation removed 24 August**: EMP-032. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listQueueEntries` reads the population and `getWaitTimes` reads one of them — list, select, act",
+  "purpose": "Watch queues during operation and call parties forward.",
+  "gaps": [
+   {
+    "operation": "listCampaigns",
+    "why": "**5 declared operations reach no component on this screen**: listCampaigns, getCampaign, getCampaignPerformance, getQueue, listQueues. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every queue",
+       "bindsTo": "WaitingGuest",
+       "columns": [
+        "WaitingGuest.id",
+        "WaitingGuest.queueId",
+        "WaitingGuest.queueName",
+        "WaitingGuest.subjectId",
+        "WaitingGuest.partyNumber",
+        "WaitingGuest.partySize",
+        "WaitingGuest.status",
+        "WaitingGuest.positionInQueue",
+        "WaitingGuest.partiesAhead",
+        "WaitingGuest.estimatedCallAt",
+        "WaitingGuest.isFastPass",
+        "WaitingGuest.entitlementId"
+       ],
+       "operation": "listQueueEntries",
+       "provenance": "contract queue.yaml GET /queues/{queueId}/entries"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected queue",
+       "bindsTo": "WaitTime",
+       "columns": [
+        "WaitTime.queueId",
+        "WaitTime.queueName",
+        "WaitTime.attractionProductId",
+        "WaitTime.status",
+        "WaitTime.waitMinutes",
+        "WaitTime.source",
+        "WaitTime.isStale",
+        "WaitTime.heightRequirementCm",
+        "WaitTime.zone",
+        "WaitTime.asOf"
+       ],
+       "operation": "getWaitTimes",
+       "provenance": "contract queue.yaml GET /queues/wait-times"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Call",
+       "operation": "callNextParties",
+       "provenance": "contract queue.yaml POST /queues/{queueId}/call-next"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createCampaign",
+       "provenance": "contract marketing-crm.yaml POST /campaigns"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createQueue",
+       "provenance": "contract queue.yaml POST /queues"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Launch",
+       "operation": "launchCampaign",
+       "provenance": "contract marketing-crm.yaml POST /campaigns/{campaignId}/launch"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Pause",
+       "operation": "pauseCampaign",
+       "provenance": "contract marketing-crm.yaml POST /campaigns/{campaignId}/pause"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setQueueStatus",
+       "provenance": "contract queue.yaml PUT /queues/{queueId}/status"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setWaitTime",
+       "provenance": "contract queue.yaml PUT /queues/{queueId}/wait-time"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Stop",
+       "operation": "stopCampaign",
+       "provenance": "contract marketing-crm.yaml POST /campaigns/{campaignId}/stop"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Test",
+       "operation": "testSendCampaign",
+       "provenance": "contract marketing-crm.yaml POST /campaigns/{campaignId}/test-send"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Unschedule",
+       "operation": "unscheduleCampaign",
+       "provenance": "contract marketing-crm.yaml POST /campaigns/{campaignId}/unschedule"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateCampaign",
+       "provenance": "contract marketing-crm.yaml PATCH /campaigns/{campaignId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateQueue",
+       "provenance": "contract queue.yaml PATCH /queues/{queueId}"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "metricTile",
+       "notes": "Waiting, called, expired, average wait",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "chart",
+       "notes": "Wait over the day. Stale where the feed has gone quiet",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Call next",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmStopCampaign",
+    "component": "confirmDialog",
+    "trigger": "Stop",
+    "body": "**Names what `stopCampaign` changes and what it leaves alone**, in the consequence rather than the verb. A queue this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml POST /campaigns/{campaignId}/stop"
+   }
+  ],
+  "states": {
+   "loading": "The queue list.",
+   "error": "Could not load. Names which read failed and leaves the queue untouched.",
+   "emptyFirstRun": "No queue yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the queue are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listQueueEntries",
+    "contract": "queue",
+    "purpose": "Who is waiting",
+    "trigger": "onInterval"
+   },
+   {
+    "operationId": "callNextParties",
+    "contract": "queue",
+    "purpose": "Call forward",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueueEntries"
+    ]
+   },
+   {
+    "operationId": "getWaitTimes",
+    "contract": "queue",
+    "purpose": "Current waits",
+    "trigger": "onInterval"
+   },
+   {
+    "operationId": "listCampaigns",
+    "contract": "marketing-crm",
+    "purpose": "From the flow it appears in",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createCampaign",
+    "contract": "marketing-crm",
+    "purpose": "Create a campaign",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueueEntries"
+    ]
+   },
+   {
+    "operationId": "createQueue",
+    "contract": "queue",
+    "purpose": "Create a queue",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueueEntries"
+    ]
+   },
+   {
+    "operationId": "getCampaign",
+    "contract": "marketing-crm",
+    "purpose": "Read a campaign with performance",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getCampaignPerformance",
+    "contract": "marketing-crm",
+    "purpose": "Delivery and engagement",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getQueue",
+    "contract": "queue",
+    "purpose": "Read a queue with live position",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "launchCampaign",
+    "contract": "marketing-crm",
+    "purpose": "Launch or schedule a campaign",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueueEntries"
+    ]
+   },
+   {
+    "operationId": "listQueues",
+    "contract": "queue",
+    "purpose": "List queues",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "pauseCampaign",
+    "contract": "marketing-crm",
+    "purpose": "Pause a campaign mid-send",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueueEntries"
+    ]
+   },
+   {
+    "operationId": "setQueueStatus",
+    "contract": "queue",
+    "purpose": "Open, pause or close a queue",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueueEntries"
+    ]
+   },
+   {
+    "operationId": "setWaitTime",
+    "contract": "queue",
+    "purpose": "Manually set a wait time",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueueEntries"
+    ]
+   },
+   {
+    "operationId": "stopCampaign",
+    "contract": "marketing-crm",
+    "purpose": "Stop a campaign mid-send",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueueEntries"
+    ]
+   },
+   {
+    "operationId": "testSendCampaign",
+    "contract": "marketing-crm",
+    "purpose": "Send a test to named recipients",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueueEntries"
+    ]
+   },
+   {
+    "operationId": "unscheduleCampaign",
+    "contract": "marketing-crm",
+    "purpose": "Pull a scheduled campaign before it sends",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueueEntries"
+    ]
+   },
+   {
+    "operationId": "updateCampaign",
+    "contract": "marketing-crm",
+    "purpose": "Amend, pause or resume a campaign",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueueEntries"
+    ]
+   },
+   {
+    "operationId": "updateQueue",
+    "contract": "queue",
+    "purpose": "Amend queue configuration",
+    "trigger": "onAction",
+    "invalidates": [
+     "listQueueEntries"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "campaignId",
+     "from": "deepLink"
+    },
+    {
+     "name": "queueId",
+     "from": "BO-001"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `campaignId`.",
+   "preloaded": [
+    "WaitTime.queueId",
+    "WaitTime.queueName",
+    "WaitTime.attractionProductId",
+    "WaitTime.status",
+    "WaitTime.waitMinutes"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-005"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-006",
+  "name": "Parking Configuration",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 2,
+  "capability": "C39",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/parking/parking-configuration",
+   "component": "apps/venue-management-web/src/routes/parking/ParkingConfigurationForm.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "BO-001"
+   ],
+   "transitions": [
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Placeholder. Parking was discussed on 14 August and the MoM has not yet been received. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "openQuestions": [
+   "Answered by the 14 August MoM section 10, which this question was waiting for. Parking is barrier integration, in three models, and it is not space counting. (1) No integration - TICVAI issues its own QR and on-site security verifies it manually; (2) ANPR - the guest enters a plate at checkout and TICVAI pushes it to the parking system's whitelist so the barrier opens; (3) QR handoff - TICVAI sends a QR to the barrier for validation. Pay-per-hour parking is explicitly out of scope, handled by the parking vendor's own POS. So this is one configuration screen choosing a model and binding a vendor adaptor, not the three different screens the question feared - and ADR-0012's adaptor-first rule is what the minute asks for when it says a new parking vendor should take days rather than weeks. The `parking` module key in the White Label Builder now has something behind it."
+  ],
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listAccessPoints` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Change how parking behaves here, and see which level the current value came from.",
+  "gaps": [
+   {
+    "operation": "listParkingFacilities",
+    "why": "**1 declared operation reach no component on this screen**: listParkingFacilities. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every parking",
+       "bindsTo": "AccessPoint",
+       "columns": [
+        "AccessPoint.id",
+        "AccessPoint.code",
+        "AccessPoint.name",
+        "AccessPoint.venueId",
+        "AccessPoint.scopePath",
+        "AccessPoint.externalCredentialSources",
+        "AccessPoint.scanAnomalyRules",
+        "AccessPoint.operatingMode",
+        "AccessPoint.vehicleLocationCapture",
+        "AccessPoint.mode",
+        "AccessPoint.direction",
+        "AccessPoint.antiPassbackEnabled"
+       ],
+       "operation": "listAccessPoints",
+       "provenance": "contract access.yaml GET /access-points"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected parking",
+       "bindsTo": "AccessPoint",
+       "columns": [
+        "AccessPoint.id",
+        "AccessPoint.code",
+        "AccessPoint.name",
+        "AccessPoint.venueId",
+        "AccessPoint.scopePath",
+        "AccessPoint.externalCredentialSources",
+        "AccessPoint.scanAnomalyRules",
+        "AccessPoint.operatingMode",
+        "AccessPoint.vehicleLocationCapture",
+        "AccessPoint.mode",
+        "AccessPoint.direction",
+        "AccessPoint.antiPassbackEnabled",
+        "AccessPoint.isActive",
+        "AccessPoint.lastHeartbeatAt"
+       ],
+       "operation": "listAccessPoints",
+       "provenance": "contract access.yaml GET /access-points"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "updateAccessPoint",
+       "provenance": "contract access.yaml PATCH /access-points/{accessPointId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setParkingFacility",
+       "provenance": "contract access.yaml PUT /parking-facilities"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "TODO",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listAccessPoints",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateAccessPoint",
+       "label": "Save access point",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateAccessPoint",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The parking list.",
+   "error": "Could not load. Names which read failed and leaves the parking untouched.",
+   "emptyFirstRun": "No parking yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the parking are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listAccessPoints",
+    "contract": "access",
+    "purpose": "List access points",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateAccessPoint",
+    "contract": "access",
+    "purpose": "Update an access point",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAccessPoints"
+    ]
+   },
+   {
+    "operationId": "listParkingFacilities",
+    "contract": "access",
+    "purpose": "Car parks at a venue, and how each integrates",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setParkingFacility",
+    "contract": "access",
+    "purpose": "Configure a car park and its integration",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAccessPoints"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "accessPointId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `accessPointId`.",
+   "preloaded": [
+    "AccessPoint.id",
+    "AccessPoint.code",
+    "AccessPoint.name",
+    "AccessPoint.venueId",
+    "AccessPoint.scopePath"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-006"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-030",
+  "name": "Work Order Verification",
+  "module": "Access & Venue",
+  "requiresModule": "maintenance",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/access-point-directory",
+   "component": "apps/venue-management-web/src/routes/venue-operations/AccessPointDirectoryDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-007",
+    "BO-008",
+    "BO-009",
+    "BO-031"
+   ],
+   "inferred": true,
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "BO-031",
+     "trigger": "Asset returns to service",
+     "provenance": "flow F12 step 4→5",
+     "operation": "verifyWorkOrder"
+    },
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-007",
+     "trigger": "Product Directory",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "carries": [
+      "productId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Pricing Rules",
+     "carries": [
+      "priceListId"
+     ],
+     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Carried eight work-order operations.** An access point directory is `access`, not `maintenance` — the two share the word *point* and nothing else. **Rewired 20 August.** **Named `Access Point Directory` and carried nine work-order operations.** On 20 August I rewired it to access points; **F12 step 4 then refused, because a supervisor verifies a work order here.** The operations were right and the name was wrong — **the flow knew what the screen was for and the name did not.**",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listWorkOrders` reads the population and `getWorkOrder` reads one of them — list, select, act",
+  "purpose": "See every gate and what it is doing.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every work order verification",
+       "bindsTo": "WorkOrder",
+       "columns": [
+        "WorkOrder.downtimeMinutes",
+        "WorkOrder.rootCause",
+        "WorkOrder.rootCauseNote",
+        "WorkOrder.escalatedAt",
+        "WorkOrder.escalationLevel",
+        "WorkOrder.id",
+        "WorkOrder.workOrderNumber",
+        "WorkOrder.title",
+        "WorkOrder.venueId",
+        "WorkOrder.assetId",
+        "WorkOrder.assetName",
+        "WorkOrder.status"
+       ],
+       "operation": "listWorkOrders",
+       "provenance": "contract maintenance.yaml GET /work-orders"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected work order verification",
+       "bindsTo": "WorkOrderDetail",
+       "columns": [
+        "WorkOrderDetail.downtimeMinutes",
+        "WorkOrderDetail.rootCause",
+        "WorkOrderDetail.rootCauseNote",
+        "WorkOrderDetail.escalatedAt",
+        "WorkOrderDetail.escalationLevel",
+        "WorkOrderDetail.id",
+        "WorkOrderDetail.workOrderNumber",
+        "WorkOrderDetail.title",
+        "WorkOrderDetail.venueId",
+        "WorkOrderDetail.assetId",
+        "WorkOrderDetail.assetName",
+        "WorkOrderDetail.status",
+        "WorkOrderDetail.priority",
+        "WorkOrderDetail.kind",
+        "WorkOrderDetail.assignedToPrincipalId",
+        "WorkOrderDetail.raisedByPrincipalId"
+       ],
+       "operation": "getWorkOrder",
+       "provenance": "contract maintenance.yaml GET /work-orders/{workOrderId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Verify",
+       "operation": "verifyWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Accept",
+       "operation": "acceptWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/accept"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Attach",
+       "operation": "attachWorkOrderEvidence",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/attachments"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Cancel",
+       "operation": "cancelWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/cancel"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Close",
+       "operation": "closeWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/close"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Complete",
+       "operation": "completeWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/complete"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createWorkOrder",
+       "provenance": "contract maintenance.yaml POST /work-orders"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "verifyWorkOrder",
+       "label": "Verify work order",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "destructiveButton",
+       "derived": true,
+       "impliedBy": "cancelWorkOrder",
+       "label": "Cancel work order",
+       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listWorkOrders",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "verifyWorkOrder",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmCancelWorkOrder",
+    "component": "confirmDialog",
+    "trigger": "Cancel",
+    "body": "**Names what `cancelWorkOrder` changes and what it leaves alone**, in the consequence rather than the verb. A work order verification this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/cancel"
+   },
+   {
+    "id": "confirmCloseWorkOrder",
+    "component": "confirmDialog",
+    "trigger": "Close",
+    "body": "**Names what `closeWorkOrder` changes and what it leaves alone**, in the consequence rather than the verb. A work order verification this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract maintenance.yaml POST /work-orders/{workOrderId}/close"
+   }
+  ],
+  "states": {
+   "loading": "The work order verification list.",
+   "error": "Could not load. Names which read failed and leaves the work order verification untouched.",
+   "emptyFirstRun": "No work order verification yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the work order verification are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "verifyWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Supervisor verification",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "acceptWorkOrder",
+    "contract": "maintenance",
+    "purpose": "The assignee takes the job",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "attachWorkOrderEvidence",
+    "contract": "maintenance",
+    "purpose": "Photo, video, document, note or signature",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "cancelWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Cancel a work order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "closeWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Administratively closed",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "completeWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Complete a work order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "createWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Raise a work order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkOrders"
+    ]
+   },
+   {
+    "operationId": "getWorkOrder",
+    "contract": "maintenance",
+    "purpose": "Read a work order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listWorkOrders",
+    "contract": "maintenance",
+    "purpose": "List work orders",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "workOrderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "A work order opened from a queue or an alert.",
+   "preloaded": [
+    "WorkOrderDetail.downtimeMinutes",
+    "WorkOrderDetail.rootCause",
+    "WorkOrderDetail.rootCauseNote",
+    "WorkOrderDetail.escalatedAt",
+    "WorkOrderDetail.escalationLevel"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-030"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-031",
+  "name": "Asset Register",
+  "module": "Access & Venue",
+  "requiresModule": "maintenance",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/access-point-configuration",
+   "component": "apps/venue-management-web/src/routes/venue-operations/AccessPointConfigurationDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-007",
+    "BO-008",
+    "BO-009"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-007",
+     "trigger": "Product Directory",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "carries": [
+      "productId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Pricing Rules",
+     "carries": [
+      "priceListId"
+     ],
+     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Carried seven asset operations.** A turnstile is an asset and configuring an access point is not asset management. **Rewired 20 August.** **Named `Access Point Configuration` and carried seven asset operations.** Same correction as BO-030 — F12 step 5 returns an asset to service here.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listAssets` reads the population and `getAsset` reads one of them — list, select, act",
+  "purpose": "Define what a gate is and where it is.",
+  "gaps": [
+   {
+    "operation": "getAssetHistory",
+    "why": "**1 declared operation reach no component on this screen**: getAssetHistory. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every asset register",
+       "bindsTo": "Asset",
+       "columns": [
+        "Asset.assetTag",
+        "Asset.name",
+        "Asset.venueId",
+        "Asset.categoryId",
+        "Asset.locationDescription",
+        "Asset.criticality",
+        "Asset.manufacturer",
+        "Asset.model",
+        "Asset.serialNumber",
+        "Asset.commissionedAt",
+        "Asset.warrantyExpiresAt",
+        "Asset.supplierId"
+       ],
+       "operation": "listAssets",
+       "provenance": "contract maintenance.yaml GET /assets"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected asset register",
+       "bindsTo": "AssetDetail",
+       "columns": [
+        "AssetDetail.openWorkOrders",
+        "AssetDetail.maintenancePlans",
+        "AssetDetail.documents"
+       ],
+       "operation": "getAsset",
+       "provenance": "contract maintenance.yaml GET /assets/{assetId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "updateAsset",
+       "provenance": "contract maintenance.yaml PATCH /assets/{assetId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createAsset",
+       "provenance": "contract maintenance.yaml POST /assets"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Lookup",
+       "operation": "lookupAsset",
+       "provenance": "contract maintenance.yaml GET /assets/lookup"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setAssetStatus",
+       "provenance": "contract maintenance.yaml PUT /assets/{assetId}/status"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "updateAsset",
+       "label": "Save asset",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listAssets",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "searchField",
+       "derived": true,
+       "impliedBy": "lookupAsset",
+       "label": "Search",
+       "notes": "A search that returns nothing must say so differently from a search not yet run.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "updateAsset",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The asset register list.",
+   "error": "Could not load. Names which read failed and leaves the asset register untouched.",
+   "emptyFirstRun": "No asset register yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the asset register are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "updateAsset",
+    "contract": "maintenance",
+    "purpose": "Amend an asset",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAssets"
+    ]
+   },
+   {
+    "operationId": "createAsset",
+    "contract": "maintenance",
+    "purpose": "Register an asset",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAssets"
+    ]
+   },
+   {
+    "operationId": "getAsset",
+    "contract": "maintenance",
+    "purpose": "Read an asset with history and documents",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getAssetHistory",
+    "contract": "maintenance",
+    "purpose": "Service history",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listAssets",
+    "contract": "maintenance",
+    "purpose": "List assets",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "lookupAsset",
+    "contract": "maintenance",
+    "purpose": "Find an asset by tag or QR",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setAssetStatus",
+    "contract": "maintenance",
+    "purpose": "Take an asset out of service or return it",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAssets"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "assetId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "An asset opened from the register or a work order.",
+   "preloaded": [
+    "AssetDetail.openWorkOrders",
+    "AssetDetail.maintenancePlans",
+    "AssetDetail.documents"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-031"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-032",
+  "name": "Admission Profiles",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/admission-rules",
+   "component": "apps/venue-management-web/src/routes/venue-operations/AdmissionProfilesDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-007",
+    "BO-008",
+    "BO-009"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-007",
+     "trigger": "Product Directory",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "carries": [
+      "productId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Pricing Rules",
+     "carries": [
+      "priceListId"
+     ],
+     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listAdmissionRules` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Set the rules a gate enforces, including offline.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every admission profiles",
+       "bindsTo": "AdmissionRules",
+       "columns": [
+        "AdmissionRules.id",
+        "AdmissionRules.code",
+        "AdmissionRules.perProductRules",
+        "AdmissionRules.name",
+        "AdmissionRules.openMinutesBefore",
+        "AdmissionRules.closeMinutesAfter",
+        "AdmissionRules.maxDurationMinutes",
+        "AdmissionRules.requiresExitBeforeReentry",
+        "AdmissionRules.maxReentries",
+        "AdmissionRules.allowedAccessPointIds",
+        "AdmissionRules.scopePath"
+       ],
+       "operation": "listAdmissionRules",
+       "provenance": "contract access.yaml GET /admission-rules"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected admission profiles",
+       "bindsTo": "AdmissionRules",
+       "columns": [
+        "AdmissionRules.id",
+        "AdmissionRules.code",
+        "AdmissionRules.perProductRules",
+        "AdmissionRules.name",
+        "AdmissionRules.openMinutesBefore",
+        "AdmissionRules.closeMinutesAfter",
+        "AdmissionRules.maxDurationMinutes",
+        "AdmissionRules.requiresExitBeforeReentry",
+        "AdmissionRules.maxReentries",
+        "AdmissionRules.allowedAccessPointIds",
+        "AdmissionRules.scopePath"
+       ],
+       "operation": "listAdmissionRules",
+       "provenance": "contract access.yaml GET /admission-rules"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createAdmissionRules",
+       "provenance": "contract access.yaml POST /admission-rules"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateAdmissionRules",
+       "provenance": "contract access.yaml PUT /admission-rules/{profileId}"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listAdmissionRules",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createAdmissionRules",
+       "label": "Create admission profile",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createAdmissionRules",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The admission profiles list.",
+   "error": "Could not load. Names which read failed and leaves the admission profiles untouched.",
+   "emptyFirstRun": "No admission profiles yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the admission profiles are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listAdmissionRules",
+    "contract": "access",
+    "purpose": "List admission profiles",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createAdmissionRules",
+    "contract": "access",
+    "purpose": "Create an admission profile",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAdmissionRules"
+    ]
+   },
+   {
+    "operationId": "updateAdmissionRules",
+    "contract": "access",
+    "purpose": "Update an admission profile",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAdmissionRules"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "profileId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `profileId`.",
+   "preloaded": [
+    "AdmissionRules.id",
+    "AdmissionRules.code",
+    "AdmissionRules.perProductRules",
+    "AdmissionRules.name",
+    "AdmissionRules.openMinutesBefore"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-032"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-033",
+  "name": "Blacklist Management",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/blacklist-management",
+   "component": "apps/venue-management-web/src/routes/venue-operations/BlacklistManagementDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-007",
+    "BO-008",
+    "BO-009"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-007",
+     "trigger": "Product Directory",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "carries": [
+      "productId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Pricing Rules",
+     "carries": [
+      "priceListId"
+     ],
+     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listBlacklist` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Bar a media code outright.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every blacklist",
+       "bindsTo": "BlacklistEntry",
+       "columns": [
+        "BlacklistEntry.mediaCode",
+        "BlacklistEntry.reason",
+        "BlacklistEntry.addedAt",
+        "BlacklistEntry.addedByPrincipalId",
+        "BlacklistEntry.expiresAt",
+        "BlacklistEntry.scopePath"
+       ],
+       "operation": "listBlacklist",
+       "provenance": "contract access.yaml GET /blacklist"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected blacklist",
+       "bindsTo": "BlacklistEntry",
+       "columns": [
+        "BlacklistEntry.mediaCode",
+        "BlacklistEntry.reason",
+        "BlacklistEntry.addedAt",
+        "BlacklistEntry.addedByPrincipalId",
+        "BlacklistEntry.expiresAt",
+        "BlacklistEntry.scopePath"
+       ],
+       "operation": "listBlacklist",
+       "provenance": "contract access.yaml GET /blacklist"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add",
+       "operation": "addBlacklistEntry",
+       "provenance": "contract access.yaml POST /blacklist"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeBlacklistEntry",
+       "provenance": "contract access.yaml DELETE /blacklist/{mediaCode}"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listBlacklist",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "addBlacklistEntry",
+       "label": "Add blacklist entry",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "destructiveButton",
+       "derived": true,
+       "impliedBy": "removeBlacklistEntry",
+       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
+       "label": "Remove blacklist entry",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "addBlacklistEntry",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmRemoveBlacklistEntry",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeBlacklistEntry` changes and what it leaves alone**, in the consequence rather than the verb. A blacklist this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract access.yaml DELETE /blacklist/{mediaCode}"
+   }
+  ],
+  "states": {
+   "loading": "The blacklist list.",
+   "error": "Could not load. Names which read failed and leaves the blacklist untouched.",
+   "emptyFirstRun": "No blacklist yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the blacklist are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listBlacklist",
+    "contract": "access",
+    "purpose": "List blacklisted media",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "addBlacklistEntry",
+    "contract": "access",
+    "purpose": "Blacklist a media code",
+    "trigger": "onAction",
+    "invalidates": [
+     "listBlacklist"
+    ]
+   },
+   {
+    "operationId": "removeBlacklistEntry",
+    "contract": "access",
+    "purpose": "Remove a blacklist entry",
+    "trigger": "onAction",
+    "invalidates": [
+     "listBlacklist"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "mediaCode",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `mediaCode`.",
+   "preloaded": [
+    "BlacklistEntry.mediaCode",
+    "BlacklistEntry.reason",
+    "BlacklistEntry.addedAt",
+    "BlacklistEntry.addedByPrincipalId",
+    "BlacklistEntry.expiresAt"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-033"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

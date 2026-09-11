@@ -1,0 +1,1065 @@
+[
+ {
+  "id": "ADM-016",
+  "name": "White-Label Branding Management",
+  "module": "Branding & Localisation",
+  "requiresModule": "core",
+  "wave": 2,
+  "capability": "C57",
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/general/white-label-branding-management",
+   "component": "apps/ticvai-web/src/routes/general/WhiteLabelBrandingManagementForm.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002",
+    "ADM-017"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "ADM-001",
+    "ADM-002",
+    "ADM-003"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-001",
+     "trigger": "Platform Login / MFA",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-003",
+     "trigger": "Cross-Tenant Health Dashboard",
+     "carries": [
+      "cellId",
+      "rightId"
+     ],
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **30 operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the **identical 41 operations** — a Typography screen that could create banners and a Component Preview that could set FAQs. **The worst instance of the 18 August bulk attach found so far**, and only walking the white-label journey surfaced it.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listConfigVersions` reads the population and `getAppIcons` reads one of them — list, select, act",
+  "purpose": "See white-label branding management for this venue.",
+  "gaps": [
+   {
+    "operation": "getBrandIdentity",
+    "why": "**2 declared operations reach no component on this screen**: getBrandIdentity, getTheme. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every white-label branding",
+       "bindsTo": "ConfigVersion",
+       "columns": [
+        "ConfigVersion.publishedAt",
+        "ConfigVersion.publishedByPrincipalId",
+        "ConfigVersion.publishedByName",
+        "ConfigVersion.note",
+        "ConfigVersion.isCurrent",
+        "ConfigVersion.scheduledFor",
+        "ConfigVersion.contentHash",
+        "ConfigVersion.pendingBuildTimeChanges",
+        "ConfigVersion.scopePath"
+       ],
+       "operation": "listConfigVersions",
+       "provenance": "contract white-label.yaml GET /tenant-config/versions"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected white-label branding",
+       "bindsTo": "AppIcons",
+       "columns": [
+        "AppIcons.sourceAssetRef",
+        "AppIcons.derived",
+        "AppIcons.changeScope",
+        "AppIcons.liveVersion",
+        "AppIcons.requiresRebuild"
+       ],
+       "operation": "getAppIcons",
+       "provenance": "contract white-label.yaml GET /tenant-config/app-icons"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createPreview",
+       "provenance": "contract white-label.yaml POST /tenant-config/preview"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Diff",
+       "operation": "diffConfigVersion",
+       "provenance": "contract white-label.yaml GET /tenant-config/versions/{version}/diff"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Publish",
+       "operation": "publishTenantConfig",
+       "provenance": "contract white-label.yaml POST /tenant-config/publish"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Restore",
+       "operation": "restoreConfigVersion",
+       "provenance": "contract white-label.yaml POST /tenant-config/versions/{version}/restore"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setAppIcons",
+       "provenance": "contract white-label.yaml PUT /tenant-config/app-icons"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setBrandIdentity",
+       "provenance": "contract white-label.yaml PUT /tenant-config/brand"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setTheme",
+       "provenance": "contract white-label.yaml PUT /tenant-config/theme"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
+       "provenance": "authored — required by check-screens"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishTenantConfig",
+       "notes": "Declares `publishTenantConfig`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The white-label branding list.",
+   "error": "Could not load. Names which read failed and leaves the white-label branding untouched.",
+   "emptyFirstRun": "No white-label branding yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the white-label branding are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "createPreview",
+    "contract": "white-label",
+    "purpose": "Generate a preview link",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConfigVersions"
+    ]
+   },
+   {
+    "operationId": "diffConfigVersion",
+    "contract": "white-label",
+    "purpose": "Compare a version against the working draft",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getAppIcons",
+    "contract": "white-label",
+    "purpose": "Read app icon set",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getBrandIdentity",
+    "contract": "white-label",
+    "purpose": "Read brand identity",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getTheme",
+    "contract": "white-label",
+    "purpose": "Read colour theme",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listConfigVersions",
+    "contract": "white-label",
+    "purpose": "Version history",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "publishTenantConfig",
+    "contract": "white-label",
+    "purpose": "Publish the working draft",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConfigVersions"
+    ]
+   },
+   {
+    "operationId": "restoreConfigVersion",
+    "contract": "white-label",
+    "purpose": "Restore a previous version",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConfigVersions"
+    ]
+   },
+   {
+    "operationId": "setAppIcons",
+    "contract": "white-label",
+    "purpose": "Set app icons",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConfigVersions"
+    ]
+   },
+   {
+    "operationId": "setBrandIdentity",
+    "contract": "white-label",
+    "purpose": "Set logo, favicon and splash",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConfigVersions"
+    ]
+   },
+   {
+    "operationId": "setTheme",
+    "contract": "white-label",
+    "purpose": "Set colour theme",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConfigVersions"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "bannerId",
+     "from": "deepLink"
+    },
+    {
+     "name": "pageId",
+     "from": "deepLink"
+    },
+    {
+     "name": "policyKind",
+     "from": "deepLink"
+    },
+    {
+     "name": "version",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A version link is expected to point at something superseded — that is what versions are for.** The screen opens the requested version read-only, says it is not current, and links to the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`, `policyKind`.",
+   "preloaded": [
+    "AppIcons.sourceAssetRef",
+    "AppIcons.derived",
+    "AppIcons.changeScope",
+    "AppIcons.liveVersion",
+    "AppIcons.requiresRebuild"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-016"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-017",
+  "name": "Domain & Certificate Management",
+  "module": "Branding & Localisation",
+  "requiresModule": "core",
+  "wave": 2,
+  "capability": "C96",
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/general/domain-and-certificate-management",
+   "component": "apps/ticvai-web/src/routes/general/DomainAndCertificateManagementForm.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "ADM-001",
+    "ADM-002",
+    "ADM-003",
+    "ADM-016"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-016",
+     "trigger": "White-Label Branding Management",
+     "provenance": "flow F103 step 1→2"
+    },
+    {
+     "to": "ADM-001",
+     "trigger": "Platform Login / MFA",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-003",
+     "trigger": "Cross-Tenant Health Dashboard",
+     "carries": [
+      "cellId",
+      "rightId"
+     ],
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **41 operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the **identical 41 operations** — a Typography screen that could create banners and a Component Preview that could set FAQs. **The worst instance of the 18 August bulk attach found so far**, and only walking the white-label journey surfaced it. **Rebuilt 24 August.** This screen declared 41 operations and **not one was about a domain** — it carried the bulk-attached white-label set, and no domain or certificate operation existed anywhere in the package. **A white-label platform whose tenants cannot use their own domain is white-label in name only.**",
+  "openQuestions": [
+   "No contract — not specified"
+  ],
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listCustomDomains` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "See domain & certificate management for this venue.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every domain certificate",
+       "bindsTo": "CustomDomain",
+       "columns": [
+        "CustomDomain.id",
+        "CustomDomain.hostname",
+        "CustomDomain.kind",
+        "CustomDomain.status",
+        "CustomDomain.verificationMethod",
+        "CustomDomain.verificationToken",
+        "CustomDomain.certificateExpiresAt",
+        "CustomDomain.lastCheckedAt",
+        "CustomDomain.failureReason"
+       ],
+       "operation": "listCustomDomains",
+       "provenance": "contract white-label.yaml GET /tenant-domains"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected domain certificate",
+       "bindsTo": "CustomDomain",
+       "columns": [
+        "CustomDomain.id",
+        "CustomDomain.hostname",
+        "CustomDomain.kind",
+        "CustomDomain.status",
+        "CustomDomain.verificationMethod",
+        "CustomDomain.verificationToken",
+        "CustomDomain.certificateExpiresAt",
+        "CustomDomain.lastCheckedAt",
+        "CustomDomain.failureReason"
+       ],
+       "operation": "listCustomDomains",
+       "provenance": "contract white-label.yaml GET /tenant-domains"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Claim",
+       "operation": "claimCustomDomain",
+       "provenance": "contract white-label.yaml POST /tenant-domains"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyCustomDomain",
+       "provenance": "contract white-label.yaml POST /tenant-domains/{domainId}/verify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Release hold",
+       "operation": "relinquishCustomDomain",
+       "provenance": "contract white-label.yaml DELETE /tenant-domains/{domainId}"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The domain certificate list.",
+   "error": "Could not load. Names which read failed and leaves the domain certificate untouched.",
+   "emptyFirstRun": "No domain certificate yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the domain certificate are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCustomDomains",
+    "contract": "white-label",
+    "purpose": "The domains this tenant has claimed",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "claimCustomDomain",
+    "contract": "white-label",
+    "purpose": "Claim a domain and get a verification token",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCustomDomains"
+    ]
+   },
+   {
+    "operationId": "verifyCustomDomain",
+    "contract": "white-label",
+    "purpose": "Check the record and issue the certificate",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCustomDomains"
+    ]
+   },
+   {
+    "operationId": "relinquishCustomDomain",
+    "contract": "white-label",
+    "purpose": "Give the domain up",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCustomDomains"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "bannerId",
+     "from": "deepLink"
+    },
+    {
+     "name": "pageId",
+     "from": "deepLink"
+    },
+    {
+     "name": "policyKind",
+     "from": "deepLink"
+    },
+    {
+     "name": "version",
+     "from": "deepLink"
+    },
+    {
+     "name": "domainId",
+     "from": "deepLink",
+     "optional": true
+    }
+   ],
+   "coldEntry": "**A version link is expected to point at something superseded — that is what versions are for.** The screen opens the requested version read-only, says it is not current, and links to the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`, `policyKind`.",
+   "preloaded": [
+    "CustomDomain.id",
+    "CustomDomain.hostname",
+    "CustomDomain.kind",
+    "CustomDomain.status",
+    "CustomDomain.verificationMethod"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-017"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-018",
+  "name": "Localisation & Language Pack",
+  "module": "Branding & Localisation",
+  "requiresModule": "core",
+  "wave": 2,
+  "capability": "C57",
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/general/localisation-and-language-pack",
+   "component": "apps/ticvai-web/src/routes/general/LocalisationAndLanguagePackDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "ADM-001",
+    "ADM-002",
+    "ADM-003"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-001",
+     "trigger": "Platform Login / MFA",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-003",
+     "trigger": "Cross-Tenant Health Dashboard",
+     "carries": [
+      "cellId",
+      "rightId"
+     ],
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **36 operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the **identical 41 operations** — a Typography screen that could create banners and a Component Preview that could set FAQs. **The worst instance of the 18 August bulk attach found so far**, and only walking the white-label journey surfaced it.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listFaqs` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Configure localisation & language pack for this venue.",
+  "gaps": [
+   {
+    "operation": "listPolicies",
+    "why": "**1 declared operation reach no component on this screen**: listPolicies. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every localisation language pack",
+       "bindsTo": "FaqCategory",
+       "columns": [
+        "FaqCategory.code",
+        "FaqCategory.name",
+        "FaqCategory.sortOrder",
+        "FaqCategory.entries",
+        "FaqCategory.scopePath"
+       ],
+       "operation": "listFaqs",
+       "provenance": "contract white-label.yaml GET /tenant-config/faqs"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected localisation language pack",
+       "bindsTo": "FaqCategory",
+       "columns": [
+        "FaqCategory.code",
+        "FaqCategory.name",
+        "FaqCategory.sortOrder",
+        "FaqCategory.entries",
+        "FaqCategory.scopePath"
+       ],
+       "operation": "listFaqs",
+       "provenance": "contract white-label.yaml GET /tenant-config/faqs"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "setLanguages",
+       "provenance": "contract white-label.yaml PUT /tenant-config/languages"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setFaqs",
+       "provenance": "contract white-label.yaml PUT /tenant-config/faqs"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setPolicy",
+       "provenance": "contract white-label.yaml PUT /tenant-config/policies/{policyKind}"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setLanguages",
+       "label": "Save languages",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listFaqs",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setLanguages",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The localisation language pack list.",
+   "error": "Could not load. Names which read failed and leaves the localisation language pack untouched.",
+   "emptyFirstRun": "No localisation language pack yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the localisation language pack are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setLanguages",
+    "contract": "white-label",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listFaqs",
+    "contract": "white-label",
+    "purpose": "List FAQs",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPolicies",
+    "contract": "white-label",
+    "purpose": "List legal policies",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setFaqs",
+    "contract": "white-label",
+    "purpose": "Set FAQ categories and entries",
+    "trigger": "onAction",
+    "invalidates": [
+     "listFaqs"
+    ]
+   },
+   {
+    "operationId": "setPolicy",
+    "contract": "white-label",
+    "purpose": "Publish a policy version",
+    "trigger": "onAction",
+    "invalidates": [
+     "listFaqs"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "bannerId",
+     "from": "deepLink"
+    },
+    {
+     "name": "pageId",
+     "from": "deepLink"
+    },
+    {
+     "name": "policyKind",
+     "from": "deepLink"
+    },
+    {
+     "name": "version",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A version link is expected to point at something superseded — that is what versions are for.** The screen opens the requested version read-only, says it is not current, and links to the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`, `policyKind`.",
+   "preloaded": [
+    "FaqCategory.code",
+    "FaqCategory.name",
+    "FaqCategory.sortOrder",
+    "FaqCategory.entries",
+    "FaqCategory.scopePath"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-018"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-019",
+  "name": "Global Configuration & Defaults",
+  "module": "Branding & Localisation",
+  "requiresModule": "membership",
+  "wave": 2,
+  "capability": "C95",
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/general/global-configuration-and-defaults",
+   "component": "apps/ticvai-web/src/routes/general/GlobalConfigurationAndDefaultsForm.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "ADM-001",
+    "ADM-002",
+    "ADM-003"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-001",
+     "trigger": "Platform Login / MFA",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-003",
+     "trigger": "Cross-Tenant Health Dashboard",
+     "carries": [
+      "cellId",
+      "rightId"
+     ],
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "openQuestions": [
+   "No contract — platform defaults not specified"
+  ],
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listPlans` reads the population and `getPlan` reads one of them — list, select, act",
+  "purpose": "Change how global behaves here, and see which level the current value came from.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every global defaults",
+       "bindsTo": "Plan",
+       "columns": [
+        "Plan.code",
+        "Plan.name",
+        "Plan.description",
+        "Plan.cellTier",
+        "Plan.licensedModules",
+        "Plan.limits",
+        "Plan.basePrice",
+        "Plan.billingPeriod",
+        "Plan.includesBrandedApp",
+        "Plan.includedAiTokens",
+        "Plan.id",
+        "Plan.isActive"
+       ],
+       "operation": "listPlans",
+       "provenance": "contract subscription.yaml GET /plans"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected global defaults",
+       "bindsTo": "Plan",
+       "columns": [
+        "Plan.code",
+        "Plan.name",
+        "Plan.description",
+        "Plan.cellTier",
+        "Plan.licensedModules",
+        "Plan.limits",
+        "Plan.basePrice",
+        "Plan.billingPeriod",
+        "Plan.includesBrandedApp",
+        "Plan.includedAiTokens",
+        "Plan.id",
+        "Plan.isActive",
+        "Plan.subscriberCount",
+        "Plan.publishedAt"
+       ],
+       "operation": "getPlan",
+       "provenance": "contract subscription.yaml GET /plans/{planId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createPlan",
+       "provenance": "contract subscription.yaml POST /plans"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createPlanVersion",
+       "provenance": "contract subscription.yaml POST /plans/{planId}"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The global defaults list.",
+   "error": "Could not load. Names which read failed and leaves the global defaults untouched.",
+   "emptyFirstRun": "No global defaults yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the global defaults are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listPlans",
+    "contract": "subscription",
+    "purpose": "List subscription plans",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createPlan",
+    "contract": "subscription",
+    "purpose": "Create a subscription plan",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPlans"
+    ]
+   },
+   {
+    "operationId": "createPlanVersion",
+    "contract": "subscription",
+    "purpose": "Publish a new version of a plan",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPlans"
+    ]
+   },
+   {
+    "operationId": "getPlan",
+    "contract": "subscription",
+    "purpose": "Read a plan",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "planId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `planId`.",
+   "preloaded": [
+    "Plan.code",
+    "Plan.name",
+    "Plan.description",
+    "Plan.cellTier",
+    "Plan.licensedModules"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-019"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

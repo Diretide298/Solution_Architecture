@@ -1,0 +1,643 @@
+{
+ "closeTableVisit": {
+  "method": "POST",
+  "path": "/table-visits/{visitId}/close",
+  "contract": "fnb",
+  "summary": "Settle and close a visit",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "compItem": {
+  "method": "POST",
+  "path": "/table-visits/{visitId}/comp",
+  "contract": "fnb",
+  "summary": "Take a line off the bill, with a reason and a name",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TableVisit"
+ },
+ "createFnbOrder": {
+  "method": "POST",
+  "path": "/fnb-orders",
+  "contract": "fnb",
+  "summary": "Place an F&B order",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateFnbOrderRequest",
+  "responds": "FnbOrder"
+ },
+ "createPayment": {
+  "method": "POST",
+  "path": "/payments",
+  "contract": "orders",
+  "summary": "Take a payment against an order",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreatePaymentRequest",
+  "responds": "Payment"
+ },
+ "createTableReservation": {
+  "method": "POST",
+  "path": "/table-reservations",
+  "contract": "fnb",
+  "summary": "Book a table in advance",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "TableReservation",
+  "responds": "TableReservation"
+ },
+ "fireCourse": {
+  "method": "POST",
+  "path": "/kitchen-tickets/{ticketId}/fire",
+  "contract": "fnb",
+  "summary": "Send a held course to the pass",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KitchenTicket"
+ },
+ "getBill": {
+  "method": "GET",
+  "path": "/table-visits/{visitId}/bill",
+  "contract": "fnb",
+  "summary": "Bill for a visit",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Bill"
+ },
+ "getGuestProfile": {
+  "method": "GET",
+  "path": "/guests/{subjectId}",
+  "contract": "marketing-crm",
+  "summary": "Read a guest profile",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestProfileDetail"
+ },
+ "getTableMap": {
+  "method": "GET",
+  "path": "/outlets/{outletId}/tables",
+  "contract": "fnb",
+  "summary": "Table map with live state",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "TableMap"
+ },
+ "holdCourse": {
+  "method": "POST",
+  "path": "/kitchen-tickets/{ticketId}/hold",
+  "contract": "fnb",
+  "summary": "Stop a course going out",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KitchenTicket"
+ },
+ "joinRestaurantWaitlist": {
+  "method": "POST",
+  "path": "/waitlist",
+  "contract": "fnb",
+  "summary": "Add a party to an outlet's waitlist",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RestaurantWaitlist",
+  "responds": "RestaurantWaitlist"
+ },
+ "listFnbOrders": {
+  "method": "GET",
+  "path": "/fnb-orders",
+  "contract": "fnb",
+  "summary": "List F&B orders",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "outletId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "tableVisitId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listOrders": {
+  "method": "GET",
+  "path": "/orders",
+  "contract": "orders",
+  "summary": "List orders",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "shiftId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "createdFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "createdTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listTableReservations": {
+  "method": "GET",
+  "path": "/table-reservations",
+  "contract": "fnb",
+  "summary": "Bookings for a service period",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "outletId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "date",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TableReservation"
+ },
+ "matchGuest": {
+  "method": "POST",
+  "path": "/guests/match",
+  "contract": "marketing-crm",
+  "summary": "Is this the same person we already have?",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "mergeGuests": {
+  "method": "POST",
+  "path": "/guests/merge",
+  "contract": "marketing-crm",
+  "summary": "Two records, one person",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "mergeTableVisits": {
+  "method": "POST",
+  "path": "/table-visits/{visitId}/merge",
+  "contract": "fnb",
+  "summary": "Merge another visit into this one",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TableVisit"
+ },
+ "moveTableVisit": {
+  "method": "POST",
+  "path": "/table-visits/{visitId}/move",
+  "contract": "fnb",
+  "summary": "Move a party to a different table, mid-service",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TableVisit"
+ },
+ "notifyServer": {
+  "method": "POST",
+  "path": "/table-visits/{visitId}/notify-server",
+  "contract": "fnb",
+  "summary": "The kitchen calls the server to the pass",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "notifyWaitlistParty": {
+  "method": "POST",
+  "path": "/waitlist/{entryId}/notify",
+  "contract": "fnb",
+  "summary": "Their table is ready",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RestaurantWaitlist"
+ },
+ "openTableVisit": {
+  "method": "POST",
+  "path": "/table-visits",
+  "contract": "fnb",
+  "summary": "Seat a party and open a visit",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "OpenTableVisitRequest",
+  "responds": "TableVisit"
+ },
+ "quoteWaitTime": {
+  "method": "POST",
+  "path": "/waitlist/{entryId}/quote",
+  "contract": "fnb",
+  "summary": "Tell a party how long, and mean it",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "reassignServer": {
+  "method": "PUT",
+  "path": "/table-visits/{visitId}/server",
+  "contract": "fnb",
+  "summary": "Hand a table to another server",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TableVisit"
+ },
+ "seatTableReservation": {
+  "method": "POST",
+  "path": "/table-reservations/{reservationId}/seat",
+  "contract": "fnb",
+  "summary": "The party arrived and has been sat down",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TableReservation"
+ },
+ "setServiceStage": {
+  "method": "PUT",
+  "path": "/table-visits/{visitId}/stage",
+  "contract": "fnb",
+  "summary": "Where this table is in its meal",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TableVisit"
+ },
+ "setTableCombinations": {
+  "method": "PUT",
+  "path": "/outlets/{outletId}/table-combinations",
+  "contract": "fnb",
+  "summary": "Which tables can be pushed together, and to what capacity",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setTableLayout": {
+  "method": "PUT",
+  "path": "/outlets/{outletId}/tables",
+  "contract": "fnb",
+  "summary": "Configure the table layout",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TableMap"
+ },
+ "splitBill": {
+  "method": "POST",
+  "path": "/table-visits/{visitId}/bill/split",
+  "contract": "fnb",
+  "summary": "Split a bill",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SplitBillRequest",
+  "responds": "BillSplit"
+ },
+ "transferOrderItems": {
+  "method": "POST",
+  "path": "/table-visits/{visitId}/transfer-items",
+  "contract": "fnb",
+  "summary": "Move items to another table's bill",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TableVisit"
+ },
+ "transferTableVisit": {
+  "method": "POST",
+  "path": "/table-visits/{visitId}/transfer",
+  "contract": "fnb",
+  "summary": "Move a check to another server",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "updateTableVisit": {
+  "method": "PATCH",
+  "path": "/table-visits/{visitId}",
+  "contract": "fnb",
+  "summary": "Amend covers, move table, or reassign server",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TableVisit"
+ }
+}

@@ -1,0 +1,365 @@
+[
+ {
+  "id": "WEB-034",
+  "name": "Lost & Found",
+  "module": "Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "capability": "C00",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/lost-found",
+   "component": "apps/guest-web/src/routes/LostFound.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "WEB-001"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "notes": "**Reached from WEB-001** — a top-level section of the site. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "GST-034",
+     "trigger": "They track it",
+     "provenance": "flow F54 step 3→4",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "Added 17 August for parity with GST-034. **Not on the wireframe board** — needs drawing. CF-93. **Guest case operations wired 24 August.** **No case operation was guest-callable** — a guest could raise nothing and read nothing, and `check-screens` refused the staff-permissioned ones on a guest surface. `listMyCases`, `raiseMyCase` and `replyToMyCase` are scoped to the caller rather than filtered by a subject parameter.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listMyCases` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Report something you left behind.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every lost found",
+       "bindsTo": "Case",
+       "columns": [
+        "Case.id",
+        "Case.caseNumber",
+        "Case.subjectId",
+        "Case.guestName",
+        "Case.subject",
+        "Case.categoryId",
+        "Case.status",
+        "Case.priority",
+        "Case.assignedToPrincipalId",
+        "Case.venueId",
+        "Case.relatedOrderId",
+        "Case.slaDueAt"
+       ],
+       "operation": "listMyCases",
+       "provenance": "contract marketing-crm.yaml GET /my/cases"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected lost found",
+       "bindsTo": "Case",
+       "columns": [
+        "Case.id",
+        "Case.caseNumber",
+        "Case.subjectId",
+        "Case.guestName",
+        "Case.subject",
+        "Case.categoryId",
+        "Case.status",
+        "Case.priority",
+        "Case.assignedToPrincipalId",
+        "Case.venueId",
+        "Case.relatedOrderId",
+        "Case.slaDueAt",
+        "Case.isSlaBreached",
+        "Case.slaPausedSeconds",
+        "Case.escalationCount",
+        "Case.resolvedAt"
+       ],
+       "operation": "listMyCases",
+       "provenance": "contract marketing-crm.yaml GET /my/cases"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Raise",
+       "operation": "raiseMyCase",
+       "provenance": "contract marketing-crm.yaml POST /my/cases"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reply",
+       "operation": "replyToMyCase",
+       "provenance": "contract marketing-crm.yaml POST /my/cases/{caseId}/messages"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "raiseMyCase",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The lost found list.",
+   "error": "Could not load. Names which read failed and leaves the lost found untouched.",
+   "emptyFirstRun": "No lost found yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the lost found are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listMyCases",
+    "contract": "marketing-crm",
+    "purpose": "The cases this guest raised",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "raiseMyCase",
+    "contract": "marketing-crm",
+    "purpose": "Report something — lost property, a complaint, a question",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyCases"
+    ]
+   },
+   {
+    "operationId": "replyToMyCase",
+    "contract": "marketing-crm",
+    "purpose": "Reply on a case the guest raised",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMyCases"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "caseId",
+     "from": "deepLink",
+     "optional": true
+    }
+   ],
+   "coldEntry": "A case opened from a notification or the list. **Optional** — the ordinary way in is to raise a new one, not to open an old one.",
+   "preloaded": [
+    "Case.id",
+    "Case.caseNumber",
+    "Case.subjectId",
+    "Case.guestName",
+    "Case.subject"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-034"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-045",
+  "name": "Help Centre & Accessibility",
+  "module": "Support",
+  "requiresModule": "core",
+  "wave": 2,
+  "implementation": {
+   "app": "guest-web",
+   "route": "/help-centre-and-accessibility",
+   "component": "apps/guest-web/src/routes/HelpCentreAccessibility.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "exitTo": [
+    "WEB-001"
+   ]
+  },
+  "notes": "**P01 Board 4 drew *Help Centre* and *Accessibility Statement* and neither could load content.** `listFaqs` and `listContentPages` were app-only.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listFaqs` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Answers, policies and the accessibility statement.",
+  "gaps": [
+   {
+    "operation": "listContentPages",
+    "why": "**1 declared operation reach no component on this screen**: listContentPages. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every help accessibility",
+       "bindsTo": "FaqCategory",
+       "columns": [
+        "FaqCategory.code",
+        "FaqCategory.name",
+        "FaqCategory.sortOrder",
+        "FaqCategory.entries",
+        "FaqCategory.scopePath"
+       ],
+       "operation": "listFaqs",
+       "provenance": "contract white-label.yaml GET /tenant-config/faqs"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected help accessibility",
+       "bindsTo": "FaqCategory",
+       "columns": [
+        "FaqCategory.code",
+        "FaqCategory.name",
+        "FaqCategory.sortOrder",
+        "FaqCategory.entries",
+        "FaqCategory.scopePath"
+       ],
+       "operation": "listFaqs",
+       "provenance": "contract white-label.yaml GET /tenant-config/faqs"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "cardList",
+       "label": "Help Centre & Accessibility",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Detail",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Content resolves in place.",
+   "error": "Could not load. **The rest of the site is unaffected.**",
+   "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
+   "emptyNoResults": "Nothing matches.",
+   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused."
+  },
+  "apis": [
+   {
+    "operationId": "listFaqs",
+    "contract": "white-label",
+    "purpose": "List FAQs",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listContentPages",
+    "contract": "white-label",
+    "purpose": "List custom content pages",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land here, and the person holding it did nothing wrong. Arrives with no parameter — the venue comes from the site.",
+   "preloaded": [
+    "FaqCategory.code",
+    "FaqCategory.name",
+    "FaqCategory.sortOrder",
+    "FaqCategory.entries",
+    "FaqCategory.scopePath"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-045"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

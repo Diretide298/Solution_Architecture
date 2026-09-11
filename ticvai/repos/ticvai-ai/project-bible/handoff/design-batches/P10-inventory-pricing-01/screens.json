@@ -1,0 +1,974 @@
+[
+ {
+  "id": "PTR-005",
+  "name": "Inventory & Allocation View",
+  "module": "Inventory & Pricing",
+  "requiresModule": "partner",
+  "wave": 2,
+  "capability": "C103",
+  "implementation": {
+   "app": "partner-web",
+   "route": "/general/inventory-and-allocation-view",
+   "component": "apps/partner-web/src/routes/general/InventoryAndAllocationViewDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "PTR-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "PTR-001",
+    "PTR-002",
+    "PTR-003",
+    "PTR-008"
+   ],
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "PTR-008",
+     "trigger": "Receives vouchers",
+     "provenance": "flow F10 step 2→3",
+     "operation": "createOrder"
+    },
+    {
+     "to": "PTR-001",
+     "trigger": "Partner Login / MFA",
+     "carries": [
+      "accountId",
+      "sessionId"
+     ],
+     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-002",
+     "trigger": "Partner Dashboard",
+     "carries": [
+      "accountId",
+      "orderId"
+     ],
+     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-003",
+     "trigger": "Profile & Company Details",
+     "carries": [
+      "principalId"
+     ],
+     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **createRefund removed 18 August** — attached by module resemblance, not by what this screen does. A screen that does not handle money should not be able to move it (CF-87's class).",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listChannelCapacities` reads the population and `getChannelAllocations` reads one of them — list, select, act",
+  "purpose": "See inventory & allocation view for this venue.",
+  "gaps": [
+   {
+    "operation": "getOrder",
+    "why": "**4 declared operations reach no component on this screen**: getOrder, getOrderStatement, listOrderRefunds, listOrders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every inventory allocation",
+       "bindsTo": "ChannelCapacity",
+       "columns": [
+        "ChannelCapacity.id",
+        "ChannelCapacity.performanceId",
+        "ChannelCapacity.name",
+        "ChannelCapacity.seatCategoryId",
+        "ChannelCapacity.oversellAllowance",
+        "ChannelCapacity.oversellBasis",
+        "ChannelCapacity.capacity",
+        "ChannelCapacity.sold",
+        "ChannelCapacity.leased",
+        "ChannelCapacity.remaining",
+        "ChannelCapacity.hasChannelAllocations",
+        "ChannelCapacity.isSeated"
+       ],
+       "operation": "listChannelCapacities",
+       "provenance": "contract catalogue.yaml GET /channel-capacities"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected inventory allocation",
+       "bindsTo": "ChannelAllocationSet",
+       "columns": [
+        "ChannelAllocationSet.channelCapacityId",
+        "ChannelAllocationSet.capacity",
+        "ChannelAllocationSet.allocations",
+        "ChannelAllocationSet.generalPoolUnits",
+        "ChannelAllocationSet.totalSold",
+        "ChannelAllocationSet.totalRemaining"
+       ],
+       "operation": "getChannelAllocations",
+       "provenance": "contract catalogue.yaml GET /channel-capacities/{channelCapacityId}/channel-allocations"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createOrder",
+       "provenance": "contract orders.yaml POST /orders"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Apply",
+       "operation": "applyManualDiscount",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createChannelCapacity",
+       "provenance": "contract catalogue.yaml POST /channel-capacities"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Exchange",
+       "operation": "exchangeOrderLines",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Hold",
+       "operation": "holdOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Modify",
+       "operation": "modifyOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Release hold",
+       "operation": "relinquishChannelAllocation",
+       "provenance": "contract catalogue.yaml POST /channel-capacities/{channelCapacityId}/channel-allocations/release"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reprint",
+       "operation": "reprintOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reschedule",
+       "operation": "rescheduleOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resume",
+       "operation": "resumeOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/resume"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setChannelAllocations",
+       "provenance": "contract catalogue.yaml PUT /channel-capacities/{channelCapacityId}/channel-allocations"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateChannelCapacity",
+       "provenance": "contract catalogue.yaml PATCH /channel-capacities/{channelCapacityId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Void",
+       "operation": "voidOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createOrder",
+       "label": "Create order",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listChannelCapacities",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "destructiveButton",
+       "derived": true,
+       "impliedBy": "voidOrder",
+       "label": "Void order",
+       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createOrder",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmVoidOrder",
+    "component": "confirmDialog",
+    "trigger": "Void",
+    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A inventory allocation this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
+   }
+  ],
+  "states": {
+   "loading": "The inventory allocation list.",
+   "error": "Could not load. Names which read failed and leaves the inventory allocation untouched.",
+   "emptyFirstRun": "No inventory allocation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the inventory allocation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getChannelAllocations",
+    "contract": "catalogue",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createOrder",
+    "contract": "orders",
+    "purpose": "From the flow it appears in",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "applyManualDiscount",
+    "contract": "orders",
+    "purpose": "Apply a discount a cashier chose",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannelCapacities"
+    ]
+   },
+   {
+    "operationId": "createChannelCapacity",
+    "contract": "catalogue",
+    "purpose": "Create a capacity envelope",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannelCapacities"
+    ]
+   },
+   {
+    "operationId": "exchangeOrderLines",
+    "contract": "orders",
+    "purpose": "Exchange lines for different products or dates",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannelCapacities"
+    ]
+   },
+   {
+    "operationId": "getOrder",
+    "contract": "orders",
+    "purpose": "Read an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getOrderStatement",
+    "contract": "orders",
+    "purpose": "Full financial history of an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "holdOrder",
+    "contract": "orders",
+    "purpose": "Park a sale and free the till",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannelCapacities"
+    ]
+   },
+   {
+    "operationId": "listChannelCapacities",
+    "contract": "catalogue",
+    "purpose": "List capacity envelopes",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOrderRefunds",
+    "contract": "orders",
+    "purpose": "List refunds against an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOrders",
+    "contract": "orders",
+    "purpose": "List orders",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "modifyOrder",
+    "contract": "orders",
+    "purpose": "Add or remove lines on an existing order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannelCapacities"
+    ]
+   },
+   {
+    "operationId": "relinquishChannelAllocation",
+    "contract": "catalogue",
+    "purpose": "Return unsold channel allocation to the general pool",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannelCapacities"
+    ]
+   },
+   {
+    "operationId": "reprintOrder",
+    "contract": "orders",
+    "purpose": "Reprint or resend tickets",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannelCapacities"
+    ]
+   },
+   {
+    "operationId": "rescheduleOrder",
+    "contract": "orders",
+    "purpose": "Move an order to another performance",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannelCapacities"
+    ]
+   },
+   {
+    "operationId": "resumeOrder",
+    "contract": "orders",
+    "purpose": "Bring a parked sale back to a till",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannelCapacities"
+    ]
+   },
+   {
+    "operationId": "setChannelAllocations",
+    "contract": "catalogue",
+    "purpose": "Allocate envelope capacity across channels",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannelCapacities"
+    ]
+   },
+   {
+    "operationId": "updateChannelCapacity",
+    "contract": "catalogue",
+    "purpose": "Amend an envelope",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannelCapacities"
+    ]
+   },
+   {
+    "operationId": "voidOrder",
+    "contract": "orders",
+    "purpose": "Void an order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannelCapacities"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "channelCapacityId",
+     "from": "deepLink"
+    },
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
+   "preloaded": [
+    "ChannelAllocationSet.channelCapacityId",
+    "ChannelAllocationSet.capacity",
+    "ChannelAllocationSet.allocations",
+    "ChannelAllocationSet.generalPoolUnits",
+    "ChannelAllocationSet.totalSold"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-005"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P10",
+   "audience": "partner",
+   "formFactor": "web",
+   "shortName": "Partner Web",
+   "name": "Partner Web — Reseller Portal",
+   "offlineCapable": false,
+   "app": "partner-web",
+   "operator": "partner",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P09",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "PTR-006",
+  "name": "Product Catalog (B2B Pricing)",
+  "module": "Inventory & Pricing",
+  "requiresModule": "partner",
+  "wave": 2,
+  "capability": "C85",
+  "implementation": {
+   "app": "partner-web",
+   "route": "/general/product-catalog-b2b-pricing",
+   "component": "apps/partner-web/src/routes/general/ProductCatalogB2bPricingList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "PTR-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "PTR-001",
+    "PTR-002",
+    "PTR-003"
+   ],
+   "transitions": [
+    {
+     "to": "PTR-001",
+     "trigger": "Partner Login / MFA",
+     "carries": [
+      "accountId",
+      "sessionId"
+     ],
+     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-002",
+     "trigger": "Partner Dashboard",
+     "carries": [
+      "accountId",
+      "orderId"
+     ],
+     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-003",
+     "trigger": "Profile & Company Details",
+     "carries": [
+      "principalId"
+     ],
+     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listProducts` reads the population and `getPriceList` reads one of them — list, select, act",
+  "purpose": "Find product catalog (b2b pricing) for this venue.",
+  "gaps": [
+   {
+    "operation": "getProduct",
+    "why": "**5 declared operations reach no component on this screen**: getProduct, listAlternativeCodes, listPriceLists, listPrices, listProductVariants. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every product catalog (b2b",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo"
+       ],
+       "operation": "listProducts",
+       "provenance": "contract catalogue.yaml GET /products"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected product catalog (b2b",
+       "bindsTo": "PriceList",
+       "columns": [
+        "PriceList.id",
+        "PriceList.code",
+        "PriceList.name",
+        "PriceList.venueId",
+        "PriceList.currency",
+        "PriceList.currencyScale",
+        "PriceList.channels",
+        "PriceList.validFrom",
+        "PriceList.validTo",
+        "PriceList.priority"
+       ],
+       "operation": "getPriceList",
+       "provenance": "contract catalogue.yaml GET /price-lists/{priceListId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Copy",
+       "operation": "copyPriceList",
+       "provenance": "contract catalogue.yaml POST /price-lists/{priceListId}/copy"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createPriceList",
+       "provenance": "contract catalogue.yaml POST /price-lists"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createProduct",
+       "provenance": "contract catalogue.yaml POST /products"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resolve",
+       "operation": "resolveProductByCode",
+       "provenance": "contract catalogue.yaml GET /products/resolve"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setAlternativeCodes",
+       "provenance": "contract catalogue.yaml PUT /products/{productId}/alternative-codes"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setPrices",
+       "provenance": "contract catalogue.yaml PUT /price-lists/{priceListId}/prices"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setProductAttributes",
+       "provenance": "contract catalogue.yaml PUT /products/{productId}/attributes"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Transition",
+       "operation": "transitionProductLifecycle",
+       "provenance": "contract catalogue.yaml POST /products/{productId}/lifecycle"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updatePriceList",
+       "provenance": "contract catalogue.yaml PATCH /price-lists/{priceListId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateProduct",
+       "provenance": "contract catalogue.yaml PATCH /products/{productId}"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The product catalog (b2b list.",
+   "error": "Could not load. Names which read failed and leaves the product catalog (b2b untouched.",
+   "emptyFirstRun": "No product catalog (b2b yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the product catalog (b2b are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listProducts",
+    "contract": "catalogue",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getPriceList",
+    "contract": "catalogue",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "copyPriceList",
+    "contract": "catalogue",
+    "purpose": "Copy a price list, optionally with an adjustment",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProducts"
+    ]
+   },
+   {
+    "operationId": "createPriceList",
+    "contract": "catalogue",
+    "purpose": "Create a price list",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProducts"
+    ]
+   },
+   {
+    "operationId": "createProduct",
+    "contract": "catalogue",
+    "purpose": "Create a product",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProducts"
+    ]
+   },
+   {
+    "operationId": "getProduct",
+    "contract": "catalogue",
+    "purpose": "Read a product",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listAlternativeCodes",
+    "contract": "catalogue",
+    "purpose": "External identifiers for a product",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPriceLists",
+    "contract": "catalogue",
+    "purpose": "List price lists",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPrices",
+    "contract": "catalogue",
+    "purpose": "List prices in a list",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listProductVariants",
+    "contract": "catalogue",
+    "purpose": "List generated variants",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "resolveProductByCode",
+    "contract": "catalogue",
+    "purpose": "Resolve a partner code to a product",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setAlternativeCodes",
+    "contract": "catalogue",
+    "purpose": "Set external identifiers",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProducts"
+    ]
+   },
+   {
+    "operationId": "setPrices",
+    "contract": "catalogue",
+    "purpose": "Set prices in bulk",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProducts"
+    ]
+   },
+   {
+    "operationId": "setProductAttributes",
+    "contract": "catalogue",
+    "purpose": "Set the attribute axes for a product",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProducts"
+    ]
+   },
+   {
+    "operationId": "transitionProductLifecycle",
+    "contract": "catalogue",
+    "purpose": "Move a product through its lifecycle",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProducts"
+    ]
+   },
+   {
+    "operationId": "updatePriceList",
+    "contract": "catalogue",
+    "purpose": "Amend a price list",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProducts"
+    ]
+   },
+   {
+    "operationId": "updateProduct",
+    "contract": "catalogue",
+    "purpose": "Update a product",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProducts"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "priceListId",
+     "from": "deepLink"
+    },
+    {
+     "name": "productId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A shared product link after the product retired.** Shows what replaced it where a successor exists, and the catalogue where none does.",
+   "preloaded": [
+    "PriceList.id",
+    "PriceList.code",
+    "PriceList.name",
+    "PriceList.venueId",
+    "PriceList.currency"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-006"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 17 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P10",
+   "audience": "partner",
+   "formFactor": "web",
+   "shortName": "Partner Web",
+   "name": "Partner Web — Reseller Portal",
+   "offlineCapable": false,
+   "app": "partner-web",
+   "operator": "partner",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P09",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "PTR-007",
+  "name": "Availability Search",
+  "module": "Inventory & Pricing",
+  "requiresModule": "partner",
+  "wave": 2,
+  "capability": "C81",
+  "implementation": {
+   "app": "partner-web",
+   "route": "/general/availability-search",
+   "component": "apps/partner-web/src/routes/general/AvailabilitySearchList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "PTR-001",
+    "PTR-002"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "PTR-001",
+    "PTR-002",
+    "PTR-003",
+    "PTR-008"
+   ],
+   "flowDerived": true,
+   "transitions": [
+    {
+     "to": "PTR-008",
+     "trigger": "Creates the booking",
+     "provenance": "flow F03 step 2→3",
+     "operation": "getAvailability"
+    },
+    {
+     "to": "PTR-001",
+     "trigger": "Partner Login / MFA",
+     "carries": [
+      "accountId",
+      "sessionId"
+     ],
+     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-002",
+     "trigger": "Partner Dashboard",
+     "carries": [
+      "accountId",
+      "orderId"
+     ],
+     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-003",
+     "trigger": "Profile & Company Details",
+     "carries": [
+      "principalId"
+     ],
+     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "density": "compact",
+  "pattern": "statusTracker",
+  "patternReason": "`getAvailability` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Find something when the guest does not know what it is called.",
+  "gaps": [
+   {
+    "operation": "getAvailability",
+    "why": "**1 declared operation reach no component on this screen**: getAvailability. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The availability search list.",
+   "error": "Could not load. Names which read failed and leaves the availability search untouched.",
+   "emptyFirstRun": "No availability search yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the availability search are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getAvailability",
+    "contract": "catalogue",
+    "purpose": "Per-performance capacity on the B2B channel",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-007"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P10",
+   "audience": "partner",
+   "formFactor": "web",
+   "shortName": "Partner Web",
+   "name": "Partner Web — Reseller Portal",
+   "offlineCapable": false,
+   "app": "partner-web",
+   "operator": "partner",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P09",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

@@ -23,7 +23,7 @@ platform:
     deviceOwnership: venue-owned or BYOD
     networkAssumption: venue wifi, dead zones expected
     releaseCadence: fortnightly
-  screenCount: 66
+  screenCount: 96
   designReferences:
   - path: sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf
     note: Employee app reference — dark theme, and the Home · Tasks · Scan · AI · More nav that CF-41
@@ -415,6 +415,9 @@ screens:
     - EMP-068
     - EMP-069
     - EMP-070
+    - EMP-071
+    - EMP-081
+    - EMP-091
     inferred: true
     fromFlows: true
     transitions:
@@ -572,6 +575,19 @@ screens:
       - venueId
       provenance: derived — EMP-070 declares entryState.params alertId, venueId, so an edge into it must
         carry them
+    - to: EMP-071
+      trigger: Rental Checkout Command Center
+      provenance: structural — Rental board 6 on the staff app, 11 September 2026
+    - to: EMP-081
+      trigger: Active Rental Operations Command Center
+      provenance: structural — Rental board 7 on the staff app, 11 September 2026
+    - to: EMP-091
+      trigger: Rental Return Command Center
+      provenance: structural — Rental board 8 on the staff app, 11 September 2026
+    entryFrom:
+    - EMP-071
+    - EMP-081
+    - EMP-091
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. **createCashMovement removed 18 August** — attached by module resemblance, not by what
     this screen does. A screen that does not handle money should not be able to move it (CF-87's class).
@@ -12199,3 +12215,2384 @@ screens:
   apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
     — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
     to the ones that matter is work a person still owes this screen.
+- id: EMP-071
+  name: Rental Checkout Command Center
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-544
+    book: Rental_Management.pdf
+    board: '6'
+    number: '1'
+    page: 64
+  implementation:
+    app: venue-staff-app
+    route: /rentals/rental-checkout-command-center-emp-071
+    component: apps/venue-staff-app/src/routes/rentals/RentalCheckoutCommandCenter.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-544`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Provide rental operators with a real-time operational queue of customers requiring equipment
+    checkout.
+  pattern: commandCentre
+  patternReason: the pack gives this screen a metric directory (§KPI Cards) and no per-row directory —
+    measures over a population the screen does not itself list. The tiles are the pack's, not a tenant
+    licence's
+  layout:
+    regions:
+    - components:
+      - kind: searchField
+        label: Search rental checkout
+        provenance: pack Rental_Management.pdf, page 64 §Filters
+      - columns:
+        - Location
+        - Product
+        - Start Time
+        - Booking Type
+        - Group/Individual
+        - Readiness
+        - Status
+        kind: multiSelect
+        label: Filter by
+        notes: The pack filters this screen by location, product, start time, booking type, group/individual,
+          readiness and 1 more — which are present is a decision the pack already made.
+        provenance: pack Rental_Management.pdf, page 64 §Filters
+      name: contentBody
+      slot: filters
+    - components:
+      - kind: metricTile
+        label: Arriving Next 30 Min
+        provenance: pack Rental_Management.pdf, page 64 §KPI Cards
+      - kind: metricTile
+        label: Awaiting Checkout
+        provenance: pack Rental_Management.pdf, page 64 §KPI Cards
+      - kind: metricTile
+        label: Ready for Checkout
+        provenance: pack Rental_Management.pdf, page 64 §KPI Cards
+      - kind: metricTile
+        label: Checkout in Progress
+        provenance: pack Rental_Management.pdf, page 64 §KPI Cards
+      - kind: metricTile
+        label: Checked Out Today
+        provenance: pack Rental_Management.pdf, page 64 §KPI Cards
+      - kind: metricTile
+        label: Missing Requirements
+        provenance: pack Rental_Management.pdf, page 64 §KPI Cards
+      - kind: metricTile
+        label: Equipment Issues
+        provenance: pack Rental_Management.pdf, page 64 §KPI Cards
+      - kind: metricTile
+        label: Late Arrivals
+        provenance: pack Rental_Management.pdf, page 64 §KPI Cards
+      name: contentBody
+      slot: headline
+    template: dashboard
+  states:
+    emptyFirstRun: No rental checkout yet. Carries the create action; distinct from a filter that matched
+      nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the rental checkout are still there. Names the active filter
+      and offers to clear it.
+    error: Could not load. Names which read failed and leaves the rental checkout untouched.
+    loading: The rental checkout list; the counts above it resolve separately.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 64. 0 of 7 labels bound to a
+    contract property; 15 of 23 pack bullets carried onto the screen — the rest are acceptance prose,
+    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    preloaded:
+    - Arriving Next 30 Min
+    - Awaiting Checkout
+    - Ready for Checkout
+    - Checkout in Progress
+    - Checked Out Today
+    - Missing Requirements
+  navigation:
+    entryFrom:
+    - EMP-003
+    - EMP-072
+    - EMP-073
+    - EMP-074
+    - EMP-075
+    - EMP-076
+    - EMP-077
+    - EMP-078
+    - EMP-079
+    - EMP-080
+    exitTo:
+    - EMP-003
+    - EMP-072
+    - EMP-073
+    - EMP-074
+    - EMP-075
+    - EMP-076
+    - EMP-077
+    - EMP-078
+    - EMP-079
+    - EMP-080
+    transitions:
+    - to: EMP-003
+      trigger: Back to Home — on duty
+      provenance: structural — Rental board 6 on the staff app, 11 September 2026
+      back: true
+    - to: EMP-072
+      trigger: Voucher Scan & Reservation Retrieval
+      provenance: structural — Rental board 6 on the staff app, 11 September 2026
+    - to: EMP-073
+      trigger: Checkout Readiness Validation
+      provenance: structural — Rental board 6 on the staff app, 11 September 2026
+    - to: EMP-074
+      trigger: Equipment Assignment Workspace
+      provenance: structural — Rental board 6 on the staff app, 11 September 2026
+    - to: EMP-075
+      trigger: Equipment Scan & Validation
+      provenance: structural — Rental board 6 on the staff app, 11 September 2026
+    - to: EMP-076
+      trigger: Pre-Rental Condition Inspection
+      provenance: structural — Rental board 6 on the staff app, 11 September 2026
+    - to: EMP-077
+      trigger: Safety & Handover Checklist
+      provenance: structural — Rental board 6 on the staff app, 11 September 2026
+    - to: EMP-078
+      trigger: Deposit & Financial Handover Validation
+      provenance: structural — Rental board 6 on the staff app, 11 September 2026
+    - to: EMP-079
+      trigger: Group & Multi-Item Checkout
+      provenance: structural — Rental board 6 on the staff app, 11 September 2026
+    - to: EMP-080
+      trigger: Checkout Confirmation & Rental Activation
+      provenance: structural — Rental board 6 on the staff app, 11 September 2026
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-071
+- id: EMP-072
+  name: Voucher Scan & Reservation Retrieval
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-545
+    book: Rental_Management.pdf
+    board: '6'
+    number: '2'
+    page: 65
+  implementation:
+    app: venue-staff-app
+    route: /rentals/voucher-scan-reservation-retrieval-emp-072
+    component: apps/venue-staff-app/src/routes/rentals/VoucherScanReservationRetrieval.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-545`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Quickly identify the customer reservation when they arrive. The original requirement specifically
+    requires scanning and validating the customer's voucher/ticket.
+  pattern: listDetail
+  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
+    display directory, no configuration directory. It falls to the default, and the fallback is recorded
+    rather than passed off as a decision'
+  layout:
+    regions: []
+    template: split
+  states:
+    emptyFirstRun: No voucher scan reservation yet. Carries the create action; distinct from a filter
+      that matched nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the voucher scan reservation are still there. Names the
+      active filter and offers to clear it.
+    error: Could not load. Names which read failed and leaves the voucher scan reservation untouched.
+    loading: The voucher scan reservation list.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  gaps:
+  - operation: null
+    source: pack Rental_Management.pdf, page 65
+    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
+      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
+      in them. The screen has no content region rather than an empty one, and it needs a person before
+      it is built.'
+  - operation: null
+    source: pack Rental_Management.pdf, page 65
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 65. 0 of 0 labels bound to a
+    contract property; 0 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked
+    examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  navigation:
+    entryFrom:
+    - EMP-071
+    exitTo:
+    - EMP-071
+    transitions:
+    - to: EMP-071
+      trigger: Back to Rental Checkout Command Center
+      provenance: structural — Rental board 6 on the staff app, 11 September 2026
+      back: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-072
+- id: EMP-073
+  name: Checkout Readiness Validation
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-546
+    book: Rental_Management.pdf
+    board: '6'
+    number: '3'
+    page: 66
+  implementation:
+    app: venue-staff-app
+    route: /rentals/checkout-readiness-validation-emp-073
+    component: apps/venue-staff-app/src/routes/rentals/CheckoutReadinessValidation.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-546`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Prevent equipment from being handed over until mandatory requirements are satisfied.
+  pattern: listDetail
+  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
+    display directory, no configuration directory. It falls to the default, and the fallback is recorded
+    rather than passed off as a decision'
+  layout:
+    regions: []
+    template: split
+  states:
+    emptyFirstRun: No checkout readiness validation yet. Carries the create action; distinct from a filter
+      that matched nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the checkout readiness validation are still there. Names
+      the active filter and offers to clear it.
+    error: Could not load. Names which read failed and leaves the checkout readiness validation untouched.
+    loading: The checkout readiness validation list.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  gaps:
+  - operation: null
+    source: pack Rental_Management.pdf, page 66
+    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
+      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
+      in them. The screen has no content region rather than an empty one, and it needs a person before
+      it is built.'
+  - operation: null
+    source: pack Rental_Management.pdf, page 66
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 66. 0 of 0 labels bound to a
+    contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked
+    examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  navigation:
+    entryFrom:
+    - EMP-071
+    exitTo:
+    - EMP-071
+    transitions:
+    - to: EMP-071
+      trigger: Back to Rental Checkout Command Center
+      provenance: structural — Rental board 6 on the staff app, 11 September 2026
+      back: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-073
+- id: EMP-074
+  name: Equipment Assignment Workspace
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-547
+    book: Rental_Management.pdf
+    board: '6'
+    number: '4'
+    page: 67
+  implementation:
+    app: venue-staff-app
+    route: /rentals/equipment-assignment-workspace-emp-074
+    component: apps/venue-staff-app/src/routes/rentals/EquipmentAssignmentWorkspace.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-547`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Assign the actual physical equipment to the reservation.
+  pattern: listDetail
+  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
+    display directory, no configuration directory. It falls to the default, and the fallback is recorded
+    rather than passed off as a decision'
+  layout:
+    regions: []
+    template: split
+  states:
+    emptyFirstRun: No equipment yet. Carries the create action; distinct from a filter that matched nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the equipment are still there. Names the active filter
+      and offers to clear it.
+    error: Could not load. Names which read failed and leaves the equipment untouched.
+    loading: The equipment list.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  gaps:
+  - operation: null
+    source: pack Rental_Management.pdf, page 67
+    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
+      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
+      in them. The screen has no content region rather than an empty one, and it needs a person before
+      it is built.'
+  - operation: null
+    source: pack Rental_Management.pdf, page 67
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 67. 0 of 0 labels bound to a
+    contract property; 0 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked
+    examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  navigation:
+    entryFrom:
+    - EMP-071
+    exitTo:
+    - EMP-071
+    transitions:
+    - to: EMP-071
+      trigger: Back to Rental Checkout Command Center
+      provenance: structural — Rental board 6 on the staff app, 11 September 2026
+      back: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-074
+- id: EMP-075
+  name: Equipment Scan & Validation
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-548
+    book: Rental_Management.pdf
+    board: '6'
+    number: '5'
+    page: 68
+  implementation:
+    app: venue-staff-app
+    route: /rentals/equipment-scan-validation-emp-075
+    component: apps/venue-staff-app/src/routes/rentals/EquipmentScanValidation.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-548`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Ensure the operator cannot accidentally assign the wrong, unavailable or unsafe equipment.
+  pattern: listDetail
+  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
+    display directory, no configuration directory. It falls to the default, and the fallback is recorded
+    rather than passed off as a decision'
+  layout:
+    regions: []
+    template: split
+  states:
+    emptyFirstRun: No equipment scan validation yet. Carries the create action; distinct from a filter
+      that matched nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the equipment scan validation are still there. Names the
+      active filter and offers to clear it.
+    error: Could not load. Names which read failed and leaves the equipment scan validation untouched.
+    loading: The equipment scan validation list.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  gaps:
+  - operation: null
+    source: pack Rental_Management.pdf, page 68
+    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
+      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
+      in them. The screen has no content region rather than an empty one, and it needs a person before
+      it is built.'
+  - operation: null
+    source: pack Rental_Management.pdf, page 68
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 68. 0 of 0 labels bound to a
+    contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked
+    examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  navigation:
+    entryFrom:
+    - EMP-071
+    exitTo:
+    - EMP-071
+    transitions:
+    - to: EMP-071
+      trigger: Back to Rental Checkout Command Center
+      provenance: structural — Rental board 6 on the staff app, 11 September 2026
+      back: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-075
+- id: EMP-076
+  name: Pre-Rental Condition Inspection
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-549
+    book: Rental_Management.pdf
+    board: '6'
+    number: '6'
+    page: 69
+  implementation:
+    app: venue-staff-app
+    route: /rentals/pre-rental-condition-inspection-emp-076
+    component: apps/venue-staff-app/src/routes/rentals/PreRentalConditionInspection.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-549`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Document the equipment condition before handover. Photo capture at checkout is specifically
+    recommended in the source.
+  pattern: listDetail
+  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
+    display directory, no configuration directory. It falls to the default, and the fallback is recorded
+    rather than passed off as a decision'
+  layout:
+    regions:
+    - components:
+      - kind: primaryButton
+        label: Asset
+        provenance: pack Rental_Management.pdf, page 69 §Support
+      - kind: secondaryButton
+        label: Checkout inspection
+        provenance: pack Rental_Management.pdf, page 69 §Support
+      name: actionBar
+      slot: rowActions
+    template: split
+  states:
+    emptyFirstRun: No pre-rental condition inspection yet. Carries the create action; distinct from a
+      filter that matched nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the pre-rental condition inspection are still there. Names
+      the active filter and offers to clear it.
+    error: Could not load. Names which read failed and leaves the pre-rental condition inspection untouched.
+    loading: The pre-rental condition inspection list.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  gaps:
+  - operation: null
+    source: pack Rental_Management.pdf, page 69 §Support
+    why: '**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved:
+      Asset, Checkout inspection. Each needs an operation, or needs removing from the screen; this is
+      the Phase 3 reconciliation seen from the screen side rather than the contract side.'
+  - operation: null
+    source: pack Rental_Management.pdf, page 69
+    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
+      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
+      in them. The screen has no content region rather than an empty one, and it needs a person before
+      it is built.'
+  - operation: null
+    source: pack Rental_Management.pdf, page 69
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 69. 0 of 0 labels bound to a
+    contract property; 2 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked
+    examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  navigation:
+    entryFrom:
+    - EMP-071
+    exitTo:
+    - EMP-071
+    transitions:
+    - to: EMP-071
+      trigger: Back to Rental Checkout Command Center
+      provenance: structural — Rental board 6 on the staff app, 11 September 2026
+      back: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-076
+- id: EMP-077
+  name: Safety & Handover Checklist
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-550
+    book: Rental_Management.pdf
+    board: '6'
+    number: '7'
+    page: 70
+  implementation:
+    app: venue-staff-app
+    route: /rentals/safety-handover-checklist-emp-077
+    component: apps/venue-staff-app/src/routes/rentals/SafetyHandoverChecklist.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-550`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Ensure mandatory operational and safety steps are completed before starting the rental. Example
+    — Kayak ✓ Life jacket provided ✓ Paddle provided ✓ Safety briefing completed ✓ Emergency procedure
+    explained ✓ Restricted areas explained ✓ Customer confirms swimming ability Example — Bicycle ✓ Helmet
+    provided ✓ Brake check completed ✓ Seat adjusted ✓ Safety briefing completed The checklist should
+    be configurable by rental product/category from Board 1.
+  pattern: listDetail
+  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
+    display directory, no configuration directory. It falls to the default, and the fallback is recorded
+    rather than passed off as a decision'
+  layout:
+    regions: []
+    template: split
+  states:
+    emptyFirstRun: No safety handover checklist yet. Carries the create action; distinct from a filter
+      that matched nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the safety handover checklist are still there. Names the
+      active filter and offers to clear it.
+    error: Could not load. Names which read failed and leaves the safety handover checklist untouched.
+    loading: The safety handover checklist list.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  gaps:
+  - operation: null
+    source: pack Rental_Management.pdf, page 70
+    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
+      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
+      in them. The screen has no content region rather than an empty one, and it needs a person before
+      it is built.'
+  - operation: null
+    source: pack Rental_Management.pdf, page 70
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 70. 0 of 0 labels bound to a
+    contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked
+    examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  navigation:
+    entryFrom:
+    - EMP-071
+    exitTo:
+    - EMP-071
+    transitions:
+    - to: EMP-071
+      trigger: Back to Rental Checkout Command Center
+      provenance: structural — Rental board 6 on the staff app, 11 September 2026
+      back: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-077
+- id: EMP-078
+  name: Deposit & Financial Handover Validation
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-551
+    book: Rental_Management.pdf
+    board: '6'
+    number: '8'
+    page: 70
+  implementation:
+    app: venue-staff-app
+    route: /rentals/deposit-financial-handover-validation-emp-078
+    component: apps/venue-staff-app/src/routes/rentals/DepositFinancialHandoverValidation.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-551`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Give the rental operator a clear commercial status without requiring them to enter the Finance
+    module.
+  pattern: listDetail
+  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
+    display directory, no configuration directory. It falls to the default, and the fallback is recorded
+    rather than passed off as a decision'
+  layout:
+    regions: []
+    template: split
+  states:
+    emptyFirstRun: No deposit financial handover yet. Carries the create action; distinct from a filter
+      that matched nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the deposit financial handover are still there. The pack's
+      own statuses are ✓ AUTHORIZED — the state names which is selected.
+    error: Could not load. Names which read failed and leaves the deposit financial handover untouched.
+    loading: The deposit financial handover list.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  gaps:
+  - operation: null
+    source: pack Rental_Management.pdf, page 70
+    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
+      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
+      in them. The screen has no content region rather than an empty one, and it needs a person before
+      it is built.'
+  - operation: null
+    source: pack Rental_Management.pdf, page 70
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 70. 0 of 0 labels bound to a
+    contract property; 1 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked
+    examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  navigation:
+    entryFrom:
+    - EMP-071
+    exitTo:
+    - EMP-071
+    transitions:
+    - to: EMP-071
+      trigger: Back to Rental Checkout Command Center
+      provenance: structural — Rental board 6 on the staff app, 11 September 2026
+      back: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-078
+- id: EMP-079
+  name: Group & Multi-Item Checkout
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-552
+    book: Rental_Management.pdf
+    board: '6'
+    number: '9'
+    page: 71
+  implementation:
+    app: venue-staff-app
+    route: /rentals/group-multi-item-checkout-emp-079
+    component: apps/venue-staff-app/src/routes/rentals/GroupMultiItemCheckout.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-552`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Provide an efficient checkout workflow for group rentals and reservations containing multiple
+    equipment units. This is particularly important because the original requirements support group reservations.
+  pattern: listDetail
+  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
+    display directory, no configuration directory. It falls to the default, and the fallback is recorded
+    rather than passed off as a decision'
+  layout:
+    regions: []
+    template: split
+  states:
+    emptyFirstRun: No group multi-item checkout yet. Carries the create action; distinct from a filter
+      that matched nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the group multi-item checkout are still there. Names the
+      active filter and offers to clear it.
+    error: Could not load. Names which read failed and leaves the group multi-item checkout untouched.
+    loading: The group multi-item checkout list.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  gaps:
+  - operation: null
+    source: pack Rental_Management.pdf, page 71
+    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
+      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
+      in them. The screen has no content region rather than an empty one, and it needs a person before
+      it is built.'
+  - operation: null
+    source: pack Rental_Management.pdf, page 71
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 71. 0 of 0 labels bound to a
+    contract property; 0 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked
+    examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  navigation:
+    entryFrom:
+    - EMP-071
+    exitTo:
+    - EMP-071
+    transitions:
+    - to: EMP-071
+      trigger: Back to Rental Checkout Command Center
+      provenance: structural — Rental board 6 on the staff app, 11 September 2026
+      back: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-079
+- id: EMP-080
+  name: Checkout Confirmation & Rental Activation
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-553
+    book: Rental_Management.pdf
+    board: '6'
+    number: '10'
+    page: 72
+  implementation:
+    app: venue-staff-app
+    route: /rentals/checkout-confirmation-rental-activation-emp-080
+    component: apps/venue-staff-app/src/routes/rentals/CheckoutConfirmationRentalActivation.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-553`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Officially start the rental and transition the reservation into an active rental.
+  pattern: configEditor
+  patternReason: the pack gives this screen a configuration directory (§Options; Select Equipment) and
+    no display directory — it is settings, not a population
+  layout:
+    regions:
+    - components:
+      - kind: textField
+        label: Email | SMS | App Notification
+        provenance: pack Rental_Management.pdf, page 72 §Options
+      - kind: selectField
+        label: ↓
+        provenance: pack Rental_Management.pdf, page 72 §Select Equipment
+      name: contentBody
+      slot: fields
+    template: form
+  states:
+    emptyFirstRun: No checkout confirmation rental configured yet. Carries the create action and says
+      what the platform does in the meantime.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    error: Could not load. Names which read failed and leaves the checkout confirmation rental untouched.
+    loading: The checkout confirmation rental configuration as saved.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 72. 0 of 0 labels bound to a
+    contract property; 2 of 96 pack bullets carried onto the screen — the rest are acceptance prose, worked
+    examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  navigation:
+    entryFrom:
+    - EMP-071
+    exitTo:
+    - EMP-071
+    transitions:
+    - to: EMP-071
+      trigger: Back to Rental Checkout Command Center
+      provenance: structural — Rental board 6 on the staff app, 11 September 2026
+      back: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-080
+- id: EMP-081
+  name: Active Rental Operations Command Center
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-554
+    book: Rental_Management.pdf
+    board: '7'
+    number: '1'
+    page: 78
+  implementation:
+    app: venue-staff-app
+    route: /rentals/active-rental-operations-command-center-emp-081
+    component: apps/venue-staff-app/src/routes/rentals/ActiveRentalOperationsCommandCenter.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-554`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Provide operators and supervisors with a real-time view of every rental currently in progress.
+  pattern: commandCentre
+  patternReason: the pack gives this screen a metric directory (§KPI Cards) and no per-row directory —
+    measures over a population the screen does not itself list. The tiles are the pack's, not a tenant
+    licence's
+  layout:
+    regions:
+    - components:
+      - kind: searchField
+        label: Search active rental operations
+        provenance: pack Rental_Management.pdf, page 78 §Filters
+      - columns:
+        - Venue
+        - Location
+        - Product
+        - Customer
+        - Rental status
+        - Expected return
+        - Overdue duration
+        - Group/Individual
+        kind: multiSelect
+        label: Filter by
+        notes: The pack filters this screen by venue, location, product, customer, rental status, expected
+          return and 2 more — which are present is a decision the pack already made.
+        provenance: pack Rental_Management.pdf, page 78 §Filters
+      name: contentBody
+      slot: filters
+    - components:
+      - kind: metricTile
+        label: Active Rentals
+        provenance: pack Rental_Management.pdf, page 78 §KPI Cards
+      - kind: metricTile
+        label: Due Within 30 Minutes
+        provenance: pack Rental_Management.pdf, page 78 §KPI Cards
+      - kind: metricTile
+        label: Overdue
+        provenance: pack Rental_Management.pdf, page 78 §KPI Cards
+      - kind: metricTile
+        label: Extensions Requested
+        provenance: pack Rental_Management.pdf, page 78 §KPI Cards
+      - kind: metricTile
+        label: Equipment Swap Required
+        provenance: pack Rental_Management.pdf, page 78 §KPI Cards
+      - kind: metricTile
+        label: Active Incidents
+        provenance: pack Rental_Management.pdf, page 78 §KPI Cards
+      - kind: metricTile
+        label: Group Rentals Active
+        provenance: pack Rental_Management.pdf, page 78 §KPI Cards
+      - kind: metricTile
+        label: Expected Returns Next Hour
+        provenance: pack Rental_Management.pdf, page 78 §KPI Cards
+      name: contentBody
+      slot: headline
+    template: dashboard
+  states:
+    emptyFirstRun: No active rental operations yet. Carries the create action; distinct from a filter
+      that matched nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the active rental operations are still there. Names the
+      active filter and offers to clear it.
+    error: Could not load. Names which read failed and leaves the active rental operations untouched.
+    loading: The active rental operations list; the counts above it resolve separately.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 78. 0 of 8 labels bound to a
+    contract property; 16 of 23 pack bullets carried onto the screen — the rest are acceptance prose,
+    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    preloaded:
+    - Active Rentals
+    - Due Within 30 Minutes
+    - Overdue
+    - Extensions Requested
+    - Equipment Swap Required
+    - Active Incidents
+  navigation:
+    entryFrom:
+    - EMP-003
+    - EMP-082
+    - EMP-083
+    - EMP-084
+    - EMP-085
+    - EMP-086
+    - EMP-087
+    - EMP-088
+    - EMP-089
+    - EMP-090
+    exitTo:
+    - EMP-003
+    - EMP-082
+    - EMP-083
+    - EMP-084
+    - EMP-085
+    - EMP-086
+    - EMP-087
+    - EMP-088
+    - EMP-089
+    - EMP-090
+    transitions:
+    - to: EMP-003
+      trigger: Back to Home — on duty
+      provenance: structural — Rental board 7 on the staff app, 11 September 2026
+      back: true
+    - to: EMP-082
+      trigger: Active Rental Detail & Live Timeline
+      provenance: structural — Rental board 7 on the staff app, 11 September 2026
+    - to: EMP-083
+      trigger: Rental Extension Request
+      provenance: structural — Rental board 7 on the staff app, 11 September 2026
+    - to: EMP-084
+      trigger: Extension Pricing & Confirmation
+      provenance: structural — Rental board 7 on the staff app, 11 September 2026
+    - to: EMP-085
+      trigger: Equipment Swap / Replacement
+      provenance: structural — Rental board 7 on the staff app, 11 September 2026
+    - to: EMP-086
+      trigger: Rental Incident & Operational Exception
+      provenance: structural — Rental board 7 on the staff app, 11 September 2026
+    - to: EMP-087
+      trigger: Due Soon & Customer Notification Management
+      provenance: structural — Rental board 7 on the staff app, 11 September 2026
+    - to: EMP-088
+      trigger: Overdue Rental Management
+      provenance: structural — Rental board 7 on the staff app, 11 September 2026
+    - to: EMP-089
+      trigger: Active Group Rental Management
+      provenance: structural — Rental board 7 on the staff app, 11 September 2026
+    - to: EMP-090
+      trigger: Active Rental Intelligence & Operational Alerts
+      provenance: structural — Rental board 7 on the staff app, 11 September 2026
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-081
+- id: EMP-082
+  name: Active Rental Detail & Live Timeline
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-555
+    book: Rental_Management.pdf
+    board: '7'
+    number: '2'
+    page: 79
+  implementation:
+    app: venue-staff-app
+    route: /rentals/active-rental-detail-live-timeline-emp-082
+    component: apps/venue-staff-app/src/routes/rentals/ActiveRentalDetailLiveTimeline.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-555`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Provide the complete operational view of one active rental.
+  pattern: listDetail
+  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
+    display directory, no configuration directory. It falls to the default, and the fallback is recorded
+    rather than passed off as a decision'
+  layout:
+    regions: []
+    template: split
+  states:
+    emptyFirstRun: No active rental detail yet. Carries the create action; distinct from a filter that
+      matched nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the active rental detail are still there. Names the active
+      filter and offers to clear it.
+    error: Could not load. Names which read failed and leaves the active rental detail untouched.
+    loading: The active rental detail list.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  gaps:
+  - operation: null
+    source: pack Rental_Management.pdf, page 79
+    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
+      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
+      in them. The screen has no content region rather than an empty one, and it needs a person before
+      it is built.'
+  - operation: null
+    source: pack Rental_Management.pdf, page 79
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 79. 0 of 0 labels bound to a
+    contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked
+    examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  navigation:
+    entryFrom:
+    - EMP-081
+    exitTo:
+    - EMP-081
+    transitions:
+    - to: EMP-081
+      trigger: Back to Active Rental Operations Command Center
+      provenance: structural — Rental board 7 on the staff app, 11 September 2026
+      back: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-082
+- id: EMP-083
+  name: Rental Extension Request
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-556
+    book: Rental_Management.pdf
+    board: '7'
+    number: '3'
+    page: 81
+  implementation:
+    app: venue-staff-app
+    route: /rentals/rental-extension-request-emp-083
+    component: apps/venue-staff-app/src/routes/rentals/RentalExtensionRequest.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-556`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Allow the customer or operator to request additional rental time. This is one of the important
+    capabilities I recommend formally adding to the rental scope.
+  pattern: listDetail
+  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
+    display directory, no configuration directory. It falls to the default, and the fallback is recorded
+    rather than passed off as a decision'
+  layout:
+    regions: []
+    template: split
+  states:
+    emptyFirstRun: No rental extension request yet. Carries the create action; distinct from a filter
+      that matched nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the rental extension request are still there. Names the
+      active filter and offers to clear it.
+    error: Could not load. Names which read failed and leaves the rental extension request untouched.
+    loading: The rental extension request list.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  gaps:
+  - operation: null
+    source: pack Rental_Management.pdf, page 81
+    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
+      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
+      in them. The screen has no content region rather than an empty one, and it needs a person before
+      it is built.'
+  - operation: null
+    source: pack Rental_Management.pdf, page 81
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 81. 0 of 0 labels bound to a
+    contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked
+    examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  navigation:
+    entryFrom:
+    - EMP-081
+    exitTo:
+    - EMP-081
+    transitions:
+    - to: EMP-081
+      trigger: Back to Active Rental Operations Command Center
+      provenance: structural — Rental board 7 on the staff app, 11 September 2026
+      back: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-083
+- id: EMP-084
+  name: Extension Pricing & Confirmation
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-557
+    book: Rental_Management.pdf
+    board: '7'
+    number: '4'
+    page: 82
+  implementation:
+    app: venue-staff-app
+    route: /rentals/extension-pricing-confirmation-emp-084
+    component: apps/venue-staff-app/src/routes/rentals/ExtensionPricingConfirmation.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-557`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Calculate the commercial impact of an approved extension. Once Board 3 confirms availability,
+    Board 4 calculates the extension charge.
+  pattern: listDetail
+  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
+    display directory, no configuration directory. It falls to the default, and the fallback is recorded
+    rather than passed off as a decision'
+  layout:
+    regions: []
+    template: split
+  states:
+    emptyFirstRun: No extension pricing confirmation yet. Carries the create action; distinct from a filter
+      that matched nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the extension pricing confirmation are still there. Names
+      the active filter and offers to clear it.
+    error: Could not load. Names which read failed and leaves the extension pricing confirmation untouched.
+    loading: The extension pricing confirmation list.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  gaps:
+  - operation: null
+    source: pack Rental_Management.pdf, page 82
+    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
+      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
+      in them. The screen has no content region rather than an empty one, and it needs a person before
+      it is built.'
+  - operation: null
+    source: pack Rental_Management.pdf, page 82
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 82. 0 of 0 labels bound to a
+    contract property; 0 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked
+    examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  navigation:
+    entryFrom:
+    - EMP-081
+    exitTo:
+    - EMP-081
+    transitions:
+    - to: EMP-081
+      trigger: Back to Active Rental Operations Command Center
+      provenance: structural — Rental board 7 on the staff app, 11 September 2026
+      back: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-084
+- id: EMP-085
+  name: Equipment Swap / Replacement
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-558
+    book: Rental_Management.pdf
+    board: '7'
+    number: '5'
+    page: 83
+  implementation:
+    app: venue-staff-app
+    route: /rentals/equipment-swap-replacement-emp-085
+    component: apps/venue-staff-app/src/routes/rentals/EquipmentSwapReplacement.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-558`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Replace equipment during an active rental without terminating and recreating the rental. This
+    is another capability I strongly recommend adding.
+  pattern: listDetail
+  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
+    display directory, no configuration directory. It falls to the default, and the fallback is recorded
+    rather than passed off as a decision'
+  layout:
+    regions: []
+    template: split
+  states:
+    emptyFirstRun: No equipment swap replacement yet. Carries the create action; distinct from a filter
+      that matched nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the equipment swap replacement are still there. Names the
+      active filter and offers to clear it.
+    error: Could not load. Names which read failed and leaves the equipment swap replacement untouched.
+    loading: The equipment swap replacement list.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  gaps:
+  - operation: null
+    source: pack Rental_Management.pdf, page 83
+    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
+      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
+      in them. The screen has no content region rather than an empty one, and it needs a person before
+      it is built.'
+  - operation: null
+    source: pack Rental_Management.pdf, page 83
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 83. 0 of 0 labels bound to a
+    contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked
+    examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  navigation:
+    entryFrom:
+    - EMP-081
+    exitTo:
+    - EMP-081
+    transitions:
+    - to: EMP-081
+      trigger: Back to Active Rental Operations Command Center
+      provenance: structural — Rental board 7 on the staff app, 11 September 2026
+      back: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-085
+- id: EMP-086
+  name: Rental Incident & Operational Exception
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-559
+    book: Rental_Management.pdf
+    board: '7'
+    number: '6'
+    page: 84
+  implementation:
+    app: venue-staff-app
+    route: /rentals/rental-incident-operational-exception-emp-086
+    component: apps/venue-staff-app/src/routes/rentals/RentalIncidentOperationalException.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-559`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Capture incidents occurring while equipment is in customer possession.
+  pattern: listDetail
+  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
+    display directory, no configuration directory. It falls to the default, and the fallback is recorded
+    rather than passed off as a decision'
+  layout:
+    regions: []
+    template: split
+  states:
+    emptyFirstRun: No rental incident operational yet. Carries the create action; distinct from a filter
+      that matched nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the rental incident operational are still there. Names
+      the active filter and offers to clear it.
+    error: Could not load. Names which read failed and leaves the rental incident operational untouched.
+    loading: The rental incident operational list.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  gaps:
+  - operation: null
+    source: pack Rental_Management.pdf, page 84
+    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
+      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
+      in them. The screen has no content region rather than an empty one, and it needs a person before
+      it is built.'
+  - operation: null
+    source: pack Rental_Management.pdf, page 84
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 84. 0 of 0 labels bound to a
+    contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked
+    examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  navigation:
+    entryFrom:
+    - EMP-081
+    exitTo:
+    - EMP-081
+    transitions:
+    - to: EMP-081
+      trigger: Back to Active Rental Operations Command Center
+      provenance: structural — Rental board 7 on the staff app, 11 September 2026
+      back: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-086
+- id: EMP-087
+  name: Due Soon & Customer Notification Management
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-560
+    book: Rental_Management.pdf
+    board: '7'
+    number: '7'
+    page: 85
+  implementation:
+    app: venue-staff-app
+    route: /rentals/due-soon-customer-notification-management-emp-087
+    component: apps/venue-staff-app/src/routes/rentals/DueSoonCustomerNotificationManagement.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-560`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Proactively communicate with customers before their rental becomes overdue. The original matrix
+    requires overdue rental notifications.
+  pattern: listDetail
+  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
+    display directory, no configuration directory. It falls to the default, and the fallback is recorded
+    rather than passed off as a decision'
+  layout:
+    regions: []
+    template: split
+  states:
+    emptyFirstRun: No due soon customer yet. Carries the create action; distinct from a filter that matched
+      nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the due soon customer are still there. Names the active
+      filter and offers to clear it.
+    error: Could not load. Names which read failed and leaves the due soon customer untouched.
+    loading: The due soon customer list.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  gaps:
+  - operation: null
+    source: pack Rental_Management.pdf, page 85
+    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
+      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
+      in them. The screen has no content region rather than an empty one, and it needs a person before
+      it is built.'
+  - operation: null
+    source: pack Rental_Management.pdf, page 85
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 85. 0 of 0 labels bound to a
+    contract property; 0 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked
+    examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  navigation:
+    entryFrom:
+    - EMP-081
+    exitTo:
+    - EMP-081
+    transitions:
+    - to: EMP-081
+      trigger: Back to Active Rental Operations Command Center
+      provenance: structural — Rental board 7 on the staff app, 11 September 2026
+      back: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-087
+- id: EMP-088
+  name: Overdue Rental Management
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-561
+    book: Rental_Management.pdf
+    board: '7'
+    number: '8'
+    page: 85
+  implementation:
+    app: venue-staff-app
+    route: /rentals/overdue-rental-management-emp-088
+    component: apps/venue-staff-app/src/routes/rentals/OverdueRentalManagement.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-561`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Provide operators with a dedicated workflow for rentals that have exceeded their expected return
+    time. The original requirement calls for automatic late-fee calculation, configurable grace periods
+    and overdue notifications.
+  pattern: listDetail
+  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
+    display directory, no configuration directory. It falls to the default, and the fallback is recorded
+    rather than passed off as a decision'
+  layout:
+    regions: []
+    template: split
+  states:
+    emptyFirstRun: No overdue rental yet. Carries the create action; distinct from a filter that matched
+      nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the overdue rental are still there. Names the active filter
+      and offers to clear it.
+    error: Could not load. Names which read failed and leaves the overdue rental untouched.
+    loading: The overdue rental list.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  gaps:
+  - operation: null
+    source: pack Rental_Management.pdf, page 85
+    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
+      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
+      in them. The screen has no content region rather than an empty one, and it needs a person before
+      it is built.'
+  - operation: null
+    source: pack Rental_Management.pdf, page 85
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 85. 0 of 0 labels bound to a
+    contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked
+    examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  navigation:
+    entryFrom:
+    - EMP-081
+    exitTo:
+    - EMP-081
+    transitions:
+    - to: EMP-081
+      trigger: Back to Active Rental Operations Command Center
+      provenance: structural — Rental board 7 on the staff app, 11 September 2026
+      back: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-088
+- id: EMP-089
+  name: Active Group Rental Management
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-562
+    book: Rental_Management.pdf
+    board: '7'
+    number: '9'
+    page: 86
+  implementation:
+    app: venue-staff-app
+    route: /rentals/active-group-rental-management-emp-089
+    component: apps/venue-staff-app/src/routes/rentals/ActiveGroupRentalManagement.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-562`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Manage group rentals where multiple pieces of equipment may have different operational states.
+  pattern: listDetail
+  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
+    display directory, no configuration directory. It falls to the default, and the fallback is recorded
+    rather than passed off as a decision'
+  layout:
+    regions: []
+    template: split
+  states:
+    emptyFirstRun: No active group rental yet. Carries the create action; distinct from a filter that
+      matched nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the active group rental are still there. Names the active
+      filter and offers to clear it.
+    error: Could not load. Names which read failed and leaves the active group rental untouched.
+    loading: The active group rental list.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  gaps:
+  - operation: null
+    source: pack Rental_Management.pdf, page 86
+    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
+      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
+      in them. The screen has no content region rather than an empty one, and it needs a person before
+      it is built.'
+  - operation: null
+    source: pack Rental_Management.pdf, page 86
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 86. 0 of 0 labels bound to a
+    contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked
+    examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  navigation:
+    entryFrom:
+    - EMP-081
+    exitTo:
+    - EMP-081
+    transitions:
+    - to: EMP-081
+      trigger: Back to Active Rental Operations Command Center
+      provenance: structural — Rental board 7 on the staff app, 11 September 2026
+      back: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-089
+- id: EMP-090
+  name: Active Rental Intelligence & Operational Alerts
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-563
+    book: Rental_Management.pdf
+    board: '7'
+    number: '10'
+    page: 87
+  implementation:
+    app: venue-staff-app
+    route: /rentals/active-rental-intelligence-operational-alerts-emp-090
+    component: apps/venue-staff-app/src/routes/rentals/ActiveRentalIntelligenceOperationalAlerts.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-563`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Use AI and real-time operational data to identify risks before they become operational problems.
+  pattern: listDetail
+  patternReason: the pack gives this screen a display directory (§Display) and no metric row
+  layout:
+    regions:
+    - components:
+      - bindsTo: null
+        columns:
+        - Rentals due next hour
+        - Predicted late returns
+        - Future reservation conflicts
+        - Extension demand
+        - Equipment incident trends
+        - Location return pressure
+        - Expected inventory shortage
+        kind: dataTable
+        label: Every active rental intelligence
+        operation: null
+        provenance: pack Rental_Management.pdf, page 87 §Display
+      name: contentBody
+      slot: collection
+    - components:
+      - bindsTo: null
+        columns:
+        - Rentals due next hour
+        - Predicted late returns
+        - Future reservation conflicts
+        - Extension demand
+        - Equipment incident trends
+        - Location return pressure
+        - Expected inventory shortage
+        kind: detailPanel
+        label: The selected active rental intelligence
+        notes: 'The pack groups this record''s detail under its own headings: “RNT-10482”, “Confirmed”,
+          “Ready for Checkout”, “Active”, “Incident”, “Overdue”.'
+        provenance: pack Rental_Management.pdf, page 87 §Display
+      name: contextPanel
+      slot: selection
+    template: split
+  states:
+    emptyFirstRun: No active rental intelligence yet. Carries the create action; distinct from a filter
+      that matched nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the active rental intelligence are still there. Names the
+      active filter and offers to clear it.
+    error: Could not load. Names which read failed and leaves the active rental intelligence untouched.
+    loading: The active rental intelligence list.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  gaps:
+  - operation: null
+    source: pack Rental_Management.pdf, page 87 §Display
+    why: '**This screen''s operations return no schema with described properties**, so not one of its
+      columns can be bound. The columns are the pack''s own labels and are carried as text until the response
+      shape exists.'
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 87. 0 of 7 labels bound to a
+    contract property; 7 of 74 pack bullets carried onto the screen — the rest are acceptance prose, worked
+    examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    preloaded:
+    - Rentals due next hour
+    - Predicted late returns
+    - Future reservation conflicts
+    - Extension demand
+    - Equipment incident trends
+    - Location return pressure
+  navigation:
+    entryFrom:
+    - EMP-081
+    exitTo:
+    - EMP-081
+    transitions:
+    - to: EMP-081
+      trigger: Back to Active Rental Operations Command Center
+      provenance: structural — Rental board 7 on the staff app, 11 September 2026
+      back: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-090
+- id: EMP-091
+  name: Rental Return Command Center
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-564
+    book: Rental_Management.pdf
+    board: '8'
+    number: '1'
+    page: 92
+  implementation:
+    app: venue-staff-app
+    route: /rentals/rental-return-command-center-emp-091
+    component: apps/venue-staff-app/src/routes/rentals/RentalReturnCommandCenter.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-564`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Provide operators with a live operational view of all expected, in-progress, partial, overdue
+    and completed returns.
+  pattern: commandCentre
+  patternReason: the pack gives this screen a metric directory (§KPI Cards) and no per-row directory —
+    measures over a population the screen does not itself list. The tiles are the pack's, not a tenant
+    licence's
+  layout:
+    regions:
+    - components:
+      - kind: searchField
+        label: Search rental return
+        provenance: pack Rental_Management.pdf, page 92 §Filters
+      - columns:
+        - Venue
+        - Return Location
+        - Product
+        - Expected Return
+        - Rental Status
+        - Damage Status
+        - Deposit Status
+        - Group/Individual
+        kind: multiSelect
+        label: Filter by
+        notes: The pack filters this screen by venue, return location, product, expected return, rental
+          status, damage status and 2 more — which are present is a decision the pack already made.
+        provenance: pack Rental_Management.pdf, page 92 §Filters
+      name: contentBody
+      slot: filters
+    - components:
+      - kind: metricTile
+        label: Expected Returns Today
+        provenance: pack Rental_Management.pdf, page 92 §KPI Cards
+      - kind: metricTile
+        label: Due Next 30 Minutes
+        provenance: pack Rental_Management.pdf, page 92 §KPI Cards
+      - kind: metricTile
+        label: Return in Progress
+        provenance: pack Rental_Management.pdf, page 92 §KPI Cards
+      - kind: metricTile
+        label: Overdue
+        provenance: pack Rental_Management.pdf, page 92 §KPI Cards
+      - kind: metricTile
+        label: Partial Returns
+        provenance: pack Rental_Management.pdf, page 92 §KPI Cards
+      - kind: metricTile
+        label: Damage Cases
+        provenance: pack Rental_Management.pdf, page 92 §KPI Cards
+      - kind: metricTile
+        label: Maintenance Required
+        provenance: pack Rental_Management.pdf, page 92 §KPI Cards
+      - kind: metricTile
+        label: Returns Completed Today
+        provenance: pack Rental_Management.pdf, page 92 §KPI Cards
+      - kind: metricTile
+        label: Deposits Pending Settlement
+        provenance: pack Rental_Management.pdf, page 92 §KPI Cards
+      - kind: metricTile
+        label: Equipment Awaiting Inspection
+        provenance: pack Rental_Management.pdf, page 92 §KPI Cards
+      name: contentBody
+      slot: headline
+    template: dashboard
+  states:
+    emptyFirstRun: No rental return yet. Carries the create action; distinct from a filter that matched
+      nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the rental return are still there. Names the active filter
+      and offers to clear it.
+    error: Could not load. Names which read failed and leaves the rental return untouched.
+    loading: The rental return list; the counts above it resolve separately.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 92. 0 of 8 labels bound to a
+    contract property; 18 of 24 pack bullets carried onto the screen — the rest are acceptance prose,
+    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    preloaded:
+    - Expected Returns Today
+    - Due Next 30 Minutes
+    - Return in Progress
+    - Overdue
+    - Partial Returns
+    - Damage Cases
+  navigation:
+    entryFrom:
+    - EMP-003
+    - EMP-092
+    - EMP-093
+    - EMP-094
+    - EMP-095
+    - EMP-096
+    - EMP-097
+    - EMP-098
+    - EMP-099
+    - EMP-100
+    exitTo:
+    - EMP-003
+    - EMP-092
+    - EMP-093
+    - EMP-094
+    - EMP-095
+    - EMP-096
+    - EMP-097
+    - EMP-098
+    - EMP-099
+    - EMP-100
+    transitions:
+    - to: EMP-003
+      trigger: Back to Home — on duty
+      provenance: structural — Rental board 8 on the staff app, 11 September 2026
+      back: true
+    - to: EMP-092
+      trigger: Return Scan & Rental Retrieval
+      provenance: structural — Rental board 8 on the staff app, 11 September 2026
+    - to: EMP-093
+      trigger: Return Summary & Actual Return Time
+      provenance: structural — Rental board 8 on the staff app, 11 September 2026
+    - to: EMP-094
+      trigger: Post-Rental Condition Inspection
+      provenance: structural — Rental board 8 on the staff app, 11 September 2026
+    - to: EMP-095
+      trigger: Before vs After Condition Comparison
+      provenance: structural — Rental board 8 on the staff app, 11 September 2026
+    - to: EMP-096
+      trigger: Damage Assessment & Charge Workflow
+      provenance: structural — Rental board 8 on the staff app, 11 September 2026
+    - to: EMP-097
+      trigger: Partial Return & Missing Equipment
+      provenance: structural — Rental board 8 on the staff app, 11 September 2026
+    - to: EMP-098
+      trigger: Late Fees, Damage Fees & Final Settlement
+      provenance: structural — Rental board 8 on the staff app, 11 September 2026
+    - to: EMP-099
+      trigger: Deposit Release, Capture & Customer Confirmation
+      provenance: structural — Rental board 8 on the staff app, 11 September 2026
+    - to: EMP-100
+      trigger: Return Completion & Equipment Disposition
+      provenance: structural — Rental board 8 on the staff app, 11 September 2026
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-091
+- id: EMP-092
+  name: Return Scan & Rental Retrieval
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-565
+    book: Rental_Management.pdf
+    board: '8'
+    number: '2'
+    page: 93
+  implementation:
+    app: venue-staff-app
+    route: /rentals/return-scan-rental-retrieval-emp-092
+    component: apps/venue-staff-app/src/routes/rentals/ReturnScanRentalRetrieval.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-565`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Quickly identify which active rental the returned equipment belongs to. The original requirements
+    specifically require scanning the rented item and retrieving its reservation.
+  pattern: listDetail
+  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
+    display directory, no configuration directory. It falls to the default, and the fallback is recorded
+    rather than passed off as a decision'
+  layout:
+    regions: []
+    template: split
+  states:
+    emptyFirstRun: No return scan rental yet. Carries the create action; distinct from a filter that matched
+      nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the return scan rental are still there. Names the active
+      filter and offers to clear it.
+    error: Could not load. Names which read failed and leaves the return scan rental untouched.
+    loading: The return scan rental list.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  gaps:
+  - operation: null
+    source: pack Rental_Management.pdf, page 93
+    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
+      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
+      in them. The screen has no content region rather than an empty one, and it needs a person before
+      it is built.'
+  - operation: null
+    source: pack Rental_Management.pdf, page 93
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 93. 0 of 0 labels bound to a
+    contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked
+    examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  navigation:
+    entryFrom:
+    - EMP-091
+    exitTo:
+    - EMP-091
+    transitions:
+    - to: EMP-091
+      trigger: Back to Rental Return Command Center
+      provenance: structural — Rental board 8 on the staff app, 11 September 2026
+      back: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-092
+- id: EMP-093
+  name: Return Summary & Actual Return Time
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-566
+    book: Rental_Management.pdf
+    board: '8'
+    number: '3'
+    page: 94
+  implementation:
+    app: venue-staff-app
+    route: /rentals/return-summary-actual-return-time-emp-093
+    component: apps/venue-staff-app/src/routes/rentals/ReturnSummaryActualReturnTime.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-566`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Establish the operational return event before inspection and financial settlement.
+  pattern: listDetail
+  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
+    display directory, no configuration directory. It falls to the default, and the fallback is recorded
+    rather than passed off as a decision'
+  layout:
+    regions: []
+    template: split
+  states:
+    emptyFirstRun: No return summary actual yet. Carries the create action; distinct from a filter that
+      matched nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the return summary actual are still there. Names the active
+      filter and offers to clear it.
+    error: Could not load. Names which read failed and leaves the return summary actual untouched.
+    loading: The return summary actual list.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  gaps:
+  - operation: null
+    source: pack Rental_Management.pdf, page 94
+    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
+      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
+      in them. The screen has no content region rather than an empty one, and it needs a person before
+      it is built.'
+  - operation: null
+    source: pack Rental_Management.pdf, page 94
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 94. 0 of 0 labels bound to a
+    contract property; 0 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked
+    examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  navigation:
+    entryFrom:
+    - EMP-091
+    exitTo:
+    - EMP-091
+    transitions:
+    - to: EMP-091
+      trigger: Back to Rental Return Command Center
+      provenance: structural — Rental board 8 on the staff app, 11 September 2026
+      back: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-093
+- id: EMP-094
+  name: Post-Rental Condition Inspection
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-567
+    book: Rental_Management.pdf
+    board: '8'
+    number: '4'
+    page: 95
+  implementation:
+    app: venue-staff-app
+    route: /rentals/post-rental-condition-inspection-emp-094
+    component: apps/venue-staff-app/src/routes/rentals/PostRentalConditionInspection.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-567`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Perform a structured inspection of returned equipment.
+  pattern: listDetail
+  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
+    display directory, no configuration directory. It falls to the default, and the fallback is recorded
+    rather than passed off as a decision'
+  layout:
+    regions: []
+    template: split
+  states:
+    emptyFirstRun: No post-rental condition inspection yet. Carries the create action; distinct from a
+      filter that matched nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the post-rental condition inspection are still there. Names
+      the active filter and offers to clear it.
+    error: Could not load. Names which read failed and leaves the post-rental condition inspection untouched.
+    loading: The post-rental condition inspection list.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  gaps:
+  - operation: null
+    source: pack Rental_Management.pdf, page 95
+    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
+      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
+      in them. The screen has no content region rather than an empty one, and it needs a person before
+      it is built.'
+  - operation: null
+    source: pack Rental_Management.pdf, page 95
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 95. 0 of 0 labels bound to a
+    contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked
+    examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  navigation:
+    entryFrom:
+    - EMP-091
+    exitTo:
+    - EMP-091
+    transitions:
+    - to: EMP-091
+      trigger: Back to Rental Return Command Center
+      provenance: structural — Rental board 8 on the staff app, 11 September 2026
+      back: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-094
+- id: EMP-095
+  name: Before vs After Condition Comparison
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-568
+    book: Rental_Management.pdf
+    board: '8'
+    number: '5'
+    page: 96
+  implementation:
+    app: venue-staff-app
+    route: /rentals/before-vs-after-condition-comparison-emp-095
+    component: apps/venue-staff-app/src/routes/rentals/BeforeVsAfterConditionComparison.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-568`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Use the evidence captured during Board 6 checkout to establish whether damage existed before
+    the rental or occurred during it. This is one of the important capabilities I recommended adding.
+  pattern: listDetail
+  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
+    display directory, no configuration directory. It falls to the default, and the fallback is recorded
+    rather than passed off as a decision'
+  layout:
+    regions: []
+    template: split
+  states:
+    emptyFirstRun: No before after condition yet. Carries the create action; distinct from a filter that
+      matched nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the before after condition are still there. Names the active
+      filter and offers to clear it.
+    error: Could not load. Names which read failed and leaves the before after condition untouched.
+    loading: The before after condition list.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  gaps:
+  - operation: null
+    source: pack Rental_Management.pdf, page 96
+    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
+      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
+      in them. The screen has no content region rather than an empty one, and it needs a person before
+      it is built.'
+  - operation: null
+    source: pack Rental_Management.pdf, page 96
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 96. 0 of 0 labels bound to a
+    contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked
+    examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  navigation:
+    entryFrom:
+    - EMP-091
+    exitTo:
+    - EMP-091
+    transitions:
+    - to: EMP-091
+      trigger: Back to Rental Return Command Center
+      provenance: structural — Rental board 8 on the staff app, 11 September 2026
+      back: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-095
+- id: EMP-096
+  name: Damage Assessment & Charge Workflow
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-569
+    book: Rental_Management.pdf
+    board: '8'
+    number: '6'
+    page: 97
+  implementation:
+    app: venue-staff-app
+    route: /rentals/damage-assessment-charge-workflow-emp-096
+    component: apps/venue-staff-app/src/routes/rentals/DamageAssessmentChargeWorkflow.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-569`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Convert confirmed equipment damage into a controlled operational and commercial case. The source
+    specifically recommends a formal damage assessment workflow.
+  pattern: listDetail
+  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
+    display directory, no configuration directory. It falls to the default, and the fallback is recorded
+    rather than passed off as a decision'
+  layout:
+    regions: []
+    template: split
+  states:
+    emptyFirstRun: No damage assessment charge yet. Carries the create action; distinct from a filter
+      that matched nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the damage assessment charge are still there. Names the
+      active filter and offers to clear it.
+    error: Could not load. Names which read failed and leaves the damage assessment charge untouched.
+    loading: The damage assessment charge list.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  gaps:
+  - operation: null
+    source: pack Rental_Management.pdf, page 97
+    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
+      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
+      in them. The screen has no content region rather than an empty one, and it needs a person before
+      it is built.'
+  - operation: null
+    source: pack Rental_Management.pdf, page 97
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 97. 0 of 0 labels bound to a
+    contract property; 0 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked
+    examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  navigation:
+    entryFrom:
+    - EMP-091
+    exitTo:
+    - EMP-091
+    transitions:
+    - to: EMP-091
+      trigger: Back to Rental Return Command Center
+      provenance: structural — Rental board 8 on the staff app, 11 September 2026
+      back: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-096
+- id: EMP-097
+  name: Partial Return & Missing Equipment
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-570
+    book: Rental_Management.pdf
+    board: '8'
+    number: '7'
+    page: 98
+  implementation:
+    app: venue-staff-app
+    route: /rentals/partial-return-missing-equipment-emp-097
+    component: apps/venue-staff-app/src/routes/rentals/PartialReturnMissingEquipment.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-570`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Handle multi-item and group rentals where equipment is returned at different times. This implements
+    the partial-return capability we added in Board 7.
+  pattern: listDetail
+  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
+    display directory, no configuration directory. It falls to the default, and the fallback is recorded
+    rather than passed off as a decision'
+  layout:
+    regions: []
+    template: split
+  states:
+    emptyFirstRun: No partial return missing yet. Carries the create action; distinct from a filter that
+      matched nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the partial return missing are still there. Names the active
+      filter and offers to clear it.
+    error: Could not load. Names which read failed and leaves the partial return missing untouched.
+    loading: The partial return missing list.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  gaps:
+  - operation: null
+    source: pack Rental_Management.pdf, page 98
+    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
+      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
+      in them. The screen has no content region rather than an empty one, and it needs a person before
+      it is built.'
+  - operation: null
+    source: pack Rental_Management.pdf, page 98
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 98. 0 of 0 labels bound to a
+    contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked
+    examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  navigation:
+    entryFrom:
+    - EMP-091
+    exitTo:
+    - EMP-091
+    transitions:
+    - to: EMP-091
+      trigger: Back to Rental Return Command Center
+      provenance: structural — Rental board 8 on the staff app, 11 September 2026
+      back: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-097
+- id: EMP-098
+  name: Late Fees, Damage Fees & Final Settlement
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-571
+    book: Rental_Management.pdf
+    board: '8'
+    number: '8'
+    page: 99
+  implementation:
+    app: venue-staff-app
+    route: /rentals/late-fees-damage-fees-final-settlement-emp-098
+    component: apps/venue-staff-app/src/routes/rentals/LateFeesDamageFeesFinalSettlement.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-571`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Calculate the customer's final rental financial position. Board 8 should consume, not recreate,
+    the commercial policies configured in Board 4.
+  pattern: listDetail
+  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
+    display directory, no configuration directory. It falls to the default, and the fallback is recorded
+    rather than passed off as a decision'
+  layout:
+    regions: []
+    template: split
+  states:
+    emptyFirstRun: No late fees damage yet. Carries the create action; distinct from a filter that matched
+      nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the late fees damage are still there. Names the active
+      filter and offers to clear it.
+    error: Could not load. Names which read failed and leaves the late fees damage untouched.
+    loading: The late fees damage list.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  gaps:
+  - operation: null
+    source: pack Rental_Management.pdf, page 99
+    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
+      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
+      in them. The screen has no content region rather than an empty one, and it needs a person before
+      it is built.'
+  - operation: null
+    source: pack Rental_Management.pdf, page 99
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 99. 0 of 0 labels bound to a
+    contract property; 0 of 3 pack bullets carried onto the screen — the rest are acceptance prose, worked
+    examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  navigation:
+    entryFrom:
+    - EMP-091
+    exitTo:
+    - EMP-091
+    transitions:
+    - to: EMP-091
+      trigger: Back to Rental Return Command Center
+      provenance: structural — Rental board 8 on the staff app, 11 September 2026
+      back: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-098
+- id: EMP-099
+  name: Deposit Release, Capture & Customer Confirmation
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-572
+    book: Rental_Management.pdf
+    board: '8'
+    number: '9'
+    page: 100
+  implementation:
+    app: venue-staff-app
+    route: /rentals/deposit-release-capture-customer-confirmation-emp-099
+    component: apps/venue-staff-app/src/routes/rentals/DepositReleaseCaptureCustomerConfirmation.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-572`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Complete the deposit lifecycle and provide the customer with a transparent final statement.
+    The source requires full refund/release, partial refund and deposit forfeiture, together with transaction
+    history.
+  pattern: listDetail
+  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
+    display directory, no configuration directory. It falls to the default, and the fallback is recorded
+    rather than passed off as a decision'
+  layout:
+    regions: []
+    template: split
+  states:
+    emptyFirstRun: No deposit release capture yet. Carries the create action; distinct from a filter that
+      matched nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the deposit release capture are still there. Names the
+      active filter and offers to clear it.
+    error: Could not load. Names which read failed and leaves the deposit release capture untouched.
+    loading: The deposit release capture list.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  gaps:
+  - operation: null
+    source: pack Rental_Management.pdf, page 100
+    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
+      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
+      in them. The screen has no content region rather than an empty one, and it needs a person before
+      it is built.'
+  - operation: null
+    source: pack Rental_Management.pdf, page 100
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 100. 0 of 0 labels bound to a
+    contract property; 0 of 4 pack bullets carried onto the screen — the rest are acceptance prose, worked
+    examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  navigation:
+    entryFrom:
+    - EMP-091
+    exitTo:
+    - EMP-091
+    transitions:
+    - to: EMP-091
+      trigger: Back to Rental Return Command Center
+      provenance: structural — Rental board 8 on the staff app, 11 September 2026
+      back: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-099
+- id: EMP-100
+  name: Return Completion & Equipment Disposition
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  source:
+    sameAs: BO-573
+    book: Rental_Management.pdf
+    board: '8'
+    number: '10'
+    page: 101
+  implementation:
+    app: venue-staff-app
+    route: /rentals/return-completion-equipment-disposition-emp-100
+    component: apps/venue-staff-app/src/routes/rentals/ReturnCompletionEquipmentDisposition.tsx
+    status: notStarted
+  density: comfortable
+  notes: The staff-app form of `BO-573`, for the attendant at the rental counter. Decided 11 September
+    2026 that Rental boards 6–8 live on both platforms; `tools/applied/apply-rental-staff-app.py` keeps
+    the two in step.
+  purpose: Complete the rental while determining exactly what happens to every returned physical asset.
+    This is extremely important because returning an item does not necessarily mean it becomes immediately
+    available again.
+  pattern: listDetail
+  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
+    display directory, no configuration directory. It falls to the default, and the fallback is recorded
+    rather than passed off as a decision'
+  layout:
+    regions: []
+    template: split
+  states:
+    emptyFirstRun: No return completion equipment yet. Carries the create action; distinct from a filter
+      that matched nothing.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the return completion equipment are still there. Names
+      the active filter and offers to clear it.
+    error: Could not load. Names which read failed and leaves the return completion equipment untouched.
+    loading: The return completion equipment list.
+    offline: TODO — not decided. Rental Management does not say what a staff device does here without
+      a connection, and no minute has decided it.
+  gaps:
+  - operation: null
+    source: pack Rental_Management.pdf, page 101
+    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
+      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
+      in them. The screen has no content region rather than an empty one, and it needs a person before
+      it is built.'
+  - operation: null
+    source: pack Rental_Management.pdf, page 101
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
+  apis: []
+  apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 101. 0 of 0 labels bound to a
+    contract property; 0 of 118 pack bullets carried onto the screen — the rest are acceptance prose,
+    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  navigation:
+    entryFrom:
+    - EMP-091
+    exitTo:
+    - EMP-091
+    transitions:
+    - to: EMP-091
+      trigger: Back to Rental Return Command Center
+      provenance: structural — Rental board 8 on the staff app, 11 September 2026
+      back: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P06 Venue Staff App.dc.html#emp-100

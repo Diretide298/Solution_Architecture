@@ -4,13 +4,13 @@
 
 | | |
 |---|---|
-| Screens | 60 |
+| Screens | 100 |
 | Operations | 122 |
 | Contracts | 8 |
-| Modules | 2 |
+| Modules | 3 |
 | Undrawn | 0 |
 | Operations with no screen | 110 |
-| Waves | wave2 20 · wave3 40 |
+| Waves | wave2 20 · wave3 80 |
 
 ## Gaps
 
@@ -67,6 +67,7 @@
 | Module | Screens | Waves |
 |---|---|---|
 | Policy | 40 | 3 |
+| Media Library | 40 | 3 |
 | White Label | 20 | 2 |
 
 ## Screens
@@ -133,4 +134,44 @@
 | `CMS-058` | Compliance Evidence, Audit & Waiver Repository | Policy | 3 | 1 | yes |
 | `CMS-059` | Waiver Analytics, Compliance & Operational Insights | Policy | 3 | 1 | yes |
 | `CMS-060` | AI Waiver Compliance & Risk Intelligence Center | Policy | 3 | 1 | yes |
+| `CMS-061` | Digital Asset Management Command Center | Media Library | 3 | 0 | yes |
+| `CMS-062` | Central Digital Asset Library | Media Library | 3 | 0 | yes |
+| `CMS-063` | Upload & Asset Ingestion Workspace | Media Library | 3 | 0 | yes |
+| `CMS-064` | Folder, Collection & Workspace Management | Media Library | 3 | 0 | yes |
+| `CMS-065` | Metadata & Taxonomy Management | Media Library | 3 | 0 | yes |
+| `CMS-066` | Tags, Keywords & Classification | Media Library | 3 | 0 | yes |
+| `CMS-067` | Advanced Search & Discovery | Media Library | 3 | 0 | yes |
+| `CMS-068` | Digital Asset 360° Profile | Media Library | 3 | 0 | yes |
+| `CMS-069` | Bulk Asset Management Workspace | Media Library | 3 | 0 | yes |
+| `CMS-070` | Asset Activity, Recent Assets & Library Health | Media Library | 3 | 0 | yes |
+| `CMS-071` | AI Asset Intelligence Command Center | Media Library | 3 | 0 | yes |
+| `CMS-072` | AI Auto-Tagging & Content Understanding | Media Library | 3 | 0 | yes |
+| `CMS-073` | Semantic & Natural-Language Asset Search | Media Library | 3 | 0 | yes |
+| `CMS-074` | Visual Similarity & Related Asset Discovery | Media Library | 3 | 0 | yes |
+| `CMS-075` | Duplicate & Near-Duplicate Management | Media Library | 3 | 0 | yes |
+| `CMS-076` | Asset Version Control & Revision History | Media Library | 3 | 0 | yes |
+| `CMS-077` | Version Comparison & Replacement Impact | Media Library | 3 | 0 | yes |
+| `CMS-078` | Transformation & Rendition Management | Media Library | 3 | 0 | yes |
+| `CMS-079` | Rendition Processing & Delivery Readiness | Media Library | 3 | 0 | yes |
+| `CMS-080` | AI Quality, Intelligence Review & Recommendations | Media Library | 3 | 0 | yes |
+| `CMS-081` | DAM Governance & Rights Command Center | Media Library | 3 | 0 | yes |
+| `CMS-082` | Asset Ownership & Responsibility Management | Media Library | 3 | 0 | yes |
+| `CMS-083` | Rights, License & Usage Policy Management | Media Library | 3 | 0 | yes |
+| `CMS-084` | Asset Approval Workflow Management | Media Library | 3 | 0 | yes |
+| `CMS-085` | Publication Eligibility & Governance Validation | Media Library | 3 | 0 | yes |
+| `CMS-086` | Role-Based Asset Access & Permission Management | Media Library | 3 | 0 | yes |
+| `CMS-087` | Secure Internal & External Sharing | Media Library | 3 | 0 | yes |
+| `CMS-088` | Rights Expiry, Renewal & Usage Impact | Media Library | 3 | 0 | yes |
+| `CMS-089` | Governance Audit Trail & Compliance Evidence | Media Library | 3 | 0 | yes |
+| `CMS-090` | Governance Risk, Compliance & AI Recommendations | Media Library | 3 | 0 | yes |
+| `CMS-091` | Asset Distribution & Delivery Command Center | Media Library | 3 | 0 | yes |
+| `CMS-092` | Asset Usage & Distribution Map | Media Library | 3 | 0 | yes |
+| `CMS-093` | Channel & Distribution Configuration | Media Library | 3 | 0 | yes |
+| `CMS-094` | Secure Delivery URL, CDN & Rendition Delivery | Media Library | 3 | 0 | yes |
+| `CMS-095` | Asset Replacement & Propagation Management | Media Library | 3 | 0 | yes |
+| `CMS-096` | Fallback, Expiry & Distribution Continuity | Media Library | 3 | 0 | yes |
+| `CMS-097` | DAM API & Integration Hub | Media Library | 3 | 0 | yes |
+| `CMS-098` | Delivery Monitoring & Integration Health | Media Library | 3 | 0 | yes |
+| `CMS-099` | Asset Usage & Performance Analytics | Media Library | 3 | 0 | yes |
+| `CMS-100` | Distribution Intelligence, AI Insights & Optimization | Media Library | 3 | 0 | yes |
 

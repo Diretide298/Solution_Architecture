@@ -1,0 +1,732 @@
+[
+ {
+  "id": "PTR-014",
+  "name": "Settlement & Payment History",
+  "module": "Reports & Settlement",
+  "requiresModule": "partner",
+  "wave": 3,
+  "capability": "C50",
+  "implementation": {
+   "app": "partner-web",
+   "route": "/general/settlement-and-payment-history",
+   "component": "apps/partner-web/src/routes/general/SettlementAndPaymentHistoryList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "PTR-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "PTR-001",
+    "PTR-002",
+    "PTR-003"
+   ],
+   "transitions": [
+    {
+     "to": "PTR-001",
+     "trigger": "Partner Login / MFA",
+     "carries": [
+      "accountId",
+      "sessionId"
+     ],
+     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-002",
+     "trigger": "Partner Dashboard",
+     "carries": [
+      "accountId",
+      "orderId"
+     ],
+     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-003",
+     "trigger": "Profile & Company Details",
+     "carries": [
+      "principalId"
+     ],
+     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listSettlements` reads the population and `getSettlement` reads one of them — list, select, act",
+  "purpose": "Take the money, and be unambiguous about whether it worked.",
+  "gaps": [
+   {
+    "operation": "listSettlementExceptions",
+    "why": "**1 declared operation reach no component on this screen**: listSettlementExceptions. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every settlement payment history",
+       "bindsTo": "Settlement",
+       "columns": [
+        "Settlement.id",
+        "Settlement.providerName",
+        "Settlement.periodStart",
+        "Settlement.periodEnd",
+        "Settlement.status",
+        "Settlement.lineCount",
+        "Settlement.matchedCount",
+        "Settlement.exceptionCount",
+        "Settlement.providerGross",
+        "Settlement.providerFees",
+        "Settlement.providerNet",
+        "Settlement.ledgerGross"
+       ],
+       "operation": "listSettlements",
+       "provenance": "contract finance.yaml GET /settlements"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected settlement payment history",
+       "bindsTo": "Settlement",
+       "columns": [
+        "Settlement.id",
+        "Settlement.providerName",
+        "Settlement.periodStart",
+        "Settlement.periodEnd",
+        "Settlement.status",
+        "Settlement.lineCount",
+        "Settlement.matchedCount",
+        "Settlement.exceptionCount",
+        "Settlement.providerGross",
+        "Settlement.providerFees",
+        "Settlement.providerNet",
+        "Settlement.ledgerGross",
+        "Settlement.difference",
+        "Settlement.ingestedAt",
+        "Settlement.completedAt",
+        "Settlement.scopePath"
+       ],
+       "operation": "getSettlement",
+       "provenance": "contract finance.yaml GET /settlements/{settlementId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Ingest",
+       "operation": "ingestSettlementFile",
+       "provenance": "contract finance.yaml POST /settlements"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resolve",
+       "operation": "resolveSettlementException",
+       "provenance": "contract finance.yaml POST /settlements/{settlementId}/exceptions"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The settlement payment history list.",
+   "error": "Could not load. Names which read failed and leaves the settlement payment history untouched.",
+   "emptyFirstRun": "No settlement payment history yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the settlement payment history are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listSettlements",
+    "contract": "finance",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getSettlement",
+    "contract": "finance",
+    "purpose": "Settlement detail with match results",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "ingestSettlementFile",
+    "contract": "finance",
+    "purpose": "Ingest a provider settlement file",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSettlements"
+    ]
+   },
+   {
+    "operationId": "listSettlementExceptions",
+    "contract": "finance",
+    "purpose": "Unmatched or mismatched settlement lines",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "resolveSettlementException",
+    "contract": "finance",
+    "purpose": "Resolve a settlement exception",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSettlements"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "settlementId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. If the target is gone the screen says so and offers the partner's own list. Arrives with `settlementId`.",
+   "preloaded": [
+    "Settlement.id",
+    "Settlement.providerName",
+    "Settlement.periodStart",
+    "Settlement.periodEnd",
+    "Settlement.status"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-014"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P10",
+   "audience": "partner",
+   "formFactor": "web",
+   "shortName": "Partner Web",
+   "name": "Partner Web — Reseller Portal",
+   "offlineCapable": false,
+   "app": "partner-web",
+   "operator": "partner",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P09",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "PTR-017",
+  "name": "Commission Statement",
+  "module": "Reports & Settlement",
+  "requiresModule": "partner",
+  "wave": 3,
+  "implementation": {
+   "app": "partner-web",
+   "route": "/general/commission-statement",
+   "component": "apps/partner-web/src/routes/general/CommissionStatementDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "PTR-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "PTR-001",
+    "PTR-002",
+    "PTR-003"
+   ],
+   "transitions": [
+    {
+     "to": "PTR-001",
+     "trigger": "Partner Login / MFA",
+     "carries": [
+      "accountId",
+      "sessionId"
+     ],
+     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-002",
+     "trigger": "Partner Dashboard",
+     "carries": [
+      "accountId",
+      "orderId"
+     ],
+     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-003",
+     "trigger": "Profile & Company Details",
+     "carries": [
+      "principalId"
+     ],
+     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "openQuestions": [
+   "No contract — commission not modelled"
+  ],
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listPartnerAgreements` reads the population and `getCommissionStatement` reads one of them — list, select, act",
+  "purpose": "Answer a question about commission with numbers someone can check.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every commission statement",
+       "bindsTo": "PartnerAgreement",
+       "columns": [
+        "PartnerAgreement.id",
+        "PartnerAgreement.partnerId",
+        "PartnerAgreement.partnerName",
+        "PartnerAgreement.status",
+        "PartnerAgreement.rateMode",
+        "PartnerAgreement.commissionPercent",
+        "PartnerAgreement.volumeTiers",
+        "PartnerAgreement.volumeWindow",
+        "PartnerAgreement.seasonalRates",
+        "PartnerAgreement.segmentTier",
+        "PartnerAgreement.brandingAssetId",
+        "PartnerAgreement.storefrontSubdomain"
+       ],
+       "operation": "listPartnerAgreements",
+       "provenance": "contract subscription.yaml GET /partner-agreements"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected commission statement",
+       "bindsTo": "CommissionStatement",
+       "columns": [
+        "CommissionStatement.agreementId",
+        "CommissionStatement.partnerName",
+        "CommissionStatement.from",
+        "CommissionStatement.to",
+        "CommissionStatement.currency",
+        "CommissionStatement.grossSales",
+        "CommissionStatement.refunds",
+        "CommissionStatement.netSales",
+        "CommissionStatement.commissionEarned",
+        "CommissionStatement.amountDue",
+        "CommissionStatement.lines"
+       ],
+       "operation": "getCommissionStatement",
+       "provenance": "contract subscription.yaml GET /partner-agreements/{agreementId}/commission-statement"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listPartnerAgreements",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The commission statement list.",
+   "error": "Could not load. Names which read failed and leaves the commission statement untouched.",
+   "emptyFirstRun": "No commission statement yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the commission statement are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getCommissionStatement",
+    "contract": "subscription",
+    "purpose": "What the partner earned and what is owed",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPartnerAgreements",
+    "contract": "subscription",
+    "purpose": "Commercial agreements with B2B partners",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "agreementId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. If the target is gone the screen says so and offers the partner's own list. Arrives with `agreementId`.",
+   "preloaded": [
+    "CommissionStatement.agreementId",
+    "CommissionStatement.partnerName",
+    "CommissionStatement.from",
+    "CommissionStatement.to",
+    "CommissionStatement.currency"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-017"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P10",
+   "audience": "partner",
+   "formFactor": "web",
+   "shortName": "Partner Web",
+   "name": "Partner Web — Reseller Portal",
+   "offlineCapable": false,
+   "app": "partner-web",
+   "operator": "partner",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P09",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "PTR-018",
+  "name": "Reports & Sales Performance",
+  "module": "Reports & Settlement",
+  "requiresModule": "partner",
+  "wave": 3,
+  "capability": "C21",
+  "implementation": {
+   "app": "partner-web",
+   "route": "/general/reports-and-sales-performance",
+   "component": "apps/partner-web/src/routes/general/ReportsAndSalesPerformanceDashboard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "PTR-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "PTR-001",
+    "PTR-002",
+    "PTR-003"
+   ],
+   "transitions": [
+    {
+     "to": "PTR-001",
+     "trigger": "Partner Login / MFA",
+     "carries": [
+      "accountId",
+      "sessionId"
+     ],
+     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-002",
+     "trigger": "Partner Dashboard",
+     "carries": [
+      "accountId",
+      "orderId"
+     ],
+     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-003",
+     "trigger": "Profile & Company Details",
+     "carries": [
+      "principalId"
+     ],
+     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listReports` reads the population and `getFinancialReport` reads one of them — list, select, act",
+  "purpose": "Answer a question about reports with numbers someone can check.",
+  "gaps": [
+   {
+    "operation": "getReport",
+    "why": "**1 declared operation reach no component on this screen**: getReport. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every reports sales performance",
+       "bindsTo": "ReportDefinition",
+       "columns": [
+        "ReportDefinition.name",
+        "ReportDefinition.description",
+        "ReportDefinition.category",
+        "ReportDefinition.dataSource",
+        "ReportDefinition.columns",
+        "ReportDefinition.filters",
+        "ReportDefinition.groupBy",
+        "ReportDefinition.parameters",
+        "ReportDefinition.requiredPermission",
+        "ReportDefinition.maxDateRangeDays",
+        "ReportDefinition.id",
+        "ReportDefinition.isSystem"
+       ],
+       "operation": "listReports",
+       "provenance": "contract reporting.yaml GET /reports"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected reports sales performance",
+       "bindsTo": "FinancialReport",
+       "columns": [
+        "FinancialReport.report",
+        "FinancialReport.fiscalPeriodId",
+        "FinancialReport.legalEntityId",
+        "FinancialReport.currency",
+        "FinancialReport.currencyScale",
+        "FinancialReport.generatedAt",
+        "FinancialReport.sections"
+       ],
+       "operation": "getFinancialReport",
+       "provenance": "contract finance.yaml GET /reports/financial"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Run",
+       "operation": "runReport",
+       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Ask",
+       "operation": "askReportingQuestion",
+       "provenance": "contract reporting.yaml POST /reports/ask"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createReport",
+       "provenance": "contract reporting.yaml POST /reports"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Delete",
+       "operation": "deleteReport",
+       "provenance": "contract reporting.yaml DELETE /reports/{reportId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save",
+       "operation": "saveNaturalLanguageQuery",
+       "provenance": "contract reporting.yaml POST /reports/ask/{conversationId}/save"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateReport",
+       "provenance": "contract reporting.yaml PUT /reports/{reportId}"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmDeleteReport",
+    "component": "confirmDialog",
+    "trigger": "Delete",
+    "body": "**Names what `deleteReport` changes and what it leaves alone**, in the consequence rather than the verb. A reports sales performance this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract reporting.yaml DELETE /reports/{reportId}"
+   }
+  ],
+  "states": {
+   "loading": "The reports sales performance list.",
+   "error": "Could not load. Names which read failed and leaves the reports sales performance untouched.",
+   "emptyFirstRun": "No reports sales performance yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the reports sales performance are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "runReport",
+    "contract": "reporting",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "askReportingQuestion",
+    "contract": "reporting",
+    "purpose": "Natural-language reporting query",
+    "trigger": "onAction",
+    "invalidates": [
+     "listReports"
+    ]
+   },
+   {
+    "operationId": "createReport",
+    "contract": "reporting",
+    "purpose": "Create a custom report definition",
+    "trigger": "onAction",
+    "invalidates": [
+     "listReports"
+    ]
+   },
+   {
+    "operationId": "deleteReport",
+    "contract": "reporting",
+    "purpose": "Retire a report definition",
+    "trigger": "onAction",
+    "invalidates": [
+     "listReports"
+    ]
+   },
+   {
+    "operationId": "getFinancialReport",
+    "contract": "finance",
+    "purpose": "P&L, balance sheet or cash flow",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getReport",
+    "contract": "reporting",
+    "purpose": "Read a report definition",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listReports",
+    "contract": "reporting",
+    "purpose": "List available report definitions",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "saveNaturalLanguageQuery",
+    "contract": "reporting",
+    "purpose": "Save a natural-language answer as a report definition",
+    "trigger": "onAction",
+    "invalidates": [
+     "listReports"
+    ]
+   },
+   {
+    "operationId": "updateReport",
+    "contract": "reporting",
+    "purpose": "Publish a new version of a definition",
+    "trigger": "onAction",
+    "invalidates": [
+     "listReports"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "conversationId",
+     "from": "deepLink"
+    },
+    {
+     "name": "reportId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom.",
+   "preloaded": [
+    "FinancialReport.report",
+    "FinancialReport.fiscalPeriodId",
+    "FinancialReport.legalEntityId",
+    "FinancialReport.currency",
+    "FinancialReport.currencyScale"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-018"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P10",
+   "audience": "partner",
+   "formFactor": "web",
+   "shortName": "Partner Web",
+   "name": "Partner Web — Reseller Portal",
+   "offlineCapable": false,
+   "app": "partner-web",
+   "operator": "partner",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P09",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

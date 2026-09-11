@@ -1,0 +1,275 @@
+{
+ "GuestMenu": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over menu, item and availability",
+  "required": [
+   "outletId",
+   "menuId",
+   "name",
+   "inForceUntil",
+   "sections"
+  ],
+  "properties": {
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "menuId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "inForceUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When this menu stops applying. The client shows it, because a guest browsing breakfast at 10:55 should know.\n"
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "currencyScale": {
+    "type": "integer"
+   },
+   "sections": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "sortOrder": {
+       "type": "integer"
+      },
+      "items": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "required": [
+         "menuItemId",
+         "name",
+         "price",
+         "isAvailable",
+         "allergens"
+        ],
+        "properties": {
+         "menuItemId": {
+          "type": "string",
+          "format": "uuid"
+         },
+         "name": {
+          "type": "string"
+         },
+         "description": {
+          "type": "string",
+          "nullable": true
+         },
+         "price": {
+          "$ref": "../shared/common.yaml#/components/schemas/Money"
+         },
+         "imageAssetRef": {
+          "type": "string",
+          "nullable": true
+         },
+         "isAvailable": {
+          "type": "boolean",
+          "description": "Marked, not removed. A guest who saw a dish yesterday and cannot find it today assumes the app is broken; \"sold out\" is an answer.\n"
+         },
+         "unavailableReason": {
+          "type": "string",
+          "nullable": true
+         },
+         "allergens": {
+          "type": "array",
+          "description": "Always present. Not a field a tenant may choose to omit.",
+          "items": {
+           "type": "string"
+          }
+         },
+         "preparationMinutes": {
+          "type": "integer",
+          "nullable": true
+         },
+         "modifierGroups": {
+          "type": "array",
+          "items": {
+           "$ref": "#/components/schemas/ModifierGroup"
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "ModifierGroup": {
+  "x-ticvai-persistence": "fnb.modifier_group + fnb.modifier_option",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "minSelections",
+   "maxSelections",
+   "options"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "minSelections": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Greater than zero makes the group required."
+   },
+   "maxSelections": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "options": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "id",
+      "name",
+      "priceDelta"
+     ],
+     "properties": {
+      "id": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "priceDelta": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "isDefault": {
+       "type": "boolean"
+      },
+      "isAvailable": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "ShopAndDrop": {
+  "type": "object",
+  "x-ticvai-persistence": "retail.shop_and_drop + retail.shop_and_drop_line",
+  "required": [
+   "id",
+   "dropReference",
+   "saleId",
+   "collectionPointId",
+   "status",
+   "collectBy"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "dropReference": {
+    "type": "string",
+    "description": "Short and readable. Printed on the slip a guest may or may not keep."
+   },
+   "saleId": {
+    "type": "string"
+   },
+   "entitlementId": {
+    "type": "string",
+    "nullable": true,
+    "description": "The ticket that claims these goods. The point of 4.4.7 — a guest does not have to keep a receipt safe for eight hours in a water park.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "collectionPointId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "collectionPointName": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "awaitingCollection",
+     "partiallyCollected",
+     "collected",
+     "uncollected",
+     "disposed"
+    ]
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "lineId": {
+       "type": "string"
+      },
+      "merchandiseId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "quantity": {
+       "type": "integer"
+      },
+      "collectedQuantity": {
+       "type": "integer"
+      }
+     }
+    }
+   },
+   "droppedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "collectBy": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "collectedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "collectedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "verifiedBy": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ }
+}

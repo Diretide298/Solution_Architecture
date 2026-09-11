@@ -1,0 +1,1052 @@
+[
+ {
+  "id": "WEB-025",
+  "name": "Help Centre / FAQ",
+  "module": "Engagement & Support",
+  "requiresModule": "core",
+  "wave": 1,
+  "capability": "C105",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/engagement-and-support/help-centre-faq",
+   "component": "apps/guest-web/src/routes/engagement-and-support/HelpCentreFaqDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "exitTo": [
+    "WEB-001",
+    "WEB-026",
+    "WEB-027",
+    "WEB-028"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "WEB-027",
+     "trigger": "Newsletter Subscription",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-027 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Same content the AI concierge grounds on. One source, two surfaces. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "density": "compact",
+  "pattern": "statusTracker",
+  "patternReason": "`getTenantAppStatus` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Answer a question without needing a person.",
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected help faq",
+       "bindsTo": "TenantAppStatus",
+       "columns": [
+        "TenantAppStatus.isPublished",
+        "TenantAppStatus.publishedVersion",
+        "TenantAppStatus.publishedAt",
+        "TenantAppStatus.draftVersion",
+        "TenantAppStatus.hasUnpublishedChanges",
+        "TenantAppStatus.activeModuleCount",
+        "TenantAppStatus.licensedModuleCount",
+        "TenantAppStatus.activePageCount",
+        "TenantAppStatus.isInMaintenance",
+        "TenantAppStatus.maintenanceMessage",
+        "TenantAppStatus.expectedBackAt",
+        "TenantAppStatus.recentChanges"
+       ],
+       "operation": "getTenantAppStatus",
+       "provenance": "contract white-label.yaml GET /tenant-config/status"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createCase",
+       "label": "Create case",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listCases",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createCase"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Articles load",
+   "error": "Could not load",
+   "emptyFirstRun": "No articles — offers contact instead of an empty help centre",
+   "emptyNoResults": "The filter narrowed it and the help faq are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getTenantAppStatus",
+    "contract": "white-label",
+    "purpose": "App status and recent changes",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createCase",
+    "contract": "marketing-crm",
+    "purpose": "Raise a case",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listCases",
+    "contract": "marketing-crm",
+    "purpose": "Cases this guest has open",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-025"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-026",
+  "name": "Survey & Feedback",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "capability": "C33",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/engagement-and-support/survey-and-feedback",
+   "component": "apps/guest-web/src/routes/engagement-and-support/SurveyAndFeedbackDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "exitTo": [
+    "WEB-001",
+    "WEB-025",
+    "WEB-027",
+    "WEB-028"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "WEB-027",
+     "trigger": "Newsletter Subscription",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-027 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the screen declares only writes (`submitReview`) and no read of a population — it is settings, not a list",
+  "purpose": "Work with survey & feedback for this venue.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "id",
+       "bindsTo": "SubmitReviewRequest.id",
+       "provenance": "contract marketing-crm.yaml POST /reviews"
+      },
+      {
+       "kind": "textField",
+       "label": "subjectId",
+       "bindsTo": "SubmitReviewRequest.subjectId",
+       "provenance": "contract marketing-crm.yaml POST /reviews"
+      },
+      {
+       "kind": "textField",
+       "label": "venueId",
+       "bindsTo": "SubmitReviewRequest.venueId",
+       "provenance": "contract marketing-crm.yaml POST /reviews"
+      },
+      {
+       "kind": "textField",
+       "label": "relatedOrderId",
+       "bindsTo": "SubmitReviewRequest.relatedOrderId",
+       "provenance": "contract marketing-crm.yaml POST /reviews"
+      },
+      {
+       "kind": "textField",
+       "label": "rating",
+       "bindsTo": "SubmitReviewRequest.rating",
+       "provenance": "contract marketing-crm.yaml POST /reviews"
+      },
+      {
+       "kind": "textField",
+       "label": "body",
+       "bindsTo": "SubmitReviewRequest.body",
+       "provenance": "contract marketing-crm.yaml POST /reviews"
+      },
+      {
+       "kind": "textField",
+       "label": "aspects",
+       "bindsTo": "SubmitReviewRequest.aspects",
+       "provenance": "contract marketing-crm.yaml POST /reviews"
+      },
+      {
+       "kind": "textField",
+       "label": "recordedAt",
+       "bindsTo": "SubmitReviewRequest.recordedAt",
+       "provenance": "contract marketing-crm.yaml POST /reviews"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Submit",
+       "operation": "submitReview",
+       "provenance": "contract marketing-crm.yaml POST /reviews"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "submitReview",
+       "label": "Submit review",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "submitReview",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Survey loads",
+   "error": "Could not submit. **The answers are kept** and retried",
+   "emptyFirstRun": "—",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "submitReview",
+    "contract": "marketing-crm",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-026"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-027",
+  "name": "Newsletter Subscription",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 2,
+  "capability": "C59",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/engagement-and-support/newsletter-subscription",
+   "component": "apps/guest-web/src/routes/engagement-and-support/NewsletterSubscriptionDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "exitTo": [
+    "WEB-001",
+    "WEB-025",
+    "WEB-026",
+    "WEB-028"
+   ],
+   "inferred": true
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
+  "purpose": "Record newsletter subscription for this venue.",
+  "gaps": [
+   {
+    "operation": "getMarketingSubscription",
+    "why": "**1 declared operation reach no component on this screen**: getMarketingSubscription. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every newsletter subscription",
+       "bindsTo": "GuestDevice",
+       "columns": [
+        "GuestDevice.id",
+        "GuestDevice.subjectId",
+        "GuestDevice.platform",
+        "GuestDevice.tokenFingerprint",
+        "GuestDevice.appVersion",
+        "GuestDevice.osVersion",
+        "GuestDevice.deviceModel",
+        "GuestDevice.locale",
+        "GuestDevice.status",
+        "GuestDevice.failureCount",
+        "GuestDevice.registeredAt",
+        "GuestDevice.lastSeenAt"
+       ],
+       "operation": "listGuestDevices",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected newsletter subscription",
+       "bindsTo": "Wishlist",
+       "columns": [
+        "Wishlist.subjectId",
+        "Wishlist.items"
+       ],
+       "operation": "getWishlist",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Add",
+       "operation": "addToWishlist",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Register",
+       "operation": "registerGuestDevice",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeFromWishlist",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Revoke",
+       "operation": "revokeGuestDevice",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setMarketingSubscription",
+       "provenance": "contract marketing-crm.yaml PUT /marketing-subscriptions"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listGuestDevices",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "destructiveButton",
+       "derived": true,
+       "impliedBy": "removeFromWishlist",
+       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
+       "label": "Remove from wishlist",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "recordConsent",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmRemoveFromWishlist",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A newsletter subscription this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+   },
+   {
+    "id": "confirmRevokeGuestDevice",
+    "component": "confirmDialog",
+    "trigger": "Revoke",
+    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A newsletter subscription this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+   }
+  ],
+  "states": {
+   "loading": "—",
+   "error": "Could not subscribe. **Consent is not recorded on a failed request**, because a subscription the guest believes happened and did not is worse than a visible failure",
+   "emptyFirstRun": "—",
+   "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "addToWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Save an item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest's saved items",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listGuestDevices",
+    "contract": "marketing-crm",
+    "purpose": "A guest's registered devices",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "registerGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Register a device for push",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "removeFromWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Remove a saved item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "revokeGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Revoke a device registration",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getMarketingSubscription",
+    "contract": "marketing-crm",
+    "purpose": "What this guest has opted into",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setMarketingSubscription",
+    "contract": "marketing-crm",
+    "purpose": "Subscribe or unsubscribe",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "deviceId",
+     "from": "deepLink"
+    },
+    {
+     "name": "itemId",
+     "from": "deepLink"
+    },
+    {
+     "name": "subjectId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
+   "preloaded": [
+    "Wishlist.subjectId",
+    "Wishlist.items"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-027"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-028",
+  "name": "Contact & Venue Information",
+  "module": "Engagement & Support",
+  "requiresModule": "core",
+  "wave": 1,
+  "capability": "C105",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/engagement-and-support/contact-and-venue-information",
+   "component": "apps/guest-web/src/routes/engagement-and-support/ContactAndVenueInformationForm.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001",
+    "WEB-025",
+    "WEB-026",
+    "WEB-027"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-027",
+     "trigger": "Newsletter Subscription",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-027 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "density": "compact",
+  "pattern": "statusTracker",
+  "patternReason": "`getTenantAppStatus` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Find contact & venue information for this venue.",
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected contact venue information",
+       "bindsTo": "TenantAppStatus",
+       "columns": [
+        "TenantAppStatus.isPublished",
+        "TenantAppStatus.publishedVersion",
+        "TenantAppStatus.publishedAt",
+        "TenantAppStatus.draftVersion",
+        "TenantAppStatus.hasUnpublishedChanges",
+        "TenantAppStatus.activeModuleCount",
+        "TenantAppStatus.licensedModuleCount",
+        "TenantAppStatus.activePageCount",
+        "TenantAppStatus.isInMaintenance",
+        "TenantAppStatus.maintenanceMessage",
+        "TenantAppStatus.expectedBackAt",
+        "TenantAppStatus.recentChanges"
+       ],
+       "operation": "getTenantAppStatus",
+       "provenance": "contract white-label.yaml GET /tenant-config/status"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Venue details",
+   "error": "Could not load. Falls back to the tenant contact details from the cached config",
+   "emptyFirstRun": "—",
+   "emptyNoResults": "The filter narrowed it and the contact venue information are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getTenantAppStatus",
+    "contract": "white-label",
+    "purpose": "App status and recent changes",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-028"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-044",
+  "name": "AI Concierge – Home",
+  "module": "Engagement & Support",
+  "requiresModule": "ai",
+  "wave": 2,
+  "implementation": {
+   "app": "guest-web",
+   "route": "/ai-concierge",
+   "component": "apps/guest-web/src/routes/AiConcierge.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "exitTo": [
+    "WEB-001"
+   ]
+  },
+  "notes": "**A concierge in a browser is a concierge.** ADR-0020 keeps it read-only against the transactional core regardless of surface. **Renamed 31 August** from *AI Concierge*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added getGuestMenu. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
+  "density": "compact",
+  "pattern": "statusTracker",
+  "patternReason": "`getGuestMenu` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Ask, and be answered or handed to a person.",
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected concierge home",
+       "bindsTo": "GuestMenu",
+       "columns": [
+        "GuestMenu.outletId",
+        "GuestMenu.menuId",
+        "GuestMenu.name",
+        "GuestMenu.inForceUntil",
+        "GuestMenu.currency",
+        "GuestMenu.currencyScale",
+        "GuestMenu.sections"
+       ],
+       "operation": "getGuestMenu",
+       "provenance": "contract fnb.yaml GET /outlets/{outletId}/guest-menu"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createAiConversation",
+       "provenance": "contract ai.yaml POST /conversations"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Send",
+       "operation": "sendAiMessage",
+       "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Handover",
+       "operation": "handoverToAgent",
+       "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/handover"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request",
+       "operation": "requestSuggestion",
+       "provenance": "contract ai.yaml POST /ai/suggestions"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "cardList",
+       "label": "AI Concierge",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Detail",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Content resolves in place.",
+   "error": "Could not load. **The rest of the site is unaffected.**",
+   "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
+   "emptyNoResults": "Nothing matches.",
+   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused."
+  },
+  "apis": [
+   {
+    "operationId": "createAiConversation",
+    "contract": "ai",
+    "purpose": "Open a conversation",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "sendAiMessage",
+    "contract": "ai",
+    "purpose": "Ask",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "handoverToAgent",
+    "contract": "marketing-crm",
+    "purpose": "Pass an assistant conversation to a person",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "requestSuggestion",
+    "contract": "ai",
+    "purpose": "requestSuggestion",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getGuestMenu",
+    "contract": "fnb",
+    "purpose": "The menu a guest sees",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listAiConversations",
+    "contract": "ai",
+    "purpose": "Earlier conversations",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "sendConversationMessage",
+    "contract": "marketing-crm",
+    "purpose": "Ask the concierge something",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "conversationId",
+     "from": "deepLink"
+    },
+    {
+     "name": "outletId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land here, and the person holding it did nothing wrong. Arrives with `conversationId`."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-044"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-046",
+  "name": "In-Venue Notifications",
+  "module": "Engagement & Support",
+  "requiresModule": "marketing",
+  "wave": 2,
+  "implementation": {
+   "app": "guest-web",
+   "route": "/in-venue-notifications",
+   "component": "apps/guest-web/src/routes/InVenueNotifications.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "exitTo": [
+    "WEB-001"
+   ]
+  },
+  "notes": "**Web push is weaker than native and it is not absent.** A guest with a tab open gets their queue call; the app does it better and the web does it.",
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the screen declares only writes (`claimLocationSession`) and no read of a population — it is settings, not a list",
+  "purpose": "Queue calls, order updates, venue notices.",
+  "gaps": [
+   {
+    "operation": "claimLocationSession",
+    "why": "**`claimLocationSession` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
+    "source": "contract fnb.yaml POST /location-sessions"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Claim",
+       "operation": "claimLocationSession",
+       "provenance": "contract fnb.yaml POST /location-sessions"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "cardList",
+       "label": "In-Venue Notifications",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Detail",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Content resolves in place.",
+   "error": "Could not load. **The rest of the site is unaffected.**",
+   "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
+   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused."
+  },
+  "apis": [
+   {
+    "operationId": "claimLocationSession",
+    "contract": "fnb",
+    "purpose": "Tell the platform where the guest is",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land here, and the person holding it did nothing wrong. Arrives with no parameter — the venue comes from the site."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-046"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

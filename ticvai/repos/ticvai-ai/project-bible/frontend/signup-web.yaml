@@ -1,0 +1,32 @@
+# signup-web — operated by public · public on web
+# Serves: P17 TICVAI Sign-up — Onboarding & Purchase
+# Derived by tools/derive-frontend.py from screens/*.yaml. Do not hand-edit.
+
+app: signup-web
+operator: public
+audience: public
+formFactor: web
+status: not scaffolded
+runtime: reactWeb
+offlineCapable: false
+directions:
+- ltr
+- rtl
+platforms:
+- P17 TICVAI Sign-up — Onboarding & Purchase
+servesMultiplePlatforms: false
+packages:
+- design-tokens
+- ui
+- api-client
+contracts: []
+deployment:
+  target: browser
+  distribution: public, served from the Control Plane
+  bundleUpdate: immediate on deploy
+  hosting: Control Plane, outside every cell — a prospect has no cell yet. The application itself is
+    written to the prospect's regional control database (ADR-0043)
+  storeReview: false
+  deviceOwnership: prospect device, unmanaged
+  networkAssumption: public internet
+  releaseCadence: monthly

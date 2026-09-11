@@ -7504,34 +7504,62 @@ screens:
     route: /analytics/data-refresh-pipeline-data-health-monitor-anl-067
     component: apps/venue-management-web/src/routes/analytics/DataRefreshPipelineDataHealthMonitor.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-061
+    exitTo:
+    - ANL-061
+    transitions:
+    - to: ANL-061
+      trigger: Back to BI & Analytics Administration Command Center
+      provenance: structural — pack board 10 wiring, 9 September 2026
+      back: true
   density: compact
-  pattern: listDetail
-  patternReason: the pack gives this screen a display directory (§KPI Cards; Monitor) and no metric row
-  purpose: Monitor movement of information from operational systems into the analytics platform.
   purposeNote: Administrators can identify stale or failed analytics data before users unknowingly make
     decisions from outdated information.
+  pattern: commandCentre
+  patternReason: the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory
+    (§Monitor) — counts over a population, then the population
+  purpose: Monitor movement of information from operational systems into the analytics platform.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
       columns can be bound. The columns are the pack''s own labels and are carried as text until the response
       shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
+    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §Monitor
   layout:
-    template: split
+    template: dashboard
     regions:
     - name: contentBody
-      slot: collection
+      slot: headline
+      components:
+      - kind: metricTile
+        label: Pipelines Running
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
+      - kind: metricTile
+        label: Successful Refreshes
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
+      - kind: metricTile
+        label: Failed Refreshes
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
+      - kind: metricTile
+        label: Average Refresh Duration
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
+      - kind: metricTile
+        label: Data Latency
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
+      - kind: metricTile
+        label: Stale Datasets
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
+      - kind: metricTile
+        label: Records Processed
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
+    - name: contentBody
+      slot: moduleTiles
       components:
       - kind: dataTable
         label: Every data refresh pipeline
         columns:
-        - Pipelines Running
-        - Successful Refreshes
-        - Failed Refreshes
-        - Average Refresh Duration
-        - Data Latency
-        - Stale Datasets
-        - Records Processed
         - Completeness
         - Timeliness
         - Accuracy checks
@@ -7541,7 +7569,7 @@ screens:
         - Reconciliation status
         bindsTo: null
         operation: null
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §Monitor
     - name: contextPanel
       slot: selection
       components:
@@ -7549,13 +7577,6 @@ screens:
         label: The selected data refresh pipeline
         bindsTo: null
         columns:
-        - Pipelines Running
-        - Successful Refreshes
-        - Failed Refreshes
-        - Average Refresh Duration
-        - Data Latency
-        - Stale Datasets
-        - Records Processed
         - Completeness
         - Timeliness
         - Accuracy checks
@@ -7565,9 +7586,9 @@ screens:
         - Reconciliation status
         notes: 'The pack groups this record''s detail under its own headings: “Source”, “Ticketing Dataset
           Delayed”, “Affected”.'
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §Monitor
   states:
-    loading: The data refresh pipeline list.
+    loading: The data refresh pipeline list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the data refresh pipeline untouched.
     emptyFirstRun: No data refresh pipeline yet. Carries the create action; distinct from a filter that
       matched nothing.
@@ -7588,19 +7609,9 @@ screens:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-067
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
-    page 130. 0 of 14 labels bound to a contract property; 14 of 32 pack bullets carried onto the screen
+    page 130. 0 of 7 labels bound to a contract property; 14 of 32 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-061
-    exitTo:
-    - ANL-061
-    transitions:
-    - to: ANL-061
-      trigger: Back to BI & Analytics Administration Command Center
-      provenance: structural — pack board 10 wiring, 9 September 2026
-      back: true
 - id: ANL-068
   name: Embedded BI, Workspace & Tenant Administration
   module: Analytics
@@ -7689,40 +7700,95 @@ screens:
     route: /analytics/analytics-performance-usage-cost-monitor-anl-069
     component: apps/venue-management-web/src/routes/analytics/AnalyticsPerformanceUsageCostMonitor.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-061
+    exitTo:
+    - ANL-061
+    transitions:
+    - to: ANL-061
+      trigger: Back to BI & Analytics Administration Command Center
+      provenance: structural — pack board 10 wiring, 9 September 2026
+      back: true
   density: compact
-  pattern: listDetail
-  patternReason: the pack gives this screen a display directory (§Usage KPIs; Performance KPIs; Identify)
-    and no metric row
+  pattern: commandCentre
+  patternReason: the pack gives this screen both a metric directory (§Usage KPIs; Performance KPIs) and
+    a per-row directory (§Identify) — counts over a population, then the population
   purpose: Monitor BI adoption, system performance, capacity consumption and analytical operating costs.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
       columns can be bound. The columns are the pack''s own labels and are carried as text until the response
       shape exists.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage KPIs
+    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Identify
   layout:
-    template: split
+    template: dashboard
     regions:
     - name: contentBody
-      slot: collection
+      slot: headline
+      components:
+      - kind: metricTile
+        label: Active Analytics Users
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage
+          KPIs
+      - kind: metricTile
+        label: Dashboard Views
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage
+          KPIs
+      - kind: metricTile
+        label: Report Runs
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage
+          KPIs
+      - kind: metricTile
+        label: AI Queries
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage
+          KPIs
+      - kind: metricTile
+        label: Exports
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage
+          KPIs
+      - kind: metricTile
+        label: API Requests
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage
+          KPIs
+      - kind: metricTile
+        label: Peak Concurrent Users
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage
+          KPIs
+      - kind: metricTile
+        label: Average Dashboard Load Time
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance
+          KPIs
+      - kind: metricTile
+        label: Query Duration
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance
+          KPIs
+      - kind: metricTile
+        label: Slowest Reports
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance
+          KPIs
+      - kind: metricTile
+        label: Failed Queries
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance
+          KPIs
+      - kind: metricTile
+        label: Dataset Size
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance
+          KPIs
+      - kind: metricTile
+        label: Refresh Duration
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance
+          KPIs
+      - kind: metricTile
+        label: Embedded BI Availability
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance
+          KPIs
+    - name: contentBody
+      slot: moduleTiles
       components:
       - kind: dataTable
         label: Every analytics performance usage
         columns:
-        - Active Analytics Users
-        - Dashboard Views
-        - Report Runs
-        - AI Queries
-        - Exports
-        - API Requests
-        - Peak Concurrent Users
-        - Average Dashboard Load Time
-        - Query Duration
-        - Slowest Reports
-        - Failed Queries
-        - Dataset Size
-        - Refresh Duration
-        - Embedded BI Availability
         - Most Used Dashboards
         - Least Used Dashboards
         - Most Used Reports
@@ -7731,8 +7797,7 @@ screens:
         - Most Active Users/Roles
         bindsTo: null
         operation: null
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage
-          KPIs
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Identify
     - name: contextPanel
       slot: selection
       components:
@@ -7740,20 +7805,6 @@ screens:
         label: The selected analytics performance usage
         bindsTo: null
         columns:
-        - Active Analytics Users
-        - Dashboard Views
-        - Report Runs
-        - AI Queries
-        - Exports
-        - API Requests
-        - Peak Concurrent Users
-        - Average Dashboard Load Time
-        - Query Duration
-        - Slowest Reports
-        - Failed Queries
-        - Dataset Size
-        - Refresh Duration
-        - Embedded BI Availability
         - Most Used Dashboards
         - Least Used Dashboards
         - Most Used Reports
@@ -7762,10 +7813,9 @@ screens:
         - Most Active Users/Roles
         notes: 'The pack groups this record''s detail under its own headings: “Where supported, monitor”,
           “Tenant Usage”.'
-        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage
-          KPIs
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Identify
   states:
-    loading: The analytics performance usage list.
+    loading: The analytics performance usage list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the analytics performance usage untouched.
     emptyFirstRun: No analytics performance usage yet. Carries the create action; distinct from a filter
       that matched nothing.
@@ -7786,19 +7836,9 @@ screens:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-069
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
-    page 132. 0 of 20 labels bound to a contract property; 20 of 34 pack bullets carried onto the screen
+    page 132. 0 of 6 labels bound to a contract property; 20 of 34 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-061
-    exitTo:
-    - ANL-061
-    transitions:
-    - to: ANL-061
-      trigger: Back to BI & Analytics Administration Command Center
-      provenance: structural — pack board 10 wiring, 9 September 2026
-      back: true
 - id: ANL-070
   name: Analytics Governance, Security & Audit Center
   module: Analytics

@@ -1,0 +1,173 @@
+{
+ "listAccessRiskScoring": {
+  "method": "GET",
+  "path": "/access-risk-scoring",
+  "contract": "access",
+  "summary": "Access Risk Scoring & Decision Engine",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AccessRiskScoringDecisionEngineView"
+ },
+ "listAccessSecurityFraud": {
+  "method": "GET",
+  "path": "/access-security-fraud",
+  "contract": "access",
+  "summary": "Access Security & Fraud Command Center",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AccessSecurityFraudCommandCenterView"
+ },
+ "listBiometricIdentityIntegrity": {
+  "method": "GET",
+  "path": "/biometric-identity-integrity",
+  "contract": "access",
+  "summary": "Biometric & Identity Integrity Monitoring",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BiometricIdentityIntegrityMonitoringView"
+ },
+ "listCredentialSharingConcurrent": {
+  "method": "GET",
+  "path": "/credential-sharing-concurrent",
+  "contract": "access",
+  "summary": "Credential Sharing & Concurrent Usage Detection",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CredentialSharingConcurrentUsageDetectionView"
+ },
+ "listFraudDetectionRule": {
+  "method": "GET",
+  "path": "/fraud-detection-rule",
+  "contract": "access",
+  "summary": "Fraud Detection Rule & Signal Library",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "FraudDetectionRuleSignalLibraryView"
+ },
+ "listRelationshipCompanionFraud": {
+  "method": "GET",
+  "path": "/relationship-companion-fraud",
+  "contract": "access",
+  "summary": "Relationship & Companion Fraud Monitoring",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "RelationshipCompanionFraudMonitoringView"
+ },
+ "listSecurityDetectionGovernance": {
+  "method": "GET",
+  "path": "/security-detection-governance",
+  "contract": "access",
+  "summary": "Security Analytics, AI Detection & Governance",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "park",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "reseller",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "credentialType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "media",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "SecurityAnalyticsAiDetectionGovernanceView"
+ },
+ "listUnifiedIdentityCredential": {
+  "method": "GET",
+  "path": "/unified-identity-credential",
+  "contract": "access",
+  "summary": "Unified Identity & Credential Lock Manager",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "UnifiedIdentityCredentialLockManagerView"
+ },
+ "setRealTimeSecurity": {
+  "method": "PUT",
+  "path": "/real-time-security",
+  "contract": "access",
+  "summary": "Real-Time Security Response & Playbook Builder",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "RealTimeSecurityResponsePlaybookBuilderInput",
+  "responds": "RealTimeSecurityResponsePlaybookBuilderView"
+ },
+ "setSecurityInvestigationEvidence": {
+  "method": "PUT",
+  "path": "/security-investigation-evidence",
+  "contract": "access",
+  "summary": "Security Investigation & Evidence Workspace",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "SecurityInvestigationEvidenceWorkspaceInput",
+  "responds": "SecurityInvestigationEvidenceWorkspaceView"
+ }
+}

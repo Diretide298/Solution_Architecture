@@ -1,0 +1,799 @@
+{
+ "BundleAvailabilityByChannelVenuePartnerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Bundle Availability by Channel, Venue & Partner displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "channelsType": {
+    "type": "string",
+    "enum": [
+     "b2c",
+     "b2b",
+     "pos",
+     "mobilePos",
+     "mobileApp",
+     "kiosk",
+     "callCenter",
+     "api",
+     "ota",
+     "reseller",
+     "partner"
+    ],
+    "description": "Vocabulary listed under Channels."
+   },
+   "eEE": {
+    "type": "string",
+    "description": "e e e"
+   },
+   "venueSpecificAvailability": {
+    "type": "string",
+    "description": "Venue-specific availability"
+   },
+   "attractionSpecificAvailability": {
+    "type": "string",
+    "description": "Attraction-specific availability"
+   },
+   "operatingArea": {
+    "type": "string",
+    "description": "Operating area"
+   },
+   "countryMarket": {
+    "type": "string",
+    "description": "Country/market"
+   },
+   "salesLocation": {
+    "type": "string",
+    "description": "Sales location"
+   },
+   "dedicatedAllocation": {
+    "type": "string",
+    "description": "Dedicated allocation"
+   },
+   "sharedAllocation": {
+    "type": "string",
+    "description": "Shared allocation"
+   },
+   "capacityCeiling": {
+    "type": "integer",
+    "description": "Capacity ceiling"
+   },
+   "bookingCutoff": {
+    "type": "string",
+    "description": "Booking cutoff"
+   }
+  }
+ },
+ "BundleAvailabilityForecastAlertsRecoveryView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Bundle Availability Forecast, Alerts & Recovery displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "historicalDemand": {
+    "type": "string",
+    "description": "Historical demand"
+   },
+   "currentBookingVelocity": {
+    "type": "string",
+    "description": "Current booking velocity"
+   },
+   "inventory": {
+    "type": "string",
+    "description": "Inventory"
+   },
+   "capacity": {
+    "type": "integer",
+    "description": "Capacity"
+   },
+   "timeslotUtilization": {
+    "type": "number",
+    "description": "Timeslot utilization"
+   },
+   "seasonality": {
+    "type": "string",
+    "description": "Seasonality"
+   },
+   "dayOfWeek": {
+    "type": "string",
+    "description": "Day of week"
+   },
+   "campaignActivity": {
+    "type": "string",
+    "description": "Campaign activity"
+   },
+   "partnerReservations": {
+    "type": "string",
+    "description": "Partner reservations"
+   },
+   "levelsType": {
+    "type": "string",
+    "enum": [
+     "information",
+     "warning",
+     "critical"
+    ],
+    "description": "Vocabulary listed under Alert Levels."
+   },
+   "switchChoiceGroup": {
+    "type": "string",
+    "description": "Switch choice group"
+   },
+   "restrictChannel": {
+    "type": "string",
+    "description": "Restrict channel"
+   },
+   "reduceBundleAllocation": {
+    "type": "string",
+    "description": "Reduce bundle allocation"
+   },
+   "increaseAlternativeInventory": {
+    "type": "string",
+    "description": "Increase alternative inventory"
+   },
+   "recommendAnotherTimeslot": {
+    "type": "string",
+    "description": "Recommend another timeslot"
+   },
+   "potentialRevenueRecoverableThroughSubstitution": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Potential Revenue Recoverable Through Substitution"
+   }
+  }
+ },
+ "BundleSellabilityDependencyRuleEngineView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Bundle Sellability & Dependency Rule Engine displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "allComponentsRequired": {
+    "type": "boolean",
+    "description": "All components required"
+   },
+   "atLeastXOfY": {
+    "type": "string",
+    "description": "At least X of Y"
+   },
+   "atLeastOneFromCategory": {
+    "type": "string",
+    "description": "At least one from category"
+   },
+   "optionalComponent": {
+    "type": "string",
+    "description": "Optional component"
+   },
+   "conditionalComponent": {
+    "type": "string",
+    "description": "Conditional component"
+   },
+   "substituteAllowed": {
+    "type": "boolean",
+    "description": "Substitute allowed"
+   },
+   "partnerComponentRequired": {
+    "type": "boolean",
+    "description": "Partner component required"
+   },
+   "waterParkMandatory": {
+    "type": "string",
+    "description": "Water Park — Mandatory"
+   },
+   "aquariumMandatory": {
+    "type": "string",
+    "description": "Aquarium — Mandatory"
+   },
+   "photoOptional": {
+    "type": "string",
+    "description": "Photo — Optional"
+   }
+  }
+ },
+ "CapacityPoolReservationManagerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Capacity Pool & Reservation Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "aquariumRemainingCapacity": {
+    "type": "integer",
+    "description": "Aquarium remaining capacity (the pack shows 100)"
+   },
+   "standaloneSales": {
+    "type": "integer",
+    "description": "Standalone sales (the pack shows 60)"
+   },
+   "held": {
+    "type": "string",
+    "description": "Held (the pack shows 5)"
+   },
+   "remainingSellable": {
+    "type": "string",
+    "description": "Remaining sellable (the pack shows 10)"
+   },
+   "sharedPool": {
+    "type": "string",
+    "description": "Shared pool"
+   },
+   "dedicatedBundleAllocation": {
+    "type": "string",
+    "description": "Dedicated bundle allocation"
+   },
+   "channelAllocation": {
+    "type": "string",
+    "description": "Channel allocation"
+   },
+   "partnerAllocation": {
+    "type": "string",
+    "description": "Partner allocation"
+   },
+   "eventCapacity": {
+    "type": "integer",
+    "description": "Event capacity"
+   },
+   "timeslotCapacity": {
+    "type": "integer",
+    "description": "Timeslot capacity"
+   },
+   "seatInventory": {
+    "type": "string",
+    "description": "Seat inventory"
+   },
+   "resourceCapacity": {
+    "type": "integer",
+    "description": "Resource capacity"
+   },
+   "temporaryReservation": {
+    "type": "string",
+    "description": "Temporary reservation"
+   },
+   "holdDuration": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Hold duration"
+   },
+   "hardAllocation": {
+    "type": "string",
+    "description": "Hard allocation"
+   },
+   "softAllocation": {
+    "type": "string",
+    "description": "Soft allocation"
+   },
+   "overbookingPolicy": {
+    "type": "string",
+    "description": "Overbooking policy"
+   },
+   "waitlistBehavior": {
+    "type": "string",
+    "description": "Waitlist behavior"
+   },
+   "capacityAutomaticallyReleased": {
+    "type": "integer",
+    "description": "Capacity automatically released"
+   }
+  }
+ },
+ "ComponentInventoryAvailabilityMatrixView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Component Inventory & Availability Matrix displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "tRyTyLe": {
+    "type": "string",
+    "description": "t ry ty le"
+   },
+   "dE": {
+    "type": "string",
+    "description": "d e"
+   },
+   "souvenir0Open": {
+    "type": "integer",
+    "description": "Souvenir 0 — Open"
+   },
+   "ticketInventory": {
+    "type": "string",
+    "description": "Ticket inventory"
+   },
+   "attractionCapacity": {
+    "type": "integer",
+    "description": "Attraction capacity"
+   },
+   "eventCapacity": {
+    "type": "integer",
+    "description": "Event capacity"
+   },
+   "seatInventory": {
+    "type": "string",
+    "description": "Seat inventory"
+   },
+   "timeslots": {
+    "type": "string",
+    "description": "Timeslots"
+   },
+   "fBAvailability": {
+    "type": "string",
+    "description": "F&B availability"
+   },
+   "retailStock": {
+    "type": "string",
+    "description": "Retail stock"
+   },
+   "resourceAvailability": {
+    "type": "string",
+    "description": "Resource availability"
+   },
+   "parking": {
+    "type": "string",
+    "description": "Parking"
+   },
+   "rental": {
+    "type": "string",
+    "description": "Rental"
+   },
+   "externalPartnerApi": {
+    "type": "string",
+    "description": "External partner API"
+   },
+   "available": {
+    "type": "string",
+    "description": "Available"
+   },
+   "limited": {
+    "type": "string",
+    "description": "Limited"
+   },
+   "low": {
+    "type": "string",
+    "description": "Low"
+   },
+   "soldOut": {
+    "type": "string",
+    "description": "Sold Out"
+   },
+   "closed": {
+    "type": "integer",
+    "description": "Closed"
+   },
+   "suspended": {
+    "type": "string",
+    "description": "Suspended"
+   },
+   "unpublished": {
+    "type": "string",
+    "description": "Unpublished"
+   },
+   "apiUnavailable": {
+    "type": "string",
+    "description": "API Unavailable"
+   }
+  }
+ },
+ "DynamicBundleOperationsCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Dynamic Bundle Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "activeDynamicBundles": {
+    "type": "integer",
+    "description": "Active Dynamic Bundles"
+   },
+   "sellableBundles": {
+    "type": "integer",
+    "description": "Sellable Bundles"
+   },
+   "partiallyAvailableBundles": {
+    "type": "integer",
+    "description": "Partially Available Bundles"
+   },
+   "unavailableBundles": {
+    "type": "integer",
+    "description": "Unavailable Bundles"
+   },
+   "bundlesWithLowCapacity": {
+    "type": "integer",
+    "description": "Bundles with Low Capacity"
+   },
+   "componentsSoldOut": {
+    "type": "string",
+    "description": "Components Sold Out"
+   },
+   "substitutionsTriggered": {
+    "type": "string",
+    "description": "Substitutions Triggered"
+   },
+   "bundleSalesToday": {
+    "type": "string",
+    "description": "Bundle Sales Today"
+   },
+   "failedBundleAttempts": {
+    "type": "integer",
+    "description": "Failed Bundle Attempts"
+   },
+   "capacityReserved": {
+    "type": "integer",
+    "description": "Capacity Reserved"
+   },
+   "revenueAtRisk": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue at Risk"
+   },
+   "recoveredRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Recovered Revenue"
+   },
+   "healthy": {
+    "type": "string",
+    "description": "Healthy"
+   },
+   "warning": {
+    "type": "string",
+    "description": "Warning"
+   },
+   "critical": {
+    "type": "string",
+    "description": "Critical"
+   },
+   "unavailable": {
+    "type": "string",
+    "description": "Unavailable"
+   },
+   "waterParkAvailable": {
+    "type": "string",
+    "description": "Water Park — Available"
+   },
+   "aquariumAvailable": {
+    "type": "string",
+    "description": "Aquarium — Available"
+   },
+   "familyMealLowStock": {
+    "type": "string",
+    "description": "Family Meal — Low Stock"
+   },
+   "photoAvailable": {
+    "type": "string",
+    "description": "Photo — Available"
+   },
+   "bundleHealthWarning": {
+    "type": "string",
+    "description": "Bundle Health: WARNING"
+   }
+  }
+ },
+ "DynamicBundleRuleCompositionEngineView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Dynamic Bundle Rule & Composition Engine displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "guestSegment": {
+    "type": "string",
+    "description": "Guest segment"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "loyaltyTier": {
+    "type": "string",
+    "description": "Loyalty tier"
+   },
+   "purchaseHistory": {
+    "type": "string",
+    "description": "Purchase history"
+   },
+   "numberOfGuests": {
+    "type": "integer",
+    "description": "Number of guests"
+   },
+   "guestType": {
+    "type": "string",
+    "description": "Guest type"
+   },
+   "salesChannel": {
+    "type": "string",
+    "description": "Sales channel"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "season": {
+    "type": "string",
+    "description": "Season"
+   },
+   "day": {
+    "type": "string",
+    "description": "Day"
+   },
+   "time": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time"
+   },
+   "capacity": {
+    "type": "integer",
+    "description": "Capacity"
+   },
+   "inventory": {
+    "type": "string",
+    "description": "Inventory"
+   },
+   "campaign": {
+    "type": "string",
+    "description": "Campaign"
+   },
+   "productPopularity": {
+    "type": "string",
+    "description": "Product popularity"
+   }
+  }
+ },
+ "DynamicBundleSimulationAiOptimizationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Dynamic Bundle Simulation & AI Optimization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "aquariumUnavailable": {
+    "type": "string",
+    "description": "Aquarium unavailable"
+   },
+   "aquariumRequiredSubstituteAllowed": {
+    "type": "boolean",
+    "description": "Aquarium required → Substitute allowed"
+   },
+   "observationDeckAvailable": {
+    "type": "string",
+    "description": "Observation Deck available"
+   },
+   "aed20": {
+    "type": "string",
+    "description": "+AED 20"
+   },
+   "customerApprovalRequired": {
+    "type": "boolean",
+    "description": "Customer approval required"
+   },
+   "bundleRemainsSellable": {
+    "type": "string",
+    "description": "Bundle remains sellable"
+   },
+   "bundleStatus": {
+    "type": "integer",
+    "description": "Bundle status"
+   },
+   "componentsSelected": {
+    "type": "string",
+    "description": "Components selected"
+   },
+   "substitutions": {
+    "type": "integer",
+    "description": "Substitutions"
+   },
+   "priceImpact": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price impact"
+   },
+   "marginImpact": {
+    "type": "number",
+    "description": "Margin impact"
+   },
+   "capacityImpact": {
+    "type": "integer",
+    "description": "Capacity impact"
+   },
+   "customerImpact": {
+    "type": "string",
+    "description": "Customer impact"
+   },
+   "revenueImpact": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue impact"
+   },
+   "beforeRecommendingSubstitutions": {
+    "type": "string",
+    "description": "before recommending substitutions"
+   },
+   "level1RecommendOnly": {
+    "type": "string",
+    "description": "Level 1 — Recommend Only"
+   },
+   "humanApproves": {
+    "type": "string",
+    "description": "Human approves"
+   },
+   "level2PreApprovedAutomation": {
+    "type": "string",
+    "description": "Level 2 — Pre-Approved Automation"
+   },
+   "productStatusAndInventory": {
+    "type": "string",
+    "description": "Product status and inventory"
+   },
+   "attractionEventCapacity": {
+    "type": "integer",
+    "description": "Attraction/event capacity"
+   },
+   "seatAvailabilityWhereIncluded": {
+    "type": "string",
+    "description": "Seat availability where included"
+   },
+   "resourceAvailability": {
+    "type": "string",
+    "description": "Resource availability"
+   },
+   "menuAvailability": {
+    "type": "string",
+    "description": "Menu availability"
+   },
+   "physicalInventory": {
+    "type": "string",
+    "description": "Physical inventory"
+   },
+   "membershipBasedComponents": {
+    "type": "string",
+    "description": "Membership-based components"
+   },
+   "entitlementRedemptionState": {
+    "type": "string",
+    "description": "Entitlement/redemption state"
+   },
+   "realTimePricing": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Real-time pricing"
+   },
+   "promotionQualification": {
+    "type": "string",
+    "description": "Promotion qualification"
+   },
+   "checkoutPaymentCoordination": {
+    "type": "string",
+    "description": "Checkout/payment coordination"
+   },
+   "partnerAllocation": {
+    "type": "string",
+    "description": "Partner allocation"
+   },
+   "externalAvailability": {
+    "type": "string",
+    "description": "External availability"
+   },
+   "commercialImpact": {
+    "type": "string",
+    "description": "Commercial impact"
+   },
+   "whatIsTheBundle": {
+    "type": "string",
+    "description": "WHAT IS THE BUNDLE?"
+   },
+   "change": {
+    "type": "string",
+    "description": "CHANGE?"
+   },
+   "matrixCoverageBoard6": {
+    "type": "string",
+    "description": "Matrix Coverage — Board 6"
+   }
+  }
+ },
+ "DynamicComponentSubstitutionEngineView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Dynamic Component Substitution Engine displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "primaryComponent": {
+    "type": "string",
+    "description": "Primary component"
+   },
+   "alternative1": {
+    "type": "string",
+    "description": "Alternative 1"
+   },
+   "alternative2": {
+    "type": "string",
+    "description": "Alternative 2"
+   },
+   "alternative3": {
+    "type": "string",
+    "description": "Alternative 3"
+   },
+   "fallbackAction": {
+    "type": "string",
+    "description": "Fallback action"
+   },
+   "soldOut": {
+    "type": "string",
+    "description": "Sold out"
+   },
+   "capacityExhausted": {
+    "type": "integer",
+    "description": "Capacity exhausted"
+   },
+   "productSuspended": {
+    "type": "string",
+    "description": "Product suspended"
+   },
+   "venueClosed": {
+    "type": "integer",
+    "description": "Venue closed"
+   },
+   "externalApiUnavailable": {
+    "type": "string",
+    "description": "External API unavailable"
+   },
+   "inventoryBelowThreshold": {
+    "type": "integer",
+    "description": "Inventory below threshold"
+   },
+   "maintainsSameBundlePrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Maintains same bundle price"
+   },
+   "addsSurcharge": {
+    "type": "string",
+    "description": "Adds surcharge"
+   },
+   "reducesBundlePrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Reduces bundle price"
+   },
+   "requiresCustomerApproval": {
+    "type": "string",
+    "description": "Requires customer approval"
+   },
+   "requiresOperatorApproval": {
+    "type": "string",
+    "description": "Requires operator approval"
+   }
+  }
+ },
+ "RealTimeAvailabilityCheckoutValidationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Real-Time Availability & Checkout Validation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "productActive": {
+    "type": "integer",
+    "description": "Product active"
+   },
+   "inventoryAvailable": {
+    "type": "string",
+    "description": "Inventory available"
+   },
+   "capacityAvailable": {
+    "type": "integer",
+    "description": "Capacity available"
+   },
+   "timeslotAvailable": {
+    "type": "string",
+    "description": "Timeslot available"
+   },
+   "resourceAvailable": {
+    "type": "string",
+    "description": "Resource available"
+   },
+   "priceValid": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price valid"
+   },
+   "promotionValid": {
+    "type": "string",
+    "description": "Promotion valid"
+   },
+   "partnerComponentValid": {
+    "type": "string",
+    "description": "Partner component valid"
+   },
+   "componentMappingValid": {
+    "type": "string",
+    "description": "Component mapping valid"
+   }
+  }
+ }
+}

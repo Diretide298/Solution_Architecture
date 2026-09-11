@@ -1,0 +1,486 @@
+[
+ {
+  "id": "ADM-031",
+  "name": "Security & Compliance Dashboard",
+  "module": "Security & Compliance",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "capability": "C97",
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/general/security-and-compliance-dashboard",
+   "component": "apps/ticvai-web/src/routes/general/SecurityAndComplianceDashboard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "ADM-001",
+    "ADM-002",
+    "ADM-003",
+    "ADM-004"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-004",
+     "trigger": "Platform Audit Log",
+     "provenance": "flow F106 step 1→2"
+    },
+    {
+     "to": "ADM-001",
+     "trigger": "Platform Login / MFA",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-003",
+     "trigger": "Cross-Tenant Health Dashboard",
+     "carries": [
+      "cellId",
+      "rightId"
+     ],
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "openQuestions": [
+   "No contract — not specified"
+  ],
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listDashboards` reads the population and `getDashboard` reads one of them — list, select, act",
+  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every security compliance",
+       "bindsTo": "Dashboard",
+       "columns": [
+        "Dashboard.name",
+        "Dashboard.description",
+        "Dashboard.venueId",
+        "Dashboard.isShared",
+        "Dashboard.tiles",
+        "Dashboard.id",
+        "Dashboard.ownerPrincipalId",
+        "Dashboard.aggregateCost"
+       ],
+       "operation": "listDashboards",
+       "provenance": "contract reporting.yaml GET /dashboards"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected security compliance",
+       "bindsTo": "DashboardData",
+       "columns": [
+        "DashboardData.tileData"
+       ],
+       "operation": "getDashboard",
+       "provenance": "contract reporting.yaml GET /dashboards/{dashboardId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createDashboard",
+       "provenance": "contract reporting.yaml POST /dashboards"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateDashboard",
+       "provenance": "contract reporting.yaml PUT /dashboards/{dashboardId}"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The security compliance list.",
+   "error": "Could not load. Names which read failed and leaves the security compliance untouched.",
+   "emptyFirstRun": "No security compliance yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the security compliance are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listDashboards",
+    "contract": "reporting",
+    "purpose": "List dashboards",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getDashboard",
+    "contract": "reporting",
+    "purpose": "Read a dashboard with tile data",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createDashboard",
+    "contract": "reporting",
+    "purpose": "Create a dashboard",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDashboards"
+    ]
+   },
+   {
+    "operationId": "updateDashboard",
+    "contract": "reporting",
+    "purpose": "Update a dashboard",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDashboards"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "dashboardId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `dashboardId`.",
+   "preloaded": [
+    "DashboardData.tileData"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-031"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-032",
+  "name": "WAF & Security Policy View",
+  "module": "Security & Compliance",
+  "requiresModule": "membership",
+  "wave": 3,
+  "capability": "C96",
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/general/waf-and-security-policy-view",
+   "component": "apps/ticvai-web/src/routes/general/WafAndSecurityPolicyViewForm.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "ADM-001",
+    "ADM-002",
+    "ADM-003"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-001",
+     "trigger": "Platform Login / MFA",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-003",
+     "trigger": "Cross-Tenant Health Dashboard",
+     "carries": [
+      "cellId",
+      "rightId"
+     ],
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "openQuestions": [
+   "No contract — infrastructure"
+  ],
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listCellJobs` reads the population and `getCellHealth` reads one of them — list, select, act",
+  "purpose": "See waf & security policy view for this venue.",
+  "gaps": [
+   {
+    "operation": "getCell",
+    "why": "**3 declared operations reach no component on this screen**: getCell, getCellCapacity, listWafRules. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every waf security policy",
+       "bindsTo": "CellJob",
+       "columns": [
+        "CellJob.id",
+        "CellJob.kind",
+        "CellJob.status",
+        "CellJob.progressPercent",
+        "CellJob.message",
+        "CellJob.error",
+        "CellJob.scheduledFor",
+        "CellJob.completedAt"
+       ],
+       "operation": "listCellJobs",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}/jobs"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected waf security policy",
+       "bindsTo": "CellHealth",
+       "columns": [
+        "CellHealth.isHealthy",
+        "CellHealth.isSchemaBehind",
+        "CellHealth.databaseStatus",
+        "CellHealth.replicationLagSeconds",
+        "CellHealth.lastBackupAt",
+        "CellHealth.lastRestoreDrillAt",
+        "CellHealth.checkedAt"
+       ],
+       "operation": "getCellHealth",
+       "provenance": "contract subscription.yaml GET /cells/{cellId}/health"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "destructiveButton",
+       "label": "Cancel",
+       "operation": "cancelDecommission",
+       "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Decommission",
+       "operation": "decommissionCell",
+       "provenance": "contract subscription.yaml POST /cells/{cellId}/decommission"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateCellTier",
+       "provenance": "contract subscription.yaml PATCH /cells/{cellId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setWafPolicy",
+       "provenance": "contract platform-ops.yaml PUT /waf-policies"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmCancelDecommission",
+    "component": "confirmDialog",
+    "trigger": "Cancel",
+    "body": "**Names what `cancelDecommission` changes and what it leaves alone**, in the consequence rather than the verb. A waf security policy this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
+   }
+  ],
+  "states": {
+   "loading": "The waf security policy list.",
+   "error": "Could not load. Names which read failed and leaves the waf security policy untouched.",
+   "emptyFirstRun": "No waf security policy yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the waf security policy are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getCellHealth",
+    "contract": "subscription",
+    "purpose": "Cell health and schema version",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "cancelDecommission",
+    "contract": "subscription",
+    "purpose": "Halt a decommission",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCellJobs"
+    ]
+   },
+   {
+    "operationId": "decommissionCell",
+    "contract": "subscription",
+    "purpose": "Begin decommissioning a cell",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCellJobs"
+    ]
+   },
+   {
+    "operationId": "getCell",
+    "contract": "subscription",
+    "purpose": "Read a cell",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getCellCapacity",
+    "contract": "subscription",
+    "purpose": "Load against headroom",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCellJobs",
+    "contract": "subscription",
+    "purpose": "Provisioning, migration and maintenance jobs",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateCellTier",
+    "contract": "subscription",
+    "purpose": "Change a cell's tier",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCellJobs"
+    ]
+   },
+   {
+    "operationId": "listWafRules",
+    "contract": "platform-ops",
+    "purpose": "Firewall rules in force",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setWafPolicy",
+    "contract": "platform-ops",
+    "purpose": "Change the firewall policy",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCellJobs"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "cellId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `cellId`.",
+   "preloaded": [
+    "CellHealth.isHealthy",
+    "CellHealth.isSchemaBehind",
+    "CellHealth.databaseStatus",
+    "CellHealth.replicationLagSeconds",
+    "CellHealth.lastBackupAt"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-032"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

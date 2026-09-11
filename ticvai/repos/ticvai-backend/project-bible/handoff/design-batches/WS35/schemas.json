@@ -1,0 +1,923 @@
+{
+ "ChannelBasedPricingRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Channel-Based Pricing Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "priceList": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price List"
+   },
+   "rate": {
+    "type": "number",
+    "description": "Rate"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "effectiveDates": {
+    "type": "string",
+    "description": "Effective Dates"
+   },
+   "priority": {
+    "type": "string",
+    "description": "Priority"
+   },
+   "relationshipWithSalesChannelManagement": {
+    "type": "string",
+    "description": "Relationship with Sales Channel Management"
+   },
+   "startDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Start Date"
+   }
+  }
+ },
+ "CustomerSegmentProfilePricingRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Customer Segment & Profile Pricing Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "customerType": {
+    "type": "string",
+    "description": "Customer Type"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer Segment"
+   },
+   "accountType": {
+    "type": "string",
+    "description": "Account Type"
+   },
+   "crmSegment": {
+    "type": "string",
+    "description": "CRM Segment"
+   },
+   "vipStatus": {
+    "type": "string",
+    "description": "VIP Status"
+   },
+   "corporateCustomer": {
+    "type": "string",
+    "description": "Corporate Customer"
+   },
+   "employeeStaff": {
+    "type": "string",
+    "description": "Employee/Staff"
+   },
+   "partnerCustomer": {
+    "type": "string",
+    "description": "Partner Customer"
+   },
+   "guestRegisteredUser": {
+    "type": "string",
+    "description": "Guest/Registered User"
+   },
+   "crm": {
+    "type": "string",
+    "description": "CRM"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "b2bPartner": {
+    "type": "string",
+    "description": "B2B Partner"
+   },
+   "corporateAccount": {
+    "type": "string",
+    "description": "Corporate Account"
+   },
+   "customerProfile": {
+    "type": "string",
+    "description": "Customer Profile"
+   },
+   "ruleName": {
+    "type": "string",
+    "description": "Rule Name"
+   },
+   "segment": {
+    "type": "string",
+    "description": "Segment"
+   },
+   "applicableProducts": {
+    "type": "string",
+    "description": "Applicable Products"
+   },
+   "priceList": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price List"
+   },
+   "rate": {
+    "type": "number",
+    "description": "Rate"
+   },
+   "priority": {
+    "type": "string",
+    "description": "Priority"
+   },
+   "effectiveDates": {
+    "type": "string",
+    "description": "Effective Dates"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status"
+   }
+  }
+ },
+ "EffectiveDateSeasonDayBasedPricingRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Effective Date, Season & Day-Based Pricing Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "effectiveFrom": {
+    "type": "string",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "description": "Effective To"
+   },
+   "salesStart": {
+    "type": "string",
+    "description": "Sales Start"
+   },
+   "salesEnd": {
+    "type": "string",
+    "description": "Sales End"
+   },
+   "visitDateRange": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Visit Date Range"
+   },
+   "season": {
+    "type": "string",
+    "description": "Season"
+   },
+   "holidayPeriod": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Holiday Period"
+   },
+   "eventPeriod": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Event Period"
+   },
+   "publicHolidays": {
+    "type": "string",
+    "description": "Public Holidays"
+   },
+   "schoolHolidays": {
+    "type": "string",
+    "description": "School Holidays"
+   },
+   "specialDates": {
+    "type": "string",
+    "description": "Special Dates"
+   },
+   "blackoutDates": {
+    "type": "string",
+    "description": "Blackout Dates"
+   },
+   "peakDates": {
+    "type": "string",
+    "description": "Peak Dates"
+   }
+  }
+ },
+ "LocationVenueEventPricingRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Location, Venue & Event Pricing Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "country": {
+    "type": "string",
+    "description": "Country"
+   },
+   "city": {
+    "type": "string",
+    "description": "City"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "location": {
+    "type": "string",
+    "description": "Location"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "performance": {
+    "type": "string",
+    "description": "Performance"
+   },
+   "zone": {
+    "type": "string",
+    "description": "Zone"
+   },
+   "experience": {
+    "type": "string",
+    "description": "Experience"
+   },
+   "popUpVenue": {
+    "type": "string",
+    "description": "Pop-up Venue"
+   },
+   "exhibition": {
+    "type": "string",
+    "description": "Exhibition"
+   },
+   "seasonalSite": {
+    "type": "string",
+    "description": "Seasonal Site"
+   },
+   "temporaryEventLocation": {
+    "type": "string",
+    "description": "Temporary Event Location"
+   },
+   "globalRateAed250": {
+    "type": "number",
+    "description": "Global Rate → AED 250"
+   },
+   "dubaiVenueAed275": {
+    "type": "string",
+    "description": "Dubai Venue → AED 275"
+   },
+   "specialEventAed320": {
+    "type": "string",
+    "description": "Special Event → AED 320"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "rate": {
+    "type": "number",
+    "description": "Rate"
+   },
+   "effectiveDates": {
+    "type": "string",
+    "description": "Effective Dates"
+   },
+   "priority": {
+    "type": "string",
+    "description": "Priority"
+   }
+  }
+ },
+ "MembershipLoyaltyPricingRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Membership & Loyalty Pricing Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "membershipProduct": {
+    "type": "string",
+    "description": "Membership Product"
+   },
+   "membershipStatus": {
+    "type": "string",
+    "description": "Membership Status"
+   },
+   "membershipTier": {
+    "type": "string",
+    "description": "Membership Tier"
+   },
+   "annualPassType": {
+    "type": "string",
+    "description": "Annual Pass Type"
+   },
+   "membershipLevel": {
+    "type": "string",
+    "description": "Membership Level"
+   },
+   "activeSuspendedStatus": {
+    "type": "integer",
+    "description": "Active/Suspended Status"
+   },
+   "loyaltyTier": {
+    "type": "string",
+    "description": "Loyalty Tier"
+   },
+   "loyaltyProgram": {
+    "type": "string",
+    "description": "Loyalty Program"
+   },
+   "pointsBand": {
+    "type": "string",
+    "description": "Points Band"
+   },
+   "customerStatus": {
+    "type": "string",
+    "description": "Customer Status"
+   },
+   "memberOnly": {
+    "type": "string",
+    "description": "Member Only"
+   },
+   "member1Guest": {
+    "type": "string",
+    "description": "Member + 1 Guest"
+   },
+   "memberFamily": {
+    "type": "string",
+    "description": "Member + Family"
+   },
+   "selectedQuantity": {
+    "type": "integer",
+    "description": "Selected Quantity"
+   }
+  }
+ },
+ "PricingRuleCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Pricing Rule Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "activePricingRules": {
+    "type": "integer",
+    "description": "Active Pricing Rules"
+   },
+   "draftRules": {
+    "type": "integer",
+    "description": "Draft Rules"
+   },
+   "customerSegmentRules": {
+    "type": "integer",
+    "description": "Customer Segment Rules"
+   },
+   "membershipRules": {
+    "type": "integer",
+    "description": "Membership Rules"
+   },
+   "residencyRules": {
+    "type": "integer",
+    "description": "Residency Rules"
+   },
+   "channelRules": {
+    "type": "integer",
+    "description": "Channel Rules"
+   },
+   "locationRules": {
+    "type": "integer",
+    "description": "Location Rules"
+   },
+   "quantityRules": {
+    "type": "integer",
+    "description": "Quantity Rules"
+   },
+   "seasonalRules": {
+    "type": "integer",
+    "description": "Seasonal Rules"
+   },
+   "timeslotRules": {
+    "type": "integer",
+    "description": "Timeslot Rules"
+   },
+   "ruleConflicts": {
+    "type": "integer",
+    "description": "Rule Conflicts"
+   },
+   "rulesExpiringSoon": {
+    "type": "string",
+    "description": "Rules Expiring Soon"
+   },
+   "ruleId": {
+    "type": "string",
+    "description": "Rule ID"
+   },
+   "ruleName": {
+    "type": "string",
+    "description": "Rule Name"
+   },
+   "ruleType": {
+    "type": "string",
+    "description": "Rule Type"
+   },
+   "priceList": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price List"
+   },
+   "productScope": {
+    "type": "string",
+    "description": "Product Scope"
+   },
+   "customerScope": {
+    "type": "string",
+    "description": "Customer Scope"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "venueLocation": {
+    "type": "string",
+    "description": "Venue/Location"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "description": "Effective To"
+   },
+   "priority": {
+    "type": "string",
+    "description": "Priority"
+   },
+   "status": {
+    "type": "integer",
+    "description": "Status"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer Segment"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "loyalty": {
+    "type": "string",
+    "description": "Loyalty"
+   },
+   "residency": {
+    "type": "string",
+    "description": "Residency"
+   },
+   "nationality": {
+    "type": "string",
+    "description": "Nationality"
+   },
+   "location": {
+    "type": "string",
+    "description": "Location"
+   },
+   "quantity": {
+    "type": "integer",
+    "description": "Quantity"
+   },
+   "group": {
+    "type": "string",
+    "description": "Group"
+   },
+   "seasonal": {
+    "type": "string",
+    "description": "Seasonal"
+   },
+   "dayOfWeek": {
+    "type": "string",
+    "description": "Day-of-Week"
+   },
+   "timeslot": {
+    "type": "string",
+    "description": "Timeslot"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "corporateB2b": {
+    "type": "string",
+    "description": "Corporate/B2B"
+   },
+   "custom": {
+    "type": "string",
+    "description": "Custom"
+   },
+   "testRule": {
+    "type": "string",
+    "description": "Test Rule"
+   }
+  }
+ },
+ "PricingRulePriorityConflictResolutionTestingView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Pricing Rule Priority, Conflict Resolution & Testing displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "priority": {
+    "type": "string",
+    "description": "Priority"
+   },
+   "specificity": {
+    "type": "string",
+    "description": "Specificity"
+   },
+   "stopProcessing": {
+    "type": "string",
+    "description": "Stop Processing"
+   },
+   "continueProcessing": {
+    "type": "string",
+    "description": "Continue Processing"
+   },
+   "fallbackBehavior": {
+    "type": "string",
+    "description": "Fallback Behavior"
+   },
+   "samePriorityMatches": {
+    "type": "string",
+    "description": "Same-priority matches"
+   },
+   "contradictoryRates": {
+    "type": "string",
+    "description": "Contradictory rates"
+   },
+   "circularFallback": {
+    "type": "string",
+    "description": "Circular fallback"
+   },
+   "unreachableRule": {
+    "type": "string",
+    "description": "Unreachable rule"
+   },
+   "missingFallback": {
+    "type": "string",
+    "description": "Missing fallback"
+   },
+   "overlappingTimeDateConditions": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Overlapping time/date conditions"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "residency": {
+    "type": "string",
+    "description": "Residency"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "quantity": {
+    "type": "integer",
+    "description": "Quantity"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "timeslot": {
+    "type": "string",
+    "description": "Timeslot"
+   },
+   "customerGoldMember": {
+    "type": "string",
+    "description": "Customer: Gold Member"
+   },
+   "residencyUae": {
+    "type": "string",
+    "description": "Residency: UAE"
+   },
+   "productAdultAdmission": {
+    "type": "string",
+    "description": "Product: Adult Admission"
+   },
+   "channelB2c": {
+    "type": "string",
+    "description": "Channel: B2C"
+   },
+   "venueDubai": {
+    "type": "string",
+    "description": "Venue: Dubai"
+   },
+   "dateSaturday": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date: Saturday"
+   },
+   "time1800": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time: 18:00"
+   },
+   "standardAdultAed250": {
+    "type": "string",
+    "description": "Standard Adult — AED 250"
+   },
+   "uaeResidentAed220": {
+    "type": "string",
+    "description": "UAE Resident — AED 220"
+   },
+   "saturdayPeakAed280": {
+    "type": "string",
+    "description": "Saturday Peak — AED 280"
+   },
+   "goldMemberAed190": {
+    "type": "string",
+    "description": "Gold Member — AED 190"
+   },
+   "backendScreen": {
+    "type": "string",
+    "description": "# Backend Screen"
+   },
+   "channelBasedPricingRulesChannelPricing": {
+    "type": "string",
+    "description": "Channel-Based Pricing Rules Channel pricing"
+   },
+   "whatTaxApplies": {
+    "type": "string",
+    "description": "“What tax applies?”"
+   },
+   "whatServiceFeeApplies": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "“What service fee applies?”"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "amount?"
+   }
+  }
+ },
+ "QuantityGroupVolumePricingRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Quantity, Group & Volume Pricing Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "minimumQuantity": {
+    "type": "integer",
+    "description": "Minimum Quantity"
+   },
+   "quantityBands": {
+    "type": "integer",
+    "description": "Quantity Bands"
+   },
+   "groupSize": {
+    "type": "string",
+    "description": "Group Size"
+   },
+   "volumeThreshold": {
+    "type": "integer",
+    "description": "Volume Threshold"
+   },
+   "buyXRate": {
+    "type": "number",
+    "description": "Buy-X Rate"
+   },
+   "perPersonGroupRate": {
+    "type": "number",
+    "description": "Per-Person Group Rate"
+   },
+   "groupMinimum": {
+    "type": "string",
+    "description": "Group Minimum"
+   },
+   "maximumGroupSize": {
+    "type": "string",
+    "description": "Maximum Group Size"
+   },
+   "groupType": {
+    "type": "string",
+    "description": "Group Type"
+   },
+   "school": {
+    "type": "string",
+    "description": "School"
+   },
+   "corporate": {
+    "type": "string",
+    "description": "Corporate"
+   },
+   "tour": {
+    "type": "string",
+    "description": "Tour"
+   },
+   "family": {
+    "type": "string",
+    "description": "Family"
+   },
+   "b2b": {
+    "type": "string",
+    "description": "B2B"
+   },
+   "custom": {
+    "type": "string",
+    "description": "Custom"
+   }
+  }
+ },
+ "ResidencyNationalityMarketPricingRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Residency, Nationality & Market Pricing Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "residency": {
+    "type": "string",
+    "description": "Residency"
+   },
+   "nationality": {
+    "type": "string",
+    "description": "Nationality"
+   },
+   "country": {
+    "type": "string",
+    "description": "Country"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "region": {
+    "type": "string",
+    "description": "Region"
+   },
+   "customerAddress": {
+    "type": "string",
+    "description": "Customer Address"
+   },
+   "verifiedId": {
+    "type": "string",
+    "description": "Verified ID"
+   },
+   "governmentIdIntegrationWhereApplicable": {
+    "type": "string",
+    "description": "Government ID Integration where applicable"
+   },
+   "customerDeclaration": {
+    "type": "string",
+    "description": "Customer Declaration"
+   },
+   "accountProfile": {
+    "type": "string",
+    "description": "Account Profile"
+   },
+   "idUpload": {
+    "type": "string",
+    "description": "ID Upload"
+   },
+   "governmentIdentityVerification": {
+    "type": "string",
+    "description": "Government/Identity Verification"
+   },
+   "staffVerification": {
+    "type": "string",
+    "description": "Staff Verification"
+   }
+  }
+ },
+ "TimeslotPerformanceTimeOfDayPricingRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Timeslot, Performance & Time-of-Day Pricing Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "timeslot": {
+    "type": "string",
+    "description": "Timeslot"
+   },
+   "performance": {
+    "type": "string",
+    "description": "Performance"
+   },
+   "startTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Start Time"
+   },
+   "arrivalWindow": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Arrival Window"
+   },
+   "session": {
+    "type": "string",
+    "description": "Session"
+   },
+   "timeOfDayBand": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time-of-Day Band"
+   },
+   "peak": {
+    "type": "string",
+    "description": "Peak"
+   },
+   "standard": {
+    "type": "string",
+    "description": "Standard"
+   },
+   "offPeak": {
+    "type": "string",
+    "description": "Off-Peak"
+   },
+   "lateEntry": {
+    "type": "string",
+    "description": "Late Entry"
+   },
+   "earlyEntry": {
+    "type": "string",
+    "description": "Early Entry"
+   },
+   "matineeAed350": {
+    "type": "string",
+    "description": "Matinee → AED 350"
+   },
+   "eveningAed450": {
+    "type": "string",
+    "description": "Evening → AED 450"
+   },
+   "finalPerformanceAed550": {
+    "type": "string",
+    "description": "Final Performance → AED 550"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "priceList": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price List"
+   },
+   "rate": {
+    "type": "number",
+    "description": "Rate"
+   },
+   "timeRange": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time Range"
+   },
+   "effectiveDates": {
+    "type": "string",
+    "description": "Effective Dates"
+   },
+   "priority": {
+    "type": "string",
+    "description": "Priority"
+   },
+   "overlappingTimeRanges": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Overlapping time ranges"
+   },
+   "missingTimeslotRate": {
+    "type": "number",
+    "description": "Missing timeslot rate"
+   },
+   "conflictingPerformanceRule": {
+    "type": "string",
+    "description": "Conflicting performance rule"
+   }
+  }
+ }
+}

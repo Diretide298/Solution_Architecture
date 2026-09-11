@@ -1,0 +1,929 @@
+{
+ "AccessRiskScoringDecisionEngineView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Access Risk Scoring & Decision Engine displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "newDevice10": {
+    "type": "integer",
+    "description": "New Device +10"
+   },
+   "multipleSessions20": {
+    "type": "string",
+    "description": "Multiple Sessions +20"
+   },
+   "impossibleTravel25": {
+    "type": "string",
+    "description": "Impossible Travel +25"
+   },
+   "previousFailedAttempts12": {
+    "type": "integer",
+    "description": "Previous Failed Attempts +12"
+   },
+   "faceMismatch15": {
+    "type": "string",
+    "description": "Face Mismatch +15"
+   },
+   "criticalLockSecurityReview": {
+    "type": "string",
+    "description": "Critical Lock + Security Review"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "ticketValue": {
+    "type": "string",
+    "description": "Ticket Value"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "accessZone": {
+    "type": "string",
+    "description": "Access Zone"
+   },
+   "time": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time"
+   },
+   "credentialType": {
+    "type": "string",
+    "description": "Credential type"
+   },
+   "historicalBehavior": {
+    "type": "string",
+    "description": "historical behavior"
+   }
+  }
+ },
+ "AccessSecurityFraudCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Access Security & Fraud Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "activeSecurityAlerts": {
+    "type": "integer",
+    "description": "Active Security Alerts"
+   },
+   "highRiskCredentials": {
+    "type": "integer",
+    "description": "High-Risk Credentials"
+   },
+   "credentialsLockedToday": {
+    "type": "string",
+    "description": "Credentials Locked Today"
+   },
+   "suspiciousQrActivity": {
+    "type": "string",
+    "description": "Suspicious QR Activity"
+   },
+   "deviceSharingAlerts": {
+    "type": "integer",
+    "description": "Device-Sharing Alerts"
+   },
+   "biometricAlerts": {
+    "type": "integer",
+    "description": "Biometric Alerts"
+   },
+   "blacklistedCredentials": {
+    "type": "integer",
+    "description": "Blacklisted Credentials"
+   },
+   "activeInvestigations": {
+    "type": "integer",
+    "description": "Active Investigations"
+   },
+   "fraudPrevented": {
+    "type": "string",
+    "description": "Fraud Prevented"
+   },
+   "lowRisk": {
+    "type": "string",
+    "description": "🟢 Low Risk"
+   },
+   "mediumRisk": {
+    "type": "string",
+    "description": "🟡 Medium Risk"
+   },
+   "highRisk": {
+    "type": "string",
+    "description": "🟠 High Risk"
+   },
+   "critical": {
+    "type": "string",
+    "description": "🔴 Critical"
+   },
+   "unusuallyHighReEntryAttemptsDetected": {
+    "type": "integer",
+    "description": "Unusually high re-entry attempts detected"
+   }
+  }
+ },
+ "BiometricIdentityIntegrityMonitoringView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Biometric & Identity Integrity Monitoring displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "faceChanged": {
+    "type": "string",
+    "description": "Face changed"
+   },
+   "reEnrollment": {
+    "type": "string",
+    "description": "Re-enrollment"
+   },
+   "repeatedFaceMismatch": {
+    "type": "string",
+    "description": "repeated face mismatch"
+   },
+   "suspiciousEnrollmentFrequency": {
+    "type": "string",
+    "description": "suspicious enrollment frequency"
+   },
+   "unusualVerificationFailures": {
+    "type": "integer",
+    "description": "unusual verification failures"
+   },
+   "successfulVisits": {
+    "type": "integer",
+    "description": "Successful Visits (the pack shows 28)"
+   },
+   "currentVerification": {
+    "type": "string",
+    "description": "Current verification"
+   },
+   "oldBiometricReference": {
+    "type": "string",
+    "description": "Old biometric reference"
+   },
+   "newBiometricReference": {
+    "type": "integer",
+    "description": "New biometric reference"
+   },
+   "changeDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "change date"
+   },
+   "location": {
+    "type": "string",
+    "description": "location"
+   },
+   "operator": {
+    "type": "string",
+    "description": "operator"
+   },
+   "verificationProcess": {
+    "type": "string",
+    "description": "verification process"
+   },
+   "reason": {
+    "type": "string",
+    "description": "reason"
+   },
+   "approval": {
+    "type": "string",
+    "description": "approval"
+   }
+  }
+ },
+ "CredentialSharingConcurrentUsageDetectionView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Credential Sharing & Concurrent Usage Detection displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "iphoneDeviceA": {
+    "type": "string",
+    "description": "iPhone — Device A"
+   },
+   "additionalDevices": {
+    "type": "integer",
+    "description": "Additional Devices (the pack shows 3)"
+   },
+   "maximumActiveDevices": {
+    "type": "integer",
+    "description": "Maximum Active Devices (the pack shows 1)"
+   },
+   "increaseRisk": {
+    "type": "string",
+    "description": "Increase Risk"
+   },
+   "requireId": {
+    "type": "string",
+    "description": "Require ID"
+   },
+   "requireBiometric": {
+    "type": "boolean",
+    "description": "Require Biometric"
+   },
+   "requireOperator": {
+    "type": "boolean",
+    "description": "Require Operator"
+   },
+   "securityAlert": {
+    "type": "string",
+    "description": "Security alert"
+   }
+  }
+ },
+ "FraudDetectionRuleSignalLibraryView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Fraud Detection Rule & Signal Library displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "excessiveQrActivations": {
+    "type": "string",
+    "description": "Excessive QR activations"
+   },
+   "multipleActiveSessions": {
+    "type": "string",
+    "description": "Multiple active sessions"
+   },
+   "credentialCopied": {
+    "type": "string",
+    "description": "Credential copied"
+   },
+   "excessiveRefreshAttempts": {
+    "type": "integer",
+    "description": "Excessive refresh attempts"
+   },
+   "invalidSignature": {
+    "type": "string",
+    "description": "Invalid signature"
+   },
+   "expiredCredential": {
+    "type": "integer",
+    "description": "Expired credential"
+   },
+   "revokedCredential": {
+    "type": "string",
+    "description": "Revoked credential"
+   },
+   "screenshotReplayAttempt": {
+    "type": "string",
+    "description": "Screenshot/replay attempt"
+   },
+   "abnormalTransferFrequency": {
+    "type": "string",
+    "description": "Abnormal transfer frequency"
+   },
+   "repeatedFailedValidation": {
+    "type": "string",
+    "description": "Repeated failed validation"
+   },
+   "newDevice": {
+    "type": "integer",
+    "description": "New device"
+   },
+   "multipleDevices": {
+    "type": "string",
+    "description": "Multiple devices"
+   },
+   "deviceBindingMismatch": {
+    "type": "string",
+    "description": "Device-binding mismatch"
+   },
+   "rootedCompromisedDeviceWhereDetectable": {
+    "type": "string",
+    "description": "Rooted/compromised device where detectable"
+   },
+   "abnormalDeviceChanges": {
+    "type": "string",
+    "description": "abnormal device changes"
+   },
+   "impossibleDeviceMovement": {
+    "type": "string",
+    "description": "impossible device movement"
+   },
+   "suspiciousScannerDeviceActivity": {
+    "type": "string",
+    "description": "suspicious scanner/device activity"
+   },
+   "simultaneousUse": {
+    "type": "string",
+    "description": "simultaneous use"
+   },
+   "antiPassbackViolations": {
+    "type": "string",
+    "description": "anti-passback violations"
+   },
+   "unusualReEntry": {
+    "type": "string",
+    "description": "unusual re-entry"
+   },
+   "unusualCrossover": {
+    "type": "string",
+    "description": "unusual crossover"
+   },
+   "excessiveAttractionUse": {
+    "type": "string",
+    "description": "excessive attraction use"
+   },
+   "repeatedWrongGateAttempts": {
+    "type": "integer",
+    "description": "repeated wrong-gate attempts"
+   },
+   "abnormalFastPassConsumption": {
+    "type": "string",
+    "description": "abnormal Fast Pass consumption"
+   },
+   "faceMismatch": {
+    "type": "string",
+    "description": "Face mismatch"
+   },
+   "unusualFaceChange": {
+    "type": "string",
+    "description": "unusual face change"
+   },
+   "multipleIdentitiesLinked": {
+    "type": "string",
+    "description": "multiple identities linked"
+   },
+   "suspiciousCompanionChanges": {
+    "type": "string",
+    "description": "suspicious companion changes"
+   },
+   "podNannyRelationshipAnomalies": {
+    "type": "string",
+    "description": "POD/nanny relationship anomalies"
+   },
+   "gateA1002": {
+    "type": "string",
+    "description": "Gate A — 10:02"
+   },
+   "gateB1003": {
+    "type": "string",
+    "description": "Gate B — 10:03"
+   },
+   "severity": {
+    "type": "string",
+    "description": "Severity"
+   },
+   "weight": {
+    "type": "string",
+    "description": "Weight"
+   },
+   "threshold": {
+    "type": "integer",
+    "description": "Threshold"
+   },
+   "scope": {
+    "type": "string",
+    "description": "Scope"
+   },
+   "applicableCredentialTypes": {
+    "type": "string",
+    "description": "Applicable credential types"
+   },
+   "applicableVenues": {
+    "type": "string",
+    "description": "Applicable venues"
+   },
+   "timeWindow": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time window"
+   },
+   "offlineAvailability": {
+    "type": "integer",
+    "description": "Offline availability"
+   },
+   "response": {
+    "type": "string",
+    "description": "Response"
+   }
+  }
+ },
+ "RealTimeSecurityResponsePlaybookBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Real-Time Security Response & Playbook Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "alertOnly": {
+    "type": "string",
+    "description": "Alert Only"
+   },
+   "increaseRiskScore": {
+    "type": "number",
+    "description": "Increase Risk Score"
+   },
+   "requireAdditionalVerification": {
+    "type": "boolean",
+    "description": "Require Additional Verification"
+   },
+   "requireSupervisor": {
+    "type": "boolean",
+    "description": "Require Supervisor"
+   },
+   "temporarilyLock": {
+    "type": "string",
+    "description": "Temporarily Lock"
+   },
+   "fullIdentityLock": {
+    "type": "string",
+    "description": "Full Identity Lock"
+   },
+   "blacklist": {
+    "type": "string",
+    "description": "Blacklist"
+   },
+   "after": {
+    "type": "string",
+    "description": "after"
+   }
+  }
+ },
+ "RealTimeSecurityResponsePlaybookBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Real-Time Security Response & Playbook Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "alertOnly": {
+    "type": "string",
+    "description": "Alert Only"
+   },
+   "increaseRiskScore": {
+    "type": "number",
+    "description": "Increase Risk Score"
+   },
+   "requireAdditionalVerification": {
+    "type": "boolean",
+    "description": "Require Additional Verification"
+   },
+   "requireSupervisor": {
+    "type": "boolean",
+    "description": "Require Supervisor"
+   },
+   "temporarilyLock": {
+    "type": "string",
+    "description": "Temporarily Lock"
+   },
+   "fullIdentityLock": {
+    "type": "string",
+    "description": "Full Identity Lock"
+   },
+   "blacklist": {
+    "type": "string",
+    "description": "Blacklist"
+   },
+   "after": {
+    "type": "string",
+    "description": "after"
+   }
+  }
+ },
+ "RelationshipCompanionFraudMonitoringView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Relationship & Companion Fraud Monitoring displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "differentCompanionBAttemptedEntry": {
+    "type": "string",
+    "description": "Different Companion B attempted entry"
+   },
+   "companionChangedDuringVisit": {
+    "type": "string",
+    "description": "Companion changed during visit"
+   },
+   "childEntersExitsWithUnauthorizedAdult": {
+    "type": "string",
+    "description": "Child enters/exits with unauthorized adult"
+   },
+   "excessiveRelationshipChanges": {
+    "type": "string",
+    "description": "excessive relationship changes"
+   },
+   "relationshipChangeAttempt": {
+    "type": "string",
+    "description": "Relationship Change Attempt"
+   },
+   "yellowIntervention": {
+    "type": "string",
+    "description": "Yellow intervention"
+   },
+   "supervisorVerification": {
+    "type": "string",
+    "description": "Supervisor verification"
+   },
+   "idVerification": {
+    "type": "string",
+    "description": "ID verification"
+   },
+   "biometricVerification": {
+    "type": "string",
+    "description": "Biometric verification"
+   },
+   "securityEscalation": {
+    "type": "string",
+    "description": "Security escalation"
+   },
+   "accessDenial": {
+    "type": "string",
+    "description": "Access denial"
+   }
+  }
+ },
+ "SecurityAnalyticsAiDetectionGovernanceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Security Analytics, AI Detection & Governance displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "fraudAttempts": {
+    "type": "integer",
+    "description": "Fraud Attempts"
+   },
+   "preventedFraud": {
+    "type": "string",
+    "description": "Prevented Fraud"
+   },
+   "credentialSharing": {
+    "type": "string",
+    "description": "Credential Sharing"
+   },
+   "biometricAlerts": {
+    "type": "integer",
+    "description": "Biometric Alerts"
+   },
+   "deviceBindingViolations": {
+    "type": "integer",
+    "description": "Device-Binding Violations"
+   },
+   "companionViolations": {
+    "type": "integer",
+    "description": "Companion Violations"
+   },
+   "blacklistHits": {
+    "type": "integer",
+    "description": "Blacklist Hits"
+   },
+   "identityLocks": {
+    "type": "integer",
+    "description": "Identity Locks"
+   },
+   "securityOverrides": {
+    "type": "integer",
+    "description": "Security Overrides"
+   },
+   "web8": {
+    "type": "number",
+    "description": "Web: 8%"
+   },
+   "pos3": {
+    "type": "number",
+    "description": "POS: 3%"
+   },
+   "b2b12": {
+    "type": "number",
+    "description": "B2B: 12%"
+   },
+   "resellerX41": {
+    "type": "number",
+    "description": "Reseller X: 41%"
+   },
+   "resellerY7": {
+    "type": "number",
+    "description": "Reseller Y: 7%"
+   },
+   "detectionRate": {
+    "type": "number",
+    "description": "Detection Rate"
+   },
+   "falsePositiveIndicator": {
+    "type": "string",
+    "description": "False Positive Indicator"
+   },
+   "operatorOverrideRate": {
+    "type": "number",
+    "description": "Operator Override Rate"
+   },
+   "averageInvestigationTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Average Investigation Time"
+   },
+   "averageResponseTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Average Response Time"
+   },
+   "recurringFraudRate": {
+    "type": "number",
+    "description": "Recurring Fraud Rate"
+   },
+   "financialExposure": {
+    "type": "string",
+    "description": "Financial Exposure"
+   },
+   "estimatedFraudPrevented": {
+    "type": "string",
+    "description": "Estimated Fraud Prevented"
+   },
+   "fraudRules": {
+    "type": "string",
+    "description": "fraud rules"
+   },
+   "thresholds": {
+    "type": "string",
+    "description": "thresholds"
+   },
+   "riskModels": {
+    "type": "string",
+    "description": "risk models"
+   },
+   "responsePlaybooks": {
+    "type": "string",
+    "description": "response playbooks"
+   },
+   "blacklistPolicies": {
+    "type": "string",
+    "description": "blacklist policies"
+   },
+   "aiRecommendations": {
+    "type": "string",
+    "description": "AI recommendations"
+   },
+   "patternImproveControls": {
+    "type": "string",
+    "description": "Pattern → Improve Controls"
+   },
+   "board3CredentialSecurity": {
+    "type": "string",
+    "description": "Board 3 — Credential Security"
+   },
+   "board5BiometricAccess": {
+    "type": "string",
+    "description": "Board 5 — Biometric Access"
+   },
+   "board9LiveOperations": {
+    "type": "string",
+    "description": "Board 9 — Live Operations"
+   },
+   "board10DynamicPolicy": {
+    "type": "string",
+    "description": "Board 10 — Dynamic Policy"
+   },
+   "contextualConditions": {
+    "type": "string",
+    "description": "contextual conditions"
+   },
+   "abusiveCompromisedOrFraudulent": {
+    "type": "string",
+    "description": "abusive, compromised or fraudulent"
+   }
+  }
+ },
+ "SecurityInvestigationEvidenceWorkspaceInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Security Investigation & Evidence Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "critical91": {
+    "type": "string",
+    "description": "CRITICAL — 91"
+   },
+   "operatorIntervention": {
+    "type": "string",
+    "description": "Operator Intervention"
+   },
+   "credentialHistory": {
+    "type": "string",
+    "description": "Credential history"
+   },
+   "scanRecords": {
+    "type": "string",
+    "description": "Scan records"
+   },
+   "gate": {
+    "type": "string",
+    "description": "Gate"
+   },
+   "deviceIds": {
+    "type": "string",
+    "description": "device IDs"
+   },
+   "qrActivations": {
+    "type": "string",
+    "description": "QR activations"
+   },
+   "mediaChanges": {
+    "type": "string",
+    "description": "media changes"
+   },
+   "biometricEvents": {
+    "type": "string",
+    "description": "biometric events"
+   },
+   "companionRelationships": {
+    "type": "string",
+    "description": "companion relationships"
+   },
+   "posTicketTransactionReference": {
+    "type": "string",
+    "description": "POS/ticket transaction reference"
+   },
+   "overrides": {
+    "type": "string",
+    "description": "overrides"
+   },
+   "blacklistEvents": {
+    "type": "string",
+    "description": "blacklist events"
+   },
+   "securityPolicies": {
+    "type": "string",
+    "description": "security policies"
+   },
+   "blacklist": {
+    "type": "string",
+    "description": "Blacklist"
+   },
+   "clearRisk": {
+    "type": "string",
+    "description": "Clear Risk"
+   }
+  }
+ },
+ "SecurityInvestigationEvidenceWorkspaceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Security Investigation & Evidence Workspace displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "critical91": {
+    "type": "string",
+    "description": "CRITICAL — 91"
+   },
+   "operatorIntervention": {
+    "type": "string",
+    "description": "Operator Intervention"
+   },
+   "credentialHistory": {
+    "type": "string",
+    "description": "Credential history"
+   },
+   "scanRecords": {
+    "type": "string",
+    "description": "Scan records"
+   },
+   "gate": {
+    "type": "string",
+    "description": "Gate"
+   },
+   "deviceIds": {
+    "type": "string",
+    "description": "device IDs"
+   },
+   "qrActivations": {
+    "type": "string",
+    "description": "QR activations"
+   },
+   "mediaChanges": {
+    "type": "string",
+    "description": "media changes"
+   },
+   "biometricEvents": {
+    "type": "string",
+    "description": "biometric events"
+   },
+   "companionRelationships": {
+    "type": "string",
+    "description": "companion relationships"
+   },
+   "posTicketTransactionReference": {
+    "type": "string",
+    "description": "POS/ticket transaction reference"
+   },
+   "overrides": {
+    "type": "string",
+    "description": "overrides"
+   },
+   "blacklistEvents": {
+    "type": "string",
+    "description": "blacklist events"
+   },
+   "securityPolicies": {
+    "type": "string",
+    "description": "security policies"
+   },
+   "blacklist": {
+    "type": "string",
+    "description": "Blacklist"
+   },
+   "clearRisk": {
+    "type": "string",
+    "description": "Clear Risk"
+   }
+  }
+ },
+ "UnifiedIdentityCredentialLockManagerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Unified Identity & Credential Lock Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "guestJohnSmith": {
+    "type": "string",
+    "description": "Guest: John Smith"
+   },
+   "ticketVc18274": {
+    "type": "string",
+    "description": "Ticket VC-18274"
+   },
+   "rfidWristbandRf8291": {
+    "type": "string",
+    "description": "RFID Wristband RF-8291"
+   },
+   "dynamicQr": {
+    "type": "string",
+    "description": "Dynamic QR"
+   },
+   "walletCredential": {
+    "type": "string",
+    "description": "Wallet Credential"
+   },
+   "facePass": {
+    "type": "string",
+    "description": "Face Pass"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "fastPass": {
+    "type": "string",
+    "description": "Fast Pass"
+   },
+   "selectType": {
+    "type": "string",
+    "enum": [
+     "credentialOnly",
+     "mediaOnly",
+     "entitlement",
+     "venue",
+     "allVenueAccess",
+     "fullIdentity"
+    ],
+    "description": "Vocabulary listed under Select."
+   },
+   "untilManuallyReleased": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Until manually released"
+   },
+   "endOfDay": {
+    "type": "string",
+    "description": "End of day"
+   },
+   "nHours": {
+    "type": "string",
+    "description": "N hours"
+   },
+   "untilInvestigationComplete": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Until investigation complete"
+   },
+   "permanent": {
+    "type": "string",
+    "description": "Permanent"
+   },
+   "centralPlatform": {
+    "type": "string",
+    "description": "Central Platform ✓"
+   },
+   "venueEdge": {
+    "type": "string",
+    "description": "Venue Edge ✓"
+   },
+   "onlineGates": {
+    "type": "integer",
+    "description": "Online Gates ✓"
+   },
+   "offlineRevocationPackage": {
+    "type": "integer",
+    "description": "Offline Revocation Package ✓"
+   },
+   "mobileDevices": {
+    "type": "string",
+    "description": "Mobile Devices ✓"
+   }
+  }
+ }
+}

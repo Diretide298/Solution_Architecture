@@ -1,0 +1,736 @@
+{
+ "AccessRuleCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Access Rule Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "activeAccessRules": {
+    "type": "integer",
+    "description": "Active Access Rules"
+   },
+   "draftRules": {
+    "type": "integer",
+    "description": "Draft Rules"
+   },
+   "scheduledRules": {
+    "type": "integer",
+    "description": "Scheduled Rules"
+   },
+   "rulesPendingApproval": {
+    "type": "string",
+    "description": "Rules Pending Approval"
+   },
+   "venuesCovered": {
+    "type": "string",
+    "description": "Venues Covered"
+   },
+   "productsTicketsCovered": {
+    "type": "string",
+    "description": "Products/Tickets Covered"
+   },
+   "rulesWithConflicts": {
+    "type": "integer",
+    "description": "Rules with Conflicts"
+   },
+   "rulesUsingBiometrics": {
+    "type": "integer",
+    "description": "Rules Using Biometrics"
+   },
+   "rulesAllowingOverride": {
+    "type": "string",
+    "description": "Rules Allowing Override"
+   },
+   "offlineCompatibleRules": {
+    "type": "integer",
+    "description": "Offline-Compatible Rules"
+   },
+   "recentlyModifiedRules": {
+    "type": "integer",
+    "description": "Recently Modified Rules"
+   },
+   "upcomingRuleChanges": {
+    "type": "integer",
+    "description": "Upcoming Rule Changes"
+   }
+  }
+ },
+ "AccessValidityTimeRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Access Validity & Time Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "fromTo": {
+    "type": "string",
+    "description": "From / To"
+   },
+   "nDaysAfterSale": {
+    "type": "string",
+    "description": "N days after sale"
+   },
+   "nDaysAfterActivation": {
+    "type": "string",
+    "description": "N days after activation"
+   },
+   "nDaysAfterFirstUse": {
+    "type": "string",
+    "description": "N days after first use"
+   },
+   "endOfDay": {
+    "type": "string",
+    "description": "End of Day"
+   },
+   "endOfWeek": {
+    "type": "string",
+    "description": "End of Week"
+   },
+   "endOfMonth": {
+    "type": "string",
+    "description": "End of Month"
+   },
+   "endOfYear": {
+    "type": "string",
+    "description": "End of Year"
+   },
+   "weekdays": {
+    "type": "string",
+    "description": "weekdays"
+   },
+   "weekends": {
+    "type": "string",
+    "description": "weekends"
+   },
+   "peakDates": {
+    "type": "string",
+    "description": "peak dates"
+   },
+   "offPeakDates": {
+    "type": "string",
+    "description": "off-peak dates"
+   },
+   "holidays": {
+    "type": "string",
+    "description": "holidays"
+   },
+   "seasons": {
+    "type": "string",
+    "description": "seasons"
+   },
+   "eventDates": {
+    "type": "string",
+    "description": "event dates"
+   },
+   "blackoutDates": {
+    "type": "string",
+    "description": "blackout dates"
+   },
+   "toItsAdmissionPerformanceTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "to its admission/performance time"
+   }
+  }
+ },
+ "AntiPassbackJourneySequenceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Anti-Passback & Journey Sequence displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "credential": {
+    "type": "string",
+    "description": "Credential"
+   },
+   "guest": {
+    "type": "string",
+    "description": "Guest"
+   },
+   "gate": {
+    "type": "string",
+    "description": "Gate"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "park": {
+    "type": "string",
+    "description": "Park"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "entryExitReEntry": {
+    "type": "string",
+    "description": "ENTRY → EXIT → RE-ENTRY"
+   },
+   "mainEntryAttractionEntry": {
+    "type": "string",
+    "description": "MAIN ENTRY → ATTRACTION ENTRY"
+   }
+  }
+ },
+ "EntitlementConsumptionEngineView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Entitlement Consumption Engine displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "parkAdmission": {
+    "type": "string",
+    "description": "Park Admission"
+   },
+   "attractionAdmission": {
+    "type": "string",
+    "description": "Attraction Admission"
+   },
+   "ride": {
+    "type": "string",
+    "description": "Ride"
+   },
+   "fastPass": {
+    "type": "string",
+    "description": "Fast Pass"
+   },
+   "meal": {
+    "type": "string",
+    "description": "Meal"
+   },
+   "voucher": {
+    "type": "string",
+    "description": "Voucher"
+   },
+   "photo": {
+    "type": "string",
+    "description": "Photo"
+   },
+   "locker": {
+    "type": "string",
+    "description": "Locker"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "experience": {
+    "type": "string",
+    "description": "Experience"
+   },
+   "reEntry": {
+    "type": "string",
+    "description": "Re-entry"
+   },
+   "membershipBenefit": {
+    "type": "string",
+    "description": "Membership benefit"
+   },
+   "customEntitlement": {
+    "type": "string",
+    "description": "custom entitlement"
+   },
+   "quantity": {
+    "type": "integer",
+    "description": "Quantity (the pack shows 3)"
+   },
+   "consumptionPerValidation": {
+    "type": "string",
+    "description": "Consumption per validation (the pack shows 1)"
+   },
+   "exampleSilverFastPass": {
+    "type": "string",
+    "description": "Example — Silver Fast Pass"
+   },
+   "ride1Remaining2": {
+    "type": "string",
+    "description": "Ride 1 → Remaining 2"
+   },
+   "ride2Remaining1": {
+    "type": "string",
+    "description": "Ride 2 → Remaining 1"
+   },
+   "ride3Remaining0": {
+    "type": "string",
+    "description": "Ride 3 → Remaining 0"
+   },
+   "oneAccessPerRide": {
+    "type": "string",
+    "description": "one access per ride"
+   }
+  }
+ },
+ "EntryExitReEntryRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Entry, Exit & Re-entry Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "unlimited": {
+    "type": "string",
+    "description": "Unlimited"
+   },
+   "once": {
+    "type": "string",
+    "description": "Once"
+   },
+   "nTimes": {
+    "type": "string",
+    "description": "N times"
+   },
+   "nPerDay": {
+    "type": "string",
+    "description": "N per day"
+   },
+   "nPerPeriod": {
+    "type": "string",
+    "format": "date-time",
+    "description": "N per period"
+   },
+   "exitScanRequired": {
+    "type": "boolean",
+    "description": "Exit scan required"
+   },
+   "exitScanOptional": {
+    "type": "string",
+    "description": "Exit scan optional"
+   },
+   "unlimitedExit": {
+    "type": "string",
+    "description": "Unlimited exit"
+   },
+   "nExits": {
+    "type": "string",
+    "description": "N exits"
+   },
+   "allowedNotAllowed": {
+    "type": "boolean",
+    "description": "Allowed / Not Allowed"
+   },
+   "maximumReEntries": {
+    "type": "string",
+    "description": "Maximum re-entries"
+   },
+   "sameDayOnly": {
+    "type": "string",
+    "description": "Same-day only"
+   },
+   "designatedGateRequired": {
+    "type": "boolean",
+    "description": "Designated gate required"
+   },
+   "exitRequiredFirst": {
+    "type": "string",
+    "description": "Exit required first"
+   },
+   "reEntryWindow": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Re-entry window"
+   },
+   "entry1": {
+    "type": "string",
+    "description": "Entry: 1"
+   },
+   "exitRequired": {
+    "type": "boolean",
+    "description": "Exit: Required"
+   },
+   "reEntry1": {
+    "type": "string",
+    "description": "Re-entry: 1"
+   },
+   "reEntryGateDesignatedGateOnly": {
+    "type": "string",
+    "description": "Re-entry Gate: Designated Gate Only"
+   }
+  }
+ },
+ "GroupAdmissionQuantityValidationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Group Admission & Quantity Validation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "authorizedQuantity50": {
+    "type": "integer",
+    "description": "Authorized Quantity: 50"
+   },
+   "authorizedGuests50": {
+    "type": "string",
+    "description": "Authorized Guests: 50"
+   },
+   "guestsEnteringNow42": {
+    "type": "string",
+    "description": "Guests Entering Now: 42"
+   },
+   "entered42": {
+    "type": "string",
+    "description": "Entered: 42"
+   },
+   "remaining8": {
+    "type": "string",
+    "description": "Remaining: 8"
+   },
+   "attendanceIncrement": {
+    "type": "integer",
+    "description": "Attendance increment (the pack shows +42)"
+   },
+   "entireGroup": {
+    "type": "string",
+    "description": "Entire Group"
+   },
+   "partialGroup": {
+    "type": "string",
+    "description": "Partial Group"
+   },
+   "multipleWaves": {
+    "type": "string",
+    "description": "Multiple Waves"
+   },
+   "leaderGuests": {
+    "type": "string",
+    "description": "Leader + Guests"
+   },
+   "singleQrMultiEntry": {
+    "type": "string",
+    "description": "Single QR Multi-Entry"
+   },
+   "individualChildTicketsUnderGroup": {
+    "type": "string",
+    "description": "Individual Child Tickets under Group"
+   },
+   "prevalidatedB2bManifest": {
+    "type": "string",
+    "description": "Prevalidated B2B Manifest"
+   },
+   "storedOnOneDevice": {
+    "type": "string",
+    "description": "stored on one device"
+   }
+  }
+ },
+ "GuestCompanionEligibilityRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Guest, Companion & Eligibility Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "adult": {
+    "type": "string",
+    "description": "Adult"
+   },
+   "child": {
+    "type": "string",
+    "description": "Child"
+   },
+   "junior": {
+    "type": "string",
+    "description": "Junior"
+   },
+   "senior": {
+    "type": "string",
+    "description": "Senior"
+   },
+   "pod": {
+    "type": "string",
+    "description": "POD"
+   },
+   "podCompanion": {
+    "type": "string",
+    "description": "POD Companion"
+   },
+   "nanny": {
+    "type": "string",
+    "description": "Nanny"
+   },
+   "vip": {
+    "type": "string",
+    "description": "VIP"
+   },
+   "member": {
+    "type": "string",
+    "description": "Member"
+   },
+   "staff": {
+    "type": "string",
+    "description": "Staff"
+   },
+   "accreditation": {
+    "type": "string",
+    "description": "Accreditation"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer Segment"
+   },
+   "beforeAdmission": {
+    "type": "string",
+    "description": "before admission"
+   },
+   "beforeExit": {
+    "type": "string",
+    "description": "before exit"
+   },
+   "journeys": {
+    "type": "string",
+    "description": "journeys"
+   },
+   "childA": {
+    "type": "string",
+    "description": "Child A"
+   },
+   "childB": {
+    "type": "string",
+    "description": "Child B"
+   }
+  }
+ },
+ "MultiParkCrossoverRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Multi-Park & Crossover Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "allowedParks": {
+    "type": "string",
+    "description": "allowed parks"
+   },
+   "parkOrder": {
+    "type": "string",
+    "description": "park order"
+   },
+   "sameDayCrossover": {
+    "type": "string",
+    "description": "same-day crossover"
+   },
+   "differentDayAccess": {
+    "type": "string",
+    "description": "different-day access"
+   },
+   "numberOfParkEntries": {
+    "type": "integer",
+    "description": "number of park entries"
+   },
+   "crossoverQuantity": {
+    "type": "integer",
+    "description": "crossover quantity"
+   },
+   "crossoverTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "crossover time"
+   },
+   "prerequisitePark": {
+    "type": "string",
+    "description": "prerequisite park"
+   },
+   "reEntryAfterCrossover": {
+    "type": "string",
+    "description": "re-entry after crossover"
+   }
+  }
+ },
+ "RuleSimulationConflictCheckPublicationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Rule Simulation, Conflict Check & Publication submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "adventureParkEnteredAt1400": {
+    "type": "string",
+    "description": "Adventure Park entered at 14:00"
+   },
+   "exitedAt1730": {
+    "type": "string",
+    "description": "Exited at 17:30"
+   },
+   "credentialValid": {
+    "type": "string",
+    "description": "✓ Credential Valid"
+   },
+   "visitDateValid": {
+    "type": "string",
+    "format": "date-time",
+    "description": "✓ Visit Date Valid"
+   },
+   "waterParkEntitlement": {
+    "type": "string",
+    "description": "✓ Water Park Entitlement"
+   },
+   "crossoverAllowed": {
+    "type": "boolean",
+    "description": "✓ Crossover Allowed"
+   },
+   "previousParkRequirementMet": {
+    "type": "string",
+    "description": "✓ Previous Park Requirement Met"
+   },
+   "entryQuantityAvailable": {
+    "type": "integer",
+    "description": "✓ Entry Quantity Available"
+   },
+   "antiPassbackPassed": {
+    "type": "string",
+    "description": "✓ Anti-Passback Passed"
+   },
+   "verificationMethodValid": {
+    "type": "string",
+    "description": "✓ Verification Method Valid"
+   },
+   "denyRuleAc284": {
+    "type": "string",
+    "description": "DENY — RULE AC-284"
+   },
+   "ruleV10": {
+    "type": "string",
+    "description": "Rule V1.0"
+   },
+   "ruleV11": {
+    "type": "string",
+    "description": "Rule V1.1"
+   },
+   "ruleV20": {
+    "type": "string",
+    "description": "Rule V2.0"
+   },
+   "validatedOfflineAndInvalidated": {
+    "type": "string",
+    "description": "validated offline, and invalidated"
+   },
+   "entitlements": {
+    "type": "string",
+    "description": "entitlements"
+   }
+  }
+ },
+ "RuleSimulationConflictCheckPublicationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Rule Simulation, Conflict Check & Publication displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "adventureParkEnteredAt1400": {
+    "type": "string",
+    "description": "Adventure Park entered at 14:00"
+   },
+   "exitedAt1730": {
+    "type": "string",
+    "description": "Exited at 17:30"
+   },
+   "credentialValid": {
+    "type": "string",
+    "description": "✓ Credential Valid"
+   },
+   "visitDateValid": {
+    "type": "string",
+    "format": "date-time",
+    "description": "✓ Visit Date Valid"
+   },
+   "waterParkEntitlement": {
+    "type": "string",
+    "description": "✓ Water Park Entitlement"
+   },
+   "crossoverAllowed": {
+    "type": "boolean",
+    "description": "✓ Crossover Allowed"
+   },
+   "previousParkRequirementMet": {
+    "type": "string",
+    "description": "✓ Previous Park Requirement Met"
+   },
+   "entryQuantityAvailable": {
+    "type": "integer",
+    "description": "✓ Entry Quantity Available"
+   },
+   "antiPassbackPassed": {
+    "type": "string",
+    "description": "✓ Anti-Passback Passed"
+   },
+   "verificationMethodValid": {
+    "type": "string",
+    "description": "✓ Verification Method Valid"
+   },
+   "denyRuleAc284": {
+    "type": "string",
+    "description": "DENY — RULE AC-284"
+   },
+   "ruleV10": {
+    "type": "string",
+    "description": "Rule V1.0"
+   },
+   "ruleV11": {
+    "type": "string",
+    "description": "Rule V1.1"
+   },
+   "ruleV20": {
+    "type": "string",
+    "description": "Rule V2.0"
+   },
+   "validatedOfflineAndInvalidated": {
+    "type": "string",
+    "description": "validated offline, and invalidated"
+   },
+   "entitlements": {
+    "type": "string",
+    "description": "entitlements"
+   }
+  }
+ },
+ "VisualAccessRuleBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Visual Access Rule Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "at": {
+    "type": "string",
+    "description": "AT"
+   },
+   "conditionsAreSatisfied": {
+    "type": "string",
+    "description": "conditions are satisfied"
+   },
+   "logic": {
+    "type": "string",
+    "description": "logic"
+   },
+   "ai": {
+    "type": "string",
+    "description": "AI"
+   },
+   "exited": {
+    "type": "string",
+    "description": "exited.\""
+   }
+  }
+ },
+ "VisualAccessRuleBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Visual Access Rule Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "at": {
+    "type": "string",
+    "description": "AT"
+   },
+   "conditionsAreSatisfied": {
+    "type": "string",
+    "description": "conditions are satisfied"
+   },
+   "logic": {
+    "type": "string",
+    "description": "logic"
+   },
+   "ai": {
+    "type": "string",
+    "description": "AI"
+   },
+   "exited": {
+    "type": "string",
+    "description": "exited.\""
+   }
+  }
+ }
+}

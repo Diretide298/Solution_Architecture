@@ -1,0 +1,972 @@
+{
+ "CreateFnbOrderLine": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "menuItemId",
+   "quantity"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "menuItemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "quantity": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "modifierOptionIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 200,
+    "description": "Free text to the kitchen. Allergy notes belong here and are surfaced prominently."
+   },
+   "seatNumber": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Which cover ordered it. Drives split-by-covers accurately."
+   },
+   "course": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Course grouping, so the kitchen fires in sequence."
+   }
+  }
+ },
+ "Dashboard": {
+  "x-ticvai-persistence": "reporting.dashboard + reporting.dashboard_tile",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateDashboardRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "ownerPrincipalId",
+     "aggregateCost",
+     "createdAt"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "ownerPrincipalId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "aggregateCost": {
+      "type": "string",
+      "enum": [
+       "low",
+       "medium",
+       "high"
+      ],
+      "description": "Combined refresh load of every tile."
+     },
+     "createdAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  ]
+ },
+ "DashboardData": {
+  "x-ticvai-persistence": "none — computed",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/Dashboard"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "tileData": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "tileId": {
+         "type": "string",
+         "format": "uuid"
+        },
+        "result": {
+         "$ref": "#/components/schemas/ReportResult"
+        },
+        "isCached": {
+         "type": "boolean"
+        },
+        "error": {
+         "type": "string",
+         "nullable": true
+        }
+       }
+      }
+     }
+    }
+   }
+  ]
+ },
+ "DataSource": {
+  "type": "string",
+  "description": "What a report may be built over. **A closed set, and that is the point** — a builder that accepts any table will happily produce a report over data nobody maintains.\n**Eight sources added 18 August** (BL-143), each because the matrix asks for a report the builder could not source. `stockCounts` and `waste`: 6.1.21 wants count variance and `stockMovements` records the movement rather than **the count that found the discrepancy**. `workstations`, `devices` and `principals`: 6.1.28 — **who did what at which till** is the question an auditor asks first and it had no source. `loyalty`: 6.1.37, points earned, burned and expiring. `reviews`: 6.1.46. `queueEntries`: **wait times are already measured and nothing could report on them.**\n**Adding a source is a decision, not an omission.** `principals`, `guests`, `loyalty` and `reviews` all name a person, and `REPORT_EXPORT_PII` gates them.\n",
+  "enum": [
+   "orders",
+   "orderLines",
+   "payments",
+   "refunds",
+   "shifts",
+   "scanEvents",
+   "entitlements",
+   "products",
+   "inventory",
+   "stockMovements",
+   "stockCounts",
+   "waste",
+   "workstations",
+   "devices",
+   "principals",
+   "loyalty",
+   "reviews",
+   "queueEntries",
+   "guests",
+   "campaigns",
+   "cases",
+   "ledgerEntries",
+   "workOrders",
+   "approvals",
+   "purchaseOrders",
+   "receipts",
+   "requisitions",
+   "stockBatches",
+   "resourceBookings",
+   "delegations",
+   "forms",
+   "challenges",
+   "wallets",
+   "resaleListings"
+  ]
+ },
+ "FnbOrder": {
+  "x-ticvai-persistence": "fnb.fnb_order + fnb.fnb_order_line",
+  "type": "object",
+  "required": [
+   "id",
+   "orderNumber",
+   "outletId",
+   "serviceMode",
+   "status",
+   "lines",
+   "grossAmount",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "serviceMode": {
+    "$ref": "#/components/schemas/ServiceMode"
+   },
+   "tableVisitId": {
+    "type": "string",
+    "nullable": true
+   },
+   "status": {
+    "$ref": "#/components/schemas/FnbOrderStatus"
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "allOf": [
+      {
+       "$ref": "#/components/schemas/CreateFnbOrderLine"
+      },
+      {
+       "type": "object",
+       "properties": {
+        "status": {
+         "$ref": "#/components/schemas/FnbOrderStatus"
+        },
+        "unitPrice": {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        },
+        "lineTotal": {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       }
+      }
+     ]
+    }
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "kitchenTicketId": {
+    "type": "string",
+    "nullable": true
+   },
+   "estimatedReadyAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "FnbOrderStatus": {
+  "type": "string",
+  "description": "The full lifecycle from 4.6.35. Nine states, not six — the earlier enum collapsed `accepted` into `placed` and had no `collected` or `delivered` at all, which made collection and delivery indistinguishable from a server putting a plate down.\n`accepted` matters because an outlet may refuse: past last orders, out of a key ingredient, or simply too far behind. A guest whose order sat in `placed` for ten minutes and was then rejected has a worse experience than one refused immediately.\n",
+  "enum": [
+   "ordered",
+   "accepted",
+   "inPreparation",
+   "ready",
+   "served",
+   "collected",
+   "delivered",
+   "cancelled",
+   "refunded"
+  ]
+ },
+ "GuestOrderStatus": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over kitchen_ticket",
+  "required": [
+   "orderId",
+   "status",
+   "lines"
+  ],
+  "properties": {
+   "orderId": {
+    "type": "string"
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/FnbOrderStatus"
+   },
+   "estimatedReadyAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "isReadyForCollection": {
+    "type": "boolean"
+   },
+   "lines": {
+    "type": "array",
+    "description": "Per-line status. A guest waiting on one dish should see which.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "quantity": {
+       "type": "integer"
+      },
+      "status": {
+       "$ref": "#/components/schemas/KitchenTicketStatus"
+      }
+     }
+    }
+   }
+  }
+ },
+ "KitchenStation": {
+  "x-ticvai-persistence": "fnb.kitchen_station",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "menuItemIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "Items routed to this station."
+   },
+   "displayEndpoint": {
+    "type": "string",
+    "nullable": true,
+    "description": "Where the venue's KDS listens. Absent where a fallback screen is used instead.\n"
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "KitchenTicket": {
+  "x-ticvai-persistence": "fnb.kitchen_ticket + fnb.kitchen_ticket_line",
+  "type": "object",
+  "required": [
+   "id",
+   "orderId",
+   "outletId",
+   "status",
+   "lines",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "orderId": {
+    "type": "string"
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "tableLabel": {
+    "type": "string",
+    "nullable": true
+   },
+   "serviceMode": {
+    "$ref": "#/components/schemas/ServiceMode"
+   },
+   "coursing": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "fireAndForget",
+     "holdAndFire",
+     "phased",
+     "timed",
+     "delayed"
+    ],
+    "description": "BL-131. **Starters before mains is the entire job of a kitchen pass**, and the model fired everything at once.\n`holdAndFire` waits for a server to call it; `timed` fires on a clock; `phased` staggers by course. **Without this a table gets its dessert while eating its starter.**\n"
+   },
+   "buzzerCode": {
+    "type": "string",
+    "nullable": true,
+    "description": "BL-128. **The pager number handed to a guest at a counter.** Recorded against the order so a lost buzzer is a lookup rather than an argument.\n"
+   },
+   "status": {
+    "$ref": "#/components/schemas/KitchenTicketStatus"
+   },
+   "priority": {
+    "type": "integer",
+    "description": "Higher fires sooner. Raised by Fast Pass or supervisor override."
+   },
+   "prioritisedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "prioritiseReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "lineId",
+      "name",
+      "quantity",
+      "status"
+     ],
+     "properties": {
+      "lineId": {
+       "type": "string"
+      },
+      "name": {
+       "type": "string"
+      },
+      "quantity": {
+       "type": "integer"
+      },
+      "modifiers": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "note": {
+       "type": "string",
+       "nullable": true
+      },
+      "allergens": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "course": {
+       "type": "integer",
+       "nullable": true
+      },
+      "stationId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "status": {
+       "$ref": "#/components/schemas/KitchenTicketStatus"
+      }
+     }
+    }
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "targetReadyAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "elapsedSeconds": {
+    "type": "integer"
+   }
+  }
+ },
+ "KitchenTicketStatus": {
+  "type": "string",
+  "enum": [
+   "received",
+   "preparing",
+   "ready",
+   "served",
+   "recalled",
+   "cancelled"
+  ]
+ },
+ "MenuItem": {
+  "x-ticvai-persistence": "fnb.menu_item",
+  "type": "object",
+  "required": [
+   "id",
+   "productVariantId",
+   "name",
+   "price",
+   "isAvailable"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "productVariantId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The catalogue variant this item sells. Pricing and tax come from there — a menu is a presentation of the catalogue, not a second catalogue.\n"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "price": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "sortOrder": {
+    "type": "integer"
+   },
+   "modifierGroupIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "stationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "isStockTracked": {
+    "type": "boolean",
+    "description": "True where a recipe exists. Stock-tracked items cannot be sold offline."
+   },
+   "isAvailable": {
+    "type": "boolean"
+   },
+   "unavailableReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "preparationMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "allergens": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   }
+  }
+ },
+ "NaturalLanguageAnswer": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "conversationId",
+   "question",
+   "interpretation",
+   "result",
+   "confidence"
+  ],
+  "properties": {
+   "conversationId": {
+    "type": "string"
+   },
+   "question": {
+    "type": "string"
+   },
+   "interpretation": {
+    "type": "string",
+    "description": "What the question was understood to mean, in plain language."
+   },
+   "generatedQuery": {
+    "type": "object",
+    "description": "The structured query produced — data source, columns, filters, grouping. Returned so the answer can be checked. An answer nobody can verify is worse than no answer.\n",
+    "properties": {
+     "dataSource": {
+      "$ref": "#/components/schemas/DataSource"
+     },
+     "columns": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/ReportColumn"
+      }
+     },
+     "filters": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/ReportFilter"
+      }
+     },
+     "groupBy": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "result": {
+    "$ref": "#/components/schemas/ReportResult"
+   },
+   "confidence": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1
+   },
+   "suggestedFollowUps": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "modelVersion": {
+    "type": "string"
+   },
+   "tokensUsed": {
+    "type": "integer"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "ReportColumn": {
+  "x-ticvai-persistence": "reporting.report_column",
+  "type": "object",
+  "required": [
+   "field"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "field": {
+    "type": "string"
+   },
+   "label": {
+    "type": "string"
+   },
+   "aggregation": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/Aggregation"
+     }
+    ],
+    "default": "none"
+   },
+   "sortOrder": {
+    "type": "integer"
+   },
+   "sortDirection": {
+    "type": "string",
+    "enum": [
+     "asc",
+     "desc"
+    ]
+   },
+   "format": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "ReportFilter": {
+  "x-ticvai-persistence": "reporting.report_filter",
+  "type": "object",
+  "required": [
+   "field",
+   "operator"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "field": {
+    "type": "string"
+   },
+   "operator": {
+    "type": "string",
+    "enum": [
+     "equals",
+     "notEquals",
+     "greaterThan",
+     "lessThan",
+     "between",
+     "in",
+     "notIn",
+     "contains",
+     "isNull",
+     "isNotNull"
+    ]
+   },
+   "value": {},
+   "values": {
+    "type": "array",
+    "items": {}
+   },
+   "isParameter": {
+    "type": "boolean",
+    "default": false,
+    "description": "Prompted at run time rather than fixed. Parameters narrow the result; they never widen scope.\n"
+   }
+  }
+ },
+ "ReportResult": {
+  "x-ticvai-persistence": "none — result set, cached in object storage",
+  "type": "object",
+  "required": [
+   "executionId",
+   "columns",
+   "rows"
+  ],
+  "properties": {
+   "executionId": {
+    "type": "string"
+   },
+   "columns": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "key": {
+       "type": "string"
+      },
+      "label": {
+       "type": "string"
+      },
+      "type": {
+       "$ref": "#/components/schemas/FieldType"
+      }
+     }
+    }
+   },
+   "rows": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "additionalProperties": true
+    }
+   },
+   "totals": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "rowCount": {
+    "type": "integer"
+   },
+   "nextCursor": {
+    "type": "string",
+    "nullable": true
+   },
+   "generatedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "dataAsOf": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it prevents an argument about a figure that moved.\n"
+   }
+  }
+ },
+ "ServiceMode": {
+  "type": "string",
+  "enum": [
+   "quickService",
+   "tableService",
+   "roomService",
+   "collection",
+   "delivery"
+  ]
+ },
+ "VenueSettings": {
+  "type": "object",
+  "x-ticvai-persistence": "platform.venue_settings",
+  "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "supportHours": {
+    "type": "object",
+    "description": "CF-100. **A venue decides whether its support desk is 24/7 or bounded, and the platform does not.** This was recorded as an open question for eleven days and was never one — the code is identical either way, and what was missing was somewhere to put the answer.\n",
+    "properties": {
+     "mode": {
+      "type": "string",
+      "enum": [
+       "alwaysOn",
+       "businessHours",
+       "custom",
+       "none"
+      ]
+     },
+     "timezone": {
+      "type": "string"
+     },
+     "windows": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "day": {
+         "type": "string",
+         "enum": [
+          "mon",
+          "tue",
+          "wed",
+          "thu",
+          "fri",
+          "sat",
+          "sun"
+         ]
+        },
+        "from": {
+         "type": "string"
+        },
+        "to": {
+         "type": "string"
+        }
+       }
+      }
+     },
+     "outOfHoursMessage": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   },
+   "quietHours": {
+    "type": "object",
+    "nullable": true,
+    "description": "**When the platform does not send.** A wallet low-balance alert at 3am is a complaint, and journeys and message triggers both respect this.\n**Operational messages ignore it** — a queue-turn alert is why a guest is holding the phone.\n",
+    "properties": {
+     "from": {
+      "type": "string"
+     },
+     "to": {
+      "type": "string"
+     }
+    }
+   },
+   "segregatedAccess": {
+    "type": "object",
+    "nullable": true,
+    "description": "CF-130. **Configured at venue level because it changes by region and the venue is where it is known** — a Ladies Night, a family session, a prayer-time closure.\n**The platform does not infer gender.** 3.2.45 asks for automatic gender recognition and 3.2.46 for rule-based facial recognition validation, and neither is built. Two reasons, and the second is the one that decided it:\n**A Ladies Night ticket is already gendered at the point of sale**, so the gate checks the entitlement the platform issued rather than the face in front of it — deterministic, auditable, and already contracted through `admissionRules`.\n**And these events are staffed.** A steward at the entrance is making the judgment anyway, and a classifier that overrules a person who can see more than it can is a machine and a human disagreeing while a guest waits.\n**`genderVerification` is a switch, not an implementation.** Where a venue's access hardware offers the capability and the venue chooses to use it, this turns it on — following ADR-0015's standards-first driver model, where the device does what the device does. **Not everything needs to be built.**\n",
+    "properties": {
+     "isEnabled": {
+      "type": "boolean",
+      "default": false
+     },
+     "appliesToAccessPointIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "schedule": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "day": {
+         "type": "string"
+        },
+        "from": {
+         "type": "string"
+        },
+        "to": {
+         "type": "string"
+        },
+        "admits": {
+         "type": "string",
+         "enum": [
+          "all",
+          "women",
+          "womenAndChildren",
+          "families",
+          "members"
+         ]
+        }
+       }
+      }
+     },
+     "entitlementGated": {
+      "type": "boolean",
+      "default": true,
+      "readOnly": true,
+      "description": "**Always true, and stated rather than assumed.** The gate admits on the entitlement. Everything below is advisory on top of that, and nothing replaces it.\n"
+     },
+     "genderVerification": {
+      "type": "string",
+      "enum": [
+       false,
+       "staffAssisted",
+       "deviceAssisted"
+      ],
+      "default": false,
+      "description": "`off` — the entitlement decides and a steward handles exceptions. **The default, and what is contracted.**\n`staffAssisted` — the steward's screen shows the ticket type so they can ask. No inference anywhere.\n`deviceAssisted` — **the venue's access hardware performs the check, not the platform.** Available only where the driver reports the capability, and the result is **advisory to the steward rather than decisive at the turnstile** (3.2.45 asks for rejection; this deviates deliberately).\n"
+     },
+     "overrideRateAlertThreshold": {
+      "type": "number",
+      "nullable": true,
+      "description": "Where `deviceAssisted` is on. **An override rate near zero means the steward has stopped deciding**, and that is the number that says whether the human safeguard is working or decorative.\n"
+     }
+    }
+   },
+   "alerting": {
+    "type": "object",
+    "description": "CF-134. **On-platform notification, marked as read.** Six contracts detect their own trouble and none told a person.\n**The panel is the default and email or WhatsApp only where the matrix names them** — an operational alert that arrives by email is an alert nobody sees in time.\n",
+    "properties": {
+     "channel": {
+      "type": "string",
+      "enum": [
+       "dashboardPanel",
+       "dashboardAndEmail",
+       "dashboardAndWhatsapp"
+      ],
+      "default": "dashboardPanel"
+     },
+     "acknowledgementRequired": {
+      "type": "boolean",
+      "default": true
+     },
+     "escalateAfterMinutes": {
+      "type": "integer",
+      "nullable": true
+     }
+    }
+   }
+  }
+ }
+}

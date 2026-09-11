@@ -1,0 +1,1060 @@
+{
+ "acceptShiftVariance": {
+  "method": "POST",
+  "path": "/shifts/{shiftId}/accept-variance",
+  "contract": "shift",
+  "summary": "Accept an over/short beyond the threshold",
+  "permission": "OVERSHORT_ACCEPT",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Shift"
+ },
+ "acceptWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/accept",
+  "contract": "maintenance",
+  "summary": "The assignee takes the job",
+  "permission": "MAINTENANCE_EXECUTE",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
+ },
+ "acknowledgeAnnouncement": {
+  "method": "POST",
+  "path": "/announcements/{announcementId}/acknowledge",
+  "contract": "workforce",
+  "summary": "Confirm you have read it",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "approveShiftOpen": {
+  "method": "POST",
+  "path": "/shifts/{shiftId}/approve-open",
+  "contract": "shift",
+  "summary": "Approve a shift opening outside tolerance",
+  "permission": "SHIFT_APPROVE_OPEN",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Shift"
+ },
+ "attachWorkOrderEvidence": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/attachments",
+  "contract": "maintenance",
+  "summary": "Photo, video, document, note or signature",
+  "permission": "MAINTENANCE_EXECUTE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrderAttachment"
+ },
+ "cancelWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/cancel",
+  "contract": "maintenance",
+  "summary": "Cancel a work order",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
+ },
+ "closeShift": {
+  "method": "POST",
+  "path": "/shifts/{shiftId}/close",
+  "contract": "shift",
+  "summary": "Blind close-out",
+  "permission": "SHIFT_CLOSE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CloseShiftRequest",
+  "responds": "ShiftCloseResult"
+ },
+ "closeWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/close",
+  "contract": "maintenance",
+  "summary": "Administratively closed",
+  "permission": "MAINTENANCE_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
+ },
+ "completeWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/complete",
+  "contract": "maintenance",
+  "summary": "Complete a work order",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
+ },
+ "createCashMovement": {
+  "method": "POST",
+  "path": "/shifts/{shiftId}/cash-movements",
+  "contract": "shift",
+  "summary": "Record a cash lift or add",
+  "permission": "CASH_LIFT",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateCashMovementRequest",
+  "responds": "CashMovement"
+ },
+ "createWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders",
+  "contract": "maintenance",
+  "summary": "Raise a work order",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateWorkOrderRequest",
+  "responds": "WorkOrder"
+ },
+ "getAnnouncementReach": {
+  "method": "GET",
+  "path": "/announcements/{announcementId}/reach",
+  "contract": "workforce",
+  "summary": "Who has acknowledged, and who has not",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AnnouncementReach"
+ },
+ "getCurrentSession": {
+  "method": "GET",
+  "path": "/auth/session",
+  "contract": "identity",
+  "summary": "Current session and effective permissions",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Session"
+ },
+ "getCurrentShift": {
+  "method": "GET",
+  "path": "/shifts/current",
+  "contract": "shift",
+  "summary": "The open or suspended shift on the session's workstation",
+  "permission": "SHIFT_OPEN",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Shift"
+ },
+ "getGuestSession": {
+  "method": "GET",
+  "path": "/auth/guest/session",
+  "contract": "identity",
+  "summary": "Read the current guest session",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestSession"
+ },
+ "getIncident": {
+  "method": "GET",
+  "path": "/incidents/{incidentId}",
+  "contract": "maintenance",
+  "summary": "Read an incident",
+  "permission": "INCIDENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "IncidentDetail"
+ },
+ "getOfflinePackage": {
+  "method": "GET",
+  "path": "/access/offline-package",
+  "contract": "access",
+  "summary": "Entitlement and rule set for offline validation",
+  "permission": "ACCESS_VALIDATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": "validFrom",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "validTo",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "If-None-Match",
+    "in": "header",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "OfflinePackage"
+ },
+ "getShift": {
+  "method": "GET",
+  "path": "/shifts/{shiftId}",
+  "contract": "shift",
+  "summary": "Read a shift",
+  "permission": "REPORT_VIEW_WORKSTATION",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Shift"
+ },
+ "getWorkOrder": {
+  "method": "GET",
+  "path": "/work-orders/{workOrderId}",
+  "contract": "maintenance",
+  "summary": "Read a work order",
+  "permission": "WORK_ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WorkOrderDetail"
+ },
+ "listAnnouncements": {
+  "method": "GET",
+  "path": "/announcements",
+  "contract": "workforce",
+  "summary": "What staff have been told",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "unacknowledgedOnly",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Announcement"
+ },
+ "listCashMovements": {
+  "method": "GET",
+  "path": "/shifts/{shiftId}/cash-movements",
+  "contract": "shift",
+  "summary": "Lifts, adds and the opening float",
+  "permission": "REPORT_VIEW_WORKSTATION",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CashMovement"
+ },
+ "listIncidents": {
+  "method": "GET",
+  "path": "/incidents",
+  "contract": "maintenance",
+  "summary": "List incidents",
+  "permission": "INCIDENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "severity",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "isReportable",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMfaMethods": {
+  "method": "GET",
+  "path": "/auth/mfa/methods",
+  "contract": "identity",
+  "summary": "Enrolled MFA methods",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MfaMethod"
+ },
+ "listRoles": {
+  "method": "GET",
+  "path": "/roles",
+  "contract": "identity",
+  "summary": "List roles",
+  "permission": "ROLE_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listScans": {
+  "method": "GET",
+  "path": "/access/scans",
+  "contract": "access",
+  "summary": "List scan events",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "accessPointId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "ticketId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "outcome",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "recordedFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "recordedTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listShifts": {
+  "method": "GET",
+  "path": "/shifts",
+  "contract": "shift",
+  "summary": "List shifts",
+  "permission": "REPORT_VIEW_WORKSTATION",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "openedFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "openedTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listSsoProviders": {
+  "method": "GET",
+  "path": "/auth/sso/providers",
+  "contract": "identity",
+  "summary": "Identity providers configured for this tenant",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SsoProvider"
+ },
+ "listWorkOrders": {
+  "method": "GET",
+  "path": "/work-orders",
+  "contract": "maintenance",
+  "summary": "List work orders",
+  "permission": "WORK_ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "assignedToPrincipalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "priority",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "assetId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "overdueOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "login": {
+  "method": "POST",
+  "path": "/auth/login",
+  "contract": "identity",
+  "summary": "Authenticate and open a session",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "LoginRequest",
+  "responds": "LoginResponse"
+ },
+ "lookupTicket": {
+  "method": "GET",
+  "path": "/access/lookup",
+  "contract": "access",
+  "summary": "Read-only validity check without admitting",
+  "permission": "TICKET_LOOKUP",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "mediaCode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "ticketId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TicketStatus"
+ },
+ "openShift": {
+  "method": "POST",
+  "path": "/shifts",
+  "contract": "shift",
+  "summary": "Open a shift",
+  "permission": "SHIFT_OPEN",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "OpenShiftRequest",
+  "responds": "Shift"
+ },
+ "overrideAccess": {
+  "method": "POST",
+  "path": "/access/override",
+  "contract": "access",
+  "summary": "Admit against a failed validation",
+  "permission": "ACCESS_OVERRIDE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ValidationResult"
+ },
+ "pauseWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/pause",
+  "contract": "maintenance",
+  "summary": "Stopped, and why",
+  "permission": "MAINTENANCE_EXECUTE",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
+ },
+ "publishAnnouncement": {
+  "method": "POST",
+  "path": "/announcements",
+  "contract": "workforce",
+  "summary": "Tell staff something",
+  "permission": "ANNOUNCEMENT_PUBLISH",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Announcement",
+  "responds": "Announcement"
+ },
+ "recordAuthorityNotification": {
+  "method": "POST",
+  "path": "/incidents/{incidentId}/notify-authority",
+  "contract": "maintenance",
+  "summary": "Record notification to an external authority",
+  "permission": "INCIDENT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Incident"
+ },
+ "recordNoSale": {
+  "method": "POST",
+  "path": "/shifts/{shiftId}/no-sale",
+  "contract": "shift",
+  "summary": "Open the drawer without a sale",
+  "permission": "SHIFT_SUSPEND",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "NoSaleEvent"
+ },
+ "recordWorkOrderParts": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/parts",
+  "contract": "maintenance",
+  "summary": "Record parts consumed",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrderDetail"
+ },
+ "recordWorkOrderTime": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/time",
+  "contract": "maintenance",
+  "summary": "Start, pause or stop work",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
+ },
+ "rejectWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/reject",
+  "contract": "maintenance",
+  "summary": "The assignee declines, with a reason",
+  "permission": "MAINTENANCE_EXECUTE",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
+ },
+ "reopenShift": {
+  "method": "POST",
+  "path": "/shifts/{shiftId}/reopen",
+  "contract": "shift",
+  "summary": "Reopen a shift closed in error",
+  "permission": "SHIFT_REOPEN",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Shift"
+ },
+ "reportIncident": {
+  "method": "POST",
+  "path": "/incidents",
+  "contract": "maintenance",
+  "summary": "Report an incident",
+  "permission": "INCIDENT_REPORT",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ReportIncidentRequest",
+  "responds": "Incident"
+ },
+ "resumeShift": {
+  "method": "POST",
+  "path": "/shifts/{shiftId}/resume",
+  "contract": "shift",
+  "summary": "Resume a suspended shift",
+  "permission": "SHIFT_OPEN",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Shift"
+ },
+ "resumeWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/resume",
+  "contract": "maintenance",
+  "summary": "Back to work",
+  "permission": "MAINTENANCE_EXECUTE",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
+ },
+ "selectRole": {
+  "method": "POST",
+  "path": "/auth/select-role",
+  "contract": "identity",
+  "summary": "Choose a role for a multi-role session",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Session"
+ },
+ "startWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/start",
+  "contract": "maintenance",
+  "summary": "Work has begun",
+  "permission": "MAINTENANCE_EXECUTE",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
+ },
+ "suspendShift": {
+  "method": "POST",
+  "path": "/shifts/{shiftId}/suspend",
+  "contract": "shift",
+  "summary": "Suspend a shift so another user can log in",
+  "permission": "SHIFT_SUSPEND",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Shift"
+ },
+ "syncScans": {
+  "method": "POST",
+  "path": "/access/scans",
+  "contract": "access",
+  "summary": "Replay scans recorded offline",
+  "permission": "ACCESS_VALIDATE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ScanSyncResult"
+ },
+ "updateIncident": {
+  "method": "PATCH",
+  "path": "/incidents/{incidentId}",
+  "contract": "maintenance",
+  "summary": "Investigate, escalate or close an incident",
+  "permission": "INCIDENT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Incident"
+ },
+ "updateWorkOrder": {
+  "method": "PATCH",
+  "path": "/work-orders/{workOrderId}",
+  "contract": "maintenance",
+  "summary": "Assign, reprioritise or amend",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
+ },
+ "validateAccess": {
+  "method": "POST",
+  "path": "/access/validate",
+  "contract": "access",
+  "summary": "Validate media at an access point and admit or deny",
+  "permission": "ACCESS_VALIDATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ValidateRequest",
+  "responds": "ValidationResult"
+ },
+ "validateGroupAccess": {
+  "method": "POST",
+  "path": "/access/group-validate",
+  "contract": "access",
+  "summary": "Admit a group on one read",
+  "permission": "ACCESS_VALIDATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ValidationResult"
+ },
+ "verifyWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/verify",
+  "contract": "maintenance",
+  "summary": "Supervisor verification",
+  "permission": "WORK_ORDER_VERIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
+ }
+}

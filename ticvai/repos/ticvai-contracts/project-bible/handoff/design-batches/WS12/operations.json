@@ -1,0 +1,209 @@
+{
+ "listAccessExecutiveInsight": {
+  "method": "GET",
+  "path": "/access-executive-insight",
+  "contract": "access",
+  "summary": "AI Access Intelligence, Forecasting & Executive Insights",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiAccessIntelligenceForecastingExecutiveInsightsView"
+ },
+ "listAccessMonitoring": {
+  "method": "GET",
+  "path": "/access-monitoring",
+  "contract": "access",
+  "summary": "Access Monitoring & Analytics Command Center",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AccessMonitoringAnalyticsCommandCenterView"
+ },
+ "listAccessReportScheduled": {
+  "method": "GET",
+  "path": "/access-report-scheduled",
+  "contract": "access",
+  "summary": "Access Reports, Scheduled Reporting & Data Export",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AccessReportsScheduledReportingDataExportView"
+ },
+ "listAttendanceAdmission": {
+  "method": "GET",
+  "path": "/attendance-admission",
+  "contract": "access",
+  "summary": "Attendance & Admission Analytics",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "timeslot",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "membership",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "b2bPartner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "reseller",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "guestCategory",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "AttendanceAdmissionAnalyticsView"
+ },
+ "listEntryExitCrossover": {
+  "method": "GET",
+  "path": "/entry-exit-crossover",
+  "contract": "access",
+  "summary": "Entry, Exit, Re-entry & Crossover Analytics",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "EntryExitReEntryCrossoverAnalyticsView"
+ },
+ "listGraphicalAccessMap": {
+  "method": "GET",
+  "path": "/graphical-access-map",
+  "contract": "access",
+  "summary": "Graphical Access Map & Live Gate Performance",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GraphicalAccessMapLiveGatePerformanceView"
+ },
+ "listGuestDwellTime": {
+  "method": "GET",
+  "path": "/guest-dwell-time",
+  "contract": "access",
+  "summary": "Guest Dwell Time, Length of Stay & Attraction Flow",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestDwellTimeLengthOfStayAttractionFlowView"
+ },
+ "listLiveVenueOccupancy": {
+  "method": "GET",
+  "path": "/live-venue-occupancy",
+  "contract": "access",
+  "summary": "Live Venue Occupancy & People Counting",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "LiveVenueOccupancyPeopleCountingView"
+ },
+ "listThroughputQueueValidation": {
+  "method": "GET",
+  "path": "/throughput-queue-validation",
+  "contract": "access",
+  "summary": "Throughput, Queue & Validation Performance Analytics",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ThroughputQueueValidationPerformanceAnalyticsView"
+ },
+ "listValidationOutcomeRejection": {
+  "method": "GET",
+  "path": "/validation-outcome-rejection",
+  "contract": "access",
+  "summary": "Validation Outcome & Rejection Analytics",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "gate",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ticketType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "reseller",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "operator",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "device",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "ValidationOutcomeRejectionAnalyticsView"
+ }
+}

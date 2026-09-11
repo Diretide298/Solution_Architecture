@@ -1,7 +1,7 @@
 $id: ticvai/roles-by-app.yaml
 title: Permissions each shipped app requires
 generatedBy: tools/derive-app-roles.py
-generated: '2026-09-10'
+generated: '2026-09-11'
 description: '**Derived from what each app''s screens call, not decided here.** For every app, the permissions
   its operations declare in `x-ticvai-permission`, tiered by what the key permits. Role names, headcounts
   and the approval hierarchy are deliberately absent: who at a venue may configure pricing is the client''s
@@ -108,7 +108,8 @@ apps:
     - P10
     - P11
     - P14
-    screens: 434
+    - P17
+    screens: 537
     operations: 538
     permissions: 62
     tiers:
@@ -199,7 +200,7 @@ apps:
     - P12
     - P13
     - P16
-    screens: 550
+    screens: 811
     operations: 810
     permissions: 107
     tiers:
@@ -404,7 +405,7 @@ apps:
     platforms:
     - P06
     - P07
-    screens: 77
+    screens: 107
     operations: 191
     permissions: 55
     tiers:

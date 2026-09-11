@@ -1,0 +1,1106 @@
+{
+ "CodeDistributionAssignmentManagerInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Code Distribution & Assignment Manager submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "channelsType": {
+    "type": "string",
+    "enum": [
+     "email",
+     "sms",
+     "whatsapp",
+     "mobileApp",
+     "crmJourney",
+     "guestPortal",
+     "b2bPortal",
+     "partnerPortal",
+     "pos",
+     "callCenter",
+     "api",
+     "exportedBatch"
+    ],
+    "description": "Vocabulary listed under Distribution Channels."
+   },
+   "individualCustomer": {
+    "type": "string",
+    "description": "Individual customer"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer segment"
+   },
+   "membershipAccount": {
+    "type": "string",
+    "description": "Membership account"
+   },
+   "b2bCompany": {
+    "type": "string",
+    "description": "B2B company"
+   },
+   "reseller": {
+    "type": "string",
+    "description": "Reseller"
+   },
+   "travelAgency": {
+    "type": "string",
+    "description": "Travel agency"
+   },
+   "school": {
+    "type": "string",
+    "description": "School"
+   },
+   "hotel": {
+    "type": "string",
+    "description": "Hotel"
+   },
+   "bank": {
+    "type": "string",
+    "description": "Bank"
+   },
+   "corporatePartner": {
+    "type": "string",
+    "description": "Corporate partner"
+   },
+   "marketingCampaign": {
+    "type": "string",
+    "description": "Marketing campaign"
+   },
+   "partnerBankAbc": {
+    "type": "string",
+    "description": "Partner: Bank ABC"
+   },
+   "batchBankabc2027001": {
+    "type": "string",
+    "description": "Batch: BANKABC-2027-001"
+   },
+   "codes25000": {
+    "type": "string",
+    "description": "Codes: 25,000"
+   },
+   "assigned25000": {
+    "type": "string",
+    "description": "Assigned: 25,000"
+   },
+   "redeemed8720": {
+    "type": "string",
+    "description": "Redeemed: 8,720"
+   },
+   "remaining16280": {
+    "type": "string",
+    "description": "Remaining: 16,280"
+   }
+  }
+ },
+ "CodeDistributionAssignmentManagerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Code Distribution & Assignment Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "channelsType": {
+    "type": "string",
+    "enum": [
+     "email",
+     "sms",
+     "whatsapp",
+     "mobileApp",
+     "crmJourney",
+     "guestPortal",
+     "b2bPortal",
+     "partnerPortal",
+     "pos",
+     "callCenter",
+     "api",
+     "exportedBatch"
+    ],
+    "description": "Vocabulary listed under Distribution Channels."
+   },
+   "individualCustomer": {
+    "type": "string",
+    "description": "Individual customer"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer segment"
+   },
+   "membershipAccount": {
+    "type": "string",
+    "description": "Membership account"
+   },
+   "b2bCompany": {
+    "type": "string",
+    "description": "B2B company"
+   },
+   "reseller": {
+    "type": "string",
+    "description": "Reseller"
+   },
+   "travelAgency": {
+    "type": "string",
+    "description": "Travel agency"
+   },
+   "school": {
+    "type": "string",
+    "description": "School"
+   },
+   "hotel": {
+    "type": "string",
+    "description": "Hotel"
+   },
+   "bank": {
+    "type": "string",
+    "description": "Bank"
+   },
+   "corporatePartner": {
+    "type": "string",
+    "description": "Corporate partner"
+   },
+   "marketingCampaign": {
+    "type": "string",
+    "description": "Marketing campaign"
+   },
+   "generated": {
+    "type": "string",
+    "description": "Generated"
+   },
+   "assigned": {
+    "type": "string",
+    "description": "Assigned"
+   },
+   "sent": {
+    "type": "string",
+    "description": "Sent"
+   },
+   "delivered": {
+    "type": "string",
+    "description": "Delivered"
+   },
+   "viewedWhereAvailable": {
+    "type": "string",
+    "description": "Viewed where available"
+   },
+   "redeemed": {
+    "type": "string",
+    "description": "Redeemed"
+   },
+   "expired": {
+    "type": "integer",
+    "description": "Expired"
+   },
+   "cancelled": {
+    "type": "integer",
+    "description": "Cancelled"
+   },
+   "partnerBankAbc": {
+    "type": "string",
+    "description": "Partner: Bank ABC"
+   },
+   "batchBankabc2027001": {
+    "type": "string",
+    "description": "Batch: BANKABC-2027-001"
+   },
+   "codes25000": {
+    "type": "string",
+    "description": "Codes: 25,000"
+   },
+   "assigned25000": {
+    "type": "string",
+    "description": "Assigned: 25,000"
+   },
+   "redeemed8720": {
+    "type": "string",
+    "description": "Redeemed: 8,720"
+   },
+   "remaining16280": {
+    "type": "string",
+    "description": "Remaining: 16,280"
+   }
+  }
+ },
+ "CodeEligibilityRestrictionManagerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Code Eligibility & Restriction Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "ticket": {
+    "type": "string",
+    "description": "Ticket"
+   },
+   "ticketType": {
+    "type": "string",
+    "description": "Ticket type"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "productCategory": {
+    "type": "string",
+    "description": "Product category"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "bundle": {
+    "type": "string",
+    "description": "Bundle"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "fB": {
+    "type": "string",
+    "description": "F&B"
+   },
+   "retail": {
+    "type": "string",
+    "description": "Retail"
+   },
+   "addOn": {
+    "type": "string",
+    "description": "Add-on"
+   },
+   "guestType": {
+    "type": "string",
+    "description": "Guest type"
+   },
+   "crmSegment": {
+    "type": "string",
+    "description": "CRM segment"
+   },
+   "loyaltyTier": {
+    "type": "string",
+    "description": "Loyalty tier"
+   },
+   "b2bAccount": {
+    "type": "string",
+    "description": "B2B account"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner"
+   },
+   "corporateGroup": {
+    "type": "string",
+    "description": "Corporate group"
+   },
+   "b2c": {
+    "type": "string",
+    "description": "B2C"
+   },
+   "b2b": {
+    "type": "string",
+    "description": "B2B"
+   },
+   "pos": {
+    "type": "string",
+    "description": "POS"
+   },
+   "mobilePos": {
+    "type": "string",
+    "description": "Mobile POS"
+   },
+   "kiosk": {
+    "type": "string",
+    "description": "Kiosk"
+   },
+   "mobileApp": {
+    "type": "string",
+    "description": "Mobile App"
+   },
+   "callCenter": {
+    "type": "string",
+    "description": "Call Center"
+   },
+   "reseller": {
+    "type": "string",
+    "description": "Reseller"
+   },
+   "api": {
+    "type": "string",
+    "description": "API"
+   },
+   "businessEntity": {
+    "type": "string",
+    "description": "Business entity"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "location": {
+    "type": "string",
+    "description": "Location"
+   },
+   "operatingArea": {
+    "type": "string",
+    "description": "Operating area"
+   },
+   "conditions": {
+    "type": "string",
+    "description": "conditions"
+   }
+  }
+ },
+ "CodeSecurityFraudExceptionCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Code Security, Fraud & Exception Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "excessiveRedemptionVelocity": {
+    "type": "string",
+    "description": "Excessive redemption velocity"
+   },
+   "repeatedFailedAttempts": {
+    "type": "integer",
+    "description": "Repeated failed attempts"
+   },
+   "multipleCustomersUsingCustomerSpecificCode": {
+    "type": "string",
+    "description": "Multiple customers using customer-specific code"
+   },
+   "unusualGeographicUsage": {
+    "type": "string",
+    "description": "Unusual geographic usage"
+   },
+   "highVolumeRedemptionFromOneDevice": {
+    "type": "integer",
+    "description": "High-volume redemption from one device"
+   },
+   "suspiciousPosOperatorActivity": {
+    "type": "string",
+    "description": "Suspicious POS/operator activity"
+   },
+   "codeEnumerationAttempts": {
+    "type": "integer",
+    "description": "Code enumeration attempts"
+   },
+   "partnerCodeLeakage": {
+    "type": "string",
+    "description": "Partner code leakage"
+   },
+   "redemptionAboveExpectedCampaignPattern": {
+    "type": "string",
+    "description": "Redemption above expected campaign pattern"
+   },
+   "levelsType": {
+    "type": "string",
+    "enum": [
+     "low",
+     "medium",
+     "high",
+     "critical"
+    ],
+    "description": "Vocabulary listed under Risk Levels."
+   },
+   "reinstateCode": {
+    "type": "string",
+    "description": "Reinstate code"
+   }
+  }
+ },
+ "CouponPromoCodeBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Coupon & Promo Code Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "commonPromoCode": {
+    "type": "string",
+    "description": "Common promo code"
+   },
+   "uniquePromoCode": {
+    "type": "string",
+    "description": "Unique promo code"
+   },
+   "coupon": {
+    "type": "string",
+    "description": "Coupon"
+   },
+   "promotionalVoucher": {
+    "type": "string",
+    "description": "Promotional voucher"
+   },
+   "freeTicketCode": {
+    "type": "string",
+    "description": "Free-ticket code"
+   },
+   "discountVoucher": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount voucher"
+   },
+   "partnerCode": {
+    "type": "string",
+    "description": "Partner code"
+   },
+   "employeeCode": {
+    "type": "string",
+    "description": "Employee code"
+   },
+   "influencerAffiliateCode": {
+    "type": "string",
+    "description": "Influencer/affiliate code"
+   },
+   "compensationServiceRecoveryCode": {
+    "type": "string",
+    "description": "Compensation/service-recovery code"
+   },
+   "bulkCampaignCode": {
+    "type": "string",
+    "description": "Bulk campaign code"
+   },
+   "percentageDiscount": {
+    "type": "number",
+    "description": "Percentage discount"
+   },
+   "fixedValueDiscount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fixed-value discount"
+   },
+   "fixedPromotionalPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fixed promotional price"
+   },
+   "freeProduct": {
+    "type": "string",
+    "description": "Free product"
+   },
+   "freeTicket": {
+    "type": "string",
+    "description": "Free ticket"
+   },
+   "freeAddOn": {
+    "type": "string",
+    "description": "Free add-on"
+   },
+   "bundleBenefit": {
+    "type": "string",
+    "description": "Bundle benefit"
+   },
+   "addedValue": {
+    "type": "string",
+    "description": "Added value"
+   },
+   "thanDuplicateDiscountLogic": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "than duplicate discount logic"
+   }
+  }
+ },
+ "CouponPromoCodeBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Coupon & Promo Code Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "commonPromoCode": {
+    "type": "string",
+    "description": "Common promo code"
+   },
+   "uniquePromoCode": {
+    "type": "string",
+    "description": "Unique promo code"
+   },
+   "coupon": {
+    "type": "string",
+    "description": "Coupon"
+   },
+   "promotionalVoucher": {
+    "type": "string",
+    "description": "Promotional voucher"
+   },
+   "freeTicketCode": {
+    "type": "string",
+    "description": "Free-ticket code"
+   },
+   "discountVoucher": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount voucher"
+   },
+   "partnerCode": {
+    "type": "string",
+    "description": "Partner code"
+   },
+   "employeeCode": {
+    "type": "string",
+    "description": "Employee code"
+   },
+   "influencerAffiliateCode": {
+    "type": "string",
+    "description": "Influencer/affiliate code"
+   },
+   "compensationServiceRecoveryCode": {
+    "type": "string",
+    "description": "Compensation/service-recovery code"
+   },
+   "bulkCampaignCode": {
+    "type": "string",
+    "description": "Bulk campaign code"
+   },
+   "percentageDiscount": {
+    "type": "number",
+    "description": "Percentage discount"
+   },
+   "fixedValueDiscount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fixed-value discount"
+   },
+   "fixedPromotionalPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fixed promotional price"
+   },
+   "freeProduct": {
+    "type": "string",
+    "description": "Free product"
+   },
+   "freeTicket": {
+    "type": "string",
+    "description": "Free ticket"
+   },
+   "freeAddOn": {
+    "type": "string",
+    "description": "Free add-on"
+   },
+   "bundleBenefit": {
+    "type": "string",
+    "description": "Bundle benefit"
+   },
+   "addedValue": {
+    "type": "string",
+    "description": "Added value"
+   },
+   "thanDuplicateDiscountLogic": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "than duplicate discount logic"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "RedemptionAnalyticsAuditAiOptimizationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Redemption Analytics, Audit & AI Optimization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "codesGenerated": {
+    "type": "string",
+    "description": "Codes generated"
+   },
+   "codesDistributed": {
+    "type": "string",
+    "description": "Codes distributed"
+   },
+   "codesRedeemed": {
+    "type": "string",
+    "description": "Codes redeemed"
+   },
+   "redemptionRate": {
+    "type": "number",
+    "description": "Redemption rate"
+   },
+   "conversionRate": {
+    "type": "number",
+    "description": "Conversion rate"
+   },
+   "revenueGenerated": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue generated"
+   },
+   "discountGranted": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount granted"
+   },
+   "incrementalRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Incremental revenue"
+   },
+   "aovUplift": {
+    "type": "number",
+    "description": "AOV uplift"
+   },
+   "costPerRedemption": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Cost per redemption"
+   },
+   "marginImpact": {
+    "type": "number",
+    "description": "Margin impact"
+   },
+   "expiredUnusedCodes": {
+    "type": "integer",
+    "description": "Expired unused codes"
+   },
+   "created": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Created"
+   },
+   "modified": {
+    "type": "string",
+    "description": "Modified"
+   },
+   "generated": {
+    "type": "string",
+    "description": "Generated"
+   },
+   "assigned": {
+    "type": "string",
+    "description": "Assigned"
+   },
+   "distributed": {
+    "type": "string",
+    "description": "Distributed"
+   },
+   "redeemed": {
+    "type": "string",
+    "description": "Redeemed"
+   },
+   "suspended": {
+    "type": "string",
+    "description": "Suspended"
+   },
+   "reactivated": {
+    "type": "string",
+    "description": "Reactivated"
+   },
+   "expired": {
+    "type": "integer",
+    "description": "Expired"
+   },
+   "cancelled": {
+    "type": "integer",
+    "description": "Cancelled"
+   },
+   "user": {
+    "type": "string",
+    "description": "User"
+   },
+   "timestamp": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Timestamp"
+   },
+   "previousValue": {
+    "type": "string",
+    "description": "Previous value"
+   },
+   "newValue": {
+    "type": "integer",
+    "description": "New value"
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason"
+   },
+   "approvalReference": {
+    "type": "string",
+    "description": "Approval reference"
+   },
+   "identifiesBenefit": {
+    "type": "string",
+    "description": "↓ identifies benefit"
+   },
+   "determinesQualificationAndCalculation": {
+    "type": "string",
+    "description": "↓ determines qualification and calculation"
+   },
+   "ticketingCatalogueEligibleTicketsProducts": {
+    "type": "string",
+    "description": "Ticketing Catalogue — eligible tickets/products"
+   },
+   "bundlesBundleRelatedCouponBenefits": {
+    "type": "string",
+    "description": "Bundles — bundle-related coupon benefits"
+   },
+   "paymentPaymentMethodDependentPromotions": {
+    "type": "string",
+    "description": "Payment — payment-method-dependent promotions"
+   },
+   "matrixCoverageBoard3": {
+    "type": "string",
+    "description": "Matrix Coverage — Board 3"
+   }
+  }
+ },
+ "RedemptionMonitorCodeLookupView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Redemption Monitor & Code Lookup displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "promoCode": {
+    "type": "string",
+    "description": "Promo code"
+   },
+   "couponId": {
+    "type": "string",
+    "description": "Coupon ID"
+   },
+   "batchId": {
+    "type": "string",
+    "description": "Batch ID"
+   },
+   "transaction": {
+    "type": "string",
+    "description": "Transaction"
+   },
+   "booking": {
+    "type": "string",
+    "description": "Booking"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner"
+   },
+   "campaign": {
+    "type": "string",
+    "description": "Campaign"
+   },
+   "code": {
+    "type": "string",
+    "description": "Code"
+   },
+   "redemptionDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Redemption date"
+   },
+   "redemptionTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Redemption time"
+   },
+   "customerAccountReference": {
+    "type": "string",
+    "description": "Customer/account reference"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "originalValue": {
+    "type": "string",
+    "description": "Original value"
+   },
+   "discount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount"
+   },
+   "finalValue": {
+    "type": "string",
+    "description": "Final value"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "devicePos": {
+    "type": "integer",
+    "description": "Device/POS"
+   },
+   "operator": {
+    "type": "string",
+    "description": "Operator"
+   },
+   "validationResult": {
+    "type": "string",
+    "description": "Validation result"
+   },
+   "valid": {
+    "type": "string",
+    "description": "Valid"
+   },
+   "redeemed": {
+    "type": "string",
+    "description": "Redeemed"
+   },
+   "expired": {
+    "type": "integer",
+    "description": "Expired"
+   },
+   "notStarted": {
+    "type": "string",
+    "description": "Not Started"
+   },
+   "usageLimitReached": {
+    "type": "integer",
+    "description": "Usage Limit Reached"
+   },
+   "invalidProduct": {
+    "type": "string",
+    "description": "Invalid Product"
+   },
+   "invalidChannel": {
+    "type": "string",
+    "description": "Invalid Channel"
+   },
+   "invalidCustomer": {
+    "type": "string",
+    "description": "Invalid Customer"
+   },
+   "invalidLocation": {
+    "type": "string",
+    "description": "Invalid Location"
+   },
+   "suspended": {
+    "type": "string",
+    "description": "Suspended"
+   },
+   "cancelled": {
+    "type": "integer",
+    "description": "Cancelled"
+   },
+   "requiresRedemptionReporting": {
+    "type": "string",
+    "description": "requires redemption reporting"
+   }
+  }
+ },
+ "UniqueCodeGenerationBatchManagerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Unique Code Generation & Batch Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "campaign": {
+    "type": "string",
+    "description": "Campaign"
+   },
+   "numberOfCodes": {
+    "type": "integer",
+    "description": "Number of codes"
+   },
+   "codeLength": {
+    "type": "string",
+    "description": "Code length"
+   },
+   "prefix": {
+    "type": "string",
+    "description": "Prefix"
+   },
+   "suffix": {
+    "type": "string",
+    "description": "Suffix"
+   },
+   "characterType": {
+    "type": "string",
+    "description": "Character type"
+   },
+   "caseSensitivity": {
+    "type": "string",
+    "description": "Case sensitivity"
+   },
+   "expiration": {
+    "type": "string",
+    "description": "Expiration"
+   },
+   "numberOfUses": {
+    "type": "integer",
+    "description": "Number of uses"
+   },
+   "distributionOwner": {
+    "type": "string",
+    "description": "Distribution owner"
+   },
+   "batchId": {
+    "type": "string",
+    "description": "Batch ID"
+   },
+   "quantityGenerated": {
+    "type": "integer",
+    "description": "Quantity generated"
+   },
+   "generatedBy": {
+    "type": "string",
+    "description": "Generated by"
+   },
+   "generationDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Generation date"
+   },
+   "expiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry"
+   },
+   "assignedPartner": {
+    "type": "string",
+    "description": "Assigned partner"
+   },
+   "distributionStatus": {
+    "type": "string",
+    "description": "Distribution status"
+   },
+   "redeemedQuantity": {
+    "type": "integer",
+    "description": "Redeemed quantity"
+   },
+   "remainingQuantity": {
+    "type": "integer",
+    "description": "Remaining quantity"
+   },
+   "it": {
+    "type": "string",
+    "description": "it"
+   },
+   "permissionsExplicitlyAllowIt": {
+    "type": "string",
+    "description": "permissions explicitly allow it"
+   }
+  }
+ },
+ "UsageCapacityFrequencyControlView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Usage, Capacity & Frequency Control displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "singleUse": {
+    "type": "string",
+    "description": "Single use"
+   },
+   "multipleUse": {
+    "type": "string",
+    "description": "Multiple use"
+   },
+   "unlimitedUse": {
+    "type": "string",
+    "description": "Unlimited use"
+   },
+   "maximumTotalRedemptions": {
+    "type": "string",
+    "description": "Maximum total redemptions"
+   },
+   "maximumPerCustomer": {
+    "type": "string",
+    "description": "Maximum per customer"
+   },
+   "maximumPerAccount": {
+    "type": "string",
+    "description": "Maximum per account"
+   },
+   "maximumPerTransaction": {
+    "type": "string",
+    "description": "Maximum per transaction"
+   },
+   "maximumPerDay": {
+    "type": "string",
+    "description": "Maximum per day"
+   },
+   "maximumPerChannel": {
+    "type": "string",
+    "description": "Maximum per channel"
+   },
+   "maximumPerVenue": {
+    "type": "string",
+    "description": "Maximum per venue"
+   },
+   "issued50000": {
+    "type": "string",
+    "description": "Issued: 50,000"
+   },
+   "redeemed31450": {
+    "type": "string",
+    "description": "Redeemed: 31,450"
+   },
+   "reservedPending420": {
+    "type": "string",
+    "description": "Reserved/Pending: 420"
+   },
+   "remaining18130": {
+    "type": "string",
+    "description": "Remaining: 18,130"
+   },
+   "at": {
+    "type": "string",
+    "description": "At"
+   },
+   "thresholdsShallBeConfigurable": {
+    "type": "string",
+    "description": "Thresholds shall be configurable"
+   }
+  }
+ },
+ "ValidityDateTimeControlView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Validity, Date & Time Control displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "valid18002200": {
+    "type": "string",
+    "description": "Valid 18:00–22:00"
+   },
+   "mondayThursdayOnly": {
+    "type": "string",
+    "description": "Monday–Thursday only"
+   },
+   "blackoutDates": {
+    "type": "string",
+    "description": "Blackout dates"
+   },
+   "holidays": {
+    "type": "string",
+    "description": "Holidays"
+   },
+   "selectedTimeslots": {
+    "type": "string",
+    "description": "Selected timeslots"
+   },
+   "selectedEvents": {
+    "type": "string",
+    "description": "Selected events"
+   },
+   "seasonalCalendars": {
+    "type": "string",
+    "description": "Seasonal calendars"
+   },
+   "expirationGracePeriod": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiration grace period"
+   },
+   "theAdministratorSBrowserTimezone": {
+    "type": "string",
+    "description": "the administrator's browser timezone"
+   }
+  }
+ }
+}

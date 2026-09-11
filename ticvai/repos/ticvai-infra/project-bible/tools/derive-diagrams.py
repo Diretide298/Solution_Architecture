@@ -265,6 +265,10 @@ def write_project_hld(services, lin, schema, real, owner):
              "note": "Provisions tenants, watches cells, runs releases. **Softlabs, not the venue.**"},
             {"actor": "developer", "reaches": ["P14"], "operations": aud.get("public", 0),
              "note": "Third parties against the public API, rate-limited and quota'd."},
+            {"actor": "prospect", "reaches": ["P17"], "operations": 0,
+             "note": ("A business buying TICVAI, before it is a tenant. **No operation serves them "
+                      "yet** — every onboarding operation is authenticated at tenant scope. Added "
+                      "11 September.")},
             {"actor": "device", "reaches": ["P07", "P15"], "operations": aud.get("device", 0),
              "note": ("Turnstiles, scanners, kitchen displays. **A device authenticates and does "
                       "not authorise.**")},

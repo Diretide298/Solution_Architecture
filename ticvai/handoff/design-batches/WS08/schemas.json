@@ -1,0 +1,741 @@
+{
+ "FamilyChildPodCompanionJourneyView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Family, Child, POD & Companion Journey displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "parentChild": {
+    "type": "string",
+    "description": "Parent → Child"
+   },
+   "guardianMinor": {
+    "type": "string",
+    "description": "Guardian → Minor"
+   },
+   "podCompanion": {
+    "type": "string",
+    "description": "POD → Companion"
+   },
+   "primaryGuestNanny": {
+    "type": "string",
+    "description": "Primary Guest → Nanny"
+   },
+   "groupLeaderGroupMember": {
+    "type": "string",
+    "description": "Group Leader → Group Member"
+   },
+   "otherAuthorizedRelationships": {
+    "type": "string",
+    "description": "other authorized relationships"
+   }
+  }
+ },
+ "FastPassAttractionAccessJourneyView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Fast Pass & Attraction Access Journey displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "totalUses": {
+    "type": "integer",
+    "description": "Total Uses (the pack shows 3)"
+   },
+   "rideCoaster": {
+    "type": "string",
+    "description": "Ride: Coaster"
+   },
+   "previousUse1032": {
+    "type": "string",
+    "description": "Previous Use: 10:32"
+   },
+   "eligibleYes": {
+    "type": "string",
+    "description": "Eligible: YES"
+   },
+   "eligibleType": {
+    "type": "string",
+    "enum": [
+     "rollerCoaster",
+     "dropTower",
+     "waterRide",
+     "adventureRide"
+    ],
+    "description": "Vocabulary listed under Select eligible."
+   }
+  }
+ },
+ "GroupAttendancePartialEntryManagerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Group Attendance & Partial Entry Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "purchased50": {
+    "type": "string",
+    "description": "Purchased: 50"
+   },
+   "previouslyEntered0": {
+    "type": "string",
+    "description": "Previously Entered: 0"
+   },
+   "entered43": {
+    "type": "string",
+    "description": "Entered: 43"
+   },
+   "remaining7": {
+    "type": "string",
+    "description": "Remaining: 7"
+   },
+   "remaining": {
+    "type": "string",
+    "description": "Remaining (the pack shows 7, 2)"
+   },
+   "guestsArriving": {
+    "type": "string",
+    "description": "Guests arriving (the pack shows 104 | Pa ge, 5)"
+   },
+   "totalEntered": {
+    "type": "integer",
+    "description": "Total Entered (the pack shows 48)"
+   },
+   "group": {
+    "type": "string",
+    "description": "Group"
+   },
+   "leader": {
+    "type": "string",
+    "description": "Leader"
+   },
+   "gate": {
+    "type": "string",
+    "description": "Gate"
+   },
+   "operator": {
+    "type": "string",
+    "description": "Operator"
+   },
+   "quantity": {
+    "type": "integer",
+    "description": "Quantity"
+   },
+   "time": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time"
+   },
+   "device": {
+    "type": "string",
+    "description": "Device"
+   }
+  }
+ },
+ "GroupB2bAdmissionProfileBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Group & B2B Admission Profile Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "schools": {
+    "type": "string",
+    "description": "Schools"
+   },
+   "tourOperators": {
+    "type": "string",
+    "description": "Tour Operators"
+   },
+   "corporateGroups": {
+    "type": "string",
+    "description": "Corporate Groups"
+   },
+   "resellers": {
+    "type": "string",
+    "description": "Resellers"
+   },
+   "travelGroups": {
+    "type": "string",
+    "description": "Travel Groups"
+   },
+   "camps": {
+    "type": "string",
+    "description": "Camps"
+   },
+   "families": {
+    "type": "string",
+    "description": "Families"
+   },
+   "events": {
+    "type": "string",
+    "description": "Events"
+   },
+   "singleGroupQr": {
+    "type": "string",
+    "description": "Single Group QR"
+   },
+   "groupBarcode": {
+    "type": "string",
+    "description": "Group Barcode"
+   },
+   "groupRfid": {
+    "type": "string",
+    "description": "Group RFID"
+   },
+   "groupLeaderCredential": {
+    "type": "string",
+    "description": "Group Leader Credential"
+   },
+   "individualCredentials": {
+    "type": "string",
+    "description": "Individual Credentials"
+   },
+   "hybrid": {
+    "type": "string",
+    "description": "Hybrid"
+   },
+   "entireGroup": {
+    "type": "string",
+    "description": "Entire Group"
+   },
+   "partialGroup": {
+    "type": "string",
+    "description": "Partial Group"
+   },
+   "multipleWaves": {
+    "type": "string",
+    "description": "Multiple Waves"
+   },
+   "individualScan": {
+    "type": "string",
+    "description": "Individual Scan"
+   },
+   "leaderQuantity": {
+    "type": "integer",
+    "description": "Leader + Quantity"
+   },
+   "manifestBased": {
+    "type": "string",
+    "description": "Manifest-Based"
+   }
+  }
+ },
+ "GroupB2bAdmissionProfileBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Group & B2B Admission Profile Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "schools": {
+    "type": "string",
+    "description": "Schools"
+   },
+   "tourOperators": {
+    "type": "string",
+    "description": "Tour Operators"
+   },
+   "corporateGroups": {
+    "type": "string",
+    "description": "Corporate Groups"
+   },
+   "resellers": {
+    "type": "string",
+    "description": "Resellers"
+   },
+   "travelGroups": {
+    "type": "string",
+    "description": "Travel Groups"
+   },
+   "camps": {
+    "type": "string",
+    "description": "Camps"
+   },
+   "families": {
+    "type": "string",
+    "description": "Families"
+   },
+   "events": {
+    "type": "string",
+    "description": "Events"
+   },
+   "singleGroupQr": {
+    "type": "string",
+    "description": "Single Group QR"
+   },
+   "groupBarcode": {
+    "type": "string",
+    "description": "Group Barcode"
+   },
+   "groupRfid": {
+    "type": "string",
+    "description": "Group RFID"
+   },
+   "groupLeaderCredential": {
+    "type": "string",
+    "description": "Group Leader Credential"
+   },
+   "individualCredentials": {
+    "type": "string",
+    "description": "Individual Credentials"
+   },
+   "hybrid": {
+    "type": "string",
+    "description": "Hybrid"
+   },
+   "purchasedGuests": {
+    "type": "integer",
+    "description": "Purchased Guests (the pack shows 50)"
+   },
+   "entireGroup": {
+    "type": "string",
+    "description": "Entire Group"
+   },
+   "partialGroup": {
+    "type": "string",
+    "description": "Partial Group"
+   },
+   "multipleWaves": {
+    "type": "string",
+    "description": "Multiple Waves"
+   },
+   "individualScan": {
+    "type": "string",
+    "description": "Individual Scan"
+   },
+   "leaderQuantity": {
+    "type": "integer",
+    "description": "Leader + Quantity"
+   },
+   "manifestBased": {
+    "type": "string",
+    "description": "Manifest-Based"
+   }
+  }
+ },
+ "GroupLeaderFastB2bValidationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Group Leader & Fast B2B Validation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "group120Guests": {
+    "type": "string",
+    "description": "GROUP: 120 GUESTS"
+   },
+   "attendance": {
+    "type": "integer",
+    "description": "Attendance (the pack shows +112)"
+   },
+   "remaining": {
+    "type": "string",
+    "description": "Remaining (the pack shows 8)"
+   },
+   "payment": {
+    "type": "string",
+    "description": "Payment ✓"
+   },
+   "booking": {
+    "type": "string",
+    "description": "Booking ✓"
+   },
+   "visitDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Visit Date ✓"
+   },
+   "groupProduct": {
+    "type": "string",
+    "description": "Group Product ✓"
+   },
+   "accessRules": {
+    "type": "string",
+    "description": "Access Rules ✓"
+   },
+   "manifest": {
+    "type": "string",
+    "description": "Manifest ✓"
+   }
+  }
+ },
+ "GuestJourneyCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Guest Journey Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "activeJourneyProfiles": {
+    "type": "integer",
+    "description": "Active Journey Profiles"
+   },
+   "groupArrivalsToday": {
+    "type": "string",
+    "description": "Group Arrivals Today"
+   },
+   "guestsViaGroupAdmission": {
+    "type": "string",
+    "description": "Guests via Group Admission"
+   },
+   "familyJourneys": {
+    "type": "integer",
+    "description": "Family Journeys"
+   },
+   "reEntryGuests": {
+    "type": "integer",
+    "description": "Re-entry Guests"
+   },
+   "crossoversToday": {
+    "type": "string",
+    "description": "Crossovers Today"
+   },
+   "fastPassValidations": {
+    "type": "integer",
+    "description": "Fast Pass Validations"
+   },
+   "specialEventAdmissions": {
+    "type": "integer",
+    "description": "Special Event Admissions"
+   },
+   "vipAdmissions": {
+    "type": "integer",
+    "description": "VIP Admissions"
+   },
+   "journeyExceptions": {
+    "type": "integer",
+    "description": "Journey Exceptions"
+   },
+   "delayedGroups": {
+    "type": "string",
+    "description": "delayed groups"
+   },
+   "unusuallyHighManualIntervention": {
+    "type": "string",
+    "description": "unusually high manual intervention"
+   },
+   "incompleteGroupEntry": {
+    "type": "string",
+    "description": "incomplete group entry"
+   },
+   "companionViolations": {
+    "type": "string",
+    "description": "companion violations"
+   },
+   "crossoverExceptions": {
+    "type": "string",
+    "description": "crossover exceptions"
+   },
+   "fastPassAnomalies": {
+    "type": "string",
+    "description": "Fast Pass anomalies"
+   }
+  }
+ },
+ "Journey": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.journey",
+  "description": "22.3.1b to 22.3.10b, CF-137. **A journey is a sequence with branches; a `MessageTrigger` is one step of it.** The trigger already handles *\"send this when that happens\"* — a journey is what you need when the next message depends on what the guest did about the last one.\nFive of the ten requirements are named lifecycles — abandoned cart, membership, loyalty, wallet, birthday. **They are not five features.** Each is a journey with a different entry event and a different set of steps, which is why this is one entity and a template library rather than five contracts.\n**Consent is checked at every send, not at entry.** A guest who opts out mid-journey stops receiving, and the journey does not need to know — the same rule `MessageTrigger` follows and the one PDPL Article 17(1) makes unconditional.\n",
+  "required": [
+   "id",
+   "name",
+   "entryEvent",
+   "status",
+   "steps"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "templateKind": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "abandonedCart",
+     "membershipLifecycle",
+     "loyaltyLifecycle",
+     "walletLifecycle",
+     "birthday",
+     "onboarding",
+     "winBack",
+     "custom"
+    ],
+    "description": "Which named lifecycle this implements. **Set for reporting and for the library**, not for behaviour — the steps decide what happens.\n"
+   },
+   "entryEvent": {
+    "type": "string",
+    "description": "22.3.2b. From the event catalogue, so a journey cannot enter on something nothing publishes.\n"
+   },
+   "entryConditions": {
+    "type": "object",
+    "nullable": true,
+    "description": "Narrows entry — a segment, a tier, a venue. **Evaluated once at entry**, unlike step conditions.\n"
+   },
+   "steps": {
+    "type": "array",
+    "description": "22.3.1b. What the builder produces. **The visual builder is a frontend over this** — the contract holds the graph and the canvas is a rendering of it.\n",
+    "items": {
+     "$ref": "#/components/schemas/JourneyStep"
+    }
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "active",
+     "paused",
+     "archived"
+    ]
+   },
+   "maxDurationDays": {
+    "type": "integer",
+    "default": 30,
+    "description": "**A journey with no end is a guest who never leaves it.** After this, entrants exit wherever they are.\n"
+   },
+   "reentryPolicy": {
+    "type": "string",
+    "enum": [
+     "never",
+     "afterCompletion",
+     "always"
+    ],
+    "default": "afterCompletion",
+    "description": "22.3.6b. **Abandoned cart is the case that needs this.** A guest who abandons three carts in an hour should not get three recovery sequences, and `never` is wrong too — they may genuinely abandon one next month.\n"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "JourneyStep": {
+  "type": "object",
+  "description": "One node. **A step either sends, waits, or branches** — three kinds rather than a general graph, because a marketing user drawing an arbitrary graph draws a loop.\n",
+  "required": [
+   "id",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "send",
+     "wait",
+     "branch",
+     "exit",
+     "goal"
+    ]
+   },
+   "templateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For `send`. Channel is resolved from the guest's preference at the moment of sending."
+   },
+   "channelPreference": {
+    "type": "array",
+    "nullable": true,
+    "description": "22.3.3b. Ordered fallback — email, then SMS, then push. **A guest with no email address does not get an email step**, and the step does not fail, it moves down the list.\n",
+    "items": {
+     "type": "string",
+     "enum": [
+      "email",
+      "sms",
+      "whatsapp",
+      "push",
+      "inApp"
+     ]
+    }
+   },
+   "waitMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "waitUntil": {
+    "type": "object",
+    "nullable": true,
+    "description": "22.3.5b. **Business hours, time zone and blackout windows** — a wallet low-balance alert at 3am is a complaint, and the venue's quiet hours are venue configuration rather than a property of this step.\n",
+    "properties": {
+     "businessHoursOnly": {
+      "type": "boolean",
+      "default": false
+     },
+     "timezone": {
+      "type": "string",
+      "nullable": true
+     },
+     "respectQuietHours": {
+      "type": "boolean",
+      "default": true
+     },
+     "notBefore": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   },
+   "condition": {
+    "type": "object",
+    "nullable": true,
+    "description": "22.3.4b. IF/THEN over guest profile, behaviour and prior steps. **The most common condition is whether the previous message worked** — a recovery sequence must stop when the guest buys.\n",
+    "properties": {
+     "field": {
+      "type": "string"
+     },
+     "operator": {
+      "type": "string",
+      "enum": [
+       "eq",
+       "neq",
+       "gt",
+       "lt",
+       "contains",
+       "exists",
+       "notExists"
+      ]
+     },
+     "value": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   },
+   "onTrue": {
+    "type": "string",
+    "nullable": true,
+    "description": "Next step id."
+   },
+   "onFalse": {
+    "type": "string",
+    "nullable": true
+   },
+   "next": {
+    "type": "string",
+    "nullable": true
+   },
+   "goalEvent": {
+    "type": "string",
+    "nullable": true,
+    "description": "For `goal`. **The event that means this journey worked and the guest should leave it** — a purchase for abandoned cart, a renewal for membership. **Reaching a goal exits immediately**, which is what stops a recovered cart from being chased.\n"
+   }
+  }
+ },
+ "MultiParkCrossoverJourneyOrchestratorView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Multi-Park & Crossover Journey Orchestrator displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "maximum": {
+    "type": "string",
+    "description": "Maximum (the pack shows 1)"
+   },
+   "adventureParkInside": {
+    "type": "string",
+    "description": "Adventure Park — INSIDE"
+   },
+   "waterParkCrossoverAvailable": {
+    "type": "string",
+    "description": "Water Park — CROSSOVER AVAILABLE"
+   },
+   "normalEntry": {
+    "type": "string",
+    "description": "Normal Entry"
+   },
+   "reEntry": {
+    "type": "string",
+    "description": "Re-entry"
+   },
+   "crossover": {
+    "type": "string",
+    "description": "Crossover"
+   }
+  }
+ },
+ "ReEntryTemporaryExitJourneyView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Re-entry & Temporary Exit Journey displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "credentialOnly": {
+    "type": "string",
+    "description": "Credential only"
+   },
+   "credentialUvStamp": {
+    "type": "string",
+    "description": "Credential + UV stamp"
+   },
+   "credentialFace": {
+    "type": "string",
+    "description": "Credential + Face"
+   },
+   "credentialOperator": {
+    "type": "string",
+    "description": "Credential + operator"
+   },
+   "customSupportedMethod": {
+    "type": "string",
+    "description": "custom supported method"
+   },
+   "maximum": {
+    "type": "string",
+    "description": "Maximum (the pack shows 1)"
+   },
+   "previousEntry": {
+    "type": "string",
+    "description": "✓ Previous entry"
+   },
+   "validExit": {
+    "type": "string",
+    "description": "✓ Valid exit"
+   },
+   "reEntryEntitlement": {
+    "type": "string",
+    "description": "✓ Re-entry entitlement"
+   },
+   "reEntryQuantity": {
+    "type": "integer",
+    "description": "✓ Re-entry quantity"
+   },
+   "correctGate": {
+    "type": "string",
+    "description": "✓ Correct gate"
+   },
+   "antiPassback": {
+    "type": "string",
+    "description": "✓ Anti-passback"
+   },
+   "additionalVerification": {
+    "type": "string",
+    "description": "✓ Additional verification"
+   }
+  }
+ },
+ "SpecialEventFreeViewAlternativeAdmissionView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Special Event, Free View & Alternative Admission displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "exampleFreeViewDay": {
+    "type": "string",
+    "description": "Example — Free View Day"
+   },
+   "on": {
+    "type": "string",
+    "description": "ON"
+   },
+   "attendance": {
+    "type": "integer",
+    "description": "Attendance (the pack shows +85)"
+   },
+   "exampleSpecialEvent": {
+    "type": "string",
+    "description": "Example — Special Event"
+   }
+  }
+ }
+}

@@ -1,0 +1,171 @@
+{
+ "AccessPoint": {
+  "x-ticvai-persistence": "access.access_point",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "venueId",
+   "mode",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "externalCredentialSources": {
+    "type": "array",
+    "description": "BL-108. **A hotel room card admitting a guest to a water park** — externally issued, and the platform validates it without having sold it.\n**The entitlement is created on first use, not on check-in.** A hotel with 400 rooms does not want 400 entitlements a night for guests who never visit.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "hotelRoomCard",
+        "corporateBadge",
+        "cityPass",
+        "transitCard",
+        "partnerToken"
+       ]
+      },
+      "providerName": {
+       "type": "string"
+      },
+      "endpoint": {
+       "type": "string"
+      },
+      "credentialRef": {
+       "type": "string"
+      },
+      "grantsProductId": {
+       "type": "string",
+       "format": "uuid"
+      }
+     }
+    }
+   },
+   "scanAnomalyRules": {
+    "type": "array",
+    "description": "BL-104. **Rule-based scan anomalies, separated from the parked model-based engine** — device sharing, simultaneous entries at two gates, an impossible walking time between them.\n**These are deterministic and need no model**, which is why they are here and not in `ai`: two entries eight seconds apart at gates four hundred metres apart is arithmetic.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "rule": {
+       "type": "string",
+       "enum": [
+        "simultaneousEntry",
+        "impossibleTravelTime",
+        "rapidReentry",
+        "sharedDevice",
+        "velocityBreach"
+       ]
+      },
+      "action": {
+       "type": "string",
+       "enum": [
+        "log",
+        "flag",
+        "requireSupervisor",
+        "deny"
+       ]
+      },
+      "thresholdSeconds": {
+       "type": "integer",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "operatingMode": {
+    "type": "string",
+    "enum": [
+     "normal",
+     "freeFlow",
+     "dropArm",
+     "closed",
+     "podium",
+     "maintenance"
+    ],
+    "default": "normal",
+    "description": "BL-107 and BL-109. **A closed turnstile and one in emergency drop-arm mode look the same in the model and are opposite in meaning.** Closed refuses everybody; drop-arm lets everybody through, and it is the state that exists for an evacuation.\n**`podium` is a supervised validation position** — a member of staff directing a group through a lane, validating by eye against a list. It scans nothing and it is how school parties actually enter.\n**`freeFlow` counts without validating.** Useful at a free event, and a mode that must be visibly distinct from a broken reader.\n"
+   },
+   "vehicleLocationCapture": {
+    "type": "boolean",
+    "default": false,
+    "description": "BL-023. **Nothing helped a guest find their vehicle.** Where the access point is a car park entry, the level and zone are captured against the visit so the app can answer it — **the guest who cannot find their car at 11pm is the last impression of the day.**\n"
+   },
+   "mode": {
+    "$ref": "#/components/schemas/TurnstileMode"
+   },
+   "direction": {
+    "$ref": "#/components/schemas/Direction"
+   },
+   "antiPassbackEnabled": {
+    "type": "boolean"
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "lastHeartbeatAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "Direction": {
+  "type": "string",
+  "enum": [
+   "entry",
+   "exit",
+   "reentry",
+   "crossover"
+  ]
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "TurnstileMode": {
+  "type": "string",
+  "enum": [
+   "entry",
+   "reentry",
+   "crossover",
+   "exit",
+   "freeRotation",
+   "closed"
+  ]
+ }
+}

@@ -5,15 +5,15 @@
 ```
 1628 operations · 28 contracts · 388 tables · 978 relationships
 125 state models · 29 events · 96 flows · 44 ADRs
-1235 screens · 15 platforms · 12 frontends · 5 apps · 21 boards
+1629 screens · 16 platforms · 13 frontends · 5 apps · 22 boards
 ```
 
-**`96 flows` counts authored journeys.** 72 more are derived from the client boards and carry
+**`96 flows` counts authored journeys.** 106 more are derived from the client boards and carry
 `provenance: derived-from-board` — they route screens the client specified and do not yet say
 why anyone walks them. `check-board-flows` reports the two apart, because a number a generator can
 move is not a measure of progress.
 
-**`12 frontends` and `5 apps` are different units and both are real.** A frontend is the build
+**`13 frontends` and `5 apps` are different units and both are real.** A frontend is the build
 unit, one per platform, each joining to a `frontend/*.yaml` manifest that `check-frontend` and
 `check-package` validate. An app is what a user installs — guest, venue-pos,
 venue-staff-mobile, venue-management, ticvai-control — decided 10 September and carried
@@ -56,7 +56,7 @@ that is the point rather than a limitation.
 | `audit-pack-citations` | A citation pointing at a pack or page that is not there |
 | `audit-transitions` | **Coverage, not a rule** · the share of navigation edges carrying an authored label |
 
-**Warnings are not failures.** 913 on screens, 37 on flows, 5 on wireframes — each is a
+**Warnings are not failures.** 968 on screens, 37 on flows, 5 on wireframes — each is a
 decision somebody has to make, and the register says which.
 
 **Two checks do not pass, and both are real work rather than noise.**
@@ -65,9 +65,10 @@ decision somebody has to make, and the register says which.
   `SCN-006`, `SCN-010` and `SCN-012` — its denial, override and offline paths — and none of
   those four screens exists. The flow does not lack a denial path; it describes one that was
   deleted out from under it.
-- **`check-package` — 16 errors.** Long-standing and tracked in the registers.
+- **`check-package` — 9 errors.** Long-standing and tracked in the registers: seven `release*` lineage
+  entries renamed to `relinquish*`, and two notes naming a platform by an old name.
 
-`audit-links` reports 23 broken links, which is the standing baseline rather than a regression.
+`audit-links` reports every link resolving.
 
 ---
 
@@ -75,24 +76,91 @@ decision somebody has to make, and the register says which.
 
 ```
 contracts/      28 OpenAPI files — the source of truth. Everything else derives from here.
-screens/        1235 screens across 15 platforms
-flows/          168 journeys · 96 authored, 72 derived from the client boards
+screens/        1629 screens across 16 platforms
+flows/          203 journey files · 106 derived from the client boards, one per board but B2B board 1
 states/         125 state models
 events/         29 declared events
 docs/adr/       44 architecture decisions
 docs/active/    the working documents — audits, briefs, handoffs
 docs/registers/ conflicts (CF-*), backlog, decisions
 
-backend/        DDL, generated — 388 tables, 574 foreign keys, 278 indexes
+backend/        DDL, generated — 388 tables, 574 foreign keys, 279 indexes
 services/       16 FastAPI skeletons for topology benchmarking
 deploy/         four deployment configurations plus three burst variants
 tools/          the generators and the checks
 handoff/        derived artefacts for consumers — lineage, schema, burst scope, sizing
-wireframes/     21 boards · 15 per platform, 5 per shipped app, 1 index. All
+wireframes/     22 boards · 16 per platform, 5 per shipped app, 1 index. All
                 generated. The 65 client-pack boards were archived on 10 September, and
                 every screen that pointed at one was repointed rather than orphaned.
+                frames/ holds what a designer drew, one file per screen; the boards
+                render around it. design-base/ holds the client-approved POS build,
+                unpacked so it can be edited.
 sources/        every client file — MoMs, RFP, board PDFs, requirements
 ```
+
+---
+
+## Where the screen design stands
+
+**46 of 1629 screens are drawn.** 13 batches of P01 Guest Web came back on 10 September,
+passed the import with nothing refused, and 45 of the 46 carry seeded values rather than
+blank rows. Those frames are now the house style: a later batch that re-derives the look
+instead of matching them produces a second product, not more of this one.
+
+| | batches | screens |
+|---|---|---|
+| drawn | 13 | 46 |
+| locked (P04, the client-approved POS build) | 6 | 30 |
+| pending | 191 | 1,553 |
+
+**About 57 hours of design work remains**, measured at 18 minutes a batch. `QUEUE.md` in
+`handoff/design-batches/` orders it by shipped app, cheapest platforms first, with P08 and
+P09 late because between them they hold 1,060 of the package's screens.
+
+**107 of the 191 pending batches are `WS##` workshop boards** — 1,067 of the pending screens, about 32 hours.
+Their screens already live on a platform. Whether they are wanted as separate drawings is a
+decision nobody has made; they are counted here because pretending they are not in the queue
+would make the queue lie. 34 of them arrived on 11 September with `Latest Docs.zip` (DAM, Game &
+Ride, Rental, Subscription), and their codes are `WS74`–`WS107`: **a `WS` code is issued once, in
+`screens/_workshop-boards.yaml`, and never renumbered** — before that day the codes were
+positions, and those four books moved 47 of them.
+
+**Rental boards 6–8 are drawn twice, on purpose** — as `WS93`–`WS95` on P08 and as
+`P06-rentals-01`–`03` on the staff app, decided 11 September. A counter attendant's handheld and a
+supervisor's desk are different drawings of the same work.
+
+**The Subscription book was placed by who works each screen**, 11 September. Boards 7 and 8 and
+screen 6.10 are the new customer's own admin and moved to P08 (`WS104`, `WS105`,
+`P08-setup-go-live-01`). **P17 TICVAI Sign-up** is new: three batches holding 24 of the book's screens, the ones a prospect sees
+before they are a tenant, copied from boards 2, 4 and 5, which P09 keeps for the operator-led sale.
+
+**54 pending batches have no operation behind any screen**, and `QUEUE.md` puts them last in a
+section of their own. There is no data to seed and no control to gate, so under the finished-screen
+brief they are the weakest ask in the queue; a night that runs short should lose these first.
+
+**Every pending batch has its bundle.** `export-design-batch.py` writes
+`handoff/design-batches/<id>/BUNDLE.md` — the brief plus every field of every screen, its
+operations and its schemas, in one file. All 191 exist, on the brief that leads with the person
+and bans spec vocabulary, and each one's screens match the manifest's batch.
+
+**What the design sessions build from is the YAML, never the boards.** The bundle is derived
+from `screens/P*.yaml` and carries `bindsTo`, `columns` and the operation behind each
+component. The boards are an output. A session that reads a board instead is copying a
+generator's placeholder — which is why the 22 stale renders were deleted on 10 September
+rather than left on disk to be found.
+
+**1,292 of 7,679 component labels are scaffolding, not copy.** 593 read `Every <screen name>`
+and 663 read `The selected <screen name>` -- a generator naming a table after the screen it sits
+on, because nobody had named it. `SCN-016 Gate mode` offers a designer "Every gate mode" and "The
+selected gate mode" and nothing else. **These are placeholders to be replaced, and a build that
+sets them in type has published a generator's shrug.** The 83% that remain were written by a
+person and should be kept.
+
+**719 of the 1629 screens cannot be drawn faithfully from what they declare.** They carry fewer
+than four components, 224 carry none, and `purpose` runs to a median of 84 characters (measured
+11 September). The bundle says
+so where a designer will see it. Drawing over that gap invents requirements; the gap is a
+specification problem and belongs in the log, not in a picture.
 
 ---
 

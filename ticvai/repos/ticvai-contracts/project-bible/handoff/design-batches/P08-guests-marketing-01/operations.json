@@ -1,0 +1,254 @@
+{
+ "createCampaign": {
+  "method": "POST",
+  "path": "/campaigns",
+  "contract": "marketing-crm",
+  "summary": "Create a campaign",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateCampaignRequest",
+  "responds": "Campaign"
+ },
+ "getAiPolicy": {
+  "method": "GET",
+  "path": "/policy",
+  "contract": "ai",
+  "summary": "What the assistant may do here",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiPolicy"
+ },
+ "getAiUsage": {
+  "method": "GET",
+  "path": "/usage",
+  "contract": "ai",
+  "summary": "Usage, cost and performance",
+  "permission": "AI_AUDIT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "groupBy",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiUsageReport"
+ },
+ "getVenueSettings": {
+  "method": "GET",
+  "path": "/venues/{venueId}/settings",
+  "contract": "tenancy",
+  "summary": "Operational settings for this venue",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VenueSettings"
+ },
+ "listAuditRecords": {
+  "method": "GET",
+  "path": "/audit-records",
+  "contract": "tenancy",
+  "summary": "Who did what, where, and when",
+  "permission": "AI_AUDIT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "orgUnitId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "action",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "subjectRef",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "listCampaigns": {
+  "method": "GET",
+  "path": "/campaigns",
+  "contract": "marketing-crm",
+  "summary": "List campaigns",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listIndexFailures": {
+  "method": "GET",
+  "path": "/index-failures",
+  "contract": "ai",
+  "summary": "Records an index could not embed",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "jobId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "stage",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "IndexFailure"
+ },
+ "listLostItems": {
+  "method": "GET",
+  "path": "/lost-items",
+  "contract": "marketing-crm",
+  "summary": "Reported and found, with suggested matches",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "LostItem"
+ },
+ "matchLostItem": {
+  "method": "POST",
+  "path": "/lost-items/{itemId}/match",
+  "contract": "marketing-crm",
+  "summary": "Tie a report to a found item, or hand it back",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "LostItem"
+ },
+ "resolvePermissions": {
+  "method": "POST",
+  "path": "/permissions/resolve",
+  "contract": "identity",
+  "summary": "Simulate a principal's effective permissions",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setAiPolicy": {
+  "method": "PUT",
+  "path": "/policy",
+  "contract": "ai",
+  "summary": "Set the policy",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AiPolicy",
+  "responds": "AiPolicy"
+ }
+}

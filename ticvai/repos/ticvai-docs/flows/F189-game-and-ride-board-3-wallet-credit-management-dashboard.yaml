@@ -1,0 +1,137 @@
+id: F189
+name: 'Game and Ride board 3: Wallet & Credit Management Dashboard'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Game and Ride board 3. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-414
+  entryPoints:
+  - Arrives at Wallet & Credit Management Dashboard
+steps:
+- step: 1
+  screen: BO-414
+  action: Opens Wallet & Credit Management Dashboard
+  operations: []
+  outcome: Provide a central management view of wallet balances, credit issuance, bonus utilization, free-game
+    credits and top-up activity across the operation.
+- step: 2
+  screen: BO-415
+  action: Works in Wallet & Credit Type Configuration
+  operations: []
+  outcome: Define the different value buckets that can exist inside a guest's digital wallet. The source
+    distinguishes normal wallet value, bonus value, free-game credits and game/ride entitlements.
+- step: 3
+  screen: BO-414
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-416
+  action: Works in Wallet Account & Balance View
+  operations: []
+  outcome: Allow authorized operators to inspect all value held in an individual guest wallet. The source
+    requires stored credits to be viewable through operator and self-service kiosks.
+- step: 5
+  screen: BO-414
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-417
+  action: Works in Top-Up Configuration
+  operations: []
+  outcome: Configure the rules governing customer wallet recharges.
+- step: 7
+  screen: BO-414
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-418
+  action: Works in Top-Up Bonus Rule Configuration
+  operations: []
+  outcome: 'Configure promotional bonus value automatically awarded when a customer tops up. The requirement
+    explicitly gives the example: Top-Up AED 100 → AED 100 Paid Credit + AED 25 Bonus.'
+- step: 9
+  screen: BO-414
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-419
+  action: Works in Bonus Usage Restrictions
+  operations: []
+  outcome: Control where promotional bonus value can and cannot be spent. This is a critical requirement
+    because the source states that the bonus can be used for amusement park games/rides but not for F&B
+    or Retail, and that this must be configurable.
+- step: 11
+  screen: BO-414
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-420
+  action: Works in Bonus Validity & Expiry Configuration
+  operations: []
+  outcome: Define how long promotional bonus credit remains valid. The source specifically requires the
+    ability to set a validity period for the bonus.
+- step: 13
+  screen: BO-414
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-421
+  action: Works in Free Game & Ride Credit Management
+  operations: []
+  outcome: Configure and allocate free gameplay credits to customer wallets. The requirement explicitly
+    requires the system to add credits for free games and rides to a guest's digital wallet, usable across
+    applicable attractions.
+- step: 15
+  screen: BO-414
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-422
+  action: Works in Refund, Adjustment & Manual Bonus Control
+  operations: []
+  outcome: Enforce refund restrictions and provide governed manual wallet adjustments.
+- step: 17
+  screen: BO-414
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-423
+  action: Works in Wallet Credit Transaction Ledger & Audit
+  operations: []
+  outcome: Provide complete traceability for every change to wallet value.
+branches:
+- at: 1
+  condition: Nothing has been set up on Wallet & Credit Management Dashboard yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Game and Ride board 3 visited
+primaryContract: unknown
+contracts:
+- unknown

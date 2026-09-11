@@ -1,0 +1,146 @@
+[
+ {
+  "id": "GST-063",
+  "name": "Search",
+  "module": "Discovery",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/search",
+   "component": "apps/guest-app/src/routes/Search.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "GST-001"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "GST-001"
+   ],
+   "notes": "**Reached from GST-001** — search is reached from home. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Added 17 August for parity with WEB-003. **Not on the wireframe board** — needs drawing. CF-93.",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`searchCatalogue` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Find something when you do not know what it is called.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every search",
+       "bindsTo": "Money",
+       "columns": [
+        "Money.amount",
+        "Money.currency",
+        "Money.scale"
+       ],
+       "operation": "searchCatalogue",
+       "provenance": "contract catalogue.yaml GET /search"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected search",
+       "bindsTo": "Money",
+       "columns": [
+        "Money.amount",
+        "Money.currency",
+        "Money.scale"
+       ],
+       "operation": "searchCatalogue",
+       "provenance": "contract catalogue.yaml GET /search"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "derived": true,
+       "impliedBy": "searchCatalogue",
+       "label": "Search",
+       "notes": "A search that returns nothing must say so differently from a search not yet run.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The search list.",
+   "error": "Could not load. Names which read failed and leaves the search untouched.",
+   "emptyFirstRun": "No search yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the search are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Searches the cached catalogue only**, with a note that newer items may exist"
+  },
+  "apis": [
+   {
+    "operationId": "searchCatalogue",
+    "contract": "catalogue",
+    "purpose": "Find something by name",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Money.amount",
+    "Money.currency",
+    "Money.scale"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-063"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

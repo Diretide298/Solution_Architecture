@@ -1,0 +1,1597 @@
+[
+ {
+  "id": "ADM-218",
+  "name": "Campaign Governance & Budget Command Center",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "9",
+   "number": "1",
+   "page": 125
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/campaign-governance-budget-command-center-adm-218",
+   "component": "apps/ticvai-web/src/routes/commercial/CampaignGovernanceBudgetCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "exitTo": [
+    "ADM-002",
+    "ADM-219",
+    "ADM-220",
+    "ADM-221",
+    "ADM-222",
+    "ADM-223",
+    "ADM-224",
+    "ADM-225",
+    "ADM-226",
+    "ADM-227"
+   ],
+   "inferred": false,
+   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
+   "transitions": [
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-219",
+     "trigger": "Works in Campaign Budget & Financial Limit Setup",
+     "provenance": "flow F162 step 1→2",
+     "operation": "listCampaignGovernanceBudget"
+    },
+    {
+     "to": "ADM-220",
+     "trigger": "Works in Redemption, Discount & Exposure Limit Manager",
+     "provenance": "flow F162 step 3→4",
+     "operation": "listCampaignGovernanceBudget"
+    },
+    {
+     "to": "ADM-221",
+     "trigger": "Works in Budget Consumption & Forecast Monitor",
+     "provenance": "flow F162 step 5→6",
+     "operation": "listCampaignGovernanceBudget"
+    },
+    {
+     "to": "ADM-222",
+     "trigger": "Works in Threshold Actions & Automatic Suspension",
+     "provenance": "flow F162 step 7→8",
+     "operation": "listCampaignGovernanceBudget"
+    },
+    {
+     "to": "ADM-223",
+     "trigger": "Works in Campaign Approval Workflow Designer",
+     "provenance": "flow F162 step 9→10",
+     "operation": "listCampaignGovernanceBudget"
+    },
+    {
+     "to": "ADM-224",
+     "trigger": "Works in Approval Inbox & Decision Workspace",
+     "provenance": "flow F162 step 11→12",
+     "operation": "listCampaignGovernanceBudget"
+    },
+    {
+     "to": "ADM-225",
+     "trigger": "Works in Campaign Financial & Commercial Simulator",
+     "provenance": "flow F162 step 13→14",
+     "operation": "listCampaignGovernanceBudget"
+    },
+    {
+     "to": "ADM-226",
+     "trigger": "Works in Campaign Experiment & A/B Test Manager",
+     "provenance": "flow F162 step 15→16",
+     "operation": "listCampaignGovernanceBudget"
+    },
+    {
+     "to": "ADM-227",
+     "trigger": "Works in Governance Audit, AI Risk & Launch Readiness",
+     "provenance": "flow F162 step 17→18",
+     "operation": "listCampaignGovernanceBudget"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
+  "purpose": "Provide executives, Marketing, Commercial, Revenue, and Finance with one centralized view of the financial and governance status of promotional campaigns.",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Active Campaigns",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 125 §KPI Cards",
+       "bindsTo": "CampaignGovernanceBudgetCommandCenterView.activeCampaigns"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Campaign Budget",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 125 §KPI Cards",
+       "bindsTo": "CampaignGovernanceBudgetCommandCenterView.campaignBudget"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Budget Consumed",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 125 §KPI Cards",
+       "bindsTo": "CampaignGovernanceBudgetCommandCenterView.budgetConsumed"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Remaining Budget",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 125 §KPI Cards",
+       "bindsTo": "CampaignGovernanceBudgetCommandCenterView.remainingBudget"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Discount Exposure",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 125 §KPI Cards",
+       "bindsTo": "CampaignGovernanceBudgetCommandCenterView.discountExposure"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Redemption Value",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 125 §KPI Cards",
+       "bindsTo": "CampaignGovernanceBudgetCommandCenterView.redemptionValue"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Revenue Generated",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 125 §KPI Cards",
+       "bindsTo": "CampaignGovernanceBudgetCommandCenterView.revenueGenerated"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Incremental Revenue",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 125 §KPI Cards",
+       "bindsTo": "CampaignGovernanceBudgetCommandCenterView.incrementalRevenue"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Campaign ROI",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 125 §KPI Cards",
+       "bindsTo": "CampaignGovernanceBudgetCommandCenterView.campaignRoi"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Campaigns Near Budget Limit",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 125 §KPI Cards",
+       "bindsTo": "CampaignGovernanceBudgetCommandCenterView.campaignsNearBudgetLimit"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pending Approvals",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 125 §KPI Cards",
+       "bindsTo": "CampaignGovernanceBudgetCommandCenterView.pendingApprovals"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Suspended Campaigns",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 125 §KPI Cards",
+       "bindsTo": "CampaignGovernanceBudgetCommandCenterView.suspendedCampaigns"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The campaign governance budget list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the campaign governance budget untouched.",
+   "emptyFirstRun": "No campaign governance budget yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the campaign governance budget are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCampaignGovernanceBudget",
+    "contract": "promotions",
+    "purpose": "Campaign Governance & Budget Command Center",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "CampaignGovernanceBudgetCommandCenterView.activeCampaigns",
+    "CampaignGovernanceBudgetCommandCenterView.campaignBudget",
+    "CampaignGovernanceBudgetCommandCenterView.budgetConsumed",
+    "CampaignGovernanceBudgetCommandCenterView.remainingBudget",
+    "CampaignGovernanceBudgetCommandCenterView.discountExposure",
+    "CampaignGovernanceBudgetCommandCenterView.redemptionValue"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-218"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 125. 12 of 12 labels bound to a contract property; 12 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-219",
+  "name": "Campaign Budget & Financial Limit Setup",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "9",
+   "number": "2",
+   "page": 126
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/campaign-budget-financial-limit-setup-adm-219",
+   "component": "apps/ticvai-web/src/routes/commercial/CampaignBudgetFinancialLimitSetup.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-218"
+   ],
+   "exitTo": [
+    "ADM-218"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-218, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-218",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F162 step 2→3",
+     "operation": "setCampaignBudgetFinancial"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configuration) and no display directory — it is settings, not a population",
+  "purpose": "Define the financial envelope within which a campaign is permitted to operate.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Total campaign budget. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 126 §Support"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Campaign",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 126 §Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Budget amount",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 126 §Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Currency",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 126 §Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Effective dates",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 126 §Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Budget owner",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 126 §Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Cost center",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 126 §Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Business entity",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 126 §Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 126 §Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Department",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 126 §Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Funding source",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 126 §Configuration"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Total campaign budget",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 126 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The campaign budget financial configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the campaign budget financial untouched.",
+   "emptyFirstRun": "No campaign budget financial configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setCampaignBudgetFinancial",
+    "contract": "promotions",
+    "purpose": "Campaign Budget & Financial Limit Setup",
+    "trigger": "onAction",
+    "invalidates": [
+     "setCampaignBudgetFinancial"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-219"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 126. 0 of 0 labels bound to a contract property; 11 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-220",
+  "name": "Redemption, Discount & Exposure Limit Manager",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "9",
+   "number": "3",
+   "page": 128
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/redemption-discount-exposure-limit-manager-adm-220",
+   "component": "apps/ticvai-web/src/routes/commercial/RedemptionDiscountExposureLimitManager.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-218"
+   ],
+   "exitTo": [
+    "ADM-218"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-218, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-218",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F162 step 4→5",
+     "operation": "listRedemptionDiscountExposure"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Define non-budget commercial limits controlling campaign exposure.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**Redemption, Discount & Exposure Limit Manager declares no operation that writes anything** — its only declared call is `listRedemptionDiscountExposure`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "50%",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 128 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "75%",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 128 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "90%",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 128 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "95%",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 128 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "100%",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 128 §Configure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The redemption discount exposure configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the redemption discount exposure untouched.",
+   "emptyFirstRun": "No redemption discount exposure configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listRedemptionDiscountExposure",
+    "contract": "promotions",
+    "purpose": "Redemption, Discount & Exposure Limit Manager",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-220"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 128. 0 of 0 labels bound to a contract property; 5 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-221",
+  "name": "Budget Consumption & Forecast Monitor",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "9",
+   "number": "4",
+   "page": 129
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/budget-consumption-forecast-monitor-adm-221",
+   "component": "apps/ticvai-web/src/routes/commercial/BudgetConsumptionForecastMonitor.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-218"
+   ],
+   "exitTo": [
+    "ADM-218"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-218, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-218",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F162 step 6→7",
+     "operation": "listBudgetConsumptionForecast"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Provide real-time tracking of campaign financial consumption and predict when limits will be reached.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every budget consumption forecast",
+       "columns": [
+        "BudgetConsumptionForecastMonitorView.originalBudget",
+        "BudgetConsumptionForecastMonitorView.consumed",
+        "BudgetConsumptionForecastMonitorView.committed",
+        "BudgetConsumptionForecastMonitorView.reserved",
+        "BudgetConsumptionForecastMonitorView.remaining",
+        "BudgetConsumptionForecastMonitorView.forecastFinalSpend",
+        "BudgetConsumptionForecastMonitorView.dailyBurnRate"
+       ],
+       "bindsTo": "BudgetConsumptionForecastMonitorView",
+       "operation": "listBudgetConsumptionForecast",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 129 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected budget consumption forecast",
+       "bindsTo": "BudgetConsumptionForecastMonitorView",
+       "columns": [
+        "BudgetConsumptionForecastMonitorView.originalBudget",
+        "BudgetConsumptionForecastMonitorView.consumed",
+        "BudgetConsumptionForecastMonitorView.committed",
+        "BudgetConsumptionForecastMonitorView.reserved",
+        "BudgetConsumptionForecastMonitorView.remaining",
+        "BudgetConsumptionForecastMonitorView.forecastFinalSpend",
+        "BudgetConsumptionForecastMonitorView.dailyBurnRate"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Consumed”, “Reserved”, “Committed”, “Remaining campaign”.",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 129 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The budget consumption forecast list.",
+   "error": "Could not load. Names which read failed and leaves the budget consumption forecast untouched.",
+   "emptyFirstRun": "No budget consumption forecast yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the budget consumption forecast are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listBudgetConsumptionForecast",
+    "contract": "promotions",
+    "purpose": "Budget Consumption & Forecast Monitor",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "BudgetConsumptionForecastMonitorView.originalBudget",
+    "BudgetConsumptionForecastMonitorView.consumed",
+    "BudgetConsumptionForecastMonitorView.committed",
+    "BudgetConsumptionForecastMonitorView.reserved",
+    "BudgetConsumptionForecastMonitorView.remaining",
+    "BudgetConsumptionForecastMonitorView.forecastFinalSpend"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-221"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 129. 7 of 7 labels bound to a contract property; 7 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-222",
+  "name": "Threshold Actions & Automatic Suspension",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "9",
+   "number": "5",
+   "page": 130
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/threshold-actions-automatic-suspension-adm-222",
+   "component": "apps/ticvai-web/src/routes/commercial/ThresholdActionsAutomaticSuspension.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-218"
+   ],
+   "exitTo": [
+    "ADM-218"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-218, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-218",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F162 step 8→9",
+     "operation": "listThresholdActionAutomatic"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Define what TICVAI should do as financial or redemption thresholds are approached or exceeded. This is explicitly required by the matrix.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 10 actions on this screen and the screen declares 1 operation.** Unserved: Notify, Warn, Require approval, Reduce allocation, Stop specific channel, Stop partner, Stop promotion, Stop campaign …. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 130 §Available Actions"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 130"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 130"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Notify",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 130 §Available Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Warn",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 130 §Available Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Require approval",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 130 §Available Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reduce allocation",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 130 §Available Actions"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Stop specific channel",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 130 §Available Actions"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Stop partner",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 130 §Available Actions"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Stop promotion",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 130 §Available Actions"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Stop campaign",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 130 §Available Actions"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmStopSpecificChannel",
+    "component": "confirmDialog",
+    "trigger": "Stop specific channel",
+    "body": "**Stop specific channel on a threshold actions automatic is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
+    "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 130 §Available Actions"
+   },
+   {
+    "id": "confirmStopPartner",
+    "component": "confirmDialog",
+    "trigger": "Stop partner",
+    "body": "**Stop partner on a threshold actions automatic is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
+    "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 130 §Available Actions"
+   },
+   {
+    "id": "confirmStopPromotion",
+    "component": "confirmDialog",
+    "trigger": "Stop promotion",
+    "body": "**Stop promotion on a threshold actions automatic is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
+    "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 130 §Available Actions"
+   },
+   {
+    "id": "confirmStopCampaign",
+    "component": "confirmDialog",
+    "trigger": "Stop campaign",
+    "body": "**Stop campaign on a threshold actions automatic is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
+    "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 130 §Available Actions"
+   }
+  ],
+  "states": {
+   "loading": "The threshold actions automatic list.",
+   "error": "Could not load. Names which read failed and leaves the threshold actions automatic untouched.",
+   "emptyFirstRun": "No threshold actions automatic yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the threshold actions automatic are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listThresholdActionAutomatic",
+    "contract": "promotions",
+    "purpose": "Threshold Actions & Automatic Suspension",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "ThresholdActionsAutomaticSuspensionView.warn",
+    "ThresholdActionsAutomaticSuspensionView.requireApproval",
+    "ThresholdActionsAutomaticSuspensionView.reduceAllocation",
+    "ThresholdActionsAutomaticSuspensionView.stopSpecificChannel",
+    "ThresholdActionsAutomaticSuspensionView.stopPartner"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-222"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 130. 0 of 0 labels bound to a contract property; 10 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-223",
+  "name": "Campaign Approval Workflow Designer",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "9",
+   "number": "6",
+   "page": 131
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/campaign-approval-workflow-designer-adm-223",
+   "component": "apps/ticvai-web/src/routes/commercial/CampaignApprovalWorkflowDesigner.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-218"
+   ],
+   "exitTo": [
+    "ADM-218"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-218, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-218",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F162 step 10→11",
+     "operation": "approveCampaignWorkflow"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure multi-level approval workflows for promotions and campaigns. The matrix explicitly requires configurable multi-level approval for promotion creation, modification, activation, and deactivation.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Sequential approval, Parallel approval, Conditional approval, Mandatory approval, Optional review. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 131 §Support"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 131"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 131"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Sequential approval",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 131 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Parallel approval",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 131 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Conditional approval",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 131 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Mandatory approval",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 131 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Optional review",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 131 §Support"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The campaign approval workflow list.",
+   "error": "Could not load. Names which read failed and leaves the campaign approval workflow untouched.",
+   "emptyFirstRun": "No campaign approval workflow yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the campaign approval workflow are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "approveCampaignWorkflow",
+    "contract": "promotions",
+    "purpose": "Campaign Approval Workflow Designer",
+    "trigger": "onAction",
+    "invalidates": [
+     "approveCampaignWorkflow"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-223"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 131. 0 of 0 labels bound to a contract property; 5 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-224",
+  "name": "Approval Inbox & Decision Workspace",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "9",
+   "number": "7",
+   "page": 132
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/approval-inbox-decision-workspace-adm-224",
+   "component": "apps/ticvai-web/src/routes/commercial/ApprovalInboxDecisionWorkspace.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-218"
+   ],
+   "exitTo": [
+    "ADM-218"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-218, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-218",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F162 step 12→13",
+     "operation": "approveDecision"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
+  "purpose": "Provide approvers with enough commercial information to make an informed decision without navigating through every configuration screen.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every approval decision",
+       "columns": [
+        "ApprovalInboxDecisionWorkspaceView.campaign",
+        "ApprovalInboxDecisionWorkspaceView.promotion",
+        "ApprovalInboxDecisionWorkspaceView.requestedBy",
+        "ApprovalInboxDecisionWorkspaceView.requestDate",
+        "ApprovalInboxDecisionWorkspaceView.requestedAction",
+        "ApprovalInboxDecisionWorkspaceView.discount",
+        "ApprovalInboxDecisionWorkspaceView.budget",
+        "ApprovalInboxDecisionWorkspaceView.estimatedRedemptions",
+        "ApprovalInboxDecisionWorkspaceView.estimatedRevenue",
+        "ApprovalInboxDecisionWorkspaceView.marginImpact",
+        "ApprovalInboxDecisionWorkspaceView.customerReach",
+        "ApprovalInboxDecisionWorkspaceView.riskLevel",
+        "ApprovalInboxDecisionWorkspaceView.aiForecast"
+       ],
+       "bindsTo": "ApprovalInboxDecisionWorkspaceView",
+       "operation": "approveDecision",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 132 §Show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected approval decision",
+       "bindsTo": "ApprovalInboxDecisionWorkspaceView",
+       "columns": [
+        "ApprovalInboxDecisionWorkspaceView.campaign",
+        "ApprovalInboxDecisionWorkspaceView.promotion",
+        "ApprovalInboxDecisionWorkspaceView.requestedBy",
+        "ApprovalInboxDecisionWorkspaceView.requestDate",
+        "ApprovalInboxDecisionWorkspaceView.requestedAction",
+        "ApprovalInboxDecisionWorkspaceView.discount",
+        "ApprovalInboxDecisionWorkspaceView.budget",
+        "ApprovalInboxDecisionWorkspaceView.estimatedRedemptions",
+        "ApprovalInboxDecisionWorkspaceView.estimatedRevenue",
+        "ApprovalInboxDecisionWorkspaceView.marginImpact",
+        "ApprovalInboxDecisionWorkspaceView.customerReach",
+        "ApprovalInboxDecisionWorkspaceView.riskLevel",
+        "ApprovalInboxDecisionWorkspaceView.aiForecast"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Current”, “Discount”, “Budget”, “Duration”, “Approver Actions”, “Comments”.",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 132 §Show"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Approve",
+       "provenance": "contract operation approveDecision"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The approval decision list.",
+   "error": "Could not load. Names which read failed and leaves the approval decision untouched.",
+   "emptyFirstRun": "No approval decision yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the approval decision are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "approveDecision",
+    "contract": "promotions",
+    "purpose": "Approval Inbox & Decision Workspace",
+    "trigger": "onAction",
+    "invalidates": [
+     "approveDecision"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "ApprovalInboxDecisionWorkspaceView.campaign",
+    "ApprovalInboxDecisionWorkspaceView.promotion",
+    "ApprovalInboxDecisionWorkspaceView.requestedBy",
+    "ApprovalInboxDecisionWorkspaceView.requestDate",
+    "ApprovalInboxDecisionWorkspaceView.requestedAction",
+    "ApprovalInboxDecisionWorkspaceView.discount"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-224"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 132. 13 of 13 labels bound to a contract property; 13 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-225",
+  "name": "Campaign Financial & Commercial Simulator",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "9",
+   "number": "8",
+   "page": 133
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/campaign-financial-commercial-simulator-adm-225",
+   "component": "apps/ticvai-web/src/routes/commercial/CampaignFinancialCommercialSimulator.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-218"
+   ],
+   "exitTo": [
+    "ADM-218"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-218, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-218",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F162 step 14→15",
+     "operation": "listCampaignFinancialCommercial"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
+  "purpose": "Simulate the likely financial result of a campaign before activation. This is a major matrix requirement.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every campaign financial commercial",
+       "columns": [
+        "CampaignFinancialCommercialSimulatorView.eligibleAudience",
+        "CampaignFinancialCommercialSimulatorView.expectedTransactions",
+        "CampaignFinancialCommercialSimulatorView.expectedRedemptions",
+        "CampaignFinancialCommercialSimulatorView.grossRevenue",
+        "CampaignFinancialCommercialSimulatorView.discountCost",
+        "CampaignFinancialCommercialSimulatorView.netRevenue",
+        "CampaignFinancialCommercialSimulatorView.incrementalRevenue",
+        "CampaignFinancialCommercialSimulatorView.averageOrderValue",
+        "CampaignFinancialCommercialSimulatorView.grossMargin",
+        "CampaignFinancialCommercialSimulatorView.marginImpact",
+        "CampaignFinancialCommercialSimulatorView.expectedBudgetConsumption",
+        "CampaignFinancialCommercialSimulatorView.roi"
+       ],
+       "bindsTo": "CampaignFinancialCommercialSimulatorView",
+       "operation": "listCampaignFinancialCommercial",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 133 §Show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected campaign financial commercial",
+       "bindsTo": "CampaignFinancialCommercialSimulatorView",
+       "columns": [
+        "CampaignFinancialCommercialSimulatorView.eligibleAudience",
+        "CampaignFinancialCommercialSimulatorView.expectedTransactions",
+        "CampaignFinancialCommercialSimulatorView.expectedRedemptions",
+        "CampaignFinancialCommercialSimulatorView.grossRevenue",
+        "CampaignFinancialCommercialSimulatorView.discountCost",
+        "CampaignFinancialCommercialSimulatorView.netRevenue",
+        "CampaignFinancialCommercialSimulatorView.incrementalRevenue",
+        "CampaignFinancialCommercialSimulatorView.averageOrderValue",
+        "CampaignFinancialCommercialSimulatorView.grossMargin",
+        "CampaignFinancialCommercialSimulatorView.marginImpact",
+        "CampaignFinancialCommercialSimulatorView.expectedBudgetConsumption",
+        "CampaignFinancialCommercialSimulatorView.roi"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Simulation Inputs”, “Scenario ROI”, “Historical Replay”.",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 133 §Show"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The campaign financial commercial list.",
+   "error": "Could not load. Names which read failed and leaves the campaign financial commercial untouched.",
+   "emptyFirstRun": "No campaign financial commercial yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the campaign financial commercial are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCampaignFinancialCommercial",
+    "contract": "promotions",
+    "purpose": "Campaign Financial & Commercial Simulator",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "CampaignFinancialCommercialSimulatorView.eligibleAudience",
+    "CampaignFinancialCommercialSimulatorView.expectedTransactions",
+    "CampaignFinancialCommercialSimulatorView.expectedRedemptions",
+    "CampaignFinancialCommercialSimulatorView.grossRevenue",
+    "CampaignFinancialCommercialSimulatorView.discountCost",
+    "CampaignFinancialCommercialSimulatorView.netRevenue"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-225"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 133. 12 of 12 labels bound to a contract property; 12 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-226",
+  "name": "Campaign Experiment & A/B Test Manager",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "9",
+   "number": "9",
+   "page": 134
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/campaign-experiment-a-b-test-manager-adm-226",
+   "component": "apps/ticvai-web/src/routes/commercial/CampaignExperimentABTestManager.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-218"
+   ],
+   "exitTo": [
+    "ADM-218"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-218, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-218",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F162 step 16→17",
+     "operation": "listCampaignExperimentTest"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Measure) and no metric row",
+  "purpose": "Allow TICVAI to test campaign variants and determine which commercial strategy performs better. The matrix explicitly requires A/B testing of promotion variants, including discount levels, validity periods, bundles, and target segments.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**Campaign Experiment & A/B Test Manager declares no operation that writes anything** — its only declared call is `listCampaignExperimentTest`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every campaign experiment test",
+       "columns": [
+        "CampaignExperimentABTestManagerView.conversion",
+        "CampaignExperimentABTestManagerView.revenue",
+        "CampaignExperimentABTestManagerView.aov",
+        "CampaignExperimentABTestManagerView.redemption",
+        "CampaignExperimentABTestManagerView.discountCost",
+        "CampaignExperimentABTestManagerView.margin",
+        "CampaignExperimentABTestManagerView.incrementalRevenue",
+        "CampaignExperimentABTestManagerView.roi"
+       ],
+       "bindsTo": "CampaignExperimentABTestManagerView",
+       "operation": "listCampaignExperimentTest",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 134 §Measure"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected campaign experiment test",
+       "bindsTo": "CampaignExperimentABTestManagerView",
+       "columns": [
+        "CampaignExperimentABTestManagerView.conversion",
+        "CampaignExperimentABTestManagerView.revenue",
+        "CampaignExperimentABTestManagerView.aov",
+        "CampaignExperimentABTestManagerView.redemption",
+        "CampaignExperimentABTestManagerView.discountCost",
+        "CampaignExperimentABTestManagerView.margin",
+        "CampaignExperimentABTestManagerView.incrementalRevenue",
+        "CampaignExperimentABTestManagerView.roi"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Variant A”, “Variant B”, “Variant C”, “Audience Allocation”, “Test”.",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 134 §Measure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The campaign experiment test list.",
+   "error": "Could not load. Names which read failed and leaves the campaign experiment test untouched.",
+   "emptyFirstRun": "No campaign experiment test yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the campaign experiment test are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCampaignExperimentTest",
+    "contract": "promotions",
+    "purpose": "Campaign Experiment & A/B Test Manager",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "CampaignExperimentABTestManagerView.conversion",
+    "CampaignExperimentABTestManagerView.revenue",
+    "CampaignExperimentABTestManagerView.aov",
+    "CampaignExperimentABTestManagerView.redemption",
+    "CampaignExperimentABTestManagerView.discountCost",
+    "CampaignExperimentABTestManagerView.margin"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-226"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 134. 8 of 8 labels bound to a contract property; 8 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-227",
+  "name": "Governance Audit, AI Risk & Launch Readiness",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "9",
+   "number": "10",
+   "page": 136
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/governance-audit-ai-risk-launch-readiness-adm-227",
+   "component": "apps/ticvai-web/src/routes/commercial/GovernanceAuditAiRiskLaunchReadiness.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-218"
+   ],
+   "exitTo": [
+    "ADM-218"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-218, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure commercial behavior) and no display directory — it is settings, not a population",
+  "purpose": "Provide the final governance checkpoint before a campaign is allowed to go live.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "↓",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 136 §Configure commercial behavior"
+      },
+      {
+       "kind": "textField",
+       "label": "Board 9 — Governance",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 136 §Configure commercial behavior"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The governance audit risk configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the governance audit risk untouched.",
+   "emptyFirstRun": "No governance audit risk configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listGovernanceRiskLaunch",
+    "contract": "promotions",
+    "purpose": "Governance Audit, AI Risk & Launch Readiness",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-227"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 136. 0 of 0 labels bound to a contract property; 2 of 102 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

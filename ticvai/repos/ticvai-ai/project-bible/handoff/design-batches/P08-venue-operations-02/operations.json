@@ -1,0 +1,330 @@
+{
+ "configureWorkstation": {
+  "method": "PUT",
+  "path": "/workstations/{workstationId}",
+  "contract": "tenancy",
+  "summary": "Configure a workstation",
+  "permission": "WORKSTATION_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ConfigureWorkstationRequest",
+  "responds": "Workstation"
+ },
+ "createOrder": {
+  "method": "POST",
+  "path": "/orders",
+  "contract": "orders",
+  "summary": "Create an order",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateOrderRequest",
+  "responds": "Order"
+ },
+ "decideApprovalRequest": {
+  "method": "POST",
+  "path": "/approval-requests/{requestId}/decide",
+  "contract": "approvals",
+  "summary": "Approve or reject",
+  "permission": "APPROVAL_DECIDE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalRequest"
+ },
+ "deployConfigurationProfile": {
+  "method": "POST",
+  "path": "/configuration-profiles/{profileId}/deploy",
+  "contract": "tenancy",
+  "summary": "Push a version to a fleet, in stages",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ProfileDeployment",
+  "responds": null
+ },
+ "getWorkstationHealth": {
+  "method": "GET",
+  "path": "/workstations/{workstationId}/health",
+  "contract": "tenancy",
+  "summary": "A score a manager can sort by, and what is dragging it down",
+  "permission": "DEVICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
+ "listAlerts": {
+  "method": "GET",
+  "path": "/alerts",
+  "contract": "reporting",
+  "summary": "What is currently wrong",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Alert"
+ },
+ "listAuditRecords": {
+  "method": "GET",
+  "path": "/audit-records",
+  "contract": "tenancy",
+  "summary": "Who did what, where, and when",
+  "permission": "AI_AUDIT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "orgUnitId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "action",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "subjectRef",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "listSyncRejections": {
+  "method": "GET",
+  "path": "/sync/rejections",
+  "contract": "orders",
+  "summary": "Entries the server refused",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listWorkstations": {
+  "method": "GET",
+  "path": "/workstations",
+  "contract": "tenancy",
+  "summary": "List workstations",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "saleBoardKind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "runReport": {
+  "method": "POST",
+  "path": "/reports/{reportId}/run",
+  "contract": "reporting",
+  "summary": "Run a report",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RunReportRequest",
+  "responds": "ReportResult"
+ },
+ "setAlertRule": {
+  "method": "PUT",
+  "path": "/alert-rules",
+  "contract": "reporting",
+  "summary": "Watch a metric and tell somebody",
+  "permission": "REPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AlertRule",
+  "responds": "AlertRule"
+ },
+ "setConfigurationProfile": {
+  "method": "PUT",
+  "path": "/configuration-profiles",
+  "contract": "tenancy",
+  "summary": "What a class of workstation is configured to be",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ConfigurationProfile",
+  "responds": "ConfigurationProfile"
+ },
+ "setConnectivityThresholds": {
+  "method": "PUT",
+  "path": "/connectivity-policy",
+  "contract": "tenancy",
+  "summary": "When a workstation decides it is offline, and when it is back",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ConnectivityPolicy",
+  "responds": "ConnectivityPolicy"
+ },
+ "setOfflinePolicy": {
+  "method": "PUT",
+  "path": "/offline-policy",
+  "contract": "tenancy",
+  "summary": "What a workstation may do with no network, and for how long",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "OfflinePolicy",
+  "responds": "OfflinePolicy"
+ },
+ "syncOrders": {
+  "method": "POST",
+  "path": "/sync/orders",
+  "contract": "orders",
+  "summary": "Replay orders recorded offline",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "OrderSyncResult"
+ }
+}

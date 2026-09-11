@@ -1,0 +1,1079 @@
+{
+ "AiAudienceDiscoveryTargetingOptimizationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What AI Audience Discovery & Targeting Optimization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "purchasedAquariumAdmission": {
+    "type": "string",
+    "description": "purchased Aquarium admission"
+   },
+   "audience48260": {
+    "type": "string",
+    "description": "Audience: 48,260"
+   },
+   "suggestedOffer15AquariumDiscount": {
+    "type": "number",
+    "description": "Suggested offer: 15% Aquarium discount"
+   },
+   "predictedConversion128": {
+    "type": "number",
+    "description": "Predicted conversion: 12.8%"
+   },
+   "estimatedIncrementalRevenueAed740k": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Estimated incremental revenue: AED 740K"
+   },
+   "narrowAudience": {
+    "type": "string",
+    "description": "Narrow audience"
+   },
+   "expandAudience": {
+    "type": "string",
+    "description": "Expand audience"
+   },
+   "excludeLowValueSegment": {
+    "type": "string",
+    "description": "Exclude low-value segment"
+   },
+   "changeEligibility": {
+    "type": "string",
+    "description": "Change eligibility"
+   },
+   "changeChannel": {
+    "type": "string",
+    "description": "Change channel"
+   },
+   "changeTiming": {
+    "type": "string",
+    "description": "Change timing"
+   },
+   "changePromotion": {
+    "type": "string",
+    "description": "Change promotion"
+   },
+   "reduceFrequency": {
+    "type": "string",
+    "description": "Reduce frequency"
+   },
+   "whyThisAudience": {
+    "type": "string",
+    "description": "Why this audience?"
+   },
+   "useOnlyPermittedCustomerAttributes": {
+    "type": "string",
+    "description": "Use only permitted customer attributes"
+   },
+   "respectCustomerConsentPreferencesWhereApplicable": {
+    "type": "string",
+    "description": "Respect customer consent/preferences where applicable"
+   },
+   "respectConfiguredMarketingSuppression": {
+    "type": "string",
+    "description": "Respect configured marketing suppression"
+   },
+   "auditSegmentUse": {
+    "type": "string",
+    "description": "Audit segment use"
+   },
+   "auditEligibilityRuleChanges": {
+    "type": "string",
+    "description": "Audit eligibility-rule changes"
+   },
+   "audienceSize126500": {
+    "type": "string",
+    "description": "Audience size: 126,500"
+   },
+   "individualCustomerIdentities": {
+    "type": "string",
+    "description": "Individual customer identities"
+   },
+   "membershipTierEligibility": {
+    "type": "string",
+    "description": "Membership/tier eligibility"
+   },
+   "productRelationships": {
+    "type": "string",
+    "description": "Product relationships"
+   },
+   "commercialBenefits": {
+    "type": "string",
+    "description": "Commercial benefits"
+   },
+   "couponEngineBoard3": {
+    "type": "string",
+    "description": "Coupon Engine — Board 3"
+   },
+   "codeBasedEligibility": {
+    "type": "string",
+    "description": "Code-based eligibility"
+   },
+   "bundleEngineBoards56": {
+    "type": "string",
+    "description": "Bundle Engine — Boards 5–6"
+   },
+   "bundleTargeting": {
+    "type": "string",
+    "description": "Bundle targeting"
+   },
+   "partnerAccountEligibility": {
+    "type": "string",
+    "description": "Partner/account eligibility"
+   },
+   "contextAndChannel": {
+    "type": "string",
+    "description": "Context and channel"
+   },
+   "paymentMethodEligibility": {
+    "type": "string",
+    "description": "Payment-method eligibility"
+   },
+   "campaignAudienceActivation": {
+    "type": "string",
+    "description": "Campaign audience activation"
+   },
+   "performanceAndPredictiveTargeting": {
+    "type": "string",
+    "description": "Performance and predictive targeting"
+   },
+   "doesThisCustomerQualify": {
+    "type": "string",
+    "description": "Does this customer qualify?"
+   },
+   "whatCommercialBenefitApplies": {
+    "type": "string",
+    "description": "What commercial benefit applies?"
+   },
+   "matrixCoverageBoard7": {
+    "type": "string",
+    "description": "Matrix Coverage — Board 7"
+   },
+   "customerGuestEligibilityAndTargetedDiscounts": {
+    "type": "string",
+    "description": "Customer/guest eligibility and targeted discounts"
+   },
+   "membershipAndLoyaltyEligibility": {
+    "type": "string",
+    "description": "Membership and loyalty eligibility"
+   },
+   "customerAccountSpecificPromotionConditions": {
+    "type": "string",
+    "description": "Customer/account-specific promotion conditions"
+   },
+   "channelLocationPartnerRestrictions": {
+    "type": "string",
+    "description": "Channel/location/partner restrictions"
+   }
+  }
+ },
+ "AudiencePreviewReachEligibilitySimulatorView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Audience Preview, Reach & Eligibility Simulator displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "mobileAppEnabled": {
+    "type": "boolean",
+    "description": "Mobile App enabled (the pack shows 126,500)"
+   },
+   "estimatedAudience": {
+    "type": "string",
+    "description": "Estimated audience"
+   },
+   "percentageOfCustomerBase": {
+    "type": "number",
+    "description": "Percentage of customer base"
+   },
+   "historicalConversion": {
+    "type": "number",
+    "description": "Historical conversion"
+   },
+   "historicalAov": {
+    "type": "string",
+    "description": "Historical AOV"
+   },
+   "expectedRedemptions": {
+    "type": "integer",
+    "description": "Expected redemptions"
+   },
+   "estimatedPromotionCost": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Estimated promotion cost"
+   },
+   "estimatedRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Estimated revenue"
+   },
+   "profileAEligible": {
+    "type": "string",
+    "description": "Profile A → Eligible"
+   },
+   "profileBNotEligible": {
+    "type": "string",
+    "description": "Profile B → Not Eligible"
+   }
+  }
+ },
+ "BehavioralTransactionTargetingView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Behavioral & Transaction Targeting displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "previousProductPurchased": {
+    "type": "string",
+    "description": "Previous product purchased"
+   },
+   "previousAttractionVisited": {
+    "type": "string",
+    "description": "Previous attraction visited"
+   },
+   "visitFrequency": {
+    "type": "string",
+    "description": "Visit frequency"
+   },
+   "daysSinceLastVisit": {
+    "type": "string",
+    "description": "Days since last visit"
+   },
+   "previousPromotionRedemption": {
+    "type": "string",
+    "description": "Previous promotion redemption"
+   },
+   "abandonedCart": {
+    "type": "string",
+    "description": "Abandoned cart"
+   },
+   "bookingFrequency": {
+    "type": "string",
+    "description": "Booking frequency"
+   },
+   "purchaseFrequency": {
+    "type": "string",
+    "description": "Purchase frequency"
+   },
+   "averageTransactionValue": {
+    "type": "number",
+    "description": "Average transaction value"
+   },
+   "totalCustomerValue": {
+    "type": "integer",
+    "description": "Total customer value"
+   },
+   "productAffinity": {
+    "type": "string",
+    "description": "Product affinity"
+   },
+   "lifetimeSpend": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Lifetime spend"
+   },
+   "averageBasket": {
+    "type": "number",
+    "description": "Average basket"
+   },
+   "numberOfTransactions": {
+    "type": "integer",
+    "description": "Number of transactions"
+   },
+   "lastPurchase": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last purchase"
+   },
+   "purchaseChannel": {
+    "type": "string",
+    "description": "Purchase channel"
+   },
+   "productMix": {
+    "type": "string",
+    "description": "Product mix"
+   },
+   "last7Days": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last 7 days"
+   },
+   "lifetime": {
+    "type": "string",
+    "description": "Lifetime"
+   },
+   "customPeriod": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Custom period"
+   }
+  }
+ },
+ "ContextLocationChannelTimeTargetingView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Context, Location, Channel & Time Targeting displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "b2cWebsite": {
+    "type": "string",
+    "description": "B2C Website"
+   },
+   "mobileApp": {
+    "type": "string",
+    "description": "Mobile App"
+   },
+   "pos": {
+    "type": "string",
+    "description": "POS"
+   },
+   "mobilePos": {
+    "type": "string",
+    "description": "Mobile POS"
+   },
+   "kiosk": {
+    "type": "string",
+    "description": "Kiosk"
+   },
+   "b2b": {
+    "type": "string",
+    "description": "B2B"
+   },
+   "callCenter": {
+    "type": "string",
+    "description": "Call Center"
+   },
+   "api": {
+    "type": "string",
+    "description": "API"
+   },
+   "ota": {
+    "type": "string",
+    "description": "OTA"
+   },
+   "reseller": {
+    "type": "string",
+    "description": "Reseller"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner"
+   },
+   "businessEntity": {
+    "type": "string",
+    "description": "Business entity"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "operatingArea": {
+    "type": "string",
+    "description": "Operating area"
+   },
+   "marketCountry": {
+    "type": "string",
+    "description": "Market/country"
+   },
+   "salesLocation": {
+    "type": "string",
+    "description": "Sales location"
+   },
+   "purchaseDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Purchase date"
+   },
+   "visitDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Visit date"
+   },
+   "day": {
+    "type": "string",
+    "description": "Day"
+   },
+   "time": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time"
+   },
+   "season": {
+    "type": "string",
+    "description": "Season"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "holiday": {
+    "type": "string",
+    "description": "Holiday"
+   },
+   "campaignPeriod": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Campaign period"
+   },
+   "currentBasket": {
+    "type": "string",
+    "description": "Current basket"
+   },
+   "productCurrentlyViewed": {
+    "type": "string",
+    "description": "Product currently viewed"
+   },
+   "currentBooking": {
+    "type": "string",
+    "description": "Current booking"
+   },
+   "visitState": {
+    "type": "string",
+    "description": "Visit state"
+   },
+   "inVenueStateWhereAvailable": {
+    "type": "string",
+    "description": "In-venue state where available"
+   }
+  }
+ },
+ "CrmCustomerSegmentManagerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What CRM & Customer Segment Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "ticvaiCrm": {
+    "type": "string",
+    "description": "TICVAI CRM"
+   },
+   "importedSegment": {
+    "type": "string",
+    "description": "Imported segment"
+   },
+   "externalCrm": {
+    "type": "string",
+    "description": "External CRM"
+   },
+   "externalCdp": {
+    "type": "string",
+    "description": "External CDP"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "loyalty": {
+    "type": "string",
+    "description": "Loyalty"
+   },
+   "b2bAccounts": {
+    "type": "string",
+    "description": "B2B accounts"
+   },
+   "marketingAutomation": {
+    "type": "string",
+    "description": "Marketing automation"
+   },
+   "segmentName": {
+    "type": "string",
+    "description": "Segment name"
+   },
+   "source": {
+    "type": "string",
+    "description": "Source"
+   },
+   "estimatedAudience": {
+    "type": "string",
+    "description": "Estimated audience"
+   },
+   "lastRefreshed": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last refreshed"
+   },
+   "promotionsUsingSegment": {
+    "type": "string",
+    "description": "Promotions using segment"
+   },
+   "conversion": {
+    "type": "number",
+    "description": "Conversion"
+   },
+   "revenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue"
+   },
+   "status": {
+    "type": "integer",
+    "description": "Status"
+   }
+  }
+ },
+ "EligibilityRuleBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Eligibility Rule Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "guestType": {
+    "type": "string",
+    "description": "Guest type"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer segment"
+   },
+   "ageCategory": {
+    "type": "string",
+    "description": "Age/category"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "loyaltyTier": {
+    "type": "string",
+    "description": "Loyalty tier"
+   },
+   "purchaseHistory": {
+    "type": "string",
+    "description": "Purchase history"
+   },
+   "visitHistory": {
+    "type": "string",
+    "description": "Visit history"
+   },
+   "transactionValue": {
+    "type": "string",
+    "description": "Transaction value"
+   },
+   "productPurchased": {
+    "type": "string",
+    "description": "Product purchased"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "location": {
+    "type": "string",
+    "description": "Location"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner"
+   },
+   "dateTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date/time"
+   },
+   "paymentMethod": {
+    "type": "string",
+    "description": "Payment method"
+   },
+   "campaign": {
+    "type": "string",
+    "description": "Campaign"
+   },
+   "customerAccountAttributes": {
+    "type": "string",
+    "description": "Customer/account attributes"
+   },
+   "nestedGroups": {
+    "type": "string",
+    "description": "Nested groups"
+   },
+   "include": {
+    "type": "string",
+    "description": "Include"
+   },
+   "exclude": {
+    "type": "string",
+    "description": "Exclude"
+   },
+   "multipleConditionSets": {
+    "type": "string",
+    "description": "Multiple condition sets"
+   }
+  }
+ },
+ "EligibilityRuleBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Eligibility Rule Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "guestType": {
+    "type": "string",
+    "description": "Guest type"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer segment"
+   },
+   "ageCategory": {
+    "type": "string",
+    "description": "Age/category"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "loyaltyTier": {
+    "type": "string",
+    "description": "Loyalty tier"
+   },
+   "purchaseHistory": {
+    "type": "string",
+    "description": "Purchase history"
+   },
+   "visitHistory": {
+    "type": "string",
+    "description": "Visit history"
+   },
+   "transactionValue": {
+    "type": "string",
+    "description": "Transaction value"
+   },
+   "productPurchased": {
+    "type": "string",
+    "description": "Product purchased"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "location": {
+    "type": "string",
+    "description": "Location"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner"
+   },
+   "dateTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date/time"
+   },
+   "paymentMethod": {
+    "type": "string",
+    "description": "Payment method"
+   },
+   "campaign": {
+    "type": "string",
+    "description": "Campaign"
+   },
+   "customerAccountAttributes": {
+    "type": "string",
+    "description": "Customer/account attributes"
+   },
+   "nestedGroups": {
+    "type": "string",
+    "description": "Nested groups"
+   },
+   "include": {
+    "type": "string",
+    "description": "Include"
+   },
+   "exclude": {
+    "type": "string",
+    "description": "Exclude"
+   },
+   "multipleConditionSets": {
+    "type": "string",
+    "description": "Multiple condition sets"
+   }
+  }
+ },
+ "MembershipLoyaltyGuestEligibilityView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Membership, Loyalty & Guest Eligibility displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "membershipType": {
+    "type": "string",
+    "description": "Membership type"
+   },
+   "membershipTier": {
+    "type": "string",
+    "description": "Membership tier"
+   },
+   "membershipStatus": {
+    "type": "string",
+    "description": "Membership status"
+   },
+   "membershipStartDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Membership start date"
+   },
+   "renewalStatus": {
+    "type": "string",
+    "description": "Renewal status"
+   },
+   "expiryDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry date"
+   },
+   "membershipTenure": {
+    "type": "string",
+    "description": "Membership tenure"
+   },
+   "loyaltyTier": {
+    "type": "string",
+    "description": "Loyalty tier"
+   },
+   "pointsBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Points balance"
+   },
+   "pointsEarned": {
+    "type": "string",
+    "description": "Points earned"
+   },
+   "pointsRedeemed": {
+    "type": "string",
+    "description": "Points redeemed"
+   },
+   "loyaltyActivity": {
+    "type": "string",
+    "description": "Loyalty activity"
+   },
+   "tierProgression": {
+    "type": "string",
+    "description": "Tier progression"
+   },
+   "adult": {
+    "type": "string",
+    "description": "Adult"
+   },
+   "child": {
+    "type": "string",
+    "description": "Child"
+   },
+   "senior": {
+    "type": "string",
+    "description": "Senior"
+   },
+   "family": {
+    "type": "string",
+    "description": "Family"
+   },
+   "student": {
+    "type": "string",
+    "description": "Student"
+   },
+   "resident": {
+    "type": "string",
+    "description": "Resident"
+   },
+   "tourist": {
+    "type": "string",
+    "description": "Tourist"
+   },
+   "group": {
+    "type": "string",
+    "description": "Group"
+   },
+   "vip": {
+    "type": "string",
+    "description": "VIP"
+   },
+   "fit": {
+    "type": "string",
+    "description": "fit"
+   },
+   "bronze5": {
+    "type": "number",
+    "description": "Bronze 5%"
+   },
+   "silver10": {
+    "type": "number",
+    "description": "Silver 10%"
+   },
+   "gold15": {
+    "type": "number",
+    "description": "Gold 15%"
+   }
+  }
+ },
+ "PartnerB2bPaymentEligibilityView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Partner, B2B & Payment Eligibility displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "partner": {
+    "type": "string",
+    "description": "Partner"
+   },
+   "partnerCategory": {
+    "type": "string",
+    "description": "Partner category"
+   },
+   "corporateAccount": {
+    "type": "string",
+    "description": "Corporate account"
+   },
+   "employer": {
+    "type": "string",
+    "description": "Employer"
+   },
+   "hotel": {
+    "type": "string",
+    "description": "Hotel"
+   },
+   "travelAgency": {
+    "type": "string",
+    "description": "Travel agency"
+   },
+   "tourOperator": {
+    "type": "string",
+    "description": "Tour operator"
+   },
+   "school": {
+    "type": "string",
+    "description": "School"
+   },
+   "governmentEntity": {
+    "type": "string",
+    "description": "Government entity"
+   },
+   "bank": {
+    "type": "string",
+    "description": "Bank"
+   },
+   "b2bAccount": {
+    "type": "string",
+    "description": "B2B account"
+   },
+   "masterAccount": {
+    "type": "string",
+    "description": "Master account"
+   },
+   "subAccount": {
+    "type": "string",
+    "description": "Sub-account"
+   },
+   "contract": {
+    "type": "string",
+    "description": "Contract"
+   },
+   "customerGroup": {
+    "type": "string",
+    "description": "Customer group"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "salesChannel": {
+    "type": "string",
+    "description": "Sales channel"
+   },
+   "paymentMethod": {
+    "type": "string",
+    "description": "Payment method"
+   },
+   "eligibleCardProgram": {
+    "type": "string",
+    "description": "Eligible card program"
+   },
+   "wallet": {
+    "type": "string",
+    "description": "Wallet"
+   },
+   "loyaltyPayment": {
+    "type": "string",
+    "description": "Loyalty payment"
+   },
+   "giftCard": {
+    "type": "string",
+    "description": "Gift card"
+   },
+   "approvedPaymentPartner": {
+    "type": "integer",
+    "description": "Approved payment partner"
+   }
+  }
+ },
+ "TargetingConflictFrequencyExclusionControlsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Targeting Conflict, Frequency & Exclusion Controls displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "maximumOffersPerDay": {
+    "type": "string",
+    "description": "Maximum offers per day"
+   },
+   "maximumOffersPerWeek": {
+    "type": "string",
+    "description": "Maximum offers per week"
+   },
+   "maximumCampaignsPerMonth": {
+    "type": "string",
+    "description": "Maximum campaigns per month"
+   },
+   "maximumRedemptions": {
+    "type": "string",
+    "description": "Maximum redemptions"
+   },
+   "coolingOffPeriod": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Cooling-off period"
+   },
+   "repeatCampaignRestriction": {
+    "type": "string",
+    "description": "Repeat campaign restriction"
+   },
+   "alreadyPurchasedProduct": {
+    "type": "string",
+    "description": "Already purchased product"
+   },
+   "alreadyRedeemedPromotion": {
+    "type": "string",
+    "description": "Already redeemed promotion"
+   },
+   "existingMember": {
+    "type": "string",
+    "description": "Existing member"
+   },
+   "employee": {
+    "type": "string",
+    "description": "Employee"
+   },
+   "specificCrmSegment": {
+    "type": "string",
+    "description": "Specific CRM segment"
+   },
+   "fraudRiskStatus": {
+    "type": "string",
+    "description": "Fraud/risk status"
+   },
+   "accountType": {
+    "type": "string",
+    "description": "Account type"
+   },
+   "partnerRestriction": {
+    "type": "string",
+    "description": "Partner restriction"
+   },
+   "productOwnership": {
+    "type": "string",
+    "description": "Product ownership"
+   },
+   "campaignExclusions": {
+    "type": "string",
+    "description": "Campaign exclusions"
+   },
+   "partnerExclusions": {
+    "type": "string",
+    "description": "Partner exclusions"
+   },
+   "operationalExclusions": {
+    "type": "string",
+    "description": "Operational exclusions"
+   }
+  }
+ },
+ "TargetingEligibilityCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Targeting & Eligibility Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "activeTargetingRules": {
+    "type": "integer",
+    "description": "Active Targeting Rules"
+   },
+   "activeSegments": {
+    "type": "integer",
+    "description": "Active Segments"
+   },
+   "promotionsUsingTargeting": {
+    "type": "string",
+    "description": "Promotions Using Targeting"
+   },
+   "bundlesUsingTargeting": {
+    "type": "string",
+    "description": "Bundles Using Targeting"
+   },
+   "eligibleCustomers": {
+    "type": "integer",
+    "description": "Eligible Customers"
+   },
+   "targetedCustomers": {
+    "type": "integer",
+    "description": "Targeted Customers"
+   },
+   "personalizedOffers": {
+    "type": "integer",
+    "description": "Personalized Offers"
+   },
+   "eligibilityPassRate": {
+    "type": "number",
+    "description": "Eligibility Pass Rate"
+   },
+   "conversionRate": {
+    "type": "number",
+    "description": "Conversion Rate"
+   },
+   "targetedRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Targeted Revenue"
+   },
+   "aovUplift": {
+    "type": "number",
+    "description": "AOV Uplift"
+   },
+   "aiRecommendedSegments": {
+    "type": "integer",
+    "description": "AI-Recommended Segments"
+   },
+   "healthy": {
+    "type": "string",
+    "description": "Healthy"
+   },
+   "warning": {
+    "type": "string",
+    "description": "Warning"
+   },
+   "conflict": {
+    "type": "string",
+    "description": "Conflict"
+   },
+   "noAudience": {
+    "type": "string",
+    "description": "No Audience"
+   },
+   "oversizedAudience": {
+    "type": "string",
+    "description": "Oversized Audience"
+   },
+   "expired": {
+    "type": "integer",
+    "description": "Expired"
+   },
+   "missingData": {
+    "type": "string",
+    "description": "Missing Data"
+   }
+  }
+ }
+}

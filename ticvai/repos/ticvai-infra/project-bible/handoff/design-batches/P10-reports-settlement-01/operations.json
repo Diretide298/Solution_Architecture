@@ -1,0 +1,359 @@
+{
+ "askReportingQuestion": {
+  "method": "POST",
+  "path": "/reports/ask",
+  "contract": "reporting",
+  "summary": "Natural-language reporting query",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "NaturalLanguageAnswer"
+ },
+ "createReport": {
+  "method": "POST",
+  "path": "/reports",
+  "contract": "reporting",
+  "summary": "Create a custom report definition",
+  "permission": "REPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateReportRequest",
+  "responds": "ReportDefinition"
+ },
+ "deleteReport": {
+  "method": "DELETE",
+  "path": "/reports/{reportId}",
+  "contract": "reporting",
+  "summary": "Retire a report definition",
+  "permission": "REPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getCommissionStatement": {
+  "method": "GET",
+  "path": "/partner-agreements/{agreementId}/commission-statement",
+  "contract": "subscription",
+  "summary": "What the partner earned and what is owed",
+  "permission": "PARTNER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CommissionStatement"
+ },
+ "getFinancialReport": {
+  "method": "GET",
+  "path": "/reports/financial",
+  "contract": "finance",
+  "summary": "P&L, balance sheet or cash flow",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "report",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "fiscalPeriodId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "legalEntityId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "costCenterId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "FinancialReport"
+ },
+ "getReport": {
+  "method": "GET",
+  "path": "/reports/{reportId}",
+  "contract": "reporting",
+  "summary": "Read a report definition",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ReportDefinition"
+ },
+ "getSettlement": {
+  "method": "GET",
+  "path": "/settlements/{settlementId}",
+  "contract": "finance",
+  "summary": "Settlement detail with match results",
+  "permission": "SETTLEMENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Settlement"
+ },
+ "ingestSettlementFile": {
+  "method": "POST",
+  "path": "/settlements",
+  "contract": "finance",
+  "summary": "Ingest a provider settlement file",
+  "permission": "SETTLEMENT_RECONCILE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "listPartnerAgreements": {
+  "method": "GET",
+  "path": "/partner-agreements",
+  "contract": "subscription",
+  "summary": "Commercial agreements with B2B partners",
+  "permission": "PARTNER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "expiringWithinDays",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PartnerAgreement"
+ },
+ "listReports": {
+  "method": "GET",
+  "path": "/reports",
+  "contract": "reporting",
+  "summary": "List available report definitions",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "category",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listSettlementExceptions": {
+  "method": "GET",
+  "path": "/settlements/{settlementId}/exceptions",
+  "contract": "finance",
+  "summary": "Unmatched or mismatched settlement lines",
+  "permission": "SETTLEMENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listSettlements": {
+  "method": "GET",
+  "path": "/settlements",
+  "contract": "finance",
+  "summary": "List settlement batches",
+  "permission": "SETTLEMENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": "providerName",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "resolveSettlementException": {
+  "method": "POST",
+  "path": "/settlements/{settlementId}/exceptions",
+  "contract": "finance",
+  "summary": "Resolve a settlement exception",
+  "permission": "SETTLEMENT_RECONCILE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SettlementException"
+ },
+ "runReport": {
+  "method": "POST",
+  "path": "/reports/{reportId}/run",
+  "contract": "reporting",
+  "summary": "Run a report",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RunReportRequest",
+  "responds": "ReportResult"
+ },
+ "saveNaturalLanguageQuery": {
+  "method": "POST",
+  "path": "/reports/ask/{conversationId}/save",
+  "contract": "reporting",
+  "summary": "Save a natural-language answer as a report definition",
+  "permission": "REPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ReportDefinition"
+ },
+ "updateReport": {
+  "method": "PUT",
+  "path": "/reports/{reportId}",
+  "contract": "reporting",
+  "summary": "Publish a new version of a definition",
+  "permission": "REPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateReportRequest",
+  "responds": "ReportDefinition"
+ }
+}

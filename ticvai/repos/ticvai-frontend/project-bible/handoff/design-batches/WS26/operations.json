@@ -1,0 +1,153 @@
+{
+ "listAgentWorkloadAvailability": {
+  "method": "GET",
+  "path": "/agent-workload-availability",
+  "contract": "marketing-crm",
+  "summary": "Agent Workload, Availability & Workforce Control",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AgentWorkloadAvailabilityWorkforceControlView"
+ },
+ "listContact": {
+  "method": "GET",
+  "path": "/contact",
+  "contract": "marketing-crm",
+  "summary": "Contact Center Operations Command Center",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ContactCenterOperationsCommandCenterView"
+ },
+ "listContactAutomation": {
+  "method": "GET",
+  "path": "/contact-automation",
+  "contract": "marketing-crm",
+  "summary": "AI Contact Center Intelligence & Automation Studio",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiContactCenterIntelligenceAutomationStudioView"
+ },
+ "listCustomerSatisfactionFeedback": {
+  "method": "GET",
+  "path": "/customer-satisfaction-feedback",
+  "contract": "marketing-crm",
+  "summary": "Customer Satisfaction, Feedback & Voice of Customer",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CustomerSatisfactionFeedbackVoiceOfCustomerView"
+ },
+ "listEscalationCriticalCase": {
+  "method": "GET",
+  "path": "/escalation-critical-case",
+  "contract": "marketing-crm",
+  "summary": "Escalation & Critical Case Monitor",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "EscalationCriticalCaseMonitorView"
+ },
+ "listQualityAgentEvaluation": {
+  "method": "GET",
+  "path": "/quality-agent-evaluation",
+  "contract": "marketing-crm",
+  "summary": "Quality Management & Agent Evaluation",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "QualityManagementAgentEvaluationView"
+ },
+ "listQueues": {
+  "method": "GET",
+  "path": "/queues",
+  "contract": "queue",
+  "summary": "List queues",
+  "permission": "QUEUE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "openOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listServiceRootCause": {
+  "method": "GET",
+  "path": "/service-root-cause",
+  "contract": "marketing-crm",
+  "summary": "Service Analytics & Root-Cause Intelligence",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ServiceAnalyticsRootCauseIntelligenceView"
+ },
+ "listSlaPolicyService": {
+  "method": "GET",
+  "path": "/sla-policy-service",
+  "contract": "marketing-crm",
+  "summary": "SLA Policy & Service-Level Management",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SlaPolicyServiceLevelManagementView"
+ },
+ "setIntelligentRoutingSkill": {
+  "method": "PUT",
+  "path": "/intelligent-routing-skill",
+  "contract": "marketing-crm",
+  "summary": "Intelligent Routing, Skills & Assignment Engine",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "IntelligentRoutingSkillsAssignmentEngineInput",
+  "responds": "IntelligentRoutingSkillsAssignmentEngineView"
+ }
+}

@@ -1,0 +1,213 @@
+{
+ "decideApprovalRequest": {
+  "method": "POST",
+  "path": "/approval-requests/{requestId}/decide",
+  "contract": "approvals",
+  "summary": "Approve or reject",
+  "permission": "APPROVAL_DECIDE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalRequest"
+ },
+ "getPromotionUsage": {
+  "method": "GET",
+  "path": "/promotions/{promotionId}/usage",
+  "contract": "promotions",
+  "summary": "Redemption count and discount given",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PromotionUsage"
+ },
+ "listApprovalRequests": {
+  "method": "GET",
+  "path": "/approval-requests",
+  "contract": "approvals",
+  "summary": "Requests awaiting a decision, or already decided",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "assignedToMe",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "raisedByMe",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "breachingWithinMinutes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listCampaignCalendarTimeline": {
+  "method": "GET",
+  "path": "/campaign-calendar-timeline",
+  "contract": "promotions",
+  "summary": "Campaign Calendar & Timeline",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CampaignCalendarTimelineView"
+ },
+ "listPromotionActivityVersion": {
+  "method": "GET",
+  "path": "/promotion-activity-version",
+  "contract": "promotions",
+  "summary": "Promotion Audit, Activity & Version History",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PromotionAuditActivityVersionHistoryView"
+ },
+ "listPromotionAlertException": {
+  "method": "GET",
+  "path": "/promotion-alert-exception",
+  "contract": "promotions",
+  "summary": "Promotion Alerts & Exception Center",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PromotionAlertsExceptionCenterView"
+ },
+ "listPromotionCampaign": {
+  "method": "GET",
+  "path": "/promotion-campaign",
+  "contract": "promotions",
+  "summary": "Promotion & Campaign Directory",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PromotionCampaignDirectoryView"
+ },
+ "listPromotionChannel": {
+  "method": "GET",
+  "path": "/promotion-channel",
+  "contract": "promotions",
+  "summary": "Promotion Channel & Publication Monitor",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PromotionChannelPublicationMonitorView"
+ },
+ "listPromotionHealthPerformance": {
+  "method": "GET",
+  "path": "/promotion-health-performance",
+  "contract": "promotions",
+  "summary": "Promotion Health & Performance Monitor",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PromotionHealthPerformanceMonitorView"
+ },
+ "listPromotionLifecycleStatus": {
+  "method": "GET",
+  "path": "/promotion-lifecycle-statu",
+  "contract": "promotions",
+  "summary": "Promotion Lifecycle & Status Manager",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PromotionLifecycleStatusManagerView"
+ },
+ "listPromotions": {
+  "method": "GET",
+  "path": "/promotions",
+  "contract": "promotions",
+  "summary": "List promotions",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "activeAt",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ }
+}

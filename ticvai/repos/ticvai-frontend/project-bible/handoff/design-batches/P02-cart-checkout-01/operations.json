@@ -1,0 +1,312 @@
+{
+ "abandonCart": {
+  "method": "DELETE",
+  "path": "/carts/{cartId}",
+  "contract": "orders",
+  "summary": "Empty it deliberately",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "acquireInventoryHold": {
+  "method": "POST",
+  "path": "/inventory-holds",
+  "contract": "catalogue",
+  "summary": "Acquire an inventory lease",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AcquireLeaseRequest",
+  "responds": "InventoryHold"
+ },
+ "checkoutCart": {
+  "method": "POST",
+  "path": "/carts/{cartId}/checkout",
+  "contract": "orders",
+  "summary": "Turn the cart into an order",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Order"
+ },
+ "claimCart": {
+  "method": "POST",
+  "path": "/carts/{cartId}/claim",
+  "contract": "orders",
+  "summary": "Attach an anonymous cart to a guest",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CartMergeResult"
+ },
+ "createOrder": {
+  "method": "POST",
+  "path": "/orders",
+  "contract": "orders",
+  "summary": "Create an order",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateOrderRequest",
+  "responds": "Order"
+ },
+ "createPayment": {
+  "method": "POST",
+  "path": "/payments",
+  "contract": "orders",
+  "summary": "Take a payment against an order",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreatePaymentRequest",
+  "responds": "Payment"
+ },
+ "extendCart": {
+  "method": "POST",
+  "path": "/carts/{cartId}/extend",
+  "contract": "orders",
+  "summary": "Give the guest more time",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Cart"
+ },
+ "getCart": {
+  "method": "GET",
+  "path": "/carts/{cartId}",
+  "contract": "orders",
+  "summary": "The cart, priced and checked, right now",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Cart"
+ },
+ "getOrder": {
+  "method": "GET",
+  "path": "/orders/{orderId}",
+  "contract": "orders",
+  "summary": "Read an order",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Order"
+ },
+ "getPaymentLink": {
+  "method": "GET",
+  "path": "/payment-links/{token}",
+  "contract": "orders",
+  "summary": "What a guest holding a link is being asked to pay for",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
+ "inquirePaymentStatus": {
+  "method": "POST",
+  "path": "/payments/{paymentId}/inquiry",
+  "contract": "orders",
+  "summary": "Ask the provider what actually happened",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Payment"
+ },
+ "listProductVariants": {
+  "method": "GET",
+  "path": "/products/{productId}/variants",
+  "contract": "catalogue",
+  "summary": "List generated variants",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "payByLink": {
+  "method": "POST",
+  "path": "/payment-links/{token}/pay",
+  "contract": "orders",
+  "summary": "Pay for a booking taken at a till",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "removeCartLine": {
+  "method": "DELETE",
+  "path": "/carts/{cartId}/lines/{lineId}",
+  "contract": "orders",
+  "summary": "Take something out",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Cart"
+ },
+ "reprintOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/reprints",
+  "contract": "orders",
+  "summary": "Reprint or resend tickets",
+  "permission": "ORDER_REPRINT",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "transferOrderTickets": {
+  "method": "POST",
+  "path": "/orders/{orderId}/transfer",
+  "contract": "orders",
+  "summary": "Transfer tickets to another guest",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "updateCartLine": {
+  "method": "PATCH",
+  "path": "/carts/{cartId}/lines/{lineId}",
+  "contract": "orders",
+  "summary": "Change a quantity",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Cart"
+ }
+}

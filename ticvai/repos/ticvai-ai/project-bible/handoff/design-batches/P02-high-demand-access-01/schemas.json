@@ -1,0 +1,219 @@
+{
+ "JoinQueueRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "queueId",
+   "partySize",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "queueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "partySize": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "entitlementId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Fast Pass or priority entitlement. Owned by Product & Entitlement — this contract references it and never defines it.\n"
+   },
+   "partyHeightsCm": {
+    "type": "array",
+    "description": "Where the queue has a height requirement. Refusing here is far better than refusing at the ride, in front of a child who has already waited.\n",
+    "items": {
+     "type": "integer"
+    }
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
+ "QueueEntryStatus": {
+  "type": "string",
+  "enum": [
+   "waiting",
+   "called",
+   "redeemed",
+   "expired",
+   "noShow",
+   "cancelled",
+   "released"
+  ]
+ },
+ "QueueStatus": {
+  "type": "string",
+  "enum": [
+   "open",
+   "paused",
+   "closed",
+   "atCapacity"
+  ]
+ },
+ "WaitTime": {
+  "x-ticvai-persistence": "none — computed from readings and throughput",
+  "type": "object",
+  "required": [
+   "queueId",
+   "waitMinutes",
+   "source",
+   "asOf",
+   "isStale"
+  ],
+  "properties": {
+   "queueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "queueName": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "attractionProductId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "status": {
+    "$ref": "#/components/schemas/QueueStatus"
+   },
+   "waitMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Null where the queue is closed or no estimate is available."
+   },
+   "source": {
+    "$ref": "#/components/schemas/WaitTimeSource"
+   },
+   "isStale": {
+    "type": "boolean",
+    "description": "The underlying feed has gone quiet past its expected interval. The figure is shown with a caveat rather than frozen and presented as current.\n"
+   },
+   "heightRequirementCm": {
+    "type": "integer",
+    "nullable": true
+   },
+   "zone": {
+    "type": "string",
+    "nullable": true
+   },
+   "asOf": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "WaitTimeSource": {
+  "type": "string",
+  "description": "Where the estimate came from. Surfaced so an operator knows whether a figure is measured or guessed.\n",
+  "enum": [
+   "sensor",
+   "throughput",
+   "manual",
+   "unavailable"
+  ]
+ },
+ "WaitingGuest": {
+  "x-ticvai-persistence": "queue.waiting_guest",
+  "type": "object",
+  "required": [
+   "id",
+   "queueId",
+   "partyNumber",
+   "partySize",
+   "status",
+   "joinedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "queueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "queueName": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "partyNumber": {
+    "type": "integer",
+    "description": "What the guest sees and what appears on signage."
+   },
+   "partySize": {
+    "type": "integer"
+   },
+   "status": {
+    "$ref": "#/components/schemas/QueueEntryStatus"
+   },
+   "positionInQueue": {
+    "type": "integer",
+    "nullable": true
+   },
+   "partiesAhead": {
+    "type": "integer",
+    "nullable": true
+   },
+   "estimatedCallAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "isFastPass": {
+    "type": "boolean"
+   },
+   "entitlementId": {
+    "type": "string",
+    "nullable": true
+   },
+   "calledAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "returnWindowEndsAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "redeemedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "admittedCount": {
+    "type": "integer",
+    "nullable": true
+   },
+   "joinedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ }
+}

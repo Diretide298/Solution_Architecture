@@ -1,0 +1,2002 @@
+[
+ {
+  "id": "BO-020",
+  "name": "F&B Order Management",
+  "module": "Food & Beverage",
+  "requiresModule": "fnb",
+  "wave": 1,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/fnb/bo-020",
+   "component": "apps/venue-management-web/src/routes/fnb/BO020List.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-104"
+   ],
+   "exitTo": [
+    "BO-104"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-104.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-104",
+     "trigger": "Food & Beverage",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-104 declares entryState.params venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-025",
+     "trigger": "Tracks the order",
+     "provenance": "flow F11 step 5→6",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "Restored 20 August when the P15 build was rolled back. **Named `Timed Entry Rules` and carrying eleven F&B order operations.** Timed entry is an admission profile; this is the order desk. The client board calls it *Active Order Management & Fulfilment Journey*. **Purpose corrected 24 August.** The screen was renamed *F&B Order Management* and its purpose still read *\"Control how early and how late a ticket admits\"* — **timed entry, on a screen whose every operation is `fnb`.** A rename that moves the label and leaves the sentence is worse than no rename: the name is what a reader scans and the purpose is what they trust.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listFnbOrders` reads the population and `getFnbOrder` reads one of them — list, select, act",
+  "purpose": "Take, amend and route an F&B order from the back office — and see what the kitchen is working on.",
+  "gaps": [
+   {
+    "operation": "listKitchenStations",
+    "why": "**2 declared operations reach no component on this screen**: listKitchenStations, listKitchenTickets. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every order",
+       "bindsTo": "FnbOrder",
+       "columns": [
+        "FnbOrder.id",
+        "FnbOrder.orderNumber",
+        "FnbOrder.outletId",
+        "FnbOrder.serviceMode",
+        "FnbOrder.tableVisitId",
+        "FnbOrder.status",
+        "FnbOrder.lines",
+        "FnbOrder.grossAmount",
+        "FnbOrder.taxAmount",
+        "FnbOrder.kitchenTicketId",
+        "FnbOrder.estimatedReadyAt",
+        "FnbOrder.recordedAt"
+       ],
+       "operation": "listFnbOrders",
+       "provenance": "contract fnb.yaml GET /fnb-orders"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected order",
+       "bindsTo": "FnbOrder",
+       "columns": [
+        "FnbOrder.id",
+        "FnbOrder.orderNumber",
+        "FnbOrder.outletId",
+        "FnbOrder.serviceMode",
+        "FnbOrder.tableVisitId",
+        "FnbOrder.status",
+        "FnbOrder.lines",
+        "FnbOrder.grossAmount",
+        "FnbOrder.taxAmount",
+        "FnbOrder.kitchenTicketId",
+        "FnbOrder.estimatedReadyAt",
+        "FnbOrder.recordedAt",
+        "FnbOrder.syncedAt"
+       ],
+       "operation": "getFnbOrder",
+       "provenance": "contract fnb.yaml GET /fnb-orders/{orderId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Accept",
+       "operation": "acceptFnbOrder",
+       "provenance": "contract fnb.yaml POST /fnb-orders/{orderId}/accept"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setKitchenTicketStatus",
+       "provenance": "contract fnb.yaml PUT /kitchen/tickets/{ticketId}/status"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Amend",
+       "operation": "amendFnbOrder",
+       "provenance": "contract fnb.yaml PATCH /fnb-orders/{orderId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Cancel",
+       "operation": "cancelFnbOrder",
+       "provenance": "contract fnb.yaml POST /fnb-orders/{orderId}/cancel"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createFnbOrder",
+       "provenance": "contract fnb.yaml POST /fnb-orders"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Prioritise",
+       "operation": "prioritiseKitchenTicket",
+       "provenance": "contract fnb.yaml POST /kitchen/tickets/{ticketId}/prioritise"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setKitchenStations",
+       "provenance": "contract fnb.yaml PUT /kitchen/stations"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "acceptFnbOrder",
+       "label": "Accept fnb order",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "destructiveButton",
+       "derived": true,
+       "impliedBy": "cancelFnbOrder",
+       "label": "Cancel fnb order",
+       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getFnbOrder",
+       "notes": "One record, read-only.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "acceptFnbOrder",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmCancelFnbOrder",
+    "component": "confirmDialog",
+    "trigger": "Cancel",
+    "body": "**Names what `cancelFnbOrder` changes and what it leaves alone**, in the consequence rather than the verb. A order this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract fnb.yaml POST /fnb-orders/{orderId}/cancel"
+   }
+  ],
+  "states": {
+   "loading": "The order list.",
+   "error": "Could not load. Names which read failed and leaves the order untouched.",
+   "emptyFirstRun": "No order yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the order are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "acceptFnbOrder",
+    "contract": "fnb",
+    "purpose": "The outlet takes the order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listFnbOrders"
+    ]
+   },
+   {
+    "operationId": "setKitchenTicketStatus",
+    "contract": "fnb",
+    "purpose": "Advance a kitchen ticket",
+    "trigger": "onAction",
+    "invalidates": [
+     "listFnbOrders"
+    ]
+   },
+   {
+    "operationId": "amendFnbOrder",
+    "contract": "fnb",
+    "purpose": "Amend an order before it is prepared",
+    "trigger": "onAction",
+    "invalidates": [
+     "listFnbOrders"
+    ]
+   },
+   {
+    "operationId": "cancelFnbOrder",
+    "contract": "fnb",
+    "purpose": "Cancel an order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listFnbOrders"
+    ]
+   },
+   {
+    "operationId": "createFnbOrder",
+    "contract": "fnb",
+    "purpose": "Place an F&B order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listFnbOrders"
+    ]
+   },
+   {
+    "operationId": "getFnbOrder",
+    "contract": "fnb",
+    "purpose": "Read an F&B order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listFnbOrders",
+    "contract": "fnb",
+    "purpose": "List F&B orders",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listKitchenStations",
+    "contract": "fnb",
+    "purpose": "List preparation stations and their routing",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listKitchenTickets",
+    "contract": "fnb",
+    "purpose": "Kitchen ticket queue",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "prioritiseKitchenTicket",
+    "contract": "fnb",
+    "purpose": "Move a ticket up the queue",
+    "trigger": "onAction",
+    "invalidates": [
+     "listFnbOrders"
+    ]
+   },
+   {
+    "operationId": "setKitchenStations",
+    "contract": "fnb",
+    "purpose": "Configure stations and item routing",
+    "trigger": "onAction",
+    "invalidates": [
+     "listFnbOrders"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    },
+    {
+     "name": "ticketId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "An order opened from a list or a link. A kitchen ticket opened from the rail.",
+   "preloaded": [
+    "FnbOrder.id",
+    "FnbOrder.orderNumber",
+    "FnbOrder.outletId",
+    "FnbOrder.serviceMode",
+    "FnbOrder.tableVisitId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-020"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-021",
+  "name": "Order Search",
+  "module": "Food & Beverage",
+  "requiresModule": "fnb",
+  "wave": 1,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/fnb/bo-021",
+   "component": "apps/venue-management-web/src/routes/fnb/BO021List.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-104"
+   ],
+   "exitTo": [
+    "BO-104"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-104.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-104",
+     "trigger": "Food & Beverage",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-104 declares entryState.params venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "POS-002",
+     "trigger": "Sell — Ticket Catalogue",
+     "provenance": "flow F81 step 1→2",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "Restored 20 August when the P15 build was rolled back.",
+  "density": "compact",
+  "boardFrames": [
+   "Retail Board 3.dc.html#ret-3a"
+  ],
+  "pattern": "statusTracker",
+  "patternReason": "`getGuestOrderStatus` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Find any order taken at this venue.",
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected order search",
+       "bindsTo": "GuestOrderStatus",
+       "columns": [
+        "GuestOrderStatus.orderId",
+        "GuestOrderStatus.orderNumber",
+        "GuestOrderStatus.status",
+        "GuestOrderStatus.estimatedReadyAt",
+        "GuestOrderStatus.isReadyForCollection",
+        "GuestOrderStatus.lines"
+       ],
+       "operation": "getGuestOrderStatus",
+       "provenance": "contract fnb.yaml GET /guest-orders/{orderId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Record",
+       "operation": "recordOrderHandover",
+       "provenance": "contract fnb.yaml POST /guest-orders/{orderId}/delivery"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getGuestOrderStatus",
+       "notes": "One record, read-only.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "recordOrderHandover",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The order search list.",
+   "error": "Could not load. Names which read failed and leaves the order search untouched.",
+   "emptyFirstRun": "No order search yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the order search are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "recordOrderHandover",
+    "contract": "fnb",
+    "purpose": "Record that an order reached the guest",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getGuestOrderStatus",
+    "contract": "fnb",
+    "purpose": "Track an order",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "An order opened from a list or a link."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-021",
+   "source": "Claude Design Retail pack, 24 August",
+   "note": "**Drawn by Claude Design on `Retail Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-045",
+  "name": "Menu Management",
+  "module": "Food & Beverage",
+  "requiresModule": "fnb",
+  "wave": 1,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/fnb/bo-045",
+   "component": "apps/venue-management-web/src/routes/fnb/BO045List.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-007",
+    "BO-104"
+   ],
+   "exitTo": [
+    "BO-008",
+    "BO-104",
+    "BO-111"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-104.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product. **flow F31 — the manager re-verifies allergens from the menu being drafted.** The flow is the authority on the journey and the navigation has to agree with it; marking this block non-inferred is what turned the disagreement from a warning into a failure.",
+   "transitions": [
+    {
+     "to": "BO-111",
+     "trigger": "An item's recipe changed, so its allergens are re-verified",
+     "provenance": "flow F31 step 2→3",
+     "operation": "applyMenuActions"
+    },
+    {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "provenance": "flow F93 step 2→3"
+    },
+    {
+     "to": "BO-104",
+     "trigger": "Food & Beverage",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-104 declares entryState.params venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "POS-002",
+     "trigger": "The till picks it up in its next catalogue bundle",
+     "provenance": "flow F31 step 5→6",
+     "operation": "publishMenu",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "Restored 20 August when the P15 build was rolled back. **Operations from the 24 August F&B build wired here** — the contract grew and the screens had not caught up, which is how 92 operations reached 49% of screens.",
+  "density": "compact",
+  "boardFrames": [
+   "FnB Board 2.dc.html#fnb-2a",
+   "FnB Board 2.dc.html#fnb-2b",
+   "FnB Board 2.dc.html#fnb-2e",
+   "FnB Board 2.dc.html#fnb-2j",
+   "FnB Board 2.dc.html#fnb-2k"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listMenus` reads the population and `getMenu` reads one of them — list, select, act",
+  "purpose": "Change what is on sale and what is in it.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every menu",
+       "bindsTo": "Menu",
+       "columns": [
+        "Menu.id",
+        "Menu.code",
+        "Menu.name",
+        "Menu.outletId",
+        "Menu.availability",
+        "Menu.sections",
+        "Menu.isActive"
+       ],
+       "operation": "listMenus",
+       "provenance": "contract fnb.yaml GET /menus"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected menu",
+       "bindsTo": "Menu",
+       "columns": [
+        "Menu.id",
+        "Menu.code",
+        "Menu.name",
+        "Menu.outletId",
+        "Menu.availability",
+        "Menu.sections",
+        "Menu.isActive"
+       ],
+       "operation": "getMenu",
+       "provenance": "contract fnb.yaml GET /menus/{menuId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createMenu",
+       "provenance": "contract fnb.yaml POST /menus"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setMenuSections",
+       "provenance": "contract fnb.yaml PUT /menus/{menuId}/sections"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateMenu",
+       "provenance": "contract fnb.yaml PATCH /menus/{menuId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Publish",
+       "operation": "publishMenu",
+       "provenance": "contract fnb.yaml POST /menus/{menuId}/publish"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Schedule",
+       "operation": "scheduleMenuPublish",
+       "provenance": "contract fnb.yaml POST /menus/{menuId}/schedule"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Rollback",
+       "operation": "rollbackMenu",
+       "provenance": "contract fnb.yaml POST /menus/{menuId}/rollback"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Apply",
+       "operation": "applyMenuActions",
+       "provenance": "contract fnb.yaml POST /menus/{menuId}/actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify",
+       "operation": "verifyAllergens",
+       "provenance": "contract fnb.yaml POST /menu-items/{menuItemId}/verify-allergens"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
+       "provenance": "authored — required by check-screens"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getMenu",
+       "notes": "One record, read-only.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createMenu",
+       "label": "Create menu",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createMenu",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishMenu",
+       "notes": "Declares `publishMenu`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The menu list.",
+   "error": "Could not load. Names which read failed and leaves the menu untouched.",
+   "emptyFirstRun": "No menu yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the menu are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listMenus",
+    "contract": "fnb",
+    "purpose": "List menus",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getMenu",
+    "contract": "fnb",
+    "purpose": "Read a menu with sections and items",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createMenu",
+    "contract": "fnb",
+    "purpose": "Create a menu",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMenus"
+    ]
+   },
+   {
+    "operationId": "setMenuSections",
+    "contract": "fnb",
+    "purpose": "Set menu sections and their item ordering",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMenus"
+    ]
+   },
+   {
+    "operationId": "updateMenu",
+    "contract": "fnb",
+    "purpose": "Amend a menu",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMenus"
+    ]
+   },
+   {
+    "operationId": "publishMenu",
+    "contract": "fnb",
+    "purpose": "Make the draft live, now or on a date",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMenus"
+    ]
+   },
+   {
+    "operationId": "scheduleMenuPublish",
+    "contract": "fnb",
+    "purpose": "Publish it on a date, not now",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMenus"
+    ]
+   },
+   {
+    "operationId": "rollbackMenu",
+    "contract": "fnb",
+    "purpose": "Put the previous version back",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMenus"
+    ]
+   },
+   {
+    "operationId": "applyMenuActions",
+    "contract": "fnb",
+    "purpose": "Do the same thing to many items at once",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMenus"
+    ]
+   },
+   {
+    "operationId": "verifyAllergens",
+    "contract": "fnb",
+    "purpose": "Does this dish still match its claim?",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMenus"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "menuId",
+     "from": "deepLink"
+    },
+    {
+     "name": "menuItemId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "A menu opened from the list. An item opened from the menu. **Allergen verification is per item** — a menu-wide check is a job, not a screen.",
+   "preloaded": [
+    "Menu.id",
+    "Menu.code",
+    "Menu.name",
+    "Menu.outletId",
+    "Menu.availability"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-045",
+   "source": "Claude Design F&B pack, 24 August",
+   "note": "**Drawn by Claude Design on `FnB Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-046",
+  "name": "Kitchen Display",
+  "module": "Food & Beverage",
+  "requiresModule": "fnb",
+  "wave": 1,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/fnb/bo-046",
+   "component": "apps/venue-management-web/src/routes/fnb/BO046List.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-104"
+   ],
+   "exitTo": [
+    "BO-104"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-104.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-104",
+     "trigger": "Food & Beverage",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-104 declares entryState.params venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Restored 20 August when the P15 build was rolled back. **Retained in P08 on 20 August when the P15 build was rolled back**, and P15 now owns the kitchen display for the venue floor. **This is the back-office view of the same tickets** — a manager watching the pass from a desk, not a screen at the pass.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listKitchenTickets` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Show the kitchen what to make, in order.",
+  "gaps": [
+   {
+    "operation": "listKitchenStations",
+    "why": "**1 declared operation reach no component on this screen**: listKitchenStations. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every kitchen display",
+       "bindsTo": "KitchenTicket",
+       "columns": [
+        "KitchenTicket.id",
+        "KitchenTicket.orderId",
+        "KitchenTicket.orderNumber",
+        "KitchenTicket.outletId",
+        "KitchenTicket.tableLabel",
+        "KitchenTicket.serviceMode",
+        "KitchenTicket.coursing",
+        "KitchenTicket.buzzerCode",
+        "KitchenTicket.status",
+        "KitchenTicket.priority",
+        "KitchenTicket.prioritisedByPrincipalId",
+        "KitchenTicket.prioritiseReason"
+       ],
+       "operation": "listKitchenTickets",
+       "provenance": "contract fnb.yaml GET /kitchen/tickets"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected kitchen display",
+       "bindsTo": "KitchenTicket",
+       "columns": [
+        "KitchenTicket.id",
+        "KitchenTicket.orderId",
+        "KitchenTicket.orderNumber",
+        "KitchenTicket.outletId",
+        "KitchenTicket.tableLabel",
+        "KitchenTicket.serviceMode",
+        "KitchenTicket.coursing",
+        "KitchenTicket.buzzerCode",
+        "KitchenTicket.status",
+        "KitchenTicket.priority",
+        "KitchenTicket.prioritisedByPrincipalId",
+        "KitchenTicket.prioritiseReason",
+        "KitchenTicket.lines",
+        "KitchenTicket.targetReadyAt",
+        "KitchenTicket.elapsedSeconds"
+       ],
+       "operation": "listKitchenTickets",
+       "provenance": "contract fnb.yaml GET /kitchen/tickets"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "setKitchenTicketStatus",
+       "provenance": "contract fnb.yaml PUT /kitchen/tickets/{ticketId}/status"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Prioritise",
+       "operation": "prioritiseKitchenTicket",
+       "provenance": "contract fnb.yaml POST /kitchen/tickets/{ticketId}/prioritise"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setKitchenStations",
+       "provenance": "contract fnb.yaml PUT /kitchen/stations"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setKitchenTicketStatus",
+       "label": "Save kitchen ticket status",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setKitchenTicketStatus",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The kitchen display list.",
+   "error": "Could not load. Names which read failed and leaves the kitchen display untouched.",
+   "emptyFirstRun": "No kitchen display yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the kitchen display are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listKitchenTickets",
+    "contract": "fnb",
+    "purpose": "Kitchen ticket queue",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setKitchenTicketStatus",
+    "contract": "fnb",
+    "purpose": "Advance a kitchen ticket",
+    "trigger": "onAction",
+    "invalidates": [
+     "listKitchenTickets"
+    ]
+   },
+   {
+    "operationId": "listKitchenStations",
+    "contract": "fnb",
+    "purpose": "List preparation stations and their routing",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "prioritiseKitchenTicket",
+    "contract": "fnb",
+    "purpose": "Move a ticket up the queue",
+    "trigger": "onAction",
+    "invalidates": [
+     "listKitchenTickets"
+    ]
+   },
+   {
+    "operationId": "setKitchenStations",
+    "contract": "fnb",
+    "purpose": "Configure stations and item routing",
+    "trigger": "onAction",
+    "invalidates": [
+     "listKitchenTickets"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "ticketId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "A kitchen ticket opened from the rail.",
+   "preloaded": [
+    "KitchenTicket.id",
+    "KitchenTicket.orderId",
+    "KitchenTicket.orderNumber",
+    "KitchenTicket.outletId",
+    "KitchenTicket.tableLabel"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-046"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-104",
+  "name": "Food & Beverage",
+  "module": "Food & Beverage",
+  "requiresModule": "core",
+  "wave": 1,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/food-beverage",
+   "component": "apps/venue-management-web/src/routes/home/FoodBeverageList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-020",
+    "BO-021",
+    "BO-045",
+    "BO-046",
+    "BO-134",
+    "BO-135",
+    "BO-136"
+   ],
+   "transitions": [
+    {
+     "to": "BO-020",
+     "trigger": "F&B Order Management",
+     "carries": [
+      "orderId",
+      "ticketId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-020 declares entryState.params orderId, ticketId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-021",
+     "trigger": "Order Search",
+     "carries": [
+      "orderId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-021 declares entryState.params orderId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-045",
+     "trigger": "Menu Management",
+     "carries": [
+      "menuId",
+      "menuItemId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-045 declares entryState.params menuId, menuItemId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-046",
+     "trigger": "Kitchen Display",
+     "carries": [
+      "ticketId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-046 declares entryState.params ticketId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-134",
+     "trigger": "Kitchen & Preparation Stations",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-134 declares entryState.params venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-135",
+     "trigger": "Order Routing & KDS/Printer Rules",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-135 declares entryState.params venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-136",
+     "trigger": "F&B Global Settings & Controls",
+     "carries": [
+      "planId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-136 declares entryState.params planId, venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Section landing. **4 screens reach the entry point through here** — before 20 August they reached it through nothing. **Navigation repointed to P15 on 20 August** — the F&B screens it linked to moved out of the back office when the client board was adopted.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listMenus` reads the population and `getVenueSettings` reads one of them — list, select, act",
+  "purpose": "Everything in food & beverage, and what in it needs attention.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every food beverage",
+       "bindsTo": "Menu",
+       "columns": [
+        "Menu.id",
+        "Menu.code",
+        "Menu.name",
+        "Menu.outletId",
+        "Menu.availability",
+        "Menu.sections",
+        "Menu.isActive"
+       ],
+       "operation": "listMenus",
+       "provenance": "contract fnb.yaml GET /menus"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected food beverage",
+       "bindsTo": "VenueSettings",
+       "columns": [
+        "VenueSettings.id",
+        "VenueSettings.venueId",
+        "VenueSettings.supportHours",
+        "VenueSettings.quietHours",
+        "VenueSettings.segregatedAccess",
+        "VenueSettings.alerting"
+       ],
+       "operation": "getVenueSettings",
+       "provenance": "contract tenancy.yaml GET /venues/{venueId}/settings"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createMenu",
+       "provenance": "contract fnb.yaml POST /menus"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "cardList",
+       "bindsTo": "screens",
+       "notes": "4 screens, each with what needs attention.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search food & beverage",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The list, with counts.",
+   "error": "Could not load. Venue Home is still reachable.",
+   "emptyFirstRun": "**Nothing configured in food & beverage yet.** The action is the first thing to set up, not a blank list.",
+   "emptyNoResults": "Nothing matches the filter.",
+   "emptyNoAccess": "You do not have permission for food & beverage. **Said plainly** — an empty section reads as broken."
+  },
+  "apis": [
+   {
+    "operationId": "getVenueSettings",
+    "contract": "tenancy",
+    "purpose": "What is enabled here",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listMenus",
+    "contract": "fnb",
+    "purpose": "Menus and their state",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createMenu",
+    "contract": "fnb",
+    "purpose": "Start a menu",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMenus"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "**Resolves from the session, so a cold arrival is the ordinary case** — a manager bookmarks the back office and opens it every morning. A principal with more than one venue is asked which before the page renders, rather than shown the first one.",
+   "preloaded": [
+    "VenueSettings.id",
+    "VenueSettings.venueId",
+    "VenueSettings.supportHours",
+    "VenueSettings.quietHours",
+    "VenueSettings.segregatedAccess"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-104"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-134",
+  "name": "Kitchen & Preparation Stations",
+  "module": "Food & Beverage",
+  "requiresModule": "fnb",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/food-beverage/kitchen-preparation-stations",
+   "component": "apps/venue-management-web/src/routes/ops/KitchenPreparationStationsList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-104"
+   ],
+   "exitTo": [
+    "BO-104"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-104.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-104",
+     "trigger": "Food & Beverage",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-104 declares entryState.params venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not. **Drawn 31 August** — `FnB Board 1.dc.html` frame `fnb-1h`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Kitchen &amp; Preparation Stations* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
+  "density": "compact",
+  "boardFrames": [
+   "FnB Board 1.dc.html#fnb-1h"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listKitchenStations` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Kitchen & Preparation Stations — from the client design board, 20 August.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every kitchen preparation stations",
+       "bindsTo": "KitchenStation",
+       "columns": [
+        "KitchenStation.id",
+        "KitchenStation.code",
+        "KitchenStation.name",
+        "KitchenStation.outletId",
+        "KitchenStation.menuItemIds",
+        "KitchenStation.displayEndpoint",
+        "KitchenStation.isActive"
+       ],
+       "operation": "listKitchenStations",
+       "provenance": "contract fnb.yaml GET /kitchen/stations"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected kitchen preparation stations",
+       "bindsTo": "KitchenStation",
+       "columns": [
+        "KitchenStation.id",
+        "KitchenStation.code",
+        "KitchenStation.name",
+        "KitchenStation.outletId",
+        "KitchenStation.menuItemIds",
+        "KitchenStation.displayEndpoint",
+        "KitchenStation.isActive"
+       ],
+       "operation": "listKitchenStations",
+       "provenance": "contract fnb.yaml GET /kitchen/stations"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "setKitchenStations",
+       "provenance": "contract fnb.yaml PUT /kitchen/stations"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search kitchen",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The kitchen preparation stations list.",
+   "error": "Could not load. Names which read failed and leaves the kitchen preparation stations untouched.",
+   "emptyFirstRun": "No kitchen preparation stations yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the kitchen preparation stations are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listKitchenStations",
+    "contract": "fnb",
+    "purpose": "List preparation stations and their routing",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setKitchenStations",
+    "contract": "fnb",
+    "purpose": "Configure stations and item routing",
+    "trigger": "onAction",
+    "invalidates": [
+     "listKitchenStations"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first.",
+   "preloaded": [
+    "KitchenStation.id",
+    "KitchenStation.code",
+    "KitchenStation.name",
+    "KitchenStation.outletId",
+    "KitchenStation.menuItemIds"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-134",
+   "note": "**Drawn by Claude Design on `FnB Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-135",
+  "name": "Order Routing & KDS/Printer Rules",
+  "module": "Food & Beverage",
+  "requiresModule": "fnb",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/food-beverage/order-routing-kds-printer-rules",
+   "component": "apps/venue-management-web/src/routes/ops/OrderRoutingKdsPrinterRulesList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-104"
+   ],
+   "exitTo": [
+    "BO-104"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-104.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-104",
+     "trigger": "Food & Beverage",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-104 declares entryState.params venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not. **Drawn 31 August** — `FnB Board 1.dc.html` frame `fnb-1j`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Order Routing &amp; KDS / Printer Rules* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
+  "density": "compact",
+  "boardFrames": [
+   "FnB Board 1.dc.html#fnb-1j"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listWorkstations` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Order Routing & KDS/Printer Rules — from the client design board, 20 August.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every order routing kds",
+       "bindsTo": "Workstation",
+       "columns": [
+        "Workstation.id",
+        "Workstation.code",
+        "Workstation.name",
+        "Workstation.venueId",
+        "Workstation.regionId",
+        "Workstation.departmentId",
+        "Workstation.scopePath",
+        "Workstation.saleBoard",
+        "Workstation.accessPointId",
+        "Workstation.devices",
+        "Workstation.currency",
+        "Workstation.currencyScale"
+       ],
+       "operation": "listWorkstations",
+       "provenance": "contract tenancy.yaml GET /workstations"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected order routing kds",
+       "bindsTo": "Workstation",
+       "columns": [
+        "Workstation.id",
+        "Workstation.code",
+        "Workstation.name",
+        "Workstation.venueId",
+        "Workstation.regionId",
+        "Workstation.departmentId",
+        "Workstation.scopePath",
+        "Workstation.saleBoard",
+        "Workstation.accessPointId",
+        "Workstation.devices",
+        "Workstation.currency",
+        "Workstation.currencyScale",
+        "Workstation.timeZone",
+        "Workstation.deploymentProfile",
+        "Workstation.edgeNodeId",
+        "Workstation.healthScore"
+       ],
+       "operation": "listWorkstations",
+       "provenance": "contract tenancy.yaml GET /workstations"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "setKitchenStations",
+       "provenance": "contract fnb.yaml PUT /kitchen/stations"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search order routing",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The order routing kds list.",
+   "error": "Could not load. Names which read failed and leaves the order routing kds untouched.",
+   "emptyFirstRun": "No order routing kds yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the order routing kds are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setKitchenStations",
+    "contract": "fnb",
+    "purpose": "Configure stations and item routing",
+    "trigger": "onAction",
+    "invalidates": [
+     "listWorkstations"
+    ]
+   },
+   {
+    "operationId": "listWorkstations",
+    "contract": "tenancy",
+    "purpose": "List workstations",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first.",
+   "preloaded": [
+    "Workstation.id",
+    "Workstation.code",
+    "Workstation.name",
+    "Workstation.venueId",
+    "Workstation.regionId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-135",
+   "note": "**Drawn by Claude Design on `FnB Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-136",
+  "name": "F&B Global Settings & Controls",
+  "module": "Food & Beverage",
+  "requiresModule": "core",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/food-beverage/f-b-global-settings-controls",
+   "component": "apps/venue-management-web/src/routes/ops/FBGlobalSettingsControlsList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-104"
+   ],
+   "exitTo": [
+    "BO-104",
+    "BO-137"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-104.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-137",
+     "trigger": "Recipe Consumption & Theoretical Inventory",
+     "provenance": "flow F85 step 1→2"
+    },
+    {
+     "to": "BO-104",
+     "trigger": "Food & Beverage",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-104 declares entryState.params venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not.",
+  "density": "compact",
+  "boardFrames": [
+   "FnB Board 2.dc.html#fnb-2m",
+   "FnB Board 2.dc.html#fnb-2n",
+   "FnB Board 5.dc.html#fnb-5d"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listProductionRuns` reads the population and `getVenueSettings` reads one of them — list, select, act",
+  "purpose": "F&B Global Settings & Controls — from the client design board, 20 August.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every global settings controls",
+       "bindsTo": "ProductionRun",
+       "columns": [
+        "ProductionRun.id",
+        "ProductionRun.recipeId",
+        "ProductionRun.producingOutletId",
+        "ProductionRun.forOutletIds",
+        "ProductionRun.plannedQuantity",
+        "ProductionRun.actualQuantity",
+        "ProductionRun.scheduledFor",
+        "ProductionRun.status",
+        "ProductionRun.varianceReason"
+       ],
+       "operation": "listProductionRuns",
+       "provenance": "contract fnb.yaml GET /production-runs"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected global settings controls",
+       "bindsTo": "VenueSettings",
+       "columns": [
+        "VenueSettings.id",
+        "VenueSettings.venueId",
+        "VenueSettings.supportHours",
+        "VenueSettings.quietHours",
+        "VenueSettings.segregatedAccess",
+        "VenueSettings.alerting"
+       ],
+       "operation": "getVenueSettings",
+       "provenance": "contract tenancy.yaml GET /venues/{venueId}/settings"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "setVenueSettings",
+       "provenance": "contract tenancy.yaml PUT /venues/{venueId}/settings"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Build",
+       "operation": "buildProductionPlan",
+       "provenance": "contract fnb.yaml POST /production-plans"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Release",
+       "operation": "releaseProductionPlan",
+       "provenance": "contract fnb.yaml POST /production-plans/{planId}/release"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search f",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "releaseProductionPlan",
+       "notes": "Declares `releaseProductionPlan`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The global settings controls list.",
+   "error": "Could not load. Names which read failed and leaves the global settings controls untouched.",
+   "emptyFirstRun": "No global settings controls yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the global settings controls are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getVenueSettings",
+    "contract": "tenancy",
+    "purpose": "Operational settings for this venue",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setVenueSettings",
+    "contract": "tenancy",
+    "purpose": "Set support hours, quiet hours, segregated access and alerti",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProductionRuns"
+    ]
+   },
+   {
+    "operationId": "buildProductionPlan",
+    "contract": "fnb",
+    "purpose": "Turn a forecast into a prep list",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProductionRuns"
+    ]
+   },
+   {
+    "operationId": "releaseProductionPlan",
+    "contract": "fnb",
+    "purpose": "Make the plan real",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProductionRuns"
+    ]
+   },
+   {
+    "operationId": "listProductionRuns",
+    "contract": "fnb",
+    "purpose": "What is being made, and what was",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "planId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first. A plan opened from the list.",
+   "preloaded": [
+    "VenueSettings.id",
+    "VenueSettings.venueId",
+    "VenueSettings.supportHours",
+    "VenueSettings.quietHours",
+    "VenueSettings.segregatedAccess"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-136",
+   "source": "Claude Design F&B pack, 24 August",
+   "note": "**Drawn by Claude Design on `FnB Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

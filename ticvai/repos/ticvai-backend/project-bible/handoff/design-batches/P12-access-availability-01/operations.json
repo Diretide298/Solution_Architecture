@@ -1,0 +1,169 @@
+{
+ "forceLogout": {
+  "method": "POST",
+  "path": "/auth/sessions/{sessionId}/force-logout",
+  "contract": "identity",
+  "summary": "Supervisor termination of an abandoned session",
+  "permission": "SESSION_FORCE_LOGOUT",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "sessionId",
+    "in": "path",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getCurrentSession": {
+  "method": "GET",
+  "path": "/auth/session",
+  "contract": "identity",
+  "summary": "Current session and effective permissions",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Session"
+ },
+ "getGuestSession": {
+  "method": "GET",
+  "path": "/auth/guest/session",
+  "contract": "identity",
+  "summary": "Read the current guest session",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestSession"
+ },
+ "listActiveSessions": {
+  "method": "GET",
+  "path": "/auth/sessions",
+  "contract": "identity",
+  "summary": "List active sessions",
+  "permission": "SESSION_FORCE_LOGOUT",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMfaMethods": {
+  "method": "GET",
+  "path": "/auth/mfa/methods",
+  "contract": "identity",
+  "summary": "Enrolled MFA methods",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MfaMethod"
+ },
+ "listSsoProviders": {
+  "method": "GET",
+  "path": "/auth/sso/providers",
+  "contract": "identity",
+  "summary": "Identity providers configured for this tenant",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SsoProvider"
+ },
+ "login": {
+  "method": "POST",
+  "path": "/auth/login",
+  "contract": "identity",
+  "summary": "Authenticate and open a session",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "LoginRequest",
+  "responds": "LoginResponse"
+ },
+ "revokeAllSessions": {
+  "method": "POST",
+  "path": "/auth/sessions/revoke-all",
+  "contract": "identity",
+  "summary": "Revoke every session in scope",
+  "permission": "SESSION_FORCE_LOGOUT",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setAgentAvailability": {
+  "method": "PUT",
+  "path": "/agent-availability",
+  "contract": "marketing-crm",
+  "summary": "An agent goes available, away or offline",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ }
+}

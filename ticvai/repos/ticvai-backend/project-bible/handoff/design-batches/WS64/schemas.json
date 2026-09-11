@@ -1,0 +1,884 @@
+{
+ "BuyerCheckoutInventoryHoldSecurePaymentView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Buyer Checkout, Inventory Hold & Secure Payment displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "architecture": {
+    "type": "string",
+    "description": "architecture"
+   },
+   "name": {
+    "type": "string",
+    "description": "Name"
+   },
+   "email": {
+    "type": "string",
+    "description": "Email"
+   },
+   "mobile": {
+    "type": "string",
+    "description": "Mobile"
+   },
+   "billingDetails": {
+    "type": "string",
+    "description": "Billing details"
+   },
+   "requiredParticipantInformation": {
+    "type": "string",
+    "description": "Required participant information"
+   }
+  }
+ },
+ "CreateListingResalePriceSelectionView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Create Listing & Resale Price Selection displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "faceValueOnly": {
+    "type": "string",
+    "description": "Face Value Only"
+   },
+   "fixedPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fixed Price"
+   },
+   "sellerSelectedPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Seller Selected Price"
+   },
+   "cappedPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Capped Price"
+   },
+   "operatorControlled": {
+    "type": "string",
+    "description": "Operator Controlled"
+   },
+   "aiRecommendedPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "AI Recommended Price"
+   },
+   "recommendedPriceAed215": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Recommended Price: AED 215"
+   }
+  }
+ },
+ "FeesSellerProceedsListingConfirmationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Fees, Seller Proceeds & Listing Confirmation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "yourSellingPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Your Selling Price (the pack shows AED 220.00)"
+   },
+   "aed2200": {
+    "type": "string",
+    "description": "− AED 22.00"
+   },
+   "aed000": {
+    "type": "string",
+    "description": "− AED 0.00"
+   },
+   "youWillReceiveAed19800": {
+    "type": "string",
+    "description": "You will receive AED 198.00"
+   },
+   "clearlyExplainApplicableSettlementRules": {
+    "type": "string",
+    "description": "Clearly explain applicable settlement rules"
+   },
+   "marketplaceTerms": {
+    "type": "integer",
+    "description": "Marketplace Terms"
+   },
+   "sellerTerms": {
+    "type": "integer",
+    "description": "Seller Terms"
+   },
+   "cancellationPolicy": {
+    "type": "string",
+    "description": "Cancellation Policy"
+   },
+   "settlementConditions": {
+    "type": "integer",
+    "description": "Settlement Conditions"
+   },
+   "eventCancellationTreatment": {
+    "type": "string",
+    "description": "Event Cancellation Treatment"
+   },
+   "applicablePrivacyNotice": {
+    "type": "string",
+    "description": "Applicable privacy notice"
+   },
+   "storeTheApplicableTermsVersionAcceptance": {
+    "type": "string",
+    "description": "Store the applicable terms/version acceptance"
+   },
+   "eventMuseumNight": {
+    "type": "string",
+    "description": "Event: Museum Night"
+   },
+   "seatA18": {
+    "type": "string",
+    "description": "Seat: A18"
+   },
+   "originalPriceAed200": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Original Price: AED 200"
+   },
+   "resalePriceAed220": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Resale Price: AED 220"
+   },
+   "feeAed22": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fee: AED 22"
+   },
+   "estimatedProceedsAed198": {
+    "type": "string",
+    "description": "Estimated Proceeds: AED 198"
+   }
+  }
+ },
+ "MyResaleListingsSellerDashboardView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What My Resale Listings & Seller Dashboard displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "activeListings": {
+    "type": "integer",
+    "description": "Active Listings"
+   },
+   "pendingApproval": {
+    "type": "integer",
+    "description": "Pending Approval"
+   },
+   "sold": {
+    "type": "string",
+    "description": "Sold"
+   },
+   "expiringSoon": {
+    "type": "string",
+    "description": "Expiring Soon"
+   },
+   "sellerProceeds": {
+    "type": "integer",
+    "description": "Seller Proceeds"
+   },
+   "pendingSettlement": {
+    "type": "integer",
+    "description": "Pending Settlement"
+   },
+   "paidSettlements": {
+    "type": "integer",
+    "description": "Paid Settlements"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "seat": {
+    "type": "string",
+    "description": "Seat"
+   },
+   "listingPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Listing Price"
+   },
+   "originalPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Original Price"
+   },
+   "marketplaceStatus": {
+    "type": "string",
+    "description": "Marketplace Status"
+   },
+   "viewsWhereApplicable": {
+    "type": "string",
+    "description": "Views where applicable"
+   },
+   "listingDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Listing Date"
+   },
+   "expiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry"
+   },
+   "settlementStatus": {
+    "type": "string",
+    "description": "Settlement Status"
+   },
+   "acceptAiPriceRecommendation": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Accept AI Price Recommendation"
+   },
+   "relist": {
+    "type": "string",
+    "description": "Relist"
+   },
+   "contactSupport": {
+    "type": "boolean",
+    "description": "Contact Support"
+   },
+   "sellingPriceAed220": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Selling Price: AED 220"
+   },
+   "estimatedProceedsAed198": {
+    "type": "string",
+    "description": "Estimated Proceeds: AED 198"
+   },
+   "settlementScheduledAfterEvent": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Settlement: Scheduled after event"
+   }
+  }
+ },
+ "MyTicketsResaleMarketplaceEntryView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What My Tickets & Resale Marketplace Entry displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "eventProduct": {
+    "type": "string",
+    "description": "Event/Product"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "dateTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date/Time"
+   },
+   "ticketType": {
+    "type": "string",
+    "description": "Ticket Type"
+   },
+   "sectionRowSeat": {
+    "type": "string",
+    "description": "Section/Row/Seat"
+   },
+   "ticketHolder": {
+    "type": "string",
+    "description": "Ticket Holder"
+   },
+   "virtualTicketIdReference": {
+    "type": "string",
+    "description": "Virtual Ticket ID reference"
+   },
+   "ticketStatus": {
+    "type": "string",
+    "description": "Ticket Status"
+   },
+   "resaleStatus": {
+    "type": "string",
+    "description": "Resale Status"
+   },
+   "availableActions": {
+    "type": "string",
+    "description": "Available Actions"
+   },
+   "exchange": {
+    "type": "string",
+    "description": "Exchange"
+   },
+   "resellTicket": {
+    "type": "string",
+    "description": "Resell Ticket"
+   },
+   "requestRefund": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Request Refund"
+   },
+   "customerAccount": {
+    "type": "string",
+    "description": "Customer account"
+   },
+   "sso": {
+    "type": "string",
+    "description": "SSO"
+   },
+   "passwordlessLogin": {
+    "type": "string",
+    "description": "Passwordless login"
+   },
+   "otp": {
+    "type": "string",
+    "description": "OTP"
+   },
+   "appAuthentication": {
+    "type": "string",
+    "description": "App authentication"
+   },
+   "clientLogo": {
+    "type": "string",
+    "description": "Client logo"
+   },
+   "brand": {
+    "type": "string",
+    "description": "Brand"
+   },
+   "colors": {
+    "type": "string",
+    "description": "Colors"
+   },
+   "typography": {
+    "type": "string",
+    "description": "Typography"
+   },
+   "language": {
+    "type": "string",
+    "description": "Language"
+   },
+   "supportDetails": {
+    "type": "string",
+    "description": "Support details"
+   },
+   "marketplaceName": {
+    "type": "string",
+    "description": "Marketplace name"
+   }
+  }
+ },
+ "OfficialResaleMarketplaceBuyerDiscoveryView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Official Resale Marketplace & Buyer Discovery displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "officialTicketsOfficialResale": {
+    "type": "string",
+    "description": "Official Tickets + Official Resale"
+   },
+   "asASeparateMarketplacePage": {
+    "type": "string",
+    "description": "as a separate marketplace page"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "performance": {
+    "type": "string",
+    "description": "Performance"
+   },
+   "ticketType": {
+    "type": "string",
+    "description": "Ticket Type"
+   },
+   "section": {
+    "type": "string",
+    "description": "Section"
+   },
+   "price": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price"
+   },
+   "quantity": {
+    "type": "integer",
+    "description": "Quantity"
+   },
+   "accessibility": {
+    "type": "string",
+    "description": "Accessibility"
+   },
+   "resaleOnly": {
+    "type": "string",
+    "description": "Resale only"
+   },
+   "primaryOnly": {
+    "type": "string",
+    "description": "Primary only"
+   },
+   "andWhereAppropriate": {
+    "type": "string",
+    "description": "and, where appropriate"
+   },
+   "name": {
+    "type": "string",
+    "description": "Name"
+   },
+   "email": {
+    "type": "string",
+    "description": "Email"
+   },
+   "mobile": {
+    "type": "string",
+    "description": "Mobile"
+   },
+   "address": {
+    "type": "string",
+    "description": "Address"
+   },
+   "paymentInformation": {
+    "type": "string",
+    "description": "Payment information"
+   }
+  }
+ },
+ "ResaleConfirmationOwnershipTransferTicketDeliveryView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Resale Confirmation, Ownership Transfer & Ticket Delivery displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "followedBy": {
+    "type": "string",
+    "description": "followed by"
+   },
+   "yourTicketIsReady": {
+    "type": "string",
+    "description": "Your Ticket Is Ready ✓"
+   },
+   "currentOwnerSellerA": {
+    "type": "string",
+    "description": "Current Owner: Seller A"
+   },
+   "previousOwnerSellerA": {
+    "type": "string",
+    "description": "Previous Owner: Seller A"
+   },
+   "currentOwnerBuyerB": {
+    "type": "string",
+    "description": "Current Owner: Buyer B"
+   },
+   "dynamicQr": {
+    "type": "string",
+    "description": "Dynamic QR"
+   },
+   "mobileTicket": {
+    "type": "string",
+    "description": "Mobile Ticket"
+   },
+   "appleWallet": {
+    "type": "string",
+    "description": "Apple Wallet"
+   },
+   "googleWallet": {
+    "type": "string",
+    "description": "Google Wallet"
+   },
+   "rfidNfcAssignmentWhereApplicable": {
+    "type": "string",
+    "description": "RFID/NFC assignment where applicable"
+   },
+   "otherSupportedCredentialMedia": {
+    "type": "string",
+    "description": "Other supported credential media"
+   },
+   "yourTicketHasBeenSold": {
+    "type": "string",
+    "description": "Your ticket has been sold"
+   },
+   "settlementStatusPending": {
+    "type": "integer",
+    "description": "Settlement Status: Pending"
+   }
+  }
+ },
+ "ResaleEligibilityTicketSelectionView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Resale Eligibility & Ticket Selection displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "ticketOwnership": {
+    "type": "string",
+    "description": "Ticket ownership"
+   },
+   "paymentStatus": {
+    "type": "string",
+    "description": "Payment status"
+   },
+   "ticketValidity": {
+    "type": "string",
+    "description": "Ticket validity"
+   },
+   "scanUseStatus": {
+    "type": "string",
+    "description": "Scan/use status"
+   },
+   "eventStatus": {
+    "type": "string",
+    "description": "Event status"
+   },
+   "resaleWindow": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Resale window"
+   },
+   "ticketType": {
+    "type": "string",
+    "description": "Ticket type"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "promotionRestrictions": {
+    "type": "string",
+    "description": "Promotion restrictions"
+   },
+   "membershipRestrictions": {
+    "type": "string",
+    "description": "Membership restrictions"
+   },
+   "existingListing": {
+    "type": "string",
+    "description": "Existing listing"
+   },
+   "fraudSecurityHold": {
+    "type": "string",
+    "description": "Fraud/security hold"
+   },
+   "with": {
+    "type": "string",
+    "description": "with"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "seat": {
+    "type": "string",
+    "description": "Seat"
+   },
+   "originalPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Original price"
+   },
+   "resaleClosingTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Resale closing time"
+   },
+   "applicableMarketplaceConditions": {
+    "type": "integer",
+    "description": "Applicable marketplace conditions"
+   },
+   "error5042": {
+    "type": "string",
+    "description": "Error 5042"
+   },
+   "a14": {
+    "type": "string",
+    "description": "A14 ☑"
+   },
+   "a15": {
+    "type": "string",
+    "description": "A15 ☑"
+   },
+   "a16": {
+    "type": "string",
+    "description": "A16 ☐"
+   },
+   "a17": {
+    "type": "string",
+    "description": "A17 ☐"
+   },
+   "sellIndividually": {
+    "type": "string",
+    "description": "Sell individually"
+   },
+   "sellSelectedTickets": {
+    "type": "string",
+    "description": "Sell selected tickets"
+   },
+   "sellTogetherOnly": {
+    "type": "string",
+    "description": "Sell together only"
+   },
+   "adjacentSeatGroup": {
+    "type": "string",
+    "description": "Adjacent-seat group"
+   }
+  }
+ },
+ "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "integrateWithTicvaiSeatMap": {
+    "type": "string",
+    "description": "Integrate with TICVAI Seat Map"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "performance": {
+    "type": "string",
+    "description": "Performance"
+   },
+   "ticketType": {
+    "type": "string",
+    "description": "Ticket Type"
+   },
+   "section": {
+    "type": "string",
+    "description": "Section"
+   },
+   "row": {
+    "type": "string",
+    "description": "Row"
+   },
+   "seat": {
+    "type": "string",
+    "description": "Seat"
+   },
+   "accessibilityAttributes": {
+    "type": "integer",
+    "description": "Accessibility attributes"
+   },
+   "applicableBenefits": {
+    "type": "integer",
+    "description": "Applicable benefits"
+   },
+   "resalePrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Resale Price"
+   },
+   "fees": {
+    "type": "integer",
+    "description": "Fees"
+   },
+   "applicableRestrictions": {
+    "type": "integer",
+    "description": "Applicable restrictions"
+   },
+   "originalFaceValueAed200": {
+    "type": "string",
+    "description": "Original Face Value: AED 200"
+   },
+   "officialResalePriceAed220": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Official Resale Price: AED 220"
+   },
+   "theCustomerCanChoose": {
+    "type": "string",
+    "description": "The customer can choose"
+   },
+   "primaryInventoryResaleInventory": {
+    "type": "string",
+    "description": "Primary Inventory + Resale Inventory"
+   },
+   "whileMaintainingTheirBackendDistinction": {
+    "type": "string",
+    "description": "while maintaining their backend distinction"
+   }
+  }
+ },
+ "WhiteLabelMarketplaceDeploymentExperienceArchitecturView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What White-Label Marketplace Deployment & Experience Architecture displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "embeddedPages": {
+    "type": "string",
+    "description": "Embedded pages"
+   },
+   "embeddedComponents": {
+    "type": "string",
+    "description": "Embedded components"
+   },
+   "clientNavigation": {
+    "type": "string",
+    "description": "Client navigation"
+   },
+   "clientAuthentication": {
+    "type": "string",
+    "description": "Client authentication"
+   },
+   "ssoSessionPassing": {
+    "type": "string",
+    "description": "SSO/session passing"
+   },
+   "clientBranding": {
+    "type": "string",
+    "description": "Client branding"
+   },
+   "domainConfiguration": {
+    "type": "string",
+    "description": "Domain configuration"
+   },
+   "analytics": {
+    "type": "string",
+    "description": "Analytics"
+   },
+   "localization": {
+    "type": "string",
+    "description": "Localization"
+   },
+   "deepLinking": {
+    "type": "string",
+    "description": "Deep linking"
+   },
+   "mobileResponsiveBehavior": {
+    "type": "string",
+    "description": "Mobile responsive behavior"
+   },
+   "english": {
+    "type": "string",
+    "description": "English"
+   },
+   "arabicRtl": {
+    "type": "string",
+    "description": "Arabic RTL"
+   },
+   "additionalClientLanguages": {
+    "type": "string",
+    "description": "Additional client languages"
+   },
+   "secureSessions": {
+    "type": "string",
+    "description": "Secure sessions"
+   },
+   "authentication": {
+    "type": "string",
+    "description": "Authentication"
+   },
+   "authorization": {
+    "type": "string",
+    "description": "Authorization"
+   },
+   "rateLimiting": {
+    "type": "number",
+    "description": "Rate limiting"
+   },
+   "botProtectionWhereApplicable": {
+    "type": "string",
+    "description": "Bot protection where applicable"
+   },
+   "fraudIntegration": {
+    "type": "string",
+    "description": "Fraud integration"
+   },
+   "dataProtection": {
+    "type": "string",
+    "description": "Data protection"
+   },
+   "sessionExpiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Session expiry"
+   },
+   "auditLogging": {
+    "type": "string",
+    "description": "Audit logging"
+   },
+   "marketplaceName": {
+    "type": "string",
+    "description": "Marketplace Name"
+   },
+   "clientLogo": {
+    "type": "string",
+    "description": "Client Logo"
+   },
+   "brandColors": {
+    "type": "string",
+    "description": "Brand Colors"
+   },
+   "typography": {
+    "type": "string",
+    "description": "Typography"
+   },
+   "domainSubdomain": {
+    "type": "string",
+    "description": "Domain/Subdomain"
+   },
+   "supportContact": {
+    "type": "string",
+    "description": "Support Contact"
+   },
+   "legalLinks": {
+    "type": "string",
+    "description": "Legal Links"
+   },
+   "sellerTerms": {
+    "type": "string",
+    "description": "Seller Terms"
+   },
+   "buyerTerms": {
+    "type": "string",
+    "description": "Buyer Terms"
+   },
+   "privacy": {
+    "type": "string",
+    "description": "Privacy"
+   },
+   "languages": {
+    "type": "string",
+    "description": "Languages"
+   },
+   "authenticationMethod": {
+    "type": "string",
+    "description": "Authentication method"
+   },
+   "myTickets": {
+    "type": "string",
+    "description": "My Tickets"
+   },
+   "sell": {
+    "type": "string",
+    "description": "Sell"
+   },
+   "buy": {
+    "type": "string",
+    "description": "Buy"
+   },
+   "myListings": {
+    "type": "string",
+    "description": "My Listings"
+   },
+   "transactions": {
+    "type": "string",
+    "description": "Transactions"
+   }
+  }
+ }
+}

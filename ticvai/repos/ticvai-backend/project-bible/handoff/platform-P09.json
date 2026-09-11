@@ -7,10 +7,10 @@
  "audience": "platformAdmin",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-10",
+ "generated": "2026-09-11",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
-  "screens": 367,
+  "screens": 446,
   "operations": 404,
   "contracts": 15,
   "modules": 13,
@@ -20,13 +20,22 @@
  "waves": {
   "wave1": 12,
   "wave2": 16,
-  "wave3": 339
+  "wave3": 418
  },
  "modules": [
   {
    "module": "Commercial",
    "screens": 230,
    "waves": [
+    3
+   ]
+  },
+  {
+   "module": "Tenants & Licensing",
+   "screens": 88,
+   "waves": [
+    1,
+    2,
     3
    ]
   },
@@ -41,15 +50,6 @@
    "module": "Catalogue",
    "screens": 20,
    "waves": [
-    3
-   ]
-  },
-  {
-   "module": "Tenants & Licensing",
-   "screens": 9,
-   "waves": [
-    1,
-    2,
     3
    ]
   },
@@ -163,11 +163,11 @@
    "operations": 5
   },
   {
-   "contract": "public-api",
+   "contract": "reporting",
    "operations": 4
   },
   {
-   "contract": "reporting",
+   "contract": "public-api",
    "operations": 4
   },
   {
@@ -3484,6 +3484,717 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/ai-governance-executive-advisor-adm-368",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-369",
+   "name": "Commercial Command Center",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/commercial-command-center-adm-369",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-370",
+   "name": "Customer Subscription & Commercial Portfolio",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/customer-subscription-commercial-portfolio-adm-370",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-371",
+   "name": "Customer Commercial 360\u00b0",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/customer-commercial-360-adm-371",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-372",
+   "name": "Operational Profile, VSI & Commercial Model Intelligence",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/operational-profile-vsi-commercial-model-intelligence-adm-372",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-373",
+   "name": "Revenue & Commercial Model Analytics",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/revenue-commercial-model-analytics-adm-373",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-374",
+   "name": "Trial & Conversion Monitor",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/trial-conversion-monitor-adm-374",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-375",
+   "name": "Renewal & Retention Center",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/renewal-retention-center-adm-375",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-376",
+   "name": "Commercial Optimization & Expansion Opportunities",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/commercial-optimization-expansion-opportunities-adm-376",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-377",
+   "name": "Subscription Exceptions & Commercial Alerts",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/subscription-exceptions-commercial-alerts-adm-377",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-378",
+   "name": "Executive AI Commercial Intelligence",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/executive-ai-commercial-intelligence-adm-378",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-379",
+   "name": "Welcome & Start Your TICVAI Journey",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/welcome-start-your-ticvai-journey-adm-379",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-380",
+   "name": "Customer & Organization Registration",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/customer-organization-registration-adm-380",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-381",
+   "name": "Venue Type & Business Profile",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/venue-type-business-profile-adm-381",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-382",
+   "name": "Visitor, Capacity & Operational Scale",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/visitor-capacity-operational-scale-adm-382",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-383",
+   "name": "Sales Channel Assessment",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/sales-channel-assessment-adm-383",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-384",
+   "name": "Ticketing & Product Requirements",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/ticketing-product-requirements-adm-384",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-385",
+   "name": "Access, Queue & Visitor Experience Assessment",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/access-queue-visitor-experience-assessment-adm-385",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-386",
+   "name": "Additional Business Module Assessment",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/additional-business-module-assessment-adm-386",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-387",
+   "name": "Integration, Payment & Technical Readiness",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/integration-payment-technical-readiness-adm-387",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-388",
+   "name": "AI Assessment Summary & Handoff",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/ai-assessment-summary-handoff-adm-388",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-389",
+   "name": "Commercial Rules Engine Overview",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/commercial-rules-engine-overview-adm-389",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-390",
+   "name": "VSI Model Builder",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/vsi-model-builder-adm-390",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-391",
+   "name": "VSI Scoring & Tier Threshold Configuration",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/vsi-scoring-tier-threshold-configuration-adm-391",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-392",
+   "name": "Subscription Tier Configuration",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/subscription-tier-configuration-adm-392",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-393",
+   "name": "Tier Included Allowances",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/tier-included-allowances-adm-393",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-394",
+   "name": "Commercial & Licensing Model Configuration",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/commercial-licensing-model-configuration-adm-394",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-395",
+   "name": "Billable Unit, Minimum Guarantee & Enforcement Rules",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/billable-unit-minimum-guarantee-enforcement-rules-adm-395",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-396",
+   "name": "Overage Pricing & Capacity Packs",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/overage-pricing-capacity-packs-adm-396",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-397",
+   "name": "Commercial Model & Rule Simulation",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/commercial-model-rule-simulation-adm-397",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-398",
+   "name": "Rule Versioning, Approval & Publication",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/rule-versioning-approval-publication-adm-398",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-399",
+   "name": "Recommended Package Overview",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/recommended-package-overview-adm-399",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-400",
+   "name": "Commercial Model & Tier Selection",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/commercial-model-tier-selection-adm-400",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-401",
+   "name": "Module Marketplace",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/module-marketplace-adm-401",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-402",
+   "name": "AI Module & Package Recommendations",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/ai-module-package-recommendations-adm-402",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-403",
+   "name": "Module Detail & Commercial Treatment",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/module-detail-commercial-treatment-adm-403",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-404",
+   "name": "Module Dependency & Compatibility Manager",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/module-dependency-compatibility-manager-adm-404",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-405",
+   "name": "Add-Ons, Capacity & Commercial Options",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/add-ons-capacity-commercial-options-adm-405",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-406",
+   "name": "Commercial Package Simulator",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/commercial-package-simulator-adm-406",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-407",
+   "name": "Package Review & Commercial Summary",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/package-review-commercial-summary-adm-407",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-408",
+   "name": "Final Package Approval & Handoff",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/final-package-approval-handoff-adm-408",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-409",
+   "name": "Purchase / Trial Journey Selection",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/purchase-trial-journey-selection-adm-409",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-410",
+   "name": "Contract & Billing Cycle Selection",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/contract-billing-cycle-selection-adm-410",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-411",
+   "name": "Billing & Legal Entity Information",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/billing-legal-entity-information-adm-411",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-412",
+   "name": "Payment Method & Settlement Setup",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/payment-method-settlement-setup-adm-412",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-413",
+   "name": "Trial Configuration & Conversion Rules",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/trial-configuration-conversion-rules-adm-413",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-414",
+   "name": "Order & Commercial Pricing Review",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/order-commercial-pricing-review-adm-414",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-415",
+   "name": "Commercial Agreement, Billable Definition & Customer Acceptance",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/commercial-agreement-billable-definition-customer-accept-adm-415",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-416",
+   "name": "Payment, Contract & Commercial Validation",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/payment-contract-commercial-validation-adm-416",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-417",
+   "name": "Subscription Confirmation & Commercial Activation",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/subscription-confirmation-commercial-activation-adm-417",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-418",
+   "name": "Subscription Lifecycle & Trial-to-Paid Handoff",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/subscription-lifecycle-trial-to-paid-handoff-adm-418",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-419",
+   "name": "Provisioning Command Center",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/provisioning-command-center-adm-419",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-420",
+   "name": "Tenant & Organization Provisioning",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/tenant-organization-provisioning-adm-420",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-421",
+   "name": "Venue & Operational Structure Creation",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/venue-operational-structure-creation-adm-421",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-422",
+   "name": "Administrator & Security Initialization",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/administrator-security-initialization-adm-422",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-423",
+   "name": "License & Entitlement Activation",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/license-entitlement-activation-adm-423",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-424",
+   "name": "Module Activation & Dependency Validation",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/module-activation-dependency-validation-adm-424",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-425",
+   "name": "Venue Template Application",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/venue-template-application-adm-425",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-426",
+   "name": "Initial Configuration & Regional Defaults",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/initial-configuration-regional-defaults-adm-426",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-427",
+   "name": "Provisioning Validation & Exception Management",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/provisioning-validation-exception-management-adm-427",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-449",
+   "name": "Usage & License Command Center",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/usage-license-command-center-adm-449",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-450",
+   "name": "Entitlement & License Inventory",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/entitlement-license-inventory-adm-450",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-451",
+   "name": "Commercial Consumption & Billable Event Metering",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/commercial-consumption-billable-event-metering-adm-451",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-452",
+   "name": "Operational Usage & Threshold Monitor",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/operational-usage-threshold-monitor-adm-452",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-453",
+   "name": "License Enforcement & Decision Engine",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/license-enforcement-decision-engine-adm-453",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-454",
+   "name": "Minimum Guarantee & Variable Consumption Monitor",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/minimum-guarantee-variable-consumption-monitor-adm-454",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-455",
+   "name": "Overage, Capacity & Temporary Exception Management",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/overage-capacity-temporary-exception-management-adm-455",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-456",
+   "name": "Usage Alerts, Reconciliation & Exception Center",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/usage-alerts-reconciliation-exception-center-adm-456",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-457",
+   "name": "AI Usage Forecast & Commercial Optimization",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/ai-usage-forecast-commercial-optimization-adm-457",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-458",
+   "name": "License, Metering & Commercial Synchronization Audit",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/license-metering-commercial-synchronization-audit-adm-458",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-459",
+   "name": "Billing & Commercial Command Center",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/billing-commercial-command-center-adm-459",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-460",
+   "name": "Billing Calculation & Charge Breakdown",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/billing-calculation-charge-breakdown-adm-460",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-461",
+   "name": "Consumption Reconciliation & Billing Approval",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/consumption-reconciliation-billing-approval-adm-461",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-462",
+   "name": "Invoice & Payment Management",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/invoice-payment-management-adm-462",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-463",
+   "name": "Subscription & Commercial Change Management",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/subscription-commercial-change-management-adm-463",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-464",
+   "name": "Renewal Management Center",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/renewal-management-center-adm-464",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-465",
+   "name": "AI Upgrade, Downgrade & Commercial Right-Sizing",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/ai-upgrade-downgrade-commercial-right-sizing-adm-465",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-466",
+   "name": "Commercial Scenario Simulator",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/commercial-scenario-simulator-adm-466",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-467",
+   "name": "Discount, Credit & Commercial Override Management",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/discount-credit-commercial-override-management-adm-467",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-468",
+   "name": "Renewal Approval, Activation & Commercial Handoff",
+   "module": "Tenants & Licensing",
+   "wave": 3,
+   "route": "/tenants-licensing/renewal-approval-activation-commercial-handoff-adm-468",
    "operations": 0,
    "drawn": true
   }

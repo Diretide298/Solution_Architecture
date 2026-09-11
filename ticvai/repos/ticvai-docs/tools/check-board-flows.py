@@ -33,6 +33,9 @@ import sys
 
 import yaml
 
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import workshop_boards  # noqa: E402  -- WS codes are issued once, not enumerated
+
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SCREEN_ID = re.compile(r"\b[A-Z]{2,4}-\d{3}\b")
 
@@ -74,7 +77,7 @@ def main() -> int:
                 screen_board[sc["id"]] = key
 
     keys = sorted(board_screens)
-    ws = {k: "WS%02d" % i for i, k in enumerate(keys, 1)}
+    ws = workshop_boards.codes(keys)
 
     # **Every screen id a flow names, however it names it.** Reading only `steps[].screen` missed
     # entry screens and the ids that appear in prose, and a checker that undercounts coverage is

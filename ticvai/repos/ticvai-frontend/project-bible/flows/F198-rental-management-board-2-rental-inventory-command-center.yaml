@@ -1,0 +1,131 @@
+id: F198
+name: 'Rental Management board 2: Rental Inventory Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Rental Management board 2. **This route is read from the
+    screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-504
+  entryPoints:
+  - Arrives at Rental Inventory Command Center
+steps:
+- step: 1
+  screen: BO-504
+  action: Opens Rental Inventory Command Center
+  operations: []
+  outcome: Provide a real-time operational overview of all rental inventory across venues and locations.
+- step: 2
+  screen: BO-505
+  action: Works in Serialized Equipment Registry
+  operations: []
+  outcome: Manage individually identifiable rental assets.
+- step: 3
+  screen: BO-504
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-506
+  action: Works in Equipment / Asset Profile
+  operations: []
+  outcome: Provide a complete digital record for every serialized rental asset.
+- step: 5
+  screen: BO-504
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-507
+  action: Works in Pooled Inventory Management
+  operations: []
+  outcome: Manage products where individual physical items do not require serial-level tracking.
+- step: 7
+  screen: BO-504
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-508
+  action: Works in Equipment Status & Condition Management
+  operations: []
+  outcome: Separate operational status from physical condition. This distinction is important.
+- step: 9
+  screen: BO-504
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-509
+  action: Works in QR / Barcode Equipment Identification
+  operations: []
+  outcome: Give every physical serialized rental item a scannable digital identity. This incorporates
+    the equipment-assignment scanning recommendation from the source.
+- step: 11
+  screen: BO-504
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-510
+  action: Works in Inventory Location Allocation
+  operations: []
+  outcome: Manage how inventory is distributed among rental locations.
+- step: 13
+  screen: BO-504
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-511
+  action: Works in Inventory Transfer Management
+  operations: []
+  outcome: Control physical inventory movement between locations. The original requirements explicitly
+    include inventory transfers between locations.
+- step: 15
+  screen: BO-504
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-512
+  action: Works in Inventory Adjustment & Exception Management
+  operations: []
+  outcome: Handle physical inventory discrepancies and exceptional conditions.
+- step: 17
+  screen: BO-504
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-513
+  action: Works in Inventory Intelligence & Rebalancing
+  operations: []
+  outcome: Use operational data and AI to improve rental inventory distribution and utilization. This
+    is one of the areas where TICVAI should go beyond the original matrix.
+branches:
+- at: 1
+  condition: Nothing has been set up on Rental Inventory Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Rental Management board 2 visited
+primaryContract: unknown
+contracts:
+- unknown

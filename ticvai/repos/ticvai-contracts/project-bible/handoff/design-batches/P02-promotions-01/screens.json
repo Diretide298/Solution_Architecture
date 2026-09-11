@@ -1,0 +1,218 @@
+[
+ {
+  "id": "GST-037",
+  "name": "Offers & Promotions",
+  "module": "Promotions",
+  "requiresModule": "ticketing",
+  "wave": 2,
+  "capability": "C86",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/general/offers-and-promotions",
+   "component": "apps/guest-app/src/routes/general/OffersAndPromotionsDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "GST-001",
+    "GST-002",
+    "GST-003",
+    "GST-011"
+   ],
+   "transitions": [
+    {
+     "to": "GST-011",
+     "trigger": "Their wallet shows stored value",
+     "provenance": "flow F53 step 3→4"
+    },
+    {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-003",
+     "trigger": "Event & Attraction Listing",
+     "carries": [
+      "eventId"
+     ],
+     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "openQuestions": [
+   "Inventory cites `GET /offers` — no matching operation. Written before the contracts existed."
+  ],
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listPromotions` reads the population and `getPromotion` reads one of them — list, select, act",
+  "purpose": "Find offers & promotions for this venue.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every offers promotions",
+       "bindsTo": "Promotion",
+       "columns": [
+        "Promotion.code",
+        "Promotion.name",
+        "Promotion.description",
+        "Promotion.venueId",
+        "Promotion.discount",
+        "Promotion.conditions",
+        "Promotion.stackingMode",
+        "Promotion.stackingGroup",
+        "Promotion.precedence",
+        "Promotion.validFrom",
+        "Promotion.validTo",
+        "Promotion.maxRedemptions"
+       ],
+       "operation": "listPromotions",
+       "provenance": "contract promotions.yaml GET /promotions"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected offers promotions",
+       "bindsTo": "Promotion",
+       "columns": [
+        "Promotion.code",
+        "Promotion.name",
+        "Promotion.description",
+        "Promotion.venueId",
+        "Promotion.discount",
+        "Promotion.conditions",
+        "Promotion.stackingMode",
+        "Promotion.stackingGroup",
+        "Promotion.precedence",
+        "Promotion.validFrom",
+        "Promotion.validTo",
+        "Promotion.maxRedemptions",
+        "Promotion.maxRedemptionsPerGuest",
+        "Promotion.budgetCap",
+        "Promotion.id",
+        "Promotion.status"
+       ],
+       "operation": "getPromotion",
+       "provenance": "contract promotions.yaml GET /promotions/{promotionId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Evaluate",
+       "operation": "evaluatePromotions",
+       "provenance": "contract promotions.yaml POST /promotions/evaluate"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The offers promotions list.",
+   "error": "Could not load. Names which read failed and leaves the offers promotions untouched.",
+   "emptyFirstRun": "No offers promotions yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the offers promotions are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+  },
+  "apis": [
+   {
+    "operationId": "listPromotions",
+    "contract": "promotions",
+    "purpose": "List promotions",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getPromotion",
+    "contract": "promotions",
+    "purpose": "Read a promotion",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "evaluatePromotions",
+    "contract": "promotions",
+    "purpose": "Evaluate promotions against a cart",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPromotions"
+    ]
+   },
+   {
+    "operationId": "getCouponCode",
+    "contract": "promotions",
+    "purpose": "Resolve a code the guest typed",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "promotionId",
+     "from": "deepLink"
+    },
+    {
+     "name": "code",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `promotionId`.",
+   "preloaded": [
+    "Promotion.code",
+    "Promotion.name",
+    "Promotion.description",
+    "Promotion.venueId",
+    "Promotion.discount"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-037"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

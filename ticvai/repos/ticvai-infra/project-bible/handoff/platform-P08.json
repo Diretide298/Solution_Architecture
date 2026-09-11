@@ -7,20 +7,20 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-10",
+ "generated": "2026-09-11",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
-  "screens": 393,
+  "screens": 614,
   "operations": 666,
   "contracts": 27,
-  "modules": 8,
+  "modules": 11,
   "undrawn": 0,
   "operationsWithNoScreen": 229
  },
  "waves": {
   "wave1": 60,
   "wave2": 79,
-  "wave3": 254
+  "wave3": 475
  },
  "modules": [
   {
@@ -29,6 +29,20 @@
    "waves": [
     1,
     2,
+    3
+   ]
+  },
+  {
+   "module": "Games & Rides",
+   "screens": 100,
+   "waves": [
+    3
+   ]
+  },
+  {
+   "module": "Rentals",
+   "screens": 100,
+   "waves": [
     3
    ]
   },
@@ -56,6 +70,13 @@
    "waves": [
     1,
     2,
+    3
+   ]
+  },
+  {
+   "module": "Setup & Go-Live",
+   "screens": 21,
+   "waves": [
     3
    ]
   },
@@ -111,19 +132,19 @@
    "operations": 46
   },
   {
-   "contract": "finance",
-   "operations": 43
-  },
-  {
    "contract": "fnb",
    "operations": 43
   },
   {
-   "contract": "marketing-crm",
-   "operations": 25
+   "contract": "finance",
+   "operations": 43
   },
   {
    "contract": "tenancy",
+   "operations": 25
+  },
+  {
+   "contract": "marketing-crm",
    "operations": 25
   },
   {
@@ -159,11 +180,11 @@
    "operations": 11
   },
   {
-   "contract": "venue-map",
+   "contract": "retail",
    "operations": 10
   },
   {
-   "contract": "retail",
+   "contract": "venue-map",
    "operations": 10
   },
   {
@@ -195,11 +216,11 @@
    "operations": 2
   },
   {
-   "contract": "platform-ops",
+   "contract": "white-label",
    "operations": 1
   },
   {
-   "contract": "white-label",
+   "contract": "platform-ops",
    "operations": 1
   }
  ],
@@ -3738,6 +3759,1995 @@
    "module": "Venue Operations",
    "wave": 3,
    "route": "/venue-operations/ai-sla-escalation-advisor-bo-393",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-394",
+   "name": "Game & Ride Operations Dashboard",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/game-ride-operations-dashboard-bo-394",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-395",
+   "name": "Game & Ride Directory",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/game-ride-directory-bo-395",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-396",
+   "name": "Attraction Profile",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/attraction-profile-bo-396",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-397",
+   "name": "Attraction Type Configuration",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/attraction-type-configuration-bo-397",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-398",
+   "name": "Game & Ride Operational Configuration",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/game-ride-operational-configuration-bo-398",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-399",
+   "name": "Wallet & Credit Acceptance Mapping",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/wallet-credit-acceptance-mapping-bo-399",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-400",
+   "name": "Attraction / Reader Mapping",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/attraction-reader-mapping-bo-400",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-401",
+   "name": "Game Package & Entitlement Association",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/game-package-entitlement-association-bo-401",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-402",
+   "name": "Configuration Health & Validation",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/configuration-health-validation-bo-402",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-403",
+   "name": "Attraction Audit, Dependencies & Governed Actions",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/attraction-audit-dependencies-governed-actions-bo-403",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-404",
+   "name": "Reader Management Dashboard",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/reader-management-dashboard-bo-404",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-405",
+   "name": "Reader Directory",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/reader-directory-bo-405",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-406",
+   "name": "Reader Profile & Device Setup",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/reader-profile-device-setup-bo-406",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-407",
+   "name": "Reader Credit & Payment Configuration",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/reader-credit-payment-configuration-bo-407",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-408",
+   "name": "Reader / Attraction Assignment",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/reader-attraction-assignment-bo-408",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-409",
+   "name": "Retap Delay & Transaction Protection",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/retap-delay-transaction-protection-bo-409",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-410",
+   "name": "Free Game Glow & Reader Display Rules",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/free-game-glow-reader-display-rules-bo-410",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-411",
+   "name": "Reader Theme & Experience Configuration",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/reader-theme-experience-configuration-bo-411",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-412",
+   "name": "Real-Time Tap Validation & Reader Response",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/real-time-tap-validation-reader-response-bo-412",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-413",
+   "name": "Balance Check Reader & Device Test Console",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/balance-check-reader-device-test-console-bo-413",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-414",
+   "name": "Wallet & Credit Management Dashboard",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/wallet-credit-management-dashboard-bo-414",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-415",
+   "name": "Wallet & Credit Type Configuration",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/wallet-credit-type-configuration-bo-415",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-416",
+   "name": "Wallet Account & Balance View",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/wallet-account-balance-view-bo-416",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-417",
+   "name": "Top-Up Configuration",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/top-up-configuration-bo-417",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-418",
+   "name": "Top-Up Bonus Rule Configuration",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/top-up-bonus-rule-configuration-bo-418",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-419",
+   "name": "Bonus Usage Restrictions",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/bonus-usage-restrictions-bo-419",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-420",
+   "name": "Bonus Validity & Expiry Configuration",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/bonus-validity-expiry-configuration-bo-420",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-421",
+   "name": "Free Game & Ride Credit Management",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/free-game-ride-credit-management-bo-421",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-422",
+   "name": "Refund, Adjustment & Manual Bonus Control",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/refund-adjustment-manual-bonus-control-bo-422",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-423",
+   "name": "Wallet Credit Transaction Ledger & Audit",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/wallet-credit-transaction-ledger-audit-bo-423",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-424",
+   "name": "Gameplay Validation Command Center",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/gameplay-validation-command-center-bo-424",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-425",
+   "name": "Gameplay Validation Rule Configuration",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/gameplay-validation-rule-configuration-bo-425",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-426",
+   "name": "Deduction Priority & Funding Source Rules",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/deduction-priority-funding-source-rules-bo-426",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-427",
+   "name": "All Games & Rides Pass Configuration",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/all-games-rides-pass-configuration-bo-427",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-428",
+   "name": "Specific Game/Ride Unlimited Entitlement",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/specific-game-ride-unlimited-entitlement-bo-428",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-429",
+   "name": "Specific Game/Ride Limited Entitlement",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/specific-game-ride-limited-entitlement-bo-429",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-430",
+   "name": "Game Package Builder",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/game-package-builder-bo-430",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-431",
+   "name": "Entitlement Validity & Activation Rules",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/entitlement-validity-activation-rules-bo-431",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-432",
+   "name": "Real-Time Gameplay Authorization",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/real-time-gameplay-authorization-bo-432",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-433",
+   "name": "Validation Simulator & Exception Analysis",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/validation-simulator-exception-analysis-bo-433",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-434",
+   "name": "Game & Ride Pricing Command Center",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/game-ride-pricing-command-center-bo-434",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-435",
+   "name": "Standard Game & Ride Price Configuration",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/standard-game-ride-price-configuration-bo-435",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-436",
+   "name": "Group Pricing Configuration",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/group-pricing-configuration-bo-436",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-437",
+   "name": "Peak / Non-Peak Dynamic Pricing",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/peak-non-peak-dynamic-pricing-bo-437",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-438",
+   "name": "Pricing Calendar & Exception Dates",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/pricing-calendar-exception-dates-bo-438",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-439",
+   "name": "Normal & VIP Pricing Configuration",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/normal-vip-pricing-configuration-bo-439",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-440",
+   "name": "Retry Price Configuration",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/retry-price-configuration-bo-440",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-441",
+   "name": "Price Priority & Conflict Rules",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/price-priority-conflict-rules-bo-441",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-442",
+   "name": "Effective Pricing & Reader Price Preview",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/effective-pricing-reader-price-preview-bo-442",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-443",
+   "name": "Pricing Audit, Approval & Publication",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/pricing-audit-approval-publication-bo-443",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-444",
+   "name": "Redemption Operations Dashboard",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/redemption-operations-dashboard-bo-444",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-445",
+   "name": "Redemption Credit Rule Configuration",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/redemption-credit-rule-configuration-bo-445",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-446",
+   "name": "Ticket-Based Redemption / Ticket-Eater Integration",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/ticket-based-redemption-ticket-eater-integration-bo-446",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-447",
+   "name": "Ticketless Redemption Game Integration",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/ticketless-redemption-game-integration-bo-447",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-448",
+   "name": "Redemption Wallet & Balance View",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/redemption-wallet-balance-view-bo-448",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-449",
+   "name": "Redemption Counter / Prize Checkout",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/redemption-counter-prize-checkout-bo-449",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-450",
+   "name": "Prize Catalogue & Credit Cost Configuration",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/prize-catalogue-credit-cost-configuration-bo-450",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-451",
+   "name": "Prize Inventory Integration",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/prize-inventory-integration-bo-451",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-452",
+   "name": "Direct-Pay / Crane & Prize Machine Configuration",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/direct-pay-crane-prize-machine-configuration-bo-452",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-453",
+   "name": "Redemption Transaction Ledger, Reconciliation & Audit",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/redemption-transaction-ledger-reconciliation-audit-bo-453",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-454",
+   "name": "Card Lifecycle Command Center",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/card-lifecycle-command-center-bo-454",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-455",
+   "name": "Card / Credential Profile",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/card-credential-profile-bo-455",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-456",
+   "name": "Card Expiry Rule Configuration",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/card-expiry-rule-configuration-bo-456",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-457",
+   "name": "Last Recharge & Last Activity Tracking",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/last-recharge-last-activity-tracking-bo-457",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-458",
+   "name": "Expiry Monitoring & Upcoming Expiration",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/expiry-monitoring-upcoming-expiration-bo-458",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-459",
+   "name": "Card Expiry Runtime Validation",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/card-expiry-runtime-validation-bo-459",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-460",
+   "name": "Card Block, Suspend & Reactivation Control",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/card-block-suspend-reactivation-control-bo-460",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-461",
+   "name": "Card Replacement & Wallet Relinking",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/card-replacement-wallet-relinking-bo-461",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-462",
+   "name": "Customer Balance & Credential Status View",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/customer-balance-credential-status-view-bo-462",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-463",
+   "name": "Card Lifecycle Audit & History",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/card-lifecycle-audit-history-bo-463",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-464",
+   "name": "Game & Ride Operations Control Center",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/game-ride-operations-control-center-bo-464",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-465",
+   "name": "Live Gameplay Transaction Monitor",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/live-gameplay-transaction-monitor-bo-465",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-466",
+   "name": "Reader & Device Health Monitor",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/reader-device-health-monitor-bo-466",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-467",
+   "name": "Tap Validation & Decision Trace",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/tap-validation-decision-trace-bo-467",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-468",
+   "name": "Rejected Transaction & Reason Analysis",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/rejected-transaction-reason-analysis-bo-468",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-469",
+   "name": "Wallet & Deduction Transaction Monitor",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/wallet-deduction-transaction-monitor-bo-469",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-470",
+   "name": "Entitlement & Free-Play Consumption Monitor",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/entitlement-free-play-consumption-monitor-bo-470",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-471",
+   "name": "Offline, Synchronization & Recovery Monitor",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/offline-synchronization-recovery-monitor-bo-471",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-472",
+   "name": "Operational Alerts & Exception Center",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/operational-alerts-exception-center-bo-472",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-473",
+   "name": "Operational Analytics & Reconciliation Dashboard",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/operational-analytics-reconciliation-dashboard-bo-473",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-474",
+   "name": "Reader Integration Command Center",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/reader-integration-command-center-bo-474",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-475",
+   "name": "Reader Manufacturer & Model Profile",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/reader-manufacturer-model-profile-bo-475",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-476",
+   "name": "Communication Protocol Configuration",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/communication-protocol-configuration-bo-476",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-477",
+   "name": "Reader Command & Event Mapping",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/reader-command-event-mapping-bo-477",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-478",
+   "name": "Reader Configuration Deployment & Synchronization",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/reader-configuration-deployment-synchronization-bo-478",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-479",
+   "name": "Game Trigger & I/O Control Mapping",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/game-trigger-i-o-control-mapping-bo-479",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-480",
+   "name": "Reader Screen, LED & Sound Output Mapping",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/reader-screen-led-sound-output-mapping-bo-480",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-481",
+   "name": "Edge Cache & Offline Rule Package",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/edge-cache-offline-rule-package-bo-481",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-482",
+   "name": "Device Diagnostics & Integration Logs",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/device-diagnostics-integration-logs-bo-482",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-483",
+   "name": "Integration Certification & Test Console",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/integration-certification-test-console-bo-483",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-484",
+   "name": "Self-Service Experience Command Center",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/self-service-experience-command-center-bo-484",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-485",
+   "name": "Self-Service Kiosk Profile & Channel Configuration",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/self-service-kiosk-profile-channel-configuration-bo-485",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-486",
+   "name": "Customer Card / Wallet Identification",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/customer-card-wallet-identification-bo-486",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-487",
+   "name": "Customer Wallet & Balance Summary",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/customer-wallet-balance-summary-bo-487",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-488",
+   "name": "Self-Service Wallet Top-Up",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/self-service-wallet-top-up-bo-488",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-489",
+   "name": "Bonus, Free Game & Benefit View",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/bonus-free-game-benefit-view-bo-489",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-490",
+   "name": "Game & Ride Eligibility / \u201cWhat Can I Play?\u201d",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/game-ride-eligibility-what-can-i-play-bo-490",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-491",
+   "name": "Redemption Balance & Prize Discovery",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/redemption-balance-prize-discovery-bo-491",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-492",
+   "name": "Customer Game & Wallet Transaction History",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/customer-game-wallet-transaction-history-bo-492",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-493",
+   "name": "Self-Service UI Theme, Language & Journey Configuration",
+   "module": "Games & Rides",
+   "wave": 3,
+   "route": "/games-rides/self-service-ui-theme-language-journey-configuration-bo-493",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-494",
+   "name": "Rental Product Command Center",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/rental-product-command-center-bo-494",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-495",
+   "name": "Create Rental Product Wizard",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/create-rental-product-wizard-bo-495",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-496",
+   "name": "Rental Product Profile",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/rental-product-profile-bo-496",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-497",
+   "name": "Rental Category & Classification Setup",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/rental-category-classification-setup-bo-497",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-498",
+   "name": "Inventory Tracking Model",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/inventory-tracking-model-bo-498",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-499",
+   "name": "Rental Location Assignment",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/rental-location-assignment-bo-499",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-500",
+   "name": "Rental Duration & Turnaround Configuration",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/rental-duration-turnaround-configuration-bo-500",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-501",
+   "name": "Rental Rules & Operational Policy",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/rental-rules-operational-policy-bo-501",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-502",
+   "name": "Customer Requirements, Agreement & Waiver",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/customer-requirements-agreement-waiver-bo-502",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-503",
+   "name": "Product Validation, Approval & Publication",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/product-validation-approval-publication-bo-503",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-504",
+   "name": "Rental Inventory Command Center",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/rental-inventory-command-center-bo-504",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-505",
+   "name": "Serialized Equipment Registry",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/serialized-equipment-registry-bo-505",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-506",
+   "name": "Equipment / Asset Profile",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/equipment-asset-profile-bo-506",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-507",
+   "name": "Pooled Inventory Management",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/pooled-inventory-management-bo-507",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-508",
+   "name": "Equipment Status & Condition Management",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/equipment-status-condition-management-bo-508",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-509",
+   "name": "QR / Barcode Equipment Identification",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/qr-barcode-equipment-identification-bo-509",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-510",
+   "name": "Inventory Location Allocation",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/inventory-location-allocation-bo-510",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-511",
+   "name": "Inventory Transfer Management",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/inventory-transfer-management-bo-511",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-512",
+   "name": "Inventory Adjustment & Exception Management",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/inventory-adjustment-exception-management-bo-512",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-513",
+   "name": "Inventory Intelligence & Rebalancing",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/inventory-intelligence-rebalancing-bo-513",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-514",
+   "name": "Availability Command Center",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/availability-command-center-bo-514",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-515",
+   "name": "Availability Rule Configuration",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/availability-rule-configuration-bo-515",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-516",
+   "name": "Operating Hours & Rental Windows",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/operating-hours-rental-windows-bo-516",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-517",
+   "name": "Timeslot & Duration Availability Setup",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/timeslot-duration-availability-setup-bo-517",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-518",
+   "name": "Real-Time Availability Calendar",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/real-time-availability-calendar-bo-518",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-519",
+   "name": "Resource / Equipment Calendar",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/resource-equipment-calendar-bo-519",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-520",
+   "name": "Blackout, Closure & Capacity Blocking",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/blackout-closure-capacity-blocking-bo-520",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-521",
+   "name": "Overlap & Conflict Engine",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/overlap-conflict-engine-bo-521",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-522",
+   "name": "Inventory Holds, Buffers & Release Rules",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/inventory-holds-buffers-release-rules-bo-522",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-523",
+   "name": "Availability Intelligence & AI Forecasting",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/availability-intelligence-ai-forecasting-bo-523",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-524",
+   "name": "Rental Pricing Command Center",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/rental-pricing-command-center-bo-524",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-525",
+   "name": "Pricing Profile Builder",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/pricing-profile-builder-bo-525",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-526",
+   "name": "Duration & Tiered Pricing Configuration",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/duration-tiered-pricing-configuration-bo-526",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-527",
+   "name": "Calendar, Peak & Seasonal Pricing",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/calendar-peak-seasonal-pricing-bo-527",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-528",
+   "name": "Dynamic Pricing & AI Recommendation",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/dynamic-pricing-ai-recommendation-bo-528",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-529",
+   "name": "Deposit & Security Hold Policy",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/deposit-security-hold-policy-bo-529",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-530",
+   "name": "Deposit Lifecycle & Settlement Rules",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/deposit-lifecycle-settlement-rules-bo-530",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-531",
+   "name": "Late Fee, Grace Period & Extension Pricing",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/late-fee-grace-period-extension-pricing-bo-531",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-532",
+   "name": "Commercial Exceptions, Waivers & Overrides",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/commercial-exceptions-waivers-overrides-bo-532",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-533",
+   "name": "Pricing Simulation, Validation & AI Commercial Intelligence",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/pricing-simulation-validation-ai-commercial-intelligence-bo-533",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-534",
+   "name": "Rental Booking Command Center",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/rental-booking-command-center-bo-534",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-535",
+   "name": "New Rental Booking Wizard",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/new-rental-booking-wizard-bo-535",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-536",
+   "name": "Availability Selection & Alternative Options",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/availability-selection-alternative-options-bo-536",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-537",
+   "name": "Customer & Participant Information",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/customer-participant-information-bo-537",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-538",
+   "name": "Group Rental & Participant Management",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/group-rental-participant-management-bo-538",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-539",
+   "name": "Rental Agreement & Waiver Completion",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/rental-agreement-waiver-completion-bo-539",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-540",
+   "name": "Booking Commercial Summary & Payment",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/booking-commercial-summary-payment-bo-540",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-541",
+   "name": "Reservation Confirmation & QR Voucher",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/reservation-confirmation-qr-voucher-bo-541",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-542",
+   "name": "Reservation Modification, Cancellation & No-Show",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/reservation-modification-cancellation-no-show-bo-542",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-543",
+   "name": "Reservation Detail, Timeline & Readiness",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/reservation-detail-timeline-readiness-bo-543",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-544",
+   "name": "Rental Checkout Command Center",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/rental-checkout-command-center-bo-544",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-545",
+   "name": "Voucher Scan & Reservation Retrieval",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/voucher-scan-reservation-retrieval-bo-545",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-546",
+   "name": "Checkout Readiness Validation",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/checkout-readiness-validation-bo-546",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-547",
+   "name": "Equipment Assignment Workspace",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/equipment-assignment-workspace-bo-547",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-548",
+   "name": "Equipment Scan & Validation",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/equipment-scan-validation-bo-548",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-549",
+   "name": "Pre-Rental Condition Inspection",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/pre-rental-condition-inspection-bo-549",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-550",
+   "name": "Safety & Handover Checklist",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/safety-handover-checklist-bo-550",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-551",
+   "name": "Deposit & Financial Handover Validation",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/deposit-financial-handover-validation-bo-551",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-552",
+   "name": "Group & Multi-Item Checkout",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/group-multi-item-checkout-bo-552",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-553",
+   "name": "Checkout Confirmation & Rental Activation",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/checkout-confirmation-rental-activation-bo-553",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-554",
+   "name": "Active Rental Operations Command Center",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/active-rental-operations-command-center-bo-554",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-555",
+   "name": "Active Rental Detail & Live Timeline",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/active-rental-detail-live-timeline-bo-555",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-556",
+   "name": "Rental Extension Request",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/rental-extension-request-bo-556",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-557",
+   "name": "Extension Pricing & Confirmation",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/extension-pricing-confirmation-bo-557",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-558",
+   "name": "Equipment Swap / Replacement",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/equipment-swap-replacement-bo-558",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-559",
+   "name": "Rental Incident & Operational Exception",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/rental-incident-operational-exception-bo-559",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-560",
+   "name": "Due Soon & Customer Notification Management",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/due-soon-customer-notification-management-bo-560",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-561",
+   "name": "Overdue Rental Management",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/overdue-rental-management-bo-561",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-562",
+   "name": "Active Group Rental Management",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/active-group-rental-management-bo-562",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-563",
+   "name": "Active Rental Intelligence & Operational Alerts",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/active-rental-intelligence-operational-alerts-bo-563",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-564",
+   "name": "Rental Return Command Center",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/rental-return-command-center-bo-564",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-565",
+   "name": "Return Scan & Rental Retrieval",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/return-scan-rental-retrieval-bo-565",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-566",
+   "name": "Return Summary & Actual Return Time",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/return-summary-actual-return-time-bo-566",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-567",
+   "name": "Post-Rental Condition Inspection",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/post-rental-condition-inspection-bo-567",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-568",
+   "name": "Before vs After Condition Comparison",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/before-vs-after-condition-comparison-bo-568",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-569",
+   "name": "Damage Assessment & Charge Workflow",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/damage-assessment-charge-workflow-bo-569",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-570",
+   "name": "Partial Return & Missing Equipment",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/partial-return-missing-equipment-bo-570",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-571",
+   "name": "Late Fees, Damage Fees & Final Settlement",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/late-fees-damage-fees-final-settlement-bo-571",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-572",
+   "name": "Deposit Release, Capture & Customer Confirmation",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/deposit-release-capture-customer-confirmation-bo-572",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-573",
+   "name": "Return Completion & Equipment Disposition",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/return-completion-equipment-disposition-bo-573",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-574",
+   "name": "Maintenance Command Center",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/maintenance-command-center-bo-574",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-575",
+   "name": "Maintenance Rule & Service Plan Configuration",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/maintenance-rule-service-plan-configuration-bo-575",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-576",
+   "name": "Maintenance Calendar & Scheduling",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/maintenance-calendar-scheduling-bo-576",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-577",
+   "name": "Maintenance Work Order",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/maintenance-work-order-bo-577",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-578",
+   "name": "Technician Repair Workspace",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/technician-repair-workspace-bo-578",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-579",
+   "name": "Parts, Cost & Maintenance Expense Tracking",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/parts-cost-maintenance-expense-tracking-bo-579",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-580",
+   "name": "Asset Maintenance History & Lifecycle",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/asset-maintenance-history-lifecycle-bo-580",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-581",
+   "name": "Return-to-Service Inspection & Approval",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/return-to-service-inspection-approval-bo-581",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-582",
+   "name": "Asset Retirement, Write-Off & Replacement Recommendation",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/asset-retirement-write-off-replacement-recommendation-bo-582",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-583",
+   "name": "Maintenance Intelligence & Predictive AI",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/maintenance-intelligence-predictive-ai-bo-583",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-584",
+   "name": "Rental Executive Command Center",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/rental-executive-command-center-bo-584",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-585",
+   "name": "Rental Revenue & Commercial Analytics",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/rental-revenue-commercial-analytics-bo-585",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-586",
+   "name": "Utilization & Capacity Analytics",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/utilization-capacity-analytics-bo-586",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-587",
+   "name": "Inventory & Equipment Performance Analytics",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/inventory-equipment-performance-analytics-bo-587",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-588",
+   "name": "Rental Duration, Extension & Return Analytics",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/rental-duration-extension-return-analytics-bo-588",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-589",
+   "name": "Damage, Loss, Deposit & Exception Analytics",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/damage-loss-deposit-exception-analytics-bo-589",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-590",
+   "name": "Location & Channel Performance",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/location-channel-performance-bo-590",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-591",
+   "name": "Rental Forecasting & Demand Intelligence",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/rental-forecasting-demand-intelligence-bo-591",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-592",
+   "name": "Audit, Governance & Operational Control",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/audit-governance-operational-control-bo-592",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-593",
+   "name": "AI Rental Management Copilot & Action Center",
+   "module": "Rentals",
+   "wave": 3,
+   "route": "/rentals/ai-rental-management-copilot-action-center-bo-593",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-594",
+   "name": "Environment Ready & Handoff to AI Setup",
+   "module": "Setup & Go-Live",
+   "wave": 3,
+   "route": "/setup-go-live/environment-ready-handoff-to-ai-setup-bo-594",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-595",
+   "name": "AI Setup Command Center",
+   "module": "Setup & Go-Live",
+   "wave": 3,
+   "route": "/setup-go-live/ai-setup-command-center-bo-595",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-596",
+   "name": "Guided Setup Plan",
+   "module": "Setup & Go-Live",
+   "wave": 3,
+   "route": "/setup-go-live/guided-setup-plan-bo-596",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-597",
+   "name": "AI Configuration Workspace",
+   "module": "Setup & Go-Live",
+   "wave": 3,
+   "route": "/setup-go-live/ai-configuration-workspace-bo-597",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-598",
+   "name": "AI Draft Review & Approval",
+   "module": "Setup & Go-Live",
+   "wave": 3,
+   "route": "/setup-go-live/ai-draft-review-approval-bo-598",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-599",
+   "name": "Manual Configuration Center",
+   "module": "Setup & Go-Live",
+   "wave": 3,
+   "route": "/setup-go-live/manual-configuration-center-bo-599",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-600",
+   "name": "Venue, Calendar & Operational Setup",
+   "module": "Setup & Go-Live",
+   "wave": 3,
+   "route": "/setup-go-live/venue-calendar-operational-setup-bo-600",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-601",
+   "name": "Product, Pricing & Sales Channel Setup",
+   "module": "Setup & Go-Live",
+   "wave": 3,
+   "route": "/setup-go-live/product-pricing-sales-channel-setup-bo-601",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-602",
+   "name": "POS, Payment & Access Setup",
+   "module": "Setup & Go-Live",
+   "wave": 3,
+   "route": "/setup-go-live/pos-payment-access-setup-bo-602",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-603",
+   "name": "Configuration Health & AI Review",
+   "module": "Setup & Go-Live",
+   "wave": 3,
+   "route": "/setup-go-live/configuration-health-ai-review-bo-603",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-604",
+   "name": "Setup Completion & Handoff to Go-Live",
+   "module": "Setup & Go-Live",
+   "wave": 3,
+   "route": "/setup-go-live/setup-completion-handoff-to-go-live-bo-604",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-605",
+   "name": "Go-Live Readiness Command Center",
+   "module": "Setup & Go-Live",
+   "wave": 3,
+   "route": "/setup-go-live/go-live-readiness-command-center-bo-605",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-606",
+   "name": "Automated Validation Plan",
+   "module": "Setup & Go-Live",
+   "wave": 3,
+   "route": "/setup-go-live/automated-validation-plan-bo-606",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-607",
+   "name": "Ticketing & Product Validation",
+   "module": "Setup & Go-Live",
+   "wave": 3,
+   "route": "/setup-go-live/ticketing-product-validation-bo-607",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-608",
+   "name": "End-to-End Sales Channel Testing",
+   "module": "Setup & Go-Live",
+   "wave": 3,
+   "route": "/setup-go-live/end-to-end-sales-channel-testing-bo-608",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-609",
+   "name": "Payment & Financial Validation",
+   "module": "Setup & Go-Live",
+   "wave": 3,
+   "route": "/setup-go-live/payment-financial-validation-bo-609",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-610",
+   "name": "Ticket, QR & Access Validation",
+   "module": "Setup & Go-Live",
+   "wave": 3,
+   "route": "/setup-go-live/ticket-qr-access-validation-bo-610",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-611",
+   "name": "User, Security & Integration Validation",
+   "module": "Setup & Go-Live",
+   "wave": 3,
+   "route": "/setup-go-live/user-security-integration-validation-bo-611",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-612",
+   "name": "Communication & Customer Journey Validation",
+   "module": "Setup & Go-Live",
+   "wave": 3,
+   "route": "/setup-go-live/communication-customer-journey-validation-bo-612",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-613",
+   "name": "Blocker, Warning & AI Resolution Center",
+   "module": "Setup & Go-Live",
+   "wave": 3,
+   "route": "/setup-go-live/blocker-warning-ai-resolution-center-bo-613",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-614",
+   "name": "Final Go-Live Approval & Production Launch",
+   "module": "Setup & Go-Live",
+   "wave": 3,
+   "route": "/setup-go-live/final-go-live-approval-production-launch-bo-614",
    "operations": 0,
    "drawn": true
   }

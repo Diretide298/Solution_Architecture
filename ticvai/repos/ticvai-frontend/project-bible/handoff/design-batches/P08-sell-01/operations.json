@@ -1,0 +1,1361 @@
+{
+ "analysePromotionConflicts": {
+  "method": "GET",
+  "path": "/promotions/{promotionId}/conflicts",
+  "contract": "promotions",
+  "summary": "Analyse stacking against live promotions",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ConflictAnalysis"
+ },
+ "bulkUpdateProducts": {
+  "method": "POST",
+  "path": "/products/bulk",
+  "contract": "inventory",
+  "summary": "Change many products at once, with a preview",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "cancelPerformance": {
+  "method": "POST",
+  "path": "/performances/{performanceId}/cancel",
+  "contract": "catalogue",
+  "summary": "Cancel a performance",
+  "permission": "PERFORMANCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PerformanceCancellationResult"
+ },
+ "copyPriceList": {
+  "method": "POST",
+  "path": "/price-lists/{priceListId}/copy",
+  "contract": "catalogue",
+  "summary": "Copy a price list, optionally with an adjustment",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "createBundle": {
+  "method": "POST",
+  "path": "/bundles",
+  "contract": "promotions",
+  "summary": "Create a bundle",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateBundleRequest",
+  "responds": "Bundle"
+ },
+ "createChannelCapacity": {
+  "method": "POST",
+  "path": "/channel-capacities",
+  "contract": "catalogue",
+  "summary": "Create a capacity envelope",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateEnvelopeRequest",
+  "responds": "ChannelCapacity"
+ },
+ "createCouponCampaign": {
+  "method": "POST",
+  "path": "/coupon-campaigns",
+  "contract": "promotions",
+  "summary": "Create a coupon campaign",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateCouponCampaignRequest",
+  "responds": "CouponCampaign"
+ },
+ "createEntitlementTemplate": {
+  "method": "POST",
+  "path": "/entitlement-templates",
+  "contract": "catalogue",
+  "summary": "Create an entitlement template",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "EntitlementTemplate",
+  "responds": "EntitlementTemplate"
+ },
+ "createEvent": {
+  "method": "POST",
+  "path": "/events",
+  "contract": "catalogue",
+  "summary": "Create an event",
+  "permission": "EVENT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateEventRequest",
+  "responds": "Event"
+ },
+ "createMerchandise": {
+  "method": "POST",
+  "path": "/merchandise",
+  "contract": "retail",
+  "summary": "Create a merchandise item",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateMerchandiseRequest",
+  "responds": "MerchandiseItem"
+ },
+ "createPerformances": {
+  "method": "POST",
+  "path": "/events/{eventId}/performances",
+  "contract": "catalogue",
+  "summary": "Create performances, singly or by schedule",
+  "permission": "PERFORMANCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreatePerformancesRequest",
+  "responds": null
+ },
+ "createPriceList": {
+  "method": "POST",
+  "path": "/price-lists",
+  "contract": "catalogue",
+  "summary": "Create a price list",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreatePriceListRequest",
+  "responds": "PriceList"
+ },
+ "createProduct": {
+  "method": "POST",
+  "path": "/products",
+  "contract": "catalogue",
+  "summary": "Create a product",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateProductRequest",
+  "responds": "Product"
+ },
+ "createPromotion": {
+  "method": "POST",
+  "path": "/promotions",
+  "contract": "promotions",
+  "summary": "Create a promotion",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreatePromotionRequest",
+  "responds": "Promotion"
+ },
+ "endPromotion": {
+  "method": "POST",
+  "path": "/promotions/{promotionId}/end",
+  "contract": "promotions",
+  "summary": "End a promotion early",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "evaluatePromotions": {
+  "method": "POST",
+  "path": "/promotions/evaluate",
+  "contract": "promotions",
+  "summary": "Evaluate promotions against a cart",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "EvaluatePromotionsRequest",
+  "responds": "PromotionEvaluation"
+ },
+ "generateCouponCodes": {
+  "method": "POST",
+  "path": "/coupon-campaigns/{campaignId}/codes",
+  "contract": "promotions",
+  "summary": "Generate codes in bulk",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getChannelAllocations": {
+  "method": "GET",
+  "path": "/channel-capacities/{channelCapacityId}/channel-allocations",
+  "contract": "catalogue",
+  "summary": "Capacity allocated to each channel",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ChannelAllocationSet"
+ },
+ "getDashboard": {
+  "method": "GET",
+  "path": "/dashboards/{dashboardId}",
+  "contract": "reporting",
+  "summary": "Read a dashboard with tile data",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "refresh",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DashboardData"
+ },
+ "getEvent": {
+  "method": "GET",
+  "path": "/events/{eventId}",
+  "contract": "catalogue",
+  "summary": "Read an event",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Event"
+ },
+ "getLatestBundle": {
+  "method": "GET",
+  "path": "/catalogue/bundles/latest",
+  "contract": "catalogue",
+  "summary": "Pull the current bundle for this workstation's venue",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": "since",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "If-None-Match",
+    "in": "header",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CatalogueBundle"
+ },
+ "getPerformance": {
+  "method": "GET",
+  "path": "/performances/{performanceId}",
+  "contract": "catalogue",
+  "summary": "Read a performance",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Performance"
+ },
+ "getPriceList": {
+  "method": "GET",
+  "path": "/price-lists/{priceListId}",
+  "contract": "catalogue",
+  "summary": "Read a price list",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PriceList"
+ },
+ "getProduct": {
+  "method": "GET",
+  "path": "/products/{productId}",
+  "contract": "catalogue",
+  "summary": "Read a product",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Product"
+ },
+ "getPromotion": {
+  "method": "GET",
+  "path": "/promotions/{promotionId}",
+  "contract": "promotions",
+  "summary": "Read a promotion",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Promotion"
+ },
+ "getPromotionUsage": {
+  "method": "GET",
+  "path": "/promotions/{promotionId}/usage",
+  "contract": "promotions",
+  "summary": "Redemption count and discount given",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PromotionUsage"
+ },
+ "getSeatAvailability": {
+  "method": "GET",
+  "path": "/performances/{performanceId}/seat-availability",
+  "contract": "seating",
+  "summary": "Seat status for a performance",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "sectionCode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "availableOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "mode",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatAvailability"
+ },
+ "listAlternativeCodes": {
+  "method": "GET",
+  "path": "/products/{productId}/alternative-codes",
+  "contract": "catalogue",
+  "summary": "External identifiers for a product",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AlternativeCode"
+ },
+ "listCatalogueBundles": {
+  "method": "GET",
+  "path": "/catalogue/bundles",
+  "contract": "catalogue",
+  "summary": "List published bundles",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BundleSummary"
+ },
+ "listChannelCapacities": {
+  "method": "GET",
+  "path": "/channel-capacities",
+  "contract": "catalogue",
+  "summary": "List capacity envelopes",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "performanceId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listChannelListings": {
+  "method": "GET",
+  "path": "/channel-listings",
+  "contract": "subscription",
+  "summary": "What is listed on which OTA",
+  "permission": "PARTNER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ChannelListing"
+ },
+ "listCouponCampaigns": {
+  "method": "GET",
+  "path": "/coupon-campaigns",
+  "contract": "promotions",
+  "summary": "List coupon campaigns",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listCouponCodes": {
+  "method": "GET",
+  "path": "/coupon-campaigns/{campaignId}/codes",
+  "contract": "promotions",
+  "summary": "List generated codes",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listEntitlementTemplates": {
+  "method": "GET",
+  "path": "/entitlement-templates",
+  "contract": "catalogue",
+  "summary": "List entitlement templates",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "EntitlementTemplate"
+ },
+ "listEvents": {
+  "method": "GET",
+  "path": "/events",
+  "contract": "catalogue",
+  "summary": "List events",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMenus": {
+  "method": "GET",
+  "path": "/menus",
+  "contract": "fnb",
+  "summary": "List menus",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "outletId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "activeAt",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMerchandise": {
+  "method": "GET",
+  "path": "/merchandise",
+  "contract": "retail",
+  "summary": "List merchandise",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "outletId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "inStockOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listPerformances": {
+  "method": "GET",
+  "path": "/events/{eventId}/performances",
+  "contract": "catalogue",
+  "summary": "List performances of an event",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listPriceLists": {
+  "method": "GET",
+  "path": "/price-lists",
+  "contract": "catalogue",
+  "summary": "List price lists",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listPrices": {
+  "method": "GET",
+  "path": "/price-lists/{priceListId}/prices",
+  "contract": "catalogue",
+  "summary": "List prices in a list",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listProductVariants": {
+  "method": "GET",
+  "path": "/products/{productId}/variants",
+  "contract": "catalogue",
+  "summary": "List generated variants",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listProducts": {
+  "method": "GET",
+  "path": "/products",
+  "contract": "catalogue",
+  "summary": "List products",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "isSellable",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listPromotions": {
+  "method": "GET",
+  "path": "/promotions",
+  "contract": "promotions",
+  "summary": "List promotions",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "activeAt",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "pausePromotion": {
+  "method": "POST",
+  "path": "/promotions/{promotionId}/pause",
+  "contract": "promotions",
+  "summary": "Pause a live promotion",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "publishBundle": {
+  "method": "POST",
+  "path": "/catalogue/bundles",
+  "contract": "catalogue",
+  "summary": "Compute, sign and publish a catalogue bundle",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "BundleSummary"
+ },
+ "publishPromotion": {
+  "method": "POST",
+  "path": "/promotions/{promotionId}/publish",
+  "contract": "promotions",
+  "summary": "Publish a promotion",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Promotion"
+ },
+ "recommendSeats": {
+  "method": "POST",
+  "path": "/performances/{performanceId}/seat-recommendations",
+  "contract": "seating",
+  "summary": "Recommend seats for a party",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "SeatRecommendationRequest",
+  "responds": null
+ },
+ "relinquishChannelAllocation": {
+  "method": "POST",
+  "path": "/channel-capacities/{channelCapacityId}/channel-allocations/release",
+  "contract": "catalogue",
+  "summary": "Return unsold channel allocation to the general pool",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ChannelAllocationSet"
+ },
+ "reportBundleApplied": {
+  "method": "POST",
+  "path": "/catalogue/bundles/{version}/applied",
+  "contract": "catalogue",
+  "summary": "Report that a workstation applied a bundle",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "resolveProductByCode": {
+  "method": "GET",
+  "path": "/products/resolve",
+  "contract": "catalogue",
+  "summary": "Resolve a partner code to a product",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "code",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "partnerId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProductVariant"
+ },
+ "runReport": {
+  "method": "POST",
+  "path": "/reports/{reportId}/run",
+  "contract": "reporting",
+  "summary": "Run a report",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RunReportRequest",
+  "responds": "ReportResult"
+ },
+ "setAlternativeCodes": {
+  "method": "PUT",
+  "path": "/products/{productId}/alternative-codes",
+  "contract": "catalogue",
+  "summary": "Set external identifiers",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AlternativeCode"
+ },
+ "setChannelAllocations": {
+  "method": "PUT",
+  "path": "/channel-capacities/{channelCapacityId}/channel-allocations",
+  "contract": "catalogue",
+  "summary": "Allocate envelope capacity across channels",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ChannelAllocationSet"
+ },
+ "setChannelListing": {
+  "method": "PUT",
+  "path": "/channel-listings",
+  "contract": "subscription",
+  "summary": "List a product on a channel, with its own allocation",
+  "permission": "PARTNER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ChannelListing",
+  "responds": "ChannelListing"
+ },
+ "setItemAvailability": {
+  "method": "PUT",
+  "path": "/menu-items/{itemId}/availability",
+  "contract": "fnb",
+  "summary": "Mark an item available or eighty-sixed",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MenuItem"
+ },
+ "setPrices": {
+  "method": "PUT",
+  "path": "/price-lists/{priceListId}/prices",
+  "contract": "catalogue",
+  "summary": "Set prices in bulk",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setProductAttributes": {
+  "method": "PUT",
+  "path": "/products/{productId}/attributes",
+  "contract": "catalogue",
+  "summary": "Set the attribute axes for a product",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "simulatePromotion": {
+  "method": "POST",
+  "path": "/promotions/{promotionId}/simulate",
+  "contract": "promotions",
+  "summary": "What this promotion would have cost on real history",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
+ "transitionProductLifecycle": {
+  "method": "POST",
+  "path": "/products/{productId}/lifecycle",
+  "contract": "catalogue",
+  "summary": "Move a product through its lifecycle",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Product"
+ },
+ "unschedulePromotion": {
+  "method": "POST",
+  "path": "/promotions/{promotionId}/unschedule",
+  "contract": "promotions",
+  "summary": "Pull a scheduled promotion before it starts",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "updateChannelCapacity": {
+  "method": "PATCH",
+  "path": "/channel-capacities/{channelCapacityId}",
+  "contract": "catalogue",
+  "summary": "Amend an envelope",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ChannelCapacity"
+ },
+ "updateEvent": {
+  "method": "PATCH",
+  "path": "/events/{eventId}",
+  "contract": "catalogue",
+  "summary": "Amend an event",
+  "permission": "EVENT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Event"
+ },
+ "updatePerformance": {
+  "method": "PATCH",
+  "path": "/performances/{performanceId}",
+  "contract": "catalogue",
+  "summary": "Amend a performance",
+  "permission": "PERFORMANCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Performance"
+ },
+ "updatePriceList": {
+  "method": "PATCH",
+  "path": "/price-lists/{priceListId}",
+  "contract": "catalogue",
+  "summary": "Amend a price list",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PriceList"
+ },
+ "updateProduct": {
+  "method": "PATCH",
+  "path": "/products/{productId}",
+  "contract": "catalogue",
+  "summary": "Update a product",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "UpdateProductRequest",
+  "responds": "Product"
+ },
+ "updatePromotion": {
+  "method": "PATCH",
+  "path": "/promotions/{promotionId}",
+  "contract": "promotions",
+  "summary": "Amend a promotion",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Promotion"
+ },
+ "voidCouponCode": {
+  "method": "POST",
+  "path": "/coupon-codes/{code}/void",
+  "contract": "promotions",
+  "summary": "Void a code",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CouponCode"
+ }
+}

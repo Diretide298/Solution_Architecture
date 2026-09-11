@@ -1,0 +1,1500 @@
+{
+ "CalculationValidationReconciliationServiceInterfaceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Calculation Validation, Reconciliation & Service Interface displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "missingProfile": {
+    "type": "string",
+    "description": "Missing Profile"
+   },
+   "invalidRate": {
+    "type": "number",
+    "description": "Invalid Rate"
+   },
+   "expiredRule": {
+    "type": "integer",
+    "description": "Expired Rule"
+   },
+   "overlappingRule": {
+    "type": "string",
+    "description": "Overlapping Rule"
+   },
+   "conflictingRule": {
+    "type": "string",
+    "description": "Conflicting Rule"
+   },
+   "missingTaxTreatment": {
+    "type": "string",
+    "description": "Missing Tax Treatment"
+   },
+   "circularDependency": {
+    "type": "string",
+    "description": "Circular Dependency"
+   },
+   "invalidSequence": {
+    "type": "string",
+    "description": "Invalid Sequence"
+   },
+   "missingInput": {
+    "type": "string",
+    "description": "Missing Input"
+   },
+   "invalidPrecision": {
+    "type": "string",
+    "description": "Invalid Precision"
+   },
+   "unsupportedCurrency": {
+    "type": "string",
+    "description": "Unsupported Currency"
+   },
+   "roundingDifference": {
+    "type": "string",
+    "description": "Rounding Difference"
+   },
+   "lineTotal": {
+    "type": "string",
+    "description": "Line Total"
+   },
+   "taxTotal": {
+    "type": "string",
+    "description": "Tax Total"
+   },
+   "feeTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fee Total"
+   },
+   "discountTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount Total"
+   },
+   "finalTotal": {
+    "type": "string",
+    "description": "Final Total"
+   },
+   "standardB2cSale": {
+    "type": "string",
+    "description": "Standard B2C Sale"
+   },
+   "posSale": {
+    "type": "string",
+    "description": "POS Sale"
+   },
+   "memberSale": {
+    "type": "string",
+    "description": "Member Sale"
+   },
+   "groupBooking": {
+    "type": "string",
+    "description": "Group Booking"
+   },
+   "b2bSale": {
+    "type": "string",
+    "description": "B2B Sale"
+   },
+   "reschedule": {
+    "type": "string",
+    "description": "Reschedule"
+   },
+   "multiProductOrder": {
+    "type": "string",
+    "description": "Multi-Product Order"
+   },
+   "packageSale": {
+    "type": "string",
+    "description": "Package Sale"
+   },
+   "multiCurrencySale": {
+    "type": "string",
+    "description": "Multi-Currency Sale"
+   },
+   "selectedPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Selected Price"
+   },
+   "discounts": {
+    "type": "string",
+    "description": "Discounts"
+   },
+   "fees": {
+    "type": "string",
+    "description": "Fees"
+   },
+   "taxes": {
+    "type": "string",
+    "description": "Taxes"
+   },
+   "rounding": {
+    "type": "string",
+    "description": "Rounding"
+   },
+   "finalPayable": {
+    "type": "string",
+    "description": "Final Payable"
+   },
+   "calculationVersion": {
+    "type": "string",
+    "description": "Calculation Version"
+   },
+   "explanationReference": {
+    "type": "string",
+    "description": "Explanation Reference"
+   },
+   "baseAed250": {
+    "type": "string",
+    "description": "Base: AED 250"
+   },
+   "discountAed25": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount: AED 25"
+   },
+   "feeAed10": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fee: AED 10"
+   },
+   "vatAed1175": {
+    "type": "string",
+    "description": "VAT: AED 11.75"
+   },
+   "finalAed24675": {
+    "type": "string",
+    "description": "Final: AED 246.75"
+   },
+   "authentication": {
+    "type": "string",
+    "description": "Authentication"
+   }
+  }
+ },
+ "CurrencyPrecisionRoundingMonetaryRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Currency Precision, Rounding & Monetary Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "decimalPlaces": {
+    "type": "string",
+    "description": "Decimal Places"
+   },
+   "minimumMonetaryUnit": {
+    "type": "string",
+    "description": "Minimum Monetary Unit"
+   },
+   "displayPrecision": {
+    "type": "string",
+    "description": "Display Precision"
+   },
+   "calculationPrecision": {
+    "type": "string",
+    "description": "Calculation Precision"
+   },
+   "roundingMethod": {
+    "type": "string",
+    "description": "Rounding Method"
+   },
+   "standard": {
+    "type": "string",
+    "description": "Standard"
+   },
+   "roundUp": {
+    "type": "string",
+    "description": "Round Up"
+   },
+   "roundDown": {
+    "type": "string",
+    "description": "Round Down"
+   },
+   "bankerSRounding": {
+    "type": "string",
+    "description": "Banker's Rounding"
+   },
+   "nearestCurrencyUnit": {
+    "type": "string",
+    "description": "Nearest Currency Unit"
+   },
+   "customRegulatoryRule": {
+    "type": "string",
+    "description": "Custom Regulatory Rule"
+   },
+   "calculated": {
+    "type": "string",
+    "description": "Calculated (the pack shows AED 199.497)"
+   },
+   "display": {
+    "type": "string",
+    "description": "Display (the pack shows AED 199.50)"
+   },
+   "chf1998": {
+    "type": "string",
+    "description": "CHF 19.98"
+   },
+   "chf2000": {
+    "type": "string",
+    "description": "CHF 20.00"
+   },
+   "perItem": {
+    "type": "string",
+    "description": "Per Item"
+   },
+   "perTax": {
+    "type": "string",
+    "description": "Per Tax"
+   },
+   "perFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Per Fee"
+   },
+   "perLine": {
+    "type": "string",
+    "description": "Per Line"
+   },
+   "atOrderTotal": {
+    "type": "string",
+    "description": "At Order Total"
+   },
+   "resultingMonetaryValuesAreRounded": {
+    "type": "string",
+    "description": "resulting monetary values are rounded"
+   },
+   "resultingMonetaryValuesAreCalculated": {
+    "type": "string",
+    "description": "resulting monetary values are calculated"
+   }
+  }
+ },
+ "FeeApplicabilityChargingRuleBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.channel_allocation at 5%, so this is not an update to anything the package stores today and no new table has been decided",
+  "description": "**What Fee Applicability & Charging Rule Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "productCategory": {
+    "type": "string",
+    "description": "Product Category"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "customerType": {
+    "type": "string",
+    "description": "Customer Type"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "transactionType": {
+    "type": "string",
+    "description": "Transaction Type"
+   },
+   "paymentMethod": {
+    "type": "string",
+    "description": "Payment Method"
+   },
+   "deliveryMethod": {
+    "type": "string",
+    "description": "Delivery Method"
+   },
+   "orderValue": {
+    "type": "string",
+    "description": "Order Value"
+   },
+   "quantity": {
+    "type": "integer",
+    "description": "Quantity"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "country": {
+    "type": "string",
+    "description": "Country"
+   },
+   "serviceAction": {
+    "type": "string",
+    "description": "Service Action"
+   },
+   "rulePriority": {
+    "type": "string",
+    "description": "Rule Priority"
+   },
+   "stopProcessing": {
+    "type": "string",
+    "description": "Stop Processing"
+   },
+   "continueProcessing": {
+    "type": "string",
+    "description": "Continue Processing"
+   },
+   "mutualExclusion": {
+    "type": "string",
+    "description": "Mutual Exclusion"
+   },
+   "stack": {
+    "type": "string",
+    "description": "Stack"
+   },
+   "excludeAnotherFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Exclude Another Fee"
+   }
+  }
+ },
+ "FeeApplicabilityChargingRuleBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Fee Applicability & Charging Rule Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "productCategory": {
+    "type": "string",
+    "description": "Product Category"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "customerType": {
+    "type": "string",
+    "description": "Customer Type"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "transactionType": {
+    "type": "string",
+    "description": "Transaction Type"
+   },
+   "paymentMethod": {
+    "type": "string",
+    "description": "Payment Method"
+   },
+   "deliveryMethod": {
+    "type": "string",
+    "description": "Delivery Method"
+   },
+   "orderValue": {
+    "type": "string",
+    "description": "Order Value"
+   },
+   "quantity": {
+    "type": "integer",
+    "description": "Quantity"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "country": {
+    "type": "string",
+    "description": "Country"
+   },
+   "serviceAction": {
+    "type": "string",
+    "description": "Service Action"
+   },
+   "rulePriority": {
+    "type": "string",
+    "description": "Rule Priority"
+   },
+   "stopProcessing": {
+    "type": "string",
+    "description": "Stop Processing"
+   },
+   "continueProcessing": {
+    "type": "string",
+    "description": "Continue Processing"
+   },
+   "mutualExclusion": {
+    "type": "string",
+    "description": "Mutual Exclusion"
+   },
+   "stack": {
+    "type": "string",
+    "description": "Stack"
+   },
+   "excludeAnotherFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Exclude Another Fee"
+   }
+  }
+ },
+ "FeeSurchargeLibraryView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Fee & Surcharge Library displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "bookingFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Booking Fee"
+   },
+   "transactionFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Transaction Fee"
+   },
+   "serviceFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Service Fee"
+   },
+   "convenienceFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Convenience Fee"
+   },
+   "deliveryFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Delivery Fee"
+   },
+   "handlingFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Handling Fee"
+   },
+   "modificationFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Modification Fee"
+   },
+   "reschedulingFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Rescheduling Fee"
+   },
+   "cancellationFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Cancellation Fee"
+   },
+   "paymentFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Payment Fee"
+   },
+   "channelFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Channel Fee"
+   },
+   "facilityFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Facility Fee"
+   },
+   "surcharge": {
+    "type": "string",
+    "description": "Surcharge"
+   },
+   "customFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Custom Fee"
+   },
+   "fixedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fixed Amount"
+   },
+   "percentage": {
+    "type": "number",
+    "description": "Percentage"
+   },
+   "perTicket": {
+    "type": "string",
+    "description": "Per Ticket"
+   },
+   "perProduct": {
+    "type": "string",
+    "description": "Per Product"
+   },
+   "perPerson": {
+    "type": "string",
+    "description": "Per Person"
+   },
+   "perOrder": {
+    "type": "string",
+    "description": "Per Order"
+   },
+   "perTransaction": {
+    "type": "string",
+    "description": "Per Transaction"
+   },
+   "perDay": {
+    "type": "string",
+    "description": "Per Day"
+   },
+   "tiered": {
+    "type": "string",
+    "description": "Tiered"
+   },
+   "feeName": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fee Name"
+   },
+   "feeCode": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fee Code"
+   },
+   "feeType": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fee Type"
+   },
+   "description": {
+    "type": "string",
+    "description": "Description"
+   },
+   "calculationMethod": {
+    "type": "string",
+    "description": "Calculation Method"
+   },
+   "value": {
+    "type": "string",
+    "description": "Value"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "taxTreatment": {
+    "type": "string",
+    "description": "Tax Treatment"
+   },
+   "refundability": {
+    "type": "string",
+    "description": "Refundability"
+   },
+   "effectivePeriod": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Effective Period"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status"
+   },
+   "customerVisible": {
+    "type": "string",
+    "description": "Customer Visible"
+   },
+   "includedInDisplayPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Included in Display Price"
+   },
+   "shownSeparately": {
+    "type": "string",
+    "description": "Shown Separately"
+   },
+   "internalOnly": {
+    "type": "string",
+    "description": "Internal Only"
+   }
+  }
+ },
+ "FeeWaiverTaxExemptionExceptionRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Fee Waiver, Tax Exemption & Exception Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "feeWaiver": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fee Waiver"
+   },
+   "feeReduction": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fee Reduction"
+   },
+   "taxExemption": {
+    "type": "string",
+    "description": "Tax Exemption"
+   },
+   "zeroRatedTax": {
+    "type": "string",
+    "description": "Zero-Rated Tax"
+   },
+   "complimentaryTransaction": {
+    "type": "string",
+    "description": "Complimentary Transaction"
+   },
+   "operationalWaiver": {
+    "type": "string",
+    "description": "Operational Waiver"
+   },
+   "contractualWaiver": {
+    "type": "string",
+    "description": "Contractual Waiver"
+   },
+   "membershipBenefit": {
+    "type": "string",
+    "description": "Membership Benefit"
+   },
+   "loyaltyTier": {
+    "type": "string",
+    "description": "Loyalty Tier"
+   },
+   "corporateAgreement": {
+    "type": "string",
+    "description": "Corporate Agreement"
+   },
+   "b2bContract": {
+    "type": "string",
+    "description": "B2B Contract"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer Segment"
+   },
+   "staffRole": {
+    "type": "string",
+    "description": "Staff Role"
+   },
+   "promotion": {
+    "type": "string",
+    "description": "Promotion"
+   },
+   "serviceRecovery": {
+    "type": "string",
+    "description": "Service Recovery"
+   },
+   "operationalIssue": {
+    "type": "string",
+    "description": "Operational Issue"
+   },
+   "legalExemption": {
+    "type": "string",
+    "description": "Legal Exemption"
+   },
+   "supervisorOverride": {
+    "type": "string",
+    "description": "Supervisor Override"
+   },
+   "reasonMandatory": {
+    "type": "string",
+    "description": "Reason mandatory"
+   },
+   "waiveAed25ModificationFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Waive AED 25 modification fee"
+   },
+   "exemptionType": {
+    "type": "string",
+    "description": "Exemption Type"
+   },
+   "reference": {
+    "type": "string",
+    "description": "Reference"
+   },
+   "evidence": {
+    "type": "string",
+    "description": "Evidence"
+   },
+   "validity": {
+    "type": "string",
+    "description": "Validity"
+   },
+   "verificationStatus": {
+    "type": "string",
+    "description": "Verification Status"
+   }
+  }
+ },
+ "PriceBreakdownCalculationSimulationExplainabilityInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Price Breakdown, Calculation Simulation & Explainability submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "selectType": {
+    "type": "string",
+    "enum": [
+     "customer",
+     "product",
+     "quantity",
+     "venue",
+     "event",
+     "channel",
+     "date",
+     "timeslot",
+     "membership",
+     "promotion",
+     "paymentMethod",
+     "deliveryMethod",
+     "currency"
+    ],
+    "description": "Vocabulary listed under Select."
+   },
+   "aed50": {
+    "type": "string",
+    "description": "− AED 50"
+   },
+   "aed25": {
+    "type": "string",
+    "description": "− AED 25"
+   },
+   "source": {
+    "type": "string",
+    "description": "Source"
+   },
+   "rule": {
+    "type": "string",
+    "description": "Rule"
+   },
+   "formula": {
+    "type": "string",
+    "description": "Formula"
+   },
+   "input": {
+    "type": "string",
+    "description": "Input"
+   },
+   "output": {
+    "type": "string",
+    "description": "Output"
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason"
+   },
+   "taxTreatment": {
+    "type": "string",
+    "description": "Tax Treatment"
+   },
+   "sequence": {
+    "type": "string",
+    "description": "Sequence"
+   }
+  }
+ },
+ "PriceBreakdownCalculationSimulationExplainabilityView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Price Breakdown, Calculation Simulation & Explainability displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "selectType": {
+    "type": "string",
+    "enum": [
+     "customer",
+     "product",
+     "quantity",
+     "venue",
+     "event",
+     "channel",
+     "date",
+     "timeslot",
+     "membership",
+     "promotion",
+     "paymentMethod",
+     "deliveryMethod",
+     "currency"
+    ],
+    "description": "Vocabulary listed under Select."
+   },
+   "aed50": {
+    "type": "string",
+    "description": "− AED 50"
+   },
+   "aed25": {
+    "type": "string",
+    "description": "− AED 25"
+   },
+   "bookingFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Booking Fee (the pack shows AED 10)"
+   },
+   "vat": {
+    "type": "string",
+    "description": "VAT (the pack shows AED 21.75)"
+   },
+   "finalPayable": {
+    "type": "string",
+    "description": "Final Payable (the pack shows AED 456.75)"
+   },
+   "source": {
+    "type": "string",
+    "description": "Source"
+   },
+   "rule": {
+    "type": "string",
+    "description": "Rule"
+   },
+   "formula": {
+    "type": "string",
+    "description": "Formula"
+   },
+   "input": {
+    "type": "string",
+    "description": "Input"
+   },
+   "output": {
+    "type": "string",
+    "description": "Output"
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason"
+   },
+   "taxTreatment": {
+    "type": "string",
+    "description": "Tax Treatment"
+   },
+   "sequence": {
+    "type": "string",
+    "description": "Sequence"
+   }
+  }
+ },
+ "PriceCalculationSequenceFormulaEngineView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Price Calculation Sequence & Formula Engine displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "input": {
+    "type": "string",
+    "description": "Input"
+   },
+   "formula": {
+    "type": "string",
+    "description": "Formula"
+   },
+   "sequence": {
+    "type": "string",
+    "description": "Sequence"
+   },
+   "taxability": {
+    "type": "string",
+    "description": "Taxability"
+   },
+   "rounding": {
+    "type": "string",
+    "description": "Rounding"
+   },
+   "dependency": {
+    "type": "string",
+    "description": "Dependency"
+   },
+   "output": {
+    "type": "string",
+    "description": "Output"
+   },
+   "fixedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fixed Amount"
+   },
+   "percentage": {
+    "type": "number",
+    "description": "Percentage"
+   },
+   "percentageOfBase": {
+    "type": "number",
+    "description": "Percentage of Base"
+   },
+   "percentageOfSubtotal": {
+    "type": "number",
+    "description": "Percentage of Subtotal"
+   },
+   "tiered": {
+    "type": "string",
+    "description": "Tiered"
+   },
+   "conditional": {
+    "type": "string",
+    "description": "Conditional"
+   },
+   "minimum": {
+    "type": "string",
+    "description": "Minimum"
+   },
+   "maximum": {
+    "type": "string",
+    "description": "Maximum"
+   },
+   "customGovernedFormula": {
+    "type": "string",
+    "description": "Custom Governed Formula"
+   },
+   "aed20": {
+    "type": "string",
+    "description": "−AED 20"
+   },
+   "serviceFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Service Fee (the pack shows +AED 10)"
+   },
+   "vat": {
+    "type": "string",
+    "description": "VAT (the pack shows 48 | Pag e, +AED 9.50)"
+   },
+   "final": {
+    "type": "string",
+    "description": "Final (the pack shows AED 199.50)"
+   }
+  }
+ },
+ "TaxFeeCalculationCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Tax, Fee & Calculation Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "activeTaxProfiles": {
+    "type": "integer",
+    "description": "Active Tax Profiles"
+   },
+   "taxJurisdictions": {
+    "type": "integer",
+    "description": "Tax Jurisdictions"
+   },
+   "activeFeeProfiles": {
+    "type": "integer",
+    "description": "Active Fee Profiles"
+   },
+   "activeSurcharges": {
+    "type": "integer",
+    "description": "Active Surcharges"
+   },
+   "exemptionRules": {
+    "type": "integer",
+    "description": "Exemption Rules"
+   },
+   "calculationProfiles": {
+    "type": "integer",
+    "description": "Calculation Profiles"
+   },
+   "productsMissingTax": {
+    "type": "string",
+    "description": "Products Missing Tax"
+   },
+   "productsMissingCalculationProfile": {
+    "type": "string",
+    "description": "Products Missing Calculation Profile"
+   },
+   "configurationConflicts": {
+    "type": "integer",
+    "description": "Configuration Conflicts"
+   },
+   "upcomingTaxChanges": {
+    "type": "integer",
+    "description": "Upcoming Tax Changes"
+   },
+   "validationIssues": {
+    "type": "integer",
+    "description": "Validation Issues"
+   },
+   "recentlyModifiedRules": {
+    "type": "integer",
+    "description": "Recently Modified Rules"
+   },
+   "profileName": {
+    "type": "string",
+    "description": "Profile Name"
+   },
+   "type": {
+    "type": "string",
+    "description": "Type"
+   },
+   "country": {
+    "type": "string",
+    "description": "Country"
+   },
+   "legalEntity": {
+    "type": "string",
+    "description": "Legal Entity"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "productScope": {
+    "type": "string",
+    "description": "Product Scope"
+   },
+   "effectivePeriod": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Effective Period"
+   },
+   "status": {
+    "type": "integer",
+    "description": "Status"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   }
+  }
+ },
+ "TaxProfileJurisdictionConfigurationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Tax Profile & Jurisdiction Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "taxProfileName": {
+    "type": "string",
+    "description": "Tax Profile Name"
+   },
+   "taxProfileCode": {
+    "type": "string",
+    "description": "Tax Profile Code"
+   },
+   "taxType": {
+    "type": "string",
+    "description": "Tax Type"
+   },
+   "country": {
+    "type": "string",
+    "description": "Country"
+   },
+   "regionJurisdiction": {
+    "type": "string",
+    "description": "Region/Jurisdiction"
+   },
+   "legalEntity": {
+    "type": "string",
+    "description": "Legal Entity"
+   },
+   "taxRegistrationNumber": {
+    "type": "string",
+    "description": "Tax Registration Number"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "description": "Effective To"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "vat": {
+    "type": "string",
+    "description": "VAT"
+   },
+   "gst": {
+    "type": "string",
+    "description": "GST"
+   },
+   "salesTax": {
+    "type": "string",
+    "description": "Sales Tax"
+   },
+   "entertainmentTax": {
+    "type": "string",
+    "description": "Entertainment Tax"
+   },
+   "tourismTax": {
+    "type": "string",
+    "description": "Tourism Tax"
+   },
+   "municipalityTax": {
+    "type": "string",
+    "description": "Municipality Tax"
+   },
+   "serviceTax": {
+    "type": "string",
+    "description": "Service Tax"
+   },
+   "customRegulatoryTax": {
+    "type": "string",
+    "description": "Custom Regulatory Tax"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "productCategory": {
+    "type": "string",
+    "description": "Product Category"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "service": {
+    "type": "string",
+    "description": "Service"
+   },
+   "channelWhereLegallyApplicable": {
+    "type": "string",
+    "description": "Channel where legally applicable"
+   },
+   "countryUae": {
+    "type": "string",
+    "description": "Country: UAE"
+   },
+   "taxTypeVat": {
+    "type": "string",
+    "description": "Tax Type: VAT"
+   },
+   "rate5": {
+    "type": "number",
+    "description": "Rate: 5%"
+   }
+  }
+ },
+ "TaxProfileJurisdictionConfigurationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Tax Profile & Jurisdiction Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "taxProfileName": {
+    "type": "string",
+    "description": "Tax Profile Name"
+   },
+   "taxProfileCode": {
+    "type": "string",
+    "description": "Tax Profile Code"
+   },
+   "taxType": {
+    "type": "string",
+    "description": "Tax Type"
+   },
+   "country": {
+    "type": "string",
+    "description": "Country"
+   },
+   "regionJurisdiction": {
+    "type": "string",
+    "description": "Region/Jurisdiction"
+   },
+   "legalEntity": {
+    "type": "string",
+    "description": "Legal Entity"
+   },
+   "taxRegistrationNumber": {
+    "type": "string",
+    "description": "Tax Registration Number"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "description": "Effective To"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "vat": {
+    "type": "string",
+    "description": "VAT"
+   },
+   "gst": {
+    "type": "string",
+    "description": "GST"
+   },
+   "salesTax": {
+    "type": "string",
+    "description": "Sales Tax"
+   },
+   "entertainmentTax": {
+    "type": "string",
+    "description": "Entertainment Tax"
+   },
+   "tourismTax": {
+    "type": "string",
+    "description": "Tourism Tax"
+   },
+   "municipalityTax": {
+    "type": "string",
+    "description": "Municipality Tax"
+   },
+   "serviceTax": {
+    "type": "string",
+    "description": "Service Tax"
+   },
+   "customRegulatoryTax": {
+    "type": "string",
+    "description": "Custom Regulatory Tax"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "productCategory": {
+    "type": "string",
+    "description": "Product Category"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "service": {
+    "type": "string",
+    "description": "Service"
+   },
+   "channelWhereLegallyApplicable": {
+    "type": "string",
+    "description": "Channel where legally applicable"
+   },
+   "countryUae": {
+    "type": "string",
+    "description": "Country: UAE"
+   },
+   "taxTypeVat": {
+    "type": "string",
+    "description": "Tax Type: VAT"
+   },
+   "rate5": {
+    "type": "number",
+    "description": "Rate: 5%"
+   },
+   "whereDifferentRulesApply": {
+    "type": "string",
+    "description": "where different rules apply"
+   }
+  }
+ },
+ "TaxRuleTreatmentBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Tax Rule & Treatment Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "taxInclusive": {
+    "type": "string",
+    "description": "Tax Inclusive"
+   },
+   "taxExclusive": {
+    "type": "string",
+    "description": "Tax Exclusive"
+   },
+   "taxExempt": {
+    "type": "string",
+    "description": "Tax Exempt"
+   },
+   "zeroRated": {
+    "type": "string",
+    "description": "Zero Rated"
+   },
+   "outOfScope": {
+    "type": "string",
+    "description": "Out of Scope"
+   },
+   "percentage": {
+    "type": "number",
+    "description": "Percentage"
+   },
+   "fixedTax": {
+    "type": "string",
+    "description": "Fixed Tax"
+   },
+   "tiered": {
+    "type": "string",
+    "description": "Tiered"
+   },
+   "compound": {
+    "type": "string",
+    "description": "Compound"
+   },
+   "sequential": {
+    "type": "string",
+    "description": "Sequential"
+   },
+   "multipleConcurrentTaxes": {
+    "type": "string",
+    "description": "Multiple Concurrent Taxes"
+   },
+   "exampleInclusive": {
+    "type": "string",
+    "description": "Example — Inclusive"
+   },
+   "exampleExclusive": {
+    "type": "string",
+    "description": "Example — Exclusive"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "productCategory": {
+    "type": "string",
+    "description": "Product Category"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "country": {
+    "type": "string",
+    "description": "Country"
+   },
+   "legalEntity": {
+    "type": "string",
+    "description": "Legal Entity"
+   },
+   "transactionType": {
+    "type": "string",
+    "description": "Transaction Type"
+   },
+   "customerTypeWhereLegallyRelevant": {
+    "type": "string",
+    "description": "Customer Type where legally relevant"
+   },
+   "salesChannelWhereLegallyRelevant": {
+    "type": "string",
+    "description": "Sales Channel where legally relevant"
+   },
+   "effectiveDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Effective Date"
+   }
+  }
+ },
+ "TaxRuleTreatmentBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Tax Rule & Treatment Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "taxInclusive": {
+    "type": "string",
+    "description": "Tax Inclusive"
+   },
+   "taxExclusive": {
+    "type": "string",
+    "description": "Tax Exclusive"
+   },
+   "taxExempt": {
+    "type": "string",
+    "description": "Tax Exempt"
+   },
+   "zeroRated": {
+    "type": "string",
+    "description": "Zero Rated"
+   },
+   "outOfScope": {
+    "type": "string",
+    "description": "Out of Scope"
+   },
+   "percentage": {
+    "type": "number",
+    "description": "Percentage"
+   },
+   "fixedTax": {
+    "type": "string",
+    "description": "Fixed Tax"
+   },
+   "tiered": {
+    "type": "string",
+    "description": "Tiered"
+   },
+   "compound": {
+    "type": "string",
+    "description": "Compound"
+   },
+   "sequential": {
+    "type": "string",
+    "description": "Sequential"
+   },
+   "multipleConcurrentTaxes": {
+    "type": "string",
+    "description": "Multiple Concurrent Taxes"
+   },
+   "exampleInclusive": {
+    "type": "string",
+    "description": "Example — Inclusive"
+   },
+   "exampleExclusive": {
+    "type": "string",
+    "description": "Example — Exclusive"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "productCategory": {
+    "type": "string",
+    "description": "Product Category"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "country": {
+    "type": "string",
+    "description": "Country"
+   },
+   "legalEntity": {
+    "type": "string",
+    "description": "Legal Entity"
+   },
+   "transactionType": {
+    "type": "string",
+    "description": "Transaction Type"
+   },
+   "customerTypeWhereLegallyRelevant": {
+    "type": "string",
+    "description": "Customer Type where legally relevant"
+   },
+   "salesChannelWhereLegallyRelevant": {
+    "type": "string",
+    "description": "Sales Channel where legally relevant"
+   },
+   "effectiveDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Effective Date"
+   }
+  }
+ }
+}

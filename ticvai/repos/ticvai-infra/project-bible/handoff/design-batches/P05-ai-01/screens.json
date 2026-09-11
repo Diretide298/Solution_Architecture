@@ -1,0 +1,207 @@
+[
+ {
+  "id": "KSK-015",
+  "name": "Assistant",
+  "module": "AI",
+  "requiresModule": "ticketing",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/kiosk/assistant",
+   "component": "apps/guest-app/src/routes/Assistant.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "KSK-001"
+   ],
+   "inferred": false,
+   "fromFlows": true,
+   "entryFrom": [
+    "KSK-004"
+   ],
+   "notes": "**Reached from KSK-004** — help is asked for at the point of confusion. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "SUP-004",
+     "trigger": "The conversation appears in the queue",
+     "provenance": "flow F24 step 2→3",
+     "operation": "handoverToAgent",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "Added 17 August for 2.1.28, which names the kiosk explicitly and was the only surface with no AI screen. **Scoped to `guestCapabilityScope`** — ticket selection, promotions, FAQs, recommendations and checkout, and nothing else. **No keyboard**: voice or a constrained touch interface, which is why the app chat pattern does not transfer. Depends on CF-14. **Not on the wireframe board.** **Wave 2 with the rest of the kiosk.** Set to Wave 1 in error on 17 August — an assistant that guides a guest through ticket selection and checkout cannot ship before the screens that do the selecting and the checking out. **Cross-platform navigation removed 24 August**: SUP-004. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.",
+  "density": "touchLarge",
+  "boardFrames": [
+   "Kiosk Board 2.dc.html#KSK-015"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listProducts` reads the population and `getAvailability` reads one of them — list, select, act",
+  "purpose": "Help a guest choose and pay, and nothing else.",
+  "gaps": [
+   {
+    "operation": "getAvailability",
+    "why": "**1 declared operation reach no component on this screen**: getAvailability. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every assistant",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo"
+       ],
+       "operation": "listProducts",
+       "provenance": "contract catalogue.yaml GET /products"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Send",
+       "operation": "sendAiMessage",
+       "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Handover",
+       "operation": "handoverToAgent",
+       "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/handover"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "sendAiMessage",
+       "label": "Send ai message",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "derived": true,
+       "impliedBy": "listProducts",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "sendAiMessage",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The assistant list.",
+   "error": "Could not load. Names which read failed and leaves the assistant untouched.",
+   "emptyFirstRun": "No assistant yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the assistant are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "sendAiMessage",
+    "contract": "ai",
+    "purpose": "Ask",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProducts"
+    ]
+   },
+   {
+    "operationId": "listProducts",
+    "contract": "catalogue",
+    "purpose": "List products",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getAvailability",
+    "contract": "catalogue",
+    "purpose": "Live remaining capacity",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "handoverToAgent",
+    "contract": "marketing-crm",
+    "purpose": "Pass an assistant conversation to a person",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProducts"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "conversationId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom.",
+   "preloaded": []
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-015",
+   "note": "**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P05",
+   "audience": "guest",
+   "formFactor": "kiosk",
+   "shortName": "Guest Kiosk",
+   "name": "Guest Kiosk — Self-Service",
+   "app": "guest-app",
+   "offlineCapable": false,
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "kiosk",
+    "siblings": [
+     "P01",
+     "P02"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

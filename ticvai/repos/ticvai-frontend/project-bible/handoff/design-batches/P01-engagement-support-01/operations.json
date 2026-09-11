@@ -1,0 +1,417 @@
+{
+ "addToWishlist": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/wishlist",
+  "contract": "marketing-crm",
+  "summary": "Save an item",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Wishlist"
+ },
+ "claimLocationSession": {
+  "method": "POST",
+  "path": "/location-sessions",
+  "contract": "fnb",
+  "summary": "Tell the platform where the guest is",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "LocationSession"
+ },
+ "createAiConversation": {
+  "method": "POST",
+  "path": "/conversations",
+  "contract": "ai",
+  "summary": "Open a conversation",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiConversation"
+ },
+ "createCase": {
+  "method": "POST",
+  "path": "/cases",
+  "contract": "marketing-crm",
+  "summary": "Raise a service case",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateCaseRequest",
+  "responds": "Case"
+ },
+ "getGuestMenu": {
+  "method": "GET",
+  "path": "/outlets/{outletId}/guest-menu",
+  "contract": "fnb",
+  "summary": "The menu a guest sees",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "at",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "language",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestMenu"
+ },
+ "getMarketingSubscription": {
+  "method": "GET",
+  "path": "/marketing-subscriptions",
+  "contract": "marketing-crm",
+  "summary": "What this guest has opted into",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MarketingSubscription"
+ },
+ "getTenantAppStatus": {
+  "method": "GET",
+  "path": "/tenant-config/status",
+  "contract": "white-label",
+  "summary": "App status and recent changes",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "TenantAppStatus"
+ },
+ "getWishlist": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/wishlist",
+  "contract": "marketing-crm",
+  "summary": "Read a guest's saved items",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Wishlist"
+ },
+ "handoverToAgent": {
+  "method": "POST",
+  "path": "/conversations/{conversationId}/handover",
+  "contract": "marketing-crm",
+  "summary": "Pass an assistant conversation to a person",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Conversation"
+ },
+ "listAiConversations": {
+  "method": "GET",
+  "path": "/conversations",
+  "contract": "ai",
+  "summary": "A principal's conversation history",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiConversation"
+ },
+ "listCases": {
+  "method": "GET",
+  "path": "/cases",
+  "contract": "marketing-crm",
+  "summary": "List service cases",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "assignedToPrincipalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "breachedSla",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "priority",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listGuestDevices": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/devices",
+  "contract": "marketing-crm",
+  "summary": "A guest's registered devices",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestDevice"
+ },
+ "recordConsent": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/consents",
+  "contract": "marketing-crm",
+  "summary": "Record a consent decision",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RecordConsentRequest",
+  "responds": "ConsentState"
+ },
+ "registerGuestDevice": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/devices",
+  "contract": "marketing-crm",
+  "summary": "Register a device for push",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestDevice"
+ },
+ "removeFromWishlist": {
+  "method": "DELETE",
+  "path": "/guests/{subjectId}/wishlist/{itemId}",
+  "contract": "marketing-crm",
+  "summary": "Remove a saved item",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "requestSuggestion": {
+  "method": "POST",
+  "path": "/ai/suggestions",
+  "contract": "ai",
+  "summary": "Ask for an answer, however it is currently produced",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Suggestion"
+ },
+ "revokeGuestDevice": {
+  "method": "DELETE",
+  "path": "/guests/{subjectId}/devices/{deviceId}",
+  "contract": "marketing-crm",
+  "summary": "Revoke a device registration",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "sendAiMessage": {
+  "method": "POST",
+  "path": "/conversations/{conversationId}/messages",
+  "contract": "ai",
+  "summary": "Ask",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiMessage"
+ },
+ "sendConversationMessage": {
+  "method": "POST",
+  "path": "/conversations/{conversationId}/messages",
+  "contract": "marketing-crm",
+  "summary": "Say something, as a guest or an agent",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ConversationMessage"
+ },
+ "setMarketingSubscription": {
+  "method": "PUT",
+  "path": "/marketing-subscriptions",
+  "contract": "marketing-crm",
+  "summary": "Subscribe or unsubscribe",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": "MarketingSubscription",
+  "responds": "MarketingSubscription"
+ },
+ "submitReview": {
+  "method": "POST",
+  "path": "/reviews",
+  "contract": "marketing-crm",
+  "summary": "Submit a review",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SubmitReviewRequest",
+  "responds": "Review"
+ }
+}

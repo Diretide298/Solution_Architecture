@@ -1,0 +1,264 @@
+{
+ "evaluatePromotions": {
+  "method": "POST",
+  "path": "/promotions/evaluate",
+  "contract": "promotions",
+  "summary": "Evaluate promotions against a cart",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "EvaluatePromotionsRequest",
+  "responds": "PromotionEvaluation"
+ },
+ "getLoyaltyPosition": {
+  "method": "GET",
+  "path": "/loyalty/position",
+  "contract": "marketing-crm",
+  "summary": "A guest's points, tier and what is within reach",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
+ "getMyMemberships": {
+  "method": "GET",
+  "path": "/guests/me/memberships",
+  "contract": "catalogue",
+  "summary": "A guest's own memberships, benefits and history",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "includeLapsed",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestMembership"
+ },
+ "getWallet": {
+  "method": "GET",
+  "path": "/wallets/{subjectId}",
+  "contract": "retail",
+  "summary": "Read a guest wallet",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Wallet"
+ },
+ "grantDelegation": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/delegations",
+  "contract": "identity",
+  "summary": "Let one guest act for another",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DelegatedAccess"
+ },
+ "listDelegations": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/delegations",
+  "contract": "identity",
+  "summary": "Who may act for this guest, and for whom they may act",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "listGuestMemberships": {
+  "method": "GET",
+  "path": "/guest/memberships",
+  "contract": "catalogue",
+  "summary": "A guest's memberships, benefits and history",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "includeLapsed",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestMembership"
+ },
+ "listLoyaltyProgrammes": {
+  "method": "GET",
+  "path": "/loyalty/programmes",
+  "contract": "marketing-crm",
+  "summary": "List loyalty programmes",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "LoyaltyProgramme"
+ },
+ "listProducts": {
+  "method": "GET",
+  "path": "/products",
+  "contract": "catalogue",
+  "summary": "List products",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "isSellable",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listPromotions": {
+  "method": "GET",
+  "path": "/promotions",
+  "contract": "promotions",
+  "summary": "List promotions",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "activeAt",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listWalletTransactions": {
+  "method": "GET",
+  "path": "/wallets/{subjectId}/transactions",
+  "contract": "retail",
+  "summary": "Wallet transaction history",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ }
+}

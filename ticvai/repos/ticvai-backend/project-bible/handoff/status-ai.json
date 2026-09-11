@@ -38,7 +38,7 @@
   "redis": 4,
   "qdrant": 1
  },
- "generated": "2026-09-10",
+ "generated": "2026-09-11",
  "note": "Derived by closure from the contract, not listed. See handoff/README.md \u2014 the hand-maintained version of this drifted four times in one day.",
  "counts": {
   "operations": 33,
@@ -48,7 +48,7 @@
   "tables": 51,
   "screens": 34,
   "flows": 11,
-  "documents": 22,
+  "documents": 23,
   "openConflicts": 1
  },
  "metrics": {
@@ -234,6 +234,11 @@
   {
    "file": "docs\\active\\viewer-update-brief-20aug.md",
    "title": "Viewer \u2014 what changed in the package on 20 August",
+   "status": ""
+  },
+  {
+   "file": "docs\\active\\workshop-contract-gap.md",
+   "title": "Workshop pack \u2014 what the new screens need from the contracts",
    "status": ""
   },
   {

@@ -1,0 +1,235 @@
+{
+ "FaqCategory": {
+  "x-ticvai-persistence": "whitelabel.faq_category + whitelabel.faq_entry",
+  "type": "object",
+  "required": [
+   "code",
+   "name",
+   "entries"
+  ],
+  "properties": {
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "sortOrder": {
+    "type": "integer"
+   },
+   "entries": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "id",
+      "question",
+      "answer"
+     ],
+     "properties": {
+      "id": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "question": {
+       "$ref": "#/components/schemas/LocalisedText"
+      },
+      "answer": {
+       "$ref": "#/components/schemas/LocalisedRichText"
+      },
+      "sortOrder": {
+       "type": "integer"
+      },
+      "isPublished": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+   }
+  }
+ },
+ "KnowledgeCollection": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.knowledge_collection",
+  "required": [
+   "name",
+   "scopeLevel"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string"
+   },
+   "scopeLevel": {
+    "type": "string",
+    "enum": [
+     "tenant",
+     "region",
+     "venue"
+    ]
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true
+   },
+   "documentCount": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "shardKey": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The tenant boundary on shared placement** (ADR-0021). A collection is shared by every tenant using the same embedding model, and the shard separates them — set at provisioning from the tenant, never from a request.\nOn dedicated placement there is one shard and this is still populated, because a tenant moving from shared to dedicated moves a shard rather than being re-indexed.\n"
+   },
+   "retrieval": {
+    "type": "string",
+    "enum": [
+     "dense",
+     "hybrid"
+    ],
+    "default": "hybrid",
+    "description": "**Set at creation and not changeable.** A collection created dense-only cannot gain a sparse index without a full rebuild, which is why this is a creation decision rather than a query one.\nHybrid is the default because **a venue corpus is mostly proper nouns** — Yas Waterworld, Bronze Annual Pass, a menu item name. Dense retrieval is good at meaning and poor at exact tokens, and half our queries are exact tokens.\n"
+   },
+   "sparseModel": {
+    "type": "string",
+    "nullable": true,
+    "description": "The sparse signal, where `retrieval` is `hybrid`. BM25 unless a tenant needs otherwise."
+   },
+   "idfScope": {
+    "type": "string",
+    "enum": [
+     "shard",
+     "tenant",
+     "venue"
+    ],
+    "default": "tenant",
+    "description": "**Which population the sparse score measures rarity against** (ADR-0021). Qdrant computes IDF statistics shard-wide by default, so a term common at one venue and rare at another gets one score for both. Shard-per-tenant fixes the cross-tenant case; **inside a dedicated cell the shard is the whole tenant and venues share it**, which is what this narrows.\n"
+   },
+   "embeddingModel": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**This is what decides how many collections exist** (ADR-0021). A collection carries its own vector configuration and a shard cannot, so vectors from two models cannot share one. A tenant that residency forces onto a local model therefore has its own collection — forced by the model, not chosen for isolation.\nRead-only because **changing it invalidates every embedding in the collection**, and a collection silently searched with mismatched vectors returns plausible nonsense.\n"
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "LocalisedRichText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "description": "Keyed by language code. Values are sanitised HTML.",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
+ "MessageChannel": {
+  "type": "string",
+  "enum": [
+   "email",
+   "sms",
+   "whatsapp",
+   "push",
+   "inApp",
+   "post"
+  ]
+ },
+ "MessageTemplate": {
+  "x-ticvai-persistence": "marketing.message_template",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "channel",
+   "bodies"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "channel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "subjects": {
+    "type": "object",
+    "description": "Per language. Email only.",
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "bodies": {
+    "type": "object",
+    "description": "Per language, keyed by ISO 639-1 code.",
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "mergeFields": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "missingLanguages": {
+    "type": "array",
+    "readOnly": true,
+    "description": "Enabled languages without a body. Flagged rather than silently falling back — a guest receiving English when they chose Arabic is a defect.\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "providerTemplateId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Required for WhatsApp, where templates are pre-approved by the provider."
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ }
+}

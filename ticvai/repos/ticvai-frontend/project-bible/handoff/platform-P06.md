@@ -4,13 +4,13 @@
 
 | | |
 |---|---|
-| Screens | 66 |
+| Screens | 96 |
 | Operations | 184 |
 | Contracts | 17 |
-| Modules | 3 |
+| Modules | 4 |
 | Undrawn | 0 |
 | Operations with no screen | 125 |
-| Waves | wave1 25 · wave2 40 · wave3 1 |
+| Waves | wave1 25 · wave2 40 · wave3 31 |
 
 ## Gaps
 
@@ -73,6 +73,7 @@
 | Module | Screens | Waves |
 |---|---|---|
 | Operations | 46 | 1, 2, 3 |
+| Rentals | 30 | 3 |
 | Floor Service | 10 | 2 |
 | Stock on the Floor | 10 | 2 |
 
@@ -146,4 +147,34 @@
 | `EMP-068` | Reservation, Allocation & Omnichannel Inventory | Stock on the Floor | 2 | 2 | yes |
 | `EMP-069` | Barcode, RFID, Serialized Stock & Traceability | Stock on the Floor | 2 | 2 | yes |
 | `EMP-070` | Inventory Exceptions, AI Replenishment & Action Center | Stock on the Floor | 2 | 3 | yes |
+| `EMP-071` | Rental Checkout Command Center | Rentals | 3 | 0 | yes |
+| `EMP-072` | Voucher Scan & Reservation Retrieval | Rentals | 3 | 0 | yes |
+| `EMP-073` | Checkout Readiness Validation | Rentals | 3 | 0 | yes |
+| `EMP-074` | Equipment Assignment Workspace | Rentals | 3 | 0 | yes |
+| `EMP-075` | Equipment Scan & Validation | Rentals | 3 | 0 | yes |
+| `EMP-076` | Pre-Rental Condition Inspection | Rentals | 3 | 0 | yes |
+| `EMP-077` | Safety & Handover Checklist | Rentals | 3 | 0 | yes |
+| `EMP-078` | Deposit & Financial Handover Validation | Rentals | 3 | 0 | yes |
+| `EMP-079` | Group & Multi-Item Checkout | Rentals | 3 | 0 | yes |
+| `EMP-080` | Checkout Confirmation & Rental Activation | Rentals | 3 | 0 | yes |
+| `EMP-081` | Active Rental Operations Command Center | Rentals | 3 | 0 | yes |
+| `EMP-082` | Active Rental Detail & Live Timeline | Rentals | 3 | 0 | yes |
+| `EMP-083` | Rental Extension Request | Rentals | 3 | 0 | yes |
+| `EMP-084` | Extension Pricing & Confirmation | Rentals | 3 | 0 | yes |
+| `EMP-085` | Equipment Swap / Replacement | Rentals | 3 | 0 | yes |
+| `EMP-086` | Rental Incident & Operational Exception | Rentals | 3 | 0 | yes |
+| `EMP-087` | Due Soon & Customer Notification Management | Rentals | 3 | 0 | yes |
+| `EMP-088` | Overdue Rental Management | Rentals | 3 | 0 | yes |
+| `EMP-089` | Active Group Rental Management | Rentals | 3 | 0 | yes |
+| `EMP-090` | Active Rental Intelligence & Operational Alerts | Rentals | 3 | 0 | yes |
+| `EMP-091` | Rental Return Command Center | Rentals | 3 | 0 | yes |
+| `EMP-092` | Return Scan & Rental Retrieval | Rentals | 3 | 0 | yes |
+| `EMP-093` | Return Summary & Actual Return Time | Rentals | 3 | 0 | yes |
+| `EMP-094` | Post-Rental Condition Inspection | Rentals | 3 | 0 | yes |
+| `EMP-095` | Before vs After Condition Comparison | Rentals | 3 | 0 | yes |
+| `EMP-096` | Damage Assessment & Charge Workflow | Rentals | 3 | 0 | yes |
+| `EMP-097` | Partial Return & Missing Equipment | Rentals | 3 | 0 | yes |
+| `EMP-098` | Late Fees, Damage Fees & Final Settlement | Rentals | 3 | 0 | yes |
+| `EMP-099` | Deposit Release, Capture & Customer Confirmation | Rentals | 3 | 0 | yes |
+| `EMP-100` | Return Completion & Equipment Disposition | Rentals | 3 | 0 | yes |
 

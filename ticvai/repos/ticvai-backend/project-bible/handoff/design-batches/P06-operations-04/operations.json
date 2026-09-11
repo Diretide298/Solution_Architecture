@@ -1,0 +1,330 @@
+{
+ "acknowledgeAnnouncement": {
+  "method": "POST",
+  "path": "/announcements/{announcementId}/acknowledge",
+  "contract": "workforce",
+  "summary": "Confirm you have read it",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "addTip": {
+  "method": "POST",
+  "path": "/payments/{paymentId}/tip",
+  "contract": "orders",
+  "summary": "Record a tip against a payment",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Payment"
+ },
+ "appendEntitlementToMedia": {
+  "method": "POST",
+  "path": "/media/{mediaCode}/entitlements",
+  "contract": "orders",
+  "summary": "Add something to a ticket the guest already holds",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AppendEntitlementRequest",
+  "responds": "AppendEntitlementResult"
+ },
+ "capturePayment": {
+  "method": "POST",
+  "path": "/payments/{paymentId}/capture",
+  "contract": "orders",
+  "summary": "Capture a previously authorised payment",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Payment"
+ },
+ "createPayment": {
+  "method": "POST",
+  "path": "/payments",
+  "contract": "orders",
+  "summary": "Take a payment against an order",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreatePaymentRequest",
+  "responds": "Payment"
+ },
+ "getAnnouncementReach": {
+  "method": "GET",
+  "path": "/announcements/{announcementId}/reach",
+  "contract": "workforce",
+  "summary": "Who has acknowledged, and who has not",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AnnouncementReach"
+ },
+ "getCurrentSession": {
+  "method": "GET",
+  "path": "/auth/session",
+  "contract": "identity",
+  "summary": "Current session and effective permissions",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Session"
+ },
+ "getGuestSession": {
+  "method": "GET",
+  "path": "/auth/guest/session",
+  "contract": "identity",
+  "summary": "Read the current guest session",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestSession"
+ },
+ "getMediaAsset": {
+  "method": "GET",
+  "path": "/media/{mediaId}",
+  "contract": "assets",
+  "summary": "Read an asset with derivatives and usage",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MediaAssetDetail"
+ },
+ "getMediaEntitlements": {
+  "method": "GET",
+  "path": "/media/{mediaCode}/entitlements",
+  "contract": "orders",
+  "summary": "What is already on this media",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MediaEntitlements"
+ },
+ "inquirePaymentStatus": {
+  "method": "POST",
+  "path": "/payments/{paymentId}/inquiry",
+  "contract": "orders",
+  "summary": "Ask the provider what actually happened",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Payment"
+ },
+ "listAnnouncements": {
+  "method": "GET",
+  "path": "/announcements",
+  "contract": "workforce",
+  "summary": "What staff have been told",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "unacknowledgedOnly",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Announcement"
+ },
+ "listDevices": {
+  "method": "GET",
+  "path": "/devices",
+  "contract": "tenancy",
+  "summary": "List registered devices",
+  "permission": "DEVICE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMfaMethods": {
+  "method": "GET",
+  "path": "/auth/mfa/methods",
+  "contract": "identity",
+  "summary": "Enrolled MFA methods",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MfaMethod"
+ },
+ "listSsoProviders": {
+  "method": "GET",
+  "path": "/auth/sso/providers",
+  "contract": "identity",
+  "summary": "Identity providers configured for this tenant",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SsoProvider"
+ },
+ "listTrainingRecords": {
+  "method": "GET",
+  "path": "/training-records",
+  "contract": "workforce",
+  "summary": "Training completed and what is expiring",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "TrainingRecord"
+ },
+ "publishAnnouncement": {
+  "method": "POST",
+  "path": "/announcements",
+  "contract": "workforce",
+  "summary": "Tell staff something",
+  "permission": "ANNOUNCEMENT_PUBLISH",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Announcement",
+  "responds": "Announcement"
+ },
+ "registerDevice": {
+  "method": "POST",
+  "path": "/devices",
+  "contract": "tenancy",
+  "summary": "Register a device",
+  "permission": "DEVICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RegisteredDevice",
+  "responds": "RegisteredDevice"
+ },
+ "semanticSearch": {
+  "method": "POST",
+  "path": "/search",
+  "contract": "ai",
+  "summary": "Search meaning, not words",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SearchResult"
+ }
+}

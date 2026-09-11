@@ -1,0 +1,138 @@
+id: F190
+name: 'Game and Ride board 4: Gameplay Validation Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Game and Ride board 4. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-424
+  entryPoints:
+  - Arrives at Gameplay Validation Command Center
+steps:
+- step: 1
+  screen: BO-424
+  action: Opens Gameplay Validation Command Center
+  operations: []
+  outcome: Provide an operational overview of gameplay authorization across all games and rides.
+- step: 2
+  screen: BO-425
+  action: Works in Gameplay Validation Rule Configuration
+  operations: []
+  outcome: Configure the checks TICVAI performs before allowing a game or ride to start. The source requires
+    validation before game start against balance, bonus and applicable entitlements.
+- step: 3
+  screen: BO-424
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-426
+  action: Works in Deduction Priority & Funding Source Rules
+  operations: []
+  outcome: 'Determine which wallet/value source TICVAI consumes when more than one valid funding source
+    is available. Requirement 10.2.7 explicitly states: “Bonus deduction should be done first.”'
+- step: 5
+  screen: BO-424
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-427
+  action: Works in All Games & Rides Pass Configuration
+  operations: []
+  outcome: Configure a ticket/product that permits the guest to play all games/rides in the amusement
+    park. This directly represents requirement 10.2.8.
+- step: 7
+  screen: BO-424
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-428
+  action: Works in Specific Game/Ride Unlimited Entitlement
+  operations: []
+  outcome: Configure products that provide unlimited free usage of selected games or rides. This directly
+    implements requirement 10.2.11.
+- step: 9
+  screen: BO-424
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-429
+  action: Works in Specific Game/Ride Limited Entitlement
+  operations: []
+  outcome: Configure products providing a defined number of free plays on specific attractions. This directly
+    implements requirement 10.2.12.
+- step: 11
+  screen: BO-424
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-430
+  action: Works in Game Package Builder
+  operations: []
+  outcome: 'Create a package containing a specific collection of games/rides. Requirement 10.2.7 explicitly
+    requires: Create a package with specific games. Define validity for the game entitlement.'
+- step: 13
+  screen: BO-424
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-431
+  action: Works in Entitlement Validity & Activation Rules
+  operations: []
+  outcome: Control when a gameplay entitlement becomes valid and when it expires. The source specifically
+    requires the ability to define validity for game entitlements.
+- step: 15
+  screen: BO-424
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-432
+  action: Works in Real-Time Gameplay Authorization
+  operations: []
+  outcome: Provide the operational transaction view showing exactly how TICVAI evaluates a customer tap.
+    Requirement 10.2.13 requires the system to validate the balance/card, bonus and entitlement in real
+    time and deduct the applicable amount before g
+- step: 17
+  screen: BO-424
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-433
+  action: Works in Validation Simulator & Exception Analysis
+  operations: []
+  outcome: Allow administrators to test entitlement and payment configurations before deployment and investigate
+    rejected gameplay transactions.
+branches:
+- at: 1
+  condition: Nothing has been set up on Gameplay Validation Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Game and Ride board 4 visited
+primaryContract: unknown
+contracts:
+- unknown

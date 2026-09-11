@@ -1,0 +1,658 @@
+{
+ "AccessMonitoringAnalyticsCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Access Monitoring & Analytics Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "totalAdmissionsToday": {
+    "type": "integer",
+    "description": "Total Admissions Today"
+   },
+   "entries": {
+    "type": "integer",
+    "description": "Entries"
+   },
+   "exits": {
+    "type": "integer",
+    "description": "Exits"
+   },
+   "currentlyInVenue": {
+    "type": "string",
+    "description": "Currently In Venue"
+   },
+   "reEntries": {
+    "type": "integer",
+    "description": "Re-entries"
+   },
+   "crossovers": {
+    "type": "integer",
+    "description": "Crossovers"
+   },
+   "groupAdmissions": {
+    "type": "integer",
+    "description": "Group Admissions"
+   },
+   "fastPassUses": {
+    "type": "integer",
+    "description": "Fast Pass Uses"
+   },
+   "validScans": {
+    "type": "integer",
+    "description": "Valid Scans"
+   },
+   "rejectedScans": {
+    "type": "integer",
+    "description": "Rejected Scans"
+   },
+   "interventionRate": {
+    "type": "number",
+    "description": "Intervention Rate"
+   },
+   "averageValidationTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Average Validation Time"
+   },
+   "activeGates": {
+    "type": "integer",
+    "description": "Active Gates"
+   },
+   "offlineDevices": {
+    "type": "integer",
+    "description": "Offline Devices"
+   },
+   "totalAdmissions": {
+    "type": "integer",
+    "description": "TOTAL ADMISSIONS (the pack shows 42,684)"
+   },
+   "avgValidation": {
+    "type": "number",
+    "description": "AVG. VALIDATION"
+   }
+  }
+ },
+ "AccessReportsScheduledReportingDataExportView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Access Reports, Scheduled Reporting & Data Export displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "tenant": {
+    "type": "string",
+    "description": "Tenant"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "park": {
+    "type": "string",
+    "description": "Park"
+   },
+   "zone": {
+    "type": "string",
+    "description": "Zone"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "ticketType": {
+    "type": "string",
+    "description": "Ticket Type"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "gate": {
+    "type": "string",
+    "description": "Gate"
+   },
+   "device": {
+    "type": "string",
+    "description": "Device"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner"
+   },
+   "dashboard": {
+    "type": "string",
+    "description": "Dashboard"
+   },
+   "csv": {
+    "type": "string",
+    "description": "CSV"
+   },
+   "xlsx": {
+    "type": "string",
+    "description": "XLSX"
+   },
+   "pdf": {
+    "type": "string",
+    "description": "PDF"
+   },
+   "apiDataFeed": {
+    "type": "string",
+    "description": "API/Data Feed"
+   },
+   "biIntegration": {
+    "type": "string",
+    "description": "BI integration"
+   },
+   "rbac": {
+    "type": "string",
+    "description": "RBAC"
+   },
+   "tenantIsolation": {
+    "type": "string",
+    "description": "tenant isolation"
+   },
+   "fieldLevelRestrictions": {
+    "type": "string",
+    "description": "field-level restrictions"
+   },
+   "retentionRules": {
+    "type": "string",
+    "description": "retention rules"
+   }
+  }
+ },
+ "AiAccessIntelligenceForecastingExecutiveInsightsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What AI Access Intelligence, Forecasting & Executive Insights displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "tomorrowSAttendance": {
+    "type": "integer",
+    "description": "Tomorrow's Attendance"
+   },
+   "peakArrivalTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Peak Arrival Time"
+   },
+   "peakExitTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Peak Exit Time"
+   },
+   "venueOccupancy": {
+    "type": "integer",
+    "description": "Venue Occupancy"
+   },
+   "zoneOccupancy": {
+    "type": "integer",
+    "description": "Zone Occupancy"
+   },
+   "gateDemand": {
+    "type": "string",
+    "description": "Gate Demand"
+   },
+   "groupArrivalPressure": {
+    "type": "string",
+    "description": "Group Arrival Pressure"
+   },
+   "reEntryDemand": {
+    "type": "string",
+    "description": "Re-entry Demand"
+   },
+   "deviceCapacity": {
+    "type": "integer",
+    "description": "Device Capacity"
+   },
+   "expectedAttendance": {
+    "type": "integer",
+    "description": "Expected Attendance (the pack shows 28,400)"
+   },
+   "currentPlanned": {
+    "type": "string",
+    "description": "Current Planned (the pack shows 10)"
+   },
+   "forecastAiRecommend": {
+    "type": "string",
+    "description": "Forecast → AI Recommend"
+   }
+  }
+ },
+ "AttendanceAdmissionAnalyticsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Attendance & Admission Analytics displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "ticketsSold": {
+    "type": "string",
+    "description": "Tickets Sold"
+   },
+   "ticketsEligibleToday": {
+    "type": "string",
+    "description": "Tickets Eligible Today"
+   },
+   "ticketsScanned": {
+    "type": "string",
+    "description": "Tickets Scanned"
+   },
+   "uniqueGuests": {
+    "type": "integer",
+    "description": "Unique Guests"
+   },
+   "noShows": {
+    "type": "integer",
+    "description": "No-Shows"
+   },
+   "groupAttendance": {
+    "type": "integer",
+    "description": "Group Attendance"
+   },
+   "membershipAttendance": {
+    "type": "integer",
+    "description": "Membership Attendance"
+   },
+   "repeatEntry": {
+    "type": "string",
+    "description": "Repeat Entry"
+   },
+   "attendanceRate": {
+    "type": "integer",
+    "description": "Attendance Rate"
+   },
+   "noShowRate": {
+    "type": "number",
+    "description": "no-show rate"
+   },
+   "ticketType": {
+    "type": "string",
+    "description": "ticket type"
+   },
+   "channel": {
+    "type": "string",
+    "description": "channel"
+   },
+   "event": {
+    "type": "string",
+    "description": "event"
+   },
+   "dateTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "date/time"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "customer segment"
+   },
+   "sold": {
+    "type": "string",
+    "description": "Sold (the pack shows 25,000)"
+   },
+   "eligible": {
+    "type": "string",
+    "description": "Eligible (the pack shows 23,842)"
+   },
+   "attended": {
+    "type": "string",
+    "description": "Attended (the pack shows 21,384)"
+   },
+   "purchased": {
+    "type": "string",
+    "description": "Purchased (the pack shows 120)"
+   },
+   "actualAttendance": {
+    "type": "integer",
+    "description": "Actual Attendance (the pack shows 112)"
+   },
+   "attendance": {
+    "type": "integer",
+    "description": "Attendance (the pack shows 93.3%)"
+   }
+  }
+ },
+ "EntryExitReEntryCrossoverAnalyticsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Entry, Exit, Re-entry & Crossover Analytics displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "reEntryRate": {
+    "type": "number",
+    "description": "Re-entry rate"
+   },
+   "averageTimeOutside": {
+    "type": "string",
+    "format": "date-time",
+    "description": "average time outside"
+   },
+   "mostUsedReEntryGates": {
+    "type": "integer",
+    "description": "most-used re-entry gates"
+   },
+   "rejectedReEntry": {
+    "type": "integer",
+    "description": "rejected re-entry"
+   },
+   "reEntryByProduct": {
+    "type": "string",
+    "description": "re-entry by product"
+   },
+   "parkAParkB": {
+    "type": "string",
+    "description": "Park A → Park B"
+   },
+   "parkBParkA": {
+    "type": "string",
+    "description": "Park B → Park A"
+   },
+   "crossoverTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "crossover time"
+   },
+   "crossoverProduct": {
+    "type": "string",
+    "description": "crossover product"
+   },
+   "crossoverUtilization": {
+    "type": "number",
+    "description": "crossover utilization"
+   },
+   "waterPark": {
+    "type": "string",
+    "description": "Water Park (the pack shows 1,327)"
+   }
+  }
+ },
+ "GraphicalAccessMapLiveGatePerformanceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Graphical Access Map & Live Gate Performance displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "gates": {
+    "type": "integer",
+    "description": "Gates"
+   },
+   "turnstiles": {
+    "type": "integer",
+    "description": "Turnstiles"
+   },
+   "entryPoints": {
+    "type": "integer",
+    "description": "Entry points"
+   },
+   "exitPoints": {
+    "type": "integer",
+    "description": "Exit points"
+   },
+   "reEntryGates": {
+    "type": "integer",
+    "description": "Re-entry gates"
+   },
+   "groupGates": {
+    "type": "integer",
+    "description": "Group gates"
+   },
+   "vipGates": {
+    "type": "integer",
+    "description": "VIP gates"
+   },
+   "attractionAccess": {
+    "type": "string",
+    "description": "attraction access"
+   },
+   "crossoverPoints": {
+    "type": "integer",
+    "description": "crossover points"
+   },
+   "healthy": {
+    "type": "string",
+    "description": "🟢 Healthy"
+   },
+   "warning": {
+    "type": "string",
+    "description": "🟡 Warning"
+   },
+   "critical": {
+    "type": "string",
+    "description": "🔴 Critical"
+   },
+   "offline": {
+    "type": "integer",
+    "description": "⚫ Offline"
+   },
+   "guests": {
+    "type": "integer",
+    "description": "Guests (the pack shows 171 | Pa ge, 4,821)"
+   },
+   "success": {
+    "type": "string",
+    "description": "Success (the pack shows 96.4%)"
+   },
+   "reject": {
+    "type": "string",
+    "description": "Reject (the pack shows 2.1%)"
+   },
+   "yellow": {
+    "type": "string",
+    "description": "Yellow (the pack shows 1.5%)"
+   }
+  }
+ },
+ "GuestDwellTimeLengthOfStayAttractionFlowView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Guest Dwell Time, Length of Stay & Attraction Flow displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "averageLengthOfStay": {
+    "type": "number",
+    "description": "Average Length of Stay"
+   },
+   "medianStay": {
+    "type": "string",
+    "description": "Median Stay"
+   },
+   "peakArrival": {
+    "type": "string",
+    "description": "Peak Arrival"
+   },
+   "peakDeparture": {
+    "type": "string",
+    "description": "Peak Departure"
+   },
+   "zoneDwellTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Zone Dwell Time"
+   },
+   "attractionVisits": {
+    "type": "integer",
+    "description": "Attraction Visits"
+   },
+   "fastPassUsage": {
+    "type": "string",
+    "description": "Fast Pass Usage"
+   },
+   "reEntryBehavior": {
+    "type": "string",
+    "description": "Re-entry behavior"
+   },
+   "uniqueGuests": {
+    "type": "integer",
+    "description": "Unique Guests (the pack shows 5,842)"
+   },
+   "totalValidations": {
+    "type": "integer",
+    "description": "Total Validations (the pack shows 6,211)"
+   },
+   "fastPass": {
+    "type": "string",
+    "description": "Fast Pass (the pack shows 1,827)"
+   },
+   "repeatVisits": {
+    "type": "integer",
+    "description": "Repeat Visits (the pack shows 369)"
+   },
+   "unnecessary": {
+    "type": "string",
+    "description": "unnecessary"
+   }
+  }
+ },
+ "LiveVenueOccupancyPeopleCountingView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Live Venue Occupancy & People Counting displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "exits": {
+    "type": "integer",
+    "description": "Exits (the pack shows ±)"
+   },
+   "operationalAdjustments": {
+    "type": "integer",
+    "description": "Operational Adjustments (the pack shows =)"
+   },
+   "current": {
+    "type": "string",
+    "description": "Current (the pack shows 8,214)"
+   },
+   "capacity": {
+    "type": "integer",
+    "description": "Capacity (the pack shows 12,000)"
+   },
+   "occupancy": {
+    "type": "integer",
+    "description": "Occupancy (the pack shows 68.5%)"
+   },
+   "kidsZone": {
+    "type": "string",
+    "description": "Kids Zone (the pack shows 1,842 / 2,500, 🟢 74%)"
+   },
+   "adventureZone": {
+    "type": "string",
+    "description": "Adventure Zone (the pack shows 3,107 / 3,500, 🟠 89%)"
+   },
+   "vipZone": {
+    "type": "string",
+    "description": "VIP Zone (the pack shows 421 / 600, 🟢 70%)"
+   },
+   "normal": {
+    "type": "string",
+    "description": "Normal (the pack shows 0–79%)"
+   },
+   "warning": {
+    "type": "string",
+    "description": "Warning (the pack shows 80–89%)"
+   },
+   "high": {
+    "type": "string",
+    "description": "High (the pack shows 90–94%)"
+   },
+   "critical": {
+    "type": "string",
+    "description": "Critical (the pack shows 95%+)"
+   }
+  }
+ },
+ "ThroughputQueueValidationPerformanceAnalyticsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Throughput, Queue & Validation Performance Analytics displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "guestsPerMinute": {
+    "type": "string",
+    "description": "Guests per Minute"
+   },
+   "guestsPerHour": {
+    "type": "string",
+    "description": "Guests per Hour"
+   },
+   "averageScanTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Average Scan Time"
+   },
+   "averageGateCycle": {
+    "type": "number",
+    "description": "Average Gate Cycle"
+   },
+   "successRate": {
+    "type": "number",
+    "description": "Success Rate"
+   },
+   "yellowRate": {
+    "type": "number",
+    "description": "Yellow Rate"
+   },
+   "manualInterventionRate": {
+    "type": "number",
+    "description": "Manual Intervention Rate"
+   },
+   "downtime": {
+    "type": "string",
+    "description": "Downtime"
+   },
+   "gateGuestsHrValidationRejectIntervention": {
+    "type": "string",
+    "description": "Gate Guests/hr Validation Reject Intervention"
+   },
+   "g011482039s1208": {
+    "type": "number",
+    "description": "G01 1,482 0.39s 1.2% 0.8%"
+   },
+   "g021391042s1411": {
+    "type": "number",
+    "description": "G02 1,391 0.42s 1.4% 1.1%"
+   },
+   "g03821081s8264": {
+    "type": "number",
+    "description": "G03 821 0.81s 8.2% 6.4%"
+   },
+   "gate03Underperforming": {
+    "type": "string",
+    "description": "GATE 03 — UNDERPERFORMING"
+   },
+   "reasonsType": {
+    "type": "string",
+    "enum": [
+     "qrReadFailures",
+     "excessiveManualVerification",
+     "hardwareLatency",
+     "policyComplexity",
+     "wrongGuestRouting"
+    ],
+    "description": "Vocabulary listed under Potential reasons."
+   }
+  }
+ },
+ "ValidationOutcomeRejectionAnalyticsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Validation Outcome & Rejection Analytics displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "rejected": {
+    "type": "integer",
+    "description": "Rejected (the pack shows 482)"
+   },
+   "overrides": {
+    "type": "integer",
+    "description": "Overrides (the pack shows 281)"
+   }
+  }
+ }
+}

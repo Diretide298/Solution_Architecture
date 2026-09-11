@@ -1,0 +1,538 @@
+{
+ "Case": {
+  "x-ticvai-persistence": "marketing.case",
+  "type": "object",
+  "required": [
+   "id",
+   "caseNumber",
+   "subject",
+   "status",
+   "priority",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "caseNumber": {
+    "type": "string"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "guestName": {
+    "type": "string",
+    "nullable": true
+   },
+   "subject": {
+    "type": "string"
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "status": {
+    "$ref": "#/components/schemas/CaseStatus"
+   },
+   "priority": {
+    "$ref": "#/components/schemas/CasePriority"
+   },
+   "assignedToPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "relatedOrderId": {
+    "type": "string",
+    "nullable": true
+   },
+   "slaDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "isSlaBreached": {
+    "type": "boolean"
+   },
+   "slaPausedSeconds": {
+    "type": "integer",
+    "description": "Accrued only while awaiting the guest. Waiting on an internal team does not pause the clock.\n"
+   },
+   "escalationCount": {
+    "type": "integer"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "CaseDetail": {
+  "x-ticvai-persistence": "marketing.case",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/Case"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "description": {
+      "type": "string"
+     },
+     "resolutionNote": {
+      "type": "string",
+      "nullable": true
+     },
+     "messages": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/CaseMessage"
+      }
+     }
+    }
+   }
+  ]
+ },
+ "CaseMessage": {
+  "x-ticvai-persistence": "marketing.case_message",
+  "type": "object",
+  "required": [
+   "id",
+   "body",
+   "isInternal",
+   "authorKind",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "body": {
+    "type": "string"
+   },
+   "isInternal": {
+    "type": "boolean"
+   },
+   "authorKind": {
+    "type": "string",
+    "enum": [
+     "agent",
+     "guest",
+     "system",
+     "ai"
+    ]
+   },
+   "authorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "channel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "attachmentRefs": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "CasePriority": {
+  "type": "string",
+  "enum": [
+   "low",
+   "normal",
+   "high",
+   "urgent"
+  ]
+ },
+ "CaseStatus": {
+  "type": "string",
+  "enum": [
+   "open",
+   "inProgress",
+   "awaitingGuest",
+   "escalated",
+   "resolved",
+   "closed"
+  ]
+ },
+ "Conversation": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.conversation",
+  "description": "22.8. **A conversation is not a case.** A case is a ticket measured in hours; a conversation is a live session measured in seconds, with somebody waiting. A conversation may create a case; it is not one.\n",
+  "required": [
+   "id",
+   "channel",
+   "state"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "telephony": {
+    "type": "object",
+    "nullable": true,
+    "description": "BL-083. **`ConversationChannel` included `voice` with nothing behind it** — the model anticipated telephony and stopped at the enum.\n**Not an integration, a binding.** Genesys, Avaya, Amazon Connect, Teams and 3CX all do call control themselves; what the platform needs is the call bound to the guest and the case, so **an agent who answers already knows who is calling and what about.**\n",
+    "properties": {
+     "providerCallId": {
+      "type": "string"
+     },
+     "direction": {
+      "type": "string",
+      "enum": [
+       "inbound",
+       "outbound",
+       "transferred"
+      ]
+     },
+     "fromNumberMasked": {
+      "type": "string",
+      "nullable": true,
+      "description": "**Masked, and it is still personal data.** A phone number identifies a person more reliably than a name does.\n"
+     },
+     "recordingRef": {
+      "type": "string",
+      "nullable": true,
+      "description": "Held by the provider, referenced here. **Recording consent is jurisdictional and the platform does not assume it** — a reference with no consent record is a recording nobody may play.\n"
+     },
+     "agentState": {
+      "type": "string",
+      "enum": [
+       "available",
+       "onCall",
+       "wrapUp",
+       "away",
+       "offline"
+      ],
+      "nullable": true
+     }
+    }
+   },
+   "assistSessionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "BL-094. **`startKioskAssist` recorded a staff member helping a guest and `createCase` recorded a service interaction, and neither referenced the other** — so the traceability 2.13.20 asks for had no link to follow.\n**The link is here rather than on the assist session**, because a case may span several assists and an assist belongs to at most one case.\n"
+   },
+   "channel": {
+    "$ref": "#/components/schemas/ConversationChannel"
+   },
+   "state": {
+    "$ref": "#/components/schemas/ConversationState"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "22.8.3. Resolved from phone, email, membership number or a signed-in session. **A conversation with none of those stays anonymous rather than being guessed at.**\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "assignedPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "queueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "queuePosition": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true
+   },
+   "estimatedWaitSeconds": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true
+   },
+   "handoverReason": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "guestRequested",
+     "assistantRefused",
+     "assistantFailed",
+     "outOfScope",
+     "negativeSentiment",
+     "complexIntent",
+     "paymentIssue"
+    ]
+   },
+   "handoverSummary": {
+    "type": "string",
+    "nullable": true,
+    "description": "**The assistant's own account of what the guest wants**, so an agent opens with context rather than reading a transcript while somebody waits.\n"
+   },
+   "sentiment": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "positive",
+     "neutral",
+     "negative",
+     "escalating"
+    ],
+    "description": "22.8.16. **`escalating` is a routing signal**, not a report line."
+   },
+   "intent": {
+    "type": "string",
+    "nullable": true,
+    "description": "22.8.13. What the guest appears to want, used for routing."
+   },
+   "locale": {
+    "type": "string"
+   },
+   "caseId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "22.8.12. Where the conversation raised one."
+   },
+   "messages": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ConversationMessage"
+    }
+   },
+   "firstResponseSeconds": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "closedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "outcome": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "resolved",
+     "caseRaised",
+     "abandonedByGuest",
+     "timedOut",
+     "spam"
+    ]
+   }
+  }
+ },
+ "ConversationChannel": {
+  "type": "string",
+  "enum": [
+   "webChat",
+   "inAppChat",
+   "whatsapp",
+   "sms",
+   "email",
+   "kiosk",
+   "voice"
+  ]
+ },
+ "ConversationMessage": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.conversation_message",
+  "required": [
+   "id",
+   "sender",
+   "body",
+   "sentAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sender": {
+    "type": "string",
+    "enum": [
+     "guest",
+     "agent",
+     "assistant",
+     "system"
+    ],
+    "description": "**Resolved, never declared.** The assistant is labelled as one — a guest talking to a bot that presents as a person is a complaint waiting for the moment they find out.\n"
+   },
+   "senderPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "body": {
+    "type": "string"
+   },
+   "attachments": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "assetId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "kind": {
+       "type": "string",
+       "enum": [
+        "image",
+        "video",
+        "document",
+        "ticket",
+        "qr",
+        "paymentLink"
+       ]
+      }
+     }
+    }
+   },
+   "aiInteractionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where the assistant sent it. **Links the message to its tokens and cost**, so a conversation's spend is attributable (CF-14).\n"
+   },
+   "sentAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "readAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "ConversationState": {
+  "type": "string",
+  "description": "**`withAssistant` and `queued` are different, and the second has a person waiting.** Merging them makes the service level unmeasurable, because time with a bot is not time in a queue.\n",
+  "enum": [
+   "withAssistant",
+   "queued",
+   "withAgent",
+   "waitingOnGuest",
+   "resolved",
+   "abandoned",
+   "timedOut"
+  ]
+ },
+ "CreateCaseRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "subject",
+   "description",
+   "channel",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subject": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 10000
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "priority": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CasePriority"
+     }
+    ],
+    "default": "normal"
+   },
+   "channel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "relatedOrderId": {
+    "type": "string"
+   },
+   "attachmentRefs": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "MessageChannel": {
+  "type": "string",
+  "enum": [
+   "email",
+   "sms",
+   "whatsapp",
+   "push",
+   "inApp",
+   "post"
+  ]
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ }
+}

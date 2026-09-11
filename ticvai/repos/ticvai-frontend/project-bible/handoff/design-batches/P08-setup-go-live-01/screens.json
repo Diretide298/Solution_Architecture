@@ -1,0 +1,131 @@
+[
+ {
+  "id": "BO-594",
+  "name": "Environment Ready & Handoff to AI Setup",
+  "module": "Setup & Go-Live",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
+   "board": "6",
+   "number": "10",
+   "page": 80
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/setup-go-live/environment-ready-handoff-to-ai-setup-bo-594",
+   "component": "apps/venue-management-web/src/routes/setup-go-live/EnvironmentReadyHandoffToAiSetup.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-595"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — Subscription board 6 on P08, 11 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-595",
+     "trigger": "AI Setup Command Center",
+     "provenance": "structural — the book's handoff, 6.10: \"This hands the customer directly to Board 7\", 11 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configuration Status; AI Configuration prepares; Initial Configuration Prepared) and no display directory — it is settings, not a population",
+  "purpose": "Confirm that provisioning is complete and move the customer into Board 7.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**Environment Ready & Handoff to AI Setup declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Initial Configuration: 42%",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 80 §Configuration Status"
+      },
+      {
+       "kind": "textField",
+       "label": "Board 6 — Zero-Touch Requirement",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 80 §AI Configuration prepares"
+      },
+      {
+       "kind": "selectField",
+       "label": "↓",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 80 §Initial Configuration Prepared"
+      },
+      {
+       "kind": "textField",
+       "label": "Customer Receives “Environment Ready”",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 80 §Initial Configuration Prepared"
+      },
+      {
+       "kind": "textField",
+       "label": "Board 6 — Trial Handling",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 80 §Initial Configuration Prepared"
+      },
+      {
+       "kind": "textField",
+       "label": "Tenant Type = Trial",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 80 §Initial Configuration Prepared"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The environment ready handoff configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the environment ready handoff untouched.",
+   "emptyFirstRun": "No environment ready handoff configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-594"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 80. 0 of 0 labels bound to a contract property; 6 of 83 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "notes": "**Moved from P09 `ADM-428` on 11 September 2026.** Board 6 is worked by the new customer's own administrator inside their tenant, not by TICVAI; `tools/applied/apply-subscription-placement.py` records why. `ADM-428` is retired and never reissued.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

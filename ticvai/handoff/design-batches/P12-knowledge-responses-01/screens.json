@@ -1,0 +1,377 @@
+[
+ {
+  "id": "SUP-006",
+  "name": "Knowledge Base Search",
+  "module": "Knowledge & Responses",
+  "requiresModule": "core",
+  "wave": 3,
+  "capability": "C105",
+  "implementation": {
+   "app": "venue-support-web",
+   "route": "/general/knowledge-base-search",
+   "component": "apps/venue-support-web/src/routes/general/KnowledgeBaseSearchList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "SUP-001"
+   ],
+   "exitTo": [
+    "SUP-001",
+    "SUP-002",
+    "SUP-003",
+    "SUP-005"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "SUP-001",
+     "trigger": "Agent Login",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "SUP-002",
+     "trigger": "Agent Dashboard",
+     "carries": [
+      "caseId"
+     ],
+     "provenance": "derived — SUP-002 declares entryState.params caseId, so an edge into it must carry them"
+    },
+    {
+     "to": "SUP-005",
+     "trigger": "Live Chat Workspace",
+     "carries": [
+      "caseId",
+      "conversationId"
+     ],
+     "provenance": "derived — SUP-005 declares entryState.params caseId, conversationId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **41 operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the **identical 41 operations** — a Typography screen that could create banners and a Component Preview that could set FAQs. **The worst instance of the 18 August bulk attach found so far**, and only walking the white-label journey surfaced it.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listKnowledgeCollections` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Find something when the guest does not know what it is called.",
+  "gaps": [
+   {
+    "operation": "listFaqs",
+    "why": "**1 declared operation reach no component on this screen**: listFaqs. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every knowledge base search",
+       "bindsTo": "KnowledgeCollection",
+       "columns": [
+        "KnowledgeCollection.id",
+        "KnowledgeCollection.name",
+        "KnowledgeCollection.description",
+        "KnowledgeCollection.scopeLevel",
+        "KnowledgeCollection.scopePath",
+        "KnowledgeCollection.documentCount",
+        "KnowledgeCollection.shardKey",
+        "KnowledgeCollection.retrieval",
+        "KnowledgeCollection.sparseModel",
+        "KnowledgeCollection.idfScope",
+        "KnowledgeCollection.embeddingModel",
+        "KnowledgeCollection.isActive"
+       ],
+       "operation": "listKnowledgeCollections",
+       "provenance": "contract ai.yaml GET /collections"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected knowledge base search",
+       "bindsTo": "KnowledgeCollection",
+       "columns": [
+        "KnowledgeCollection.id",
+        "KnowledgeCollection.name",
+        "KnowledgeCollection.description",
+        "KnowledgeCollection.scopeLevel",
+        "KnowledgeCollection.scopePath",
+        "KnowledgeCollection.documentCount",
+        "KnowledgeCollection.shardKey",
+        "KnowledgeCollection.retrieval",
+        "KnowledgeCollection.sparseModel",
+        "KnowledgeCollection.idfScope",
+        "KnowledgeCollection.embeddingModel",
+        "KnowledgeCollection.isActive"
+       ],
+       "operation": "listKnowledgeCollections",
+       "provenance": "contract ai.yaml GET /collections"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The knowledge base search list.",
+   "error": "Could not load. Names which read failed and leaves the knowledge base search untouched.",
+   "emptyFirstRun": "No knowledge base search yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the knowledge base search are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listKnowledgeCollections",
+    "contract": "ai",
+    "purpose": "Collections an agent may search",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listFaqs",
+    "contract": "white-label",
+    "purpose": "Published answers, as the guest sees them",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "bannerId",
+     "from": "deepLink"
+    },
+    {
+     "name": "pageId",
+     "from": "deepLink"
+    },
+    {
+     "name": "policyKind",
+     "from": "deepLink"
+    },
+    {
+     "name": "version",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A version link is expected to point at something superseded — that is what versions are for.** The screen opens the requested version read-only, says it is not current, and links to the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`, `policyKind`.",
+   "preloaded": [
+    "KnowledgeCollection.id",
+    "KnowledgeCollection.name",
+    "KnowledgeCollection.description",
+    "KnowledgeCollection.scopeLevel",
+    "KnowledgeCollection.scopePath"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P12 Venue Support.dc.html#sup-006"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P12",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Support",
+   "name": "Venue Support — Agent Console",
+   "offlineCapable": false,
+   "app": "venue-support-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "SUP-007",
+  "name": "Canned Response Management",
+  "module": "Knowledge & Responses",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "capability": "C60",
+  "implementation": {
+   "app": "venue-support-web",
+   "route": "/general/canned-response-management",
+   "component": "apps/venue-support-web/src/routes/general/CannedResponseManagementForm.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "SUP-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "SUP-001",
+    "SUP-002",
+    "SUP-003"
+   ],
+   "transitions": [
+    {
+     "to": "SUP-001",
+     "trigger": "Agent Login",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "SUP-002",
+     "trigger": "Agent Dashboard",
+     "carries": [
+      "caseId"
+     ],
+     "provenance": "derived — SUP-002 declares entryState.params caseId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listMessageTemplates` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Find canned response management for this venue.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every canned response",
+       "bindsTo": "MessageTemplate",
+       "columns": [
+        "MessageTemplate.id",
+        "MessageTemplate.code",
+        "MessageTemplate.name",
+        "MessageTemplate.channel",
+        "MessageTemplate.subjects",
+        "MessageTemplate.bodies",
+        "MessageTemplate.mergeFields",
+        "MessageTemplate.missingLanguages",
+        "MessageTemplate.providerTemplateId"
+       ],
+       "operation": "listMessageTemplates",
+       "provenance": "contract marketing-crm.yaml GET /message-templates"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected canned response",
+       "bindsTo": "MessageTemplate",
+       "columns": [
+        "MessageTemplate.id",
+        "MessageTemplate.code",
+        "MessageTemplate.name",
+        "MessageTemplate.channel",
+        "MessageTemplate.subjects",
+        "MessageTemplate.bodies",
+        "MessageTemplate.mergeFields",
+        "MessageTemplate.missingLanguages",
+        "MessageTemplate.providerTemplateId"
+       ],
+       "operation": "listMessageTemplates",
+       "provenance": "contract marketing-crm.yaml GET /message-templates"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createMessageTemplate",
+       "provenance": "contract marketing-crm.yaml POST /message-templates"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The canned response list.",
+   "error": "Could not load. Names which read failed and leaves the canned response untouched.",
+   "emptyFirstRun": "No canned response yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the canned response are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listMessageTemplates",
+    "contract": "marketing-crm",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createMessageTemplate",
+    "contract": "marketing-crm",
+    "purpose": "Create a message template",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMessageTemplates"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "MessageTemplate.id",
+    "MessageTemplate.code",
+    "MessageTemplate.name",
+    "MessageTemplate.channel",
+    "MessageTemplate.subjects"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P12 Venue Support.dc.html#sup-007"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P12",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Support",
+   "name": "Venue Support — Agent Console",
+   "offlineCapable": false,
+   "app": "venue-support-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

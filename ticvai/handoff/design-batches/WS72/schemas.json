@@ -1,0 +1,1652 @@
+{
+ "DigitalWaiverFormBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Digital Waiver & Form Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "heading": {
+    "type": "string",
+    "description": "Heading"
+   },
+   "paragraph": {
+    "type": "string",
+    "description": "Paragraph"
+   },
+   "legalText": {
+    "type": "string",
+    "description": "Legal Text"
+   },
+   "instructions": {
+    "type": "string",
+    "description": "Instructions"
+   },
+   "imageLogo": {
+    "type": "string",
+    "description": "Image/Logo"
+   },
+   "divider": {
+    "type": "string",
+    "description": "Divider"
+   },
+   "informationBox": {
+    "type": "string",
+    "description": "Information Box"
+   },
+   "checkbox": {
+    "type": "string",
+    "description": "Checkbox"
+   },
+   "acknowledgement": {
+    "type": "string",
+    "description": "Acknowledgement"
+   },
+   "question": {
+    "type": "string",
+    "description": "Question"
+   },
+   "signature": {
+    "type": "string",
+    "description": "Signature"
+   },
+   "initials": {
+    "type": "string",
+    "description": "Initials"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "customerDetails": {
+    "type": "string",
+    "description": "Customer Details"
+   },
+   "guardianDetails": {
+    "type": "string",
+    "description": "Guardian Details"
+   },
+   "headings": {
+    "type": "string",
+    "description": "Headings"
+   },
+   "paragraphs": {
+    "type": "string",
+    "description": "Paragraphs"
+   },
+   "lists": {
+    "type": "string",
+    "description": "Lists"
+   },
+   "boldEmphasis": {
+    "type": "string",
+    "description": "Bold/Emphasis"
+   },
+   "hyperlinks": {
+    "type": "string",
+    "description": "Hyperlinks"
+   },
+   "mandatoryNotices": {
+    "type": "string",
+    "description": "Mandatory notices"
+   },
+   "sectionNumbering": {
+    "type": "string",
+    "description": "Section numbering"
+   },
+   "desktop": {
+    "type": "string",
+    "description": "Desktop"
+   },
+   "mobile": {
+    "type": "string",
+    "description": "Mobile"
+   },
+   "tablet": {
+    "type": "string",
+    "description": "Tablet"
+   },
+   "b2c": {
+    "type": "string",
+    "description": "B2C"
+   },
+   "kioskOnSite": {
+    "type": "string",
+    "description": "Kiosk/On-Site"
+   }
+  }
+ },
+ "DigitalWaiverFormBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Digital Waiver & Form Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "heading": {
+    "type": "string",
+    "description": "Heading"
+   },
+   "paragraph": {
+    "type": "string",
+    "description": "Paragraph"
+   },
+   "legalText": {
+    "type": "string",
+    "description": "Legal Text"
+   },
+   "instructions": {
+    "type": "string",
+    "description": "Instructions"
+   },
+   "imageLogo": {
+    "type": "string",
+    "description": "Image/Logo"
+   },
+   "divider": {
+    "type": "string",
+    "description": "Divider"
+   },
+   "informationBox": {
+    "type": "string",
+    "description": "Information Box"
+   },
+   "checkbox": {
+    "type": "string",
+    "description": "Checkbox"
+   },
+   "acknowledgement": {
+    "type": "string",
+    "description": "Acknowledgement"
+   },
+   "question": {
+    "type": "string",
+    "description": "Question"
+   },
+   "signature": {
+    "type": "string",
+    "description": "Signature"
+   },
+   "initials": {
+    "type": "string",
+    "description": "Initials"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "customerDetails": {
+    "type": "string",
+    "description": "Customer Details"
+   },
+   "guardianDetails": {
+    "type": "string",
+    "description": "Guardian Details"
+   },
+   "headings": {
+    "type": "string",
+    "description": "Headings"
+   },
+   "paragraphs": {
+    "type": "string",
+    "description": "Paragraphs"
+   },
+   "lists": {
+    "type": "string",
+    "description": "Lists"
+   },
+   "boldEmphasis": {
+    "type": "string",
+    "description": "Bold/Emphasis"
+   },
+   "hyperlinks": {
+    "type": "string",
+    "description": "Hyperlinks"
+   },
+   "mandatoryNotices": {
+    "type": "string",
+    "description": "Mandatory notices"
+   },
+   "sectionNumbering": {
+    "type": "string",
+    "description": "Section numbering"
+   },
+   "desktop": {
+    "type": "string",
+    "description": "Desktop"
+   },
+   "mobile": {
+    "type": "string",
+    "description": "Mobile"
+   },
+   "tablet": {
+    "type": "string",
+    "description": "Tablet"
+   },
+   "b2c": {
+    "type": "string",
+    "description": "B2C"
+   },
+   "kioskOnSite": {
+    "type": "string",
+    "description": "Kiosk/On-Site"
+   }
+  }
+ },
+ "DynamicFieldsQuestionsConditionalLogicView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Dynamic Fields, Questions & Conditional Logic displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "shortText": {
+    "type": "string",
+    "description": "Short Text"
+   },
+   "longText": {
+    "type": "string",
+    "description": "Long Text"
+   },
+   "number": {
+    "type": "string",
+    "description": "Number"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "yesNo": {
+    "type": "string",
+    "description": "Yes/No"
+   },
+   "checkbox": {
+    "type": "string",
+    "description": "Checkbox"
+   },
+   "singleSelect": {
+    "type": "string",
+    "description": "Single Select"
+   },
+   "multiSelect": {
+    "type": "string",
+    "description": "Multi-Select"
+   },
+   "dropdown": {
+    "type": "string",
+    "description": "Dropdown"
+   },
+   "email": {
+    "type": "string",
+    "description": "Email"
+   },
+   "mobile": {
+    "type": "string",
+    "description": "Mobile"
+   },
+   "address": {
+    "type": "string",
+    "description": "Address"
+   },
+   "customerLookup": {
+    "type": "string",
+    "description": "Customer Lookup"
+   },
+   "participantLookup": {
+    "type": "string",
+    "description": "Participant Lookup"
+   },
+   "signature": {
+    "type": "string",
+    "description": "Signature"
+   },
+   "initials": {
+    "type": "string",
+    "description": "Initials"
+   },
+   "participantName": {
+    "type": "string",
+    "description": "Participant Name"
+   },
+   "dateOfBirth": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date of Birth"
+   },
+   "customerId": {
+    "type": "string",
+    "description": "Customer ID"
+   },
+   "bookingReference": {
+    "type": "string",
+    "description": "Booking Reference"
+   },
+   "ticketNumber": {
+    "type": "string",
+    "description": "Ticket Number"
+   },
+   "guardianName": {
+    "type": "string",
+    "description": "Guardian Name"
+   },
+   "relationship": {
+    "type": "string",
+    "description": "Relationship"
+   },
+   "emergencyContact": {
+    "type": "string",
+    "description": "Emergency Contact"
+   },
+   "required": {
+    "type": "boolean",
+    "description": "Required"
+   },
+   "optional": {
+    "type": "string",
+    "description": "Optional"
+   },
+   "conditional": {
+    "type": "string",
+    "description": "Conditional"
+   },
+   "readOnly": {
+    "type": "string",
+    "description": "Read Only"
+   },
+   "autoPopulated": {
+    "type": "string",
+    "description": "Auto-Populated"
+   },
+   "minimumMaximum": {
+    "type": "string",
+    "description": "Minimum/Maximum"
+   },
+   "dateRange": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date range"
+   },
+   "format": {
+    "type": "string",
+    "description": "Format"
+   },
+   "characterLimit": {
+    "type": "integer",
+    "description": "Character limit"
+   },
+   "allowedValues": {
+    "type": "string",
+    "description": "Allowed values"
+   },
+   "duplicatingData": {
+    "type": "string",
+    "description": "duplicating data"
+   }
+  }
+ },
+ "LocalizationBrandingCustomerExperienceConfigurationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Localization, Branding & Customer Experience Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "arabic": {
+    "type": "string",
+    "description": "Arabic"
+   },
+   "english": {
+    "type": "string",
+    "description": "English"
+   },
+   "additionalLanguagesAsConfigured": {
+    "type": "string",
+    "description": "Additional languages as configured"
+   },
+   "translatedContent": {
+    "type": "string",
+    "description": "translated content"
+   },
+   "brandLogo": {
+    "type": "string",
+    "description": "Brand Logo"
+   },
+   "venueLogo": {
+    "type": "string",
+    "description": "Venue Logo"
+   },
+   "header": {
+    "type": "string",
+    "description": "Header"
+   },
+   "footer": {
+    "type": "string",
+    "description": "Footer"
+   },
+   "typography": {
+    "type": "string",
+    "description": "Typography"
+   },
+   "customerInstructions": {
+    "type": "string",
+    "description": "Customer Instructions"
+   },
+   "supportContact": {
+    "type": "string",
+    "description": "Support Contact"
+   },
+   "confirmationMessage": {
+    "type": "string",
+    "description": "Confirmation Message"
+   },
+   "b2cWeb": {
+    "type": "string",
+    "description": "B2C Web"
+   },
+   "mobileApp": {
+    "type": "string",
+    "description": "Mobile App"
+   },
+   "emailLink": {
+    "type": "string",
+    "description": "Email Link"
+   },
+   "qrLink": {
+    "type": "string",
+    "description": "QR Link"
+   },
+   "kiosk": {
+    "type": "string",
+    "description": "Kiosk"
+   },
+   "posFrontDesk": {
+    "type": "string",
+    "description": "POS/Front Desk"
+   },
+   "groupPortal": {
+    "type": "string",
+    "description": "Group Portal"
+   },
+   "keyboardNavigation": {
+    "type": "string",
+    "description": "Keyboard navigation"
+   },
+   "screenReaderCompatibleLabels": {
+    "type": "string",
+    "description": "Screen-reader compatible labels"
+   },
+   "appropriateContrast": {
+    "type": "string",
+    "description": "Appropriate contrast"
+   },
+   "clearValidationMessages": {
+    "type": "string",
+    "description": "Clear validation messages"
+   },
+   "responsiveLayouts": {
+    "type": "string",
+    "description": "Responsive layouts"
+   }
+  }
+ },
+ "LocalizationBrandingCustomerExperienceConfigurationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Localization, Branding & Customer Experience Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "arabic": {
+    "type": "string",
+    "description": "Arabic"
+   },
+   "english": {
+    "type": "string",
+    "description": "English"
+   },
+   "additionalLanguagesAsConfigured": {
+    "type": "string",
+    "description": "Additional languages as configured"
+   },
+   "sourceLanguage": {
+    "type": "string",
+    "description": "Source Language"
+   },
+   "translationStatus": {
+    "type": "integer",
+    "description": "Translation Status"
+   },
+   "translatorReviewer": {
+    "type": "string",
+    "description": "Translator/Reviewer"
+   },
+   "approvalStatus": {
+    "type": "integer",
+    "description": "Approval Status"
+   },
+   "lastUpdated": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last Updated"
+   },
+   "translatedContent": {
+    "type": "string",
+    "description": "translated content"
+   },
+   "brandLogo": {
+    "type": "string",
+    "description": "Brand Logo"
+   },
+   "venueLogo": {
+    "type": "string",
+    "description": "Venue Logo"
+   },
+   "header": {
+    "type": "string",
+    "description": "Header"
+   },
+   "footer": {
+    "type": "string",
+    "description": "Footer"
+   },
+   "typography": {
+    "type": "string",
+    "description": "Typography"
+   },
+   "customerInstructions": {
+    "type": "string",
+    "description": "Customer Instructions"
+   },
+   "supportContact": {
+    "type": "string",
+    "description": "Support Contact"
+   },
+   "confirmationMessage": {
+    "type": "string",
+    "description": "Confirmation Message"
+   },
+   "b2cWeb": {
+    "type": "string",
+    "description": "B2C Web"
+   },
+   "mobileApp": {
+    "type": "string",
+    "description": "Mobile App"
+   },
+   "emailLink": {
+    "type": "string",
+    "description": "Email Link"
+   },
+   "qrLink": {
+    "type": "string",
+    "description": "QR Link"
+   },
+   "kiosk": {
+    "type": "string",
+    "description": "Kiosk"
+   },
+   "posFrontDesk": {
+    "type": "string",
+    "description": "POS/Front Desk"
+   },
+   "groupPortal": {
+    "type": "string",
+    "description": "Group Portal"
+   },
+   "keyboardNavigation": {
+    "type": "string",
+    "description": "Keyboard navigation"
+   },
+   "screenReaderCompatibleLabels": {
+    "type": "string",
+    "description": "Screen-reader compatible labels"
+   },
+   "appropriateContrast": {
+    "type": "string",
+    "description": "Appropriate contrast"
+   },
+   "clearValidationMessages": {
+    "type": "string",
+    "description": "Clear validation messages"
+   },
+   "responsiveLayouts": {
+    "type": "string",
+    "description": "Responsive layouts"
+   }
+  }
+ },
+ "ProductEventExperienceAssociationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Product, Event & Experience Association displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "ticketType": {
+    "type": "string",
+    "description": "Ticket Type"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "performance": {
+    "type": "string",
+    "description": "Performance"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "activity": {
+    "type": "string",
+    "description": "Activity"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "camp": {
+    "type": "string",
+    "description": "Camp"
+   },
+   "rental": {
+    "type": "string",
+    "description": "Rental"
+   },
+   "resource": {
+    "type": "string",
+    "description": "Resource"
+   },
+   "package": {
+    "type": "string",
+    "description": "Package"
+   },
+   "addOn": {
+    "type": "string",
+    "description": "Add-On"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "activityLiabilityWaiver": {
+    "type": "string",
+    "description": "Activity Liability Waiver"
+   },
+   "safetyAcknowledgement": {
+    "type": "string",
+    "description": "Safety Acknowledgement"
+   },
+   "parentGuardianConsent": {
+    "type": "boolean",
+    "description": "Parent/Guardian Consent"
+   },
+   "mandatory": {
+    "type": "string",
+    "description": "Mandatory"
+   },
+   "optional": {
+    "type": "string",
+    "description": "Optional"
+   },
+   "conditional": {
+    "type": "string",
+    "description": "Conditional"
+   },
+   "informational": {
+    "type": "string",
+    "description": "Informational"
+   },
+   "automaticallyInheritedByApplicableActivities": {
+    "type": "string",
+    "description": "Automatically inherited by applicable activities"
+   },
+   "products": {
+    "type": "string",
+    "description": "Products"
+   },
+   "futureBookings": {
+    "type": "string",
+    "description": "Future bookings"
+   },
+   "tickets": {
+    "type": "string",
+    "description": "Tickets"
+   },
+   "participants": {
+    "type": "string",
+    "description": "Participants"
+   },
+   "events": {
+    "type": "string",
+    "description": "Events"
+   }
+  }
+ },
+ "SignatorySignatureGuardianRuleConfigurationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Signatory, Signature & Guardian Rule Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "ticketHolder": {
+    "type": "string",
+    "description": "Ticket Holder"
+   },
+   "purchaser": {
+    "type": "string",
+    "description": "Purchaser"
+   },
+   "participant": {
+    "type": "string",
+    "description": "Participant"
+   },
+   "parent": {
+    "type": "string",
+    "description": "Parent"
+   },
+   "legalGuardian": {
+    "type": "string",
+    "description": "Legal Guardian"
+   },
+   "groupLeader": {
+    "type": "string",
+    "description": "Group Leader"
+   },
+   "corporateRepresentative": {
+    "type": "string",
+    "description": "Corporate Representative"
+   },
+   "member": {
+    "type": "string",
+    "description": "Member"
+   },
+   "rentalCustomer": {
+    "type": "string",
+    "description": "Rental Customer"
+   },
+   "otherAuthorizedSignatory": {
+    "type": "string",
+    "description": "Other Authorized Signatory"
+   },
+   "signatureRequired": {
+    "type": "boolean",
+    "description": "Signature Required"
+   },
+   "initialsRequired": {
+    "type": "boolean",
+    "description": "Initials Required"
+   },
+   "typedAcceptance": {
+    "type": "string",
+    "description": "Typed Acceptance"
+   },
+   "checkboxAcceptance": {
+    "type": "string",
+    "description": "Checkbox Acceptance"
+   },
+   "digitalSignature": {
+    "type": "string",
+    "description": "Digital Signature"
+   },
+   "dateTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date/Time"
+   },
+   "signatoryName": {
+    "type": "string",
+    "description": "Signatory Name"
+   },
+   "relationship": {
+    "type": "string",
+    "description": "Relationship"
+   },
+   "identityVerificationWhereRequired": {
+    "type": "boolean",
+    "description": "Identity Verification where required"
+   },
+   "participantGuardian": {
+    "type": "string",
+    "description": "Participant + Guardian"
+   },
+   "customerAuthorizedRepresentative": {
+    "type": "string",
+    "description": "Customer + Authorized Representative"
+   },
+   "eachParticipantSignsIndividually": {
+    "type": "string",
+    "description": "Each participant signs individually"
+   },
+   "guardianSignsForEachMinor": {
+    "type": "string",
+    "description": "Guardian signs for each minor"
+   },
+   "timestamp": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Timestamp"
+   },
+   "waiverVersion": {
+    "type": "string",
+    "description": "Waiver Version"
+   },
+   "signatory": {
+    "type": "string",
+    "description": "Signatory"
+   },
+   "authenticationMethod": {
+    "type": "string",
+    "description": "Authentication Method"
+   },
+   "relevantTransactionCustomerReference": {
+    "type": "string",
+    "description": "Relevant transaction/customer reference"
+   },
+   "consentEvidence": {
+    "type": "string",
+    "description": "Consent evidence"
+   },
+   "organizationSLegalComplianceApproval": {
+    "type": "string",
+    "description": "organization's legal/compliance approval"
+   }
+  }
+ },
+ "SignatorySignatureGuardianRuleConfigurationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Signatory, Signature & Guardian Rule Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "ticketHolder": {
+    "type": "string",
+    "description": "Ticket Holder"
+   },
+   "purchaser": {
+    "type": "string",
+    "description": "Purchaser"
+   },
+   "participant": {
+    "type": "string",
+    "description": "Participant"
+   },
+   "parent": {
+    "type": "string",
+    "description": "Parent"
+   },
+   "legalGuardian": {
+    "type": "string",
+    "description": "Legal Guardian"
+   },
+   "groupLeader": {
+    "type": "string",
+    "description": "Group Leader"
+   },
+   "corporateRepresentative": {
+    "type": "string",
+    "description": "Corporate Representative"
+   },
+   "member": {
+    "type": "string",
+    "description": "Member"
+   },
+   "rentalCustomer": {
+    "type": "string",
+    "description": "Rental Customer"
+   },
+   "otherAuthorizedSignatory": {
+    "type": "string",
+    "description": "Other Authorized Signatory"
+   },
+   "signatureRequired": {
+    "type": "boolean",
+    "description": "Signature Required"
+   },
+   "initialsRequired": {
+    "type": "boolean",
+    "description": "Initials Required"
+   },
+   "typedAcceptance": {
+    "type": "string",
+    "description": "Typed Acceptance"
+   },
+   "checkboxAcceptance": {
+    "type": "string",
+    "description": "Checkbox Acceptance"
+   },
+   "digitalSignature": {
+    "type": "string",
+    "description": "Digital Signature"
+   },
+   "dateTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date/Time"
+   },
+   "signatoryName": {
+    "type": "string",
+    "description": "Signatory Name"
+   },
+   "relationship": {
+    "type": "string",
+    "description": "Relationship"
+   },
+   "identityVerificationWhereRequired": {
+    "type": "boolean",
+    "description": "Identity Verification where required"
+   },
+   "participantGuardian": {
+    "type": "string",
+    "description": "Participant + Guardian"
+   },
+   "customerAuthorizedRepresentative": {
+    "type": "string",
+    "description": "Customer + Authorized Representative"
+   },
+   "eachParticipantSignsIndividually": {
+    "type": "string",
+    "description": "Each participant signs individually"
+   },
+   "guardianSignsForEachMinor": {
+    "type": "string",
+    "description": "Guardian signs for each minor"
+   },
+   "timestamp": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Timestamp"
+   },
+   "waiverVersion": {
+    "type": "string",
+    "description": "Waiver Version"
+   },
+   "signatory": {
+    "type": "string",
+    "description": "Signatory"
+   },
+   "authenticationMethod": {
+    "type": "string",
+    "description": "Authentication Method"
+   },
+   "relevantTransactionCustomerReference": {
+    "type": "string",
+    "description": "Relevant transaction/customer reference"
+   },
+   "consentEvidence": {
+    "type": "string",
+    "description": "Consent evidence"
+   },
+   "organizationSLegalComplianceApproval": {
+    "type": "string",
+    "description": "organization's legal/compliance approval"
+   }
+  }
+ },
+ "VersioningEffectiveDatesLegalChangeControlView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Versioning, Effective Dates & Legal Change Control displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "v10": {
+    "type": "string",
+    "description": "v1.0"
+   },
+   "v11": {
+    "type": "string",
+    "description": "v1.1"
+   },
+   "v20": {
+    "type": "string",
+    "description": "v2.0"
+   },
+   "versionNumber": {
+    "type": "string",
+    "description": "Version Number"
+   },
+   "createdBy": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Created By"
+   },
+   "createdDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Created Date"
+   },
+   "changeReason": {
+    "type": "string",
+    "description": "Change Reason"
+   },
+   "legalReviewer": {
+    "type": "string",
+    "description": "Legal Reviewer"
+   },
+   "approval": {
+    "type": "string",
+    "description": "Approval"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "description": "Effective To"
+   },
+   "previousVersionNewVersion": {
+    "type": "string",
+    "description": "Previous Version ↔ New Version"
+   },
+   "addedText": {
+    "type": "string",
+    "description": "Added text"
+   },
+   "removedText": {
+    "type": "string",
+    "description": "Removed text"
+   },
+   "changedQuestions": {
+    "type": "string",
+    "description": "Changed questions"
+   },
+   "changedSignatoryRules": {
+    "type": "string",
+    "description": "Changed signatory rules"
+   },
+   "changedAssociations": {
+    "type": "string",
+    "description": "Changed associations"
+   }
+  }
+ },
+ "WaiverApprovalTestingPublicationWorkspaceInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Waiver Approval, Testing & Publication Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "requiredLegalTextPresent": {
+    "type": "string",
+    "description": "Required legal text present"
+   },
+   "requiredFieldsConfigured": {
+    "type": "string",
+    "description": "Required fields configured"
+   },
+   "conditionalRulesValid": {
+    "type": "string",
+    "description": "Conditional rules valid"
+   },
+   "signatureRulesConfigured": {
+    "type": "string",
+    "description": "Signature rules configured"
+   },
+   "productsEventsAssigned": {
+    "type": "string",
+    "description": "Products/events assigned"
+   },
+   "completionRulesConfigured": {
+    "type": "string",
+    "description": "Completion rules configured"
+   },
+   "requiredTranslationsApproved": {
+    "type": "string",
+    "description": "Required translations approved"
+   },
+   "effectiveDatesValid": {
+    "type": "string",
+    "description": "Effective dates valid"
+   },
+   "activityWaiver": {
+    "type": "string",
+    "description": "✓ Activity Waiver"
+   },
+   "guardianConsent": {
+    "type": "boolean",
+    "description": "✓ Guardian Consent"
+   },
+   "guardianSignature": {
+    "type": "string",
+    "description": "✓ Guardian Signature"
+   },
+   "adultDeclaration": {
+    "type": "string",
+    "description": "✕ Adult Declaration"
+   },
+   "controlledRollout": {
+    "type": "string",
+    "description": "Controlled Rollout"
+   },
+   "submittedBy": {
+    "type": "string",
+    "description": "Submitted By"
+   },
+   "reviewedBy": {
+    "type": "string",
+    "description": "Reviewed By"
+   },
+   "approvedBy": {
+    "type": "integer",
+    "description": "Approved By"
+   },
+   "publishedBy": {
+    "type": "string",
+    "description": "Published By"
+   },
+   "dates": {
+    "type": "string",
+    "description": "Dates"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version"
+   },
+   "comments": {
+    "type": "string",
+    "description": "Comments"
+   },
+   "configuration": {
+    "type": "string",
+    "description": "configuration"
+   },
+   "enforced": {
+    "type": "string",
+    "description": "enforced"
+   },
+   "insideTicketingOrTicketMedia": {
+    "type": "string",
+    "description": "inside Ticketing or Ticket Media"
+   },
+   "multipleInconsistentWaiverImplementations": {
+    "type": "string",
+    "description": "multiple inconsistent waiver implementations"
+   },
+   "ai": {
+    "type": "string",
+    "description": "& AI"
+   }
+  }
+ },
+ "WaiverApprovalTestingPublicationWorkspaceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Waiver Approval, Testing & Publication Workspace displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "requiredLegalTextPresent": {
+    "type": "string",
+    "description": "Required legal text present"
+   },
+   "requiredFieldsConfigured": {
+    "type": "string",
+    "description": "Required fields configured"
+   },
+   "conditionalRulesValid": {
+    "type": "string",
+    "description": "Conditional rules valid"
+   },
+   "signatureRulesConfigured": {
+    "type": "string",
+    "description": "Signature rules configured"
+   },
+   "productsEventsAssigned": {
+    "type": "string",
+    "description": "Products/events assigned"
+   },
+   "completionRulesConfigured": {
+    "type": "string",
+    "description": "Completion rules configured"
+   },
+   "requiredTranslationsApproved": {
+    "type": "string",
+    "description": "Required translations approved"
+   },
+   "effectiveDatesValid": {
+    "type": "string",
+    "description": "Effective dates valid"
+   },
+   "activityWaiver": {
+    "type": "string",
+    "description": "✓ Activity Waiver"
+   },
+   "guardianConsent": {
+    "type": "boolean",
+    "description": "✓ Guardian Consent"
+   },
+   "guardianSignature": {
+    "type": "string",
+    "description": "✓ Guardian Signature"
+   },
+   "adultDeclaration": {
+    "type": "string",
+    "description": "✕ Adult Declaration"
+   },
+   "controlledRollout": {
+    "type": "string",
+    "description": "Controlled Rollout"
+   },
+   "submittedBy": {
+    "type": "string",
+    "description": "Submitted By"
+   },
+   "reviewedBy": {
+    "type": "string",
+    "description": "Reviewed By"
+   },
+   "approvedBy": {
+    "type": "integer",
+    "description": "Approved By"
+   },
+   "publishedBy": {
+    "type": "string",
+    "description": "Published By"
+   },
+   "dates": {
+    "type": "string",
+    "description": "Dates"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version"
+   },
+   "comments": {
+    "type": "string",
+    "description": "Comments"
+   },
+   "configuration": {
+    "type": "string",
+    "description": "configuration"
+   },
+   "enforced": {
+    "type": "string",
+    "description": "enforced"
+   },
+   "insideTicketingOrTicketMedia": {
+    "type": "string",
+    "description": "inside Ticketing or Ticket Media"
+   },
+   "multipleInconsistentWaiverImplementations": {
+    "type": "string",
+    "description": "multiple inconsistent waiver implementations"
+   },
+   "ai": {
+    "type": "string",
+    "description": "& AI"
+   }
+  }
+ },
+ "WaiverConsentCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Waiver & Consent Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "totalTemplates": {
+    "type": "integer",
+    "description": "Total Templates"
+   },
+   "published": {
+    "type": "string",
+    "description": "Published"
+   },
+   "draft": {
+    "type": "string",
+    "description": "Draft"
+   },
+   "pendingApproval": {
+    "type": "integer",
+    "description": "Pending Approval"
+   },
+   "scheduled": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Scheduled"
+   },
+   "expiring": {
+    "type": "string",
+    "description": "Expiring"
+   },
+   "archived": {
+    "type": "string",
+    "description": "Archived"
+   },
+   "productsRequiringWaiver": {
+    "type": "string",
+    "description": "Products Requiring Waiver"
+   },
+   "activeWaiverVersions": {
+    "type": "integer",
+    "description": "Active Waiver Versions"
+   },
+   "waiversRequiringReview": {
+    "type": "string",
+    "description": "Waivers Requiring Review"
+   },
+   "waiverId": {
+    "type": "string",
+    "description": "Waiver ID"
+   },
+   "waiverName": {
+    "type": "string",
+    "description": "Waiver Name"
+   },
+   "type": {
+    "type": "string",
+    "description": "Type"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version"
+   },
+   "language": {
+    "type": "string",
+    "description": "Language"
+   },
+   "associatedProducts": {
+    "type": "string",
+    "description": "Associated Products"
+   },
+   "signatoryType": {
+    "type": "string",
+    "description": "Signatory Type"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "description": "Effective To"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "lastModified": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last Modified"
+   },
+   "liabilityWaiver": {
+    "type": "string",
+    "description": "Liability Waiver"
+   },
+   "parentGuardianConsent": {
+    "type": "boolean",
+    "description": "Parent/Guardian Consent"
+   },
+   "participationConsent": {
+    "type": "boolean",
+    "description": "Participation Consent"
+   },
+   "medicalDeclaration": {
+    "type": "string",
+    "description": "Medical Declaration"
+   },
+   "safetyAcknowledgement": {
+    "type": "string",
+    "description": "Safety Acknowledgement"
+   },
+   "mediaConsent": {
+    "type": "boolean",
+    "description": "Media Consent"
+   },
+   "rentalAgreement": {
+    "type": "string",
+    "description": "Rental Agreement"
+   },
+   "termsAcceptance": {
+    "type": "string",
+    "description": "Terms Acceptance"
+   },
+   "membershipDeclaration": {
+    "type": "string",
+    "description": "Membership Declaration"
+   },
+   "customForm": {
+    "type": "string",
+    "description": "Custom Form"
+   },
+   "preview": {
+    "type": "string",
+    "description": "Preview"
+   },
+   "test": {
+    "type": "string",
+    "description": "Test"
+   }
+  }
+ },
+ "WaiverTemplateLibraryMasterSetupView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Waiver Template Library & Master Setup displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "waiverId": {
+    "type": "string",
+    "description": "Waiver ID"
+   },
+   "waiverName": {
+    "type": "string",
+    "description": "Waiver Name"
+   },
+   "internalDescription": {
+    "type": "string",
+    "description": "Internal Description"
+   },
+   "waiverType": {
+    "type": "string",
+    "description": "Waiver Type"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "department": {
+    "type": "string",
+    "description": "Department"
+   },
+   "brand": {
+    "type": "string",
+    "description": "Brand"
+   },
+   "legalEntity": {
+    "type": "string",
+    "description": "Legal Entity"
+   },
+   "defaultLanguage": {
+    "type": "string",
+    "description": "Default Language"
+   },
+   "applicableCountry": {
+    "type": "string",
+    "description": "Applicable Country"
+   },
+   "applicableJurisdiction": {
+    "type": "string",
+    "description": "Applicable Jurisdiction"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status"
+   },
+   "useMasterTemplate": {
+    "type": "string",
+    "description": "Use Master Template"
+   },
+   "businessOwner": {
+    "type": "string",
+    "description": "Business Owner"
+   },
+   "legalReviewer": {
+    "type": "string",
+    "description": "Legal Reviewer"
+   },
+   "complianceOwner": {
+    "type": "string",
+    "description": "Compliance Owner"
+   },
+   "operationalOwner": {
+    "type": "string",
+    "description": "Operational Owner"
+   }
+  }
+ },
+ "WaiverTriggerEligibilityCompletionRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Waiver Trigger, Eligibility & Completion Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "duringCheckout": {
+    "type": "string",
+    "description": "During Checkout"
+   },
+   "afterPurchase": {
+    "type": "string",
+    "description": "After Purchase"
+   },
+   "beforeTicketIssuance": {
+    "type": "string",
+    "description": "Before Ticket Issuance"
+   },
+   "beforeTicketDownload": {
+    "type": "string",
+    "description": "Before Ticket Download"
+   },
+   "beforeEvent": {
+    "type": "string",
+    "description": "Before Event"
+   },
+   "beforeCheckIn": {
+    "type": "string",
+    "description": "Before Check-In"
+   },
+   "beforeAccess": {
+    "type": "string",
+    "description": "Before Access"
+   },
+   "beforeEquipmentCollection": {
+    "type": "string",
+    "description": "Before Equipment Collection"
+   },
+   "beforeMembershipActivation": {
+    "type": "string",
+    "description": "Before Membership Activation"
+   },
+   "beforeActivityStart": {
+    "type": "string",
+    "description": "Before Activity Start"
+   },
+   "age": {
+    "type": "string",
+    "description": "Age"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "activity": {
+    "type": "string",
+    "description": "Activity"
+   },
+   "customerType": {
+    "type": "string",
+    "description": "Customer Type"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "country": {
+    "type": "string",
+    "description": "Country"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "participantType": {
+    "type": "string",
+    "description": "Participant Type"
+   },
+   "bookingType": {
+    "type": "string",
+    "description": "Booking Type"
+   },
+   "immediately": {
+    "type": "string",
+    "description": "Immediately"
+   },
+   "beforeTicketRelease": {
+    "type": "string",
+    "description": "Before Ticket Release"
+   },
+   "xHoursBeforeEvent": {
+    "type": "string",
+    "description": "X hours before event"
+   },
+   "xDaysBeforeVisit": {
+    "type": "string",
+    "description": "X days before visit"
+   },
+   "beforeArrival": {
+    "type": "string",
+    "description": "Before arrival"
+   },
+   "warnsOnly": {
+    "type": "string",
+    "description": "Warns only"
+   },
+   "blocksTicketDownload": {
+    "type": "string",
+    "description": "Blocks Ticket Download"
+   },
+   "blocksTicketActivation": {
+    "type": "string",
+    "description": "Blocks Ticket Activation"
+   },
+   "blocksCheckIn": {
+    "type": "string",
+    "description": "Blocks Check-In"
+   },
+   "blocksAccess": {
+    "type": "string",
+    "description": "Blocks Access"
+   },
+   "requiresStaffOverride": {
+    "type": "string",
+    "description": "Requires Staff Override"
+   },
+   "t7Days": {
+    "type": "string",
+    "description": "T−7 days"
+   },
+   "t3Days": {
+    "type": "string",
+    "description": "T−3 days"
+   },
+   "t24Hours": {
+    "type": "string",
+    "description": "T−24 hours"
+   }
+  }
+ }
+}

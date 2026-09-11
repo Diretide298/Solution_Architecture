@@ -1,0 +1,1201 @@
+{
+ "Member360MembershipAccountWorkspaceInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Member 360° Membership Account Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "payments": {
+    "type": "string",
+    "description": "Payments"
+   },
+   "renewals": {
+    "type": "string",
+    "description": "Renewals"
+   },
+   "upgrades": {
+    "type": "string",
+    "description": "Upgrades"
+   },
+   "refunds": {
+    "type": "string",
+    "description": "Refunds"
+   },
+   "membershipChanges": {
+    "type": "string",
+    "description": "Membership Changes"
+   },
+   "renew": {
+    "type": "string",
+    "description": "Renew"
+   },
+   "manageDependents": {
+    "type": "string",
+    "description": "Manage Dependents"
+   }
+  }
+ },
+ "Member360MembershipAccountWorkspaceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Member 360° Membership Account Workspace displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "memberName": {
+    "type": "string",
+    "description": "Member Name"
+   },
+   "customerId": {
+    "type": "string",
+    "description": "Customer ID"
+   },
+   "membershipId": {
+    "type": "string",
+    "description": "Membership ID"
+   },
+   "membershipProduct": {
+    "type": "string",
+    "description": "Membership Product"
+   },
+   "tier": {
+    "type": "string",
+    "description": "Tier"
+   },
+   "status": {
+    "type": "integer",
+    "description": "Status"
+   },
+   "activationDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Activation Date"
+   },
+   "expiryDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry Date"
+   },
+   "renewalStatus": {
+    "type": "integer",
+    "description": "Renewal Status"
+   },
+   "primaryVenue": {
+    "type": "string",
+    "description": "Primary Venue"
+   },
+   "credentialStatus": {
+    "type": "integer",
+    "description": "Credential Status"
+   },
+   "primaryMember": {
+    "type": "string",
+    "description": "Primary Member"
+   },
+   "secondaryAdult": {
+    "type": "string",
+    "description": "Secondary Adult"
+   },
+   "dependents": {
+    "type": "integer",
+    "description": "Dependents"
+   },
+   "sharedBenefits": {
+    "type": "integer",
+    "description": "Shared Benefits"
+   },
+   "individualBenefits": {
+    "type": "integer",
+    "description": "Individual Benefits"
+   },
+   "membershipVersion": {
+    "type": "string",
+    "description": "Membership Version"
+   },
+   "purchaseDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Purchase Date"
+   },
+   "purchaseChannel": {
+    "type": "string",
+    "description": "Purchase Channel"
+   },
+   "originalOrder": {
+    "type": "string",
+    "description": "Original Order"
+   },
+   "validity": {
+    "type": "string",
+    "description": "Validity"
+   },
+   "activationMethod": {
+    "type": "string",
+    "description": "Activation Method"
+   },
+   "renewalPolicy": {
+    "type": "string",
+    "description": "Renewal Policy"
+   },
+   "autoRenewStatus": {
+    "type": "integer",
+    "description": "Auto-Renew Status"
+   },
+   "fBBenefit": {
+    "type": "string",
+    "description": "F&B Benefit (the pack shows 10%)"
+   },
+   "retailBenefit": {
+    "type": "string",
+    "description": "Retail Benefit (the pack shows 10%)"
+   },
+   "payments": {
+    "type": "string",
+    "description": "Payments"
+   },
+   "renewals": {
+    "type": "string",
+    "description": "Renewals"
+   },
+   "upgrades": {
+    "type": "string",
+    "description": "Upgrades"
+   },
+   "refunds": {
+    "type": "string",
+    "description": "Refunds"
+   },
+   "membershipChanges": {
+    "type": "string",
+    "description": "Membership Changes"
+   },
+   "renew": {
+    "type": "string",
+    "description": "Renew"
+   },
+   "manageDependents": {
+    "type": "string",
+    "description": "Manage Dependents"
+   }
+  }
+ },
+ "MemberExceptionsOverridesServiceRecoveryView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Member Exceptions, Overrides & Service Recovery displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "eligibilityOverride": {
+    "type": "string",
+    "description": "Eligibility Override"
+   },
+   "activationExtension": {
+    "type": "string",
+    "description": "Activation Extension"
+   },
+   "expiryExtension": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry Extension"
+   },
+   "complimentaryRenewal": {
+    "type": "string",
+    "description": "Complimentary Renewal"
+   },
+   "complimentaryBenefit": {
+    "type": "string",
+    "description": "Complimentary Benefit"
+   },
+   "entitlementAdjustment": {
+    "type": "string",
+    "description": "Entitlement Adjustment"
+   },
+   "suspensionOverride": {
+    "type": "string",
+    "description": "Suspension Override"
+   },
+   "replacementCredential": {
+    "type": "string",
+    "description": "Replacement Credential"
+   },
+   "renewalException": {
+    "type": "string",
+    "description": "Renewal Exception"
+   },
+   "dependentException": {
+    "type": "string",
+    "description": "Dependent Exception"
+   },
+   "member": {
+    "type": "string",
+    "description": "Member"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "requestedAction": {
+    "type": "string",
+    "description": "Requested Action"
+   },
+   "standardPolicyResult": {
+    "type": "string",
+    "description": "Standard Policy Result"
+   },
+   "requestedException": {
+    "type": "string",
+    "description": "Requested Exception"
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason"
+   },
+   "supportingDocumentation": {
+    "type": "string",
+    "description": "Supporting Documentation"
+   },
+   "financialImpact": {
+    "type": "string",
+    "description": "Financial Impact"
+   },
+   "entitlementImpact": {
+    "type": "string",
+    "description": "Entitlement Impact"
+   },
+   "requestor": {
+    "type": "string",
+    "description": "Requestor"
+   },
+   "exceptionType": {
+    "type": "string",
+    "description": "Exception Type"
+   },
+   "value": {
+    "type": "string",
+    "description": "Value"
+   },
+   "duration": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Duration"
+   },
+   "membershipTier": {
+    "type": "string",
+    "description": "Membership Tier"
+   }
+  }
+ },
+ "MemberLifecycleHistoryAuditCaseTimelineView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Member Lifecycle History, Audit & Case Timeline displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "purchase": {
+    "type": "string",
+    "description": "Purchase"
+   },
+   "assignment": {
+    "type": "string",
+    "description": "Assignment"
+   },
+   "activation": {
+    "type": "string",
+    "description": "Activation"
+   },
+   "visits": {
+    "type": "integer",
+    "description": "Visits"
+   },
+   "benefitUsage": {
+    "type": "string",
+    "description": "Benefit Usage"
+   },
+   "dependentChanges": {
+    "type": "integer",
+    "description": "Dependent Changes"
+   },
+   "credentialChanges": {
+    "type": "integer",
+    "description": "Credential Changes"
+   },
+   "suspension": {
+    "type": "string",
+    "description": "Suspension"
+   },
+   "reactivation": {
+    "type": "string",
+    "description": "Reactivation"
+   },
+   "renewal": {
+    "type": "string",
+    "description": "Renewal"
+   },
+   "exceptions": {
+    "type": "integer",
+    "description": "Exceptions"
+   },
+   "expiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry"
+   },
+   "cancellation": {
+    "type": "string",
+    "description": "Cancellation"
+   },
+   "forConfigurationSensitiveMemberChangesCapture": {
+    "type": "string",
+    "description": "For configuration-sensitive member changes capture"
+   },
+   "previousValueNewValue": {
+    "type": "string",
+    "description": "Previous Value → New Value"
+   },
+   "serviceRecovery": {
+    "type": "string",
+    "description": "Service Recovery"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "agent": {
+    "type": "string",
+    "description": "Agent"
+   },
+   "manager": {
+    "type": "string",
+    "description": "Manager"
+   },
+   "system": {
+    "type": "string",
+    "description": "System"
+   },
+   "api": {
+    "type": "string",
+    "description": "API"
+   },
+   "integration": {
+    "type": "string",
+    "description": "Integration"
+   },
+   "order": {
+    "type": "string",
+    "description": "Order"
+   },
+   "payment": {
+    "type": "string",
+    "description": "Payment"
+   },
+   "ticket": {
+    "type": "string",
+    "description": "Ticket"
+   },
+   "reservation": {
+    "type": "string",
+    "description": "Reservation"
+   },
+   "accessEvent": {
+    "type": "string",
+    "description": "Access Event"
+   },
+   "approval": {
+    "type": "string",
+    "description": "Approval"
+   },
+   "case": {
+    "type": "string",
+    "description": "Case"
+   },
+   "credential": {
+    "type": "string",
+    "description": "Credential"
+   },
+   "events": {
+    "type": "string",
+    "description": "events"
+   },
+   "customerService": {
+    "type": "string",
+    "description": "Customer Service"
+   },
+   "finance": {
+    "type": "string",
+    "description": "Finance"
+   },
+   "audit": {
+    "type": "string",
+    "description": "Audit"
+   },
+   "compliance": {
+    "type": "string",
+    "description": "Compliance"
+   },
+   "management": {
+    "type": "string",
+    "description": "Management"
+   }
+  }
+ },
+ "MemberOperationsCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Member Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "activeMembers": {
+    "type": "integer",
+    "description": "Active Members"
+   },
+   "newMembersToday": {
+    "type": "integer",
+    "description": "New Members Today"
+   },
+   "activatedToday": {
+    "type": "string",
+    "description": "Activated Today"
+   },
+   "pendingActivation": {
+    "type": "integer",
+    "description": "Pending Activation"
+   },
+   "expiringIn30Days": {
+    "type": "string",
+    "description": "Expiring in 30 Days"
+   },
+   "renewalDue": {
+    "type": "string",
+    "description": "Renewal Due"
+   },
+   "renewedThisMonth": {
+    "type": "string",
+    "description": "Renewed This Month"
+   },
+   "renewalRate": {
+    "type": "number",
+    "description": "Renewal Rate"
+   },
+   "suspendedMemberships": {
+    "type": "integer",
+    "description": "Suspended Memberships"
+   },
+   "frozenMemberships": {
+    "type": "integer",
+    "description": "Frozen Memberships"
+   },
+   "membershipExceptions": {
+    "type": "integer",
+    "description": "Membership Exceptions"
+   },
+   "atRiskMembers": {
+    "type": "integer",
+    "description": "At-Risk Members"
+   },
+   "membershipId": {
+    "type": "string",
+    "description": "Membership ID"
+   },
+   "member": {
+    "type": "string",
+    "description": "Member"
+   },
+   "membershipProduct": {
+    "type": "string",
+    "description": "Membership Product"
+   },
+   "tier": {
+    "type": "string",
+    "description": "Tier"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "activationDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Activation Date"
+   },
+   "expiryDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry Date"
+   },
+   "membershipStatus": {
+    "type": "integer",
+    "description": "Membership Status"
+   },
+   "usageLevel": {
+    "type": "string",
+    "description": "Usage Level"
+   },
+   "renewalStatus": {
+    "type": "integer",
+    "description": "Renewal Status"
+   },
+   "outstandingIssue": {
+    "type": "string",
+    "description": "Outstanding Issue"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   }
+  }
+ },
+ "MembershipActivationAssignmentCredentialManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Membership Activation, Assignment & Credential Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "awaitingMemberAssignment": {
+    "type": "string",
+    "description": "Awaiting Member Assignment"
+   },
+   "awaitingIdentityVerification": {
+    "type": "string",
+    "description": "Awaiting Identity Verification"
+   },
+   "awaitingDocumentVerification": {
+    "type": "string",
+    "description": "Awaiting Document Verification"
+   },
+   "awaitingActivation": {
+    "type": "string",
+    "description": "Awaiting Activation"
+   },
+   "activationFailed": {
+    "type": "integer",
+    "description": "Activation Failed"
+   },
+   "eligibility": {
+    "type": "string",
+    "description": "Eligibility"
+   },
+   "age": {
+    "type": "string",
+    "description": "Age"
+   },
+   "residency": {
+    "type": "string",
+    "description": "Residency"
+   },
+   "identity": {
+    "type": "string",
+    "description": "Identity"
+   },
+   "photograph": {
+    "type": "string",
+    "description": "Photograph"
+   },
+   "requiredDocuments": {
+    "type": "string",
+    "description": "Required Documents"
+   },
+   "dependentRelationship": {
+    "type": "string",
+    "description": "Dependent Relationship"
+   },
+   "termsAcceptance": {
+    "type": "string",
+    "description": "Terms Acceptance"
+   },
+   "purchaseDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Purchase Date"
+   },
+   "eligibleActivationDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Eligible Activation Date"
+   },
+   "activationDeadline": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Activation Deadline"
+   },
+   "selectedStartDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Selected Start Date"
+   },
+   "calculatedExpiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Calculated Expiry"
+   },
+   "activationMethod": {
+    "type": "string",
+    "description": "Activation Method"
+   },
+   "dynamicQr": {
+    "type": "string",
+    "description": "Dynamic QR"
+   },
+   "barcode": {
+    "type": "string",
+    "description": "Barcode"
+   },
+   "rfid": {
+    "type": "string",
+    "description": "RFID"
+   },
+   "nfc": {
+    "type": "string",
+    "description": "NFC"
+   },
+   "digitalMembershipCard": {
+    "type": "string",
+    "description": "Digital Membership Card"
+   },
+   "walletPass": {
+    "type": "string",
+    "description": "Wallet Pass"
+   },
+   "physicalCard": {
+    "type": "string",
+    "description": "Physical Card"
+   },
+   "reason": {
+    "type": "string",
+    "enum": [
+     "eligibilityFailed",
+     "missingDocumentation",
+     "duplicateMembership",
+     "credentialFailure",
+     "configurationIssue"
+    ],
+    "description": "Vocabulary listed under Record reason."
+   }
+  }
+ },
+ "MembershipAnalyticsRenewalIntelligenceAiRetentionCenView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Membership Analytics, Renewal Intelligence & AI Retention Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "activeMembers": {
+    "type": "integer",
+    "description": "Active Members"
+   },
+   "newMemberships": {
+    "type": "integer",
+    "description": "New Memberships"
+   },
+   "renewalRate": {
+    "type": "number",
+    "description": "Renewal Rate"
+   },
+   "churnRate": {
+    "type": "number",
+    "description": "Churn Rate"
+   },
+   "autoRenewSuccess": {
+    "type": "string",
+    "description": "Auto-Renew Success"
+   },
+   "averageMembershipTenure": {
+    "type": "number",
+    "description": "Average Membership Tenure"
+   },
+   "averageVisitsPerMember": {
+    "type": "number",
+    "description": "Average Visits per Member"
+   },
+   "revenuePerMember": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue per Member"
+   },
+   "membershipUtilization": {
+    "type": "number",
+    "description": "Membership Utilization"
+   },
+   "benefitUtilization": {
+    "type": "number",
+    "description": "Benefit Utilization"
+   },
+   "freezeSuspensionRate": {
+    "type": "number",
+    "description": "Freeze/Suspension Rate"
+   },
+   "visits": {
+    "type": "string",
+    "description": "Visits"
+   },
+   "benefitUsage": {
+    "type": "string",
+    "description": "Benefit Usage"
+   },
+   "guestTicketUsage": {
+    "type": "string",
+    "description": "Guest Ticket Usage"
+   },
+   "reservationBehavior": {
+    "type": "string",
+    "description": "Reservation Behavior"
+   },
+   "complaintsExceptions": {
+    "type": "string",
+    "description": "Complaints/Exceptions"
+   },
+   "renewal": {
+    "type": "string",
+    "description": "Renewal"
+   },
+   "visitsDown58": {
+    "type": "number",
+    "description": "Visits down 58%"
+   },
+   "noVisitsIn90Days": {
+    "type": "string",
+    "description": "No visits in 90 days"
+   },
+   "twoUnusedGuestBenefits": {
+    "type": "string",
+    "description": "Two unused guest benefits"
+   },
+   "previousRenewalOccurredLate": {
+    "type": "string",
+    "description": "Previous renewal occurred late"
+   },
+   "membershipExpiresIn21Days": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Membership expires in 21 days"
+   },
+   "expectedRenewals": {
+    "type": "string",
+    "description": "Expected Renewals"
+   },
+   "expectedChurn": {
+    "type": "string",
+    "description": "Expected Churn"
+   },
+   "renewalRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Renewal Revenue"
+   },
+   "membershipBaseGrowth": {
+    "type": "string",
+    "description": "Membership Base Growth"
+   },
+   "spend": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "spend?”"
+   },
+   "confidence": {
+    "type": "string",
+    "description": "Confidence"
+   },
+   "keyDrivers": {
+    "type": "string",
+    "description": "Key Drivers"
+   },
+   "modelVersion": {
+    "type": "string",
+    "description": "Model Version"
+   },
+   "dataFreshness": {
+    "type": "string",
+    "description": "Data Freshness"
+   },
+   "member360MembershipAccountWorkspace": {
+    "type": "string",
+    "description": "Member 360° Membership Account Workspace"
+   },
+   "backendScreenCoreResponsibility": {
+    "type": "string",
+    "description": "# Backend Screen Core Responsibility"
+   },
+   "entitlements": {
+    "type": "string",
+    "description": "entitlements"
+   }
+  }
+ },
+ "MembershipFreezeSuspensionReactivationManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Membership Freeze, Suspension & Reactivation Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "reactivate": {
+    "type": "string",
+    "description": "Reactivate"
+   },
+   "administrativeHold": {
+    "type": "string",
+    "description": "Administrative Hold"
+   },
+   "policy": {
+    "type": "string",
+    "description": "policy"
+   },
+   "otherGovernedReason": {
+    "type": "string",
+    "description": "other governed reason"
+   },
+   "startDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Start Date"
+   },
+   "endDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "End Date"
+   },
+   "duration": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Duration"
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason"
+   },
+   "requestedBy": {
+    "type": "string",
+    "description": "Requested By"
+   },
+   "approvedBy": {
+    "type": "integer",
+    "description": "Approved By"
+   }
+  }
+ },
+ "MembershipUpgradeDowngradeProductMigrationOperationsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Membership Upgrade, Downgrade & Product Migration Operations displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "currentMembership": {
+    "type": "string",
+    "description": "Current Membership"
+   },
+   "targetMembership": {
+    "type": "string",
+    "description": "Target Membership"
+   },
+   "customerQualification": {
+    "type": "string",
+    "description": "Customer Qualification"
+   },
+   "usage": {
+    "type": "string",
+    "description": "Usage"
+   },
+   "remainingValidity": {
+    "type": "string",
+    "description": "Remaining Validity"
+   },
+   "entitlements": {
+    "type": "string",
+    "description": "Entitlements"
+   },
+   "outstandingBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Outstanding Balance"
+   },
+   "effectiveDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Effective Date"
+   },
+   "area11ForUpgradeConversionLogic": {
+    "type": "number",
+    "description": "Area 11 for upgrade/conversion logic"
+   },
+   "area10ForPriceDifference": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Area 10 for price difference"
+   },
+   "area12ForResultingOrderPayment": {
+    "type": "string",
+    "description": "Area 12 for resulting order/payment"
+   },
+   "immediately": {
+    "type": "string",
+    "description": "Immediately"
+   },
+   "nextVisit": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Next Visit"
+   },
+   "nextRenewal": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Next Renewal"
+   },
+   "fixedDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Fixed Date"
+   },
+   "endOfCurrentTerm": {
+    "type": "string",
+    "description": "End of Current Term"
+   },
+   "dD": {
+    "type": "string",
+    "description": "d d"
+   },
+   "guest": {
+    "type": "string",
+    "description": "Guest (the pack shows 2 6)"
+   }
+  }
+ },
+ "RenewalOperationsAutoRenewalManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Renewal Operations & Auto-Renewal Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "renewalNotOpen": {
+    "type": "integer",
+    "description": "Renewal Not Open"
+   },
+   "renewalEligible": {
+    "type": "string",
+    "description": "Renewal Eligible"
+   },
+   "renewalInvitationSent": {
+    "type": "string",
+    "description": "Renewal Invitation Sent"
+   },
+   "renewalStarted": {
+    "type": "string",
+    "description": "Renewal Started"
+   },
+   "paymentPending": {
+    "type": "integer",
+    "description": "Payment Pending"
+   },
+   "renewed": {
+    "type": "string",
+    "description": "Renewed"
+   },
+   "autoRenewScheduled": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Auto-Renew Scheduled"
+   },
+   "autoRenewFailed": {
+    "type": "integer",
+    "description": "Auto-Renew Failed"
+   },
+   "gracePeriod": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Grace Period"
+   },
+   "member": {
+    "type": "string",
+    "description": "Member"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "tier": {
+    "type": "string",
+    "description": "Tier"
+   },
+   "expiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry"
+   },
+   "renewalWindow": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Renewal Window"
+   },
+   "renewalPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Renewal Price"
+   },
+   "autoRenew": {
+    "type": "string",
+    "description": "Auto-Renew"
+   },
+   "paymentMethodStatus": {
+    "type": "integer",
+    "description": "Payment Method Status"
+   },
+   "eligibility": {
+    "type": "string",
+    "description": "Eligibility"
+   },
+   "renewalStatus": {
+    "type": "integer",
+    "description": "Renewal Status"
+   },
+   "currentStatus": {
+    "type": "string",
+    "description": "Current Status"
+   },
+   "outstandingIssues": {
+    "type": "string",
+    "description": "Outstanding Issues"
+   },
+   "pricing": {
+    "type": "string",
+    "description": "Pricing"
+   },
+   "paymentMethod": {
+    "type": "string",
+    "description": "Payment Method"
+   },
+   "consent": {
+    "type": "boolean",
+    "description": "Consent"
+   },
+   "membershipVersion": {
+    "type": "string",
+    "description": "Membership Version"
+   },
+   "accordingToBoard1Configuration": {
+    "type": "string",
+    "description": "according to Board 1 configuration"
+   }
+  }
+ },
+ "VisitAdmissionEntitlementUsageMonitorView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Visit, Admission & Entitlement Usage Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "totalVisits": {
+    "type": "integer",
+    "description": "Total Visits"
+   },
+   "visitsThisMonth": {
+    "type": "string",
+    "description": "Visits This Month"
+   },
+   "lastVisit": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last Visit"
+   },
+   "upcomingReservation": {
+    "type": "string",
+    "description": "Upcoming Reservation"
+   },
+   "guestTicketsUsed": {
+    "type": "string",
+    "description": "Guest Tickets Used"
+   },
+   "guestTicketsRemaining": {
+    "type": "string",
+    "description": "Guest Tickets Remaining"
+   },
+   "parkingUses": {
+    "type": "integer",
+    "description": "Parking Uses"
+   },
+   "benefitUsage": {
+    "type": "string",
+    "description": "Benefit Usage"
+   },
+   "noShows": {
+    "type": "integer",
+    "description": "No-Shows"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "gate": {
+    "type": "string",
+    "description": "Gate"
+   },
+   "entryTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Entry Time"
+   },
+   "exitWhereAvailable": {
+    "type": "string",
+    "description": "Exit where available"
+   },
+   "credential": {
+    "type": "string",
+    "description": "Credential"
+   },
+   "reservation": {
+    "type": "string",
+    "description": "Reservation"
+   },
+   "validationResult": {
+    "type": "string",
+    "description": "Validation Result"
+   },
+   "guest": {
+    "type": "string",
+    "description": "Guest (the pack shows 4 2 2)"
+   },
+   "usageAboveLimit": {
+    "type": "integer",
+    "description": "Usage Above Limit"
+   },
+   "invalidReEntry": {
+    "type": "string",
+    "description": "Invalid Re-entry"
+   },
+   "benefitExhausted": {
+    "type": "string",
+    "description": "Benefit Exhausted"
+   },
+   "blackoutAttempt": {
+    "type": "string",
+    "description": "Blackout Attempt"
+   },
+   "expiredMembershipUsage": {
+    "type": "integer",
+    "description": "Expired Membership Usage"
+   },
+   "suspendedMembershipAttempt": {
+    "type": "string",
+    "description": "Suspended Membership Attempt"
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason"
+   },
+   "previousValue": {
+    "type": "string",
+    "description": "Previous Value"
+   },
+   "newValue": {
+    "type": "integer",
+    "description": "New Value"
+   },
+   "user": {
+    "type": "string",
+    "description": "User"
+   },
+   "approvalWhereRequired": {
+    "type": "boolean",
+    "description": "Approval where required"
+   }
+  }
+ }
+}

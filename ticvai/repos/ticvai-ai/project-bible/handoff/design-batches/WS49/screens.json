@@ -1,0 +1,1529 @@
+[
+ {
+  "id": "ADM-178",
+  "name": "Bundle & Combo Command Center",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "5",
+   "number": "1",
+   "page": 63
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/bundle-combo-command-center-adm-178",
+   "component": "apps/ticvai-web/src/routes/commercial/BundleComboCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "exitTo": [
+    "ADM-002",
+    "ADM-179",
+    "ADM-180",
+    "ADM-181",
+    "ADM-182",
+    "ADM-183",
+    "ADM-184",
+    "ADM-185",
+    "ADM-186",
+    "ADM-187"
+   ],
+   "inferred": false,
+   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
+   "transitions": [
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-179",
+     "trigger": "Works in Bundle Definition & Setup",
+     "provenance": "flow F158 step 1→2",
+     "operation": "listBundleCombo"
+    },
+    {
+     "to": "ADM-180",
+     "trigger": "Works in Bundle Component Builder",
+     "provenance": "flow F158 step 3→4",
+     "operation": "listBundleCombo"
+    },
+    {
+     "to": "ADM-181",
+     "trigger": "Works in Guest Choice & Build-Your-Own Bundle Designer",
+     "provenance": "flow F158 step 5→6",
+     "operation": "listBundleCombo"
+    },
+    {
+     "to": "ADM-182",
+     "trigger": "Works in Bundle Pricing & Commercial Model",
+     "provenance": "flow F158 step 7→8",
+     "operation": "listBundleCombo"
+    },
+    {
+     "to": "ADM-183",
+     "trigger": "Works in Bundle Availability, Capacity & Validation",
+     "provenance": "flow F158 step 9→10",
+     "operation": "listBundleCombo"
+    },
+    {
+     "to": "ADM-184",
+     "trigger": "Works in Bundle Validity, Scheduling & Redemption Rules",
+     "provenance": "flow F158 step 11→12",
+     "operation": "listBundleCombo"
+    },
+    {
+     "to": "ADM-185",
+     "trigger": "Works in Partner & External Product Bundle Manager",
+     "provenance": "flow F158 step 13→14",
+     "operation": "listBundleCombo"
+    },
+    {
+     "to": "ADM-186",
+     "trigger": "Works in Revenue Allocation, Cost & Settlement Rules",
+     "provenance": "flow F158 step 15→16",
+     "operation": "listBundleCombo"
+    },
+    {
+     "to": "ADM-187",
+     "trigger": "Works in Bundle Preview, Simulation & AI Recommendation",
+     "provenance": "flow F158 step 17→18",
+     "operation": "listBundleCombo"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
+  "purpose": "Provide centralized visibility and management of all bundles and combo products across",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search bundle combo",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 63 §Filter by"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "Ticket bundle",
+        "Multi-attraction",
+        "Multi-park",
+        "Family package",
+        "Ticket + F&B",
+        "Ticket + Retail",
+        "Ticket + Experience",
+        "Ticket + Parking",
+        "Membership package",
+        "Partner bundle",
+        "Hotel package",
+        "Dynamic bundle",
+        "Build-your-own bundle"
+       ],
+       "notes": "The pack filters this screen by ticket bundle, multi-attraction, multi-park, family package, ticket + f&b, ticket + retail and 7 more — which are present is a decision the pack already made.",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 63 §Filter by"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Active Bundles",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 63 §KPI Cards",
+       "bindsTo": "BundleComboCommandCenterView.activeBundles"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Draft Bundles",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 63 §KPI Cards",
+       "bindsTo": "BundleComboCommandCenterView.draftBundles"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Scheduled Bundles",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 63 §KPI Cards",
+       "bindsTo": "BundleComboCommandCenterView.scheduledBundles"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Dynamic Bundles",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 63 §KPI Cards",
+       "bindsTo": "BundleComboCommandCenterView.dynamicBundles"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Fixed Bundles",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 63 §KPI Cards",
+       "bindsTo": "BundleComboCommandCenterView.fixedBundles"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Guest-Choice Bundles",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 63 §KPI Cards",
+       "bindsTo": "BundleComboCommandCenterView.guestChoiceBundles"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Partner Bundles",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 63 §KPI Cards",
+       "bindsTo": "BundleComboCommandCenterView.partnerBundles"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Bundle Sales",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 63 §KPI Cards",
+       "bindsTo": "BundleComboCommandCenterView.bundleSales"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Bundle Revenue",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 63 §KPI Cards",
+       "bindsTo": "BundleComboCommandCenterView.bundleRevenue"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Average Bundle Value",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 63 §KPI Cards",
+       "bindsTo": "BundleComboCommandCenterView.averageBundleValue"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Bundle Conversion Rate",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 63 §KPI Cards",
+       "bindsTo": "BundleComboCommandCenterView.bundleConversionRate"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Redemption Rate",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 63 §KPI Cards",
+       "bindsTo": "BundleComboCommandCenterView.redemptionRate"
+      },
+      {
+       "kind": "metricTile",
+       "label": "AOV Uplift",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 63 §KPI Cards",
+       "bindsTo": "BundleComboCommandCenterView.aovUplift"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Bundle Margin",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 63 §KPI Cards",
+       "bindsTo": "BundleComboCommandCenterView.bundleMargin"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The bundle combo list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the bundle combo untouched.",
+   "emptyFirstRun": "No bundle combo yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the bundle combo are still there. The pack's own statuses are Draft — the state names which is selected.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listBundleCombo",
+    "contract": "promotions",
+    "purpose": "Bundle & Combo Command Center",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "BundleComboCommandCenterView.activeBundles",
+    "BundleComboCommandCenterView.draftBundles",
+    "BundleComboCommandCenterView.scheduledBundles",
+    "BundleComboCommandCenterView.dynamicBundles",
+    "BundleComboCommandCenterView.fixedBundles",
+    "BundleComboCommandCenterView.guestChoiceBundles"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-178"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 63. 14 of 27 labels bound to a contract property; 37 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-179",
+  "name": "Bundle Definition & Setup",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "5",
+   "number": "2",
+   "page": 65
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/bundle-definition-setup-adm-179",
+   "component": "apps/ticvai-web/src/routes/commercial/BundleDefinitionSetup.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-178"
+   ],
+   "exitTo": [
+    "ADM-178"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-178, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-178",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F158 step 2→3",
+     "operation": "setBundleDefinition"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure; Configure whether the bundle) and no display directory — it is settings, not a population",
+  "purpose": "Create the commercial identity and high-level behavior of a bundle.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Bundle name",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 65 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Bundle ID",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 65 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Internal description",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 65 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Guest-facing description",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 65 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Business entity",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 65 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 65 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Bundle category",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 65 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Owner",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 65 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Campaign",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 65 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Effective dates",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 65 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Sales status",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 65 §Configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "provenance": "contract operation setBundleDefinition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The bundle definition configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the bundle definition untouched.",
+   "emptyFirstRun": "No bundle definition configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setBundleDefinition",
+    "contract": "promotions",
+    "purpose": "Bundle Definition & Setup",
+    "trigger": "onAction",
+    "invalidates": [
+     "setBundleDefinition"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-179"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 65. 0 of 0 labels bound to a contract property; 11 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-180",
+  "name": "Bundle Component Builder",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "5",
+   "number": "3",
+   "page": 66
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/bundle-component-builder-adm-180",
+   "component": "apps/ticvai-web/src/routes/commercial/BundleComponentBuilder.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-178"
+   ],
+   "exitTo": [
+    "ADM-178"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-178, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-178",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F158 step 4→5",
+     "operation": "setBundleComponent"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Define exactly what products and services make up the bundle.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Fixed quantity",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 66 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Minimum",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 66 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 66 §Configure"
+      },
+      {
+       "kind": "textField",
+       "label": "Quantity based on guest count",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 66 §Configure"
+      },
+      {
+       "kind": "textField",
+       "label": "Quantity based on ticket count",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 66 §Configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "provenance": "contract operation setBundleComponent"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The bundle component configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the bundle component untouched.",
+   "emptyFirstRun": "No bundle component configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setBundleComponent",
+    "contract": "promotions",
+    "purpose": "Bundle Component Builder",
+    "trigger": "onAction",
+    "invalidates": [
+     "setBundleComponent"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-180"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 66. 0 of 0 labels bound to a contract property; 5 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-181",
+  "name": "Guest Choice & Build-Your-Own Bundle Designer",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "5",
+   "number": "4",
+   "page": 67
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/guest-choice-build-your-own-bundle-designer-adm-181",
+   "component": "apps/ticvai-web/src/routes/commercial/GuestChoiceBuildYourOwnBundleDesigner.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-178"
+   ],
+   "exitTo": [
+    "ADM-178"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-178, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-178",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F158 step 6→7",
+     "operation": "setGuestChoiceBuild"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Choose 1 F&B Option) and no display directory — it is settings, not a population",
+  "purpose": "Configure bundles where the guest chooses products from predefined groups. The matrix specifically requires the guest to be able to choose attractions, experiences, F&B, retail products, or services from predefined categories while maintaining bundle pricing rules.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Meal A",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 67 §Choose 1 F&B Option"
+      },
+      {
+       "kind": "selectField",
+       "label": "Meal B",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 67 §Choose 1 F&B Option"
+      },
+      {
+       "kind": "selectField",
+       "label": "Meal C",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 67 §Choose 1 F&B Option"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "provenance": "contract operation setGuestChoiceBuild"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The guest choice build-your-own configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the guest choice build-your-own untouched.",
+   "emptyFirstRun": "No guest choice build-your-own configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setGuestChoiceBuild",
+    "contract": "promotions",
+    "purpose": "Guest Choice & Build-Your-Own Bundle Designer",
+    "trigger": "onAction",
+    "invalidates": [
+     "setGuestChoiceBuild"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-181"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 67. 0 of 0 labels bound to a contract property; 3 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-182",
+  "name": "Bundle Pricing & Commercial Model",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "5",
+   "number": "5",
+   "page": 68
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/bundle-pricing-commercial-model-adm-182",
+   "component": "apps/ticvai-web/src/routes/commercial/BundlePricingCommercialModel.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-178"
+   ],
+   "exitTo": [
+    "ADM-178"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-178, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-178",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F158 step 8→9",
+     "operation": "listBundlePricingCommercial"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Pricing Configuration) and no display directory — it is settings, not a population",
+  "purpose": "Determine how the bundle is commercially priced.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Base price",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 68 §Pricing Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Currency",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 68 §Pricing Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Discount %",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 68 §Pricing Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Discount amount",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 68 §Pricing Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Minimum price",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 68 §Pricing Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum price",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 68 §Pricing Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Price floor",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 68 §Pricing Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Margin floor",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 68 §Pricing Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Guest-specific price",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 68 §Pricing Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Channel-specific price",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 68 §Pricing Configuration"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The bundle pricing commercial configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the bundle pricing commercial untouched.",
+   "emptyFirstRun": "No bundle pricing commercial configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listBundlePricingCommercial",
+    "contract": "promotions",
+    "purpose": "Bundle Pricing & Commercial Model",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-182"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 68. 0 of 0 labels bound to a contract property; 10 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-183",
+  "name": "Bundle Availability, Capacity & Validation",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "5",
+   "number": "6",
+   "page": 69
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/bundle-availability-capacity-validation-adm-183",
+   "component": "apps/ticvai-web/src/routes/commercial/BundleAvailabilityCapacityValidation.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-178"
+   ],
+   "exitTo": [
+    "ADM-178"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-178, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-178",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F158 step 10→11",
+     "operation": "listBundleAvailabilityCapacity"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§For each component display) and no metric row",
+  "purpose": "Ensure that TICVAI does not sell a bundle unless all required components can actually be fulfilled. This is a direct requirement of the matrix: each bundle component maintains independent inventory, capacity, validity, redemption rules, and availability, and the system validates included products before confirming the sale.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every bundle availability capacity",
+       "columns": [
+        "BundleAvailabilityCapacityValidationView.available",
+        "BundleAvailabilityCapacityValidationView.lowAvailability",
+        "BundleAvailabilityCapacityValidationView.soldOut",
+        "BundleAvailabilityCapacityValidationView.suspended",
+        "BundleAvailabilityCapacityValidationView.unpublished",
+        "BundleAvailabilityCapacityValidationView.invalidDate",
+        "BundleAvailabilityCapacityValidationView.capacityUnavailable"
+       ],
+       "bindsTo": "BundleAvailabilityCapacityValidationView",
+       "operation": "listBundleAvailabilityCapacity",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 69 §For each component display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected bundle availability capacity",
+       "bindsTo": "BundleAvailabilityCapacityValidationView",
+       "columns": [
+        "BundleAvailabilityCapacityValidationView.available",
+        "BundleAvailabilityCapacityValidationView.lowAvailability",
+        "BundleAvailabilityCapacityValidationView.soldOut",
+        "BundleAvailabilityCapacityValidationView.suspended",
+        "BundleAvailabilityCapacityValidationView.unpublished",
+        "BundleAvailabilityCapacityValidationView.invalidDate",
+        "BundleAvailabilityCapacityValidationView.capacityUnavailable"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Bundle selected”, “Check mandatory components”, “Check inventory”, “Check capacity”, “Check schedule/timeslot”, “Check validity”.",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 69 §For each component display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The bundle availability capacity list.",
+   "error": "Could not load. Names which read failed and leaves the bundle availability capacity untouched.",
+   "emptyFirstRun": "No bundle availability capacity yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the bundle availability capacity are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listBundleAvailabilityCapacity",
+    "contract": "promotions",
+    "purpose": "Bundle Availability, Capacity & Validation",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "BundleAvailabilityCapacityValidationView.available",
+    "BundleAvailabilityCapacityValidationView.lowAvailability",
+    "BundleAvailabilityCapacityValidationView.soldOut",
+    "BundleAvailabilityCapacityValidationView.suspended",
+    "BundleAvailabilityCapacityValidationView.unpublished",
+    "BundleAvailabilityCapacityValidationView.invalidDate"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-183"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 69. 7 of 7 labels bound to a contract property; 7 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-184",
+  "name": "Bundle Validity, Scheduling & Redemption Rules",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "5",
+   "number": "7",
+   "page": 70
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/bundle-validity-scheduling-redemption-rules-adm-184",
+   "component": "apps/ticvai-web/src/routes/commercial/BundleValiditySchedulingRedemptionRules.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-178"
+   ],
+   "exitTo": [
+    "ADM-178"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-178, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-178",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F158 step 12→13",
+     "operation": "listBundleValidityScheduling"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Control when bundle components may be consumed and whether they must be redeemed together or separately.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 70"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 70"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listBundleValidityScheduling",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The bundle validity scheduling list.",
+   "error": "Could not load. Names which read failed and leaves the bundle validity scheduling untouched.",
+   "emptyFirstRun": "No bundle validity scheduling yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the bundle validity scheduling are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listBundleValidityScheduling",
+    "contract": "promotions",
+    "purpose": "Bundle Validity, Scheduling & Redemption Rules",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "BundleValiditySchedulingRedemptionRulesView.valid1June31August",
+    "BundleValiditySchedulingRedemptionRulesView.allComponentsTogether",
+    "BundleValiditySchedulingRedemptionRulesView.independentRedemption",
+    "BundleValiditySchedulingRedemptionRulesView.sequentialRedemption",
+    "BundleValiditySchedulingRedemptionRulesView.firstUseActivation"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-184"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 70. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-185",
+  "name": "Partner & External Product Bundle Manager",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "5",
+   "number": "8",
+   "page": 71
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/partner-external-product-bundle-manager-adm-185",
+   "component": "apps/ticvai-web/src/routes/commercial/PartnerExternalProductBundleManager.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-178"
+   ],
+   "exitTo": [
+    "ADM-178"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-178, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-178",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F158 step 14→15",
+     "operation": "listPartnerExternalProduct"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
+  "purpose": "Allow TICVAI bundles to include products or services owned by external operators. The matrix requires combinations with external products/services and bundles across different destinations, including systems that may use different databases.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**Partner & External Product Bundle Manager declares no operation that writes anything** — its only declared call is `listPartnerExternalProduct`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every partner external product",
+       "columns": [
+        "PartnerExternalProductBundleManagerView.connected",
+        "PartnerExternalProductBundleManagerView.available",
+        "PartnerExternalProductBundleManagerView.degraded",
+        "PartnerExternalProductBundleManagerView.apiError",
+        "PartnerExternalProductBundleManagerView.productUnavailable",
+        "PartnerExternalProductBundleManagerView.mappingError"
+       ],
+       "bindsTo": "PartnerExternalProductBundleManagerView",
+       "operation": "listPartnerExternalProduct",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 71 §Show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected partner external product",
+       "bindsTo": "PartnerExternalProductBundleManagerView",
+       "columns": [
+        "PartnerExternalProductBundleManagerView.connected",
+        "PartnerExternalProductBundleManagerView.available",
+        "PartnerExternalProductBundleManagerView.degraded",
+        "PartnerExternalProductBundleManagerView.apiError",
+        "PartnerExternalProductBundleManagerView.productUnavailable",
+        "PartnerExternalProductBundleManagerView.mappingError"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Dubai Weekend Package”.",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 71 §Show"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The partner external product list.",
+   "error": "Could not load. Names which read failed and leaves the partner external product untouched.",
+   "emptyFirstRun": "No partner external product yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the partner external product are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listPartnerExternalProduct",
+    "contract": "promotions",
+    "purpose": "Partner & External Product Bundle Manager",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "PartnerExternalProductBundleManagerView.connected",
+    "PartnerExternalProductBundleManagerView.available",
+    "PartnerExternalProductBundleManagerView.degraded",
+    "PartnerExternalProductBundleManagerView.apiError",
+    "PartnerExternalProductBundleManagerView.productUnavailable",
+    "PartnerExternalProductBundleManagerView.mappingError"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-185"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 71. 6 of 6 labels bound to a contract property; 17 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-186",
+  "name": "Revenue Allocation, Cost & Settlement Rules",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "5",
+   "number": "9",
+   "page": 72
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/revenue-allocation-cost-settlement-rules-adm-186",
+   "component": "apps/ticvai-web/src/routes/commercial/RevenueAllocationCostSettlementRules.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-178"
+   ],
+   "exitTo": [
+    "ADM-178"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-178, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-178",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F158 step 16→17",
+     "operation": "listRevenueAllocationCost"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Financial Configuration) and no display directory — it is settings, not a population",
+  "purpose": "Determine how bundle revenue is allocated across its components. This is explicitly required by the matrix for allocation across products, attractions, departments, partners, operators, and accounting entities.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Revenue account",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 72 §Financial Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Department",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 72 §Financial Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Cost center",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 72 §Financial Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Legal entity",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 72 §Financial Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tax treatment",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 72 §Financial Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Partner payable",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 72 §Financial Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Commission",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 72 §Financial Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Settlement cycle",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 72 §Financial Configuration"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The revenue allocation cost configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the revenue allocation cost untouched.",
+   "emptyFirstRun": "No revenue allocation cost configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listRevenueAllocationCost",
+    "contract": "promotions",
+    "purpose": "Revenue Allocation, Cost & Settlement Rules",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-186"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 72. 0 of 0 labels bound to a contract property; 8 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-187",
+  "name": "Bundle Preview, Simulation & AI Recommendation",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "5",
+   "number": "10",
+   "page": 32
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/bundle-preview-simulation-ai-recommendation-adm-187",
+   "component": "apps/ticvai-web/src/routes/commercial/BundlePreviewSimulationAiRecommendation.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-178"
+   ],
+   "exitTo": [
+    "ADM-178"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-178, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Allow administrators to test promotional rules before activating them. This is critical because the matrix requires simulation of redemption, discount exposure, revenue impact, margin impact and financial performance before activation.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Campaign Manager. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 32 §Support roles including"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 32"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 32"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Campaign Manager",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 32 §Support roles including"
+      },
+      {
+       "kind": "banner",
+       "label": "Permissions this screen separates",
+       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Create rules, Edit rules, Change discount, Change thresholds, Change segments, Change dates, Override limits, Run simulation, Submit, Approve, Activate. Each needs attaching to the control it gates, or the screen needs the control.",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 32 §Permissions must independently control"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The bundle preview simulation list.",
+   "error": "Could not load. Names which read failed and leaves the bundle preview simulation untouched.",
+   "emptyFirstRun": "No bundle preview simulation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the bundle preview simulation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "simulateBundlePreviewRecommendation",
+    "contract": "promotions",
+    "purpose": "Bundle Preview, Simulation & AI Recommendation",
+    "trigger": "onAction",
+    "invalidates": [
+     "simulateBundlePreviewRecommendation"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-187"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 32. 0 of 0 labels bound to a contract property; 12 of 76 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

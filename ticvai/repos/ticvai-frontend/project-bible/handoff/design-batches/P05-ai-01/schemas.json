@@ -1,0 +1,493 @@
+{
+ "AiMessage": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.message",
+  "required": [
+   "id",
+   "conversationId",
+   "role",
+   "content",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "conversationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "role": {
+    "type": "string",
+    "enum": [
+     "user",
+     "assistant",
+     "system"
+    ]
+   },
+   "content": {
+    "type": "string"
+   },
+   "sources": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AiSource"
+    }
+   },
+   "confidence": {
+    "type": "number",
+    "nullable": true,
+    "description": "8.1.5, 8.3.67. **Nullable on purpose** — a provider that does not report confidence must yield null rather than an invented number, and an interface showing 0.9 because the code defaulted it is worse than showing nothing.\n"
+   },
+   "rationale": {
+    "type": "string",
+    "nullable": true,
+    "description": "8.3.68, 8.3.69."
+   },
+   "proposedAction": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ProposedAction"
+     }
+    ],
+    "nullable": true,
+    "description": "Present where the answer suggests a change. **A draft, never applied here.**"
+   },
+   "traceId": {
+    "type": "string"
+   },
+   "provider": {
+    "$ref": "#/components/schemas/AiProviderKind"
+   },
+   "model": {
+    "type": "string"
+   },
+   "promptTokens": {
+    "type": "integer"
+   },
+   "completionTokens": {
+    "type": "integer"
+   },
+   "latencyMs": {
+    "type": "integer"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "AiProviderKind": {
+  "type": "string",
+  "enum": [
+   "openai",
+   "gemini",
+   "anthropic",
+   "azureOpenai",
+   "localLlm"
+  ]
+ },
+ "AiSource": {
+  "type": "object",
+  "x-ticvai-persistence": "none — embedded in the interaction",
+  "description": "What the answer was grounded in (8.3.70). **An answer with no sources is a guess**, and the interface should show it as one.\n",
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "document",
+     "product",
+     "entitlement",
+     "report",
+     "record"
+    ]
+   },
+   "id": {
+    "type": "string"
+   },
+   "title": {
+    "type": "string"
+   },
+   "collectionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "excerpt": {
+    "type": "string"
+   },
+   "relevance": {
+    "type": "number"
+   }
+  }
+ },
+ "Conversation": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.conversation",
+  "description": "22.8. **A conversation is not a case.** A case is a ticket measured in hours; a conversation is a live session measured in seconds, with somebody waiting. A conversation may create a case; it is not one.\n",
+  "required": [
+   "id",
+   "channel",
+   "state"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "telephony": {
+    "type": "object",
+    "nullable": true,
+    "description": "BL-083. **`ConversationChannel` included `voice` with nothing behind it** — the model anticipated telephony and stopped at the enum.\n**Not an integration, a binding.** Genesys, Avaya, Amazon Connect, Teams and 3CX all do call control themselves; what the platform needs is the call bound to the guest and the case, so **an agent who answers already knows who is calling and what about.**\n",
+    "properties": {
+     "providerCallId": {
+      "type": "string"
+     },
+     "direction": {
+      "type": "string",
+      "enum": [
+       "inbound",
+       "outbound",
+       "transferred"
+      ]
+     },
+     "fromNumberMasked": {
+      "type": "string",
+      "nullable": true,
+      "description": "**Masked, and it is still personal data.** A phone number identifies a person more reliably than a name does.\n"
+     },
+     "recordingRef": {
+      "type": "string",
+      "nullable": true,
+      "description": "Held by the provider, referenced here. **Recording consent is jurisdictional and the platform does not assume it** — a reference with no consent record is a recording nobody may play.\n"
+     },
+     "agentState": {
+      "type": "string",
+      "enum": [
+       "available",
+       "onCall",
+       "wrapUp",
+       "away",
+       "offline"
+      ],
+      "nullable": true
+     }
+    }
+   },
+   "assistSessionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "BL-094. **`startKioskAssist` recorded a staff member helping a guest and `createCase` recorded a service interaction, and neither referenced the other** — so the traceability 2.13.20 asks for had no link to follow.\n**The link is here rather than on the assist session**, because a case may span several assists and an assist belongs to at most one case.\n"
+   },
+   "channel": {
+    "$ref": "#/components/schemas/ConversationChannel"
+   },
+   "state": {
+    "$ref": "#/components/schemas/ConversationState"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "22.8.3. Resolved from phone, email, membership number or a signed-in session. **A conversation with none of those stays anonymous rather than being guessed at.**\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "assignedPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "queueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "queuePosition": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true
+   },
+   "estimatedWaitSeconds": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true
+   },
+   "handoverReason": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "guestRequested",
+     "assistantRefused",
+     "assistantFailed",
+     "outOfScope",
+     "negativeSentiment",
+     "complexIntent",
+     "paymentIssue"
+    ]
+   },
+   "handoverSummary": {
+    "type": "string",
+    "nullable": true,
+    "description": "**The assistant's own account of what the guest wants**, so an agent opens with context rather than reading a transcript while somebody waits.\n"
+   },
+   "sentiment": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "positive",
+     "neutral",
+     "negative",
+     "escalating"
+    ],
+    "description": "22.8.16. **`escalating` is a routing signal**, not a report line."
+   },
+   "intent": {
+    "type": "string",
+    "nullable": true,
+    "description": "22.8.13. What the guest appears to want, used for routing."
+   },
+   "locale": {
+    "type": "string"
+   },
+   "caseId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "22.8.12. Where the conversation raised one."
+   },
+   "messages": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ConversationMessage"
+    }
+   },
+   "firstResponseSeconds": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "closedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "outcome": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "resolved",
+     "caseRaised",
+     "abandonedByGuest",
+     "timedOut",
+     "spam"
+    ]
+   }
+  }
+ },
+ "ConversationChannel": {
+  "type": "string",
+  "enum": [
+   "webChat",
+   "inAppChat",
+   "whatsapp",
+   "sms",
+   "email",
+   "kiosk",
+   "voice"
+  ]
+ },
+ "ConversationMessage": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.conversation_message",
+  "required": [
+   "id",
+   "sender",
+   "body",
+   "sentAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sender": {
+    "type": "string",
+    "enum": [
+     "guest",
+     "agent",
+     "assistant",
+     "system"
+    ],
+    "description": "**Resolved, never declared.** The assistant is labelled as one — a guest talking to a bot that presents as a person is a complaint waiting for the moment they find out.\n"
+   },
+   "senderPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "body": {
+    "type": "string"
+   },
+   "attachments": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "assetId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "kind": {
+       "type": "string",
+       "enum": [
+        "image",
+        "video",
+        "document",
+        "ticket",
+        "qr",
+        "paymentLink"
+       ]
+      }
+     }
+    }
+   },
+   "aiInteractionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where the assistant sent it. **Links the message to its tokens and cost**, so a conversation's spend is attributable (CF-14).\n"
+   },
+   "sentAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "readAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "ConversationState": {
+  "type": "string",
+  "description": "**`withAssistant` and `queued` are different, and the second has a person waiting.** Merging them makes the service level unmeasurable, because time with a bot is not time in a queue.\n",
+  "enum": [
+   "withAssistant",
+   "queued",
+   "withAgent",
+   "waitingOnGuest",
+   "resolved",
+   "abandoned",
+   "timedOut"
+  ]
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "ProposedAction": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.proposed_action",
+  "required": [
+   "id",
+   "kind",
+   "targetContract",
+   "targetOperation",
+   "payload",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "interactionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "pricing",
+     "promotion",
+     "operational",
+     "financial",
+     "configuration"
+    ]
+   },
+   "targetContract": {
+    "type": "string",
+    "description": "Which contract would perform it. The assistant never performs it itself."
+   },
+   "targetOperation": {
+    "type": "string"
+   },
+   "payload": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "The request body a person would submit, ready to review."
+   },
+   "summary": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "proposed",
+     "approved",
+     "rejected",
+     "applied",
+     "expired"
+    ]
+   },
+   "approvalLevel": {
+    "type": "integer",
+    "description": "8.3.65. Multi-level, because a discount and a pricing change differ in authority."
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "decisionReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Required on rejection. **The only signal the assistant is proposing badly**, and without it a poor model degrades silently.\n"
+   },
+   "proposedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ }
+}

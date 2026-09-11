@@ -1,0 +1,196 @@
+[
+ {
+  "id": "GST-065",
+  "name": "Newsletter & Preferences",
+  "module": "Marketing",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "capability": "C00",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/newsletter-preferences",
+   "component": "apps/guest-app/src/routes/NewsletterPreferences.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "GST-001"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "GST-039"
+   ],
+   "notes": "**Reached from GST-039** — a preference is a setting on the profile. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Added 17 August for parity with WEB-027. **Not on the wireframe board** — needs drawing. CF-93.",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listConsentPurposes` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "What we may send you, and how.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every newsletter preferences",
+       "bindsTo": "ConsentPurposeConfig",
+       "columns": [
+        "ConsentPurposeConfig.purpose",
+        "ConsentPurposeConfig.displayName",
+        "ConsentPurposeConfig.description",
+        "ConsentPurposeConfig.channels",
+        "ConsentPurposeConfig.noticeVersion",
+        "ConsentPurposeConfig.isRequiredForService",
+        "ConsentPurposeConfig.expiresAfterMonths"
+       ],
+       "operation": "listConsentPurposes",
+       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected newsletter preferences",
+       "bindsTo": "ConsentPurposeConfig",
+       "columns": [
+        "ConsentPurposeConfig.purpose",
+        "ConsentPurposeConfig.displayName",
+        "ConsentPurposeConfig.description",
+        "ConsentPurposeConfig.channels",
+        "ConsentPurposeConfig.noticeVersion",
+        "ConsentPurposeConfig.isRequiredForService",
+        "ConsentPurposeConfig.expiresAfterMonths"
+       ],
+       "operation": "listConsentPurposes",
+       "provenance": "contract marketing-crm.yaml GET /consent-purposes"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "recordConsent",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The newsletter preferences list.",
+   "error": "Could not load. Names which read failed and leaves the newsletter preferences untouched.",
+   "emptyFirstRun": "No newsletter preferences yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the newsletter preferences are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Not available.** A consent change must reach the server to mean anything"
+  },
+  "apis": [
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
+    "trigger": "onAction",
+    "invalidates": [
+     "listConsentPurposes"
+    ]
+   },
+   {
+    "operationId": "listConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "Configured consent purposes",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getMarketingSubscription",
+    "contract": "marketing-crm",
+    "purpose": "What this guest has opted into",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setMarketingSubscription",
+    "contract": "marketing-crm",
+    "purpose": "Change it",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "ConsentPurposeConfig.purpose",
+    "ConsentPurposeConfig.displayName",
+    "ConsentPurposeConfig.description",
+    "ConsentPurposeConfig.channels",
+    "ConsentPurposeConfig.noticeVersion"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-065"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

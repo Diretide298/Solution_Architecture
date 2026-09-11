@@ -1,0 +1,129 @@
+id: F197
+name: 'Rental Management board 1: Rental Product Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Rental Management board 1. **This route is read from the
+    screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-494
+  entryPoints:
+  - Arrives at Rental Product Command Center
+steps:
+- step: 1
+  screen: BO-494
+  action: Opens Rental Product Command Center
+  operations: []
+  outcome: Central management screen for all rental products across tenants, venues and rental locations.
+- step: 2
+  screen: BO-495
+  action: Works in Create Rental Product Wizard
+  operations: []
+  outcome: Guided workflow for creating a new rental product.
+- step: 3
+  screen: BO-494
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-496
+  action: Works in Rental Product Profile
+  operations: []
+  outcome: Provide the complete master configuration of a rental product.
+- step: 5
+  screen: BO-494
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-497
+  action: Works in Rental Category & Classification Setup
+  operations: []
+  outcome: Configure reusable categories rather than hard-coding individual rental types.
+- step: 7
+  screen: BO-494
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-498
+  action: Works in Inventory Tracking Model
+  operations: []
+  outcome: Determine how the product's physical inventory will be controlled.
+- step: 9
+  screen: BO-494
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-499
+  action: Works in Rental Location Assignment
+  operations: []
+  outcome: Define where a product can physically be rented, collected and returned.
+- step: 11
+  screen: BO-494
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-500
+  action: Works in Rental Duration & Turnaround Configuration
+  operations: []
+  outcome: Define how long the product can be rented. The source requires minimum and maximum rental durations
+    and both fixed and customer-defined durations.
+- step: 13
+  screen: BO-494
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-501
+  action: Works in Rental Rules & Operational Policy
+  operations: []
+  outcome: Define the fundamental operational restrictions for the product.
+- step: 15
+  screen: BO-494
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-502
+  action: Works in Customer Requirements, Agreement & Waiver
+  operations: []
+  outcome: Define information and agreements required before a customer can receive the rental.
+- step: 17
+  screen: BO-494
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-503
+  action: Works in Product Validation, Approval & Publication
+  operations: []
+  outcome: Provide controlled governance before a rental product becomes sellable.
+branches:
+- at: 1
+  condition: Nothing has been set up on Rental Product Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Rental Management board 1 visited
+primaryContract: unknown
+contracts:
+- unknown

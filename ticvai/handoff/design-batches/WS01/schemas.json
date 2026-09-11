@@ -1,0 +1,918 @@
+{
+ "AccessAreaZoneBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is access.parking_facility at 14%, so this is not an update to anything the package stores today and no new table has been decided",
+  "description": "**What Access Area & Zone Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.\n\n**The pack defines this as a record**, under *Each zone receives* - one of only 13 drafted writes that does. That is the client writing a row rather than a screen, and it is where the table conversation should start.",
+  "properties": {
+   "zoneType": {
+    "type": "string",
+    "enum": [
+     "public",
+     "ticketed",
+     "vip",
+     "staff",
+     "backOfHouse",
+     "attraction",
+     "restricted",
+     "fastPass",
+     "event",
+     "temporary"
+    ],
+    "description": "Vocabulary listed under Create."
+   },
+   "capacity": {
+    "type": "integer",
+    "description": "capacity"
+   },
+   "operatingSchedule": {
+    "type": "string",
+    "description": "operating schedule"
+   },
+   "securityClassification": {
+    "type": "string",
+    "description": "security classification"
+   },
+   "entryRequirements": {
+    "type": "string",
+    "description": "entry requirements"
+   },
+   "exitRequirements": {
+    "type": "string",
+    "description": "exit requirements"
+   },
+   "allowedCredentialClasses": {
+    "type": "string",
+    "description": "allowed credential classes"
+   }
+  },
+  "x-ticvai-record-definition": "Each zone receives"
+ },
+ "AccessAreaZoneBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Access Area & Zone Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "zoneType": {
+    "type": "string",
+    "enum": [
+     "public",
+     "ticketed",
+     "vip",
+     "staff",
+     "backOfHouse",
+     "attraction",
+     "restricted",
+     "fastPass",
+     "event",
+     "temporary"
+    ],
+    "description": "Vocabulary listed under Create."
+   },
+   "capacity": {
+    "type": "integer",
+    "description": "capacity"
+   },
+   "operatingSchedule": {
+    "type": "string",
+    "description": "operating schedule"
+   },
+   "securityClassification": {
+    "type": "string",
+    "description": "security classification"
+   },
+   "entryRequirements": {
+    "type": "string",
+    "description": "entry requirements"
+   },
+   "exitRequirements": {
+    "type": "string",
+    "description": "exit requirements"
+   },
+   "allowedCredentialClasses": {
+    "type": "string",
+    "description": "allowed credential classes"
+   }
+  }
+ },
+ "AccessControlCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Access Control Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "totalVenues": {
+    "type": "integer",
+    "description": "Total venues"
+   },
+   "activeAccessPoints": {
+    "type": "integer",
+    "description": "Active access points"
+   },
+   "entryGates": {
+    "type": "integer",
+    "description": "Entry gates"
+   },
+   "exitGates": {
+    "type": "integer",
+    "description": "Exit gates"
+   },
+   "attractionGates": {
+    "type": "integer",
+    "description": "Attraction gates"
+   },
+   "turnstiles": {
+    "type": "integer",
+    "description": "Turnstiles"
+   },
+   "handheldDevices": {
+    "type": "integer",
+    "description": "Handheld devices"
+   },
+   "devicesOnline": {
+    "type": "integer",
+    "description": "Devices online"
+   },
+   "devicesOffline": {
+    "type": "integer",
+    "description": "Devices offline"
+   },
+   "gatesOpen": {
+    "type": "integer",
+    "description": "Gates open"
+   },
+   "gatesClosed": {
+    "type": "integer",
+    "description": "Gates closed"
+   },
+   "currentInVenueOccupancy": {
+    "type": "integer",
+    "description": "Current in-venue occupancy"
+   },
+   "currentAdmissionRate": {
+    "type": "number",
+    "description": "Current admission rate"
+   },
+   "failedScans": {
+    "type": "integer",
+    "description": "Failed scans"
+   },
+   "overrides": {
+    "type": "integer",
+    "description": "Overrides"
+   },
+   "securityAlerts": {
+    "type": "integer",
+    "description": "Security alerts"
+   },
+   "offlineDevices": {
+    "type": "integer",
+    "description": "Offline devices"
+   },
+   "synchronizationStatus": {
+    "type": "integer",
+    "description": "Synchronization status"
+   }
+  }
+ },
+ "AccessControlGraphicalMapDesignerInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Access Control Graphical Map Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "cad": {
+    "type": "string",
+    "description": "CAD"
+   },
+   "pdf": {
+    "type": "string",
+    "description": "PDF"
+   },
+   "image": {
+    "type": "string",
+    "description": "image"
+   },
+   "venuePlan": {
+    "type": "string",
+    "description": "venue plan"
+   },
+   "architecturalDrawing": {
+    "type": "string",
+    "description": "architectural drawing"
+   },
+   "ontoTheMap": {
+    "type": "string",
+    "description": "onto the map"
+   },
+   "ai": {
+    "type": "string",
+    "description": "AI"
+   }
+  }
+ },
+ "AccessControlGraphicalMapDesignerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Access Control Graphical Map Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "cad": {
+    "type": "string",
+    "description": "CAD"
+   },
+   "pdf": {
+    "type": "string",
+    "description": "PDF"
+   },
+   "image": {
+    "type": "string",
+    "description": "image"
+   },
+   "venuePlan": {
+    "type": "string",
+    "description": "venue plan"
+   },
+   "architecturalDrawing": {
+    "type": "string",
+    "description": "architectural drawing"
+   },
+   "ontoTheMap": {
+    "type": "string",
+    "description": "onto the map"
+   },
+   "ai": {
+    "type": "string",
+    "description": "AI"
+   }
+  }
+ },
+ "AccessLocationGroupingView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Access Location Grouping displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "gate01": {
+    "type": "string",
+    "description": "Gate 01"
+   },
+   "gate02": {
+    "type": "string",
+    "description": "Gate 02"
+   },
+   "gate03": {
+    "type": "string",
+    "description": "Gate 03"
+   },
+   "gate04": {
+    "type": "string",
+    "description": "Gate 04"
+   },
+   "coasterGate": {
+    "type": "string",
+    "description": "Coaster Gate"
+   },
+   "dropTowerGate": {
+    "type": "string",
+    "description": "Drop Tower Gate"
+   },
+   "adventureHallGate": {
+    "type": "string",
+    "description": "Adventure Hall Gate"
+   },
+   "normalOperatingDays": {
+    "type": "string",
+    "description": "normal operating days"
+   },
+   "weekends": {
+    "type": "string",
+    "description": "weekends"
+   },
+   "holidays": {
+    "type": "string",
+    "description": "holidays"
+   },
+   "seasonalSchedules": {
+    "type": "string",
+    "description": "seasonal schedules"
+   },
+   "privateEvents": {
+    "type": "string",
+    "description": "private events"
+   },
+   "freeEntryDays": {
+    "type": "string",
+    "description": "free-entry days"
+   },
+   "maintenancePeriods": {
+    "type": "string",
+    "description": "maintenance periods"
+   }
+  }
+ },
+ "AttractionAccessConfigurationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is access.parking_facility at 6%, so this is not an update to anything the package stores today and no new table has been decided",
+  "description": "**What Attraction Access Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.\n\n**The pack defines this as a record**, under *For each attraction* - one of only 13 drafted writes that does. That is the client writing a row rather than a screen, and it is where the table conversation should start.",
+  "properties": {
+   "attractionId": {
+    "type": "string",
+    "description": "Attraction ID"
+   },
+   "name": {
+    "type": "string",
+    "description": "Name"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "zone": {
+    "type": "string",
+    "description": "Zone"
+   },
+   "capacity": {
+    "type": "integer",
+    "description": "Capacity"
+   },
+   "entryPoints": {
+    "type": "string",
+    "description": "Entry points"
+   },
+   "exitPoints": {
+    "type": "string",
+    "description": "Exit points"
+   },
+   "fastPassSupport": {
+    "type": "boolean",
+    "description": "Fast Pass support"
+   },
+   "heightRestriction": {
+    "type": "string",
+    "description": "Height restriction"
+   },
+   "ageRestriction": {
+    "type": "string",
+    "description": "Age restriction"
+   },
+   "adultCompanionRequirement": {
+    "type": "string",
+    "description": "Adult companion requirement"
+   },
+   "membershipAccess": {
+    "type": "string",
+    "description": "Membership access"
+   },
+   "vipAccess": {
+    "type": "string",
+    "description": "VIP access"
+   },
+   "entitlementRequirement": {
+    "type": "string",
+    "description": "entitlement requirement"
+   },
+   "biometricRequirement": {
+    "type": "string",
+    "description": "biometric requirement"
+   },
+   "operatingCalendar": {
+    "type": "string",
+    "description": "operating calendar"
+   },
+   "temporaryClosureBehavior": {
+    "type": "string",
+    "description": "temporary closure behavior"
+   }
+  },
+  "x-ticvai-record-definition": "For each attraction"
+ },
+ "AttractionAccessConfigurationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Attraction Access Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "attractionId": {
+    "type": "string",
+    "description": "Attraction ID"
+   },
+   "name": {
+    "type": "string",
+    "description": "Name"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "zone": {
+    "type": "string",
+    "description": "Zone"
+   },
+   "capacity": {
+    "type": "integer",
+    "description": "Capacity"
+   },
+   "entryPoints": {
+    "type": "string",
+    "description": "Entry points"
+   },
+   "exitPoints": {
+    "type": "string",
+    "description": "Exit points"
+   },
+   "fastPassSupport": {
+    "type": "boolean",
+    "description": "Fast Pass support"
+   },
+   "heightRestriction": {
+    "type": "string",
+    "description": "Height restriction"
+   },
+   "ageRestriction": {
+    "type": "string",
+    "description": "Age restriction"
+   },
+   "adultCompanionRequirement": {
+    "type": "string",
+    "description": "Adult companion requirement"
+   },
+   "membershipAccess": {
+    "type": "string",
+    "description": "Membership access"
+   },
+   "vipAccess": {
+    "type": "string",
+    "description": "VIP access"
+   },
+   "entitlementRequirement": {
+    "type": "string",
+    "description": "entitlement requirement"
+   },
+   "biometricRequirement": {
+    "type": "string",
+    "description": "biometric requirement"
+   },
+   "operatingCalendar": {
+    "type": "string",
+    "description": "operating calendar"
+   },
+   "temporaryClosureBehavior": {
+    "type": "string",
+    "description": "temporary closure behavior"
+   }
+  }
+ },
+ "GateLaneConfigurationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Gate & Lane Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "gateId": {
+    "type": "string",
+    "description": "Gate ID"
+   },
+   "gateName": {
+    "type": "string",
+    "description": "Gate name"
+   },
+   "accessPoint": {
+    "type": "string",
+    "description": "Access point"
+   },
+   "location": {
+    "type": "string",
+    "description": "Location"
+   },
+   "laneNumber": {
+    "type": "string",
+    "description": "lane number"
+   },
+   "entry": {
+    "type": "string",
+    "description": "Entry"
+   },
+   "exit": {
+    "type": "string",
+    "description": "Exit"
+   },
+   "bidirectional": {
+    "type": "string",
+    "description": "Bidirectional"
+   },
+   "reEntry": {
+    "type": "string",
+    "description": "Re-entry"
+   },
+   "crossover": {
+    "type": "string",
+    "description": "Crossover"
+   },
+   "type": {
+    "type": "string",
+    "enum": [
+     "standard",
+     "vip",
+     "fastPass",
+     "accessible",
+     "group",
+     "staff",
+     "attraction"
+    ],
+    "description": "Vocabulary listed under Gate type."
+   },
+   "validation": {
+    "type": "string",
+    "description": "Validation"
+   },
+   "freeSpin": {
+    "type": "string",
+    "description": "Free Spin"
+   },
+   "closed": {
+    "type": "integer",
+    "description": "Closed"
+   },
+   "emergencyDropArm": {
+    "type": "string",
+    "description": "Emergency / Drop Arm"
+   },
+   "manual": {
+    "type": "string",
+    "description": "Manual"
+   },
+   "countOnly": {
+    "type": "integer",
+    "description": "Count Only"
+   }
+  }
+ },
+ "GateLaneConfigurationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Gate & Lane Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "gateId": {
+    "type": "string",
+    "description": "Gate ID"
+   },
+   "gateName": {
+    "type": "string",
+    "description": "Gate name"
+   },
+   "accessPoint": {
+    "type": "string",
+    "description": "Access point"
+   },
+   "location": {
+    "type": "string",
+    "description": "Location"
+   },
+   "laneNumber": {
+    "type": "string",
+    "description": "lane number"
+   },
+   "entry": {
+    "type": "string",
+    "description": "Entry"
+   },
+   "exit": {
+    "type": "string",
+    "description": "Exit"
+   },
+   "bidirectional": {
+    "type": "string",
+    "description": "Bidirectional"
+   },
+   "reEntry": {
+    "type": "string",
+    "description": "Re-entry"
+   },
+   "crossover": {
+    "type": "string",
+    "description": "Crossover"
+   },
+   "type": {
+    "type": "string",
+    "enum": [
+     "standard",
+     "vip",
+     "fastPass",
+     "accessible",
+     "group",
+     "staff",
+     "attraction"
+    ],
+    "description": "Vocabulary listed under Gate type."
+   },
+   "validation": {
+    "type": "string",
+    "description": "Validation"
+   },
+   "freeSpin": {
+    "type": "string",
+    "description": "Free Spin"
+   },
+   "closed": {
+    "type": "integer",
+    "description": "Closed"
+   },
+   "emergencyDropArm": {
+    "type": "string",
+    "description": "Emergency / Drop Arm"
+   },
+   "manual": {
+    "type": "string",
+    "description": "Manual"
+   },
+   "countOnly": {
+    "type": "integer",
+    "description": "Count Only"
+   }
+  }
+ },
+ "OperatingCalendarSpecialAccessDaysView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Operating Calendar & Special Access Days displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "normalOperatingDays": {
+    "type": "string",
+    "description": "normal operating days"
+   },
+   "weekends": {
+    "type": "string",
+    "description": "weekends"
+   },
+   "holidays": {
+    "type": "string",
+    "description": "holidays"
+   },
+   "seasonalSchedules": {
+    "type": "string",
+    "description": "seasonal schedules"
+   },
+   "privateEvents": {
+    "type": "string",
+    "description": "private events"
+   },
+   "freeEntryDays": {
+    "type": "string",
+    "description": "free-entry days"
+   },
+   "maintenancePeriods": {
+    "type": "string",
+    "description": "maintenance periods"
+   },
+   "specialEvents": {
+    "type": "string",
+    "description": "special events"
+   },
+   "ladiesOnlySessions": {
+    "type": "string",
+    "description": "ladies-only sessions"
+   },
+   "schoolGroupSessions": {
+    "type": "string",
+    "description": "school/group sessions"
+   },
+   "afterHoursEvents": {
+    "type": "string",
+    "description": "after-hours events"
+   },
+   "ai": {
+    "type": "string",
+    "description": "AI"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "TopologyValidationPublicationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Topology Validation & Publication submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "entireTenant": {
+    "type": "string",
+    "description": "Entire tenant"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "park": {
+    "type": "string",
+    "description": "Park"
+   },
+   "zone": {
+    "type": "string",
+    "description": "Zone"
+   },
+   "accessPoint": {
+    "type": "string",
+    "description": "Access point"
+   },
+   "selectedGates": {
+    "type": "string",
+    "description": "Selected gates"
+   },
+   "selectedDevices": {
+    "type": "string",
+    "description": "Selected devices"
+   },
+   "withRollbackToPreviousConfiguration": {
+    "type": "string",
+    "description": "with rollback to previous configuration"
+   },
+   "scanned": {
+    "type": "string",
+    "description": "scanned"
+   },
+   "development": {
+    "type": "string",
+    "description": "development"
+   }
+  }
+ },
+ "TopologyValidationPublicationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Topology Validation & Publication displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "entireTenant": {
+    "type": "string",
+    "description": "Entire tenant"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "park": {
+    "type": "string",
+    "description": "Park"
+   },
+   "zone": {
+    "type": "string",
+    "description": "Zone"
+   },
+   "accessPoint": {
+    "type": "string",
+    "description": "Access point"
+   },
+   "selectedGates": {
+    "type": "string",
+    "description": "Selected gates"
+   },
+   "selectedDevices": {
+    "type": "string",
+    "description": "Selected devices"
+   },
+   "withRollbackToPreviousConfiguration": {
+    "type": "string",
+    "description": "with rollback to previous configuration"
+   },
+   "scanned": {
+    "type": "string",
+    "description": "scanned"
+   },
+   "development": {
+    "type": "string",
+    "description": "development"
+   }
+  }
+ },
+ "VenueParkAccessStructureView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Venue & Park Access Structure displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "park": {
+    "type": "string",
+    "description": "Park"
+   },
+   "building": {
+    "type": "string",
+    "description": "Building"
+   },
+   "eventSpace": {
+    "type": "string",
+    "description": "Event space"
+   },
+   "waterpark": {
+    "type": "string",
+    "description": "Waterpark"
+   },
+   "themePark": {
+    "type": "string",
+    "description": "Theme park"
+   },
+   "museum": {
+    "type": "string",
+    "description": "Museum"
+   },
+   "arena": {
+    "type": "string",
+    "description": "Arena"
+   },
+   "stadium": {
+    "type": "string",
+    "description": "Stadium"
+   },
+   "exhibition": {
+    "type": "string",
+    "description": "Exhibition"
+   },
+   "temporaryVenue": {
+    "type": "string",
+    "description": "temporary venue"
+   },
+   "name": {
+    "type": "string",
+    "description": "Name"
+   },
+   "code": {
+    "type": "string",
+    "description": "Code"
+   },
+   "tenant": {
+    "type": "string",
+    "description": "Tenant"
+   },
+   "parentEntity": {
+    "type": "string",
+    "description": "Parent entity"
+   },
+   "timeZone": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time zone"
+   },
+   "operatingCalendar": {
+    "type": "string",
+    "description": "Operating calendar"
+   },
+   "capacity": {
+    "type": "integer",
+    "description": "Capacity"
+   },
+   "accessControlEnabled": {
+    "type": "boolean",
+    "description": "Access-control enabled"
+   },
+   "defaultEntryPolicy": {
+    "type": "string",
+    "description": "Default entry policy"
+   },
+   "defaultExitPolicy": {
+    "type": "string",
+    "description": "Default exit policy"
+   },
+   "defaultCredentialRules": {
+    "type": "string",
+    "description": "Default credential rules"
+   },
+   "offlinePolicy": {
+    "type": "integer",
+    "description": "Offline policy"
+   },
+   "emergencyBehavior": {
+    "type": "string",
+    "description": "Emergency behavior"
+   },
+   "supportMultiParkEnvironments": {
+    "type": "string",
+    "description": "Support multi-park environments"
+   }
+  }
+ }
+}

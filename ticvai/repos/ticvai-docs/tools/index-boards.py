@@ -59,7 +59,7 @@ ANCHOR = re.compile(r'''(?:data-screen-id|id)\s*=\s*["']([A-Za-z]{2,4}-\d{2,4})[
 # against the anchor it names rather than believed.
 SLUG = re.compile(r'''\bid\s*=\s*["']([A-Za-z][A-Za-z0-9-]{1,40})["']''')
 PLATFORM_BOARD = re.compile(r"^P\d\d ")
-WORKSHOP_BOARD = re.compile(r"^WS\d\d ")
+WORKSHOP_BOARD = re.compile(r"^WS\d+ ")  # WS100 and up since 11 September
 
 # **`generated` means `derive-wireframes.py` wrote it, and that deriver writes exactly two shapes**:
 # `<code> <shortName>.dc.html` per platform, and the index `TICVAI Wireframe Boards.dc.html`.

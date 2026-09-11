@@ -1,0 +1,939 @@
+{
+ "AdvancedOfferCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Advanced Offer Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "activeAdvancedOffers": {
+    "type": "integer",
+    "description": "Active Advanced Offers"
+   },
+   "scheduledOffers": {
+    "type": "integer",
+    "description": "Scheduled Offers"
+   },
+   "bogoCampaigns": {
+    "type": "integer",
+    "description": "BOGO Campaigns"
+   },
+   "giftWithPurchaseOffers": {
+    "type": "integer",
+    "description": "Gift-with-Purchase Offers"
+   },
+   "fixedPriceOffers": {
+    "type": "integer",
+    "description": "Fixed-Price Offers"
+   },
+   "crossCategoryOffers": {
+    "type": "integer",
+    "description": "Cross-Category Offers"
+   },
+   "totalRedemptions": {
+    "type": "integer",
+    "description": "Total Redemptions"
+   },
+   "freeItemsIssued": {
+    "type": "string",
+    "description": "Free Items Issued"
+   },
+   "discountGranted": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount Granted"
+   },
+   "revenueGenerated": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue Generated"
+   },
+   "aovUplift": {
+    "type": "number",
+    "description": "AOV Uplift"
+   },
+   "marginImpact": {
+    "type": "number",
+    "description": "Margin Impact"
+   },
+   "draft": {
+    "type": "string",
+    "description": "Draft"
+   },
+   "pendingValidation": {
+    "type": "integer",
+    "description": "Pending Validation"
+   },
+   "pendingApproval": {
+    "type": "integer",
+    "description": "Pending Approval"
+   },
+   "scheduled": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Scheduled"
+   },
+   "active": {
+    "type": "integer",
+    "description": "Active"
+   },
+   "paused": {
+    "type": "string",
+    "description": "Paused"
+   },
+   "suspended": {
+    "type": "string",
+    "description": "Suspended"
+   },
+   "expired": {
+    "type": "integer",
+    "description": "Expired"
+   },
+   "archived": {
+    "type": "string",
+    "description": "Archived"
+   }
+  }
+ },
+ "AdvancedOfferGuardrailsConflictControlsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Advanced Offer Guardrails & Conflict Controls displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "maximumFreeItems": {
+    "type": "string",
+    "description": "Maximum free items"
+   },
+   "maximumRewardValue": {
+    "type": "string",
+    "description": "Maximum reward value"
+   },
+   "maximumDiscount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Maximum discount"
+   },
+   "maximumApplicationsPerBasket": {
+    "type": "string",
+    "description": "Maximum applications per basket"
+   },
+   "maximumApplicationsPerCustomer": {
+    "type": "string",
+    "description": "Maximum applications per customer"
+   },
+   "maximumDailyRedemptions": {
+    "type": "string",
+    "description": "Maximum daily redemptions"
+   },
+   "maximumCampaignRedemptions": {
+    "type": "string",
+    "description": "Maximum campaign redemptions"
+   },
+   "minimumTransactionValue": {
+    "type": "string",
+    "description": "Minimum transaction value"
+   },
+   "minimumMargin": {
+    "type": "number",
+    "description": "Minimum margin"
+   },
+   "inventoryRequirement": {
+    "type": "string",
+    "description": "Inventory requirement"
+   },
+   "canCombine": {
+    "type": "boolean",
+    "description": "Can combine"
+   },
+   "cannotCombine": {
+    "type": "string",
+    "description": "Cannot combine"
+   },
+   "exclusive": {
+    "type": "string",
+    "description": "Exclusive"
+   },
+   "deferToCentralStackingEngine": {
+    "type": "string",
+    "description": "Defer to central stacking engine"
+   }
+  }
+ },
+ "BuyXGetYBogoRuleBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is promotions.bundle_component at 7%, so this is not an update to anything the package stores today and no new table has been decided",
+  "description": "**What Buy X Get Y / BOGO Rule Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "productCategory": {
+    "type": "string",
+    "description": "Product category"
+   },
+   "ticketType": {
+    "type": "string",
+    "description": "Ticket type"
+   },
+   "quantity": {
+    "type": "integer",
+    "description": "Quantity"
+   },
+   "minimumSpend": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Minimum spend"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer segment"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "dateTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date/time"
+   },
+   "sameProduct": {
+    "type": "string",
+    "description": "Same product"
+   },
+   "differentProduct": {
+    "type": "string",
+    "description": "Different product"
+   },
+   "free": {
+    "type": "string",
+    "description": "Free"
+   },
+   "percentageDiscount": {
+    "type": "number",
+    "description": "Percentage discount"
+   },
+   "fixedDiscount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fixed discount"
+   },
+   "fixedRewardPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fixed reward price"
+   }
+  }
+ },
+ "BuyXGetYBogoRuleBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Buy X Get Y / BOGO Rule Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "productCategory": {
+    "type": "string",
+    "description": "Product category"
+   },
+   "ticketType": {
+    "type": "string",
+    "description": "Ticket type"
+   },
+   "quantity": {
+    "type": "integer",
+    "description": "Quantity"
+   },
+   "minimumSpend": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Minimum spend"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer segment"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "dateTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date/time"
+   },
+   "sameProduct": {
+    "type": "string",
+    "description": "Same product"
+   },
+   "differentProduct": {
+    "type": "string",
+    "description": "Different product"
+   },
+   "free": {
+    "type": "string",
+    "description": "Free"
+   },
+   "percentageDiscount": {
+    "type": "number",
+    "description": "Percentage discount"
+   },
+   "fixedDiscount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fixed discount"
+   },
+   "fixedRewardPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fixed reward price"
+   }
+  }
+ },
+ "CheapestLowestValueItemPromotionView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Cheapest / Lowest-Value Item Promotion displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "e100": {
+    "type": "string",
+    "description": "e 100"
+   },
+   "buy4CheapestFree": {
+    "type": "string",
+    "description": "Buy 4 → Cheapest Free"
+   },
+   "eligibleProducts": {
+    "type": "string",
+    "description": "Eligible products"
+   },
+   "eligibleCategories": {
+    "type": "string",
+    "description": "Eligible categories"
+   },
+   "minimumQuantity": {
+    "type": "integer",
+    "description": "Minimum quantity"
+   },
+   "numberOfFreeItems": {
+    "type": "integer",
+    "description": "Number of free items"
+   },
+   "cheapestLowestPricedSelection": {
+    "type": "string",
+    "description": "Cheapest/lowest-priced selection"
+   },
+   "maximumFreeItemValue": {
+    "type": "string",
+    "description": "Maximum free-item value"
+   },
+   "maximumRepetitions": {
+    "type": "string",
+    "description": "Maximum repetitions"
+   },
+   "cheapestItemFree": {
+    "type": "string",
+    "description": "Cheapest item free"
+   },
+   "cheapestItem50Off": {
+    "type": "number",
+    "description": "Cheapest item 50% off"
+   },
+   "nCheapestItemsFree": {
+    "type": "string",
+    "description": "N cheapest items free"
+   }
+  }
+ },
+ "CrossCategoryPromotionBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Cross-Category Promotion Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "ticketing": {
+    "type": "string",
+    "description": "Ticketing"
+   },
+   "attractions": {
+    "type": "string",
+    "description": "Attractions"
+   },
+   "events": {
+    "type": "string",
+    "description": "Events"
+   },
+   "fB": {
+    "type": "string",
+    "description": "F&B"
+   },
+   "retail": {
+    "type": "string",
+    "description": "Retail"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "experiences": {
+    "type": "string",
+    "description": "Experiences"
+   },
+   "addOns": {
+    "type": "string",
+    "description": "Add-ons"
+   },
+   "parking": {
+    "type": "string",
+    "description": "Parking"
+   },
+   "services": {
+    "type": "string",
+    "description": "Services"
+   }
+  }
+ },
+ "CrossCategoryPromotionBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Cross-Category Promotion Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "ticketing": {
+    "type": "string",
+    "description": "Ticketing"
+   },
+   "attractions": {
+    "type": "string",
+    "description": "Attractions"
+   },
+   "events": {
+    "type": "string",
+    "description": "Events"
+   },
+   "fB": {
+    "type": "string",
+    "description": "F&B"
+   },
+   "retail": {
+    "type": "string",
+    "description": "Retail"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "experiences": {
+    "type": "string",
+    "description": "Experiences"
+   },
+   "addOns": {
+    "type": "string",
+    "description": "Add-ons"
+   },
+   "parking": {
+    "type": "string",
+    "description": "Parking"
+   },
+   "services": {
+    "type": "string",
+    "description": "Services"
+   }
+  }
+ },
+ "FixedPriceNForXOfferBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Fixed-Price & “N for X” Offer Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "requiredQuantity": {
+    "type": "integer",
+    "description": "Required quantity"
+   },
+   "requiredProducts": {
+    "type": "string",
+    "description": "Required products"
+   },
+   "productCategory": {
+    "type": "string",
+    "description": "Product category"
+   },
+   "mixAndMatchAllowed": {
+    "type": "boolean",
+    "description": "Mix-and-match allowed"
+   },
+   "fixedPromotionalPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fixed promotional price"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "maximumRepetitions": {
+    "type": "string",
+    "description": "Maximum repetitions"
+   },
+   "minimumMaximumProductValues": {
+    "type": "string",
+    "description": "Minimum/maximum product values"
+   },
+   "for": {
+    "type": "string",
+    "description": "for"
+   },
+   "refunds": {
+    "type": "string",
+    "description": "Refunds"
+   },
+   "tax": {
+    "type": "string",
+    "description": "Tax"
+   },
+   "revenueRecognition": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue recognition"
+   },
+   "partnerSettlement": {
+    "type": "string",
+    "description": "Partner settlement"
+   },
+   "reporting": {
+    "type": "string",
+    "description": "Reporting"
+   }
+  }
+ },
+ "FixedPriceNForXOfferBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Fixed-Price & “N for X” Offer Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "requiredQuantity": {
+    "type": "integer",
+    "description": "Required quantity"
+   },
+   "requiredProducts": {
+    "type": "string",
+    "description": "Required products"
+   },
+   "productCategory": {
+    "type": "string",
+    "description": "Product category"
+   },
+   "mixAndMatchAllowed": {
+    "type": "boolean",
+    "description": "Mix-and-match allowed"
+   },
+   "fixedPromotionalPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fixed promotional price"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "maximumRepetitions": {
+    "type": "string",
+    "description": "Maximum repetitions"
+   },
+   "minimumMaximumProductValues": {
+    "type": "string",
+    "description": "Minimum/maximum product values"
+   },
+   "for": {
+    "type": "string",
+    "description": "for"
+   },
+   "refunds": {
+    "type": "string",
+    "description": "Refunds"
+   },
+   "tax": {
+    "type": "string",
+    "description": "Tax"
+   },
+   "revenueRecognition": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue recognition"
+   },
+   "partnerSettlement": {
+    "type": "string",
+    "description": "Partner settlement"
+   },
+   "reporting": {
+    "type": "string",
+    "description": "Reporting"
+   }
+  }
+ },
+ "GiftFreeProductAddedValueOfferBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is promotions.bundle_component at 7%, so this is not an update to anything the package stores today and no new table has been decided",
+  "description": "**What Gift, Free Product & Added-Value Offer Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "basketValue": {
+    "type": "string",
+    "description": "Basket value"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "quantity": {
+    "type": "integer",
+    "description": "Quantity"
+   },
+   "productCategory": {
+    "type": "string",
+    "description": "Product category"
+   },
+   "ticket": {
+    "type": "string",
+    "description": "Ticket"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer segment"
+   },
+   "typesType": {
+    "type": "string",
+    "enum": [
+     "freeRetailProduct",
+     "freeFBProduct",
+     "freeTicket",
+     "freeAddOn",
+     "freeExperience",
+     "voucher",
+     "upgrade",
+     "service",
+     "additionalEntitlement"
+    ],
+    "description": "Vocabulary listed under Reward Types."
+   },
+   "inventoryAvailability": {
+    "type": "string",
+    "description": "Inventory availability"
+   },
+   "locationInventory": {
+    "type": "string",
+    "description": "Location inventory"
+   },
+   "eligibleFulfillmentPoint": {
+    "type": "string",
+    "description": "Eligible fulfillment point"
+   },
+   "substitutionRules": {
+    "type": "string",
+    "description": "Substitution rules"
+   },
+   "doNotOfferPromotion": {
+    "type": "string",
+    "description": "Do not offer promotion"
+   },
+   "provideAlternativeReward": {
+    "type": "string",
+    "description": "Provide alternative reward"
+   },
+   "allowLaterFulfillment": {
+    "type": "boolean",
+    "description": "Allow later fulfillment"
+   }
+  }
+ },
+ "GiftFreeProductAddedValueOfferBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Gift, Free Product & Added-Value Offer Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "basketValue": {
+    "type": "string",
+    "description": "Basket value"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "quantity": {
+    "type": "integer",
+    "description": "Quantity"
+   },
+   "productCategory": {
+    "type": "string",
+    "description": "Product category"
+   },
+   "ticket": {
+    "type": "string",
+    "description": "Ticket"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer segment"
+   },
+   "typesType": {
+    "type": "string",
+    "enum": [
+     "freeRetailProduct",
+     "freeFBProduct",
+     "freeTicket",
+     "freeAddOn",
+     "freeExperience",
+     "voucher",
+     "upgrade",
+     "service",
+     "additionalEntitlement"
+    ],
+    "description": "Vocabulary listed under Reward Types."
+   },
+   "inventoryAvailability": {
+    "type": "string",
+    "description": "Inventory availability"
+   },
+   "locationInventory": {
+    "type": "string",
+    "description": "Location inventory"
+   },
+   "eligibleFulfillmentPoint": {
+    "type": "string",
+    "description": "Eligible fulfillment point"
+   },
+   "substitutionRules": {
+    "type": "string",
+    "description": "Substitution rules"
+   },
+   "doNotOfferPromotion": {
+    "type": "string",
+    "description": "Do not offer promotion"
+   },
+   "provideAlternativeReward": {
+    "type": "string",
+    "description": "Provide alternative reward"
+   },
+   "allowLaterFulfillment": {
+    "type": "boolean",
+    "description": "Allow later fulfillment"
+   }
+  }
+ },
+ "MultiBuyQuantityOfferConfiguratorView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Multi-Buy & Quantity Offer Configurator displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "minimumQuantity": {
+    "type": "integer",
+    "description": "Minimum quantity"
+   },
+   "exactQuantity": {
+    "type": "integer",
+    "description": "Exact quantity"
+   },
+   "quantityRange": {
+    "type": "integer",
+    "description": "Quantity range"
+   },
+   "multiplesOfX": {
+    "type": "string",
+    "description": "Multiples of X"
+   },
+   "oneFree": {
+    "type": "string",
+    "description": "One free"
+   },
+   "multipleFree": {
+    "type": "string",
+    "description": "Multiple free"
+   },
+   "percentageOff": {
+    "type": "number",
+    "description": "Percentage off"
+   },
+   "amountOff": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Amount off"
+   },
+   "fixedTotalPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fixed total price"
+   },
+   "repeatAutomatically": {
+    "type": "string",
+    "description": "Repeat automatically"
+   },
+   "maximumRepetitions": {
+    "type": "string",
+    "description": "Maximum repetitions"
+   }
+  }
+ },
+ "OfferSimulationBasketTraceAiOptimizationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Offer Simulation, Basket Trace & AI Optimization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "yPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "y Price"
+   },
+   "adult": {
+    "type": "string",
+    "description": "Adult (the pack shows 2 AED 200)"
+   },
+   "child": {
+    "type": "string",
+    "description": "Child (the pack shows 2 AED 150)"
+   },
+   "subtotalAed750": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Subtotal: AED 750"
+   },
+   "originalTotalAed750": {
+    "type": "string",
+    "description": "Original Total: AED 750"
+   },
+   "promotionAed150": {
+    "type": "string",
+    "description": "Promotion: −AED 150"
+   },
+   "finalTotalAed600": {
+    "type": "string",
+    "description": "Final Total: AED 600"
+   },
+   "eligibleVenue": {
+    "type": "string",
+    "description": "Eligible venue ✓"
+   },
+   "eligibleChannel": {
+    "type": "string",
+    "description": "Eligible channel ✓"
+   },
+   "cheapestAdmissionSelected": {
+    "type": "string",
+    "description": "Cheapest admission selected ✓"
+   },
+   "childTicketAed150": {
+    "type": "string",
+    "description": "Child Ticket AED 150 ✓"
+   },
+   "maximumRewardAed200": {
+    "type": "string",
+    "description": "Maximum reward AED 200 ✓"
+   },
+   "marginFloorMaintained": {
+    "type": "number",
+    "description": "Margin floor maintained ✓"
+   },
+   "singleTransaction": {
+    "type": "string",
+    "description": "Single transaction"
+   },
+   "historicalTransactionReplay": {
+    "type": "string",
+    "description": "Historical transaction replay"
+   },
+   "sampleCustomerSegment": {
+    "type": "string",
+    "description": "Sample customer segment"
+   },
+   "forecastSimulation": {
+    "type": "string",
+    "description": "Forecast simulation"
+   },
+   "bulkScenarioTesting": {
+    "type": "string",
+    "description": "Bulk scenario testing"
+   },
+   "qualifierAndRewardTicketProducts": {
+    "type": "string",
+    "description": "Qualifier and reward ticket products"
+   },
+   "couponEngineBoard3": {
+    "type": "string",
+    "description": "Coupon Engine — Board 3"
+   },
+   "codeTriggeredAdvancedOffers": {
+    "type": "string",
+    "description": "Code-triggered advanced offers"
+   },
+   "menuProductsPricesAndInventory": {
+    "type": "string",
+    "description": "Menu products, prices and inventory"
+   },
+   "retailProductsAndStockAvailability": {
+    "type": "string",
+    "description": "Retail products and stock availability"
+   },
+   "freeProductAvailabilityAndSubstitution": {
+    "type": "string",
+    "description": "Free-product availability and substitution"
+   },
+   "memberEligibilityAndBenefits": {
+    "type": "string",
+    "description": "Member eligibility and benefits"
+   },
+   "customerSegmentationAndPersonalization": {
+    "type": "string",
+    "description": "Customer segmentation and personalization"
+   },
+   "priceBasisAndMarginProtection": {
+    "type": "number",
+    "description": "Price basis and margin protection"
+   },
+   "revenueAllocationAndPromotionalCost": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue allocation and promotional cost"
+   },
+   "finalTransactionAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Final transaction amount"
+   },
+   "board4AdvancedMechanics": {
+    "type": "string",
+    "description": "Board 4 — Advanced Mechanics"
+   },
+   "whatProductToProductRewardRelationshipOccurs": {
+    "type": "string",
+    "description": "What product-to-product reward relationship occurs?"
+   },
+   "matrixCoverageBoard4": {
+    "type": "string",
+    "description": "Matrix Coverage — Board 4"
+   }
+  }
+ },
+ "RewardSelectionSubstitutionCustomerChoiceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Reward Selection, Substitution & Customer Choice displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "guestSelectsFromConfiguredOptions": {
+    "type": "string",
+    "description": "Guest selects from configured options"
+   },
+   "posCallCenterOperatorSelects": {
+    "type": "string",
+    "description": "POS/call-center operator selects"
+   }
+  }
+ }
+}

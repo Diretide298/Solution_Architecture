@@ -1,0 +1,784 @@
+{
+ "amendAttendance": {
+  "method": "POST",
+  "path": "/attendance/{recordId}/amend",
+  "contract": "workforce",
+  "summary": "A supervisor corrects a record",
+  "permission": "WORKFORCE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AttendanceRecord"
+ },
+ "applyManualDiscount": {
+  "method": "POST",
+  "path": "/orders/{orderId}/discounts",
+  "contract": "orders",
+  "summary": "Apply a discount a cashier chose",
+  "permission": "ORDER_DISCOUNT",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ManualDiscountRequest",
+  "responds": "Order"
+ },
+ "createAiConversation": {
+  "method": "POST",
+  "path": "/conversations",
+  "contract": "ai",
+  "summary": "Open a conversation",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiConversation"
+ },
+ "createOrder": {
+  "method": "POST",
+  "path": "/orders",
+  "contract": "orders",
+  "summary": "Create an order",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateOrderRequest",
+  "responds": "Order"
+ },
+ "createRefund": {
+  "method": "POST",
+  "path": "/orders/{orderId}/refunds",
+  "contract": "orders",
+  "summary": "Refund an order, wholly or in part",
+  "permission": "ORDER_REFUND",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateRefundRequest",
+  "responds": null
+ },
+ "exchangeOrderLines": {
+  "method": "POST",
+  "path": "/orders/{orderId}/exchanges",
+  "contract": "orders",
+  "summary": "Exchange lines for different products or dates",
+  "permission": "ORDER_EXCHANGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ExchangeOrderRequest",
+  "responds": "OrderExchangeResult"
+ },
+ "getCurrentShift": {
+  "method": "GET",
+  "path": "/shifts/current",
+  "contract": "shift",
+  "summary": "The open or suspended shift on the session's workstation",
+  "permission": "SHIFT_OPEN",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Shift"
+ },
+ "getLatestBundle": {
+  "method": "GET",
+  "path": "/catalogue/bundles/latest",
+  "contract": "catalogue",
+  "summary": "Pull the current bundle for this workstation's venue",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": "since",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "If-None-Match",
+    "in": "header",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CatalogueBundle"
+ },
+ "getOfflinePackage": {
+  "method": "GET",
+  "path": "/access/offline-package",
+  "contract": "access",
+  "summary": "Entitlement and rule set for offline validation",
+  "permission": "ACCESS_VALIDATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": "validFrom",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "validTo",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "If-None-Match",
+    "in": "header",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "OfflinePackage"
+ },
+ "getOrder": {
+  "method": "GET",
+  "path": "/orders/{orderId}",
+  "contract": "orders",
+  "summary": "Read an order",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Order"
+ },
+ "getOrderStatement": {
+  "method": "GET",
+  "path": "/orders/{orderId}/statement",
+  "contract": "orders",
+  "summary": "Full financial history of an order",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "OrderStatement"
+ },
+ "holdOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/hold",
+  "contract": "orders",
+  "summary": "Park a sale and free the till",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Order"
+ },
+ "listAiConversations": {
+  "method": "GET",
+  "path": "/conversations",
+  "contract": "ai",
+  "summary": "A principal's conversation history",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiConversation"
+ },
+ "listAttendance": {
+  "method": "GET",
+  "path": "/attendance",
+  "contract": "workforce",
+  "summary": "Who was here",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "date",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "exceptionsOnly",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AttendanceRecord"
+ },
+ "listCatalogueBundles": {
+  "method": "GET",
+  "path": "/catalogue/bundles",
+  "contract": "catalogue",
+  "summary": "List published bundles",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BundleSummary"
+ },
+ "listOrderRefunds": {
+  "method": "GET",
+  "path": "/orders/{orderId}/refunds",
+  "contract": "orders",
+  "summary": "List refunds against an order",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Refund"
+ },
+ "listOrders": {
+  "method": "GET",
+  "path": "/orders",
+  "contract": "orders",
+  "summary": "List orders",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "shiftId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "createdFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "createdTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listRotaAssignments": {
+  "method": "GET",
+  "path": "/rota-assignments",
+  "contract": "workforce",
+  "summary": "The rota",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "departmentId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RotaAssignment"
+ },
+ "listScans": {
+  "method": "GET",
+  "path": "/access/scans",
+  "contract": "access",
+  "summary": "List scan events",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "accessPointId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "ticketId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "outcome",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "recordedFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "recordedTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listShiftSwapRequests": {
+  "method": "GET",
+  "path": "/shift-swaps",
+  "contract": "workforce",
+  "summary": "Swap requests and their state",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ShiftSwap"
+ },
+ "listSyncRejections": {
+  "method": "GET",
+  "path": "/sync/rejections",
+  "contract": "orders",
+  "summary": "Entries the server refused",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "lookupTicket": {
+  "method": "GET",
+  "path": "/access/lookup",
+  "contract": "access",
+  "summary": "Read-only validity check without admitting",
+  "permission": "TICKET_LOOKUP",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "mediaCode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "ticketId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TicketStatus"
+ },
+ "modifyOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/modify",
+  "contract": "orders",
+  "summary": "Add or remove lines on an existing order",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ModifyOrderRequest",
+  "responds": "OrderModificationResult"
+ },
+ "overrideAccess": {
+  "method": "POST",
+  "path": "/access/override",
+  "contract": "access",
+  "summary": "Admit against a failed validation",
+  "permission": "ACCESS_OVERRIDE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ValidationResult"
+ },
+ "recordAttendance": {
+  "method": "POST",
+  "path": "/attendance/clock",
+  "contract": "workforce",
+  "summary": "Clock in, clock out, or take a break",
+  "permission": "ATTENDANCE_RECORD",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AttendanceRecord"
+ },
+ "reportBundleApplied": {
+  "method": "POST",
+  "path": "/catalogue/bundles/{version}/applied",
+  "contract": "catalogue",
+  "summary": "Report that a workstation applied a bundle",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "reprintOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/reprints",
+  "contract": "orders",
+  "summary": "Reprint or resend tickets",
+  "permission": "ORDER_REPRINT",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "requestShiftSwap": {
+  "method": "POST",
+  "path": "/rota-assignments/{assignmentId}/swap",
+  "contract": "workforce",
+  "summary": "Ask someone to take your shift",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "rescheduleOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/reschedule",
+  "contract": "orders",
+  "summary": "Move an order to another performance",
+  "permission": "ORDER_RESCHEDULE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "OrderExchangeResult"
+ },
+ "resumeOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/resume",
+  "contract": "orders",
+  "summary": "Bring a parked sale back to a till",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "OrderResumeResult"
+ },
+ "sendAiMessage": {
+  "method": "POST",
+  "path": "/conversations/{conversationId}/messages",
+  "contract": "ai",
+  "summary": "Ask",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiMessage"
+ },
+ "syncOrders": {
+  "method": "POST",
+  "path": "/sync/orders",
+  "contract": "orders",
+  "summary": "Replay orders recorded offline",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "OrderSyncResult"
+ },
+ "syncScans": {
+  "method": "POST",
+  "path": "/access/scans",
+  "contract": "access",
+  "summary": "Replay scans recorded offline",
+  "permission": "ACCESS_VALIDATE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ScanSyncResult"
+ },
+ "validateAccess": {
+  "method": "POST",
+  "path": "/access/validate",
+  "contract": "access",
+  "summary": "Validate media at an access point and admit or deny",
+  "permission": "ACCESS_VALIDATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ValidateRequest",
+  "responds": "ValidationResult"
+ },
+ "validateGroupAccess": {
+  "method": "POST",
+  "path": "/access/group-validate",
+  "contract": "access",
+  "summary": "Admit a group on one read",
+  "permission": "ACCESS_VALIDATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ValidationResult"
+ },
+ "voidOrder": {
+  "method": "POST",
+  "path": "/orders/{orderId}/voids",
+  "contract": "orders",
+  "summary": "Void an order",
+  "permission": "ORDER_VOID",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Order"
+ }
+}

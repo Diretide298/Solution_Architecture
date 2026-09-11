@@ -1,0 +1,132 @@
+id: F211
+name: 'Subscription Licensing AI Self Service board 5: Purchase / Trial Journey Selection'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Subscription Licensing AI Self Service board 5. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-409
+  entryPoints:
+  - Arrives at Purchase / Trial Journey Selection
+steps:
+- step: 1
+  screen: ADM-409
+  action: Opens Purchase / Trial Journey Selection
+  operations: []
+  outcome: Determine how the customer enters the commercial activation journey.
+- step: 2
+  screen: ADM-410
+  action: Works in Contract & Billing Cycle Selection
+  operations: []
+  outcome: Define the contractual duration and billing/reconciliation cycle.
+- step: 3
+  screen: ADM-409
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-411
+  action: Works in Billing & Legal Entity Information
+  operations: []
+  outcome: Capture the legally correct customer and billing information.
+- step: 5
+  screen: ADM-409
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-412
+  action: Works in Payment Method & Settlement Setup
+  operations: []
+  outcome: Configure how TICVAI collects its fees.
+- step: 7
+  screen: ADM-409
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-413
+  action: Works in Trial Configuration & Conversion Rules
+  operations: []
+  outcome: Configure trial terms where the selected package is trial-eligible. Not every commercial model
+    needs to support trials.
+- step: 9
+  screen: ADM-409
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-414
+  action: Works in Order & Commercial Pricing Review
+  operations: []
+  outcome: Show the complete financial arrangement before contractual acceptance. This screen must adapt
+    dynamically to the commercial model. Example — Per Ticket + Minimum Guarantee
+- step: 11
+  screen: ADM-409
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-415
+  action: Works in Commercial Agreement, Billable Definition & Customer Acceptance
+  operations: []
+  outcome: This becomes one of the most important revised screens. The customer must understand and formally
+    accept what TICVAI considers billable.
+- step: 13
+  screen: ADM-409
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-416
+  action: Works in Payment, Contract & Commercial Validation
+  operations: []
+  outcome: Perform final checks before creating the active subscription.
+- step: 15
+  screen: ADM-409
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-417
+  action: Works in Subscription Confirmation & Commercial Activation
+  operations: []
+  outcome: Create the formal active subscription/contract record after successful validation.
+- step: 17
+  screen: ADM-409
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-418
+  action: Works in Subscription Lifecycle & Trial-to-Paid Handoff
+  operations: []
+  outcome: Manage the immediate commercial lifecycle after purchase or trial activation and ensure clean
+    handoff to operational provisioning.
+branches:
+- at: 1
+  condition: Nothing has been set up on Purchase / Trial Journey Selection yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Subscription Licensing AI Self Service board 5 visited
+primaryContract: unknown
+contracts:
+- unknown

@@ -1,0 +1,225 @@
+{
+ "GameCard": {
+  "x-ticvai-persistence": "games.card",
+  "type": "object",
+  "required": [
+   "cardCode",
+   "venueId",
+   "credits",
+   "bonusCredits",
+   "points",
+   "status",
+   "issuedAt"
+  ],
+  "properties": {
+   "cardCode": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "credits": {
+    "type": "integer",
+    "description": "Bought with money. Buys plays."
+   },
+   "bonusCredits": {
+    "type": "integer",
+    "description": "From a promotion. Typically non-refundable and spent before paid credits.\n"
+   },
+   "points": {
+    "type": "integer",
+    "description": "Won by playing. Buys prizes. **Not interchangeable with credits** — a guest who wins should not simply be able to play more.\n"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "blocked",
+     "expired",
+     "transferred"
+    ]
+   },
+   "blockedReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "transferredToCardCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "lastPlayedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "issuedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "MerchandiseReservation": {
+  "x-ticvai-persistence": "retail.reservation + retail.reservation_line",
+  "type": "object",
+  "required": [
+   "id",
+   "outletId",
+   "lines",
+   "status",
+   "expiresAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "reservationNumber": {
+    "type": "string"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "merchandiseId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "quantity": {
+       "type": "integer"
+      }
+     }
+    }
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "reserved",
+     "collected",
+     "expired",
+     "cancelled"
+    ]
+   },
+   "collectionNote": {
+    "type": "string",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "collectedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PriceCheck": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "merchandiseId",
+   "name",
+   "listPrice",
+   "effectivePrice",
+   "onHand"
+  ],
+  "properties": {
+   "merchandiseId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sku": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "listPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "effectivePrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "After any live promotion."
+   },
+   "appliedPromotionCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "onHand": {
+    "type": "number"
+   },
+   "isAvailable": {
+    "type": "boolean"
+   },
+   "siblingOutlets": {
+    "type": "array",
+    "description": "Stock elsewhere in the venue, so a colleague can be sent.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "outletId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "outletName": {
+       "type": "string"
+      },
+      "onHand": {
+       "type": "number"
+      }
+     }
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,2332 @@
+[
+ {
+  "id": "BO-053",
+  "name": "Staff Directory",
+  "module": "People & Access Rights",
+  "requiresModule": "core",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/staff-directory",
+   "component": "apps/venue-management-web/src/routes/venue-operations/StaffDirectoryDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-007",
+    "BO-008",
+    "BO-009"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-007",
+     "trigger": "Product Directory",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "carries": [
+      "productId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Pricing Rules",
+     "carries": [
+      "priceListId"
+     ],
+     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Drawn 31 August** — `Marketing Board 1.dc.html` frame `crm-1b` (*Guest Directory*), matched on title at 0.80 within this board’s platforms.",
+  "density": "compact",
+  "boardFrames": [
+   "Marketing Board 1.dc.html#crm-1b"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listPrincipals` reads the population and `getPrincipal` reads one of them — list, select, act",
+  "purpose": "Find anyone who works at this venue.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every staff",
+       "bindsTo": "Principal",
+       "columns": [
+        "Principal.id",
+        "Principal.username",
+        "Principal.displayName",
+        "Principal.isActive",
+        "Principal.validFrom",
+        "Principal.validTo",
+        "Principal.primaryRoleId",
+        "Principal.roles",
+        "Principal.lastLoginAt"
+       ],
+       "operation": "listPrincipals",
+       "provenance": "contract identity.yaml GET /principals"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected staff",
+       "bindsTo": "Principal",
+       "columns": [
+        "Principal.id",
+        "Principal.username",
+        "Principal.displayName",
+        "Principal.isActive",
+        "Principal.validFrom",
+        "Principal.validTo",
+        "Principal.primaryRoleId",
+        "Principal.roles",
+        "Principal.lastLoginAt"
+       ],
+       "operation": "getPrincipal",
+       "provenance": "contract identity.yaml GET /principals/{principalId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createPrincipal",
+       "provenance": "contract identity.yaml POST /principals"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updatePrincipal",
+       "provenance": "contract identity.yaml PATCH /principals/{principalId}"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listPrincipals",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createPrincipal",
+       "label": "Create principal",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createPrincipal",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The staff list.",
+   "error": "Could not load. Names which read failed and leaves the staff untouched.",
+   "emptyFirstRun": "No staff yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the staff are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listPrincipals",
+    "contract": "identity",
+    "purpose": "List principals",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getPrincipal",
+    "contract": "identity",
+    "purpose": "Read a principal",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createPrincipal",
+    "contract": "identity",
+    "purpose": "Create a principal",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPrincipals"
+    ]
+   },
+   {
+    "operationId": "updatePrincipal",
+    "contract": "identity",
+    "purpose": "Update or deactivate a principal",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPrincipals"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "principalId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "Principal.id",
+    "Principal.username",
+    "Principal.displayName",
+    "Principal.isActive",
+    "Principal.validFrom"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-053",
+   "note": "**Drawn by Claude Design on `Marketing Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-054",
+  "name": "Role Assignment",
+  "module": "People & Access Rights",
+  "requiresModule": "core",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/role-assignment",
+   "component": "apps/venue-management-web/src/routes/venue-operations/RoleAssignmentDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-007",
+    "BO-008",
+    "BO-009"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-007",
+     "trigger": "Product Directory",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "carries": [
+      "productId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Pricing Rules",
+     "carries": [
+      "priceListId"
+     ],
+     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listRoles` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Give somebody the permissions their job needs.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every role assignment",
+       "bindsTo": "Role",
+       "columns": [
+        "Role.id",
+        "Role.code",
+        "Role.name",
+        "Role.description",
+        "Role.permissions",
+        "Role.inheritsFromRoleId",
+        "Role.isSystem",
+        "Role.principalCount",
+        "Role.grantCount"
+       ],
+       "operation": "listRoles",
+       "provenance": "contract identity.yaml GET /roles"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected role assignment",
+       "bindsTo": "Role",
+       "columns": [
+        "Role.id",
+        "Role.code",
+        "Role.name",
+        "Role.description",
+        "Role.permissions",
+        "Role.inheritsFromRoleId",
+        "Role.isSystem",
+        "Role.principalCount",
+        "Role.grantCount"
+       ],
+       "operation": "listRoles",
+       "provenance": "contract identity.yaml GET /roles"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createRole",
+       "provenance": "contract identity.yaml POST /roles"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listRoles",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createRole",
+       "label": "Create role",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createRole",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The role assignment list.",
+   "error": "Could not load. Names which read failed and leaves the role assignment untouched.",
+   "emptyFirstRun": "No role assignment yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the role assignment are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listRoles",
+    "contract": "identity",
+    "purpose": "List roles",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createRole",
+    "contract": "identity",
+    "purpose": "Create a role",
+    "trigger": "onAction",
+    "invalidates": [
+     "listRoles"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Role.id",
+    "Role.code",
+    "Role.name",
+    "Role.description",
+    "Role.permissions"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-054"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-055",
+  "name": "Rota & Scheduling",
+  "module": "People & Access Rights",
+  "requiresModule": "core",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/rota-scheduling",
+   "component": "apps/venue-management-web/src/routes/venue-operations/RotaSchedulingDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-007",
+    "BO-008",
+    "BO-009"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-007",
+     "trigger": "Product Directory",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "carries": [
+      "productId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Pricing Rules",
+     "carries": [
+      "priceListId"
+     ],
+     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listRotaAssignments` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Decide who is on which gate, when.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every rota scheduling",
+       "bindsTo": "RotaAssignment",
+       "columns": [
+        "RotaAssignment.overtimeMinutes",
+        "RotaAssignment.restPeriodBefore",
+        "RotaAssignment.breachesWorkingHourLimit",
+        "RotaAssignment.labourCost",
+        "RotaAssignment.id",
+        "RotaAssignment.principalId",
+        "RotaAssignment.displayName",
+        "RotaAssignment.venueId",
+        "RotaAssignment.departmentId",
+        "RotaAssignment.position",
+        "RotaAssignment.requiredRoleId",
+        "RotaAssignment.workstationId"
+       ],
+       "operation": "listRotaAssignments",
+       "provenance": "contract workforce.yaml GET /rota-assignments"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected rota scheduling",
+       "bindsTo": "RotaAssignment",
+       "columns": [
+        "RotaAssignment.overtimeMinutes",
+        "RotaAssignment.restPeriodBefore",
+        "RotaAssignment.breachesWorkingHourLimit",
+        "RotaAssignment.labourCost",
+        "RotaAssignment.id",
+        "RotaAssignment.principalId",
+        "RotaAssignment.displayName",
+        "RotaAssignment.venueId",
+        "RotaAssignment.departmentId",
+        "RotaAssignment.position",
+        "RotaAssignment.requiredRoleId",
+        "RotaAssignment.workstationId",
+        "RotaAssignment.startsAt",
+        "RotaAssignment.endsAt",
+        "RotaAssignment.status",
+        "RotaAssignment.breakMinutes"
+       ],
+       "operation": "listRotaAssignments",
+       "provenance": "contract workforce.yaml GET /rota-assignments"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createRotaAssignment",
+       "provenance": "contract workforce.yaml POST /rota-assignments"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateRotaAssignment",
+       "provenance": "contract workforce.yaml PATCH /rota-assignments/{assignmentId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request",
+       "operation": "requestShiftSwap",
+       "provenance": "contract workforce.yaml POST /rota-assignments/{assignmentId}/swap"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listRotaAssignments",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createRotaAssignment",
+       "label": "Create rota assignment",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createRotaAssignment",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The rota scheduling list.",
+   "error": "Could not load. Names which read failed and leaves the rota scheduling untouched.",
+   "emptyFirstRun": "No rota scheduling yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the rota scheduling are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listRotaAssignments",
+    "contract": "workforce",
+    "purpose": "The rota",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createRotaAssignment",
+    "contract": "workforce",
+    "purpose": "Put someone on the rota",
+    "trigger": "onAction",
+    "invalidates": [
+     "listRotaAssignments"
+    ]
+   },
+   {
+    "operationId": "updateRotaAssignment",
+    "contract": "workforce",
+    "purpose": "Move or cancel an assignment",
+    "trigger": "onAction",
+    "invalidates": [
+     "listRotaAssignments"
+    ]
+   },
+   {
+    "operationId": "requestShiftSwap",
+    "contract": "workforce",
+    "purpose": "Ask someone to take your shift",
+    "trigger": "onAction",
+    "invalidates": [
+     "listRotaAssignments"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "assignmentId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `assignmentId`.",
+   "preloaded": [
+    "RotaAssignment.overtimeMinutes",
+    "RotaAssignment.restPeriodBefore",
+    "RotaAssignment.breachesWorkingHourLimit",
+    "RotaAssignment.labourCost",
+    "RotaAssignment.id"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-055"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-056",
+  "name": "Time & Attendance",
+  "module": "People & Access Rights",
+  "requiresModule": "core",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/time-attendance",
+   "component": "apps/venue-management-web/src/routes/venue-operations/TimeAttendanceDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-007",
+    "BO-008",
+    "BO-009"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-007",
+     "trigger": "Product Directory",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "carries": [
+      "productId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Pricing Rules",
+     "carries": [
+      "priceListId"
+     ],
+     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listAttendance` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Record who actually turned up.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every time attendance",
+       "bindsTo": "AttendanceRecord",
+       "columns": [
+        "AttendanceRecord.id",
+        "AttendanceRecord.principalId",
+        "AttendanceRecord.assignmentId",
+        "AttendanceRecord.venueId",
+        "AttendanceRecord.kind",
+        "AttendanceRecord.occurredAt",
+        "AttendanceRecord.recordedAt",
+        "AttendanceRecord.accessPointId",
+        "AttendanceRecord.latitude",
+        "AttendanceRecord.longitude",
+        "AttendanceRecord.isAmended",
+        "AttendanceRecord.amendedByPrincipalId"
+       ],
+       "operation": "listAttendance",
+       "provenance": "contract workforce.yaml GET /attendance"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected time attendance",
+       "bindsTo": "AttendanceRecord",
+       "columns": [
+        "AttendanceRecord.id",
+        "AttendanceRecord.principalId",
+        "AttendanceRecord.assignmentId",
+        "AttendanceRecord.venueId",
+        "AttendanceRecord.kind",
+        "AttendanceRecord.occurredAt",
+        "AttendanceRecord.recordedAt",
+        "AttendanceRecord.accessPointId",
+        "AttendanceRecord.latitude",
+        "AttendanceRecord.longitude",
+        "AttendanceRecord.isAmended",
+        "AttendanceRecord.amendedByPrincipalId",
+        "AttendanceRecord.amendmentReason",
+        "AttendanceRecord.originalOccurredAt",
+        "AttendanceRecord.exception"
+       ],
+       "operation": "listAttendance",
+       "provenance": "contract workforce.yaml GET /attendance"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Amend",
+       "operation": "amendAttendance",
+       "provenance": "contract workforce.yaml POST /attendance/{recordId}/amend"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordAttendance",
+       "provenance": "contract workforce.yaml POST /attendance/clock"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listAttendance",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "amendAttendance",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The time attendance list.",
+   "error": "Could not load. Names which read failed and leaves the time attendance untouched.",
+   "emptyFirstRun": "No time attendance yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the time attendance are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listAttendance",
+    "contract": "workforce",
+    "purpose": "Who was here",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "amendAttendance",
+    "contract": "workforce",
+    "purpose": "A supervisor corrects a record",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAttendance"
+    ]
+   },
+   {
+    "operationId": "recordAttendance",
+    "contract": "workforce",
+    "purpose": "Clock in, clock out, or take a break",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAttendance"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "recordId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `recordId`.",
+   "preloaded": [
+    "AttendanceRecord.id",
+    "AttendanceRecord.principalId",
+    "AttendanceRecord.assignmentId",
+    "AttendanceRecord.venueId",
+    "AttendanceRecord.kind"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-056"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-057",
+  "name": "Training & Certification",
+  "module": "People & Access Rights",
+  "requiresModule": "core",
+  "wave": 3,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/training-certification",
+   "component": "apps/venue-management-web/src/routes/venue-operations/TrainingCertificationDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-007",
+    "BO-008",
+    "BO-009"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-007",
+     "trigger": "Product Directory",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "carries": [
+      "productId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Pricing Rules",
+     "carries": [
+      "priceListId"
+     ],
+     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listPrincipals` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Know who is allowed to do what.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every training certification",
+       "bindsTo": "Principal",
+       "columns": [
+        "Principal.id",
+        "Principal.username",
+        "Principal.displayName",
+        "Principal.isActive",
+        "Principal.validFrom",
+        "Principal.validTo",
+        "Principal.primaryRoleId",
+        "Principal.roles",
+        "Principal.lastLoginAt"
+       ],
+       "operation": "listPrincipals",
+       "provenance": "contract identity.yaml GET /principals"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected training certification",
+       "bindsTo": "Principal",
+       "columns": [
+        "Principal.id",
+        "Principal.username",
+        "Principal.displayName",
+        "Principal.isActive",
+        "Principal.validFrom",
+        "Principal.validTo",
+        "Principal.primaryRoleId",
+        "Principal.roles",
+        "Principal.lastLoginAt"
+       ],
+       "operation": "listPrincipals",
+       "provenance": "contract identity.yaml GET /principals"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listPrincipals",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The training certification list.",
+   "error": "Could not load. Names which read failed and leaves the training certification untouched.",
+   "emptyFirstRun": "No training certification yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the training certification are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listPrincipals",
+    "contract": "identity",
+    "purpose": "List principals",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Principal.id",
+    "Principal.username",
+    "Principal.displayName",
+    "Principal.isActive",
+    "Principal.validFrom"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-057"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-066",
+  "name": "Notification Settings",
+  "module": "People & Access Rights",
+  "requiresModule": "core",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/notification-settings",
+   "component": "apps/venue-management-web/src/routes/venue-operations/NotificationSettingsDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-007",
+    "BO-008",
+    "BO-009"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-007",
+     "trigger": "Product Directory",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "carries": [
+      "productId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Pricing Rules",
+     "carries": [
+      "priceListId"
+     ],
+     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listAnnouncements` reads the population and `getAnnouncementReach` reads one of them — list, select, act",
+  "purpose": "Decide what this venue tells people, and how.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every notification settings",
+       "bindsTo": "Announcement",
+       "columns": [
+        "Announcement.id",
+        "Announcement.title",
+        "Announcement.body",
+        "Announcement.kind",
+        "Announcement.venueIds",
+        "Announcement.departmentIds",
+        "Announcement.roleIds",
+        "Announcement.requiresAcknowledgement",
+        "Announcement.expiresAt",
+        "Announcement.publishedByPrincipalId",
+        "Announcement.publishedAt",
+        "Announcement.locale"
+       ],
+       "operation": "listAnnouncements",
+       "provenance": "contract workforce.yaml GET /announcements"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected notification settings",
+       "bindsTo": "AnnouncementReach",
+       "columns": [
+        "AnnouncementReach.announcementId",
+        "AnnouncementReach.targeted",
+        "AnnouncementReach.delivered",
+        "AnnouncementReach.acknowledged",
+        "AnnouncementReach.outstanding"
+       ],
+       "operation": "getAnnouncementReach",
+       "provenance": "contract workforce.yaml GET /announcements/{announcementId}/reach"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Publish",
+       "operation": "publishAnnouncement",
+       "provenance": "contract workforce.yaml POST /announcements"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Acknowledge",
+       "operation": "acknowledgeAnnouncement",
+       "provenance": "contract workforce.yaml POST /announcements/{announcementId}/acknowledge"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
+       "provenance": "authored — required by check-screens"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listAnnouncements",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "publishAnnouncement",
+       "label": "Publish announcement",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "publishAnnouncement",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishAnnouncement",
+       "notes": "Declares `publishAnnouncement`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The notification settings list.",
+   "error": "Could not load. Names which read failed and leaves the notification settings untouched.",
+   "emptyFirstRun": "No notification settings yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the notification settings are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listAnnouncements",
+    "contract": "workforce",
+    "purpose": "What staff have been told",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "publishAnnouncement",
+    "contract": "workforce",
+    "purpose": "Tell staff something",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAnnouncements"
+    ]
+   },
+   {
+    "operationId": "acknowledgeAnnouncement",
+    "contract": "workforce",
+    "purpose": "Confirm you have read it",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAnnouncements"
+    ]
+   },
+   {
+    "operationId": "getAnnouncementReach",
+    "contract": "workforce",
+    "purpose": "Who has acknowledged, and who has not",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "announcementId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `announcementId`.",
+   "preloaded": [
+    "AnnouncementReach.announcementId",
+    "AnnouncementReach.targeted",
+    "AnnouncementReach.delivered",
+    "AnnouncementReach.acknowledged",
+    "AnnouncementReach.outstanding"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-066"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-084",
+  "name": "Approval Inbox",
+  "module": "People & Access Rights",
+  "requiresModule": "core",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/approvals/approval-inbox",
+   "component": "apps/venue-management-web/src/routes/approvals/ApprovalInbox.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-052",
+    "BO-085",
+    "BO-086",
+    "BO-087"
+   ],
+   "inferred": true,
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "BO-052",
+     "trigger": "The goods arrive and are received",
+     "provenance": "flow F15 step 3→4"
+    },
+    {
+     "to": "BO-085",
+     "trigger": "Approves it",
+     "provenance": "flow F14 step 3→4",
+     "operation": "listApprovalRequests"
+    },
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-087",
+     "trigger": "Approval Delegations",
+     "carries": [
+      "delegationId"
+     ],
+     "provenance": "derived — BO-087 declares entryState.params delegationId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing.",
+  "density": "compact",
+  "pattern": "approvalInbox",
+  "patternReason": "`decideApprovalRequest` decides items that `listApprovalRequests` queues — every row is waiting for a person, so the empty state is success",
+  "purpose": "What is waiting on this person, sorted by what breaches soonest.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "queue",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Waiting for a decision",
+       "bindsTo": "ApprovalRequest",
+       "columns": [
+        "ApprovalRequest.id",
+        "ApprovalRequest.kind",
+        "ApprovalRequest.rerouteOnNoApprover",
+        "ApprovalRequest.outOfOfficeDelegateId",
+        "ApprovalRequest.allowEmailApproval",
+        "ApprovalRequest.reopenedFrom",
+        "ApprovalRequest.status",
+        "ApprovalRequest.subjectContract",
+        "ApprovalRequest.subjectType",
+        "ApprovalRequest.subjectId",
+        "ApprovalRequest.scopePath",
+        "ApprovalRequest.summary"
+       ],
+       "operation": "listApprovalRequests",
+       "provenance": "contract approvals.yaml GET /approval-requests"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "item",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected approval",
+       "bindsTo": "ApprovalRequest",
+       "columns": [
+        "ApprovalRequest.id",
+        "ApprovalRequest.kind",
+        "ApprovalRequest.rerouteOnNoApprover",
+        "ApprovalRequest.outOfOfficeDelegateId",
+        "ApprovalRequest.allowEmailApproval",
+        "ApprovalRequest.reopenedFrom",
+        "ApprovalRequest.status",
+        "ApprovalRequest.subjectContract",
+        "ApprovalRequest.subjectType",
+        "ApprovalRequest.subjectId",
+        "ApprovalRequest.scopePath",
+        "ApprovalRequest.summary",
+        "ApprovalRequest.amount",
+        "ApprovalRequest.justification",
+        "ApprovalRequest.requestedByPrincipalId",
+        "ApprovalRequest.matrixVersion"
+       ],
+       "operation": "listApprovalRequests",
+       "provenance": "contract approvals.yaml GET /approval-requests"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "decision",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Decide",
+       "operation": "decideApprovalRequest",
+       "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/decide"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Escalate",
+       "operation": "escalateApprovalRequest",
+       "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/escalate"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The approval list.",
+   "error": "Could not load. Names which read failed and leaves the approval untouched.",
+   "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
+   "emptyNoResults": "The filter narrowed it and the approval are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listApprovalRequests",
+    "contract": "approvals",
+    "purpose": "Requests awaiting a decision, or already decided",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "decideApprovalRequest",
+    "contract": "approvals",
+    "purpose": "Approve or reject",
+    "trigger": "onAction",
+    "invalidates": [
+     "listApprovalRequests"
+    ]
+   },
+   {
+    "operationId": "escalateApprovalRequest",
+    "contract": "approvals",
+    "purpose": "Move it up a level",
+    "trigger": "onAction",
+    "invalidates": [
+     "listApprovalRequests"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "requestId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `requestId`.",
+   "preloaded": [
+    "ApprovalRequest.id",
+    "ApprovalRequest.kind",
+    "ApprovalRequest.rerouteOnNoApprover",
+    "ApprovalRequest.outOfOfficeDelegateId",
+    "ApprovalRequest.allowEmailApproval"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-084"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-085",
+  "name": "Approval Request",
+  "module": "People & Access Rights",
+  "requiresModule": "core",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/approvals/approval-request",
+   "component": "apps/venue-management-web/src/routes/approvals/ApprovalRequest.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-084",
+    "BO-086",
+    "BO-087"
+   ],
+   "inferred": true,
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-084",
+     "trigger": "Approval Inbox",
+     "carries": [
+      "requestId"
+     ],
+     "provenance": "derived — BO-084 declares entryState.params requestId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-087",
+     "trigger": "Approval Delegations",
+     "carries": [
+      "delegationId"
+     ],
+     "provenance": "derived — BO-087 declares entryState.params delegationId, so an edge into it must carry them"
+    },
+    {
+     "to": "POS-005",
+     "trigger": "The till applies it and completes the sale",
+     "provenance": "flow F14 step 4→5",
+     "operation": "decideApprovalRequest",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. **Cross-platform navigation removed 24 August**: POS-005. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.",
+  "density": "compact",
+  "pattern": "approvalInbox",
+  "patternReason": "`decideApprovalRequest` decides items that `listApprovalRequests` queues — every row is waiting for a person, so the empty state is success",
+  "purpose": "One request, its subject, and the decision.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "queue",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Waiting for a decision",
+       "bindsTo": "ApprovalRequest",
+       "columns": [
+        "ApprovalRequest.id",
+        "ApprovalRequest.kind",
+        "ApprovalRequest.rerouteOnNoApprover",
+        "ApprovalRequest.outOfOfficeDelegateId",
+        "ApprovalRequest.allowEmailApproval",
+        "ApprovalRequest.reopenedFrom",
+        "ApprovalRequest.status",
+        "ApprovalRequest.subjectContract",
+        "ApprovalRequest.subjectType",
+        "ApprovalRequest.subjectId",
+        "ApprovalRequest.scopePath",
+        "ApprovalRequest.summary"
+       ],
+       "operation": "listApprovalRequests",
+       "provenance": "contract approvals.yaml GET /approval-requests"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "item",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected approval request",
+       "bindsTo": "ApprovalRequest",
+       "columns": [
+        "ApprovalRequest.id",
+        "ApprovalRequest.kind",
+        "ApprovalRequest.rerouteOnNoApprover",
+        "ApprovalRequest.outOfOfficeDelegateId",
+        "ApprovalRequest.allowEmailApproval",
+        "ApprovalRequest.reopenedFrom",
+        "ApprovalRequest.status",
+        "ApprovalRequest.subjectContract",
+        "ApprovalRequest.subjectType",
+        "ApprovalRequest.subjectId",
+        "ApprovalRequest.scopePath",
+        "ApprovalRequest.summary",
+        "ApprovalRequest.amount",
+        "ApprovalRequest.justification",
+        "ApprovalRequest.requestedByPrincipalId",
+        "ApprovalRequest.matrixVersion"
+       ],
+       "operation": "listApprovalRequests",
+       "provenance": "contract approvals.yaml GET /approval-requests"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "decision",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Decide",
+       "operation": "decideApprovalRequest",
+       "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/decide"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resubmit",
+       "operation": "resubmitApprovalRequest",
+       "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/resubmit"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Withdraw",
+       "operation": "withdrawApprovalRequest",
+       "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/withdraw"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Evaluate",
+       "operation": "evaluateApprovalRequirement",
+       "provenance": "contract approvals.yaml POST /approval-requests/evaluate"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmWithdrawApprovalRequest",
+    "component": "confirmDialog",
+    "trigger": "Withdraw",
+    "body": "**Names what `withdrawApprovalRequest` changes and what it leaves alone**, in the consequence rather than the verb. A approval request this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract approvals.yaml POST /approval-requests/{requestId}/withdraw"
+   }
+  ],
+  "states": {
+   "loading": "The approval request list.",
+   "error": "Could not load. Names which read failed and leaves the approval request untouched.",
+   "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
+   "emptyNoResults": "The filter narrowed it and the approval request are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listApprovalRequests",
+    "contract": "approvals",
+    "purpose": "Requests awaiting a decision, or already decided",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "decideApprovalRequest",
+    "contract": "approvals",
+    "purpose": "Approve or reject",
+    "trigger": "onAction",
+    "invalidates": [
+     "listApprovalRequests"
+    ]
+   },
+   {
+    "operationId": "resubmitApprovalRequest",
+    "contract": "approvals",
+    "purpose": "Amend a rejected request and try again",
+    "trigger": "onAction",
+    "invalidates": [
+     "listApprovalRequests"
+    ]
+   },
+   {
+    "operationId": "withdrawApprovalRequest",
+    "contract": "approvals",
+    "purpose": "The requester takes it back",
+    "trigger": "onAction",
+    "invalidates": [
+     "listApprovalRequests"
+    ]
+   },
+   {
+    "operationId": "evaluateApprovalRequirement",
+    "contract": "approvals",
+    "purpose": "Does this need approval, and from whom",
+    "trigger": "onAction",
+    "invalidates": [
+     "listApprovalRequests"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "requestId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `requestId`.",
+   "preloaded": [
+    "ApprovalRequest.id",
+    "ApprovalRequest.kind",
+    "ApprovalRequest.rerouteOnNoApprover",
+    "ApprovalRequest.outOfOfficeDelegateId",
+    "ApprovalRequest.allowEmailApproval"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-085"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-086",
+  "name": "Approval Matrix",
+  "module": "People & Access Rights",
+  "requiresModule": "core",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/approvals/approval-matrix",
+   "component": "apps/venue-management-web/src/routes/approvals/ApprovalMatrix.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-084",
+    "BO-085",
+    "BO-087"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-084",
+     "trigger": "Approval Inbox",
+     "carries": [
+      "requestId"
+     ],
+     "provenance": "derived — BO-084 declares entryState.params requestId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-085",
+     "trigger": "Approval Request",
+     "carries": [
+      "requestId"
+     ],
+     "provenance": "derived — BO-085 declares entryState.params requestId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-087",
+     "trigger": "Approval Delegations",
+     "carries": [
+      "delegationId"
+     ],
+     "provenance": "derived — BO-087 declares entryState.params delegationId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listApprovalMatrices` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "What needs approval here, and who grants it.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every approval",
+       "bindsTo": "ApprovalMatrix",
+       "columns": [
+        "ApprovalMatrix.id",
+        "ApprovalMatrix.kind",
+        "ApprovalMatrix.scopeLevel",
+        "ApprovalMatrix.scopePath",
+        "ApprovalMatrix.rules",
+        "ApprovalMatrix.isActive"
+       ],
+       "operation": "listApprovalMatrices",
+       "provenance": "contract approvals.yaml GET /approval-matrices"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected approval",
+       "bindsTo": "ApprovalMatrix",
+       "columns": [
+        "ApprovalMatrix.id",
+        "ApprovalMatrix.kind",
+        "ApprovalMatrix.scopeLevel",
+        "ApprovalMatrix.scopePath",
+        "ApprovalMatrix.rules",
+        "ApprovalMatrix.isActive"
+       ],
+       "operation": "listApprovalMatrices",
+       "provenance": "contract approvals.yaml GET /approval-matrices"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "setApprovalMatrix",
+       "provenance": "contract approvals.yaml PUT /approval-matrices"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The approval list.",
+   "error": "Could not load. Names which read failed and leaves the approval untouched.",
+   "emptyFirstRun": "No approval yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the approval are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listApprovalMatrices",
+    "contract": "approvals",
+    "purpose": "What requires approval here",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setApprovalMatrix",
+    "contract": "approvals",
+    "purpose": "Configure what requires approval",
+    "trigger": "onAction",
+    "invalidates": [
+     "listApprovalMatrices"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "ApprovalMatrix.id",
+    "ApprovalMatrix.kind",
+    "ApprovalMatrix.scopeLevel",
+    "ApprovalMatrix.scopePath",
+    "ApprovalMatrix.rules"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-086"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-087",
+  "name": "Approval Delegations",
+  "module": "People & Access Rights",
+  "requiresModule": "core",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/approvals/approval-delegations",
+   "component": "apps/venue-management-web/src/routes/approvals/ApprovalDelegations.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-084",
+    "BO-085",
+    "BO-086"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-084",
+     "trigger": "Approval Inbox",
+     "carries": [
+      "requestId"
+     ],
+     "provenance": "derived — BO-084 declares entryState.params requestId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-085",
+     "trigger": "Approval Request",
+     "carries": [
+      "requestId"
+     ],
+     "provenance": "derived — BO-085 declares entryState.params requestId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listApprovalDelegations` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Who is standing in for whom, and until when.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every approval delegations",
+       "bindsTo": "ApprovalDelegation",
+       "columns": [
+        "ApprovalDelegation.id",
+        "ApprovalDelegation.delegatorPrincipalId",
+        "ApprovalDelegation.delegatePrincipalId",
+        "ApprovalDelegation.kinds",
+        "ApprovalDelegation.maxAmount",
+        "ApprovalDelegation.from",
+        "ApprovalDelegation.to",
+        "ApprovalDelegation.reason",
+        "ApprovalDelegation.isActive",
+        "ApprovalDelegation.scopePath"
+       ],
+       "operation": "listApprovalDelegations",
+       "provenance": "contract approvals.yaml GET /delegations"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected approval delegations",
+       "bindsTo": "ApprovalDelegation",
+       "columns": [
+        "ApprovalDelegation.id",
+        "ApprovalDelegation.delegatorPrincipalId",
+        "ApprovalDelegation.delegatePrincipalId",
+        "ApprovalDelegation.kinds",
+        "ApprovalDelegation.maxAmount",
+        "ApprovalDelegation.from",
+        "ApprovalDelegation.to",
+        "ApprovalDelegation.reason",
+        "ApprovalDelegation.isActive",
+        "ApprovalDelegation.scopePath"
+       ],
+       "operation": "listApprovalDelegations",
+       "provenance": "contract approvals.yaml GET /delegations"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createApprovalDelegation",
+       "provenance": "contract approvals.yaml POST /delegations"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Revoke",
+       "operation": "revokeApprovalDelegation",
+       "provenance": "contract approvals.yaml DELETE /delegations/{delegationId}"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmRevokeApprovalDelegation",
+    "component": "confirmDialog",
+    "trigger": "Revoke",
+    "body": "**Names what `revokeApprovalDelegation` changes and what it leaves alone**, in the consequence rather than the verb. A approval delegations this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract approvals.yaml DELETE /delegations/{delegationId}"
+   }
+  ],
+  "states": {
+   "loading": "The approval delegations list.",
+   "error": "Could not load. Names which read failed and leaves the approval delegations untouched.",
+   "emptyFirstRun": "No approval delegations yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the approval delegations are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listApprovalDelegations",
+    "contract": "approvals",
+    "purpose": "Who is standing in for whom",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createApprovalDelegation",
+    "contract": "approvals",
+    "purpose": "Delegate approval authority",
+    "trigger": "onAction",
+    "invalidates": [
+     "listApprovalDelegations"
+    ]
+   },
+   {
+    "operationId": "revokeApprovalDelegation",
+    "contract": "approvals",
+    "purpose": "End a delegation early",
+    "trigger": "onAction",
+    "invalidates": [
+     "listApprovalDelegations"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "delegationId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `delegationId`.",
+   "preloaded": [
+    "ApprovalDelegation.id",
+    "ApprovalDelegation.delegatorPrincipalId",
+    "ApprovalDelegation.delegatePrincipalId",
+    "ApprovalDelegation.kinds",
+    "ApprovalDelegation.maxAmount"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-087"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

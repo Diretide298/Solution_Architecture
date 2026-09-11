@@ -1,0 +1,1297 @@
+{
+ "Bill": {
+  "x-ticvai-persistence": "none — computed from visit orders",
+  "type": "object",
+  "required": [
+   "visitId",
+   "lines",
+   "subtotal",
+   "taxAmount",
+   "total"
+  ],
+  "properties": {
+   "visitId": {
+    "type": "string"
+   },
+   "covers": {
+    "type": "integer"
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "lineId",
+      "name",
+      "quantity",
+      "lineTotal"
+     ],
+     "properties": {
+      "lineId": {
+       "type": "string"
+      },
+      "orderId": {
+       "type": "string"
+      },
+      "name": {
+       "type": "string"
+      },
+      "quantity": {
+       "type": "integer"
+      },
+      "unitPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "lineTotal": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "categoryCode": {
+       "type": "string",
+       "nullable": true
+      },
+      "seatNumber": {
+       "type": "integer",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "subtotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "serviceCharge": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "discountAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "total": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  }
+ },
+ "BillSplit": {
+  "x-ticvai-persistence": "fnb.bill_split + fnb.sub_bill",
+  "type": "object",
+  "required": [
+   "visitId",
+   "method",
+   "subBills"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "visitId": {
+    "type": "string"
+   },
+   "method": {
+    "$ref": "#/components/schemas/SplitMethod"
+   },
+   "subBills": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "subBillId",
+      "total",
+      "status"
+     ],
+     "properties": {
+      "subBillId": {
+       "type": "string"
+      },
+      "lineIds": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "subtotal": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "taxAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "total": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "status": {
+       "type": "string",
+       "enum": [
+        "unpaid",
+        "paid"
+       ]
+      }
+     }
+    }
+   }
+  }
+ },
+ "ConsentState": {
+  "x-ticvai-persistence": "none — projection over consent_record",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "purposes"
+  ],
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "purposes": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "purpose",
+      "decision",
+      "requiresRenewal"
+     ],
+     "properties": {
+      "purpose": {
+       "$ref": "#/components/schemas/ConsentPurpose"
+      },
+      "decision": {
+       "$ref": "#/components/schemas/ConsentDecision"
+      },
+      "channels": {
+       "type": "array",
+       "items": {
+        "$ref": "#/components/schemas/MessageChannel"
+       }
+      },
+      "noticeVersion": {
+       "type": "string",
+       "nullable": true
+      },
+      "requiresRenewal": {
+       "type": "boolean",
+       "description": "True where the notice has been superseded since consent was given."
+      },
+      "decidedAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "CreateFnbOrderLine": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "menuItemId",
+   "quantity"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "menuItemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "quantity": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "modifierOptionIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 200,
+    "description": "Free text to the kitchen. Allergy notes belong here and are surfaced prominently."
+   },
+   "seatNumber": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Which cover ordered it. Drives split-by-covers accurately."
+   },
+   "course": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Course grouping, so the kitchen fires in sequence."
+   }
+  }
+ },
+ "CreateFnbOrderRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "outletId",
+   "serviceMode",
+   "lines",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "serviceMode": {
+    "$ref": "#/components/schemas/ServiceMode"
+   },
+   "tableVisitId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Required for table service. Absent for quick service."
+   },
+   "lines": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "$ref": "#/components/schemas/CreateFnbOrderLine"
+    }
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "CreatePaymentRequest": {
+  "type": "object",
+  "required": [
+   "id",
+   "orderId",
+   "tender",
+   "amount",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "orderId": {
+    "type": "string"
+   },
+   "tender": {
+    "$ref": "#/components/schemas/TenderKind"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "tenderedAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Cash only. Change is the difference."
+   },
+   "walletAuthorisationId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Cross-cell wallet hold, where the guest's home cell is elsewhere."
+   },
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "FnbOrder": {
+  "x-ticvai-persistence": "fnb.fnb_order + fnb.fnb_order_line",
+  "type": "object",
+  "required": [
+   "id",
+   "orderNumber",
+   "outletId",
+   "serviceMode",
+   "status",
+   "lines",
+   "grossAmount",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "serviceMode": {
+    "$ref": "#/components/schemas/ServiceMode"
+   },
+   "tableVisitId": {
+    "type": "string",
+    "nullable": true
+   },
+   "status": {
+    "$ref": "#/components/schemas/FnbOrderStatus"
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "allOf": [
+      {
+       "$ref": "#/components/schemas/CreateFnbOrderLine"
+      },
+      {
+       "type": "object",
+       "properties": {
+        "status": {
+         "$ref": "#/components/schemas/FnbOrderStatus"
+        },
+        "unitPrice": {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        },
+        "lineTotal": {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       }
+      }
+     ]
+    }
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "kitchenTicketId": {
+    "type": "string",
+    "nullable": true
+   },
+   "estimatedReadyAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "FnbOrderStatus": {
+  "type": "string",
+  "description": "The full lifecycle from 4.6.35. Nine states, not six — the earlier enum collapsed `accepted` into `placed` and had no `collected` or `delivered` at all, which made collection and delivery indistinguishable from a server putting a plate down.\n`accepted` matters because an outlet may refuse: past last orders, out of a key ingredient, or simply too far behind. A guest whose order sat in `placed` for ten minutes and was then rejected has a worse experience than one refused immediately.\n",
+  "enum": [
+   "ordered",
+   "accepted",
+   "inPreparation",
+   "ready",
+   "served",
+   "collected",
+   "delivered",
+   "cancelled",
+   "refunded"
+  ]
+ },
+ "GuestProfile": {
+  "x-ticvai-persistence": "marketing.guest_profile",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger.\n"
+   },
+   "displayName": {
+    "type": "string",
+    "nullable": true
+   },
+   "email": {
+    "type": "string",
+    "nullable": true
+   },
+   "phone": {
+    "type": "string",
+    "nullable": true
+   },
+   "preferredLanguage": {
+    "type": "string",
+    "nullable": true
+   },
+   "preferredChannel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "guestLinkId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Present where the guest is linked across cells. Marketing acts locally."
+   },
+   "tags": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "engagementScore": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 100,
+    "description": "22.2.20 and 22.2.21. **`lifetimeValue` and `visitCount` existed, so value was a stored figure and engagement was not.** They are different questions: a guest who spent a lot once and a guest who visits monthly have the same LTV and need opposite treatment.\n**Recency, frequency and breadth, not spend** — spend is already `lifetimeValue`, and folding it in here would make one number twice.\n"
+   },
+   "engagementTier": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "new",
+     "active",
+     "occasional",
+     "lapsing",
+     "lapsed",
+     "dormant"
+    ],
+    "description": "5.3.19. **Automatic classification, computed rather than assigned.** `lapsing` is the tier the whole field exists for — **a guest who has not been for a while and still might is the only one marketing can change**, and lumping them with `lapsed` wastes the window.\n"
+   },
+   "lifetimeValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "visitCount": {
+    "type": "integer"
+   },
+   "lastVisitAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "GuestProfileDetail": {
+  "x-ticvai-persistence": "marketing.guest_profile",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/GuestProfile"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true,
+      "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+     },
+     "consents": {
+      "$ref": "#/components/schemas/ConsentState"
+     },
+     "loyalty": {
+      "$ref": "#/components/schemas/LoyaltyPosition"
+     },
+     "openCaseCount": {
+      "type": "integer"
+     },
+     "recentOrderIds": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "membershipIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "notes": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   }
+  ]
+ },
+ "KitchenTicket": {
+  "x-ticvai-persistence": "fnb.kitchen_ticket + fnb.kitchen_ticket_line",
+  "type": "object",
+  "required": [
+   "id",
+   "orderId",
+   "outletId",
+   "status",
+   "lines",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "orderId": {
+    "type": "string"
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "tableLabel": {
+    "type": "string",
+    "nullable": true
+   },
+   "serviceMode": {
+    "$ref": "#/components/schemas/ServiceMode"
+   },
+   "coursing": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "fireAndForget",
+     "holdAndFire",
+     "phased",
+     "timed",
+     "delayed"
+    ],
+    "description": "BL-131. **Starters before mains is the entire job of a kitchen pass**, and the model fired everything at once.\n`holdAndFire` waits for a server to call it; `timed` fires on a clock; `phased` staggers by course. **Without this a table gets its dessert while eating its starter.**\n"
+   },
+   "buzzerCode": {
+    "type": "string",
+    "nullable": true,
+    "description": "BL-128. **The pager number handed to a guest at a counter.** Recorded against the order so a lost buzzer is a lookup rather than an argument.\n"
+   },
+   "status": {
+    "$ref": "#/components/schemas/KitchenTicketStatus"
+   },
+   "priority": {
+    "type": "integer",
+    "description": "Higher fires sooner. Raised by Fast Pass or supervisor override."
+   },
+   "prioritisedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "prioritiseReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "lineId",
+      "name",
+      "quantity",
+      "status"
+     ],
+     "properties": {
+      "lineId": {
+       "type": "string"
+      },
+      "name": {
+       "type": "string"
+      },
+      "quantity": {
+       "type": "integer"
+      },
+      "modifiers": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "note": {
+       "type": "string",
+       "nullable": true
+      },
+      "allergens": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "course": {
+       "type": "integer",
+       "nullable": true
+      },
+      "stationId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "status": {
+       "$ref": "#/components/schemas/KitchenTicketStatus"
+      }
+     }
+    }
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "targetReadyAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "elapsedSeconds": {
+    "type": "integer"
+   }
+  }
+ },
+ "KitchenTicketStatus": {
+  "type": "string",
+  "enum": [
+   "received",
+   "preparing",
+   "ready",
+   "served",
+   "recalled",
+   "cancelled"
+  ]
+ },
+ "LoyaltyPosition": {
+  "x-ticvai-persistence": "marketing.loyalty_position",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "programmeId",
+   "pointsBalance",
+   "tierCode"
+  ],
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "programmeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "pointsBalance": {
+    "type": "integer"
+   },
+   "lifetimePoints": {
+    "type": "integer"
+   },
+   "tierCode": {
+    "type": "string"
+   },
+   "tierName": {
+    "type": "string"
+   },
+   "pointsToNextTier": {
+    "type": "integer",
+    "nullable": true
+   },
+   "nextExpiryPoints": {
+    "type": "integer",
+    "nullable": true
+   },
+   "nextExpiryAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "OpenTableVisitRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "tableId",
+   "covers",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "tableId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "covers": {
+    "type": "integer",
+    "minimum": 1,
+    "description": "Captured at seating because it drives split-by-covers at close."
+   },
+   "serverPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Payment": {
+  "x-ticvai-persistence": "orders.payment",
+  "type": "object",
+  "required": [
+   "id",
+   "orderId",
+   "tender",
+   "amount",
+   "status",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "orderId": {
+    "type": "string"
+   },
+   "tender": {
+    "$ref": "#/components/schemas/TenderKind"
+   },
+   "tenderCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "description": "4.6.11. **What the guest actually handed over**, which is not always what the venue books. A tourist paying USD cash at a till is a foreign tender; the sale is still recorded in base currency.\nEqual to the base currency for almost every payment. **Present on all of them so the foreign-tender report has a source** — `getForeignTenderReport` promised *what was taken in which currency* and nothing recorded it until 18 August.\n"
+   },
+   "tenderAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "The amount in `tenderCurrency`, at that currency's own scale."
+   },
+   "fxRate": {
+    "type": "number",
+    "nullable": true,
+    "description": "The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"
+   },
+   "fxRateSource": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "manual",
+     "feed",
+     "cardScheme"
+    ],
+    "description": "4.2.8. Manual or fed on a schedule. **`cardScheme` is where the terminal did the conversion and told us** — dynamic currency conversion, the scheme's rate rather than ours.\n"
+   },
+   "changeCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "changeAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "authorised",
+     "captured",
+     "pendingConfirmation",
+     "declined",
+     "failed",
+     "voided",
+     "refunded"
+    ]
+   },
+   "providerName": {
+    "type": "string",
+    "nullable": true
+   },
+   "providerReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "lastInquiryAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "RestaurantWaitlist": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.waitlist_entry",
+  "description": "BL-130. **Distinct from `queue`, which is for rides.** A restaurant waitlist has a party size, a table preference and a walk-away point, and a guest who leaves is not the same as a guest who was served.\n",
+  "required": [
+   "id",
+   "outletId",
+   "partySize",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "partySize": {
+    "type": "integer"
+   },
+   "quotedWaitMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "seatingPreference": {
+    "type": "string",
+    "enum": [
+     "any",
+     "indoor",
+     "outdoor",
+     "bar",
+     "booth",
+     "highChair"
+    ],
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "waiting",
+     "notified",
+     "seated",
+     "walkedAway",
+     "noShow",
+     "cancelled"
+    ]
+   },
+   "notifiedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "holdExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**How long a table waits for somebody who was called.** Too short and a guest returning from the bathroom loses it; too long and the table sits empty at peak — which is why it is a setting rather than a constant.\n"
+   }
+  }
+ },
+ "ServiceMode": {
+  "type": "string",
+  "enum": [
+   "quickService",
+   "tableService",
+   "roomService",
+   "collection",
+   "delivery"
+  ]
+ },
+ "SplitBillRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "method"
+  ],
+  "properties": {
+   "method": {
+    "$ref": "#/components/schemas/SplitMethod"
+   },
+   "parts": {
+    "type": "integer",
+    "minimum": 2,
+    "description": "For `byCovers` — defaults to the visit's cover count."
+   },
+   "amounts": {
+    "type": "array",
+    "description": "For `byAmount`. Must sum to the bill total.",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/Money"
+    }
+   },
+   "lineAssignments": {
+    "type": "array",
+    "description": "For `byLine` or `bySeat`. Every line must be assigned exactly once.",
+    "items": {
+     "type": "object",
+     "required": [
+      "lineId",
+      "partIndex"
+     ],
+     "properties": {
+      "lineId": {
+       "type": "string"
+      },
+      "partIndex": {
+       "type": "integer",
+       "minimum": 0
+      }
+     }
+    }
+   },
+   "categoryAssignments": {
+    "type": "array",
+    "description": "For `byCategory` — food to one part, beverage to another.",
+    "items": {
+     "type": "object",
+     "required": [
+      "categoryCode",
+      "partIndex"
+     ],
+     "properties": {
+      "categoryCode": {
+       "type": "string"
+      },
+      "partIndex": {
+       "type": "integer",
+       "minimum": 0
+      }
+     }
+    }
+   }
+  }
+ },
+ "SplitMethod": {
+  "type": "string",
+  "enum": [
+   "byAmount",
+   "byCovers",
+   "byCategory",
+   "byLine",
+   "bySeat"
+  ]
+ },
+ "TableMap": {
+  "x-ticvai-persistence": "none — projection",
+  "type": "object",
+  "required": [
+   "outletId",
+   "tables"
+  ],
+  "properties": {
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "zones": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "tables": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/TableState"
+    }
+   }
+  }
+ },
+ "TableReservation": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.table_reservation",
+  "required": [
+   "outletId",
+   "startsAt",
+   "partySize"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "guestName": {
+    "type": "string"
+   },
+   "contactPoint": {
+    "type": "string"
+   },
+   "partySize": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "startsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "durationMinutes": {
+    "type": "integer",
+    "description": "**How long the cover is held.** An outlet turning tables twice an evening needs this to be real, or the second sitting cannot be booked.\n"
+   },
+   "tableIds": {
+    "type": "array",
+    "description": "Usually empty until seating. **Committing a specific table at booking time refuses later bookings against a constraint that did not need to exist.**\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "status": {
+    "$ref": "#/components/schemas/TableReservationStatus"
+   },
+   "groupId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "5.1.2. Several bookings managed as one party across adjacent tables."
+   },
+   "notes": {
+    "type": "string",
+    "description": "Allergies",
+    "occasion": null,
+    "accessibility.": null
+   },
+   "actualPartySize": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true
+   },
+   "tableVisitId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "TableReservationStatus": {
+  "type": "string",
+  "enum": [
+   "booked",
+   "confirmed",
+   "seated",
+   "completed",
+   "cancelled",
+   "noShow"
+  ]
+ },
+ "TableState": {
+  "x-ticvai-persistence": "none — projection over table and visit",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/TableDefinition"
+   },
+   {
+    "type": "object",
+    "required": [
+     "status"
+    ],
+    "properties": {
+     "status": {
+      "$ref": "#/components/schemas/TableStatus"
+     },
+     "visitId": {
+      "type": "string",
+      "nullable": true
+     },
+     "covers": {
+      "type": "integer",
+      "nullable": true
+     },
+     "seatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "serverPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     },
+     "billTotal": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    }
+   }
+  ]
+ },
+ "TableVisit": {
+  "x-ticvai-persistence": "fnb.table_visit",
+  "type": "object",
+  "required": [
+   "id",
+   "tableId",
+   "outletId",
+   "covers",
+   "status",
+   "orders",
+   "openedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "tableId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "tableLabel": {
+    "type": "string"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "covers": {
+    "type": "integer"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "billRequested",
+     "settled",
+     "merged",
+     "cancelled"
+    ]
+   },
+   "serverPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "orders": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/FnbOrder"
+    }
+   },
+   "mergedIntoVisitId": {
+    "type": "string",
+    "nullable": true
+   },
+   "mergedFromVisitIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "runningTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "openedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "closedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "TenderKind": {
+  "type": "string",
+  "enum": [
+   "cash",
+   "card",
+   "wallet",
+   "voucher",
+   "bankTransfer",
+   "hotelCharge",
+   "installment",
+   "giftCard",
+   "complimentary"
+  ]
+ }
+}

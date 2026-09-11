@@ -1,0 +1,556 @@
+[
+ {
+  "id": "ACC-006",
+  "name": "Reviewer Queue",
+  "module": "Reviewer (Internal)",
+  "wave": 3,
+  "requiresModule": "accreditation",
+  "pattern": "approvalInbox",
+  "density": "compact",
+  "purpose": "Work the queue of applications waiting on a decision, oldest-due first, and approve the straightforward ones without opening them.\n",
+  "apis": [
+   {
+    "operationId": "listApprovalRequests",
+    "contract": "approvals",
+    "purpose": "Accreditation applications awaiting a decision",
+    "trigger": "onLoad"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "getWaitTimes",
+    "removed": true,
+    "why": "**Removed 9 September.** The screen declared `getWaitTimes`, which is the guest app's ride-queue read. A reviewer queue and a virtual queue share a word and nothing else — the fourth instance of a name collision in this package after `release`, `generatedPack` and `provenance`.\n",
+    "source": "frame claude-design/Accreditation Board.dc.html#acc-006"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Applicant or outlet",
+       "notes": "Searches holder name and organisation. **Not \"find a record\".**"
+      },
+      {
+       "kind": "selectField",
+       "label": "Performance",
+       "notes": "All performances, or one. A reviewer usually works one night at a time.",
+       "provenance": "frame claude-design/Accreditation Board.dc.html#acc-006"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "queue",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Queue",
+       "bindsTo": "ApprovalRequest[]",
+       "columns": [
+        "ApprovalRequest.summary",
+        "ApprovalRequest.requestedAt",
+        "ApprovalRequest.slaDueAt",
+        "ApprovalRequest.status"
+       ],
+       "notes": "**Due first, and how long it has waited.** `slaDueAt` is the sort, not `requestedAt` — an application for tonight outranks one submitted earlier for next month. Rows carry the signals a reviewer decides on: *no press card, no commission*, *commission letter attached*, *accredited last season*.\n",
+       "provenance": "frame claude-design/Accreditation Board.dc.html#acc-006"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "item",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Selected application",
+       "bindsTo": "ApprovalRequest",
+       "notes": "Enough to approve without opening `ACC-007`.",
+       "provenance": "frame claude-design/Accreditation Board.dc.html#acc-006"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "decision",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Approve",
+       "permission": "APPROVAL_DECIDE"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The queue.",
+   "emptyFirstRun": "**An empty queue is success, not a broken screen.** Nothing is waiting — says so as reassurance, and says when the next applications are expected.\n",
+   "emptyNoResults": "Nothing matches this filter. The queue itself is not empty.",
+   "emptyNoAccess": "You do not review for this programme.",
+   "error": "Could not load the queue. **No decision is lost** — nothing was in flight."
+  },
+  "entryState": {
+   "params": [
+    {
+     "name": "programmeId",
+     "from": "session"
+    }
+   ],
+   "preloaded": [],
+   "coldEntry": "Opens on the reviewer's own programmes, due-first."
+  },
+  "navigation": {
+   "entryFrom": [
+    "ACC-001"
+   ],
+   "exitTo": [
+    "ACC-007",
+    "ACC-008"
+   ],
+   "transitions": [
+    {
+     "to": "ACC-007",
+     "trigger": "Reviewer Application Detail",
+     "carries": [
+      "requestId"
+     ],
+     "provenance": "derived — ACC-007 declares entryState.params requestId, so an edge into it must carry them"
+    },
+    {
+     "to": "ACC-008",
+     "trigger": "Credential Register",
+     "carries": [
+      "programmeId"
+     ],
+     "provenance": "derived — ACC-008 declares entryState.params programmeId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "implementation": {
+   "app": "accreditation-web",
+   "route": "/reviewer-internal/reviewer-queue",
+   "component": "apps/accreditation-web/src/routes/reviewer-internal/ReviewerQueueList.tsx",
+   "status": "notStarted"
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P11 Accreditation Web.dc.html#acc-006"
+  },
+  "resolvedQuestions": [
+   "Unblocked by the 7 September workshop (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue), which this question said did not exist. Decided there - identity documents are OCR'd to auto-populate the form, and the extracted data is stored as structured fields rather than only the image, because expiry tracking and renewal prompts cannot read a scan; uniqueness is enforced on passport and Emirates ID and a duplicate submission is blocked; the web portal is primary with the mobile app a secondary route for individual applicants. And one decision removes screens rather than adding them - accreditation- holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate system. Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the design corpus and no operation has been drafted from them yet."
+  ],
+  "_platform": {
+   "code": "P11",
+   "audience": "public",
+   "formFactor": "web",
+   "shortName": "Accreditation Web",
+   "name": "Accreditation Web — Applications",
+   "offlineCapable": false,
+   "app": "accreditation-web",
+   "operator": "public",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P09",
+     "P10",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ACC-007",
+  "name": "Reviewer Application Detail",
+  "module": "Reviewer (Internal)",
+  "wave": 3,
+  "requiresModule": "accreditation",
+  "pattern": "approvalInbox",
+  "density": "compact",
+  "purpose": "Everything the decision needs about one application, in one place, so the reviewer does not open another screen to decide.\n",
+  "apis": [
+   {
+    "operationId": "listApprovalRequests",
+    "contract": "approvals",
+    "purpose": "The application under review",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "decideApprovalRequest",
+    "contract": "approvals",
+    "purpose": "Approve or refuse, with a reason",
+    "trigger": "onAction",
+    "invalidates": [
+     "listApprovalRequests",
+     "listAccreditationBadges"
+    ]
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "getApprovalRequest",
+    "why": "The screen shows one application and the only read is a list. **A detail screen that fetches a collection to find one row is a detail screen that gets slower as the queue grows.**\n",
+    "source": "contract approvals.yaml"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "item",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The application",
+       "bindsTo": "ApprovalRequest",
+       "notes": "Role, outlet, press card, commission — **including the ones that are absent**, stated as *Not stated* and *None attached* rather than left blank. A blank field and a declared absence look identical and only one is information.\n",
+       "provenance": "frame claude-design/Accreditation Board.dc.html#acc-007"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "History with this venue",
+       "notes": "**Accredited before, and conditions breached.** This is the field the decision usually turns on and the one a reviewer would otherwise go looking for.\n",
+       "provenance": "frame claude-design/Accreditation Board.dc.html#acc-007"
+      },
+      {
+       "kind": "banner",
+       "label": "Decision due",
+       "bindsTo": "ApprovalRequest.slaDueAt",
+       "provenance": "frame claude-design/Accreditation Board.dc.html#acc-007"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "decision",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Approve",
+       "permission": "APPROVAL_DECIDE"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Refuse",
+       "permission": "APPROVAL_DECIDE"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "refuse",
+    "component": "confirmDialog",
+    "trigger": "Refuse",
+    "body": "**Captures the reason, and says the applicant will read it.** `ApprovalDecision.reason` is part of the record; a refusal with no reason produces an appeal by telephone.\n",
+    "bindsTo": "ApprovalDecision.reason",
+    "provenance": "authored, from pattern approvalInbox"
+   },
+   {
+    "id": "approveWithConditions",
+    "component": "drawer",
+    "trigger": "Approve",
+    "body": "Coverage granted may be narrower than coverage requested — *stalls, not pit*. **The badge renders what is granted**, so the two screens must agree.\n",
+    "provenance": "frame claude-design/Accreditation Board.dc.html#acc-005"
+   }
+  ],
+  "states": {
+   "loading": "The application.",
+   "error": "**A failed decision is not a made decision.** Says the decision was not recorded and leaves the buttons live.\n",
+   "emptyNoAccess": "You do not review for this programme.",
+   "emptyNoResults": "This application was decided by somebody else while it was open. Shows the decision.",
+   "emptyFirstRun": "Nothing selected. The queue is where a reviewer starts."
+  },
+  "entryState": {
+   "params": [
+    {
+     "name": "requestId",
+     "from": "ACC-006"
+    }
+   ],
+   "preloaded": [
+    "summary",
+    "requestedAt",
+    "slaDueAt"
+   ],
+   "coldEntry": "Reached from the queue, or from a link in a reviewer's email. Opened cold it loads the application, or says it has already been decided and by whom.\n"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ACC-002",
+    "ACC-006"
+   ],
+   "exitTo": [
+    "ACC-005",
+    "ACC-006",
+    "ACC-008"
+   ],
+   "transitions": [
+    {
+     "to": "ACC-005",
+     "trigger": "The badge is issued",
+     "provenance": "flow F23 step 2→3"
+    },
+    {
+     "to": "ACC-006",
+     "trigger": "Reviewer Queue",
+     "carries": [
+      "programmeId"
+     ],
+     "provenance": "derived — ACC-006 declares entryState.params programmeId, so an edge into it must carry them"
+    },
+    {
+     "to": "ACC-008",
+     "trigger": "Credential Register",
+     "carries": [
+      "programmeId"
+     ],
+     "provenance": "derived — ACC-008 declares entryState.params programmeId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "implementation": {
+   "app": "accreditation-web",
+   "route": "/reviewer-internal/reviewer-application-detail",
+   "component": "apps/accreditation-web/src/routes/reviewer-internal/ReviewerApplicationDetail.tsx",
+   "status": "notStarted"
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P11 Accreditation Web.dc.html#acc-007"
+  },
+  "resolvedQuestions": [
+   "Unblocked by the 7 September workshop (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue), which this question said did not exist. Decided there - identity documents are OCR'd to auto-populate the form, and the extracted data is stored as structured fields rather than only the image, because expiry tracking and renewal prompts cannot read a scan; uniqueness is enforced on passport and Emirates ID and a duplicate submission is blocked; the web portal is primary with the mobile app a secondary route for individual applicants. And one decision removes screens rather than adding them - accreditation- holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate system. Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the design corpus and no operation has been drafted from them yet."
+  ],
+  "_platform": {
+   "code": "P11",
+   "audience": "public",
+   "formFactor": "web",
+   "shortName": "Accreditation Web",
+   "name": "Accreditation Web — Applications",
+   "offlineCapable": false,
+   "app": "accreditation-web",
+   "operator": "public",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P09",
+     "P10",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ACC-008",
+  "name": "Credential Register",
+  "module": "Reviewer (Internal)",
+  "wave": 3,
+  "requiresModule": "accreditation",
+  "pattern": "listDetail",
+  "density": "compact",
+  "purpose": "Every credential issued this season, who holds it, where it is valid, and whether it has been used — and revoke one when it has to be revoked.\n",
+  "purposeNote": "**Rewritten 9 September.** The purpose read *\"Get a guest into the app, fast, on a device that may be shared\"*, which is a login screen's purpose on a credential register. Found independently by Claude Design on the drawn frame and by this pass.\n",
+  "apis": [
+   {
+    "operationId": "listAccreditationBadges",
+    "contract": "approvals",
+    "purpose": "Credentials issued for this programme",
+    "trigger": "onLoad"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "revokeAccreditationBadge",
+    "why": "The register offers **Revoke** and nothing performs it. `AccreditationBadge.state` and `revokedReason` exist to record the outcome, so the schema is ready and the operation is not.\n",
+    "source": "contract approvals.yaml AccreditationBadge.revokedReason"
+   },
+   {
+    "field": "AccreditationBadge.lastUsedAt",
+    "why": "The register shows a **last used** column and the schema has no such field. *Not yet* is the value that matters — a credential issued and never presented is the one to ask about.\n",
+    "source": "frame claude-design/Accreditation Board.dc.html#acc-008"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Holder or reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Season",
+       "notes": "Defaults to the current season. **A register scoped to all time is a register nobody reads.**",
+       "provenance": "frame claude-design/Accreditation Board.dc.html#acc-008"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Credential register",
+       "bindsTo": "AccreditationBadge[]",
+       "columns": [
+        "AccreditationBadge.holderName",
+        "AccreditationBadge.zones",
+        "AccreditationBadge.issuedAt",
+        "AccreditationBadge.state"
+       ],
+       "notes": "Holder, valid for, issued, last used. **Revoked rows stay visible and read as revoked** — removing them from the register is how a revoked badge gets re-issued by mistake.\n",
+       "provenance": "frame claude-design/Accreditation Board.dc.html#acc-008"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Credential",
+       "bindsTo": "AccreditationBadge",
+       "provenance": "frame claude-design/Accreditation Board.dc.html#acc-008"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "destructiveButton",
+       "label": "Revoke",
+       "permission": "APPROVAL_DECIDE"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Export",
+       "notes": "The register is what a venue hands to a security team before a performance.",
+       "provenance": "frame claude-design/Accreditation Board.dc.html#acc-008"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmRevoke",
+    "component": "confirmDialog",
+    "trigger": "Revoke",
+    "body": "**Names the holder and what stops working, and captures the reason.** A revocation takes somebody's access to a building they may already be standing outside.\n",
+    "bindsTo": "AccreditationBadge.revokedReason",
+    "provenance": "authored, from pattern listDetail"
+   }
+  ],
+  "states": {
+   "loading": "The register.",
+   "emptyFirstRun": "No credentials issued yet this season. Points at the queue.",
+   "emptyNoResults": "Nothing matches. The register is not empty.",
+   "emptyNoAccess": "You do not administer credentials for this programme.",
+   "error": "Could not load. **No credential is affected** by a failed read."
+  },
+  "entryState": {
+   "params": [
+    {
+     "name": "programmeId",
+     "from": "session"
+    }
+   ],
+   "preloaded": [],
+   "coldEntry": "Opens on the current season."
+  },
+  "navigation": {
+   "entryFrom": [
+    "ACC-006",
+    "ACC-007"
+   ],
+   "exitTo": [
+    "ACC-006",
+    "ACC-007"
+   ],
+   "transitions": [
+    {
+     "to": "ACC-006",
+     "trigger": "Reviewer Queue",
+     "carries": [
+      "programmeId"
+     ],
+     "provenance": "derived — ACC-006 declares entryState.params programmeId, so an edge into it must carry them"
+    },
+    {
+     "to": "ACC-007",
+     "trigger": "Reviewer Application Detail",
+     "carries": [
+      "requestId"
+     ],
+     "provenance": "derived — ACC-007 declares entryState.params requestId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "implementation": {
+   "app": "accreditation-web",
+   "route": "/reviewer-internal/credential-register",
+   "component": "apps/accreditation-web/src/routes/reviewer-internal/CredentialRegisterList.tsx",
+   "status": "notStarted"
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P11 Accreditation Web.dc.html#acc-008"
+  },
+  "resolvedQuestions": [
+   "Unblocked by the 7 September workshop (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue), which this question said did not exist. Decided there - identity documents are OCR'd to auto-populate the form, and the extracted data is stored as structured fields rather than only the image, because expiry tracking and renewal prompts cannot read a scan; uniqueness is enforced on passport and Emirates ID and a duplicate submission is blocked; the web portal is primary with the mobile app a secondary route for individual applicants. And one decision removes screens rather than adding them - accreditation- holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate system. Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the design corpus and no operation has been drafted from them yet."
+  ],
+  "_platform": {
+   "code": "P11",
+   "audience": "public",
+   "formFactor": "web",
+   "shortName": "Accreditation Web",
+   "name": "Accreditation Web — Applications",
+   "offlineCapable": false,
+   "app": "accreditation-web",
+   "operator": "public",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P09",
+     "P10",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

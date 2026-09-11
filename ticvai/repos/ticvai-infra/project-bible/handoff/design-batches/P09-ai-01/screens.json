@@ -1,0 +1,250 @@
+[
+ {
+  "id": "ADM-037",
+  "name": "AI Provider & Credentials",
+  "module": "AI",
+  "requiresModule": "ai",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/ai/providers",
+   "component": "apps/ticvai-web/src/routes/AiProviderCredentials.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "ADM-001"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "notes": "**Reached from ADM-002** — a top-level console section. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "ADM-001",
+     "trigger": "Platform Login / MFA",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-091",
+     "trigger": "AI Policy & Spend",
+     "provenance": "flow F100 step 1→2",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "Added 17 August. **The key is entered once and never returned** — the screen shows a reference, a rotation date and a last-verified date, never a secret. Test before activate. **Not on the wireframe board.**",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listAiProviders` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Configure which model a tenant uses, hold the key, and prove it works before anyone relies on it.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every provider credentials",
+       "bindsTo": "AiProvider",
+       "columns": [
+        "AiProvider.id",
+        "AiProvider.kind",
+        "AiProvider.capability",
+        "AiProvider.model",
+        "AiProvider.failoverProviderId",
+        "AiProvider.degradeGracefully",
+        "AiProvider.priority",
+        "AiProvider.scopeLevel",
+        "AiProvider.scopePath",
+        "AiProvider.credentialRef",
+        "AiProvider.credentialRotatedAt",
+        "AiProvider.credentialExpiresAt"
+       ],
+       "operation": "listAiProviders",
+       "provenance": "contract ai.yaml GET /providers"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected provider credentials",
+       "bindsTo": "AiProvider",
+       "columns": [
+        "AiProvider.id",
+        "AiProvider.kind",
+        "AiProvider.capability",
+        "AiProvider.model",
+        "AiProvider.failoverProviderId",
+        "AiProvider.degradeGracefully",
+        "AiProvider.priority",
+        "AiProvider.scopeLevel",
+        "AiProvider.scopePath",
+        "AiProvider.credentialRef",
+        "AiProvider.credentialRotatedAt",
+        "AiProvider.credentialExpiresAt",
+        "AiProvider.lastVerifiedAt",
+        "AiProvider.endpoint",
+        "AiProvider.residency",
+        "AiProvider.maxTokens"
+       ],
+       "operation": "listAiProviders",
+       "provenance": "contract ai.yaml GET /providers"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "setAiProvider",
+       "provenance": "contract ai.yaml PUT /providers"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setAiCredential",
+       "provenance": "contract ai.yaml PUT /ai-providers/{providerId}/credential"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Test",
+       "operation": "testAiProvider",
+       "provenance": "contract ai.yaml POST /ai-providers/{providerId}/test"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listAiProviders",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setAiProvider",
+       "label": "Save ai provider",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setAiProvider",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The provider credentials list.",
+   "error": "Could not load. Names which read failed and leaves the provider credentials untouched.",
+   "emptyFirstRun": "No provider credentials yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the provider credentials are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listAiProviders",
+    "contract": "ai",
+    "purpose": "Configured providers and their order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setAiProvider",
+    "contract": "ai",
+    "purpose": "Configure a provider",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAiProviders"
+    ]
+   },
+   {
+    "operationId": "setAiCredential",
+    "contract": "ai",
+    "purpose": "Store or rotate a provider key",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAiProviders"
+    ]
+   },
+   {
+    "operationId": "testAiProvider",
+    "contract": "ai",
+    "purpose": "Check the key works before anyone relies on it",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAiProviders"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "providerId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `providerId`.",
+   "preloaded": [
+    "AiProvider.id",
+    "AiProvider.kind",
+    "AiProvider.capability",
+    "AiProvider.model",
+    "AiProvider.failoverProviderId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-037"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

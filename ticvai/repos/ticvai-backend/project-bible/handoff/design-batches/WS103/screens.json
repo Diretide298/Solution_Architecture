@@ -1,0 +1,986 @@
+[
+ {
+  "id": "ADM-419",
+  "name": "Provisioning Command Center",
+  "module": "Tenants & Licensing",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
+   "board": "6",
+   "number": "1",
+   "page": 72
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/tenants-licensing/provisioning-command-center-adm-419",
+   "component": "apps/ticvai-web/src/routes/tenants-licensing/ProvisioningCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "exitTo": [
+    "ADM-002",
+    "ADM-420",
+    "ADM-421",
+    "ADM-422",
+    "ADM-423",
+    "ADM-424",
+    "ADM-425",
+    "ADM-426",
+    "ADM-427"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-002",
+     "trigger": "Back to Platform Dashboard",
+     "provenance": "structural — pack board 6 wiring, 11 September 2026",
+     "back": true
+    },
+    {
+     "to": "ADM-420",
+     "trigger": "Tenant & Organization Provisioning",
+     "provenance": "structural — pack board 6 wiring, 11 September 2026"
+    },
+    {
+     "to": "ADM-421",
+     "trigger": "Venue & Operational Structure Creation",
+     "provenance": "structural — pack board 6 wiring, 11 September 2026"
+    },
+    {
+     "to": "ADM-422",
+     "trigger": "Administrator & Security Initialization",
+     "provenance": "structural — pack board 6 wiring, 11 September 2026"
+    },
+    {
+     "to": "ADM-423",
+     "trigger": "License & Entitlement Activation",
+     "provenance": "structural — pack board 6 wiring, 11 September 2026"
+    },
+    {
+     "to": "ADM-424",
+     "trigger": "Module Activation & Dependency Validation",
+     "provenance": "structural — pack board 6 wiring, 11 September 2026"
+    },
+    {
+     "to": "ADM-425",
+     "trigger": "Venue Template Application",
+     "provenance": "structural — pack board 6 wiring, 11 September 2026"
+    },
+    {
+     "to": "ADM-426",
+     "trigger": "Initial Configuration & Regional Defaults",
+     "provenance": "structural — pack board 6 wiring, 11 September 2026"
+    },
+    {
+     "to": "ADM-427",
+     "trigger": "Provisioning Validation & Exception Management",
+     "provenance": "structural — pack board 6 wiring, 11 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Show the overall status of the customer's environment creation.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 72"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 72"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": []
+  },
+  "states": {
+   "loading": "The provisioning list.",
+   "error": "Could not load. Names which read failed and leaves the provisioning untouched.",
+   "emptyFirstRun": "No provisioning yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the provisioning are still there. The pack's own statuses are Pending — the state names which is selected.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-419"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 72. 0 of 0 labels bound to a contract property; 6 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-420",
+  "name": "Tenant & Organization Provisioning",
+  "module": "Tenants & Licensing",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
+   "board": "6",
+   "number": "2",
+   "page": 73
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/tenants-licensing/tenant-organization-provisioning-adm-420",
+   "component": "apps/ticvai-web/src/routes/tenants-licensing/TenantOrganizationProvisioning.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-419"
+   ],
+   "exitTo": [
+    "ADM-419"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-419",
+     "trigger": "Back to Provisioning Command Center",
+     "provenance": "structural — pack board 6 wiring, 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Create the customer's isolated TICVAI environment and primary organization structure.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 73"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 73"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": []
+  },
+  "states": {
+   "loading": "The tenant organization provisioning list.",
+   "error": "Could not load. Names which read failed and leaves the tenant organization provisioning untouched.",
+   "emptyFirstRun": "No tenant organization provisioning yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the tenant organization provisioning are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-420"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 73. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-421",
+  "name": "Venue & Operational Structure Creation",
+  "module": "Tenants & Licensing",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
+   "board": "6",
+   "number": "3",
+   "page": 74
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/tenants-licensing/venue-operational-structure-creation-adm-421",
+   "component": "apps/ticvai-web/src/routes/tenants-licensing/VenueOperationalStructureCreation.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-419"
+   ],
+   "exitTo": [
+    "ADM-419"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-419",
+     "trigger": "Back to Provisioning Command Center",
+     "provenance": "structural — pack board 6 wiring, 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Venue Settings) and no display directory — it is settings, not a population",
+  "purpose": "Automatically create the initial venue structure using information collected during onboarding.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**Venue & Operational Structure Creation declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Venue Name",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 74 §Venue Settings"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue Type",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 74 §Venue Settings"
+      },
+      {
+       "kind": "selectField",
+       "label": "Address",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 74 §Venue Settings"
+      },
+      {
+       "kind": "selectField",
+       "label": "Time Zone",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 74 §Venue Settings"
+      },
+      {
+       "kind": "selectField",
+       "label": "Currency",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 74 §Venue Settings"
+      },
+      {
+       "kind": "selectField",
+       "label": "Operating Region",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 74 §Venue Settings"
+      },
+      {
+       "kind": "selectField",
+       "label": "Default Language",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 74 §Venue Settings"
+      },
+      {
+       "kind": "selectField",
+       "label": "Operating Model",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 74 §Venue Settings"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The venue operational structure configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the venue operational structure untouched.",
+   "emptyFirstRun": "No venue operational structure configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-421"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 74. 0 of 0 labels bound to a contract property; 8 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-422",
+  "name": "Administrator & Security Initialization",
+  "module": "Tenants & Licensing",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
+   "board": "6",
+   "number": "4",
+   "page": 75
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/tenants-licensing/administrator-security-initialization-adm-422",
+   "component": "apps/ticvai-web/src/routes/tenants-licensing/AdministratorSecurityInitialization.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-419"
+   ],
+   "exitTo": [
+    "ADM-419"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-419",
+     "trigger": "Back to Provisioning Command Center",
+     "provenance": "structural — pack board 6 wiring, 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Security Setup) and no display directory — it is settings, not a population",
+  "purpose": "Create the initial authorized customer administrator and establish the tenant security baseline.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "✓ Administrator Account Created",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup"
+      },
+      {
+       "kind": "selectField",
+       "label": "✓ Email Verified",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup"
+      },
+      {
+       "kind": "textField",
+       "label": "✓ Tenant Access Assigned",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup"
+      },
+      {
+       "kind": "textField",
+       "label": "✓ Default Role Applied",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup"
+      },
+      {
+       "kind": "textField",
+       "label": "✓ Security Policy Applied",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup"
+      },
+      {
+       "kind": "textField",
+       "label": "✓ Audit Logging Enabled",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The administrator security initialization configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the administrator security initialization untouched.",
+   "emptyFirstRun": "No administrator security initialization configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-422"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 75. 0 of 0 labels bound to a contract property; 6 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-423",
+  "name": "License & Entitlement Activation",
+  "module": "Tenants & Licensing",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
+   "board": "6",
+   "number": "5",
+   "page": 76
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/tenants-licensing/license-entitlement-activation-adm-423",
+   "component": "apps/ticvai-web/src/routes/tenants-licensing/LicenseEntitlementActivation.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-419"
+   ],
+   "exitTo": [
+    "ADM-419"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-419",
+     "trigger": "Back to Provisioning Command Center",
+     "provenance": "structural — pack board 6 wiring, 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Translate the commercial subscription purchased in Board 5 into enforceable technical entitlements.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 76"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 76"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": []
+  },
+  "states": {
+   "loading": "The license entitlement activation list.",
+   "error": "Could not load. Names which read failed and leaves the license entitlement activation untouched.",
+   "emptyFirstRun": "No license entitlement activation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the license entitlement activation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-423"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 76. 0 of 0 labels bound to a contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-424",
+  "name": "Module Activation & Dependency Validation",
+  "module": "Tenants & Licensing",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
+   "board": "6",
+   "number": "6",
+   "page": 77
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/tenants-licensing/module-activation-dependency-validation-adm-424",
+   "component": "apps/ticvai-web/src/routes/tenants-licensing/ModuleActivationDependencyValidation.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-419"
+   ],
+   "exitTo": [
+    "ADM-419"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-419",
+     "trigger": "Back to Provisioning Command Center",
+     "provenance": "structural — pack board 6 wiring, 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Activate the modules purchased in Board 4/5 and verify all required dependencies.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 77"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 77"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": []
+  },
+  "states": {
+   "loading": "The module activation dependency list.",
+   "error": "Could not load. Names which read failed and leaves the module activation dependency untouched.",
+   "emptyFirstRun": "No module activation dependency yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the module activation dependency are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-424"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 77. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-425",
+  "name": "Venue Template Application",
+  "module": "Tenants & Licensing",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
+   "board": "6",
+   "number": "7",
+   "page": 77
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/tenants-licensing/venue-template-application-adm-425",
+   "component": "apps/ticvai-web/src/routes/tenants-licensing/VenueTemplateApplication.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-419"
+   ],
+   "exitTo": [
+    "ADM-419"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-419",
+     "trigger": "Back to Provisioning Command Center",
+     "provenance": "structural — pack board 6 wiring, 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Apply an appropriate initial configuration template based on the venue assessment from Board 2.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 77"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 77"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": []
+  },
+  "states": {
+   "loading": "The venue template application list.",
+   "error": "Could not load. Names which read failed and leaves the venue template application untouched.",
+   "emptyFirstRun": "No venue template application yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the venue template application are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-425"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 77. 0 of 0 labels bound to a contract property; 0 of 15 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-426",
+  "name": "Initial Configuration & Regional Defaults",
+  "module": "Tenants & Licensing",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
+   "board": "6",
+   "number": "8",
+   "page": 78
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/tenants-licensing/initial-configuration-regional-defaults-adm-426",
+   "component": "apps/ticvai-web/src/routes/tenants-licensing/InitialConfigurationRegionalDefaults.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-419"
+   ],
+   "exitTo": [
+    "ADM-419"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-419",
+     "trigger": "Back to Provisioning Command Center",
+     "provenance": "structural — pack board 6 wiring, 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Low-risk settings such as; Business-critical settings such as) and no display directory — it is settings, not a population",
+  "purpose": "Apply safe initial defaults using information already provided during onboarding.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Currency",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Low-risk settings such as"
+      },
+      {
+       "kind": "selectField",
+       "label": "Time Zone",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Low-risk settings such as"
+      },
+      {
+       "kind": "selectField",
+       "label": "Language",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Low-risk settings such as"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue Type",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Low-risk settings such as"
+      },
+      {
+       "kind": "selectField",
+       "label": "Ticket prices",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Business-critical settings such as"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tax",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Business-critical settings such as"
+      },
+      {
+       "kind": "selectField",
+       "label": "Refund policy",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Business-critical settings such as"
+      },
+      {
+       "kind": "selectField",
+       "label": "Payment rules",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Business-critical settings such as"
+      },
+      {
+       "kind": "selectField",
+       "label": "Access rules",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Business-critical settings such as"
+      },
+      {
+       "kind": "selectField",
+       "label": "Settlement",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Business-critical settings such as"
+      },
+      {
+       "kind": "selectField",
+       "label": "Capacity",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Business-critical settings such as"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The initial regional defaults configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the initial regional defaults untouched.",
+   "emptyFirstRun": "No initial regional defaults configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-426"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 78. 0 of 0 labels bound to a contract property; 11 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-427",
+  "name": "Provisioning Validation & Exception Management",
+  "module": "Tenants & Licensing",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Subscription_Licensing_AI_Self_Service.pdf",
+   "board": "6",
+   "number": "9",
+   "page": 79
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/tenants-licensing/provisioning-validation-exception-management-adm-427",
+   "component": "apps/ticvai-web/src/routes/tenants-licensing/ProvisioningValidationExceptionManagement.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-419"
+   ],
+   "exitTo": [
+    "ADM-419"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-419",
+     "trigger": "Back to Provisioning Command Center",
+     "provenance": "structural — pack board 6 wiring, 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Validate that the environment has been created correctly before handing it to customer configuration.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 79"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 79"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": []
+  },
+  "states": {
+   "loading": "The provisioning validation exception list.",
+   "error": "Could not load. Names which read failed and leaves the provisioning validation exception untouched.",
+   "emptyFirstRun": "No provisioning validation exception yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the provisioning validation exception are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-427"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 79. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

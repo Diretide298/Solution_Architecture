@@ -1,0 +1,1209 @@
+[
+ {
+  "id": "PTR-008",
+  "name": "Booking Creation",
+  "module": "Booking & Quotes",
+  "requiresModule": "partner",
+  "wave": 2,
+  "capability": "C02",
+  "implementation": {
+   "app": "partner-web",
+   "route": "/general/booking-creation",
+   "component": "apps/partner-web/src/routes/general/BookingCreationForm.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "PTR-001",
+    "PTR-007"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "PTR-001",
+    "PTR-002",
+    "PTR-003",
+    "PTR-016"
+   ],
+   "flowDerived": true,
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "PTR-016",
+     "trigger": "Downloads vouchers",
+     "provenance": "flow F03 step 3→4",
+     "operation": "createOrder"
+    },
+    {
+     "to": "PTR-001",
+     "trigger": "Partner Login / MFA",
+     "carries": [
+      "accountId",
+      "sessionId"
+     ],
+     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-002",
+     "trigger": "Partner Dashboard",
+     "carries": [
+      "accountId",
+      "orderId"
+     ],
+     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-003",
+     "trigger": "Profile & Company Details",
+     "carries": [
+      "principalId"
+     ],
+     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+    },
+    {
+     "to": "SCN-003",
+     "trigger": "A customer arrives and is admitted",
+     "provenance": "flow F10 step 3→4",
+     "operation": "listOrders",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Cross-platform navigation removed 24 August**: SCN-003. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listOrders` reads the population and `getOrder` reads one of them — list, select, act",
+  "purpose": "Add booking creation for this venue.",
+  "gaps": [
+   {
+    "operation": "getOrderStatement",
+    "why": "**2 declared operations reach no component on this screen**: getOrderStatement, listOrderRefunds. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every booking creation",
+       "bindsTo": "OrderSummary",
+       "columns": [
+        "OrderSummary.id",
+        "OrderSummary.orderNumber",
+        "OrderSummary.status",
+        "OrderSummary.grossAmount",
+        "OrderSummary.refundedAmount",
+        "OrderSummary.channel",
+        "OrderSummary.lineCount"
+       ],
+       "operation": "listOrders",
+       "provenance": "contract orders.yaml GET /orders"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected booking creation",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount",
+        "Order.totalPriceVariance",
+        "Order.lines",
+        "Order.payments",
+        "Order.principalId"
+       ],
+       "operation": "getOrder",
+       "provenance": "contract orders.yaml GET /orders/{orderId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createOrder",
+       "provenance": "contract orders.yaml POST /orders"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Apply",
+       "operation": "applyManualDiscount",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createRefund",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/refunds"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Exchange",
+       "operation": "exchangeOrderLines",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Hold",
+       "operation": "holdOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Modify",
+       "operation": "modifyOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reprint",
+       "operation": "reprintOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reschedule",
+       "operation": "rescheduleOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resume",
+       "operation": "resumeOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/resume"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Void",
+       "operation": "voidOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmVoidOrder",
+    "component": "confirmDialog",
+    "trigger": "Void",
+    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A booking creation this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
+   }
+  ],
+  "states": {
+   "loading": "The booking creation list.",
+   "error": "Could not load. Names which read failed and leaves the booking creation untouched.",
+   "emptyFirstRun": "No booking creation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the booking creation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "createOrder",
+    "contract": "orders",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listOrders",
+    "contract": "orders",
+    "purpose": "From the flow it appears in",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "applyManualDiscount",
+    "contract": "orders",
+    "purpose": "Apply a discount a cashier chose",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "createRefund",
+    "contract": "orders",
+    "purpose": "Refund an order, wholly or in part",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "exchangeOrderLines",
+    "contract": "orders",
+    "purpose": "Exchange lines for different products or dates",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "getOrder",
+    "contract": "orders",
+    "purpose": "Read an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getOrderStatement",
+    "contract": "orders",
+    "purpose": "Full financial history of an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "holdOrder",
+    "contract": "orders",
+    "purpose": "Park a sale and free the till",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "listOrderRefunds",
+    "contract": "orders",
+    "purpose": "List refunds against an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "modifyOrder",
+    "contract": "orders",
+    "purpose": "Add or remove lines on an existing order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "reprintOrder",
+    "contract": "orders",
+    "purpose": "Reprint or resend tickets",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "rescheduleOrder",
+    "contract": "orders",
+    "purpose": "Move an order to another performance",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "resumeOrder",
+    "contract": "orders",
+    "purpose": "Bring a parked sale back to a till",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "voidOrder",
+    "contract": "orders",
+    "purpose": "Void an order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
+   "preloaded": [
+    "Order.id",
+    "Order.orderNumber",
+    "Order.channel",
+    "Order.venueId",
+    "Order.scopePath"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-008"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P10",
+   "audience": "partner",
+   "formFactor": "web",
+   "shortName": "Partner Web",
+   "name": "Partner Web — Reseller Portal",
+   "offlineCapable": false,
+   "app": "partner-web",
+   "operator": "partner",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P09",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "PTR-009",
+  "name": "Group / Bulk Booking",
+  "module": "Booking & Quotes",
+  "requiresModule": "partner",
+  "wave": 3,
+  "capability": "C54",
+  "implementation": {
+   "app": "partner-web",
+   "route": "/general/group-bulk-booking",
+   "component": "apps/partner-web/src/routes/general/GroupBulkBookingDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "PTR-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "PTR-001",
+    "PTR-002",
+    "PTR-003"
+   ],
+   "transitions": [
+    {
+     "to": "PTR-001",
+     "trigger": "Partner Login / MFA",
+     "carries": [
+      "accountId",
+      "sessionId"
+     ],
+     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-002",
+     "trigger": "Partner Dashboard",
+     "carries": [
+      "accountId",
+      "orderId"
+     ],
+     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-003",
+     "trigger": "Profile & Company Details",
+     "carries": [
+      "principalId"
+     ],
+     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Seat Board 3.dc.html` frame `seat-3d`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**",
+  "density": "compact",
+  "boardFrames": [
+   "Seat Board 3.dc.html#seat-3d"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listSeatBlocks` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Work with group / bulk booking for this venue.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every group bulk booking",
+       "bindsTo": "SeatBlock",
+       "columns": [
+        "SeatBlock.id",
+        "SeatBlock.performanceId",
+        "SeatBlock.seatIds",
+        "SeatBlock.reason",
+        "SeatBlock.note",
+        "SeatBlock.createdByPrincipalId",
+        "SeatBlock.releaseAt",
+        "SeatBlock.releasedAt",
+        "SeatBlock.scopePath"
+       ],
+       "operation": "listSeatBlocks",
+       "provenance": "contract seating.yaml GET /seat-blocks"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected group bulk booking",
+       "bindsTo": "SeatBlock",
+       "columns": [
+        "SeatBlock.id",
+        "SeatBlock.performanceId",
+        "SeatBlock.seatIds",
+        "SeatBlock.reason",
+        "SeatBlock.note",
+        "SeatBlock.createdByPrincipalId",
+        "SeatBlock.releaseAt",
+        "SeatBlock.releasedAt",
+        "SeatBlock.scopePath"
+       ],
+       "operation": "listSeatBlocks",
+       "provenance": "contract seating.yaml GET /seat-blocks"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Allocate",
+       "operation": "allocateBlockedSeats",
+       "provenance": "contract seating.yaml POST /seat-blocks/{blockId}/allocate"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createSeatBlock",
+       "provenance": "contract seating.yaml POST /seat-blocks"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Release hold",
+       "operation": "relinquishSeatBlock",
+       "provenance": "contract seating.yaml DELETE /seat-blocks/{blockId}"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listSeatBlocks",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "destructiveButton",
+       "derived": true,
+       "impliedBy": "relinquishSeatBlock",
+       "label": "Release seat block",
+       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "allocateBlockedSeats",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The group bulk booking list.",
+   "error": "Could not load. Names which read failed and leaves the group bulk booking untouched.",
+   "emptyFirstRun": "No group bulk booking yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the group bulk booking are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "allocateBlockedSeats",
+    "contract": "seating",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createSeatBlock",
+    "contract": "seating",
+    "purpose": "Block seats from sale",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSeatBlocks"
+    ]
+   },
+   {
+    "operationId": "listSeatBlocks",
+    "contract": "seating",
+    "purpose": "List seat blocks",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "relinquishSeatBlock",
+    "contract": "seating",
+    "purpose": "Release a block back to sale",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSeatBlocks"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "blockId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. If the target is gone the screen says so and offers the partner's own list. Arrives with `blockId`.",
+   "preloaded": [
+    "SeatBlock.id",
+    "SeatBlock.performanceId",
+    "SeatBlock.seatIds",
+    "SeatBlock.reason",
+    "SeatBlock.note"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-009",
+   "note": "**Drawn by Claude Design on `Seat Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P10",
+   "audience": "partner",
+   "formFactor": "web",
+   "shortName": "Partner Web",
+   "name": "Partner Web — Reseller Portal",
+   "offlineCapable": false,
+   "app": "partner-web",
+   "operator": "partner",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P09",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "PTR-010",
+  "name": "Cart & Quote",
+  "module": "Booking & Quotes",
+  "requiresModule": "partner",
+  "wave": 3,
+  "capability": "C02",
+  "implementation": {
+   "app": "partner-web",
+   "route": "/general/cart-and-quote",
+   "component": "apps/partner-web/src/routes/general/CartAndQuoteDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "PTR-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "PTR-001",
+    "PTR-002",
+    "PTR-003"
+   ],
+   "transitions": [
+    {
+     "to": "PTR-001",
+     "trigger": "Partner Login / MFA",
+     "carries": [
+      "accountId",
+      "sessionId"
+     ],
+     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-002",
+     "trigger": "Partner Dashboard",
+     "carries": [
+      "accountId",
+      "orderId"
+     ],
+     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-003",
+     "trigger": "Profile & Company Details",
+     "carries": [
+      "principalId"
+     ],
+     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listPromotions` reads the population and `getPromotion` reads one of them — list, select, act",
+  "purpose": "Work with cart & quote for this venue.",
+  "gaps": [
+   {
+    "operation": "getPromotionUsage",
+    "why": "**2 declared operations reach no component on this screen**: getPromotionUsage, getCart. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every cart quote",
+       "bindsTo": "Promotion",
+       "columns": [
+        "Promotion.code",
+        "Promotion.name",
+        "Promotion.description",
+        "Promotion.venueId",
+        "Promotion.discount",
+        "Promotion.conditions",
+        "Promotion.stackingMode",
+        "Promotion.stackingGroup",
+        "Promotion.precedence",
+        "Promotion.validFrom",
+        "Promotion.validTo",
+        "Promotion.maxRedemptions"
+       ],
+       "operation": "listPromotions",
+       "provenance": "contract promotions.yaml GET /promotions"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected cart quote",
+       "bindsTo": "Promotion",
+       "columns": [
+        "Promotion.code",
+        "Promotion.name",
+        "Promotion.description",
+        "Promotion.venueId",
+        "Promotion.discount",
+        "Promotion.conditions",
+        "Promotion.stackingMode",
+        "Promotion.stackingGroup",
+        "Promotion.precedence",
+        "Promotion.validFrom",
+        "Promotion.validTo",
+        "Promotion.maxRedemptions",
+        "Promotion.maxRedemptionsPerGuest",
+        "Promotion.budgetCap",
+        "Promotion.id",
+        "Promotion.status"
+       ],
+       "operation": "getPromotion",
+       "provenance": "contract promotions.yaml GET /promotions/{promotionId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Evaluate",
+       "operation": "evaluatePromotions",
+       "provenance": "contract promotions.yaml POST /promotions/evaluate"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Analyse",
+       "operation": "analysePromotionConflicts",
+       "provenance": "contract promotions.yaml GET /promotions/{promotionId}/conflicts"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Add",
+       "operation": "addCartLine",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateCartLine",
+       "provenance": "contract orders.yaml PATCH /carts/{cartId}/lines/{lineId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeCartLine",
+       "provenance": "contract orders.yaml DELETE /carts/{cartId}/lines/{lineId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Checkout",
+       "operation": "checkoutCart",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/checkout"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listPromotions",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "destructiveButton",
+       "derived": true,
+       "impliedBy": "removeCartLine",
+       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
+       "label": "Remove cart line",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "evaluatePromotions",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmRemoveCartLine",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeCartLine` changes and what it leaves alone**, in the consequence rather than the verb. A cart quote this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract orders.yaml DELETE /carts/{cartId}/lines/{lineId}"
+   }
+  ],
+  "states": {
+   "loading": "The cart quote list.",
+   "error": "Could not load. Names which read failed and leaves the cart quote untouched.",
+   "emptyFirstRun": "No cart quote yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the cart quote are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "evaluatePromotions",
+    "contract": "promotions",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "analysePromotionConflicts",
+    "contract": "promotions",
+    "purpose": "Analyse stacking against live promotions",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getPromotion",
+    "contract": "promotions",
+    "purpose": "Read a promotion",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getPromotionUsage",
+    "contract": "promotions",
+    "purpose": "Redemption count and discount given",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPromotions",
+    "contract": "promotions",
+    "purpose": "List promotions",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getCart",
+    "contract": "orders",
+    "purpose": "The cart, priced and checked, right now",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "addCartLine",
+    "contract": "orders",
+    "purpose": "Add something",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPromotions"
+    ]
+   },
+   {
+    "operationId": "updateCartLine",
+    "contract": "orders",
+    "purpose": "Change a quantity",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPromotions"
+    ]
+   },
+   {
+    "operationId": "removeCartLine",
+    "contract": "orders",
+    "purpose": "Take something out",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPromotions"
+    ]
+   },
+   {
+    "operationId": "checkoutCart",
+    "contract": "orders",
+    "purpose": "Turn the cart into an order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPromotions"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "cartId",
+     "from": "session"
+    },
+    {
+     "name": "lineId",
+     "from": "deepLink"
+    },
+    {
+     "name": "promotionId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. If the target is gone the screen says so and offers the partner's own list. Arrives with `lineId`, `promotionId`.",
+   "preloaded": [
+    "Promotion.code",
+    "Promotion.name",
+    "Promotion.description",
+    "Promotion.venueId",
+    "Promotion.discount"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-010"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P10",
+   "audience": "partner",
+   "formFactor": "web",
+   "shortName": "Partner Web",
+   "name": "Partner Web — Reseller Portal",
+   "offlineCapable": false,
+   "app": "partner-web",
+   "operator": "partner",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P09",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "PTR-011",
+  "name": "Quote Management",
+  "module": "Booking & Quotes",
+  "requiresModule": "partner",
+  "wave": 3,
+  "implementation": {
+   "app": "partner-web",
+   "route": "/general/quote-management",
+   "component": "apps/partner-web/src/routes/general/QuoteManagementForm.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "PTR-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "PTR-001",
+    "PTR-002",
+    "PTR-003"
+   ],
+   "transitions": [
+    {
+     "to": "PTR-001",
+     "trigger": "Partner Login / MFA",
+     "carries": [
+      "accountId",
+      "sessionId"
+     ],
+     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-002",
+     "trigger": "Partner Dashboard",
+     "carries": [
+      "accountId",
+      "orderId"
+     ],
+     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-003",
+     "trigger": "Profile & Company Details",
+     "carries": [
+      "principalId"
+     ],
+     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "openQuestions": [
+   "No contract — quotes are procurement-side only"
+  ],
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listPartnerAgreements` reads the population and `getCommissionStatement` reads one of them — list, select, act",
+  "purpose": "Find quote management for this venue.",
+  "gaps": [
+   {
+    "operation": "listPartnerQuotes",
+    "why": "**1 declared operation reach no component on this screen**: listPartnerQuotes. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every quote",
+       "bindsTo": "PartnerAgreement",
+       "columns": [
+        "PartnerAgreement.id",
+        "PartnerAgreement.partnerId",
+        "PartnerAgreement.partnerName",
+        "PartnerAgreement.status",
+        "PartnerAgreement.rateMode",
+        "PartnerAgreement.commissionPercent",
+        "PartnerAgreement.volumeTiers",
+        "PartnerAgreement.volumeWindow",
+        "PartnerAgreement.seasonalRates",
+        "PartnerAgreement.segmentTier",
+        "PartnerAgreement.brandingAssetId",
+        "PartnerAgreement.storefrontSubdomain"
+       ],
+       "operation": "listPartnerAgreements",
+       "provenance": "contract subscription.yaml GET /partner-agreements"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected quote",
+       "bindsTo": "CommissionStatement",
+       "columns": [
+        "CommissionStatement.agreementId",
+        "CommissionStatement.partnerName",
+        "CommissionStatement.from",
+        "CommissionStatement.to",
+        "CommissionStatement.currency",
+        "CommissionStatement.grossSales",
+        "CommissionStatement.refunds",
+        "CommissionStatement.netSales",
+        "CommissionStatement.commissionEarned",
+        "CommissionStatement.amountDue",
+        "CommissionStatement.lines"
+       ],
+       "operation": "getCommissionStatement",
+       "provenance": "contract subscription.yaml GET /partner-agreements/{agreementId}/commission-statement"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createPartnerQuote",
+       "provenance": "contract subscription.yaml POST /partner-quotes"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The quote list.",
+   "error": "Could not load. Names which read failed and leaves the quote untouched.",
+   "emptyFirstRun": "No quote yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the quote are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listPartnerAgreements",
+    "contract": "subscription",
+    "purpose": "Commercial agreements with B2B partners",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getCommissionStatement",
+    "contract": "subscription",
+    "purpose": "What the partner earned and what is owed",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPartnerQuotes",
+    "contract": "subscription",
+    "purpose": "Quotes offered to this partner",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createPartnerQuote",
+    "contract": "subscription",
+    "purpose": "Raise a quote",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPartnerAgreements"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "agreementId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. If the target is gone the screen says so and offers the partner's own list. Arrives with `agreementId`.",
+   "preloaded": [
+    "CommissionStatement.agreementId",
+    "CommissionStatement.partnerName",
+    "CommissionStatement.from",
+    "CommissionStatement.to",
+    "CommissionStatement.currency"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-011"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P10",
+   "audience": "partner",
+   "formFactor": "web",
+   "shortName": "Partner Web",
+   "name": "Partner Web — Reseller Portal",
+   "offlineCapable": false,
+   "app": "partner-web",
+   "operator": "partner",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P09",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

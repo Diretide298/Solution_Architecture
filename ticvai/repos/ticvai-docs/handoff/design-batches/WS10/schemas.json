@@ -1,0 +1,764 @@
+{
+ "AccessAttributeCatalogView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Access Attribute Catalog displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "age": {
+    "type": "string",
+    "description": "Age"
+   },
+   "genderWhereLegallyBusinessPermitted": {
+    "type": "string",
+    "description": "Gender where legally/business permitted"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer Segment"
+   },
+   "guestCategory": {
+    "type": "string",
+    "description": "Guest Category"
+   },
+   "countryResidencyWhereApplicable": {
+    "type": "string",
+    "description": "Country/Residency where applicable"
+   },
+   "groupType": {
+    "type": "string",
+    "description": "Group Type"
+   },
+   "companionRelationship": {
+    "type": "string",
+    "description": "Companion Relationship"
+   },
+   "podStatus": {
+    "type": "string",
+    "description": "POD status"
+   },
+   "ticketType": {
+    "type": "string",
+    "description": "Ticket Type"
+   },
+   "credentialStatus": {
+    "type": "string",
+    "description": "Credential Status"
+   },
+   "mediaType": {
+    "type": "string",
+    "description": "Media Type"
+   },
+   "verificationMethod": {
+    "type": "string",
+    "description": "Verification Method"
+   },
+   "visitDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Visit Date"
+   },
+   "entitlements": {
+    "type": "string",
+    "description": "Entitlements"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "accreditation": {
+    "type": "string",
+    "description": "Accreditation"
+   },
+   "loyaltyTier": {
+    "type": "string",
+    "description": "Loyalty Tier"
+   },
+   "employee": {
+    "type": "string",
+    "description": "Employee"
+   },
+   "department": {
+    "type": "string",
+    "description": "Department"
+   },
+   "role": {
+    "type": "string",
+    "description": "Role"
+   },
+   "jobFunction": {
+    "type": "string",
+    "description": "Job Function"
+   },
+   "shift": {
+    "type": "string",
+    "description": "Shift"
+   },
+   "securityClearance": {
+    "type": "string",
+    "description": "Security Clearance"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "park": {
+    "type": "string",
+    "description": "Park"
+   },
+   "zone": {
+    "type": "string",
+    "description": "Zone"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "gate": {
+    "type": "string",
+    "description": "Gate"
+   },
+   "resource": {
+    "type": "string",
+    "description": "Resource"
+   },
+   "restrictedArea": {
+    "type": "string",
+    "description": "Restricted Area"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "time": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time"
+   },
+   "day": {
+    "type": "string",
+    "description": "Day"
+   },
+   "season": {
+    "type": "string",
+    "description": "Season"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "performance": {
+    "type": "string",
+    "description": "Performance"
+   },
+   "operatingCalendar": {
+    "type": "string",
+    "description": "Operating Calendar"
+   },
+   "specialDay": {
+    "type": "string",
+    "description": "Special Day"
+   },
+   "capacity": {
+    "type": "integer",
+    "description": "Capacity"
+   },
+   "occupancy": {
+    "type": "integer",
+    "description": "Occupancy"
+   }
+  }
+ },
+ "AuthorizationGovernanceTemporaryAccessView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Authorization Governance & Temporary Access displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "leastPrivilege": {
+    "type": "string",
+    "description": "Least Privilege"
+   },
+   "segregationOfDuties": {
+    "type": "string",
+    "description": "Segregation of Duties"
+   },
+   "temporaryAccess": {
+    "type": "string",
+    "description": "Temporary Access"
+   },
+   "expiringGrants": {
+    "type": "string",
+    "description": "Expiring Grants"
+   },
+   "delegatedAdministration": {
+    "type": "string",
+    "description": "Delegated Administration"
+   },
+   "approvalRequirements": {
+    "type": "string",
+    "description": "Approval Requirements"
+   },
+   "at": {
+    "type": "string",
+    "description": "At"
+   },
+   "cannot": {
+    "type": "string",
+    "description": "cannot"
+   },
+   "resortGlobalSecurityPolicy": {
+    "type": "string",
+    "description": "✕ Resort Global Security Policy"
+   },
+   "adventureParkPolicies": {
+    "type": "string",
+    "description": "✕ Adventure Park Policies"
+   },
+   "with": {
+    "type": "string",
+    "description": "with"
+   },
+   "scope": {
+    "type": "string",
+    "description": "scope"
+   },
+   "duration": {
+    "type": "string",
+    "format": "date-time",
+    "description": "duration"
+   },
+   "reason": {
+    "type": "string",
+    "description": "reason"
+   },
+   "approver": {
+    "type": "string",
+    "description": "approver"
+   },
+   "fullAudit": {
+    "type": "string",
+    "description": "full audit"
+   }
+  }
+ },
+ "ContextTimeEventCapacityPolicyBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Context, Time, Event & Capacity Policy Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "day": {
+    "type": "string",
+    "description": "Day"
+   },
+   "time": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time"
+   },
+   "season": {
+    "type": "string",
+    "description": "Season"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "performance": {
+    "type": "string",
+    "description": "Performance"
+   },
+   "specialEvent": {
+    "type": "string",
+    "description": "Special Event"
+   },
+   "holiday": {
+    "type": "string",
+    "description": "Holiday"
+   },
+   "operatingCalendar": {
+    "type": "string",
+    "description": "Operating Calendar"
+   },
+   "mayEnterSpecifiedZones": {
+    "type": "string",
+    "description": "may enter specified zones"
+   }
+  }
+ },
+ "ContextTimeEventCapacityPolicyBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Context, Time, Event & Capacity Policy Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "day": {
+    "type": "string",
+    "description": "Day"
+   },
+   "time": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time"
+   },
+   "season": {
+    "type": "string",
+    "description": "Season"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "performance": {
+    "type": "string",
+    "description": "Performance"
+   },
+   "specialEvent": {
+    "type": "string",
+    "description": "Special Event"
+   },
+   "holiday": {
+    "type": "string",
+    "description": "Holiday"
+   },
+   "operatingCalendar": {
+    "type": "string",
+    "description": "Operating Calendar"
+   },
+   "mayEnterSpecifiedZones": {
+    "type": "string",
+    "description": "may enter specified zones"
+   },
+   "normal": {
+    "type": "string",
+    "description": "NORMAL (the pack shows 80–89%)"
+   },
+   "monitor": {
+    "type": "string",
+    "description": "MONITOR (the pack shows 90–94%)"
+   },
+   "restrict": {
+    "type": "string",
+    "description": "RESTRICT (the pack shows 95%+)"
+   }
+  }
+ },
+ "DynamicAccessPolicyCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Dynamic Access Policy Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "activePolicies": {
+    "type": "integer",
+    "description": "Active Policies"
+   },
+   "draftPolicies": {
+    "type": "integer",
+    "description": "Draft Policies"
+   },
+   "policiesPendingApproval": {
+    "type": "string",
+    "description": "Policies Pending Approval"
+   },
+   "policiesTriggeredToday": {
+    "type": "string",
+    "description": "Policies Triggered Today"
+   },
+   "allowDecisions": {
+    "type": "boolean",
+    "description": "Allow Decisions"
+   },
+   "denyDecisions": {
+    "type": "integer",
+    "description": "Deny Decisions"
+   },
+   "policyConflicts": {
+    "type": "integer",
+    "description": "Policy Conflicts"
+   },
+   "expiringPolicies": {
+    "type": "integer",
+    "description": "Expiring Policies"
+   },
+   "aiRecommendations": {
+    "type": "integer",
+    "description": "AI Recommendations"
+   }
+  }
+ },
+ "IdentityMembershipAccreditationPoliciesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Identity, Membership & Accreditation Policies displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "guest": {
+    "type": "string",
+    "description": "Guest"
+   },
+   "member": {
+    "type": "string",
+    "description": "Member"
+   },
+   "annualPassHolder": {
+    "type": "string",
+    "description": "Annual Pass Holder"
+   },
+   "employee": {
+    "type": "string",
+    "description": "Employee"
+   },
+   "contractor": {
+    "type": "string",
+    "description": "Contractor"
+   },
+   "vendor": {
+    "type": "string",
+    "description": "Vendor"
+   },
+   "performer": {
+    "type": "string",
+    "description": "Performer"
+   },
+   "media": {
+    "type": "string",
+    "description": "Media"
+   },
+   "vip": {
+    "type": "string",
+    "description": "VIP"
+   },
+   "security": {
+    "type": "string",
+    "description": "Security"
+   },
+   "emergencyServices": {
+    "type": "string",
+    "description": "Emergency Services"
+   },
+   "eventStaff": {
+    "type": "string",
+    "description": "Event Staff"
+   },
+   "priorityEntrance": {
+    "type": "string",
+    "description": "✓ Priority Entrance"
+   },
+   "memberLounge": {
+    "type": "string",
+    "description": "✓ Member Lounge"
+   },
+   "selectedAttractions": {
+    "type": "string",
+    "description": "✓ Selected Attractions"
+   },
+   "productionZone": {
+    "type": "string",
+    "description": "✓ Production Zone"
+   },
+   "backstage": {
+    "type": "string",
+    "description": "✓ Backstage"
+   },
+   "staffEntrance": {
+    "type": "string",
+    "description": "✓ Staff Entrance"
+   },
+   "vipHospitality": {
+    "type": "string",
+    "description": "✕ VIP Hospitality"
+   },
+   "financeOffice": {
+    "type": "string",
+    "description": "✕ Finance Office"
+   },
+   "until": {
+    "type": "string",
+    "format": "date-time",
+    "description": "until"
+   },
+   "automaticallyExpiresAfterward": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Automatically expires afterward"
+   }
+  }
+ },
+ "LocalisedRichText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "description": "Keyed by language code. Values are sanitised HTML.",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
+ "Policy": {
+  "x-ticvai-persistence": "whitelabel.policy",
+  "type": "object",
+  "required": [
+   "kind",
+   "version",
+   "body",
+   "effectiveFrom",
+   "publishedAt"
+  ],
+  "properties": {
+   "kind": {
+    "$ref": "#/components/schemas/PolicyKind"
+   },
+   "version": {
+    "type": "string",
+    "description": "Immutable. A guest who consented to version 3 consented to version 3, and a policy that changes under a recorded consent is a compliance failure.\n"
+   },
+   "body": {
+    "$ref": "#/components/schemas/LocalisedRichText"
+   },
+   "requiresReconsent": {
+    "type": "boolean"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "publishedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+   }
+  }
+ },
+ "PolicyEvaluationArchitectureOfflineDistributionView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Policy Evaluation Architecture & Offline Distribution displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "evaluatedAtVenueEdge": {
+    "type": "string",
+    "description": "Evaluated at venue edge"
+   },
+   "evaluatedLocallyWhereSupported": {
+    "type": "string",
+    "description": "Evaluated locally where supported"
+   },
+   "centralUnavailable": {
+    "type": "string",
+    "description": "Central unavailable"
+   }
+  }
+ },
+ "PolicyKind": {
+  "type": "string",
+  "enum": [
+   "privacy",
+   "termsAndConditions",
+   "refund",
+   "cookie",
+   "accessibility"
+  ]
+ },
+ "PolicyScopeHierarchyInheritanceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Policy Scope, Hierarchy & Inheritance displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "appliesTo": {
+    "type": "string",
+    "description": "applies to"
+   },
+   "appliesOnly": {
+    "type": "string",
+    "description": "applies only"
+   },
+   "applies": {
+    "type": "string",
+    "description": "applies"
+   },
+   "highestPriorityWins": {
+    "type": "string",
+    "description": "Highest Priority Wins"
+   },
+   "denyOverridesAllow": {
+    "type": "string",
+    "description": "Deny Overrides Allow"
+   },
+   "mostSpecificWins": {
+    "type": "string",
+    "description": "Most Specific Wins"
+   },
+   "mandatoryParentWins": {
+    "type": "string",
+    "description": "Mandatory Parent Wins"
+   },
+   "explicitResolution": {
+    "type": "string",
+    "description": "Explicit Resolution"
+   }
+  }
+ },
+ "PolicySimulationConflictImpactAnalysisInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Policy Simulation, Conflict & Impact Analysis submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "pass": {
+    "type": "string",
+    "description": "✓ PASS"
+   },
+   "accessAllowed": {
+    "type": "boolean",
+    "description": "🟢 ACCESS ALLOWED"
+   },
+   "goldMembersAllow": {
+    "type": "string",
+    "description": "Gold Members → Allow"
+   }
+  }
+ },
+ "PolicySimulationConflictImpactAnalysisView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Policy Simulation, Conflict & Impact Analysis displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "occupancy": {
+    "type": "integer",
+    "description": "Occupancy (the pack shows 82%)"
+   },
+   "pass": {
+    "type": "string",
+    "description": "✓ PASS"
+   },
+   "accessAllowed": {
+    "type": "boolean",
+    "description": "🟢 ACCESS ALLOWED"
+   },
+   "goldMembersAllow": {
+    "type": "string",
+    "description": "Gold Members → Allow"
+   },
+   "policiesInvolved": {
+    "type": "string",
+    "description": "policies involved"
+   },
+   "hierarchy": {
+    "type": "string",
+    "description": "hierarchy"
+   },
+   "priority": {
+    "type": "string",
+    "description": "priority"
+   },
+   "resultingDecision": {
+    "type": "string",
+    "description": "resulting decision"
+   },
+   "affectedProducts": {
+    "type": "integer",
+    "description": "affected products"
+   },
+   "affectedVenues": {
+    "type": "integer",
+    "description": "affected venues"
+   },
+   "estimatedGuestsImpacted": {
+    "type": "string",
+    "description": "estimated guests impacted"
+   }
+  }
+ },
+ "VisualDynamicPolicyBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Visual Dynamic Policy Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "allow": {
+    "type": "string",
+    "description": "🟢 ALLOW"
+   },
+   "deny": {
+    "type": "string",
+    "description": "🔴 DENY"
+   },
+   "review": {
+    "type": "string",
+    "description": "🟡 REVIEW"
+   },
+   "requireId": {
+    "type": "string",
+    "description": "🟡 REQUIRE ID"
+   },
+   "requireBiometric": {
+    "type": "string",
+    "description": "🟡 REQUIRE BIOMETRIC"
+   },
+   "requireCompanion": {
+    "type": "string",
+    "description": "🟡 REQUIRE COMPANION"
+   },
+   "requireSupervisor": {
+    "type": "string",
+    "description": "🟡 REQUIRE SUPERVISOR"
+   }
+  }
+ },
+ "VisualDynamicPolicyBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Visual Dynamic Policy Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "allow": {
+    "type": "string",
+    "description": "🟢 ALLOW"
+   },
+   "deny": {
+    "type": "string",
+    "description": "🔴 DENY"
+   },
+   "review": {
+    "type": "string",
+    "description": "🟡 REVIEW"
+   },
+   "requireId": {
+    "type": "string",
+    "description": "🟡 REQUIRE ID"
+   },
+   "requireBiometric": {
+    "type": "string",
+    "description": "🟡 REQUIRE BIOMETRIC"
+   },
+   "requireCompanion": {
+    "type": "string",
+    "description": "🟡 REQUIRE COMPANION"
+   },
+   "requireSupervisor": {
+    "type": "string",
+    "description": "🟡 REQUIRE SUPERVISOR"
+   }
+  }
+ }
+}

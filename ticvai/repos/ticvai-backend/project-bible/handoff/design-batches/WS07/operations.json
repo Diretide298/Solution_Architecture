@@ -1,0 +1,138 @@
+{
+ "listConnectivityFailureDegraded": {
+  "method": "GET",
+  "path": "/connectivity-failure-degraded",
+  "contract": "access",
+  "summary": "Connectivity Failure & Degraded Mode Policy",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ConnectivityFailureDegradedModePolicyView"
+ },
+ "listEdgePackageData": {
+  "method": "GET",
+  "path": "/edge-package-data",
+  "contract": "access",
+  "summary": "Edge Package & Data Distribution",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "EdgePackageDataDistributionView"
+ },
+ "listEdgeSecurityDeployment": {
+  "method": "GET",
+  "path": "/edge-security-deployment",
+  "contract": "access",
+  "summary": "Edge Security, Audit & Deployment",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "EdgeSecurityAuditDeploymentView"
+ },
+ "listOfflineCredentialRevocation": {
+  "method": "GET",
+  "path": "/offline-credential-revocation",
+  "contract": "access",
+  "summary": "Offline Credential & Revocation Cache",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "OfflineCredentialRevocationCacheView"
+ },
+ "listOfflineEdge": {
+  "method": "GET",
+  "path": "/offline-edge",
+  "contract": "access",
+  "summary": "Offline & Edge Operations Command Center",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "OfflineEdgeOperationsCommandCenterView"
+ },
+ "listOfflineEntitlementUsage": {
+  "method": "GET",
+  "path": "/offline-entitlement-usage",
+  "contract": "access",
+  "summary": "Offline Entitlement & Usage Ledger",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "OfflineEntitlementUsageLedgerView"
+ },
+ "listReconnectionSynchronizationConflict": {
+  "method": "GET",
+  "path": "/reconnection-synchronization-conflict",
+  "contract": "access",
+  "summary": "Reconnection, Synchronization & Conflict Resolution",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ReconnectionSynchronizationConflictResolutionView"
+ },
+ "setEdgeNodeLocal": {
+  "method": "PUT",
+  "path": "/edge-node-local",
+  "contract": "access",
+  "summary": "Edge Node & Local Processing Configuration",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "EdgeNodeLocalProcessingConfigurationInput",
+  "responds": "EdgeNodeLocalProcessingConfigurationView"
+ },
+ "setOfflinePolicy": {
+  "method": "PUT",
+  "path": "/offline-policy",
+  "contract": "tenancy",
+  "summary": "What a workstation may do with no network, and for how long",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "OfflinePolicy",
+  "responds": "OfflinePolicy"
+ },
+ "simulateOfflineResilienceTesting": {
+  "method": "PUT",
+  "path": "/offline-resilience-testing",
+  "contract": "access",
+  "summary": "Offline Simulation & Resilience Testing",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "OfflineSimulationResilienceTestingInput",
+  "responds": "OfflineSimulationResilienceTestingView"
+ }
+}

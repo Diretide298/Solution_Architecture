@@ -1,0 +1,173 @@
+{
+ "listBundleAvailabilityCapacity": {
+  "method": "GET",
+  "path": "/bundle-availability-capacity",
+  "contract": "promotions",
+  "summary": "Bundle Availability, Capacity & Validation",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BundleAvailabilityCapacityValidationView"
+ },
+ "listBundleCombo": {
+  "method": "GET",
+  "path": "/bundle-combo",
+  "contract": "promotions",
+  "summary": "Bundle & Combo Command Center",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "ticketBundle",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "multiAttraction",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "multiPark",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "familyPackage",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ticketFB",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ticketRetail",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ticketExperience",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ticketParking",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "BundleComboCommandCenterView"
+ },
+ "listBundlePricingCommercial": {
+  "method": "GET",
+  "path": "/bundle-pricing-commercial",
+  "contract": "promotions",
+  "summary": "Bundle Pricing & Commercial Model",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BundlePricingCommercialModelView"
+ },
+ "listBundleValidityScheduling": {
+  "method": "GET",
+  "path": "/bundle-validity-scheduling",
+  "contract": "promotions",
+  "summary": "Bundle Validity, Scheduling & Redemption Rules",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BundleValiditySchedulingRedemptionRulesView"
+ },
+ "listPartnerExternalProduct": {
+  "method": "GET",
+  "path": "/partner-external-product",
+  "contract": "promotions",
+  "summary": "Partner & External Product Bundle Manager",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PartnerExternalProductBundleManagerView"
+ },
+ "listRevenueAllocationCost": {
+  "method": "GET",
+  "path": "/revenue-allocation-cost",
+  "contract": "promotions",
+  "summary": "Revenue Allocation, Cost & Settlement Rules",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "RevenueAllocationCostSettlementRulesView"
+ },
+ "setBundleComponent": {
+  "method": "PUT",
+  "path": "/bundle-component",
+  "contract": "promotions",
+  "summary": "Bundle Component Builder",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "BundleComponentBuilderInput",
+  "responds": "BundleComponentBuilderView"
+ },
+ "setBundleDefinition": {
+  "method": "PUT",
+  "path": "/bundle-definition",
+  "contract": "promotions",
+  "summary": "Bundle Definition & Setup",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "BundleDefinitionSetupInput",
+  "responds": "BundleDefinitionSetupView"
+ },
+ "setGuestChoiceBuild": {
+  "method": "PUT",
+  "path": "/guest-choice-build",
+  "contract": "promotions",
+  "summary": "Guest Choice & Build-Your-Own Bundle Designer",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "GuestChoiceBuildYourOwnBundleDesignerInput",
+  "responds": "GuestChoiceBuildYourOwnBundleDesignerView"
+ },
+ "simulateBundlePreviewRecommendation": {
+  "method": "PUT",
+  "path": "/bundle-preview-recommendation",
+  "contract": "promotions",
+  "summary": "Bundle Preview, Simulation & AI Recommendation",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "BundlePreviewSimulationAiRecommendationInput",
+  "responds": "BundlePreviewSimulationAiRecommendationView"
+ }
+}

@@ -1,0 +1,1543 @@
+[
+ {
+  "id": "KSK-001",
+  "name": "Attract Loop",
+  "module": "Sell",
+  "requiresModule": "core",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/sell/attract-loop",
+   "component": "apps/guest-app/src/routes/sell/AttractLoopDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "KSK-002",
+    "KSK-003",
+    "KSK-004"
+   ],
+   "inferred": true,
+   "isEntryPoint": true,
+   "transitions": [
+    {
+     "to": "KSK-002",
+     "trigger": "Chooses a language",
+     "provenance": "flow F07 step 1→2, F75 step 1→2"
+    },
+    {
+     "to": "KSK-003",
+     "trigger": "What are you buying",
+     "provenance": "structural — KSK-001 is P05's home screen and its exits are its launcher"
+    },
+    {
+     "to": "KSK-004",
+     "trigger": "Choose tickets",
+     "provenance": "structural — KSK-001 is P05's home screen and its exits are its launcher"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **The attract loop is the entry.** A kiosk has no login and nobody navigates to it — it is what the screen shows when nobody is standing there. **Declared 20 August** — `isEntryPoint` existed in the schema and five platforms used none, so every screen in them read as unreachable.",
+  "density": "touchLarge",
+  "boardFrames": [
+   "Kiosk Board 1.dc.html#KSK-001"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "**the screen's operations choose no pattern** — no list, no get, no write that groups. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Pull somebody standing in a queue out of it.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen declares no operation the contracts recognise.** Nothing fills it, nothing it does is committed anywhere, and its shape below is a default rather than a reading.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Not applicable — the attract loop is the idle state",
+   "error": "Falls through to KSK-014 if the kiosk cannot reach the server",
+   "emptyFirstRun": "Not applicable",
+   "emptyNoResults": "The filter narrowed it and the attract loop are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Not available.** An unattended terminal selling from a stale catalogue oversells with nobody watching"
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-001",
+   "note": "**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 0 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P05",
+   "audience": "guest",
+   "formFactor": "kiosk",
+   "shortName": "Guest Kiosk",
+   "name": "Guest Kiosk — Self-Service",
+   "app": "guest-app",
+   "offlineCapable": false,
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "kiosk",
+    "siblings": [
+     "P01",
+     "P02"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "KSK-002",
+  "name": "Language Select",
+  "module": "Sell",
+  "requiresModule": "core",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/sell/language-select",
+   "component": "apps/guest-app/src/routes/sell/LanguageSelectDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "KSK-001",
+    "KSK-003",
+    "KSK-004"
+   ],
+   "inferred": true,
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "KSK-003",
+     "trigger": "Chooses buy or collect",
+     "provenance": "flow F07 step 2→3, F75 step 2→3"
+    },
+    {
+     "to": "KSK-004",
+     "trigger": "Choose tickets",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — KSK-004 declares entryState.params productId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "density": "touchLarge",
+  "boardFrames": [
+   "Kiosk Board 1.dc.html#KSK-002"
+  ],
+  "pattern": "statusTracker",
+  "patternReason": "`getTenantAppStatus` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Ask the only question that changes everything else.",
+  "gaps": [
+   {
+    "operation": "getTenantConfig",
+    "why": "**1 declared operation reach no component on this screen**: getTenantConfig. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected language select",
+       "bindsTo": "TenantAppStatus",
+       "columns": [
+        "TenantAppStatus.isPublished",
+        "TenantAppStatus.publishedVersion",
+        "TenantAppStatus.publishedAt",
+        "TenantAppStatus.draftVersion",
+        "TenantAppStatus.hasUnpublishedChanges",
+        "TenantAppStatus.activeModuleCount",
+        "TenantAppStatus.licensedModuleCount",
+        "TenantAppStatus.activePageCount",
+        "TenantAppStatus.isInMaintenance",
+        "TenantAppStatus.maintenanceMessage",
+        "TenantAppStatus.expectedBackAt",
+        "TenantAppStatus.recentChanges"
+       ],
+       "operation": "getTenantAppStatus",
+       "provenance": "contract white-label.yaml GET /tenant-config/status"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The language select list.",
+   "error": "Could not load. Names which read failed and leaves the language select untouched.",
+   "emptyFirstRun": "No language select yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the language select are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Not available"
+  },
+  "apis": [
+   {
+    "operationId": "getTenantAppStatus",
+    "contract": "white-label",
+    "purpose": "App status and recent changes",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getTenantConfig",
+    "contract": "white-label",
+    "purpose": "Full working configuration",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-002",
+   "note": "**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P05",
+   "audience": "guest",
+   "formFactor": "kiosk",
+   "shortName": "Guest Kiosk",
+   "name": "Guest Kiosk — Self-Service",
+   "app": "guest-app",
+   "offlineCapable": false,
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "kiosk",
+    "siblings": [
+     "P01",
+     "P02"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "KSK-003",
+  "name": "What are you buying",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/sell/what-are-you-buying",
+   "component": "apps/guest-app/src/routes/sell/WhatAreYouBuyingDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "KSK-001",
+    "KSK-002",
+    "KSK-004",
+    "KSK-006"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "KSK-004",
+     "trigger": "Chooses tickets and quantities",
+     "provenance": "flow F07 step 3→4",
+     "operation": "listProducts"
+    },
+    {
+     "to": "KSK-006",
+     "trigger": "They review the basket",
+     "provenance": "flow F75 step 3→4",
+     "operation": "listProducts"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "density": "touchLarge",
+  "boardFrames": [
+   "Kiosk Board 1.dc.html#KSK-003"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listProducts` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Get to a product in one touch.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every what are you",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo"
+       ],
+       "operation": "listProducts",
+       "provenance": "contract catalogue.yaml GET /products"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected what are you",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo",
+        "Product.lifecycleState",
+        "Product.isSellable",
+        "Product.hasVariants",
+        "Product.variantCount"
+       ],
+       "operation": "listProducts",
+       "provenance": "contract catalogue.yaml GET /products"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "derived": true,
+       "impliedBy": "listProducts",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The what are you list.",
+   "error": "Could not load. Names which read failed and leaves the what are you untouched.",
+   "emptyFirstRun": "No what are you yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the what are you are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Not available"
+  },
+  "apis": [
+   {
+    "operationId": "listProducts",
+    "contract": "catalogue",
+    "purpose": "List products",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Product.id",
+    "Product.code",
+    "Product.name",
+    "Product.description",
+    "Product.kind"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-003",
+   "note": "**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P05",
+   "audience": "guest",
+   "formFactor": "kiosk",
+   "shortName": "Guest Kiosk",
+   "name": "Guest Kiosk — Self-Service",
+   "app": "guest-app",
+   "offlineCapable": false,
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "kiosk",
+    "siblings": [
+     "P01",
+     "P02"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "KSK-004",
+  "name": "Choose tickets",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/sell/choose-tickets",
+   "component": "apps/guest-app/src/routes/sell/ChooseTicketsDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "KSK-001",
+    "KSK-002",
+    "KSK-003",
+    "KSK-005"
+   ],
+   "inferred": true,
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "KSK-005",
+     "trigger": "Chooses a session",
+     "provenance": "flow F07 step 4→5"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "density": "touchLarge",
+  "boardFrames": [
+   "Kiosk Board 1.dc.html#KSK-004"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listProductVariants` reads the population and `getAvailability` reads one of them — list, select, act",
+  "purpose": "Quantities, with targets a gloved hand can hit.",
+  "gaps": [
+   {
+    "operation": "getAvailability",
+    "why": "**1 declared operation reach no component on this screen**: getAvailability. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every choose tickets",
+       "bindsTo": "ProductVariant",
+       "columns": [
+        "ProductVariant.id",
+        "ProductVariant.productId",
+        "ProductVariant.sku",
+        "ProductVariant.axisValues",
+        "ProductVariant.isActive"
+       ],
+       "operation": "listProductVariants",
+       "provenance": "contract catalogue.yaml GET /products/{productId}/variants"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "derived": true,
+       "impliedBy": "listProductVariants",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The choose tickets list.",
+   "error": "Could not load. Names which read failed and leaves the choose tickets untouched.",
+   "emptyFirstRun": "No choose tickets yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the choose tickets are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Not available"
+  },
+  "apis": [
+   {
+    "operationId": "getAvailability",
+    "contract": "catalogue",
+    "purpose": "Live remaining capacity",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listProductVariants",
+    "contract": "catalogue",
+    "purpose": "List generated variants",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "productId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A shared product link after the product retired.** Shows what replaced it where a successor exists, and the catalogue where none does.",
+   "preloaded": []
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-004",
+   "note": "**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P05",
+   "audience": "guest",
+   "formFactor": "kiosk",
+   "shortName": "Guest Kiosk",
+   "name": "Guest Kiosk — Self-Service",
+   "app": "guest-app",
+   "offlineCapable": false,
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "kiosk",
+    "siblings": [
+     "P01",
+     "P02"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "KSK-005",
+  "name": "Choose a session",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/sell/choose-a-session",
+   "component": "apps/guest-app/src/routes/sell/ChooseASessionDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "KSK-001",
+    "KSK-002",
+    "KSK-003",
+    "KSK-006"
+   ],
+   "inferred": true,
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "KSK-006",
+     "trigger": "Reviews the order",
+     "provenance": "flow F07 step 5→6"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "density": "touchLarge",
+  "boardFrames": [
+   "Kiosk Board 1.dc.html#KSK-005"
+  ],
+  "pattern": "statusTracker",
+  "patternReason": "`getAvailability` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Pick a time that still has room.",
+  "gaps": [
+   {
+    "operation": "getAvailability",
+    "why": "**1 declared operation reach no component on this screen**: getAvailability. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Acquire",
+       "operation": "acquireInventoryHold",
+       "provenance": "contract catalogue.yaml POST /inventory-holds"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "acquireInventoryHold",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The choose session list.",
+   "error": "Could not load. Names which read failed and leaves the choose session untouched.",
+   "emptyFirstRun": "No choose session yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the choose session are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Not available"
+  },
+  "apis": [
+   {
+    "operationId": "acquireInventoryHold",
+    "contract": "catalogue",
+    "purpose": "Acquire an inventory lease",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getAvailability",
+    "contract": "catalogue",
+    "purpose": "Live remaining capacity",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-005",
+   "note": "**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P05",
+   "audience": "guest",
+   "formFactor": "kiosk",
+   "shortName": "Guest Kiosk",
+   "name": "Guest Kiosk — Self-Service",
+   "app": "guest-app",
+   "offlineCapable": false,
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "kiosk",
+    "siblings": [
+     "P01",
+     "P02"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "KSK-006",
+  "name": "Review",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/sell/review",
+   "component": "apps/guest-app/src/routes/sell/ReviewDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "KSK-001",
+    "KSK-002",
+    "KSK-003",
+    "KSK-007",
+    "KSK-008"
+   ],
+   "inferred": true,
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "KSK-007",
+     "trigger": "Pays at the terminal",
+     "provenance": "flow F07 step 6→7, F75 step 4→5"
+    },
+    {
+     "to": "KSK-008",
+     "trigger": "The payment does not resolve",
+     "provenance": "flow F57 step 1→2"
+    }
+   ],
+   "entryFrom": [
+    "KSK-003"
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "density": "touchLarge",
+  "boardFrames": [
+   "Kiosk Board 1.dc.html#KSK-006"
+  ],
+  "pattern": "statusTracker",
+  "patternReason": "`getCart` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Show what is being bought before money moves.",
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected review",
+       "bindsTo": "Cart",
+       "columns": [
+        "Cart.id",
+        "Cart.token",
+        "Cart.venueId",
+        "Cart.channel",
+        "Cart.subjectId",
+        "Cart.status",
+        "Cart.lines",
+        "Cart.conflicts",
+        "Cart.subtotal",
+        "Cart.discountTotal",
+        "Cart.taxTotal",
+        "Cart.total",
+        "Cart.appliedPromotionIds",
+        "Cart.expiresAt",
+        "Cart.extensionsUsed",
+        "Cart.maxExtensions"
+       ],
+       "operation": "getCart",
+       "provenance": "contract orders.yaml GET /carts/{cartId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add",
+       "operation": "addCartLine",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Checkout",
+       "operation": "checkoutCart",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/checkout"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Evaluate",
+       "operation": "evaluatePromotions",
+       "provenance": "contract promotions.yaml POST /promotions/evaluate"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "addCartLine",
+       "label": "Add cart line",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "addCartLine",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The review list.",
+   "error": "Could not load. Names which read failed and leaves the review untouched.",
+   "emptyFirstRun": "No review yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the review are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Not available"
+  },
+  "apis": [
+   {
+    "operationId": "getCart",
+    "contract": "orders",
+    "purpose": "The cart, priced and checked, right now",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "addCartLine",
+    "contract": "orders",
+    "purpose": "Add something",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "checkoutCart",
+    "contract": "orders",
+    "purpose": "Turn the cart into an order",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "evaluatePromotions",
+    "contract": "promotions",
+    "purpose": "Evaluate promotions against a cart",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "cartId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-006",
+   "note": "**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P05",
+   "audience": "guest",
+   "formFactor": "kiosk",
+   "shortName": "Guest Kiosk",
+   "name": "Guest Kiosk — Self-Service",
+   "app": "guest-app",
+   "offlineCapable": false,
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "kiosk",
+    "siblings": [
+     "P01",
+     "P02"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "KSK-007",
+  "name": "Payment",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/sell/payment",
+   "component": "apps/guest-app/src/routes/sell/PaymentDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "KSK-001",
+    "KSK-002",
+    "KSK-003",
+    "KSK-009"
+   ],
+   "inferred": true,
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "KSK-009",
+     "trigger": "Takes the printed ticket",
+     "provenance": "flow F07 step 7→8, F75 step 5→6",
+     "operation": "createPayment"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Card only. No foreign cash** — a kiosk accepting foreign notes needs a note reader and a per-currency float, and neither is specified. A guest paying by card in a foreign currency is converted by their own issuer, which is not our rate. **Card only. No foreign cash** — a kiosk accepting notes needs a note reader and a per-currency float, and neither is specified. Dynamic currency conversion by the terminal is recorded as `fxRateSource: cardScheme`, because that rate is the scheme's rather than ours.",
+  "density": "touchLarge",
+  "boardFrames": [
+   "Kiosk Board 1.dc.html#KSK-007"
+  ],
+  "pattern": "configEditor",
+  "patternReason": "the screen declares only writes (`createPayment`) and no read of a population — it is settings, not a list",
+  "purpose": "Take a card, and nothing else.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "id",
+       "bindsTo": "CreatePaymentRequest.id",
+       "provenance": "contract orders.yaml POST /payments"
+      },
+      {
+       "kind": "textField",
+       "label": "orderId",
+       "bindsTo": "CreatePaymentRequest.orderId",
+       "provenance": "contract orders.yaml POST /payments"
+      },
+      {
+       "kind": "textField",
+       "label": "tender",
+       "bindsTo": "CreatePaymentRequest.tender",
+       "provenance": "contract orders.yaml POST /payments"
+      },
+      {
+       "kind": "textField",
+       "label": "amount",
+       "bindsTo": "CreatePaymentRequest.amount",
+       "provenance": "contract orders.yaml POST /payments"
+      },
+      {
+       "kind": "textField",
+       "label": "tenderedAmount",
+       "bindsTo": "CreatePaymentRequest.tenderedAmount",
+       "provenance": "contract orders.yaml POST /payments"
+      },
+      {
+       "kind": "textField",
+       "label": "walletAuthorisationId",
+       "bindsTo": "CreatePaymentRequest.walletAuthorisationId",
+       "provenance": "contract orders.yaml POST /payments"
+      },
+      {
+       "kind": "textField",
+       "label": "deviceId",
+       "bindsTo": "CreatePaymentRequest.deviceId",
+       "provenance": "contract orders.yaml POST /payments"
+      },
+      {
+       "kind": "textField",
+       "label": "recordedAt",
+       "bindsTo": "CreatePaymentRequest.recordedAt",
+       "provenance": "contract orders.yaml POST /payments"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createPayment",
+       "provenance": "contract orders.yaml POST /payments"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createPayment",
+       "label": "Create payment",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createPayment",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The saved payment.",
+   "error": "Could not load. Names which read failed and leaves the payment untouched.",
+   "emptyFirstRun": "No payment configured. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Not available. **Card only, and card needs the acquirer**"
+  },
+  "apis": [
+   {
+    "operationId": "createPayment",
+    "contract": "orders",
+    "purpose": "Take a payment against an order",
+    "trigger": "onAction"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-007",
+   "note": "**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P05",
+   "audience": "guest",
+   "formFactor": "kiosk",
+   "shortName": "Guest Kiosk",
+   "name": "Guest Kiosk — Self-Service",
+   "app": "guest-app",
+   "offlineCapable": false,
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "kiosk",
+    "siblings": [
+     "P01",
+     "P02"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "KSK-008",
+  "name": "Payment unresolved",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/sell/payment-unresolved",
+   "component": "apps/guest-app/src/routes/sell/PaymentUnresolvedDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "KSK-001",
+    "KSK-002",
+    "KSK-003",
+    "KSK-010"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "KSK-006",
+    "KSK-007"
+   ],
+   "notes": "**Reached from KSK-007** — the payment screen is the one that fails. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "KSK-010",
+     "trigger": "Or it resolves and the printer fails",
+     "provenance": "flow F57 step 2→3",
+     "operation": "inquirePaymentStatus"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "density": "touchLarge",
+  "boardFrames": [
+   "Kiosk Board 1.dc.html#KSK-008"
+  ],
+  "pattern": "configEditor",
+  "patternReason": "the screen declares only writes (`inquirePaymentStatus`) and no read of a population — it is settings, not a list",
+  "purpose": "Handle the state that has nobody standing next to it.",
+  "gaps": [
+   {
+    "operation": "inquirePaymentStatus",
+    "why": "**`inquirePaymentStatus` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
+    "source": "contract orders.yaml POST /payments/{paymentId}/inquiry"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Inquire",
+       "operation": "inquirePaymentStatus",
+       "provenance": "contract orders.yaml POST /payments/{paymentId}/inquiry"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "inquirePaymentStatus",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The saved payment unresolved.",
+   "error": "Could not load. Names which read failed and leaves the payment unresolved untouched.",
+   "emptyFirstRun": "No payment unresolved configured. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Not applicable"
+  },
+  "apis": [
+   {
+    "operationId": "inquirePaymentStatus",
+    "contract": "orders",
+    "purpose": "Ask the provider what actually happened",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "paymentId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `paymentId`."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-008",
+   "note": "**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P05",
+   "audience": "guest",
+   "formFactor": "kiosk",
+   "shortName": "Guest Kiosk",
+   "name": "Guest Kiosk — Self-Service",
+   "app": "guest-app",
+   "offlineCapable": false,
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "kiosk",
+    "siblings": [
+     "P01",
+     "P02"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "KSK-009",
+  "name": "Ticket issued",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/sell/ticket-issued",
+   "component": "apps/guest-app/src/routes/sell/TicketIssuedDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "KSK-001",
+    "KSK-002",
+    "KSK-003",
+    "KSK-013"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "KSK-013",
+     "trigger": "Something goes wrong and they call staff",
+     "provenance": "flow F75 step 6→7"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "density": "touchLarge",
+  "boardFrames": [
+   "Kiosk Board 1.dc.html#KSK-009"
+  ],
+  "pattern": "statusTracker",
+  "patternReason": "`getOrder` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Get the ticket into the guest’s hand.",
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected ticket issued",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount",
+        "Order.totalPriceVariance",
+        "Order.lines",
+        "Order.payments",
+        "Order.principalId"
+       ],
+       "operation": "getOrder",
+       "provenance": "contract orders.yaml GET /orders/{orderId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "transferOrderTickets",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The ticket issued list.",
+   "error": "Could not load. Names which read failed and leaves the ticket issued untouched.",
+   "emptyFirstRun": "No ticket issued yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the ticket issued are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Not applicable"
+  },
+  "apis": [
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getOrder",
+    "contract": "orders",
+    "purpose": "Read an order",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-009",
+   "note": "**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P05",
+   "audience": "guest",
+   "formFactor": "kiosk",
+   "shortName": "Guest Kiosk",
+   "name": "Guest Kiosk — Self-Service",
+   "app": "guest-app",
+   "offlineCapable": false,
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "kiosk",
+    "siblings": [
+     "P01",
+     "P02"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "KSK-010",
+  "name": "Print failure",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/sell/print-failure",
+   "component": "apps/guest-app/src/routes/sell/PrintFailureDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "KSK-001",
+    "KSK-002",
+    "KSK-003",
+    "KSK-013"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "KSK-008",
+    "KSK-009"
+   ],
+   "notes": "**Reached from KSK-009** — printing fails after the ticket is issued. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "KSK-013",
+     "trigger": "They call for help",
+     "provenance": "flow F57 step 3→4",
+     "operation": "transferOrderTickets"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "density": "touchLarge",
+  "boardFrames": [
+   "Kiosk Board 2.dc.html#KSK-010"
+  ],
+  "pattern": "configEditor",
+  "patternReason": "the screen declares only writes (`transferOrderTickets`) and no read of a population — it is settings, not a list",
+  "purpose": "Recover when the paper runs out mid-sale.",
+  "gaps": [
+   {
+    "operation": "transferOrderTickets",
+    "why": "**`transferOrderTickets` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
+    "source": "contract orders.yaml POST /orders/{orderId}/transfer"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "transferOrderTickets",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Sending by email and rendering the QR",
+   "error": "**The order is paid and the ticket exists.** Email and on-screen QR, and the kiosk marks itself degraded rather than dead",
+   "emptyFirstRun": "Not applicable",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Not applicable"
+  },
+  "apis": [
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P05 Guest Kiosk.dc.html#ksk-010",
+   "note": "**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P05",
+   "audience": "guest",
+   "formFactor": "kiosk",
+   "shortName": "Guest Kiosk",
+   "name": "Guest Kiosk — Self-Service",
+   "app": "guest-app",
+   "offlineCapable": false,
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "kiosk",
+    "siblings": [
+     "P01",
+     "P02"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

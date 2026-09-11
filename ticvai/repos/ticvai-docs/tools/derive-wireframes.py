@@ -34,6 +34,9 @@ from pathlib import Path
 
 import yaml
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import workshop_boards  # noqa: E402  -- WS codes are issued once, not enumerated
+
 ROOT = Path(__file__).resolve().parents[1]
 SCREENS = ROOT / "screens"
 WIRE = ROOT / "wireframes"
@@ -550,7 +553,7 @@ def build(path: Path) -> tuple[str, int]:
     if ws_here:
         opts = "".join(
             f'<option value="{esc(c)}">{esc(c)} &middot; {esc(lbl)} ({n})</option>'
-            for c, (lbl, n) in sorted(ws_here.items()))
+            for c, (lbl, n) in sorted(ws_here.items(), key=lambda kv: workshop_boards.sort_key(kv[0])))
         wsbar = (
             '<div class="wsbar"><label for="wsf">Workshop board</label>'
             f'<select id="wsf"><option value="">All {len(screens)} screens on this platform</option>'
@@ -642,14 +645,25 @@ def ws_map() -> dict:
     if WS_MAP:
         return WS_MAP
     keys = set()
+    rows = []
     for f in sorted((ROOT / "screens").glob("P*.yaml")):
-        for sc in (yaml.safe_load(f.read_text(encoding="utf-8")).get("screens") or []):
+        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
+        for sc in (doc.get("screens") or []):
             src = sc.get("source") or {}
             if src.get("pack") and src.get("board") is not None:
-                keys.add((_module_of(src["pack"]), int(src["board"])))
-    for i, k in enumerate(sorted(keys), 1):
-        WS_MAP[k] = ("WS%02d" % i, "%s board %d" % (k[0], k[1]))
+                k = (_module_of(src["pack"]), int(src["board"]))
+                keys.add(k)
+                rows.append((k, doc["platform"]["code"], src.get("number"), sc["id"]))
+    for k, code in workshop_boards.codes(keys, write=True).items():
+        WS_MAP[k] = (code, "%s board %d" % (k[0], k[1]))
+    # A screen placed off its board's platform is not tagged with the board's code: the design
+    # manifest batches it with its own platform, and the tag would send a reviewer to the wrong one.
+    home = workshop_boards.home_platforms((k, p, n) for k, p, n, _ in rows)
+    WS_STRAYS.update(i for k, p, _, i in rows if p != home[k])
     return WS_MAP
+
+
+WS_STRAYS: set = set()
 
 
 def ws_of(screen: dict) -> tuple:
@@ -657,7 +671,8 @@ def ws_of(screen: dict) -> tuple:
     src = screen.get("source") or {}
     if not src.get("pack") or src.get("board") is None:
         return ()
-    return ws_map().get((_module_of(src["pack"]), int(src["board"])), ())
+    found = ws_map().get((_module_of(src["pack"]), int(src["board"])), ())
+    return () if screen.get("id") in WS_STRAYS else found
 
 
 def board_of() -> dict:
@@ -941,7 +956,7 @@ display:inline-block;padding:2px 7px;border-radius:4px}}
         packs = sorted(f.name for f in WIRE.glob("*.dc.html")
                        if not re.match(r"^P\d\d ", f.name) and not f.name.startswith("TICVAI")
                        and f.name not in {"index.html"})
-        workshop = [n for n in packs if re.match(r"^WS\d\d ", n)]
+        workshop = [n for n in packs if re.match(r"^WS\d+ ", n)]
         packs = [n for n in packs if n not in set(workshop)]
         known_packs = tuple(PACK_PREFIXES)
         unrecognised = [n for n in packs if not n.startswith(known_packs)]

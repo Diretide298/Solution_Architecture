@@ -1,0 +1,364 @@
+{
+ "certifyIntegration": {
+  "method": "POST",
+  "path": "/listings/{listingId}/certify",
+  "contract": "public-api",
+  "summary": "Approve, reject or revoke a certification",
+  "permission": "DEVELOPER_ADMIN",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "IntegrationListing"
+ },
+ "createApiClient": {
+  "method": "POST",
+  "path": "/api-clients",
+  "contract": "public-api",
+  "summary": "Create a client with scopes and an environment",
+  "permission": "DEVELOPER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApiClient",
+  "responds": null
+ },
+ "createSandbox": {
+  "method": "POST",
+  "path": "/sandboxes",
+  "contract": "public-api",
+  "summary": "Provision a sandbox with synthetic data",
+  "permission": "DEVELOPER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "createWebhookSubscription": {
+  "method": "POST",
+  "path": "/webhook-subscriptions",
+  "contract": "public-api",
+  "summary": "Subscribe to business events",
+  "permission": "DEVELOPER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WebhookSubscription",
+  "responds": "WebhookSubscription"
+ },
+ "deprecateApiVersion": {
+  "method": "POST",
+  "path": "/api-versions/{version}/deprecate",
+  "contract": "public-api",
+  "summary": "Announce a sunset date and notify subscribers",
+  "permission": "DEVELOPER_ADMIN",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApiVersion"
+ },
+ "getApiUsage": {
+  "method": "GET",
+  "path": "/api-usage",
+  "contract": "public-api",
+  "summary": "Calls, errors, latency and success rate",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApiUsageSummary"
+ },
+ "listApiClients": {
+  "method": "GET",
+  "path": "/api-clients",
+  "contract": "public-api",
+  "summary": "Registered clients for this developer",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ApiClient"
+ },
+ "listApiVersions": {
+  "method": "GET",
+  "path": "/api-versions",
+  "contract": "public-api",
+  "summary": "Versions, their status and their sunset dates",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ApiVersion"
+ },
+ "listIntegrationListings": {
+  "method": "GET",
+  "path": "/listings",
+  "contract": "public-api",
+  "summary": "Published third-party integrations",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "IntegrationListing"
+ },
+ "listSandboxes": {
+  "method": "GET",
+  "path": "/sandboxes",
+  "contract": "public-api",
+  "summary": "Sandbox environments",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Sandbox"
+ },
+ "listWebhookDeliveries": {
+  "method": "GET",
+  "path": "/webhook-subscriptions/{subscriptionId}/deliveries",
+  "contract": "public-api",
+  "summary": "What was sent, what failed, and why",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WebhookDelivery"
+ },
+ "listWebhookSubscriptions": {
+  "method": "GET",
+  "path": "/webhook-subscriptions",
+  "contract": "public-api",
+  "summary": "What this client is subscribed to",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WebhookSubscription"
+ },
+ "registerDeveloper": {
+  "method": "POST",
+  "path": "/developers",
+  "contract": "public-api",
+  "summary": "Register a developer or organisation",
+  "permission": "DEVELOPER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DeveloperAccount",
+  "responds": "DeveloperAccount"
+ },
+ "replayEvents": {
+  "method": "POST",
+  "path": "/webhook-subscriptions/{subscriptionId}/replay",
+  "contract": "public-api",
+  "summary": "Re-deliver events from a point in time",
+  "permission": "DEVELOPER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "resetSandbox": {
+  "method": "POST",
+  "path": "/sandboxes/{sandboxId}/reset",
+  "contract": "public-api",
+  "summary": "Back to a clean synthetic dataset",
+  "permission": "DEVELOPER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "revokeApiCredential": {
+  "method": "DELETE",
+  "path": "/api-clients/{clientId}/credentials",
+  "contract": "public-api",
+  "summary": "Revoke immediately",
+  "permission": "DEVELOPER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
+ "rotateApiCredential": {
+  "method": "POST",
+  "path": "/api-clients/{clientId}/credentials",
+  "contract": "public-api",
+  "summary": "Issue a new secret, with an overlap window",
+  "permission": "DEVELOPER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setApiLicensing": {
+  "method": "PUT",
+  "path": "/api-licensing",
+  "contract": "public-api",
+  "summary": "Which API modules a tenant has licensed, and on what terms",
+  "permission": "DEVELOPER_ADMIN",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApiLicence",
+  "responds": "ApiLicence"
+ },
+ "setApiQuota": {
+  "method": "PUT",
+  "path": "/api-quotas",
+  "contract": "public-api",
+  "summary": "Rate limits and throttling per client",
+  "permission": "DEVELOPER_ADMIN",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApiQuota",
+  "responds": "ApiQuota"
+ },
+ "setDeveloperMembers": {
+  "method": "PUT",
+  "path": "/developers/{developerId}/members",
+  "contract": "public-api",
+  "summary": "Who at this organisation may do what",
+  "permission": "DEVELOPER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "submitIntegrationListing": {
+  "method": "POST",
+  "path": "/listings",
+  "contract": "public-api",
+  "summary": "Submit an integration for certification and listing",
+  "permission": "DEVELOPER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "IntegrationListing",
+  "responds": "IntegrationListing"
+ }
+}

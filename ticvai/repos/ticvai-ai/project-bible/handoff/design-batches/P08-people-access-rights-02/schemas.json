@@ -1,0 +1,324 @@
+{
+ "ApprovalAnalytics": {
+  "type": "object",
+  "x-ticvai-persistence": "none — aggregated from approvals.request",
+  "properties": {
+   "from": {
+    "type": "string",
+    "format": "date"
+   },
+   "to": {
+    "type": "string",
+    "format": "date"
+   },
+   "groupBy": {
+    "type": "string"
+   },
+   "rows": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "key": {
+       "type": "string"
+      },
+      "raised": {
+       "type": "integer"
+      },
+      "approved": {
+       "type": "integer"
+      },
+      "rejected": {
+       "type": "integer"
+      },
+      "withdrawn": {
+       "type": "integer"
+      },
+      "expired": {
+       "type": "integer",
+       "description": "**Requests nobody answered.** Usually a routing defect rather than a busy approver, and the number that says the matrix names the wrong person.\n"
+      },
+      "escalated": {
+       "type": "integer"
+      },
+      "slaBreached": {
+       "type": "integer"
+      },
+      "medianMinutes": {
+       "type": "number"
+      },
+      "p95Minutes": {
+       "type": "number"
+      }
+     }
+    }
+   }
+  }
+ },
+ "IndexJob": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.index_job",
+  "required": [
+   "id",
+   "sourceId",
+   "status",
+   "startedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sourceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "full",
+     "incremental",
+     "removal"
+    ]
+   },
+   "reason": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "queued",
+     "building",
+     "verifying",
+     "swapping",
+     "complete",
+     "failed"
+    ]
+   },
+   "recordsTotal": {
+    "type": "integer"
+   },
+   "recordsEmbedded": {
+    "type": "integer"
+   },
+   "recordsFailed": {
+    "type": "integer",
+    "description": "**The number to watch.** A source silently failing on 3% of its rows is a search silently missing 3% of the answers, and nothing else in the system will say so.\n"
+   },
+   "failureSample": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "shadowCollection": {
+    "type": "string",
+    "nullable": true,
+    "description": "A full rebuild writes here and swaps on completion. Reindexing in place leaves the assistant answering from a half-built index.\n"
+   },
+   "shardKey": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The tenant boundary on shared placement** (ADR-0021). A collection is shared by every tenant using the same embedding model, and the shard is what separates them — set at provisioning from the tenant, never from a request.\nOn dedicated placement there is one shard and this is still populated, because a tenant moving from shared to dedicated moves a shard rather than being re-indexed.\n"
+   },
+   "embeddingModel": {
+    "type": "string"
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "VenueSettings": {
+  "type": "object",
+  "x-ticvai-persistence": "platform.venue_settings",
+  "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "supportHours": {
+    "type": "object",
+    "description": "CF-100. **A venue decides whether its support desk is 24/7 or bounded, and the platform does not.** This was recorded as an open question for eleven days and was never one — the code is identical either way, and what was missing was somewhere to put the answer.\n",
+    "properties": {
+     "mode": {
+      "type": "string",
+      "enum": [
+       "alwaysOn",
+       "businessHours",
+       "custom",
+       "none"
+      ]
+     },
+     "timezone": {
+      "type": "string"
+     },
+     "windows": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "day": {
+         "type": "string",
+         "enum": [
+          "mon",
+          "tue",
+          "wed",
+          "thu",
+          "fri",
+          "sat",
+          "sun"
+         ]
+        },
+        "from": {
+         "type": "string"
+        },
+        "to": {
+         "type": "string"
+        }
+       }
+      }
+     },
+     "outOfHoursMessage": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   },
+   "quietHours": {
+    "type": "object",
+    "nullable": true,
+    "description": "**When the platform does not send.** A wallet low-balance alert at 3am is a complaint, and journeys and message triggers both respect this.\n**Operational messages ignore it** — a queue-turn alert is why a guest is holding the phone.\n",
+    "properties": {
+     "from": {
+      "type": "string"
+     },
+     "to": {
+      "type": "string"
+     }
+    }
+   },
+   "segregatedAccess": {
+    "type": "object",
+    "nullable": true,
+    "description": "CF-130. **Configured at venue level because it changes by region and the venue is where it is known** — a Ladies Night, a family session, a prayer-time closure.\n**The platform does not infer gender.** 3.2.45 asks for automatic gender recognition and 3.2.46 for rule-based facial recognition validation, and neither is built. Two reasons, and the second is the one that decided it:\n**A Ladies Night ticket is already gendered at the point of sale**, so the gate checks the entitlement the platform issued rather than the face in front of it — deterministic, auditable, and already contracted through `admissionRules`.\n**And these events are staffed.** A steward at the entrance is making the judgment anyway, and a classifier that overrules a person who can see more than it can is a machine and a human disagreeing while a guest waits.\n**`genderVerification` is a switch, not an implementation.** Where a venue's access hardware offers the capability and the venue chooses to use it, this turns it on — following ADR-0015's standards-first driver model, where the device does what the device does. **Not everything needs to be built.**\n",
+    "properties": {
+     "isEnabled": {
+      "type": "boolean",
+      "default": false
+     },
+     "appliesToAccessPointIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "schedule": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "day": {
+         "type": "string"
+        },
+        "from": {
+         "type": "string"
+        },
+        "to": {
+         "type": "string"
+        },
+        "admits": {
+         "type": "string",
+         "enum": [
+          "all",
+          "women",
+          "womenAndChildren",
+          "families",
+          "members"
+         ]
+        }
+       }
+      }
+     },
+     "entitlementGated": {
+      "type": "boolean",
+      "default": true,
+      "readOnly": true,
+      "description": "**Always true, and stated rather than assumed.** The gate admits on the entitlement. Everything below is advisory on top of that, and nothing replaces it.\n"
+     },
+     "genderVerification": {
+      "type": "string",
+      "enum": [
+       false,
+       "staffAssisted",
+       "deviceAssisted"
+      ],
+      "default": false,
+      "description": "`off` — the entitlement decides and a steward handles exceptions. **The default, and what is contracted.**\n`staffAssisted` — the steward's screen shows the ticket type so they can ask. No inference anywhere.\n`deviceAssisted` — **the venue's access hardware performs the check, not the platform.** Available only where the driver reports the capability, and the result is **advisory to the steward rather than decisive at the turnstile** (3.2.45 asks for rejection; this deviates deliberately).\n"
+     },
+     "overrideRateAlertThreshold": {
+      "type": "number",
+      "nullable": true,
+      "description": "Where `deviceAssisted` is on. **An override rate near zero means the steward has stopped deciding**, and that is the number that says whether the human safeguard is working or decorative.\n"
+     }
+    }
+   },
+   "alerting": {
+    "type": "object",
+    "description": "CF-134. **On-platform notification, marked as read.** Six contracts detect their own trouble and none told a person.\n**The panel is the default and email or WhatsApp only where the matrix names them** — an operational alert that arrives by email is an alert nobody sees in time.\n",
+    "properties": {
+     "channel": {
+      "type": "string",
+      "enum": [
+       "dashboardPanel",
+       "dashboardAndEmail",
+       "dashboardAndWhatsapp"
+      ],
+      "default": "dashboardPanel"
+     },
+     "acknowledgementRequired": {
+      "type": "boolean",
+      "default": true
+     },
+     "escalateAfterMinutes": {
+      "type": "integer",
+      "nullable": true
+     }
+    }
+   }
+  }
+ }
+}

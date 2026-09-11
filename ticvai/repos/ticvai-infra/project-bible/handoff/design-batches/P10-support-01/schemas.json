@@ -1,0 +1,269 @@
+{
+ "Case": {
+  "x-ticvai-persistence": "marketing.case",
+  "type": "object",
+  "required": [
+   "id",
+   "caseNumber",
+   "subject",
+   "status",
+   "priority",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "caseNumber": {
+    "type": "string"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "guestName": {
+    "type": "string",
+    "nullable": true
+   },
+   "subject": {
+    "type": "string"
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "status": {
+    "$ref": "#/components/schemas/CaseStatus"
+   },
+   "priority": {
+    "$ref": "#/components/schemas/CasePriority"
+   },
+   "assignedToPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "relatedOrderId": {
+    "type": "string",
+    "nullable": true
+   },
+   "slaDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "isSlaBreached": {
+    "type": "boolean"
+   },
+   "slaPausedSeconds": {
+    "type": "integer",
+    "description": "Accrued only while awaiting the guest. Waiting on an internal team does not pause the clock.\n"
+   },
+   "escalationCount": {
+    "type": "integer"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "CaseDetail": {
+  "x-ticvai-persistence": "marketing.case",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/Case"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "description": {
+      "type": "string"
+     },
+     "resolutionNote": {
+      "type": "string",
+      "nullable": true
+     },
+     "messages": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/CaseMessage"
+      }
+     }
+    }
+   }
+  ]
+ },
+ "CaseMessage": {
+  "x-ticvai-persistence": "marketing.case_message",
+  "type": "object",
+  "required": [
+   "id",
+   "body",
+   "isInternal",
+   "authorKind",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "body": {
+    "type": "string"
+   },
+   "isInternal": {
+    "type": "boolean"
+   },
+   "authorKind": {
+    "type": "string",
+    "enum": [
+     "agent",
+     "guest",
+     "system",
+     "ai"
+    ]
+   },
+   "authorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "channel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "attachmentRefs": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "CasePriority": {
+  "type": "string",
+  "enum": [
+   "low",
+   "normal",
+   "high",
+   "urgent"
+  ]
+ },
+ "CaseStatus": {
+  "type": "string",
+  "enum": [
+   "open",
+   "inProgress",
+   "awaitingGuest",
+   "escalated",
+   "resolved",
+   "closed"
+  ]
+ },
+ "CreateCaseRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "subject",
+   "description",
+   "channel",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subject": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 10000
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "priority": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CasePriority"
+     }
+    ],
+    "default": "normal"
+   },
+   "channel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "relatedOrderId": {
+    "type": "string"
+   },
+   "attachmentRefs": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "MessageChannel": {
+  "type": "string",
+  "enum": [
+   "email",
+   "sms",
+   "whatsapp",
+   "push",
+   "inApp",
+   "post"
+  ]
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ }
+}

@@ -1,0 +1,63 @@
+{
+ "getAccessPoint": {
+  "method": "GET",
+  "path": "/access-points/{accessPointId}",
+  "contract": "access",
+  "summary": "Read an access point",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AccessPoint"
+ },
+ "listAccessPoints": {
+  "method": "GET",
+  "path": "/access-points",
+  "contract": "access",
+  "summary": "List access points",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "setTurnstileMode": {
+  "method": "PUT",
+  "path": "/access-points/{accessPointId}/mode",
+  "contract": "access",
+  "summary": "Set the operating mode of an access point",
+  "permission": "TURNSTILE_MODE_SET",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessPoint"
+ }
+}

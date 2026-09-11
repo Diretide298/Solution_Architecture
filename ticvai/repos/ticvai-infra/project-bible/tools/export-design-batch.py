@@ -48,6 +48,22 @@ OUT = ROOT / "handoff" / "design-batches"
 PROTOTYPE = "sources/designs/TICVAI_POS_Terminal_client_approved.html"
 
 
+def _sane(x):
+    """PyYAML reads a `"\\uD83D\\uDD34"` escape as two lone surrogates rather than one emoji, and
+    `json.dumps` then refuses to encode them -- so one stray escape in one screen file killed
+    `P02-account-self-service-02` and, running unattended, showed up only as a folder that was
+    empty in the morning. Recombine the pair; replace what cannot be paired."""
+    if isinstance(x, str):
+        if any("\ud800" <= c <= "\udfff" for c in x):
+            return x.encode("utf-16", "surrogatepass").decode("utf-16", "replace")
+        return x
+    if isinstance(x, dict):
+        return {_sane(k): _sane(v) for k, v in x.items()}
+    if isinstance(x, list):
+        return [_sane(v) for v in x]
+    return x
+
+
 def _utf8() -> None:
     try:
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -60,7 +76,7 @@ def contracts() -> tuple[dict, dict]:
     ops, schemas = {}, {}
     for f in (ROOT / "contracts").rglob("*.yaml"):
         try:
-            doc = yaml.safe_load(f.read_text(encoding="utf-8"))
+            doc = _sane(yaml.safe_load(f.read_text(encoding="utf-8")))
         except Exception:
             continue
         for name, sch in ((doc.get("components") or {}).get("schemas") or {}).items():
@@ -129,7 +145,7 @@ def main() -> int:
     # Which shipped app each platform belongs to, so `--app` can select on it.
     app_of = {}
     for f in sorted((ROOT / "screens").glob("P*.yaml")):
-        pl = (yaml.safe_load(f.read_text(encoding="utf-8")) or {}).get("platform") or {}
+        pl = (_sane(yaml.safe_load(f.read_text(encoding="utf-8"))) or {}).get("platform") or {}
         app_of[pl.get("code")] = (pl.get("targetApp") or {}).get("app")
 
     def wanted(b: dict) -> bool:
@@ -179,7 +195,7 @@ def main() -> int:
     wanted = set(b["screens"])
     screens, used_ops = [], set()
     for f in sorted((ROOT / "screens").glob("P*.yaml")):
-        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
+        doc = _sane(yaml.safe_load(f.read_text(encoding="utf-8")))
         for s in doc["screens"]:
             if s["id"] not in wanted:
                 continue
@@ -226,11 +242,36 @@ Platform {plat.get('code')} {plat.get('shortName')} · ships as **{app}** ·
 {plat.get('audience')} audience · {plat.get('formFactor')} ·
 {'offline-capable' if plat.get('offlineCapable') else 'online only'}
 
+## Who this is for
+
+**{plat.get('audience')} on {plat.get('formFactor')}.** Everything below is how you know what is
+true. **None of it is the subject.** The subject is the person in front of the screen and the one
+thing they came to do.
+
 ## What to build
 
-**A working surface, not a drawing of one.** The reference is `{PROTOTYPE}` — a Claude Design
-build from these same sources, and the one the client responded to. Open it and match its depth:
-real state, seeded data, controls that do something. Do not describe it, read it.
+**A working surface, not a drawing of one.** Two references, both built from these same sources:
+
+- `sources/designs/TICVAI_Mobile.dc.html` — 54 screens in one navigable file, 133 animations,
+  a live seat map, a five-stage payment flow. **This is the bar for finish.**
+- `{PROTOTYPE}` — the client-approved POS build. **This is the bar for operator density.**
+
+`sources/designs/ticvai-motion-and-interaction.md` names every mechanism in them. Open them and
+match their depth. Do not describe them, read them.
+
+## The one rule that outranks the rest
+
+**Nothing in this bundle may appear as text a user can read.** Not an operation id, not a schema
+field name, not a permission key, not a screen id, not a file path, not a finding reference.
+
+A homepage that prints `getTenantAppStatus → listProducts` under its header, or labels a column
+`venueId · scopePath`, has published its own homework. It happened on `WEB-001`: four products on
+sale and not a single price on the page, because the build rendered what `listProducts` returns
+instead of what a guest wants — a photo, a name, a price, and a way to book.
+
+**The test: would the person this screen is for understand every word on it?** If a line would
+confuse them, it is spec leakage, not design. `bindsTo` tells you what data to invent
+convincingly. It is never a caption.
 
 ## What is in this folder
 

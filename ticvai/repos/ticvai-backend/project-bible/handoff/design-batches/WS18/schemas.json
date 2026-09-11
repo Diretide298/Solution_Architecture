@@ -1,0 +1,116 @@
+{
+ "MfaKind": {
+  "type": "string",
+  "enum": [
+   "totp",
+   "smsOtp",
+   "emailOtp",
+   "biometric",
+   "hardwareToken"
+  ]
+ },
+ "MfaMethod": {
+  "x-ticvai-persistence": "identity.mfa_method",
+  "type": "object",
+  "required": [
+   "id",
+   "kind",
+   "isActive",
+   "enrolledAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/MfaKind"
+   },
+   "label": {
+    "type": "string",
+    "nullable": true
+   },
+   "maskedTarget": {
+    "type": "string",
+    "nullable": true,
+    "description": "Partially masked destination, so a person can tell two methods apart."
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "isPrimary": {
+    "type": "boolean"
+   },
+   "enrolledAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "lastUsedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "StepUpPolicy": {
+  "x-ticvai-persistence": "approvals.step_up_policy",
+  "type": "object",
+  "required": [
+   "operationId",
+   "required"
+  ],
+  "properties": {
+   "operationId": {
+    "type": "string",
+    "description": "The action governed. Names an operation, never a screen."
+   },
+   "required": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/StepUpStrength"
+     }
+    ],
+    "description": "The strength in force at this scope."
+   },
+   "contractFloor": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/StepUpStrength"
+     }
+    ],
+    "description": "What `x-ticvai-step-up` sets on the operation. Read only, and the value `required` may not go below.\n"
+   },
+   "scopeLevel": {
+    "type": "string",
+    "enum": [
+     "tenant",
+     "region",
+     "venue"
+    ],
+    "description": "Where this rule was set, not where it applies."
+   },
+   "reason": {
+    "type": "string",
+    "maxLength": 512,
+    "description": "Why it was raised. **An unexplained control is one somebody removes** the first time it is inconvenient.\n"
+   },
+   "setBy": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "setAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "StepUpStrength": {
+  "type": "string",
+  "description": "**Ordered, weakest first, and that ordering is what makes *raise only* checkable.** `pin` is a supervisor PIN captured in place — `roles.yaml` already resolves escalation that way and it is right for an action taken several times a shift. `mfa` is a challenge against an enrolled method and is right for an action taken a few times a month.\n",
+  "enum": [
+   "none",
+   "pin",
+   "mfa"
+  ]
+ }
+}

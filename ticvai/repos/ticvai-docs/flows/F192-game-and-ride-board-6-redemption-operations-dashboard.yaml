@@ -1,0 +1,139 @@
+id: F192
+name: 'Game and Ride board 6: Redemption Operations Dashboard'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Game and Ride board 6. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-444
+  entryPoints:
+  - Arrives at Redemption Operations Dashboard
+steps:
+- step: 1
+  screen: BO-444
+  action: Opens Redemption Operations Dashboard
+  operations: []
+  outcome: Provide a central operational view of redemption activity across venues.
+- step: 2
+  screen: BO-445
+  action: Works in Redemption Credit Rule Configuration
+  operations: []
+  outcome: Configure how games generate redemption credits.
+- step: 3
+  screen: BO-444
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-446
+  action: Works in Ticket-Based Redemption / Ticket-Eater Integration
+  operations: []
+  outcome: Configure the integration with ticket-eater machines that convert physical redemption tickets
+    into digital wallet credits.
+- step: 5
+  screen: BO-444
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-447
+  action: Works in Ticketless Redemption Game Integration
+  operations: []
+  outcome: Configure games that automatically send redemption-credit results to TICVAI after gameplay.
+    The source requires integration with redemption games to digitally load credits after the guest completes
+    a game.
+- step: 7
+  screen: BO-444
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-448
+  action: Works in Redemption Wallet & Balance View
+  operations: []
+  outcome: Allow operators and systems to view the redemption-credit balance stored within a customer
+    wallet. The source requires redemption credits stored in the wallet to be viewable from operator kiosks
+    and self-service kiosks.
+- step: 9
+  screen: BO-444
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-449
+  action: Works in Redemption Counter / Prize Checkout
+  operations: []
+  outcome: Provide the operator interface used when a customer exchanges redemption credits for prizes.
+    The source explicitly requires redemption-credit usage at a redemption counter for prizes.
+- step: 11
+  screen: BO-444
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-450
+  action: Works in Prize Catalogue & Credit Cost Configuration
+  operations: []
+  outcome: Configure the prize catalogue and how many redemption credits each prize requires.
+- step: 13
+  screen: BO-444
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-451
+  action: Works in Prize Inventory Integration
+  operations: []
+  outcome: Connect prize redemption directly with TICVAI inventory so redemption transactions reduce stock
+    in real time. The source explicitly requires prizes at the redemption counter, skill games and direct-pay
+    machines such as cranes to be integrat
+- step: 15
+  screen: BO-444
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-452
+  action: Works in Direct-Pay / Crane & Prize Machine Configuration
+  operations: []
+  outcome: Configure prize machines such as cranes or other direct-pay devices that may consume wallet
+    value and dispense inventory items. The matrix specifically references skill games and direct pay
+    machines (e.g., cranes) as part of the inventory i
+- step: 17
+  screen: BO-444
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-453
+  action: Works in Redemption Transaction Ledger, Reconciliation & Audit
+  operations: []
+  outcome: Provide complete traceability of redemption credits earned, redeemed, adjusted and associated
+    inventory movements.
+branches:
+- at: 1
+  condition: Nothing has been set up on Redemption Operations Dashboard yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Game and Ride board 6 visited
+primaryContract: unknown
+contracts:
+- unknown

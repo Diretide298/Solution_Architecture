@@ -1,0 +1,1210 @@
+[
+ {
+  "id": "PTR-001",
+  "name": "Partner Login / MFA",
+  "module": "Access & Account",
+  "requiresModule": "partner",
+  "wave": 2,
+  "capability": "C35",
+  "implementation": {
+   "app": "partner-web",
+   "route": "/general/partner-login-mfa",
+   "component": "apps/partner-web/src/routes/general/PartnerLoginMfaList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "isEntryPoint": true,
+   "inferred": true,
+   "exitTo": [
+    "PTR-002",
+    "PTR-003",
+    "PTR-004",
+    "PTR-005",
+    "PTR-022"
+   ],
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "PTR-005",
+     "trigger": "Books against the allocation",
+     "provenance": "flow F10 step 1→2",
+     "operation": "getB2bCredit"
+    },
+    {
+     "to": "PTR-002",
+     "trigger": "Partner Dashboard",
+     "provenance": "structural — PTR-001 is P10's home screen and its exits are its launcher"
+    },
+    {
+     "to": "PTR-003",
+     "trigger": "Profile & Company Details",
+     "provenance": "structural — PTR-001 is P10's home screen and its exits are its launcher"
+    },
+    {
+     "to": "PTR-004",
+     "trigger": "Notifications",
+     "provenance": "structural — PTR-001 is P10's home screen and its exits are its launcher"
+    },
+    {
+     "to": "SUP-001",
+     "trigger": "Agent Login",
+     "provenance": "flow F104 step 2→3",
+     "crossesDevice": true,
+     "back": false
+    },
+    {
+     "to": "PTR-022",
+     "trigger": "Opens the partner command centre",
+     "provenance": "flow F110 step 1→2"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listActiveSessions` reads the population and `getB2bCredit` reads one of them — list, select, act",
+  "purpose": "Get someone into the app, fast, on a device that may be shared.",
+  "gaps": [
+   {
+    "operation": "getCurrentSession",
+    "why": "**5 declared operations reach no component on this screen**: getCurrentSession, getGuestSession, listMfaMethods, listSsoProviders, listPartnerAgreements. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every partner login mfa",
+       "bindsTo": "ActiveSession",
+       "columns": [
+        "ActiveSession.sessionId",
+        "ActiveSession.principalId",
+        "ActiveSession.principalName",
+        "ActiveSession.roleId",
+        "ActiveSession.roleName",
+        "ActiveSession.workstationId",
+        "ActiveSession.workstationName",
+        "ActiveSession.venueId",
+        "ActiveSession.ipAddress",
+        "ActiveSession.deviceInfo",
+        "ActiveSession.hasOpenShift",
+        "ActiveSession.mfaSatisfied"
+       ],
+       "operation": "listActiveSessions",
+       "provenance": "contract identity.yaml GET /auth/sessions"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected partner login mfa",
+       "bindsTo": "CreditPosition",
+       "columns": [
+        "CreditPosition.id",
+        "CreditPosition.accountId",
+        "CreditPosition.accountName",
+        "CreditPosition.creditLimit",
+        "CreditPosition.used",
+        "CreditPosition.available",
+        "CreditPosition.isOverLimit",
+        "CreditPosition.isSuspended",
+        "CreditPosition.paymentTermsDays",
+        "CreditPosition.oldestUnpaidInvoiceAt",
+        "CreditPosition.daysOverdue",
+        "CreditPosition.activeOverrides",
+        "CreditPosition.scopePath"
+       ],
+       "operation": "getB2bCredit",
+       "provenance": "contract orders.yaml GET /b2b-accounts/{accountId}/credit"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Login",
+       "operation": "login",
+       "provenance": "contract identity.yaml POST /auth/login"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Force",
+       "operation": "forceLogout",
+       "provenance": "contract identity.yaml POST /auth/sessions/{sessionId}/force-logout"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Override",
+       "operation": "overrideCreditLimit",
+       "provenance": "contract orders.yaml POST /b2b-accounts/{accountId}/credit/override"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Revoke",
+       "operation": "revokeAllSessions",
+       "provenance": "contract identity.yaml POST /auth/sessions/revoke-all"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setB2bCreditLimit",
+       "provenance": "contract orders.yaml PUT /b2b-accounts/{accountId}/credit"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmForceLogout",
+    "component": "confirmDialog",
+    "trigger": "Force",
+    "body": "**Names what `forceLogout` changes and what it leaves alone**, in the consequence rather than the verb. A partner login mfa this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract identity.yaml POST /auth/sessions/{sessionId}/force-logout"
+   },
+   {
+    "id": "confirmOverrideCreditLimit",
+    "component": "confirmDialog",
+    "trigger": "Override",
+    "body": "**Names what `overrideCreditLimit` changes and what it leaves alone**, in the consequence rather than the verb. A partner login mfa this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract orders.yaml POST /b2b-accounts/{accountId}/credit/override"
+   },
+   {
+    "id": "confirmRevokeAllSessions",
+    "component": "confirmDialog",
+    "trigger": "Revoke",
+    "body": "**Names what `revokeAllSessions` changes and what it leaves alone**, in the consequence rather than the verb. A partner login mfa this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract identity.yaml POST /auth/sessions/revoke-all"
+   }
+  ],
+  "states": {
+   "loading": "The partner login mfa list.",
+   "error": "Could not load. Names which read failed and leaves the partner login mfa untouched.",
+   "emptyFirstRun": "No partner login mfa yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the partner login mfa are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "login",
+    "contract": "identity",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getB2bCredit",
+    "contract": "orders",
+    "purpose": "From the flow it appears in",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "forceLogout",
+    "contract": "identity",
+    "purpose": "Supervisor termination of an abandoned session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listActiveSessions"
+    ]
+   },
+   {
+    "operationId": "getCurrentSession",
+    "contract": "identity",
+    "purpose": "Current session and effective permissions",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getGuestSession",
+    "contract": "identity",
+    "purpose": "Read the current guest session",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listActiveSessions",
+    "contract": "identity",
+    "purpose": "List active sessions",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listMfaMethods",
+    "contract": "identity",
+    "purpose": "Enrolled MFA methods",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listSsoProviders",
+    "contract": "identity",
+    "purpose": "Identity providers configured for this tenant",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "overrideCreditLimit",
+    "contract": "orders",
+    "purpose": "Authorise an order beyond the credit limit",
+    "trigger": "onAction",
+    "invalidates": [
+     "listActiveSessions"
+    ]
+   },
+   {
+    "operationId": "revokeAllSessions",
+    "contract": "identity",
+    "purpose": "Revoke every session in scope",
+    "trigger": "onAction",
+    "invalidates": [
+     "listActiveSessions"
+    ]
+   },
+   {
+    "operationId": "setB2bCreditLimit",
+    "contract": "orders",
+    "purpose": "Set a partner credit limit",
+    "trigger": "onAction",
+    "invalidates": [
+     "listActiveSessions"
+    ]
+   },
+   {
+    "operationId": "listPartnerAgreements",
+    "contract": "subscription",
+    "purpose": "Commercial agreements with B2B partners",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "accountId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. If the target is gone the screen says so and offers the partner's own list. Arrives with `accountId`.",
+   "preloaded": [
+    "CreditPosition.id",
+    "CreditPosition.accountId",
+    "CreditPosition.accountName",
+    "CreditPosition.creditLimit",
+    "CreditPosition.used"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-001"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 12 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P10",
+   "audience": "partner",
+   "formFactor": "web",
+   "shortName": "Partner Web",
+   "name": "Partner Web — Reseller Portal",
+   "offlineCapable": false,
+   "app": "partner-web",
+   "operator": "partner",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P09",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "PTR-003",
+  "name": "Profile & Company Details",
+  "module": "Access & Account",
+  "requiresModule": "partner",
+  "wave": 2,
+  "capability": "C56",
+  "implementation": {
+   "app": "partner-web",
+   "route": "/general/profile-and-company-details",
+   "component": "apps/partner-web/src/routes/general/ProfileAndCompanyDetailsDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "PTR-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "PTR-001",
+    "PTR-002",
+    "PTR-004"
+   ],
+   "transitions": [
+    {
+     "to": "PTR-001",
+     "trigger": "Partner Login / MFA",
+     "carries": [
+      "accountId",
+      "sessionId"
+     ],
+     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-002",
+     "trigger": "Partner Dashboard",
+     "carries": [
+      "accountId",
+      "orderId"
+     ],
+     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-004",
+     "trigger": "Notifications",
+     "carries": [
+      "messageId"
+     ],
+     "provenance": "derived — PTR-004 declares entryState.params messageId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listPrincipals` reads the population and `getPrincipal` reads one of them — list, select, act",
+  "purpose": "What we hold about staff, and what they can change.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every profile company",
+       "bindsTo": "Principal",
+       "columns": [
+        "Principal.id",
+        "Principal.username",
+        "Principal.displayName",
+        "Principal.isActive",
+        "Principal.validFrom",
+        "Principal.validTo",
+        "Principal.primaryRoleId",
+        "Principal.roles",
+        "Principal.lastLoginAt"
+       ],
+       "operation": "listPrincipals",
+       "provenance": "contract identity.yaml GET /principals"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected profile company",
+       "bindsTo": "Principal",
+       "columns": [
+        "Principal.id",
+        "Principal.username",
+        "Principal.displayName",
+        "Principal.isActive",
+        "Principal.validFrom",
+        "Principal.validTo",
+        "Principal.primaryRoleId",
+        "Principal.roles",
+        "Principal.lastLoginAt"
+       ],
+       "operation": "getPrincipal",
+       "provenance": "contract identity.yaml GET /principals/{principalId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createPrincipal",
+       "provenance": "contract identity.yaml POST /principals"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updatePrincipal",
+       "provenance": "contract identity.yaml PATCH /principals/{principalId}"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createPrincipal",
+       "label": "Create principal",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listPrincipals",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createPrincipal",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The profile company list.",
+   "error": "Could not load. Names which read failed and leaves the profile company untouched.",
+   "emptyFirstRun": "No profile company yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the profile company are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getPrincipal",
+    "contract": "identity",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createPrincipal",
+    "contract": "identity",
+    "purpose": "Create a principal",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPrincipals"
+    ]
+   },
+   {
+    "operationId": "listPrincipals",
+    "contract": "identity",
+    "purpose": "List principals",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "updatePrincipal",
+    "contract": "identity",
+    "purpose": "Update or deactivate a principal",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPrincipals"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "principalId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "Principal.id",
+    "Principal.username",
+    "Principal.displayName",
+    "Principal.isActive",
+    "Principal.validFrom"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-003"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P10",
+   "audience": "partner",
+   "formFactor": "web",
+   "shortName": "Partner Web",
+   "name": "Partner Web — Reseller Portal",
+   "offlineCapable": false,
+   "app": "partner-web",
+   "operator": "partner",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P09",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "PTR-004",
+  "name": "Notifications",
+  "module": "Access & Account",
+  "requiresModule": "partner",
+  "wave": 3,
+  "capability": "C59",
+  "implementation": {
+   "app": "partner-web",
+   "route": "/general/notifications",
+   "component": "apps/partner-web/src/routes/general/NotificationsDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "PTR-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "PTR-001",
+    "PTR-002",
+    "PTR-003"
+   ],
+   "transitions": [
+    {
+     "to": "PTR-001",
+     "trigger": "Partner Login / MFA",
+     "carries": [
+      "accountId",
+      "sessionId"
+     ],
+     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-002",
+     "trigger": "Partner Dashboard",
+     "carries": [
+      "accountId",
+      "orderId"
+     ],
+     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-003",
+     "trigger": "Profile & Company Details",
+     "carries": [
+      "principalId"
+     ],
+     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "density": "compact",
+  "pattern": "statusTracker",
+  "patternReason": "`getMessageStatus` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Work with notifications for this venue.",
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected notifications",
+       "bindsTo": "MessageDispatch",
+       "columns": [
+        "MessageDispatch.id",
+        "MessageDispatch.subjectId",
+        "MessageDispatch.campaignId",
+        "MessageDispatch.channel",
+        "MessageDispatch.templateId",
+        "MessageDispatch.status",
+        "MessageDispatch.failureReason",
+        "MessageDispatch.providerReference",
+        "MessageDispatch.queuedAt",
+        "MessageDispatch.deliveredAt"
+       ],
+       "operation": "getMessageStatus",
+       "provenance": "contract marketing-crm.yaml GET /messages/{messageId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Send",
+       "operation": "sendTransactionalMessage",
+       "provenance": "contract marketing-crm.yaml POST /messages"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "sendTransactionalMessage",
+       "label": "Send transactional message",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "sendTransactionalMessage",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The notifications list.",
+   "error": "Could not load. Names which read failed and leaves the notifications untouched.",
+   "emptyFirstRun": "No notifications yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the notifications are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "sendTransactionalMessage",
+    "contract": "marketing-crm",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getMessageStatus",
+    "contract": "marketing-crm",
+    "purpose": "Delivery status of one message",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "messageId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. If the target is gone the screen says so and offers the partner's own list. Arrives with `messageId`."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-004"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P10",
+   "audience": "partner",
+   "formFactor": "web",
+   "shortName": "Partner Web",
+   "name": "Partner Web — Reseller Portal",
+   "offlineCapable": false,
+   "app": "partner-web",
+   "operator": "partner",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P09",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "PTR-019",
+  "name": "API Credentials & Integration",
+  "module": "Access & Account",
+  "requiresModule": "developerApi",
+  "wave": 3,
+  "implementation": {
+   "app": "partner-web",
+   "route": "/general/api-credentials-and-integration",
+   "component": "apps/partner-web/src/routes/general/ApiCredentialsAndIntegrationDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "PTR-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "PTR-001",
+    "PTR-002",
+    "PTR-003"
+   ],
+   "transitions": [
+    {
+     "to": "PTR-001",
+     "trigger": "Partner Login / MFA",
+     "carries": [
+      "accountId",
+      "sessionId"
+     ],
+     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-002",
+     "trigger": "Partner Dashboard",
+     "carries": [
+      "accountId",
+      "orderId"
+     ],
+     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-003",
+     "trigger": "Profile & Company Details",
+     "carries": [
+      "principalId"
+     ],
+     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Licensed on `developerApi`, not on `partner`.** The partner licence is what puts a partner on this portal at all; this screen's whole function is the developer API, and without that licence there is nothing on it to show. Declared `partner` it warned as a two-licence page, which is exactly the drift the rule exists to catch.",
+  "openQuestions": [
+   "Blocked — Developer & API workshop"
+  ],
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listApiClients` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "API Credentials & Integration — the screen a person opens when they need to deal with api credentials & integration.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every api credentials integration",
+       "bindsTo": "ApiClient",
+       "columns": [
+        "ApiClient.id",
+        "ApiClient.developerId",
+        "ApiClient.name",
+        "ApiClient.clientId",
+        "ApiClient.environment",
+        "ApiClient.scopes",
+        "ApiClient.allowedTenantIds",
+        "ApiClient.ipAllowList",
+        "ApiClient.status",
+        "ApiClient.lastUsedAt"
+       ],
+       "operation": "listApiClients",
+       "provenance": "contract public-api.yaml GET /api-clients"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected api credentials integration",
+       "bindsTo": "ApiClient",
+       "columns": [
+        "ApiClient.id",
+        "ApiClient.developerId",
+        "ApiClient.name",
+        "ApiClient.clientId",
+        "ApiClient.environment",
+        "ApiClient.scopes",
+        "ApiClient.allowedTenantIds",
+        "ApiClient.ipAllowList",
+        "ApiClient.status",
+        "ApiClient.lastUsedAt"
+       ],
+       "operation": "listApiClients",
+       "provenance": "contract public-api.yaml GET /api-clients"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createApiClient",
+       "provenance": "contract public-api.yaml POST /api-clients"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Rotate",
+       "operation": "rotateApiCredential",
+       "provenance": "contract public-api.yaml POST /api-clients/{clientId}/credentials"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Revoke",
+       "operation": "revokeApiCredential",
+       "provenance": "contract public-api.yaml DELETE /api-clients/{clientId}/credentials"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmRevokeApiCredential",
+    "component": "confirmDialog",
+    "trigger": "Revoke",
+    "body": "**Names what `revokeApiCredential` changes and what it leaves alone**, in the consequence rather than the verb. A api credentials integration this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract public-api.yaml DELETE /api-clients/{clientId}/credentials"
+   }
+  ],
+  "states": {
+   "loading": "Detail loads",
+   "error": "Could not load",
+   "emptyFirstRun": "Not found — it may have been deleted or moved out of scope",
+   "emptyNoResults": "The filter narrowed it and the api credentials integration are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listApiClients",
+    "contract": "public-api",
+    "purpose": "Clients issued to this partner",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createApiClient",
+    "contract": "public-api",
+    "purpose": "Issue a client",
+    "trigger": "onAction",
+    "invalidates": [
+     "listApiClients"
+    ]
+   },
+   {
+    "operationId": "rotateApiCredential",
+    "contract": "public-api",
+    "purpose": "Rotate a key without downtime",
+    "trigger": "onAction",
+    "invalidates": [
+     "listApiClients"
+    ]
+   },
+   {
+    "operationId": "revokeApiCredential",
+    "contract": "public-api",
+    "purpose": "Revoke a key immediately",
+    "trigger": "onAction",
+    "invalidates": [
+     "listApiClients"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "clientId",
+     "from": "navigation"
+    }
+   ],
+   "coldEntry": "**Rotation and revocation act on one client**, which arrives from the row the partner chose. Opened cold the screen lists clients rather than offering an action with no subject — revoking the wrong key is not recoverable by the person who did it.",
+   "preloaded": [
+    "ApiClient.id",
+    "ApiClient.developerId",
+    "ApiClient.name",
+    "ApiClient.clientId",
+    "ApiClient.environment"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-019"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P10",
+   "audience": "partner",
+   "formFactor": "web",
+   "shortName": "Partner Web",
+   "name": "Partner Web — Reseller Portal",
+   "offlineCapable": false,
+   "app": "partner-web",
+   "operator": "partner",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P09",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "PTR-020",
+  "name": "Sub-Agent Management",
+  "module": "Access & Account",
+  "requiresModule": "partner",
+  "wave": 3,
+  "capability": "C56",
+  "implementation": {
+   "app": "partner-web",
+   "route": "/general/sub-agent-management",
+   "component": "apps/partner-web/src/routes/general/SubAgentManagementForm.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "PTR-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "PTR-001",
+    "PTR-002",
+    "PTR-003"
+   ],
+   "transitions": [
+    {
+     "to": "PTR-001",
+     "trigger": "Partner Login / MFA",
+     "carries": [
+      "accountId",
+      "sessionId"
+     ],
+     "provenance": "derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-002",
+     "trigger": "Partner Dashboard",
+     "carries": [
+      "accountId",
+      "orderId"
+     ],
+     "provenance": "derived — PTR-002 declares entryState.params accountId, orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-003",
+     "trigger": "Profile & Company Details",
+     "carries": [
+      "principalId"
+     ],
+     "provenance": "derived — PTR-003 declares entryState.params principalId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listDelegatedAccess` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Add sub-agent management for this venue.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every sub-agent",
+       "bindsTo": "DelegatedAccess",
+       "columns": [
+        "DelegatedAccess.id",
+        "DelegatedAccess.principalId",
+        "DelegatedAccess.roleId",
+        "DelegatedAccess.permission",
+        "DelegatedAccess.subjectId",
+        "DelegatedAccess.overSubjectId",
+        "DelegatedAccess.overObjectRef",
+        "DelegatedAccess.delegationKind",
+        "DelegatedAccess.quota",
+        "DelegatedAccess.isRevocableBySubject",
+        "DelegatedAccess.scopePath",
+        "DelegatedAccess.effect"
+       ],
+       "operation": "listDelegatedAccess",
+       "provenance": "contract identity.yaml GET /delegated-access"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected sub-agent",
+       "bindsTo": "DelegatedAccess",
+       "columns": [
+        "DelegatedAccess.id",
+        "DelegatedAccess.principalId",
+        "DelegatedAccess.roleId",
+        "DelegatedAccess.permission",
+        "DelegatedAccess.subjectId",
+        "DelegatedAccess.overSubjectId",
+        "DelegatedAccess.overObjectRef",
+        "DelegatedAccess.delegationKind",
+        "DelegatedAccess.quota",
+        "DelegatedAccess.isRevocableBySubject",
+        "DelegatedAccess.scopePath",
+        "DelegatedAccess.effect",
+        "DelegatedAccess.validFrom",
+        "DelegatedAccess.validTo",
+        "DelegatedAccess.createdByPrincipalId"
+       ],
+       "operation": "listDelegatedAccess",
+       "provenance": "contract identity.yaml GET /delegated-access"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createDelegatedAccess",
+       "provenance": "contract identity.yaml POST /delegated-access"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Delete",
+       "operation": "deleteDelegatedAccess",
+       "provenance": "contract identity.yaml DELETE /delegated-access/{delegatedAccessId}"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmDeleteDelegatedAccess",
+    "component": "confirmDialog",
+    "trigger": "Delete",
+    "body": "**Names what `deleteDelegatedAccess` changes and what it leaves alone**, in the consequence rather than the verb. A sub-agent this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract identity.yaml DELETE /delegated-access/{delegatedAccessId}"
+   }
+  ],
+  "states": {
+   "loading": "The sub-agent list.",
+   "error": "Could not load. Names which read failed and leaves the sub-agent untouched.",
+   "emptyFirstRun": "No sub-agent yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the sub-agent are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "createDelegatedAccess",
+    "contract": "identity",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "deleteDelegatedAccess",
+    "contract": "identity",
+    "purpose": "Remove a grant",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDelegatedAccess"
+    ]
+   },
+   {
+    "operationId": "listDelegatedAccess",
+    "contract": "identity",
+    "purpose": "List grants for a principal or role",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "delegatedAccessId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. If the target is gone the screen says so and offers the partner's own list. Arrives with `delegatedAccessId`.",
+   "preloaded": [
+    "DelegatedAccess.id",
+    "DelegatedAccess.principalId",
+    "DelegatedAccess.roleId",
+    "DelegatedAccess.permission",
+    "DelegatedAccess.subjectId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P10 Partner Web.dc.html#ptr-020"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P10",
+   "audience": "partner",
+   "formFactor": "web",
+   "shortName": "Partner Web",
+   "name": "Partner Web — Reseller Portal",
+   "offlineCapable": false,
+   "app": "partner-web",
+   "operator": "partner",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P09",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

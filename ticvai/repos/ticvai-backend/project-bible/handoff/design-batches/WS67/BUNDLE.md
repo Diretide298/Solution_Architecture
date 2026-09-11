@@ -1,0 +1,1737 @@
+# WS67 — Unified BI Reporting and AI Analytics Platform board 2
+
+**10 screens · 0 operations · 0 schemas · 0 permissions**
+
+Platform P16 Venue Analytics · ships as **venue-management** ·
+staff audience · web ·
+online only
+
+## Who this is for
+
+**staff on web.** Everything below is how you know what is
+true. **None of it is the subject.** The subject is the person in front of the screen and the one
+thing they came to do.
+
+## What to build
+
+**A working surface, not a drawing of one.** Two references, both built from these same sources:
+
+- `sources/designs/TICVAI_Mobile.dc.html` — 54 screens in one navigable file, 133 animations,
+  a live seat map, a five-stage payment flow. **This is the bar for finish.**
+- `sources/designs/TICVAI_POS_Terminal_client_approved.html` — the client-approved POS build. **This is the bar for operator density.**
+
+`sources/designs/ticvai-motion-and-interaction.md` names every mechanism in them. Open them and
+match their depth. Do not describe them, read them.
+
+## The one rule that outranks the rest
+
+**Nothing in this bundle may appear as text a user can read.** Not an operation id, not a schema
+field name, not a permission key, not a screen id, not a file path, not a finding reference.
+
+A homepage that prints `getTenantAppStatus → listProducts` under its header, or labels a column
+`venueId · scopePath`, has published its own homework. It happened on `WEB-001`: four products on
+sale and not a single price on the page, because the build rendered what `listProducts` returns
+instead of what a guest wants — a photo, a name, a price, and a way to book.
+
+**The test: would the person this screen is for understand every word on it?** If a line would
+confuse them, it is spec leakage, not design. `bindsTo` tells you what data to invent
+convincingly. It is never a caption.
+
+## What is in this folder
+
+| file | what it is |
+|---|---|
+| `screens.json` | Every field of every screen in the batch. `machine` is what a screen is *in the middle of*; `overlays` is what opens over it and what closing it does; `navigation.transitions` is how you leave, with `carries` naming the state that travels. |
+| `operations.json` | Method, path, parameters, request and response schema for every operation these screens call. Write fetches against these; do not invent endpoints. |
+| `schemas.json` | The data those operations carry, resolved one level deep. **Seed from these.** The prototype hardcodes 57 models and every one corresponds to a schema here — a build that invents its own will disagree with the backend on day one. |
+
+## Rules that are not style preferences
+
+- **Every control that can be refused must be gated.** 0 permissions apply here:
+  ``. A control nobody can use must say so,
+  not sit enabled and fail.
+- **0 of these operations work offline**
+  
+- **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
+  is a finding worth reporting, not a gap to fill with a plausible endpoint.
+- **`entryState.params` is what the screen must be given.** A screen that renders without them is
+  the empty-state bug, not the happy path.
+
+## The screens
+
+| id | name | pattern | ops | overlays | machine |
+|---|---|---|---|---|---|
+| `ANL-021` | Dashboard Library | listDetail | 0 | 0 | — |
+| `ANL-022` | Dashboard Creation Wizard | configEditor | 0 | 0 | — |
+| `ANL-023` | Drag-and-Drop Dashboard Canvas | listDetail | 0 | 0 | — |
+| `ANL-024` | Widget & Visualization Library | listDetail | 0 | 0 | — |
+| `ANL-025` | KPI Builder | configEditor | 0 | 0 | — |
+| `ANL-026` | Targets, Thresholds & KPI Status Rules | listDetail | 0 | 0 | — |
+| `ANL-027` | Data & Filter Configuration | configEditor | 0 | 0 | — |
+| `ANL-028` | Drill-Down & Interaction Designer | configEditor | 0 | 0 | — |
+| `ANL-029` | Dashboard Access, Publishing & Versioning | listDetail | 0 | 0 | — |
+| `ANL-030` | Dashboard Preview, Validation & Health | listDetail | 0 | 0 | — |
+
+## Thin screens in this batch
+
+**ANL-021, ANL-023, ANL-024, ANL-029, ANL-030 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+
+---
+
+## `screens.json`
+
+Every field of every screen in this batch. **`machine` is what a screen is in the middle of**, `overlays` is what opens over it and what closing it does, and `navigation.transitions` is how you leave, with `carries` naming the state that travels.
+
+```json
+[
+ {
+  "id": "ANL-021",
+  "name": "Dashboard Library",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "source": {
+   "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
+   "board": "2",
+   "number": "2.1",
+   "page": 14
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/analytics/dashboard-library-anl-021",
+   "component": "apps/venue-management-web/src/routes/analytics/DashboardLibrary.tsx",
+   "status": "notStarted"
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display dashboard cards/table containing; Dashboard Categories; Dashboard Types) and no metric row",
+  "purpose": "Provide a centralized catalogue for all standard, custom, AI-generated and embedded TICVAI dashboards.",
+  "purposeNote": "Authorized users can search, filter, manage, clone and govern dashboards from one central catalogue.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 14 §Display dashboard cards/table containing"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every record",
+       "columns": [
+        "Dashboard Name",
+        "Dashboard ID",
+        "Category",
+        "Business Domain",
+        "Owner",
+        "Sites/Venues",
+        "Audience/Role",
+        "Status",
+        "Version",
+        "Last Modified",
+        "Last Published",
+        "Usage Count",
+        "Data Refresh Status",
+        "Executive",
+        "Operations",
+        "Finance",
+        "Sales",
+        "Ticketing",
+        "Access Control",
+        "CRM",
+        "Marketing",
+        "Membership",
+        "Loyalty",
+        "F&B",
+        "Retail",
+        "Inventory",
+        "Resources",
+        "Custom",
+        "System Dashboard — TICVAI standard dashboard",
+        "Custom Dashboard — customer-created",
+        "AI-Generated Dashboard — generated through AI"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 14 §Display dashboard cards/table containing"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected record",
+       "bindsTo": null,
+       "columns": [
+        "Dashboard Name",
+        "Dashboard ID",
+        "Category",
+        "Business Domain",
+        "Owner",
+        "Sites/Venues",
+        "Audience/Role",
+        "Status",
+        "Version",
+        "Last Modified",
+        "Last Published",
+        "Usage Count",
+        "Data Refresh Status",
+        "Executive",
+        "Operations",
+        "Finance",
+        "Sales",
+        "Ticketing",
+        "Access Control",
+        "CRM",
+        "Marketing",
+        "Membership",
+        "Loyalty",
+        "F&B",
+        "Retail",
+        "Inventory",
+        "Resources",
+        "Custom",
+        "System Dashboard — TICVAI standard dashboard",
+        "Custom Dashboard — customer-created",
+        "AI-Generated Dashboard — generated through AI"
+       ],
+       "notes": null,
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 14 §Display dashboard cards/table containing"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The record list.",
+   "error": "Could not load. Names which read failed and leaves the record untouched.",
+   "emptyFirstRun": "No record yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the record are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "entryState": {
+   "preloaded": [
+    "Dashboard Name",
+    "Dashboard ID",
+    "Category",
+    "Business Domain",
+    "Owner",
+    "Sites/Venues"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-021"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 14. 0 of 31 labels bound to a contract property; 31 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "navigation": {
+   "entryFrom": [
+    "ANL-001"
+   ],
+   "exitTo": [
+    "ANL-001",
+    "ANL-022",
+    "ANL-023",
+    "ANL-024",
+    "ANL-025",
+    "ANL-026",
+    "ANL-027",
+    "ANL-028",
+    "ANL-029",
+    "ANL-030"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-001",
+     "trigger": "Back to Executive Command Center",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "back": true
+    },
+    {
+     "to": "ANL-030",
+     "trigger": "Dashboard Preview, Validation & Health",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-022",
+     "trigger": "Dashboard Creation Wizard",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-023",
+     "trigger": "Drag-and-Drop Dashboard Canvas",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-024",
+     "trigger": "Widget & Visualization Library",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-025",
+     "trigger": "KPI Builder",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-026",
+     "trigger": "Targets, Thresholds & KPI Status Rules",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-027",
+     "trigger": "Data & Filter Configuration",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-028",
+     "trigger": "Drill-Down & Interaction Designer",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026"
+    },
+    {
+     "to": "ANL-029",
+     "trigger": "Dashboard Access, Publishing & Versioning",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P16",
+   "formFactor": "web",
+   "app": "venue-management-web",
+   "operator": "venue",
+   "name": "Venue Analytics — Cross-Domain Reporting",
+   "shortName": "Venue Analytics",
+   "audience": "staff",
+   "offlineCapable": false,
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P13"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ANL-022",
+  "name": "Dashboard Creation Wizard",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "source": {
+   "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
+   "board": "2",
+   "number": "2.2",
+   "page": 15
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/analytics/dashboard-creation-wizard-anl-022",
+   "component": "apps/venue-management-web/src/routes/analytics/DashboardCreationWizard.tsx",
+   "status": "notStarted"
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure; Select; Select one or multiple domains) and no display directory — it is settings, not a population",
+  "purpose": "Guide users through creation of a new dashboard.",
+  "purposeNote": "Users can create the initial dashboard configuration without technical/database knowledge.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**Dashboard Creation Wizard declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Dashboard Name",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Description",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Category",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Business Domain",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Dashboard Owner",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tags",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Language",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Default Currency",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "textField",
+       "label": "Step 2 — Scope",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tenant",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Organization",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Site(s)",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue(s)",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Attraction(s)",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Business Unit(s)",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select"
+      },
+      {
+       "kind": "textField",
+       "label": "Step 3 — Data Domains",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Queue • Accreditation",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select one or multiple domains"
+      },
+      {
+       "kind": "textField",
+       "label": "Step 4 — Template",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select one or multiple domains"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The creation wizard configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the creation wizard untouched.",
+   "emptyFirstRun": "No creation wizard configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-022"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 18 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "navigation": {
+   "entryFrom": [
+    "ANL-021"
+   ],
+   "exitTo": [
+    "ANL-021"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-021",
+     "trigger": "Back to Dashboard Library",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P16",
+   "formFactor": "web",
+   "app": "venue-management-web",
+   "operator": "venue",
+   "name": "Venue Analytics — Cross-Domain Reporting",
+   "shortName": "Venue Analytics",
+   "audience": "staff",
+   "offlineCapable": false,
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P13"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ANL-023",
+  "name": "Drag-and-Drop Dashboard Canvas",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "source": {
+   "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
+   "board": "2",
+   "number": "2.3",
+   "page": 16
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/analytics/drag-and-drop-dashboard-canvas-anl-023",
+   "component": "apps/venue-management-web/src/routes/analytics/DragAndDropDashboardCanvas.tsx",
+   "status": "notStarted"
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide the main visual workspace for dashboard construction.",
+  "purposeNote": "A business analyst can visually construct a dashboard without coding.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 16"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 16"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": []
+  },
+  "states": {
+   "loading": "The drag-and-drop canvas list.",
+   "error": "Could not load. Names which read failed and leaves the drag-and-drop canvas untouched.",
+   "emptyFirstRun": "No drag-and-drop canvas yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the drag-and-drop canvas are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-023"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 0 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "navigation": {
+   "entryFrom": [
+    "ANL-021"
+   ],
+   "exitTo": [
+    "ANL-021"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-021",
+     "trigger": "Back to Dashboard Library",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P16",
+   "formFactor": "web",
+   "app": "venue-management-web",
+   "operator": "venue",
+   "name": "Venue Analytics — Cross-Domain Reporting",
+   "shortName": "Venue Analytics",
+   "audience": "staff",
+   "offlineCapable": false,
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P13"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ANL-024",
+  "name": "Widget & Visualization Library",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "source": {
+   "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
+   "board": "2",
+   "number": "2.4",
+   "page": 17
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/analytics/widget-visualization-library-anl-024",
+   "component": "apps/venue-management-web/src/routes/analytics/WidgetVisualizationLibrary.tsx",
+   "status": "notStarted"
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§KPI Components) and no metric row",
+  "purpose": "Provide reusable visual components for dashboard construction.",
+  "purposeNote": "Authorized users can search the component library and drag supported visualizations directly onto the dashboard canvas.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 17 §KPI Components"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every widget visualization",
+       "columns": [
+        "KPI Card",
+        "Target Card",
+        "Variance Card",
+        "Scorecard",
+        "Gauge",
+        "Progress Indicator"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 17 §KPI Components"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected widget visualization",
+       "bindsTo": null,
+       "columns": [
+        "KPI Card",
+        "Target Card",
+        "Variance Card",
+        "Scorecard",
+        "Gauge",
+        "Progress Indicator"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Chart Components”, “Operational Components”.",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 17 §KPI Components"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The widget visualization list.",
+   "error": "Could not load. Names which read failed and leaves the widget visualization untouched.",
+   "emptyFirstRun": "No widget visualization yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the widget visualization are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "entryState": {
+   "preloaded": [
+    "KPI Card",
+    "Target Card",
+    "Variance Card",
+    "Scorecard",
+    "Gauge",
+    "Progress Indicator"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-024"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 17. 0 of 6 labels bound to a contract property; 6 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "navigation": {
+   "entryFrom": [
+    "ANL-021"
+   ],
+   "exitTo": [
+    "ANL-021"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-021",
+     "trigger": "Back to Dashboard Library",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P16",
+   "formFactor": "web",
+   "app": "venue-management-web",
+   "operator": "venue",
+   "name": "Venue Analytics — Cross-Domain Reporting",
+   "shortName": "Venue Analytics",
+   "audience": "staff",
+   "offlineCapable": false,
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P13"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ANL-025",
+  "name": "KPI Builder",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "source": {
+   "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
+   "board": "2",
+   "number": "2.5",
+   "page": 18
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/analytics/kpi-builder-anl-025",
+   "component": "apps/venue-management-web/src/routes/analytics/KpiBuilder.tsx",
+   "status": "notStarted"
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure; Define whether) and no display directory — it is settings, not a population",
+  "purpose": "Allow authorized business users to create standardized enterprise KPIs.",
+  "purposeNote": "Administrators can centrally define reusable KPIs and ensure the same KPI calculation is used across TICVAI dashboards.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**KPI Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "KPI Name",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "KPI Code",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Description",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Business Domain",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Owner",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Data Source",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Measure",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Formula",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Aggregation",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Unit",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Currency",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Decimal Precision",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Effective Date",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Status",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Higher = Better",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Define whether"
+      },
+      {
+       "kind": "selectField",
+       "label": "Lower = Better",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Define whether"
+      },
+      {
+       "kind": "selectField",
+       "label": "Revenue ↑",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Define whether"
+      },
+      {
+       "kind": "selectField",
+       "label": "Conversion ↑",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Define whether"
+      },
+      {
+       "kind": "selectField",
+       "label": "Refund Rate ↓",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Define whether"
+      },
+      {
+       "kind": "textField",
+       "label": "Gate Rejection Rate ↓",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Define whether"
+      },
+      {
+       "kind": "selectField",
+       "label": "Queue Time ↓",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 18 §Define whether"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The kpi configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the kpi untouched.",
+   "emptyFirstRun": "No kpi configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-025"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 18. 0 of 0 labels bound to a contract property; 21 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "navigation": {
+   "entryFrom": [
+    "ANL-021"
+   ],
+   "exitTo": [
+    "ANL-021"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-021",
+     "trigger": "Back to Dashboard Library",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P16",
+   "formFactor": "web",
+   "app": "venue-management-web",
+   "operator": "venue",
+   "name": "Venue Analytics — Cross-Domain Reporting",
+   "shortName": "Venue Analytics",
+   "audience": "staff",
+   "offlineCapable": false,
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P13"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ANL-026",
+  "name": "Targets, Thresholds & KPI Status Rules",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "source": {
+   "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
+   "board": "2",
+   "number": "2.6",
+   "page": 19
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/analytics/targets-thresholds-kpi-status-rules-anl-026",
+   "component": "apps/venue-management-web/src/routes/analytics/TargetsThresholdsKpiStatusRules.tsx",
+   "status": "notStarted"
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§For each KPI) and no metric row",
+  "purpose": "Configure how TICVAI determines whether KPI performance is healthy, warning or critical.",
+  "purposeNote": "KPI status and alert behavior are calculated dynamically using centrally configured business thresholds.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Notify responsible user, Create operational task, Trigger AI analysis. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 19 §Users can configure"
+   },
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 19 §For each KPI"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every targets thresholds kpi",
+       "columns": [
+        "Target",
+        "Minimum",
+        "Maximum",
+        "Warning Threshold",
+        "Critical Threshold",
+        "Benchmark",
+        "Tolerance",
+        "Evaluation Frequency"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 19 §For each KPI"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected targets thresholds kpi",
+       "bindsTo": null,
+       "columns": [
+        "Target",
+        "Minimum",
+        "Maximum",
+        "Warning Threshold",
+        "Critical Threshold",
+        "Benchmark",
+        "Tolerance",
+        "Evaluation Frequency"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Capacity Utilization”.",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 19 §For each KPI"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Notify responsible user",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 19 §Users can configure"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create operational task",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 19 §Users can configure"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Trigger AI analysis",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 19 §Users can configure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The targets thresholds kpi list.",
+   "error": "Could not load. Names which read failed and leaves the targets thresholds kpi untouched.",
+   "emptyFirstRun": "No targets thresholds kpi yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the targets thresholds kpi are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "entryState": {
+   "preloaded": [
+    "Target",
+    "Minimum",
+    "Maximum",
+    "Warning Threshold",
+    "Critical Threshold",
+    "Benchmark"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-026"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 19. 0 of 8 labels bound to a contract property; 11 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "navigation": {
+   "entryFrom": [
+    "ANL-021"
+   ],
+   "exitTo": [
+    "ANL-021"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-021",
+     "trigger": "Back to Dashboard Library",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P16",
+   "formFactor": "web",
+   "app": "venue-management-web",
+   "operator": "venue",
+   "name": "Venue Analytics — Cross-Domain Reporting",
+   "shortName": "Venue Analytics",
+   "audience": "staff",
+   "offlineCapable": false,
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P13"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ANL-027",
+  "name": "Data & Filter Configuration",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "source": {
+   "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
+   "board": "2",
+   "number": "2.7",
+   "page": 20
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/analytics/data-filter-configuration-anl-027",
+   "component": "apps/venue-management-web/src/routes/analytics/DataFilterConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Select; Configure) and no display directory — it is settings, not a population",
+  "purpose": "Control what data a dashboard/widget uses and how users can filter it.",
+  "purposeNote": "Users can configure dashboard data and filters without direct access to underlying production databases.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search data filter",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Filters may be"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "Global",
+        "Widget-level",
+        "Mandatory",
+        "Optional",
+        "Hidden",
+        "Defaulted"
+       ],
+       "notes": "The pack filters this screen by global, widget-level, mandatory, optional, hidden, defaulted — which are present is a decision the pack already made.",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Filters may be"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Data Domain",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Dataset",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Measure",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Dimension",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Aggregation",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Date Field",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Relationship",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Calculation",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Date Range",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Site",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Attraction",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Channel",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Product",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer Segment",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Currency",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The data filter configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the data filter untouched.",
+   "emptyFirstRun": "No data filter configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoResults": "The filter narrowed it and the data filter are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-027"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 20. 0 of 6 labels bound to a contract property; 22 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "navigation": {
+   "entryFrom": [
+    "ANL-021"
+   ],
+   "exitTo": [
+    "ANL-021"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-021",
+     "trigger": "Back to Dashboard Library",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P16",
+   "formFactor": "web",
+   "app": "venue-management-web",
+   "operator": "venue",
+   "name": "Venue Analytics — Cross-Domain Reporting",
+   "shortName": "Venue Analytics",
+   "audience": "staff",
+   "offlineCapable": false,
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P13"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ANL-028",
+  "name": "Drill-Down & Interaction Designer",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "source": {
+   "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
+   "board": "2",
+   "number": "2.8",
+   "page": 22
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/analytics/drill-down-interaction-designer-anl-028",
+   "component": "apps/venue-management-web/src/routes/analytics/DrillDownInteractionDesigner.tsx",
+   "status": "notStarted"
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Define) and no display directory — it is settings, not a population",
+  "purpose": "Configure how users move from high-level KPIs into deeper analytics.",
+  "purposeNote": "Dashboard designers can visually configure analytical navigation without custom development.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**Drill-Down & Interaction Designer declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Click behavior",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Cross-filtering",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Drill-down",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Drill-up",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Drill-through",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tooltip",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Detail page",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Related dashboard",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Underlying report",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The drill-down interaction designer configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the drill-down interaction designer untouched.",
+   "emptyFirstRun": "No drill-down interaction designer configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-028"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 22. 0 of 0 labels bound to a contract property; 9 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "navigation": {
+   "entryFrom": [
+    "ANL-021"
+   ],
+   "exitTo": [
+    "ANL-021"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-021",
+     "trigger": "Back to Dashboard Library",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P16",
+   "formFactor": "web",
+   "app": "venue-management-web",
+   "operator": "venue",
+   "name": "Venue Analytics — Cross-Domain Reporting",
+   "shortName": "Venue Analytics",
+   "audience": "staff",
+   "offlineCapable": false,
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P13"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ANL-029",
+  "name": "Dashboard Access, Publishing & Versioning",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "source": {
+   "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
+   "board": "2",
+   "number": "2.9",
+   "page": 23
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/analytics/dashboard-access-publishing-versioning-anl-029",
+   "component": "apps/venue-management-web/src/routes/analytics/DashboardAccessPublishingVersioning.tsx",
+   "status": "notStarted"
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Govern who can access dashboards and how dashboard changes reach production.",
+  "purposeNote": "Only authorized and approved dashboard configurations become available to production users, with complete version history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 23 §Display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every access publishing versioning",
+       "columns": [
+        "Version Number",
+        "Changed By",
+        "Date/Time",
+        "Change Description",
+        "Approval Status",
+        "Published Version"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 23 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected access publishing versioning",
+       "bindsTo": null,
+       "columns": [
+        "Version Number",
+        "Changed By",
+        "Date/Time",
+        "Change Description",
+        "Approval Status",
+        "Published Version"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Assign dashboards to”, “Administer”, “Rollback”.",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 23 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The access publishing versioning list.",
+   "error": "Could not load. Names which read failed and leaves the access publishing versioning untouched.",
+   "emptyFirstRun": "No access publishing versioning yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the access publishing versioning are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "entryState": {
+   "preloaded": [
+    "Version Number",
+    "Changed By",
+    "Date/Time",
+    "Change Description",
+    "Approval Status",
+    "Published Version"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-029"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 23. 0 of 6 labels bound to a contract property; 6 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "navigation": {
+   "entryFrom": [
+    "ANL-021"
+   ],
+   "exitTo": [
+    "ANL-021"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-021",
+     "trigger": "Back to Dashboard Library",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P16",
+   "formFactor": "web",
+   "app": "venue-management-web",
+   "operator": "venue",
+   "name": "Venue Analytics — Cross-Domain Reporting",
+   "shortName": "Venue Analytics",
+   "audience": "staff",
+   "offlineCapable": false,
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P13"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ANL-030",
+  "name": "Dashboard Preview, Validation & Health",
+  "module": "Analytics",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "source": {
+   "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
+   "board": "2",
+   "number": "2.10",
+   "page": 23
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/analytics/dashboard-preview-validation-health-anl-030",
+   "component": "apps/venue-management-web/src/routes/analytics/DashboardPreviewValidationHealth.tsx",
+   "status": "notStarted"
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Validate dashboards before publication and monitor their technical/analytical health afterward.",
+  "purposeNote": "The system prevents dashboards containing critical configuration or security errors from being published.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 23 §Display"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every preview validation health",
+       "columns": [
+        "Data Last Refreshed",
+        "Refresh Frequency",
+        "Dataset Status",
+        "Query Performance",
+        "Widget Load Time",
+        "Failed Widgets",
+        "API Status",
+        "User Count",
+        "Usage Frequency"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 23 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected preview validation health",
+       "bindsTo": null,
+       "columns": [
+        "Data Last Refreshed",
+        "Refresh Frequency",
+        "Dataset Status",
+        "Query Performance",
+        "Widget Load Time",
+        "Failed Widgets",
+        "API Status",
+        "User Count",
+        "Usage Frequency"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Preview Modes”, “Ready to Publish”, “Issues Detected”, “The end user should experience”.",
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 23 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The preview validation health list.",
+   "error": "Could not load. Names which read failed and leaves the preview validation health untouched.",
+   "emptyFirstRun": "No preview validation health yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the preview validation health are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "entryState": {
+   "preloaded": [
+    "Data Last Refreshed",
+    "Refresh Frequency",
+    "Dataset Status",
+    "Query Performance",
+    "Widget Load Time",
+    "Failed Widgets"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P16 Venue Analytics.dc.html#anl-030"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf page 23. 0 of 9 labels bound to a contract property; 9 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "navigation": {
+   "entryFrom": [
+    "ANL-021"
+   ],
+   "exitTo": [
+    "ANL-021"
+   ],
+   "transitions": [
+    {
+     "to": "ANL-021",
+     "trigger": "Back to Dashboard Library",
+     "provenance": "structural — pack board 2 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P16",
+   "formFactor": "web",
+   "app": "venue-management-web",
+   "operator": "venue",
+   "name": "Venue Analytics — Cross-Domain Reporting",
+   "shortName": "Venue Analytics",
+   "audience": "staff",
+   "offlineCapable": false,
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P13"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]
+```
+
+## `operations.json`
+
+Method, path, parameters, request and response for every operation these screens call. **Write fetches against these and do not invent an endpoint** — a screen needing something absent here is a finding worth reporting, not a gap to fill with a plausible URL.
+
+```json
+{}
+```
+
+## `schemas.json`
+
+The data those operations carry, resolved one level deep. **Seed from these.** The reference prototype hardcodes 57 models and every one corresponds to a schema here; a build that invents its own will disagree with the backend on day one.
+
+```json
+{}
+```

@@ -1,0 +1,1525 @@
+{
+ "AiConversation": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.conversation",
+  "required": [
+   "id",
+   "principalId",
+   "module",
+   "startedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "module": {
+    "type": "string"
+   },
+   "locale": {
+    "type": "string"
+   },
+   "messageCount": {
+    "type": "integer"
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "lastMessageAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "AiMessage": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.message",
+  "required": [
+   "id",
+   "conversationId",
+   "role",
+   "content",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "conversationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "role": {
+    "type": "string",
+    "enum": [
+     "user",
+     "assistant",
+     "system"
+    ]
+   },
+   "content": {
+    "type": "string"
+   },
+   "sources": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AiSource"
+    }
+   },
+   "confidence": {
+    "type": "number",
+    "nullable": true,
+    "description": "8.1.5, 8.3.67. **Nullable on purpose** — a provider that does not report confidence must yield null rather than an invented number, and an interface showing 0.9 because the code defaulted it is worse than showing nothing.\n"
+   },
+   "rationale": {
+    "type": "string",
+    "nullable": true,
+    "description": "8.3.68, 8.3.69."
+   },
+   "proposedAction": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ProposedAction"
+     }
+    ],
+    "nullable": true,
+    "description": "Present where the answer suggests a change. **A draft, never applied here.**"
+   },
+   "traceId": {
+    "type": "string"
+   },
+   "provider": {
+    "$ref": "#/components/schemas/AiProviderKind"
+   },
+   "model": {
+    "type": "string"
+   },
+   "promptTokens": {
+    "type": "integer"
+   },
+   "completionTokens": {
+    "type": "integer"
+   },
+   "latencyMs": {
+    "type": "integer"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "AiProviderKind": {
+  "type": "string",
+  "enum": [
+   "openai",
+   "gemini",
+   "anthropic",
+   "azureOpenai",
+   "localLlm"
+  ]
+ },
+ "AiSource": {
+  "type": "object",
+  "x-ticvai-persistence": "none — embedded in the interaction",
+  "description": "What the answer was grounded in (8.3.70). **An answer with no sources is a guess**, and the interface should show it as one.\n",
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "document",
+     "product",
+     "entitlement",
+     "report",
+     "record"
+    ]
+   },
+   "id": {
+    "type": "string"
+   },
+   "title": {
+    "type": "string"
+   },
+   "collectionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "excerpt": {
+    "type": "string"
+   },
+   "relevance": {
+    "type": "number"
+   }
+  }
+ },
+ "Case": {
+  "x-ticvai-persistence": "marketing.case",
+  "type": "object",
+  "required": [
+   "id",
+   "caseNumber",
+   "subject",
+   "status",
+   "priority",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "caseNumber": {
+    "type": "string"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "guestName": {
+    "type": "string",
+    "nullable": true
+   },
+   "subject": {
+    "type": "string"
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "status": {
+    "$ref": "#/components/schemas/CaseStatus"
+   },
+   "priority": {
+    "$ref": "#/components/schemas/CasePriority"
+   },
+   "assignedToPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "relatedOrderId": {
+    "type": "string",
+    "nullable": true
+   },
+   "slaDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "isSlaBreached": {
+    "type": "boolean"
+   },
+   "slaPausedSeconds": {
+    "type": "integer",
+    "description": "Accrued only while awaiting the guest. Waiting on an internal team does not pause the clock.\n"
+   },
+   "escalationCount": {
+    "type": "integer"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "CasePriority": {
+  "type": "string",
+  "enum": [
+   "low",
+   "normal",
+   "high",
+   "urgent"
+  ]
+ },
+ "CaseStatus": {
+  "type": "string",
+  "enum": [
+   "open",
+   "inProgress",
+   "awaitingGuest",
+   "escalated",
+   "resolved",
+   "closed"
+  ]
+ },
+ "ConsentDecision": {
+  "type": "string",
+  "enum": [
+   "granted",
+   "withdrawn",
+   "notAsked"
+  ]
+ },
+ "ConsentPurpose": {
+  "type": "string",
+  "enum": [
+   "marketing",
+   "personalisation",
+   "profiling",
+   "thirdPartySharing",
+   "aiProcessing",
+   "transactional"
+  ]
+ },
+ "ConsentSource": {
+  "type": "string",
+  "enum": [
+   "guestApp",
+   "website",
+   "kiosk",
+   "pos",
+   "callCentre",
+   "import",
+   "agentRecorded"
+  ]
+ },
+ "ConsentState": {
+  "x-ticvai-persistence": "none — projection over consent_record",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "purposes"
+  ],
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "purposes": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "purpose",
+      "decision",
+      "requiresRenewal"
+     ],
+     "properties": {
+      "purpose": {
+       "$ref": "#/components/schemas/ConsentPurpose"
+      },
+      "decision": {
+       "$ref": "#/components/schemas/ConsentDecision"
+      },
+      "channels": {
+       "type": "array",
+       "items": {
+        "$ref": "#/components/schemas/MessageChannel"
+       }
+      },
+      "noticeVersion": {
+       "type": "string",
+       "nullable": true
+      },
+      "requiresRenewal": {
+       "type": "boolean",
+       "description": "True where the notice has been superseded since consent was given."
+      },
+      "decidedAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "Conversation": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.conversation",
+  "description": "22.8. **A conversation is not a case.** A case is a ticket measured in hours; a conversation is a live session measured in seconds, with somebody waiting. A conversation may create a case; it is not one.\n",
+  "required": [
+   "id",
+   "channel",
+   "state"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "telephony": {
+    "type": "object",
+    "nullable": true,
+    "description": "BL-083. **`ConversationChannel` included `voice` with nothing behind it** — the model anticipated telephony and stopped at the enum.\n**Not an integration, a binding.** Genesys, Avaya, Amazon Connect, Teams and 3CX all do call control themselves; what the platform needs is the call bound to the guest and the case, so **an agent who answers already knows who is calling and what about.**\n",
+    "properties": {
+     "providerCallId": {
+      "type": "string"
+     },
+     "direction": {
+      "type": "string",
+      "enum": [
+       "inbound",
+       "outbound",
+       "transferred"
+      ]
+     },
+     "fromNumberMasked": {
+      "type": "string",
+      "nullable": true,
+      "description": "**Masked, and it is still personal data.** A phone number identifies a person more reliably than a name does.\n"
+     },
+     "recordingRef": {
+      "type": "string",
+      "nullable": true,
+      "description": "Held by the provider, referenced here. **Recording consent is jurisdictional and the platform does not assume it** — a reference with no consent record is a recording nobody may play.\n"
+     },
+     "agentState": {
+      "type": "string",
+      "enum": [
+       "available",
+       "onCall",
+       "wrapUp",
+       "away",
+       "offline"
+      ],
+      "nullable": true
+     }
+    }
+   },
+   "assistSessionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "BL-094. **`startKioskAssist` recorded a staff member helping a guest and `createCase` recorded a service interaction, and neither referenced the other** — so the traceability 2.13.20 asks for had no link to follow.\n**The link is here rather than on the assist session**, because a case may span several assists and an assist belongs to at most one case.\n"
+   },
+   "channel": {
+    "$ref": "#/components/schemas/ConversationChannel"
+   },
+   "state": {
+    "$ref": "#/components/schemas/ConversationState"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "22.8.3. Resolved from phone, email, membership number or a signed-in session. **A conversation with none of those stays anonymous rather than being guessed at.**\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "assignedPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "queueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "queuePosition": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true
+   },
+   "estimatedWaitSeconds": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true
+   },
+   "handoverReason": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "guestRequested",
+     "assistantRefused",
+     "assistantFailed",
+     "outOfScope",
+     "negativeSentiment",
+     "complexIntent",
+     "paymentIssue"
+    ]
+   },
+   "handoverSummary": {
+    "type": "string",
+    "nullable": true,
+    "description": "**The assistant's own account of what the guest wants**, so an agent opens with context rather than reading a transcript while somebody waits.\n"
+   },
+   "sentiment": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "positive",
+     "neutral",
+     "negative",
+     "escalating"
+    ],
+    "description": "22.8.16. **`escalating` is a routing signal**, not a report line."
+   },
+   "intent": {
+    "type": "string",
+    "nullable": true,
+    "description": "22.8.13. What the guest appears to want, used for routing."
+   },
+   "locale": {
+    "type": "string"
+   },
+   "caseId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "22.8.12. Where the conversation raised one."
+   },
+   "messages": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ConversationMessage"
+    }
+   },
+   "firstResponseSeconds": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "closedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "outcome": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "resolved",
+     "caseRaised",
+     "abandonedByGuest",
+     "timedOut",
+     "spam"
+    ]
+   }
+  }
+ },
+ "ConversationChannel": {
+  "type": "string",
+  "enum": [
+   "webChat",
+   "inAppChat",
+   "whatsapp",
+   "sms",
+   "email",
+   "kiosk",
+   "voice"
+  ]
+ },
+ "ConversationMessage": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.conversation_message",
+  "required": [
+   "id",
+   "sender",
+   "body",
+   "sentAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sender": {
+    "type": "string",
+    "enum": [
+     "guest",
+     "agent",
+     "assistant",
+     "system"
+    ],
+    "description": "**Resolved, never declared.** The assistant is labelled as one — a guest talking to a bot that presents as a person is a complaint waiting for the moment they find out.\n"
+   },
+   "senderPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "body": {
+    "type": "string"
+   },
+   "attachments": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "assetId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "kind": {
+       "type": "string",
+       "enum": [
+        "image",
+        "video",
+        "document",
+        "ticket",
+        "qr",
+        "paymentLink"
+       ]
+      }
+     }
+    }
+   },
+   "aiInteractionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where the assistant sent it. **Links the message to its tokens and cost**, so a conversation's spend is attributable (CF-14).\n"
+   },
+   "sentAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "readAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "ConversationState": {
+  "type": "string",
+  "description": "**`withAssistant` and `queued` are different, and the second has a person waiting.** Merging them makes the service level unmeasurable, because time with a bot is not time in a queue.\n",
+  "enum": [
+   "withAssistant",
+   "queued",
+   "withAgent",
+   "waitingOnGuest",
+   "resolved",
+   "abandoned",
+   "timedOut"
+  ]
+ },
+ "CreateCaseRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "subject",
+   "description",
+   "channel",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subject": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 10000
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "priority": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CasePriority"
+     }
+    ],
+    "default": "normal"
+   },
+   "channel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "relatedOrderId": {
+    "type": "string"
+   },
+   "attachmentRefs": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "DeliveryLocationKind": {
+  "type": "string",
+  "description": "4.6.26. One concept, because a runner needs one instruction.",
+  "enum": [
+   "table",
+   "seat",
+   "cabana",
+   "sunbed",
+   "poolside",
+   "box",
+   "suite",
+   "lawn",
+   "collectionPoint",
+   "namedLocation"
+  ]
+ },
+ "GuestDevice": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.guest_device",
+  "required": [
+   "id",
+   "subjectId",
+   "platform",
+   "status",
+   "registeredAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "platform": {
+    "type": "string",
+    "enum": [
+     "ios",
+     "android",
+     "web"
+    ]
+   },
+   "tokenFingerprint": {
+    "type": "string",
+    "description": "Hash of the token, not the token. The token itself is write-only — returning it would put a push credential in every response a support agent can read.\n"
+   },
+   "appVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "osVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "deviceModel": {
+    "type": "string",
+    "nullable": true
+   },
+   "locale": {
+    "type": "string",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "revoked",
+     "failed"
+    ]
+   },
+   "failureCount": {
+    "type": "integer",
+    "description": "Consecutive delivery failures. Past the threshold the device is marked failed and stops being targeted — a dead token retried forever is wasted quota and a misleading delivery rate.\n"
+   },
+   "registeredAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "lastSeenAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "revokedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "GuestMenu": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over menu, item and availability",
+  "required": [
+   "outletId",
+   "menuId",
+   "name",
+   "inForceUntil",
+   "sections"
+  ],
+  "properties": {
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "menuId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "inForceUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When this menu stops applying. The client shows it, because a guest browsing breakfast at 10:55 should know.\n"
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "currencyScale": {
+    "type": "integer"
+   },
+   "sections": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "sortOrder": {
+       "type": "integer"
+      },
+      "items": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "required": [
+         "menuItemId",
+         "name",
+         "price",
+         "isAvailable",
+         "allergens"
+        ],
+        "properties": {
+         "menuItemId": {
+          "type": "string",
+          "format": "uuid"
+         },
+         "name": {
+          "type": "string"
+         },
+         "description": {
+          "type": "string",
+          "nullable": true
+         },
+         "price": {
+          "$ref": "../shared/common.yaml#/components/schemas/Money"
+         },
+         "imageAssetRef": {
+          "type": "string",
+          "nullable": true
+         },
+         "isAvailable": {
+          "type": "boolean",
+          "description": "Marked, not removed. A guest who saw a dish yesterday and cannot find it today assumes the app is broken; \"sold out\" is an answer.\n"
+         },
+         "unavailableReason": {
+          "type": "string",
+          "nullable": true
+         },
+         "allergens": {
+          "type": "array",
+          "description": "Always present. Not a field a tenant may choose to omit.",
+          "items": {
+           "type": "string"
+          }
+         },
+         "preparationMinutes": {
+          "type": "integer",
+          "nullable": true
+         },
+         "modifierGroups": {
+          "type": "array",
+          "items": {
+           "$ref": "#/components/schemas/ModifierGroup"
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
+ "LocationSession": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.location_session",
+  "required": [
+   "id",
+   "locationId",
+   "kind",
+   "label",
+   "expiresAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/DeliveryLocationKind"
+   },
+   "label": {
+    "type": "string"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The outlet serving this location. Where several serve it, the guest chooses and this is set on the first order.\n"
+   },
+   "visitId": {
+    "type": "string",
+    "nullable": true,
+    "description": "The table visit this session orders onto, where the location is a table. Absent for a cabana or a seat, which have no visit concept — the order stands alone.\n"
+   },
+   "joinedExistingVisit": {
+    "type": "boolean"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Sessions expire so a guest who leaves cannot order to a lounger now occupied by someone else.\n"
+   }
+  }
+ },
+ "MarketingSubscription": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.subscription",
+  "description": "**Drafted 4 September.** What a guest asked to receive. **Deliberately separate from `marketing.consent`** - consent is what the law allows, a subscription is what the person wants, and a system that stores one and reports the other is the reason unsubscribe links stop working.",
+  "required": [
+   "id"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "guestId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "channel": {
+    "type": "string",
+    "enum": [
+     "email",
+     "sms",
+     "push"
+    ]
+   },
+   "listName": {
+    "type": "string"
+   },
+   "subscribed": {
+    "type": "boolean"
+   },
+   "source": {
+    "type": "string",
+    "description": "Where the opt-in happened, because a regulator asks."
+   },
+   "unsubscribeToken": {
+    "type": "string",
+    "description": "**Unsubscribe must work without a login.**"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "MessageChannel": {
+  "type": "string",
+  "enum": [
+   "email",
+   "sms",
+   "whatsapp",
+   "push",
+   "inApp",
+   "post"
+  ]
+ },
+ "ModifierGroup": {
+  "x-ticvai-persistence": "fnb.modifier_group + fnb.modifier_option",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "minSelections",
+   "maxSelections",
+   "options"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "minSelections": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Greater than zero makes the group required."
+   },
+   "maxSelections": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "options": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "id",
+      "name",
+      "priceDelta"
+     ],
+     "properties": {
+      "id": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "priceDelta": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "isDefault": {
+       "type": "boolean"
+      },
+      "isAvailable": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "ProposedAction": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.proposed_action",
+  "required": [
+   "id",
+   "kind",
+   "targetContract",
+   "targetOperation",
+   "payload",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "interactionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "pricing",
+     "promotion",
+     "operational",
+     "financial",
+     "configuration"
+    ]
+   },
+   "targetContract": {
+    "type": "string",
+    "description": "Which contract would perform it. The assistant never performs it itself."
+   },
+   "targetOperation": {
+    "type": "string"
+   },
+   "payload": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "The request body a person would submit, ready to review."
+   },
+   "summary": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "proposed",
+     "approved",
+     "rejected",
+     "applied",
+     "expired"
+    ]
+   },
+   "approvalLevel": {
+    "type": "integer",
+    "description": "8.3.65. Multi-level, because a discount and a pricing change differ in authority."
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "decisionReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Required on rejection. **The only signal the assistant is proposing badly**, and without it a poor model degrades silently.\n"
+   },
+   "proposedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "RecordConsentRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "purpose",
+   "decision",
+   "noticeVersion",
+   "source",
+   "recordedAt"
+  ],
+  "properties": {
+   "purpose": {
+    "$ref": "#/components/schemas/ConsentPurpose"
+   },
+   "decision": {
+    "$ref": "#/components/schemas/ConsentDecision"
+   },
+   "channels": {
+    "type": "array",
+    "description": "Omit to apply to every channel the purpose covers.",
+    "items": {
+     "$ref": "#/components/schemas/MessageChannel"
+    }
+   },
+   "noticeVersion": {
+    "type": "string"
+   },
+   "source": {
+    "$ref": "#/components/schemas/ConsentSource"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "Review": {
+  "x-ticvai-persistence": "marketing.review",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/SubmitReviewRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "status"
+    ],
+    "properties": {
+     "status": {
+      "type": "string",
+      "enum": [
+       "pendingModeration",
+       "published",
+       "hidden",
+       "rejected"
+      ]
+     },
+     "response": {
+      "type": "string",
+      "nullable": true
+     },
+     "responseIsPublic": {
+      "type": "boolean"
+     },
+     "respondedByPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     },
+     "openedCaseId": {
+      "type": "string",
+      "nullable": true,
+      "description": "Case raised automatically where the rating fell below the venue's threshold. Feedback that goes nowhere is worse than no feedback mechanism.\n"
+     }
+    }
+   }
+  ]
+ },
+ "SubmitReviewRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "rating",
+   "venueId",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "relatedOrderId": {
+    "type": "string"
+   },
+   "rating": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 5
+   },
+   "body": {
+    "type": "string",
+    "maxLength": 5000
+   },
+   "aspects": {
+    "type": "array",
+    "description": "Aspect chips — exhibitions, staff, cleanliness, food, value.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "Suggestion": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.suggestion",
+  "description": "One answer to one question, with its reasoning and its confidence. **Built 24 August so that machine learning can be swapped in without touching a screen.**\n**A suggestion is never an action.** It proposes; `ProposedAction` and its approval path decide. A model that can order stock is a model that will order stock wrongly at three in the morning.\n**`inputs` is recorded, not just referenced.** A suggestion that cannot be reproduced cannot be defended to a finance controller asking why the system said to order four hundred.\n",
+  "required": [
+   "id",
+   "kind",
+   "basis",
+   "producedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/SuggestionKind"
+   },
+   "basis": {
+    "$ref": "#/components/schemas/SuggestionBasis"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "subjectRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "What it is about — a product, an outlet, an item, a party."
+   },
+   "value": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "The suggestion itself. Shape depends on `kind`."
+   },
+   "confidence": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 1,
+    "description": "**Null for a heuristic and that is honest.** A rule has no confidence — dressing one up with 0.85 is the fastest way to make a manager trust a number that means nothing.\n"
+   },
+   "explanation": {
+    "type": "string",
+    "description": "**Plain words, always present, whatever the basis.** *Because covers are up 12% on this day last year* — a suggestion a manager cannot explain to their own boss is a suggestion they will not action.\n"
+   },
+   "inputs": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "What went in. **Recorded so the answer can be reproduced** — and so that when a model replaces the rule, the two can be run against the same inputs and compared.\n"
+   },
+   "producerRef": {
+    "type": "string",
+    "description": "The rule name or the model id and version. **A model version is part of the record**: *the model said so* is not an answer to *which model, when*.\n"
+   },
+   "producedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**A demand forecast for Saturday is worthless on Sunday.** An expired suggestion is hidden rather than shown stale.\n"
+   }
+  }
+ },
+ "SuggestionBasis": {
+  "type": "string",
+  "description": "**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n",
+  "enum": [
+   "heuristic",
+   "statistical",
+   "model",
+   "hybrid",
+   "manual"
+  ]
+ },
+ "SuggestionKind": {
+  "type": "string",
+  "description": "What is being suggested. **A closed set, and the reason it is closed is the swap.** Every entry here is a question a venue asks that a model could answer better than a rule — and each one starts as a heuristic and becomes a model when there is data.\n**Six of these were drawn as their own endpoints on the client F&B boards** — `suggestPrice`, `simulateScenario`, `simulateSlaPolicy`, `suggestRequisition`, `suggestReplenishment`, `publishDemandPlan`. **Building six endpoints means six places to change when a model changes**, and the model will change more often than the venue's question does.\n",
+  "enum": [
+   "price",
+   "replenishment",
+   "requisition",
+   "demandForecast",
+   "prepPlan",
+   "menuEngineering",
+   "staffing",
+   "slaTarget",
+   "waitTime",
+   "upsell",
+   "segmentation",
+   "anomaly",
+   "scenario"
+  ]
+ },
+ "TenantAppStatus": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "tenantId",
+   "isPublished",
+   "isInMaintenance"
+  ],
+  "properties": {
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "isPublished": {
+    "type": "boolean"
+   },
+   "publishedVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "draftVersion": {
+    "type": "string"
+   },
+   "hasUnpublishedChanges": {
+    "type": "boolean"
+   },
+   "activeModuleCount": {
+    "type": "integer"
+   },
+   "licensedModuleCount": {
+    "type": "integer"
+   },
+   "activePageCount": {
+    "type": "integer"
+   },
+   "isInMaintenance": {
+    "type": "boolean"
+   },
+   "maintenanceMessage": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "expectedBackAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "recentChanges": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "area": {
+       "type": "string"
+      },
+      "description": {
+       "type": "string"
+      },
+      "principalId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "at": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
+   }
+  }
+ },
+ "Wishlist": {
+  "type": "object",
+  "required": [
+   "subjectId",
+   "items"
+  ],
+  "x-ticvai-persistence": "none — wrapper. The items are the table, keyed by subject",
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "items": {
+    "type": "array",
+    "x-ticvai-persistence": "marketing.wishlist_item",
+    "items": {
+     "type": "object",
+     "required": [
+      "id",
+      "variantId",
+      "addedAt",
+      "isAvailable"
+     ],
+     "properties": {
+      "id": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "variantId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "productName": {
+       "type": "string"
+      },
+      "performanceId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "performanceStartsAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "price": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "imageAssetRef": {
+       "type": "string",
+       "nullable": true
+      },
+      "isAvailable": {
+       "type": "boolean",
+       "description": "False where the product has been withdrawn or the performance has passed. Returned rather than dropped — a guest who saved something and finds it silently gone assumes the feature is broken.\n"
+      },
+      "unavailableReason": {
+       "type": "string",
+       "nullable": true
+      },
+      "note": {
+       "type": "string",
+       "nullable": true
+      },
+      "addedAt": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
+   }
+  }
+ }
+}

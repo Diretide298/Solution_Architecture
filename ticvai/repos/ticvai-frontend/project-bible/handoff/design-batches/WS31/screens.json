@@ -1,0 +1,1906 @@
+[
+ {
+  "id": "BO-304",
+  "name": "Order & Reservation Command Center",
+  "module": "Orders & Money",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Order___Reservation_Management_Reference.pdf",
+   "board": "1",
+   "number": "12.1.1",
+   "page": 3
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/order-reservation-command-center-bo-304",
+   "component": "apps/venue-management-web/src/routes/orders-money/OrderReservationCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-305",
+    "BO-306",
+    "BO-307",
+    "BO-308",
+    "BO-309",
+    "BO-310",
+    "BO-311",
+    "BO-312",
+    "BO-313"
+   ],
+   "inferred": false,
+   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Venue Home",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-305",
+     "trigger": "Works in Order Detail & Transaction Workspace",
+     "provenance": "flow F140 step 1→2",
+     "operation": "listOrderReservation"
+    },
+    {
+     "to": "BO-306",
+     "trigger": "Works in Reservation & Hold Policy Configuration",
+     "provenance": "flow F140 step 3→4",
+     "operation": "listOrderReservation"
+    },
+    {
+     "to": "BO-307",
+     "trigger": "Works in Order & Reservation Status Lifecycle Configuration",
+     "provenance": "flow F140 step 5→6",
+     "operation": "listOrderReservation"
+    },
+    {
+     "to": "BO-308",
+     "trigger": "Works in Order Creation & Source/Channel Configuration",
+     "provenance": "flow F140 step 7→8",
+     "operation": "listOrderReservation"
+    },
+    {
+     "to": "BO-309",
+     "trigger": "Works in Customer, Guest & Account Assignment",
+     "provenance": "flow F140 step 9→10",
+     "operation": "listOrderReservation"
+    },
+    {
+     "to": "BO-310",
+     "trigger": "Works in Order Line, Product & Entitlement Composition",
+     "provenance": "flow F140 step 11→12",
+     "operation": "listOrderReservation"
+    },
+    {
+     "to": "BO-311",
+     "trigger": "Works in Capacity Reservation & Inventory Commitment",
+     "provenance": "flow F140 step 13→14",
+     "operation": "listOrderReservation"
+    },
+    {
+     "to": "BO-312",
+     "trigger": "Works in Reservation Confirmation, Expiry & Fulfillment Readiness",
+     "provenance": "flow F140 step 15→16",
+     "operation": "listOrderReservation"
+    },
+    {
+     "to": "BO-313",
+     "trigger": "Works in Order Lifecycle Timeline, SLA, Exceptions & AI Operations",
+     "provenance": "flow F140 step 17→18",
+     "operation": "listOrderReservation"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Provide the central operational workspace for searching, monitoring, opening, and managing every order and reservation across TICVAI.",
+  "purposeNote": "Authorized users can locate and monitor any TICVAI order/reservation across all channels from one centralized operational workspace.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every order reservation",
+       "columns": [
+        "OrderReservationCommandCenterView.ordersToday",
+        "OrderReservationCommandCenterView.confirmedOrders",
+        "OrderReservationCommandCenterView.activeReservations",
+        "OrderReservationCommandCenterView.temporaryHolds",
+        "OrderReservationCommandCenterView.pendingPayment",
+        "OrderReservationCommandCenterView.expiringReservations",
+        "OrderReservationCommandCenterView.failedOrders",
+        "OrderReservationCommandCenterView.partiallyFulfilled",
+        "OrderReservationCommandCenterView.completedOrders",
+        "OrderReservationCommandCenterView.cancelledOrders",
+        "OrderReservationCommandCenterView.ordersRequiringAttention",
+        "OrderReservationCommandCenterView.grossOrderValue",
+        "OrderReservationCommandCenterView.orderId",
+        "OrderReservationCommandCenterView.reservationId",
+        "OrderReservationCommandCenterView.customer",
+        "OrderReservationCommandCenterView.channel",
+        "OrderReservationCommandCenterView.venue",
+        "OrderReservationCommandCenterView.productEvent",
+        "OrderReservationCommandCenterView.orderValue",
+        "OrderReservationCommandCenterView.paymentStatus",
+        "OrderReservationCommandCenterView.reservationStatus",
+        "OrderReservationCommandCenterView.fulfillmentStatus",
+        "OrderReservationCommandCenterView.createdDate",
+        "OrderReservationCommandCenterView.expiry",
+        "OrderReservationCommandCenterView.ownerAgent"
+       ],
+       "bindsTo": "OrderReservationCommandCenterView",
+       "operation": "listOrderReservation",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 3 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected order reservation",
+       "bindsTo": "OrderReservationCommandCenterView",
+       "columns": [
+        "OrderReservationCommandCenterView.ordersToday",
+        "OrderReservationCommandCenterView.confirmedOrders",
+        "OrderReservationCommandCenterView.activeReservations",
+        "OrderReservationCommandCenterView.temporaryHolds",
+        "OrderReservationCommandCenterView.pendingPayment",
+        "OrderReservationCommandCenterView.expiringReservations",
+        "OrderReservationCommandCenterView.failedOrders",
+        "OrderReservationCommandCenterView.partiallyFulfilled",
+        "OrderReservationCommandCenterView.completedOrders",
+        "OrderReservationCommandCenterView.cancelledOrders",
+        "OrderReservationCommandCenterView.ordersRequiringAttention",
+        "OrderReservationCommandCenterView.grossOrderValue",
+        "OrderReservationCommandCenterView.orderId",
+        "OrderReservationCommandCenterView.reservationId",
+        "OrderReservationCommandCenterView.customer",
+        "OrderReservationCommandCenterView.channel",
+        "OrderReservationCommandCenterView.venue",
+        "OrderReservationCommandCenterView.productEvent",
+        "OrderReservationCommandCenterView.orderValue",
+        "OrderReservationCommandCenterView.paymentStatus",
+        "OrderReservationCommandCenterView.reservationStatus",
+        "OrderReservationCommandCenterView.fulfillmentStatus",
+        "OrderReservationCommandCenterView.createdDate",
+        "OrderReservationCommandCenterView.expiry",
+        "OrderReservationCommandCenterView.ownerAgent"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Search using”.",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 3 §Display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "banner",
+       "label": "Permissions this screen separates",
+       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** Open Order, Open Reservation, Extend Hold, Resend Confirmation, Collect Payment, Add Note, View Timeline. Each needs attaching to the control it gates, or the screen needs the control.",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 3 §Depending on permission"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The order reservation list.",
+   "error": "Could not load. Names which read failed and leaves the order reservation untouched.",
+   "emptyFirstRun": "No order reservation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the order reservation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listOrderReservation",
+    "contract": "orders",
+    "purpose": "Order & Reservation Command Center",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "OrderReservationCommandCenterView.ordersToday",
+    "OrderReservationCommandCenterView.confirmedOrders",
+    "OrderReservationCommandCenterView.activeReservations",
+    "OrderReservationCommandCenterView.temporaryHolds",
+    "OrderReservationCommandCenterView.pendingPayment",
+    "OrderReservationCommandCenterView.expiringReservations"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-304"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 3. 25 of 25 labels bound to a contract property; 32 of 57 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-305",
+  "name": "Order Detail & Transaction Workspace",
+  "module": "Orders & Money",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Order___Reservation_Management_Reference.pdf",
+   "board": "1",
+   "number": "12.1.2",
+   "page": 5
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/order-detail-transaction-workspace-bo-305",
+   "component": "apps/venue-management-web/src/routes/orders-money/OrderDetailTransactionWorkspace.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-304"
+   ],
+   "exitTo": [
+    "BO-304"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-304, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-304",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F140 step 2→3",
+     "operation": "setOrderDetailTransaction"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen both a metric directory (§Display; Show) and a per-row directory (§Each line should display) — counts over a population, then the population",
+  "purpose": "Provide the authoritative 360-degree view of a single order. This should become one of the most important operational screens in TICVAI.",
+  "purposeNote": "The complete commercial, operational, customer, payment, ticket and fulfillment context of an order can be understood from one screen.",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Order Number",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Display",
+       "bindsTo": "OrderDetailTransactionWorkspaceView.orderNumber"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Order Date/Time",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Display"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Order Status",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Display",
+       "bindsTo": "OrderDetailTransactionWorkspaceView.orderStatus"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Reservation Status",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Display",
+       "bindsTo": "OrderDetailTransactionWorkspaceView.reservationStatus"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Customer",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Display",
+       "bindsTo": "OrderDetailTransactionWorkspaceView.customer"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Channel",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Display",
+       "bindsTo": "OrderDetailTransactionWorkspaceView.channel"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Sales Location",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Display",
+       "bindsTo": "OrderDetailTransactionWorkspaceView.salesLocation"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Cashier/Agent",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Display",
+       "bindsTo": "OrderDetailTransactionWorkspaceView.cashierAgent"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Currency",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Display",
+       "bindsTo": "OrderDetailTransactionWorkspaceView.currency"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Total",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Display",
+       "bindsTo": "OrderDetailTransactionWorkspaceView.total"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Payment Status",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Display",
+       "bindsTo": "OrderDetailTransactionWorkspaceView.paymentStatus"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Fulfillment Status",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Display",
+       "bindsTo": "OrderDetailTransactionWorkspaceView.fulfillmentStatus"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Tickets",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Show",
+       "bindsTo": "OrderDetailTransactionWorkspaceView.tickets"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Reservations",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Show",
+       "bindsTo": "OrderDetailTransactionWorkspaceView.reservations"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Payments",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Show",
+       "bindsTo": "OrderDetailTransactionWorkspaceView.payments"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Refunds",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Show",
+       "bindsTo": "OrderDetailTransactionWorkspaceView.refunds"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Invoices",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Show",
+       "bindsTo": "OrderDetailTransactionWorkspaceView.invoices"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Credentials",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Show",
+       "bindsTo": "OrderDetailTransactionWorkspaceView.credentials"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Membership",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Show",
+       "bindsTo": "OrderDetailTransactionWorkspaceView.membership"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Waivers",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Show",
+       "bindsTo": "OrderDetailTransactionWorkspaceView.waivers"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Related Orders",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Show",
+       "bindsTo": "OrderDetailTransactionWorkspaceView.relatedOrders"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "moduleTiles",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every order detail transaction",
+       "columns": [
+        "OrderDetailTransactionWorkspaceView.product",
+        "OrderDetailTransactionWorkspaceView.ticketType",
+        "OrderDetailTransactionWorkspaceView.event",
+        "OrderDetailTransactionWorkspaceView.performance",
+        "OrderDetailTransactionWorkspaceView.date",
+        "OrderDetailTransactionWorkspaceView.timeslot",
+        "OrderDetailTransactionWorkspaceView.quantity",
+        "OrderDetailTransactionWorkspaceView.personType",
+        "OrderDetailTransactionWorkspaceView.seat",
+        "OrderDetailTransactionWorkspaceView.unitPrice",
+        "OrderDetailTransactionWorkspaceView.discount",
+        "OrderDetailTransactionWorkspaceView.tax",
+        "OrderDetailTransactionWorkspaceView.fee",
+        "OrderDetailTransactionWorkspaceView.total",
+        "OrderDetailTransactionWorkspaceView.ticketStatus"
+       ],
+       "bindsTo": "OrderDetailTransactionWorkspaceView",
+       "operation": "setOrderDetailTransaction",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Each line should display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected order detail transaction",
+       "bindsTo": "OrderDetailTransactionWorkspaceView",
+       "columns": [
+        "OrderDetailTransactionWorkspaceView.product",
+        "OrderDetailTransactionWorkspaceView.ticketType",
+        "OrderDetailTransactionWorkspaceView.event",
+        "OrderDetailTransactionWorkspaceView.performance",
+        "OrderDetailTransactionWorkspaceView.date",
+        "OrderDetailTransactionWorkspaceView.timeslot",
+        "OrderDetailTransactionWorkspaceView.quantity",
+        "OrderDetailTransactionWorkspaceView.personType",
+        "OrderDetailTransactionWorkspaceView.seat",
+        "OrderDetailTransactionWorkspaceView.unitPrice",
+        "OrderDetailTransactionWorkspaceView.discount",
+        "OrderDetailTransactionWorkspaceView.tax",
+        "OrderDetailTransactionWorkspaceView.fee",
+        "OrderDetailTransactionWorkspaceView.total",
+        "OrderDetailTransactionWorkspaceView.ticketStatus"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Order Total”, “Internal Notes”.",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Each line should display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "provenance": "contract operation setOrderDetailTransaction"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The order detail transaction list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the order detail transaction untouched.",
+   "emptyFirstRun": "No order detail transaction yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the order detail transaction are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setOrderDetailTransaction",
+    "contract": "orders",
+    "purpose": "Order Detail & Transaction Workspace",
+    "trigger": "onAction",
+    "invalidates": [
+     "setOrderDetailTransaction"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-305"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 5. 35 of 35 labels bound to a contract property; 36 of 51 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-306",
+  "name": "Reservation & Hold Policy Configuration",
+  "module": "Orders & Money",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Order___Reservation_Management_Reference.pdf",
+   "board": "1",
+   "number": "12.1.3",
+   "page": 7
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/reservation-hold-policy-configuration-bo-306",
+   "component": "apps/venue-management-web/src/routes/orders-money/ReservationHoldPolicyConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-304"
+   ],
+   "exitTo": [
+    "BO-304"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-304, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-304",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F140 step 4→5",
+     "operation": "setReservationHoldPolicy"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure by; Configure) and no display directory — it is settings, not a population",
+  "purpose": "Configure how TICVAI temporarily reserves inventory before an order is fully confirmed.",
+  "purposeNote": "overselling or orphaning inventory.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Cart Hold, Checkout Hold, Manual Hold, Payment Hold, Seat Hold, Inventory Hold. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Order___Reservation_Management_Reference.pdf, page 7 §Support"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Channel",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Product",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Event",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Performance",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Ticket Type",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer Segment",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Reservation Type",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Configure by"
+      },
+      {
+       "kind": "selectField",
+       "label": "Extension Allowed",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum Extensions",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Extension Duration",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Authorized Role",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Approval Requirement",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Cart Hold",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Checkout Hold",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Manual Hold",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Payment Hold",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Seat Hold",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Inventory Hold",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 7 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The reservation hold policy configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the reservation hold policy untouched.",
+   "emptyFirstRun": "No reservation hold policy configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setReservationHoldPolicy",
+    "contract": "orders",
+    "purpose": "Reservation & Hold Policy Configuration",
+    "trigger": "onAction",
+    "invalidates": [
+     "setReservationHoldPolicy"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-306"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 18 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-307",
+  "name": "Order & Reservation Status Lifecycle Configuration",
+  "module": "Orders & Money",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Order___Reservation_Management_Reference.pdf",
+   "board": "1",
+   "number": "12.1.4",
+   "page": 9
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/order-reservation-status-lifecycle-configuration-bo-307",
+   "component": "apps/venue-management-web/src/routes/orders-money/OrderReservationStatusLifecycleConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-304"
+   ],
+   "exitTo": [
+    "BO-304"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-304, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-304",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F140 step 6→7",
+     "operation": "setOrderReservationStatus"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§For each transition define) and no display directory — it is settings, not a population",
+  "purpose": "Define the governed state machine for orders and reservations. SoftLab should not hard-code status transitions independently in every channel.",
+  "purposeNote": "Every order and reservation follows a centralized, controlled and auditable lifecycle regardless of originating sales channel.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "From Status",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 9 §For each transition define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Trigger",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 9 §For each transition define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Required Conditions",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 9 §For each transition define"
+      },
+      {
+       "kind": "selectField",
+       "label": "User/System Action",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 9 §For each transition define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Allowed Role",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 9 §For each transition define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Integration Requirement",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 9 §For each transition define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Notification",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 9 §For each transition define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Audit Requirement",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 9 §For each transition define"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "provenance": "contract operation setOrderReservationStatus"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The order reservation status configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the order reservation status untouched.",
+   "emptyFirstRun": "No order reservation status configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setOrderReservationStatus",
+    "contract": "orders",
+    "purpose": "Order & Reservation Status Lifecycle Configuration",
+    "trigger": "onAction",
+    "invalidates": [
+     "setOrderReservationStatus"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-307"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 8 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-308",
+  "name": "Order Creation & Source/Channel Configuration",
+  "module": "Orders & Money",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Order___Reservation_Management_Reference.pdf",
+   "board": "1",
+   "number": "12.1.5",
+   "page": 10
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/order-creation-source-channel-configuration-bo-308",
+   "component": "apps/venue-management-web/src/routes/orders-money/OrderCreationSourceChannelConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-304"
+   ],
+   "exitTo": [
+    "BO-304"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-304, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-304",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F140 step 8→9",
+     "operation": "createOrderSourceChannel"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Capture; Configure numbering rules; Configure whether a channel may) and no display directory — it is settings, not a population",
+  "purpose": "Configure how orders can originate from different TICVAI sales channels while using one common transaction engine.",
+  "purposeNote": "Orders from all TICVAI and external sales channels are created consistently while preserving complete source and attribution metadata.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: OTA Booking Reference, Reseller Order ID. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Order___Reservation_Management_Reference.pdf, page 10 §Support partner identifiers such as"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Channel",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Sub-Channel",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Sales Location",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Terminal",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Device",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Agent",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Partner",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Reseller",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Campaign",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Affiliate",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "API Consumer",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "External Reference",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Global Sequence",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Configure numbering rules"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tenant Sequence",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Configure numbering rules"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue Sequence",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Configure numbering rules"
+      },
+      {
+       "kind": "selectField",
+       "label": "Channel Prefix",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Configure numbering rules"
+      },
+      {
+       "kind": "selectField",
+       "label": "Year/Month Prefix",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Configure numbering rules"
+      },
+      {
+       "kind": "selectField",
+       "label": "Custom Pattern",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Configure numbering rules"
+      },
+      {
+       "kind": "selectField",
+       "label": "Create Reservation",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Configure whether a channel may"
+      },
+      {
+       "kind": "selectField",
+       "label": "Create Immediate Order",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Configure whether a channel may"
+      },
+      {
+       "kind": "selectField",
+       "label": "Create Unpaid Order",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Configure whether a channel may"
+      },
+      {
+       "kind": "selectField",
+       "label": "Create Group Order",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Configure whether a channel may"
+      },
+      {
+       "kind": "selectField",
+       "label": "Hold Inventory",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Configure whether a channel may"
+      },
+      {
+       "kind": "selectField",
+       "label": "Issue Ticket Immediately",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Configure whether a channel may"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "OTA Booking Reference",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Support partner identifiers such as"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reseller Order ID",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 10 §Support partner identifiers such as"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The order creation source configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the order creation source untouched.",
+   "emptyFirstRun": "No order creation source configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "createOrderSourceChannel",
+    "contract": "orders",
+    "purpose": "Order Creation & Source/Channel Configuration",
+    "trigger": "onAction",
+    "invalidates": [
+     "createOrderSourceChannel"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-308"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 10. 0 of 0 labels bound to a contract property; 26 of 46 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-309",
+  "name": "Customer, Guest & Account Assignment",
+  "module": "Orders & Money",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Order___Reservation_Management_Reference.pdf",
+   "board": "1",
+   "number": "12.1.6",
+   "page": 11
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/customer-guest-account-assignment-bo-309",
+   "component": "apps/venue-management-web/src/routes/orders-money/CustomerGuestAccountAssignment.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-304"
+   ],
+   "exitTo": [
+    "BO-304"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-304, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-304",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F140 step 10→11",
+     "operation": "setCustomerGuestAccount"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Depending on configuration) and no display directory — it is settings, not a population",
+  "purpose": "Define how customers are identified and associated with orders/reservations.",
+  "purposeNote": "Every order can correctly identify purchaser, attendee, member, corporate or partner relationships without creating unnecessary duplicate customer records.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Registered Customer, Anonymous Sale where permitted, Link Existing, Continue Guest, Review Match. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Order___Reservation_Management_Reference.pdf, page 11 §Support"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Name",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 11 §Depending on configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Email",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 11 §Depending on configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Mobile",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 11 §Depending on configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Country",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 11 §Depending on configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Language",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 11 §Depending on configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Date of Birth",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 11 §Depending on configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer ID",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 11 §Depending on configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Membership ID",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 11 §Depending on configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Company",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 11 §Depending on configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tax Details",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 11 §Depending on configuration"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Guest Checkout",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 11 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Registered Customer",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 11 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Anonymous Sale where permitted",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 11 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Link Existing",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 11 §Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Continue Guest",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 11 §Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Review Match",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 11 §Actions"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The customer guest account configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the customer guest account untouched.",
+   "emptyFirstRun": "No customer guest account configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setCustomerGuestAccount",
+    "contract": "orders",
+    "purpose": "Customer, Guest & Account Assignment",
+    "trigger": "onAction",
+    "invalidates": [
+     "setCustomerGuestAccount"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-309"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 16 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-310",
+  "name": "Order Line, Product & Entitlement Composition",
+  "module": "Orders & Money",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Order___Reservation_Management_Reference.pdf",
+   "board": "1",
+   "number": "12.1.7",
+   "page": 13
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/order-line-product-entitlement-composition-bo-310",
+   "component": "apps/venue-management-web/src/routes/orders-money/OrderLineProductEntitlementComposition.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-304"
+   ],
+   "exitTo": [
+    "BO-304"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-304, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-304",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F140 step 12→13",
+     "operation": "listOrderLineProduct"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Each line captures) and no display directory — it is settings, not a population",
+  "purpose": "Manage the products and commercial components contained within an order.",
+  "purposeNote": "entitlements, commercial calculations and fulfillment requirements.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Product",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 13 §Each line captures"
+      },
+      {
+       "kind": "selectField",
+       "label": "Variant",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 13 §Each line captures"
+      },
+      {
+       "kind": "selectField",
+       "label": "Quantity",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 13 §Each line captures"
+      },
+      {
+       "kind": "selectField",
+       "label": "Person Type",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 13 §Each line captures"
+      },
+      {
+       "kind": "selectField",
+       "label": "Event",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 13 §Each line captures"
+      },
+      {
+       "kind": "selectField",
+       "label": "Performance",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 13 §Each line captures"
+      },
+      {
+       "kind": "selectField",
+       "label": "Date",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 13 §Each line captures"
+      },
+      {
+       "kind": "selectField",
+       "label": "Timeslot",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 13 §Each line captures"
+      },
+      {
+       "kind": "selectField",
+       "label": "Seat",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 13 §Each line captures"
+      },
+      {
+       "kind": "selectField",
+       "label": "Entitlement",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 13 §Each line captures"
+      },
+      {
+       "kind": "selectField",
+       "label": "Price",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 13 §Each line captures"
+      },
+      {
+       "kind": "selectField",
+       "label": "Discount",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 13 §Each line captures"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tax",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 13 §Each line captures"
+      },
+      {
+       "kind": "selectField",
+       "label": "Fee",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 13 §Each line captures"
+      },
+      {
+       "kind": "selectField",
+       "label": "Fulfillment Method",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 13 §Each line captures"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The order line product configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the order line product untouched.",
+   "emptyFirstRun": "No order line product configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listOrderLineProduct",
+    "contract": "orders",
+    "purpose": "Order Line, Product & Entitlement Composition",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-310"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 13. 0 of 0 labels bound to a contract property; 15 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-311",
+  "name": "Capacity Reservation & Inventory Commitment",
+  "module": "Orders & Money",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Order___Reservation_Management_Reference.pdf",
+   "board": "1",
+   "number": "12.1.8",
+   "page": 14
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/capacity-reservation-inventory-commitment-bo-311",
+   "component": "apps/venue-management-web/src/routes/orders-money/CapacityReservationInventoryCommitment.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-304"
+   ],
+   "exitTo": [
+    "BO-304"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-304, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-304",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F140 step 14→15",
+     "operation": "listCapacityReservationInventory"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Control when and how order activity consumes real capacity/inventory. This is the transactional bridge between the Order Engine and the Capacity/Inventory Engines.",
+  "purposeNote": "Order and reservation activity commits and releases capacity consistently without double- selling, lost inventory, or inconsistent transaction states.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Order___Reservation_Management_Reference.pdf, page 14"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Order___Reservation_Management_Reference.pdf, page 14"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listCapacityReservationInventory",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The capacity reservation inventory list.",
+   "error": "Could not load. Names which read failed and leaves the capacity reservation inventory untouched.",
+   "emptyFirstRun": "No capacity reservation inventory yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the capacity reservation inventory are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCapacityReservationInventory",
+    "contract": "orders",
+    "purpose": "Capacity Reservation & Inventory Commitment",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "CapacityReservationInventoryCommitmentView.temporaryAvailabilityProtection",
+    "CapacityReservationInventoryCommitmentView.confirmedInventoryConsumption",
+    "CapacityReservationInventoryCommitmentView.generalAdmissionCapacity",
+    "CapacityReservationInventoryCommitmentView.seatInventory",
+    "CapacityReservationInventoryCommitmentView.timeslotCapacity"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-311"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-312",
+  "name": "Reservation Confirmation, Expiry & Fulfillment Readiness",
+  "module": "Orders & Money",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Order___Reservation_Management_Reference.pdf",
+   "board": "1",
+   "number": "12.1.9",
+   "page": 15
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/reservation-confirmation-expiry-fulfillment-readiness-bo-312",
+   "component": "apps/venue-management-web/src/routes/orders-money/ReservationConfirmationExpiryFulfillmentReadines.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-304"
+   ],
+   "exitTo": [
+    "BO-304"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-304, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-304",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F140 step 16→17",
+     "operation": "listReservationConfirmationExpiry"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure combinations of) and no display directory — it is settings, not a population",
+  "purpose": "Determine when a reservation becomes a confirmed order and when it is ready for ticket/media fulfillment.",
+  "purposeNote": "and compliance conditions have been satisfied.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Payment Complete",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 15 §Configure combinations of"
+      },
+      {
+       "kind": "selectField",
+       "label": "Deposit Received",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 15 §Configure combinations of"
+      },
+      {
+       "kind": "selectField",
+       "label": "Credit Approved",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 15 §Configure combinations of"
+      },
+      {
+       "kind": "selectField",
+       "label": "Capacity Confirmed",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 15 §Configure combinations of"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer Data Complete",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 15 §Configure combinations of"
+      },
+      {
+       "kind": "selectField",
+       "label": "Required Waiver Complete",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 15 §Configure combinations of"
+      },
+      {
+       "kind": "selectField",
+       "label": "Required Approval Complete",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 15 §Configure combinations of"
+      },
+      {
+       "kind": "selectField",
+       "label": "Partner Confirmation Received",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 15 §Configure combinations of"
+      },
+      {
+       "kind": "selectField",
+       "label": "Example — B2C",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 15 §Configure combinations of"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The reservation confirmation expiry configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the reservation confirmation expiry untouched.",
+   "emptyFirstRun": "No reservation confirmation expiry configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listReservationConfirmationExpiry",
+    "contract": "orders",
+    "purpose": "Reservation Confirmation, Expiry & Fulfillment Readiness",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-312"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 9 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-313",
+  "name": "Order Lifecycle Timeline, SLA, Exceptions & AI Operations",
+  "module": "Orders & Money",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Order___Reservation_Management_Reference.pdf",
+   "board": "1",
+   "number": "12.1.10",
+   "page": 17
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/orders-money/order-lifecycle-timeline-sla-exceptions-ai-operations-bo-313",
+   "component": "apps/venue-management-web/src/routes/orders-money/OrderLifecycleTimelineSlaExceptionsAiOperations.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-304"
+   ],
+   "exitTo": [
+    "BO-304"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-304, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Detect) and no metric row",
+  "purpose": "Provide complete lifecycle visibility and proactively identify orders/reservations that require operational intervention.",
+  "purposeNote": "Operations teams can reconstruct the complete lifecycle of an order, identify abnormal transactions and safely recover exceptions through controlled actions. Board 1 — Final Screen Register # Backend Screen Core Responsibility 12.1. Central order/reservation",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every order lifecycle timeline",
+       "columns": [
+        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.stuckOrder",
+        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.orphanReservation",
+        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.paymentOrderMismatch",
+        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.capacityMismatch",
+        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.missingCustomerData",
+        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.fulfillmentFailure",
+        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.externalSynchronizationFailure",
+        "Duplicate Transaction Risk"
+       ],
+       "bindsTo": "OrderLifecycleTimelineSlaExceptionsAiOperationsView",
+       "operation": "listOrderLifecycleTimeline",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 17 §Detect"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected order lifecycle timeline",
+       "bindsTo": "OrderLifecycleTimelineSlaExceptionsAiOperationsView",
+       "columns": [
+        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.stuckOrder",
+        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.orphanReservation",
+        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.paymentOrderMismatch",
+        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.capacityMismatch",
+        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.missingCustomerData",
+        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.fulfillmentFailure",
+        "OrderLifecycleTimelineSlaExceptionsAiOperationsView.externalSynchronizationFailure",
+        "Duplicate Transaction Risk"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Prioritize by”, “Depending on exception”, “Order & Reservation Command Center”, “Transaction state machine”, “Omnichannel order creation”, “Customer, Guest & Account Assignment”.",
+       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 17 §Detect"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The order lifecycle timeline list.",
+   "error": "Could not load. Names which read failed and leaves the order lifecycle timeline untouched.",
+   "emptyFirstRun": "No order lifecycle timeline yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the order lifecycle timeline are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listOrderLifecycleTimeline",
+    "contract": "orders",
+    "purpose": "Order Lifecycle Timeline, SLA, Exceptions & AI Operations",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "OrderLifecycleTimelineSlaExceptionsAiOperationsView.stuckOrder",
+    "OrderLifecycleTimelineSlaExceptionsAiOperationsView.orphanReservation",
+    "OrderLifecycleTimelineSlaExceptionsAiOperationsView.paymentOrderMismatch",
+    "OrderLifecycleTimelineSlaExceptionsAiOperationsView.capacityMismatch",
+    "OrderLifecycleTimelineSlaExceptionsAiOperationsView.missingCustomerData",
+    "OrderLifecycleTimelineSlaExceptionsAiOperationsView.fulfillmentFailure"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-313"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Order___Reservation_Management_Reference.pdf page 17. 7 of 8 labels bound to a contract property; 17 of 93 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

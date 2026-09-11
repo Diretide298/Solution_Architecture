@@ -1,0 +1,173 @@
+{
+ "approveUnifiedDecision": {
+  "method": "PUT",
+  "path": "/unified-decision",
+  "contract": "approvals",
+  "summary": "Unified Approval Inbox & Decision Workspace",
+  "permission": "APPROVAL_REQUEST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "UnifiedApprovalInboxDecisionWorkspaceInput",
+  "responds": "UnifiedApprovalInboxDecisionWorkspaceView"
+ },
+ "createAutomationAutonomouAction": {
+  "method": "POST",
+  "path": "/automation-autonomou-action",
+  "contract": "approvals",
+  "summary": "Automation Execution & Autonomous Action Monitor",
+  "permission": "APPROVAL_REQUEST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "AutomationExecutionAutonomousActionMonitorInput",
+  "responds": "AutomationExecutionAutonomousActionMonitorView"
+ },
+ "listCrossModuleOrchestration": {
+  "method": "GET",
+  "path": "/cross-module-orchestration",
+  "contract": "approvals",
+  "summary": "Cross-Module Orchestration Monitor",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CrossModuleOrchestrationMonitorView"
+ },
+ "listProcessAutomationOpportunity": {
+  "method": "GET",
+  "path": "/process-automation-opportunity",
+  "contract": "approvals",
+  "summary": "Process Optimization & Automation Opportunity Center",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ProcessOptimizationAutomationOpportunityCenterView"
+ },
+ "listSlaEscalationBottleneck": {
+  "method": "GET",
+  "path": "/sla-escalation-bottleneck",
+  "contract": "approvals",
+  "summary": "SLA, Escalation & Bottleneck Monitor",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SlaEscalationBottleneckMonitorView"
+ },
+ "listWorkflow": {
+  "method": "GET",
+  "path": "/workflow",
+  "contract": "approvals",
+  "summary": "Workflow Operations Command Center",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WorkflowOperationsCommandCenterView"
+ },
+ "listWorkflowAutonomouGovernance": {
+  "method": "GET",
+  "path": "/workflow-autonomou-governance",
+  "contract": "approvals",
+  "summary": "AI Workflow Intelligence & Autonomous Governance Center",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiWorkflowIntelligenceAutonomousGovernanceCenterView"
+ },
+ "listWorkflowExceptionFailure": {
+  "method": "GET",
+  "path": "/workflow-exception-failure",
+  "contract": "approvals",
+  "summary": "Workflow Exception, Failure & Recovery Center",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WorkflowExceptionFailureRecoveryCenterView"
+ },
+ "listWorkflowInstanceProcess": {
+  "method": "GET",
+  "path": "/workflow-instance-process",
+  "contract": "approvals",
+  "summary": "Workflow Instance Monitor & Process Timeline",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WorkflowInstanceMonitorProcessTimelineView"
+ },
+ "listWorkflowProcessPerformance": {
+  "method": "GET",
+  "path": "/workflow-process-performance",
+  "contract": "approvals",
+  "summary": "Workflow Analytics & Process Performance",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "workflow",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "module",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "brand",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "businessProcess",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "department",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "approver",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "user",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkflowAnalyticsProcessPerformanceView"
+ }
+}

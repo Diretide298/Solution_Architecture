@@ -1,0 +1,619 @@
+{
+ "acceptFnbOrder": {
+  "method": "POST",
+  "path": "/fnb-orders/{orderId}/accept",
+  "contract": "fnb",
+  "summary": "The outlet takes the order",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "FnbOrder"
+ },
+ "amendFnbOrder": {
+  "method": "PATCH",
+  "path": "/fnb-orders/{orderId}",
+  "contract": "fnb",
+  "summary": "Amend an order before it is prepared",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "FnbOrder"
+ },
+ "applyMenuActions": {
+  "method": "POST",
+  "path": "/menus/{menuId}/actions",
+  "contract": "fnb",
+  "summary": "Do the same thing to many items at once",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "buildProductionPlan": {
+  "method": "POST",
+  "path": "/production-plans",
+  "contract": "fnb",
+  "summary": "Turn a forecast into a prep list",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ProductionPlan",
+  "responds": "ProductionPlan"
+ },
+ "cancelFnbOrder": {
+  "method": "POST",
+  "path": "/fnb-orders/{orderId}/cancel",
+  "contract": "fnb",
+  "summary": "Cancel an order",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "FnbOrder"
+ },
+ "createFnbOrder": {
+  "method": "POST",
+  "path": "/fnb-orders",
+  "contract": "fnb",
+  "summary": "Place an F&B order",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateFnbOrderRequest",
+  "responds": "FnbOrder"
+ },
+ "createMenu": {
+  "method": "POST",
+  "path": "/menus",
+  "contract": "fnb",
+  "summary": "Create a menu",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateMenuRequest",
+  "responds": "Menu"
+ },
+ "getFnbOrder": {
+  "method": "GET",
+  "path": "/fnb-orders/{orderId}",
+  "contract": "fnb",
+  "summary": "Read an F&B order",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "FnbOrder"
+ },
+ "getGuestOrderStatus": {
+  "method": "GET",
+  "path": "/guest-orders/{orderId}",
+  "contract": "fnb",
+  "summary": "Track an order",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestOrderStatus"
+ },
+ "getMenu": {
+  "method": "GET",
+  "path": "/menus/{menuId}",
+  "contract": "fnb",
+  "summary": "Read a menu with sections and items",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Menu"
+ },
+ "getVenueSettings": {
+  "method": "GET",
+  "path": "/venues/{venueId}/settings",
+  "contract": "tenancy",
+  "summary": "Operational settings for this venue",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VenueSettings"
+ },
+ "listFnbOrders": {
+  "method": "GET",
+  "path": "/fnb-orders",
+  "contract": "fnb",
+  "summary": "List F&B orders",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "outletId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "tableVisitId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listKitchenStations": {
+  "method": "GET",
+  "path": "/kitchen/stations",
+  "contract": "fnb",
+  "summary": "List preparation stations and their routing",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KitchenStation"
+ },
+ "listKitchenTickets": {
+  "method": "GET",
+  "path": "/kitchen/tickets",
+  "contract": "fnb",
+  "summary": "Kitchen ticket queue",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "stationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KitchenTicket"
+ },
+ "listMenus": {
+  "method": "GET",
+  "path": "/menus",
+  "contract": "fnb",
+  "summary": "List menus",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "outletId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "activeAt",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listProductionRuns": {
+  "method": "GET",
+  "path": "/production-runs",
+  "contract": "fnb",
+  "summary": "What is being made, and what was",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "locationKind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProductionRun"
+ },
+ "listWorkstations": {
+  "method": "GET",
+  "path": "/workstations",
+  "contract": "tenancy",
+  "summary": "List workstations",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "saleBoardKind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "prioritiseKitchenTicket": {
+  "method": "POST",
+  "path": "/kitchen/tickets/{ticketId}/prioritise",
+  "contract": "fnb",
+  "summary": "Move a ticket up the queue",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KitchenTicket"
+ },
+ "publishMenu": {
+  "method": "POST",
+  "path": "/menus/{menuId}/publish",
+  "contract": "fnb",
+  "summary": "Make the draft live, now or on a date",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "recordOrderHandover": {
+  "method": "POST",
+  "path": "/guest-orders/{orderId}/delivery",
+  "contract": "fnb",
+  "summary": "Record that an order reached the guest",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestOrderStatus"
+ },
+ "releaseProductionPlan": {
+  "method": "POST",
+  "path": "/production-plans/{planId}/release",
+  "contract": "fnb",
+  "summary": "Make the plan real",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProductionPlan"
+ },
+ "rollbackMenu": {
+  "method": "POST",
+  "path": "/menus/{menuId}/rollback",
+  "contract": "fnb",
+  "summary": "Put the previous version back",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "scheduleMenuPublish": {
+  "method": "POST",
+  "path": "/menus/{menuId}/schedule",
+  "contract": "fnb",
+  "summary": "Publish it on a date, not now",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setKitchenStations": {
+  "method": "PUT",
+  "path": "/kitchen/stations",
+  "contract": "fnb",
+  "summary": "Configure stations and item routing",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KitchenStation"
+ },
+ "setKitchenTicketStatus": {
+  "method": "PUT",
+  "path": "/kitchen/tickets/{ticketId}/status",
+  "contract": "fnb",
+  "summary": "Advance a kitchen ticket",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KitchenTicket"
+ },
+ "setMenuSections": {
+  "method": "PUT",
+  "path": "/menus/{menuId}/sections",
+  "contract": "fnb",
+  "summary": "Set menu sections and their item ordering",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Menu"
+ },
+ "setVenueSettings": {
+  "method": "PUT",
+  "path": "/venues/{venueId}/settings",
+  "contract": "tenancy",
+  "summary": "Set support hours, quiet hours, segregated access and alerting",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VenueSettings",
+  "responds": "VenueSettings"
+ },
+ "updateMenu": {
+  "method": "PATCH",
+  "path": "/menus/{menuId}",
+  "contract": "fnb",
+  "summary": "Amend a menu",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Menu"
+ },
+ "verifyAllergens": {
+  "method": "POST",
+  "path": "/menu-items/{menuItemId}/verify-allergens",
+  "contract": "fnb",
+  "summary": "Does this dish still match its claim?",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ }
+}

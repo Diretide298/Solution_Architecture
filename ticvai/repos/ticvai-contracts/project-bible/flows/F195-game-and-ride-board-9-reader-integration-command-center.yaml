@@ -1,0 +1,137 @@
+id: F195
+name: 'Game and Ride board 9: Reader Integration Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Game and Ride board 9. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-474
+  entryPoints:
+  - Arrives at Reader Integration Command Center
+steps:
+- step: 1
+  screen: BO-474
+  action: Opens Reader Integration Command Center
+  operations: []
+  outcome: Provide the technical team with a centralized view of every reader integration deployed across
+    TICVAI clients and venues.
+- step: 2
+  screen: BO-475
+  action: Works in Reader Manufacturer & Model Profile
+  operations: []
+  outcome: Allow TICVAI to support multiple reader manufacturers/models without building business rules
+    specifically for one Chinese reader.
+- step: 3
+  screen: BO-474
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-476
+  action: Works in Communication Protocol Configuration
+  operations: []
+  outcome: Configure how TICVAI communicates with each reader/device family.
+- step: 5
+  screen: BO-474
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-477
+  action: Works in Reader Command & Event Mapping
+  operations: []
+  outcome: Translate TICVAI's standardized commands into the specific commands understood by each reader
+    manufacturer. This is one of the most important architectural screens. DISPLAY_PRICE DISPLAY_MESSAGE
+    LED_COLOR APPROVE_PLAY REJECT_PLAY TRIGGER_GA
+- step: 7
+  screen: BO-474
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-478
+  action: Works in Reader Configuration Deployment & Synchronization
+  operations: []
+  outcome: Push backend configuration from TICVAI to readers where local configuration is required.
+- step: 9
+  screen: BO-474
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-479
+  action: Works in Game Trigger & I/O Control Mapping
+  operations: []
+  outcome: Configure how an approved TICVAI transaction physically starts a game or ride.
+- step: 11
+  screen: BO-474
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-480
+  action: Works in Reader Screen, LED & Sound Output Mapping
+  operations: []
+  outcome: Map TICVAI transaction results to the physical reader's screen, lighting and sound capabilities.
+    This supports the matrix requirement for free-game color indication and custom reader themes.
+- step: 13
+  screen: BO-474
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-481
+  action: Works in Edge Cache & Offline Rule Package
+  operations: []
+  outcome: Configure what information can be securely distributed to the edge/reader or local gateway
+    for temporary offline operation.
+- step: 15
+  screen: BO-474
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-482
+  action: Works in Device Diagnostics & Integration Logs
+  operations: []
+  outcome: Give development team / support teams detailed technical visibility when a reader or game is
+    not operating correctly.
+- step: 17
+  screen: BO-474
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-483
+  action: Works in Integration Certification & Test Console
+  operations: []
+  outcome: Provide a controlled environment for testing and approving a new reader model before deployment.
+    This is particularly important for your plan because you will purchase the hardware separately and
+    TICVAI must verify that the reader supports
+branches:
+- at: 1
+  condition: Nothing has been set up on Reader Integration Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Game and Ride board 9 visited
+primaryContract: unknown
+contracts:
+- unknown

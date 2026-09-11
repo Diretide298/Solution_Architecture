@@ -1,0 +1,1174 @@
+{
+ "BuyerPurchaseResaleOrderManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Buyer Purchase & Resale Order Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "confirmationTransfer": {
+    "type": "string",
+    "description": "Confirmation → Transfer"
+   },
+   "holdDuration": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Hold duration"
+   },
+   "holdExtensionRules": {
+    "type": "string",
+    "description": "Hold extension rules"
+   },
+   "paymentTimeout": {
+    "type": "string",
+    "description": "Payment timeout"
+   },
+   "automaticRelease": {
+    "type": "string",
+    "description": "Automatic release"
+   },
+   "concurrentBuyerHandling": {
+    "type": "string",
+    "description": "Concurrent buyer handling"
+   },
+   "customerId": {
+    "type": "string",
+    "description": "Customer ID"
+   },
+   "name": {
+    "type": "string",
+    "description": "Name"
+   },
+   "email": {
+    "type": "string",
+    "description": "Email"
+   },
+   "mobile": {
+    "type": "string",
+    "description": "Mobile"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "loyaltyProfile": {
+    "type": "string",
+    "description": "Loyalty profile"
+   },
+   "identityVerificationWhereRequired": {
+    "type": "boolean",
+    "description": "Identity verification where required"
+   },
+   "billingInformation": {
+    "type": "string",
+    "description": "Billing information"
+   },
+   "resaleTicketPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Resale ticket price"
+   },
+   "buyerServiceFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Buyer service fee"
+   },
+   "taxes": {
+    "type": "string",
+    "description": "Taxes"
+   },
+   "otherPermittedCharges": {
+    "type": "string",
+    "description": "Other permitted charges"
+   },
+   "totalPayable": {
+    "type": "integer",
+    "description": "Total payable"
+   },
+   "card": {
+    "type": "string",
+    "description": "Card"
+   },
+   "wallet": {
+    "type": "string",
+    "description": "Wallet"
+   },
+   "supportedAlternativePaymentMethods": {
+    "type": "string",
+    "description": "Supported alternative payment methods"
+   },
+   "paymentAuthorization": {
+    "type": "string",
+    "description": "Payment authorization"
+   },
+   "paymentCapture": {
+    "type": "string",
+    "description": "Payment capture"
+   },
+   "failureHandling": {
+    "type": "string",
+    "description": "Failure handling"
+   }
+  }
+ },
+ "CapacityInventoryReconciliationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Capacity & Inventory Reconciliation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "venueCapacity": {
+    "type": "integer",
+    "description": "Venue capacity"
+   },
+   "sellableCapacity": {
+    "type": "integer",
+    "description": "Sellable capacity"
+   },
+   "primaryTicketsSold": {
+    "type": "string",
+    "description": "Primary tickets sold"
+   },
+   "primaryInventoryRemaining": {
+    "type": "string",
+    "description": "Primary inventory remaining"
+   },
+   "ticketsListedForResale": {
+    "type": "string",
+    "description": "Tickets listed for resale"
+   },
+   "resaleTicketsSold": {
+    "type": "string",
+    "description": "Resale tickets sold"
+   },
+   "holds": {
+    "type": "string",
+    "description": "Holds"
+   },
+   "cancelledTickets": {
+    "type": "integer",
+    "description": "Cancelled tickets"
+   },
+   "refundedTickets": {
+    "type": "string",
+    "description": "Refunded tickets"
+   },
+   "activeEntitlements": {
+    "type": "integer",
+    "description": "Active entitlements"
+   },
+   "processExplicitlyReturnsIt": {
+    "type": "string",
+    "description": "process explicitly returns it"
+   },
+   "soldResaleListingStillActive": {
+    "type": "integer",
+    "description": "Sold resale listing still active"
+   },
+   "ownershipMismatch": {
+    "type": "string",
+    "description": "Ownership mismatch"
+   },
+   "credentialMismatch": {
+    "type": "string",
+    "description": "Credential mismatch"
+   },
+   "capacityDiscrepancy": {
+    "type": "integer",
+    "description": "Capacity discrepancy"
+   },
+   "investigate": {
+    "type": "string",
+    "description": "Investigate"
+   },
+   "reSync": {
+    "type": "string",
+    "description": "Re-sync"
+   },
+   "correctMapping": {
+    "type": "string",
+    "description": "Correct mapping"
+   },
+   "holdTicket": {
+    "type": "string",
+    "description": "Hold ticket"
+   }
+  }
+ },
+ "CredentialRevocationRegenerationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Credential Revocation & Regeneration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "oldCredentialRevoke": {
+    "type": "string",
+    "description": "Old Credential → Revoke"
+   },
+   "staticQr": {
+    "type": "string",
+    "description": "Static QR"
+   },
+   "dynamicQr": {
+    "type": "string",
+    "description": "Dynamic QR"
+   },
+   "barcode": {
+    "type": "string",
+    "description": "Barcode"
+   },
+   "nfc": {
+    "type": "string",
+    "description": "NFC"
+   },
+   "rfid": {
+    "type": "string",
+    "description": "RFID"
+   },
+   "mobileWalletPass": {
+    "type": "string",
+    "description": "Mobile Wallet pass"
+   },
+   "digitalTicket": {
+    "type": "string",
+    "description": "Digital ticket"
+   },
+   "wearableCredential": {
+    "type": "string",
+    "description": "Wearable credential"
+   },
+   "revokedResold": {
+    "type": "string",
+    "description": "Revoked — Resold"
+   },
+   "newCredentialId": {
+    "type": "string",
+    "description": "New credential ID"
+   },
+   "newQr": {
+    "type": "integer",
+    "description": "New QR"
+   },
+   "newToken": {
+    "type": "integer",
+    "description": "New token"
+   },
+   "buyerAssociation": {
+    "type": "string",
+    "description": "Buyer association"
+   },
+   "originalTicketRelationship": {
+    "type": "string",
+    "description": "Original ticket relationship"
+   },
+   "newSecurityKeysTokenWhereApplicable": {
+    "type": "integer",
+    "description": "New security keys/token where applicable"
+   },
+   "newWalletPassWhereApplicable": {
+    "type": "integer",
+    "description": "New wallet pass where applicable"
+   },
+   "ticvaiAccount": {
+    "type": "string",
+    "description": "TICVAI account"
+   },
+   "mobileApp": {
+    "type": "string",
+    "description": "Mobile app"
+   },
+   "email": {
+    "type": "string",
+    "description": "Email"
+   },
+   "wallet": {
+    "type": "string",
+    "description": "Wallet"
+   },
+   "otherConfiguredDeliveryMethods": {
+    "type": "string",
+    "description": "Other configured delivery methods"
+   }
+  }
+ },
+ "RefundsDisputesResaleExceptionsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Refunds, Disputes & Resale Exceptions displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "eventCancellation": {
+    "type": "string",
+    "description": "Event cancellation"
+   },
+   "eventPostponement": {
+    "type": "string",
+    "description": "Event postponement"
+   },
+   "buyerRefund": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Buyer refund"
+   },
+   "sellerDispute": {
+    "type": "string",
+    "description": "Seller dispute"
+   },
+   "buyerDispute": {
+    "type": "string",
+    "description": "Buyer dispute"
+   },
+   "paymentChargeback": {
+    "type": "string",
+    "description": "Payment chargeback"
+   },
+   "failedOwnershipTransfer": {
+    "type": "integer",
+    "description": "Failed ownership transfer"
+   },
+   "failedCredentialIssuance": {
+    "type": "integer",
+    "description": "Failed credential issuance"
+   },
+   "ticketAccessIssue": {
+    "type": "string",
+    "description": "Ticket access issue"
+   },
+   "sellerPayoutDispute": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Seller payout dispute"
+   },
+   "incorrectTicket": {
+    "type": "string",
+    "description": "Incorrect ticket"
+   },
+   "venueChange": {
+    "type": "string",
+    "description": "Venue change"
+   },
+   "seatChange": {
+    "type": "string",
+    "description": "Seat change"
+   },
+   "caseId": {
+    "type": "string",
+    "description": "Case ID"
+   },
+   "resaleTransaction": {
+    "type": "string",
+    "description": "Resale transaction"
+   },
+   "originalOrder": {
+    "type": "string",
+    "description": "Original order"
+   },
+   "seller": {
+    "type": "string",
+    "description": "Seller"
+   },
+   "buyer": {
+    "type": "string",
+    "description": "Buyer"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "financialAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Financial amount"
+   },
+   "credentialStatus": {
+    "type": "string",
+    "description": "Credential status"
+   },
+   "settlementStatus": {
+    "type": "string",
+    "description": "Settlement status"
+   },
+   "caseOwner": {
+    "type": "string",
+    "description": "Case owner"
+   },
+   "sla": {
+    "type": "string",
+    "description": "SLA"
+   },
+   "evidence": {
+    "type": "string",
+    "description": "Evidence"
+   },
+   "notes": {
+    "type": "string",
+    "description": "Notes"
+   },
+   "resolution": {
+    "type": "string",
+    "description": "Resolution"
+   },
+   "holdSettlement": {
+    "type": "string",
+    "description": "Hold settlement"
+   },
+   "returnOwnership": {
+    "type": "string",
+    "description": "Return ownership"
+   },
+   "provideReplacementTicket": {
+    "type": "string",
+    "description": "Provide replacement ticket"
+   },
+   "whoReceivesTheRefund": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Who receives the refund?"
+   }
+  }
+ },
+ "ResaleAnalyticsAiIntelligenceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Resale Analytics & AI Intelligence displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "grossResaleValue": {
+    "type": "string",
+    "description": "Gross Resale Value"
+   },
+   "resaleTransactions": {
+    "type": "integer",
+    "description": "Resale Transactions"
+   },
+   "resaleConversionRate": {
+    "type": "number",
+    "description": "Resale Conversion Rate"
+   },
+   "averageListingPrice": {
+    "type": "number",
+    "description": "Average Listing Price"
+   },
+   "averageSalePrice": {
+    "type": "number",
+    "description": "Average Sale Price"
+   },
+   "averageMarkup": {
+    "type": "number",
+    "description": "Average Markup"
+   },
+   "averageDiscount": {
+    "type": "number",
+    "description": "Average Discount"
+   },
+   "sellerProceeds": {
+    "type": "integer",
+    "description": "Seller Proceeds"
+   },
+   "marketplaceRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Marketplace Revenue"
+   },
+   "averageTimeToSell": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Average Time to Sell"
+   },
+   "listingsToSalesRatio": {
+    "type": "number",
+    "description": "Listings-to-Sales Ratio"
+   },
+   "fraudRate": {
+    "type": "number",
+    "description": "Fraud Rate"
+   },
+   "refundDisputeRate": {
+    "type": "number",
+    "description": "Refund/Dispute Rate"
+   },
+   "including": {
+    "type": "string",
+    "description": "including"
+   },
+   "primaryAvailability": {
+    "type": "string",
+    "description": "Primary availability"
+   },
+   "resaleAvailability": {
+    "type": "string",
+    "description": "Resale availability"
+   },
+   "primaryPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Primary price"
+   },
+   "averageResalePrice": {
+    "type": "number",
+    "description": "Average resale price"
+   },
+   "demand": {
+    "type": "string",
+    "description": "Demand"
+   },
+   "conversion": {
+    "type": "number",
+    "description": "Conversion"
+   },
+   "sellThrough": {
+    "type": "string",
+    "description": "Sell-through"
+   },
+   "primaryPriceForWeekendPerformances": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "primary price for weekend performances"
+   },
+   "expectedResaleDemand": {
+    "type": "string",
+    "description": "Expected resale demand"
+   },
+   "expectedListingVolume": {
+    "type": "integer",
+    "description": "Expected listing volume"
+   },
+   "expectedResalePrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Expected resale price"
+   },
+   "expectedConversion": {
+    "type": "number",
+    "description": "Expected conversion"
+   },
+   "expectedMarketplaceRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Expected marketplace revenue"
+   },
+   "policyPermitsIt": {
+    "type": "string",
+    "description": "policy permits it"
+   },
+   "monitoring": {
+    "type": "string",
+    "description": "monitoring"
+   },
+   "exceptionsAuditAnalytics": {
+    "type": "string",
+    "description": "Exceptions → Audit → Analytics"
+   },
+   "modelAEmbeddedWhiteLabel": {
+    "type": "string",
+    "description": "Model A — Embedded White-Label"
+   },
+   "modelBTicvaiHostedWhiteLabel": {
+    "type": "string",
+    "description": "Model B — TICVAI-Hosted White-Label"
+   },
+   "andCommercialPolicies": {
+    "type": "string",
+    "description": "and commercial policies"
+   },
+   "modelCHeadlessApi": {
+    "type": "string",
+    "description": "Model C — Headless/API"
+   },
+   "engine": {
+    "type": "string",
+    "description": "engine"
+   },
+   "customerProposition": {
+    "type": "string",
+    "description": "customer proposition"
+   }
+  }
+ },
+ "ResaleAuditOwnershipHistoryView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Resale Audit & Ownership History displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "timestamp": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Timestamp"
+   },
+   "userSystem": {
+    "type": "string",
+    "description": "User/system"
+   },
+   "action": {
+    "type": "string",
+    "description": "Action"
+   },
+   "originalOrder": {
+    "type": "string",
+    "description": "Original order"
+   },
+   "resaleOrder": {
+    "type": "string",
+    "description": "Resale order"
+   },
+   "ticket": {
+    "type": "string",
+    "description": "Ticket"
+   },
+   "seller": {
+    "type": "string",
+    "description": "Seller"
+   },
+   "buyer": {
+    "type": "string",
+    "description": "Buyer"
+   },
+   "listing": {
+    "type": "string",
+    "description": "Listing"
+   },
+   "price": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price"
+   },
+   "fee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fee"
+   },
+   "credential": {
+    "type": "string",
+    "description": "Credential"
+   },
+   "ownership": {
+    "type": "string",
+    "description": "Ownership"
+   },
+   "payment": {
+    "type": "string",
+    "description": "Payment"
+   },
+   "settlement": {
+    "type": "string",
+    "description": "Settlement"
+   },
+   "approval": {
+    "type": "string",
+    "description": "Approval"
+   },
+   "deviceChannelWhereApplicable": {
+    "type": "string",
+    "description": "Device/channel where applicable"
+   },
+   "ticketId": {
+    "type": "string",
+    "description": "Ticket ID"
+   },
+   "order": {
+    "type": "string",
+    "description": "Order"
+   },
+   "resaleTransaction": {
+    "type": "string",
+    "description": "Resale transaction"
+   },
+   "seat": {
+    "type": "string",
+    "description": "Seat"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "paymentReference": {
+    "type": "string",
+    "description": "Payment reference"
+   },
+   "subjectToRolePermissions": {
+    "type": "string",
+    "description": "subject to role permissions"
+   },
+   "finance": {
+    "type": "string",
+    "description": "Finance"
+   },
+   "compliance": {
+    "type": "string",
+    "description": "Compliance"
+   },
+   "fraudInvestigation": {
+    "type": "string",
+    "description": "Fraud investigation"
+   },
+   "customerDispute": {
+    "type": "string",
+    "description": "Customer dispute"
+   },
+   "venueOperations": {
+    "type": "string",
+    "description": "Venue operations"
+   }
+  }
+ },
+ "ResaleFraudDuplicateSaleProtectionView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Resale Fraud & Duplicate Sale Protection displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "multipleResaleAttempts": {
+    "type": "integer",
+    "description": "Multiple resale attempts"
+   },
+   "sameTicketListedSimultaneously": {
+    "type": "string",
+    "description": "Same ticket listed simultaneously"
+   },
+   "unusualSellerVolume": {
+    "type": "integer",
+    "description": "Unusual seller volume"
+   },
+   "highFrequencyResale": {
+    "type": "string",
+    "description": "High-frequency resale"
+   },
+   "suspiciousPricing": {
+    "type": "string",
+    "description": "Suspicious pricing"
+   },
+   "multipleAccounts": {
+    "type": "integer",
+    "description": "Multiple accounts"
+   },
+   "paymentAnomalies": {
+    "type": "integer",
+    "description": "Payment anomalies"
+   },
+   "identityMismatch": {
+    "type": "string",
+    "description": "Identity mismatch"
+   },
+   "credentialReuse": {
+    "type": "string",
+    "description": "Credential reuse"
+   },
+   "repeatedFailedTransactions": {
+    "type": "integer",
+    "description": "Repeated failed transactions"
+   },
+   "accountDeviceAnomaliesWherePermitted": {
+    "type": "string",
+    "description": "Account/device anomalies where permitted"
+   },
+   "withExplainableContributingFactors": {
+    "type": "string",
+    "description": "with explainable contributing factors"
+   },
+   "allow": {
+    "type": "boolean",
+    "description": "Allow"
+   },
+   "requireVerification": {
+    "type": "boolean",
+    "description": "Require verification"
+   },
+   "holdTransaction": {
+    "type": "string",
+    "description": "Hold transaction"
+   },
+   "requireManualReview": {
+    "type": "boolean",
+    "description": "Require manual review"
+   },
+   "revokedSellerCredential": {
+    "type": "string",
+    "description": "Revoked seller credential"
+   },
+   "duplicatedCredentials": {
+    "type": "string",
+    "description": "Duplicated credentials"
+   },
+   "invalidatedTickets": {
+    "type": "string",
+    "description": "Invalidated tickets"
+   }
+  }
+ },
+ "ResaleOperationsCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Resale Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "resaleTransactionsToday": {
+    "type": "string",
+    "description": "Resale Transactions Today"
+   },
+   "grossResaleValue": {
+    "type": "string",
+    "description": "Gross Resale Value"
+   },
+   "completedTransfers": {
+    "type": "integer",
+    "description": "Completed Transfers"
+   },
+   "pendingTransfers": {
+    "type": "integer",
+    "description": "Pending Transfers"
+   },
+   "failedTransfers": {
+    "type": "integer",
+    "description": "Failed Transfers"
+   },
+   "credentialReissues": {
+    "type": "integer",
+    "description": "Credential Reissues"
+   },
+   "pendingSellerSettlements": {
+    "type": "integer",
+    "description": "Pending Seller Settlements"
+   },
+   "settlementValue": {
+    "type": "string",
+    "description": "Settlement Value"
+   },
+   "transactionsUnderReview": {
+    "type": "string",
+    "description": "Transactions Under Review"
+   },
+   "fraudAlerts": {
+    "type": "integer",
+    "description": "Fraud Alerts"
+   },
+   "disputes": {
+    "type": "integer",
+    "description": "Disputes"
+   },
+   "refunds": {
+    "type": "integer",
+    "description": "Refunds"
+   },
+   "resaleTransactionId": {
+    "type": "string",
+    "description": "Resale Transaction ID"
+   },
+   "listingId": {
+    "type": "string",
+    "description": "Listing ID"
+   },
+   "originalOrderId": {
+    "type": "string",
+    "description": "Original Order ID"
+   },
+   "originalTicketId": {
+    "type": "string",
+    "description": "Original Ticket ID"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "seller": {
+    "type": "string",
+    "description": "Seller"
+   },
+   "buyer": {
+    "type": "string",
+    "description": "Buyer"
+   },
+   "sectionRowSeat": {
+    "type": "string",
+    "description": "Section / Row / Seat"
+   },
+   "resalePrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Resale Price"
+   },
+   "buyerTotal": {
+    "type": "string",
+    "description": "Buyer Total"
+   },
+   "sellerProceeds": {
+    "type": "string",
+    "description": "Seller Proceeds"
+   },
+   "purchaseStatus": {
+    "type": "string",
+    "description": "Purchase Status"
+   },
+   "ownershipStatus": {
+    "type": "string",
+    "description": "Ownership Status"
+   },
+   "credentialStatus": {
+    "type": "string",
+    "description": "Credential Status"
+   },
+   "settlementStatus": {
+    "type": "string",
+    "description": "Settlement Status"
+   },
+   "riskScore": {
+    "type": "number",
+    "description": "Risk Score"
+   },
+   "transactionDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Transaction Date"
+   },
+   "statusesType": {
+    "type": "string",
+    "enum": [
+     "paymentFailed",
+     "transferFailed",
+     "underReview",
+     "suspended",
+     "refunded",
+     "disputed",
+     "cancelled"
+    ],
+    "description": "Vocabulary listed under Exception statuses."
+   },
+   "holdTransaction": {
+    "type": "string",
+    "description": "Hold transaction"
+   }
+  }
+ },
+ "SellerSettlementPayoutManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Seller Settlement & Payout Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "settlementId": {
+    "type": "string",
+    "description": "Settlement ID"
+   },
+   "resaleTransaction": {
+    "type": "string",
+    "description": "Resale Transaction"
+   },
+   "seller": {
+    "type": "string",
+    "description": "Seller"
+   },
+   "listingPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Listing Price"
+   },
+   "sellerFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Seller Fee"
+   },
+   "commission": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Commission"
+   },
+   "processingFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Processing fee"
+   },
+   "applicableTax": {
+    "type": "string",
+    "description": "Applicable tax"
+   },
+   "adjustments": {
+    "type": "integer",
+    "description": "Adjustments"
+   },
+   "sellerProceeds": {
+    "type": "integer",
+    "description": "Seller Proceeds"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "payoutMethod": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Payout method"
+   },
+   "settlementStatus": {
+    "type": "integer",
+    "description": "Settlement status"
+   },
+   "expectedPayoutDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expected payout date"
+   },
+   "statusesType": {
+    "type": "string",
+    "enum": [
+     "onHold",
+     "failed",
+     "reversed",
+     "disputed"
+    ],
+    "description": "Vocabulary listed under Exception statuses."
+   },
+   "immediatelyAfterResale": {
+    "type": "string",
+    "description": "Immediately after resale"
+   },
+   "xDaysAfterResale": {
+    "type": "string",
+    "description": "X days after resale"
+   },
+   "afterEventCompletion": {
+    "type": "string",
+    "description": "After event completion"
+   },
+   "xDaysAfterEvent": {
+    "type": "string",
+    "description": "X days after event"
+   },
+   "afterAccessValidation": {
+    "type": "string",
+    "description": "After access validation"
+   },
+   "operatorDefinedSettlementCycle": {
+    "type": "string",
+    "description": "Operator-defined settlement cycle"
+   },
+   "minimumPayoutThreshold": {
+    "type": "integer",
+    "description": "Minimum payout threshold"
+   },
+   "settlementBatches": {
+    "type": "string",
+    "description": "Settlement batches"
+   },
+   "sellerVerification": {
+    "type": "string",
+    "description": "Seller verification"
+   },
+   "paymentAccountVerification": {
+    "type": "string",
+    "description": "Payment account verification"
+   },
+   "manualHold": {
+    "type": "string",
+    "description": "Manual hold"
+   },
+   "complianceHold": {
+    "type": "string",
+    "description": "Compliance hold"
+   },
+   "refundDisputeHold": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Refund/dispute hold"
+   }
+  }
+ },
+ "TicketOwnershipTransferManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over orders state, assembled at read time from tables that already exist",
+  "description": "**What Ticket Ownership Transfer Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "originalOrder": {
+    "type": "string",
+    "description": "Original order"
+   },
+   "ticket": {
+    "type": "string",
+    "description": "Ticket"
+   },
+   "ownershipStatus": {
+    "type": "string",
+    "description": "Ownership status"
+   },
+   "newResaleOrder": {
+    "type": "integer",
+    "description": "New resale order"
+   },
+   "identity": {
+    "type": "string",
+    "description": "Identity"
+   },
+   "membershipAccount": {
+    "type": "string",
+    "description": "Membership/account"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "seat": {
+    "type": "string",
+    "description": "Seat"
+   },
+   "entitlements": {
+    "type": "string",
+    "description": "Entitlements"
+   },
+   "validity": {
+    "type": "string",
+    "description": "Validity"
+   },
+   "buyerPaymentCompleted": {
+    "type": "string",
+    "description": "Buyer payment completed"
+   },
+   "listingRemainsValid": {
+    "type": "string",
+    "description": "Listing remains valid"
+   },
+   "sellerStillOwnsTicket": {
+    "type": "string",
+    "description": "Seller still owns ticket"
+   },
+   "ticketHasNotBeenScanned": {
+    "type": "string",
+    "description": "Ticket has not been scanned"
+   },
+   "ticketHasNotBeenRefunded": {
+    "type": "string",
+    "description": "Ticket has not been refunded"
+   },
+   "eventRemainsActive": {
+    "type": "integer",
+    "description": "Event remains active"
+   },
+   "capacityRemainsValid": {
+    "type": "integer",
+    "description": "Capacity remains valid"
+   },
+   "noFraudHoldExists": {
+    "type": "string",
+    "description": "No fraud hold exists"
+   },
+   "sellerOwnershipHistoricalTransferred": {
+    "type": "string",
+    "description": "Seller Ownership: Historical / Transferred"
+   },
+   "buyerOwnershipActive": {
+    "type": "integer",
+    "description": "Buyer Ownership: Active"
+   },
+   "admissionEntitlement": {
+    "type": "string",
+    "description": "Admission entitlement"
+   },
+   "seatAssignment": {
+    "type": "string",
+    "description": "Seat assignment"
+   },
+   "addOnsWherePermitted": {
+    "type": "string",
+    "description": "Add-ons where permitted"
+   },
+   "accessRights": {
+    "type": "string",
+    "description": "Access rights"
+   },
+   "associatedBenefits": {
+    "type": "string",
+    "description": "Associated benefits"
+   }
+  }
+ }
+}

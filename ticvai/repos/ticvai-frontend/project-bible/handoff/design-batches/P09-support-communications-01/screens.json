@@ -1,0 +1,453 @@
+[
+ {
+  "id": "ADM-035",
+  "name": "Support & Escalation Console",
+  "module": "Support & Communications",
+  "requiresModule": "core",
+  "wave": 3,
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/general/support-and-escalation-console",
+   "component": "apps/ticvai-web/src/routes/general/SupportAndEscalationConsoleDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "ADM-001",
+    "ADM-002",
+    "ADM-003"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-001",
+     "trigger": "Platform Login / MFA",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-003",
+     "trigger": "Cross-Tenant Health Dashboard",
+     "carries": [
+      "cellId",
+      "rightId"
+     ],
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "openQuestions": [
+   "No contract — overlaps P12"
+  ],
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listSupportNotices` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Answer a question without needing a person.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every support escalation console",
+       "bindsTo": "SupportNotice",
+       "columns": [
+        "SupportNotice.id",
+        "SupportNotice.supportEndsAt",
+        "SupportNotice.message",
+        "SupportNotice.affectedTenantIds",
+        "SupportNotice.publishedByPrincipalId",
+        "SupportNotice.publishedAt",
+        "SupportNotice.scopePath"
+       ],
+       "operation": "listSupportNotices",
+       "provenance": "contract platform-ops.yaml GET /support-notices"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected support escalation console",
+       "bindsTo": "SupportNotice",
+       "columns": [
+        "SupportNotice.id",
+        "SupportNotice.supportEndsAt",
+        "SupportNotice.message",
+        "SupportNotice.affectedTenantIds",
+        "SupportNotice.publishedByPrincipalId",
+        "SupportNotice.publishedAt",
+        "SupportNotice.scopePath"
+       ],
+       "operation": "listSupportNotices",
+       "provenance": "contract platform-ops.yaml GET /support-notices"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Publish",
+       "operation": "publishSupportNotice",
+       "provenance": "contract platform-ops.yaml POST /support-notices"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
+       "provenance": "authored — required by check-screens"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listSupportNotices",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "publishSupportNotice",
+       "label": "Publish support notice",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "publishSupportNotice",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishSupportNotice",
+       "notes": "Declares `publishSupportNotice`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The support escalation console list.",
+   "error": "Could not load. Names which read failed and leaves the support escalation console untouched.",
+   "emptyFirstRun": "No support escalation console yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the support escalation console are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listSupportNotices",
+    "contract": "platform-ops",
+    "purpose": "End-of-support notices",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "publishSupportNotice",
+    "contract": "platform-ops",
+    "purpose": "Publish an end-of-support notice",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSupportNotices"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "SupportNotice.id",
+    "SupportNotice.supportEndsAt",
+    "SupportNotice.message",
+    "SupportNotice.affectedTenantIds",
+    "SupportNotice.publishedByPrincipalId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-035"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-036",
+  "name": "Platform Notification Broadcast",
+  "module": "Support & Communications",
+  "requiresModule": "core",
+  "wave": 3,
+  "capability": "C96",
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/general/platform-notification-broadcast",
+   "component": "apps/ticvai-web/src/routes/general/PlatformNotificationBroadcastForm.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "ADM-001",
+    "ADM-002",
+    "ADM-003"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-001",
+     "trigger": "Platform Login / MFA",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-003",
+     "trigger": "Cross-Tenant Health Dashboard",
+     "carries": [
+      "cellId",
+      "rightId"
+     ],
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "openQuestions": [
+   "No contract — not specified"
+  ],
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listSupportNotices` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Push live platform notification broadcast for this venue.",
+  "gaps": [
+   {
+    "operation": "listAnnouncements",
+    "why": "**1 declared operation reach no component on this screen**: listAnnouncements. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every platform notification broadcast",
+       "bindsTo": "SupportNotice",
+       "columns": [
+        "SupportNotice.id",
+        "SupportNotice.supportEndsAt",
+        "SupportNotice.message",
+        "SupportNotice.affectedTenantIds",
+        "SupportNotice.publishedByPrincipalId",
+        "SupportNotice.publishedAt",
+        "SupportNotice.scopePath"
+       ],
+       "operation": "listSupportNotices",
+       "provenance": "contract platform-ops.yaml GET /support-notices"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected platform notification broadcast",
+       "bindsTo": "SupportNotice",
+       "columns": [
+        "SupportNotice.id",
+        "SupportNotice.supportEndsAt",
+        "SupportNotice.message",
+        "SupportNotice.affectedTenantIds",
+        "SupportNotice.publishedByPrincipalId",
+        "SupportNotice.publishedAt",
+        "SupportNotice.scopePath"
+       ],
+       "operation": "listSupportNotices",
+       "provenance": "contract platform-ops.yaml GET /support-notices"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Publish",
+       "operation": "publishSupportNotice",
+       "provenance": "contract platform-ops.yaml POST /support-notices"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Publish",
+       "operation": "publishAnnouncement",
+       "provenance": "contract workforce.yaml POST /announcements"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
+       "provenance": "authored — required by check-screens"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "publishGate",
+       "impliedBy": "publishSupportNotice",
+       "notes": "Declares `publishSupportNotice`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The platform notification broadcast list.",
+   "error": "Could not load. Names which read failed and leaves the platform notification broadcast untouched.",
+   "emptyFirstRun": "No platform notification broadcast yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the platform notification broadcast are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "publishSupportNotice",
+    "contract": "platform-ops",
+    "purpose": "Publish an end-of-support notice",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSupportNotices"
+    ]
+   },
+   {
+    "operationId": "listSupportNotices",
+    "contract": "platform-ops",
+    "purpose": "End-of-support notices",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listAnnouncements",
+    "contract": "workforce",
+    "purpose": "What has been broadcast",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "publishAnnouncement",
+    "contract": "workforce",
+    "purpose": "Broadcast to the platform",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSupportNotices"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "SupportNotice.id",
+    "SupportNotice.supportEndsAt",
+    "SupportNotice.message",
+    "SupportNotice.affectedTenantIds",
+    "SupportNotice.publishedByPrincipalId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-036"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

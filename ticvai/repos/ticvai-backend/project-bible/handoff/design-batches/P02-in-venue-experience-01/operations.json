@@ -1,0 +1,79 @@
+{
+ "getGuestMenu": {
+  "method": "GET",
+  "path": "/outlets/{outletId}/guest-menu",
+  "contract": "fnb",
+  "summary": "The menu a guest sees",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "at",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "language",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestMenu"
+ },
+ "listModifierGroups": {
+  "method": "GET",
+  "path": "/modifier-groups",
+  "contract": "fnb",
+  "summary": "List modifier groups",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ModifierGroup"
+ },
+ "lookupShopAndDrop": {
+  "method": "GET",
+  "path": "/shop-and-drop/lookup",
+  "contract": "retail",
+  "summary": "Find a guest's dropped goods",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "entitlementId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "dropReference",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "receiptNumber",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ShopAndDrop"
+ }
+}

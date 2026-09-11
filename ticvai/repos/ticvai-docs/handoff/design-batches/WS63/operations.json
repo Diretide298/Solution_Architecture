@@ -1,0 +1,173 @@
+{
+ "listBuyerPurchaseResale": {
+  "method": "GET",
+  "path": "/buyer-purchase-resale",
+  "contract": "orders",
+  "summary": "Buyer Purchase & Resale Order Management",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BuyerPurchaseResaleOrderManagementView"
+ },
+ "listCapacityInventoryReconciliation": {
+  "method": "GET",
+  "path": "/capacity-inventory-reconciliation",
+  "contract": "orders",
+  "summary": "Capacity & Inventory Reconciliation",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CapacityInventoryReconciliationView"
+ },
+ "listCredentialRevocationRegeneration": {
+  "method": "GET",
+  "path": "/credential-revocation-regeneration",
+  "contract": "orders",
+  "summary": "Credential Revocation & Regeneration",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CredentialRevocationRegenerationView"
+ },
+ "listRefundDisputeResale": {
+  "method": "GET",
+  "path": "/refund-dispute-resale",
+  "contract": "orders",
+  "summary": "Refunds, Disputes & Resale Exceptions",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "RefundsDisputesResaleExceptionsView"
+ },
+ "listResale": {
+  "method": "GET",
+  "path": "/resale",
+  "contract": "orders",
+  "summary": "Resale Operations Command Center",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResaleOperationsCommandCenterView"
+ },
+ "listResale2": {
+  "method": "GET",
+  "path": "/resale-2",
+  "contract": "orders",
+  "summary": "Resale Analytics & AI Intelligence",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ticketType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "section",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "seatCategory",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "sellerSegment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "buyerSegment",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResaleAnalyticsAiIntelligenceView"
+ },
+ "listResaleFraudDuplicate": {
+  "method": "GET",
+  "path": "/resale-fraud-duplicate",
+  "contract": "orders",
+  "summary": "Resale Fraud & Duplicate Sale Protection",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResaleFraudDuplicateSaleProtectionView"
+ },
+ "listResaleOwnership": {
+  "method": "GET",
+  "path": "/resale-ownership",
+  "contract": "orders",
+  "summary": "Resale Audit & Ownership History",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResaleAuditOwnershipHistoryView"
+ },
+ "listSellerSettlementPayout": {
+  "method": "GET",
+  "path": "/seller-settlement-payout",
+  "contract": "orders",
+  "summary": "Seller Settlement & Payout Management",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SellerSettlementPayoutManagementView"
+ },
+ "listTicketOwnershipTransfer": {
+  "method": "GET",
+  "path": "/ticket-ownership-transfer",
+  "contract": "orders",
+  "summary": "Ticket Ownership Transfer Management",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "TicketOwnershipTransferManagementView"
+ }
+}

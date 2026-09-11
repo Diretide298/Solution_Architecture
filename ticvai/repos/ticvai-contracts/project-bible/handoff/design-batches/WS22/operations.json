@@ -1,0 +1,173 @@
+{
+ "approveBookingLimitCommercial": {
+  "method": "PUT",
+  "path": "/booking-limit-commercial",
+  "contract": "subscription",
+  "summary": "Booking Limits, Commercial Exceptions & Approval",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": "BookingLimitsCommercialExceptionsApprovalInput",
+  "responds": "BookingLimitsCommercialExceptionsApprovalView"
+ },
+ "listCommercialAgreement": {
+  "method": "GET",
+  "path": "/commercial-agreement",
+  "contract": "subscription",
+  "summary": "Commercial Agreement Command Center",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "partnerType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "brand",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "country",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "expiry",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "creditStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "risk",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "CommercialAgreementCommandCenterView"
+ },
+ "listCommercialAgreementHealth": {
+  "method": "GET",
+  "path": "/commercial-agreement-health",
+  "contract": "subscription",
+  "summary": "Commercial Agreement 360°, Health & AI Review",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CommercialAgreement360HealthAiReviewView"
+ },
+ "listCommercialAllocationQuota": {
+  "method": "GET",
+  "path": "/commercial-allocation-quota",
+  "contract": "subscription",
+  "summary": "Commercial Allocation, Quota & Commitment Management",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CommercialAllocationQuotaCommitmentManagementView"
+ },
+ "listCommissionMarginIncentive": {
+  "method": "GET",
+  "path": "/commission-margin-incentive",
+  "contract": "subscription",
+  "summary": "Commission, Margin & Incentive Management",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CommissionMarginIncentiveManagementView"
+ },
+ "listCreditLimitExposure": {
+  "method": "GET",
+  "path": "/credit-limit-exposure",
+  "contract": "subscription",
+  "summary": "Credit Limit & Exposure Management",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CreditLimitExposureManagementView"
+ },
+ "listDepositGuaranteeFinancial": {
+  "method": "GET",
+  "path": "/deposit-guarantee-financial",
+  "contract": "subscription",
+  "summary": "Deposit, Guarantee & Financial Security Management",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "DepositGuaranteeFinancialSecurityManagementView"
+ },
+ "setAgreementContractTerm": {
+  "method": "PUT",
+  "path": "/agreement-contract-term",
+  "contract": "subscription",
+  "summary": "Agreement & Contract Terms Builder",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": "AgreementContractTermsBuilderInput",
+  "responds": "AgreementContractTermsBuilderView"
+ },
+ "setPartnerRateNet": {
+  "method": "PUT",
+  "path": "/partner-rate-net",
+  "contract": "subscription",
+  "summary": "Partner Rate & Net Pricing Configuration",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": "PartnerRateNetPricingConfigurationInput",
+  "responds": "PartnerRateNetPricingConfigurationView"
+ },
+ "setPaymentTermBilling": {
+  "method": "PUT",
+  "path": "/payment-term-billing",
+  "contract": "subscription",
+  "summary": "Payment Terms, Billing & Account Configuration",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": "PaymentTermsBillingAccountConfigurationInput",
+  "responds": "PaymentTermsBillingAccountConfigurationView"
+ }
+}

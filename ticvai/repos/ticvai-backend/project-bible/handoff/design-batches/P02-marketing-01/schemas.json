@@ -1,0 +1,215 @@
+{
+ "ConsentDecision": {
+  "type": "string",
+  "enum": [
+   "granted",
+   "withdrawn",
+   "notAsked"
+  ]
+ },
+ "ConsentPurpose": {
+  "type": "string",
+  "enum": [
+   "marketing",
+   "personalisation",
+   "profiling",
+   "thirdPartySharing",
+   "aiProcessing",
+   "transactional"
+  ]
+ },
+ "ConsentPurposeConfig": {
+  "x-ticvai-persistence": "marketing.consent_purpose",
+  "type": "object",
+  "required": [
+   "purpose",
+   "channels",
+   "noticeVersion",
+   "isRequiredForService"
+  ],
+  "properties": {
+   "purpose": {
+    "$ref": "#/components/schemas/ConsentPurpose"
+   },
+   "displayName": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string"
+   },
+   "channels": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/MessageChannel"
+    }
+   },
+   "noticeVersion": {
+    "type": "string",
+    "description": "Current version of the notice. A consent against a superseded version is reported as requiring renewal rather than silently honoured.\n"
+   },
+   "isRequiredForService": {
+    "type": "boolean",
+    "description": "True for transactional. Withdrawing it means the service cannot be delivered, so it is presented differently.\n"
+   },
+   "expiresAfterMonths": {
+    "type": "integer",
+    "nullable": true
+   }
+  }
+ },
+ "ConsentSource": {
+  "type": "string",
+  "enum": [
+   "guestApp",
+   "website",
+   "kiosk",
+   "pos",
+   "callCentre",
+   "import",
+   "agentRecorded"
+  ]
+ },
+ "ConsentState": {
+  "x-ticvai-persistence": "none — projection over consent_record",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "purposes"
+  ],
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "purposes": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "purpose",
+      "decision",
+      "requiresRenewal"
+     ],
+     "properties": {
+      "purpose": {
+       "$ref": "#/components/schemas/ConsentPurpose"
+      },
+      "decision": {
+       "$ref": "#/components/schemas/ConsentDecision"
+      },
+      "channels": {
+       "type": "array",
+       "items": {
+        "$ref": "#/components/schemas/MessageChannel"
+       }
+      },
+      "noticeVersion": {
+       "type": "string",
+       "nullable": true
+      },
+      "requiresRenewal": {
+       "type": "boolean",
+       "description": "True where the notice has been superseded since consent was given."
+      },
+      "decidedAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "MarketingSubscription": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.subscription",
+  "description": "**Drafted 4 September.** What a guest asked to receive. **Deliberately separate from `marketing.consent`** - consent is what the law allows, a subscription is what the person wants, and a system that stores one and reports the other is the reason unsubscribe links stop working.",
+  "required": [
+   "id"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "guestId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "channel": {
+    "type": "string",
+    "enum": [
+     "email",
+     "sms",
+     "push"
+    ]
+   },
+   "listName": {
+    "type": "string"
+   },
+   "subscribed": {
+    "type": "boolean"
+   },
+   "source": {
+    "type": "string",
+    "description": "Where the opt-in happened, because a regulator asks."
+   },
+   "unsubscribeToken": {
+    "type": "string",
+    "description": "**Unsubscribe must work without a login.**"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "MessageChannel": {
+  "type": "string",
+  "enum": [
+   "email",
+   "sms",
+   "whatsapp",
+   "push",
+   "inApp",
+   "post"
+  ]
+ },
+ "RecordConsentRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "purpose",
+   "decision",
+   "noticeVersion",
+   "source",
+   "recordedAt"
+  ],
+  "properties": {
+   "purpose": {
+    "$ref": "#/components/schemas/ConsentPurpose"
+   },
+   "decision": {
+    "$ref": "#/components/schemas/ConsentDecision"
+   },
+   "channels": {
+    "type": "array",
+    "description": "Omit to apply to every channel the purpose covers.",
+    "items": {
+     "$ref": "#/components/schemas/MessageChannel"
+    }
+   },
+   "noticeVersion": {
+    "type": "string"
+   },
+   "source": {
+    "$ref": "#/components/schemas/ConsentSource"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ }
+}

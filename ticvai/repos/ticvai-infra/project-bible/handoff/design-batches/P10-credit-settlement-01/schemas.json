@@ -1,0 +1,242 @@
+{
+ "CreatePaymentRequest": {
+  "type": "object",
+  "required": [
+   "id",
+   "orderId",
+   "tender",
+   "amount",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "orderId": {
+    "type": "string"
+   },
+   "tender": {
+    "$ref": "#/components/schemas/TenderKind"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "tenderedAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Cash only. Change is the difference."
+   },
+   "walletAuthorisationId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Cross-cell wallet hold, where the guest's home cell is elsewhere."
+   },
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "CreditPosition": {
+  "x-ticvai-persistence": "orders.b2b_credit + orders.credit_override",
+  "type": "object",
+  "required": [
+   "accountId",
+   "creditLimit",
+   "used",
+   "available",
+   "isSuspended"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "accountId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "accountName": {
+    "type": "string"
+   },
+   "creditLimit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "used": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "available": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "isOverLimit": {
+    "type": "boolean"
+   },
+   "isSuspended": {
+    "type": "boolean"
+   },
+   "paymentTermsDays": {
+    "type": "integer"
+   },
+   "oldestUnpaidInvoiceAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "daysOverdue": {
+    "type": "integer"
+   },
+   "activeOverrides": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "orderId": {
+       "type": "string"
+      },
+      "amount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "authorisedByPrincipalId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "reason": {
+       "type": "string"
+      },
+      "expiresAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "Payment": {
+  "x-ticvai-persistence": "orders.payment",
+  "type": "object",
+  "required": [
+   "id",
+   "orderId",
+   "tender",
+   "amount",
+   "status",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "orderId": {
+    "type": "string"
+   },
+   "tender": {
+    "$ref": "#/components/schemas/TenderKind"
+   },
+   "tenderCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "description": "4.6.11. **What the guest actually handed over**, which is not always what the venue books. A tourist paying USD cash at a till is a foreign tender; the sale is still recorded in base currency.\nEqual to the base currency for almost every payment. **Present on all of them so the foreign-tender report has a source** — `getForeignTenderReport` promised *what was taken in which currency* and nothing recorded it until 18 August.\n"
+   },
+   "tenderAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "The amount in `tenderCurrency`, at that currency's own scale."
+   },
+   "fxRate": {
+    "type": "number",
+    "nullable": true,
+    "description": "The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"
+   },
+   "fxRateSource": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "manual",
+     "feed",
+     "cardScheme"
+    ],
+    "description": "4.2.8. Manual or fed on a schedule. **`cardScheme` is where the terminal did the conversion and told us** — dynamic currency conversion, the scheme's rate rather than ours.\n"
+   },
+   "changeCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "changeAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "authorised",
+     "captured",
+     "pendingConfirmation",
+     "declined",
+     "failed",
+     "voided",
+     "refunded"
+    ]
+   },
+   "providerName": {
+    "type": "string",
+    "nullable": true
+   },
+   "providerReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "lastInquiryAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "TenderKind": {
+  "type": "string",
+  "enum": [
+   "cash",
+   "card",
+   "wallet",
+   "voucher",
+   "bankTransfer",
+   "hotelCharge",
+   "installment",
+   "giftCard",
+   "complimentary"
+  ]
+ }
+}

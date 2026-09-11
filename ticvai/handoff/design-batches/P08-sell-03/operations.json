@@ -1,0 +1,517 @@
+{
+ "createCampaign": {
+  "method": "POST",
+  "path": "/campaigns",
+  "contract": "marketing-crm",
+  "summary": "Create a campaign",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateCampaignRequest",
+  "responds": "Campaign"
+ },
+ "createJourney": {
+  "method": "POST",
+  "path": "/journeys",
+  "contract": "marketing-crm",
+  "summary": "Define an automated journey",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Journey",
+  "responds": "Journey"
+ },
+ "generateConfiguration": {
+  "method": "POST",
+  "path": "/generate/configuration",
+  "contract": "ai",
+  "summary": "Draft a configuration from a description",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GeneratedConfiguration"
+ },
+ "getRecommendations": {
+  "method": "POST",
+  "path": "/recommendations",
+  "contract": "promotions",
+  "summary": "What else this guest might want",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
+ "getUpsellSuggestions": {
+  "method": "POST",
+  "path": "/upsell-suggestions",
+  "contract": "promotions",
+  "summary": "Suggestions for a cart",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "importProductCatalogue": {
+  "method": "POST",
+  "path": "/products/import",
+  "contract": "catalogue",
+  "summary": "Parse a catalogue file into a preview",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "listCampaigns": {
+  "method": "GET",
+  "path": "/campaigns",
+  "contract": "marketing-crm",
+  "summary": "List campaigns",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listJourneys": {
+  "method": "GET",
+  "path": "/journeys",
+  "contract": "marketing-crm",
+  "summary": "Automated journeys",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Journey"
+ },
+ "listMerchandise": {
+  "method": "GET",
+  "path": "/merchandise",
+  "contract": "retail",
+  "summary": "List merchandise",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "outletId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "inStockOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listProductCategories": {
+  "method": "GET",
+  "path": "/product-categories",
+  "contract": "catalogue",
+  "summary": "The merchandise hierarchy — categories, brands, collections",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ProductCategory"
+ },
+ "listSaleBoards": {
+  "method": "GET",
+  "path": "/sale-boards",
+  "contract": "tenancy",
+  "summary": "List sale boards",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SaleBoard"
+ },
+ "listSegments": {
+  "method": "GET",
+  "path": "/segments",
+  "contract": "marketing-crm",
+  "summary": "List segments",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listSerialisedItems": {
+  "method": "GET",
+  "path": "/serialised-items",
+  "contract": "inventory",
+  "summary": "Where each individual item is",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "serial",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SerialisedItem"
+ },
+ "listWorkstations": {
+  "method": "GET",
+  "path": "/workstations",
+  "contract": "tenancy",
+  "summary": "List workstations",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "saleBoardKind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "lookupMerchandise": {
+  "method": "GET",
+  "path": "/merchandise/lookup",
+  "contract": "retail",
+  "summary": "Price and stock check by barcode",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "barcode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "sku",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "includeSiblingOutlets",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PriceCheck"
+ },
+ "requestSuggestion": {
+  "method": "POST",
+  "path": "/ai/suggestions",
+  "contract": "ai",
+  "summary": "Ask for an answer, however it is currently produced",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Suggestion"
+ },
+ "runReport": {
+  "method": "POST",
+  "path": "/reports/{reportId}/run",
+  "contract": "reporting",
+  "summary": "Run a report",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RunReportRequest",
+  "responds": "ReportResult"
+ },
+ "setConfigurationProfile": {
+  "method": "PUT",
+  "path": "/configuration-profiles",
+  "contract": "tenancy",
+  "summary": "What a class of workstation is configured to be",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ConfigurationProfile",
+  "responds": "ConfigurationProfile"
+ },
+ "setProductCategories": {
+  "method": "PUT",
+  "path": "/product-categories",
+  "contract": "catalogue",
+  "summary": "Define the hierarchy, in the order a guest sees it",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProductCategory"
+ },
+ "setRolePermissions": {
+  "method": "PUT",
+  "path": "/roles/{roleId}/permissions",
+  "contract": "tenancy",
+  "summary": "What this role may do",
+  "permission": "ROLE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setVenueSettings": {
+  "method": "PUT",
+  "path": "/venues/{venueId}/settings",
+  "contract": "tenancy",
+  "summary": "Set support hours, quiet hours, segregated access and alerting",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VenueSettings",
+  "responds": "VenueSettings"
+ },
+ "updateMerchandise": {
+  "method": "PATCH",
+  "path": "/merchandise/{merchandiseId}",
+  "contract": "retail",
+  "summary": "Amend a merchandise item",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MerchandiseItem"
+ },
+ "updateSaleBoard": {
+  "method": "PUT",
+  "path": "/sale-boards/{saleBoardId}",
+  "contract": "tenancy",
+  "summary": "Update a sale board",
+  "permission": "WORKSTATION_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SaleBoard",
+  "responds": "SaleBoard"
+ }
+}

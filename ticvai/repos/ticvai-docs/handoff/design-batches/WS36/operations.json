@@ -1,0 +1,168 @@
+{
+ "listCalculationValidationReconciliation": {
+  "method": "GET",
+  "path": "/calculation-validation-reconciliation",
+  "contract": "catalogue",
+  "summary": "Calculation Validation, Reconciliation & Service Interface",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CalculationValidationReconciliationServiceInterfaceView"
+ },
+ "listCurrencyPrecisionRounding": {
+  "method": "GET",
+  "path": "/currency-precision-rounding",
+  "contract": "catalogue",
+  "summary": "Currency Precision, Rounding & Monetary Rules",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CurrencyPrecisionRoundingMonetaryRulesView"
+ },
+ "listFeeSurcharge": {
+  "method": "GET",
+  "path": "/fee-surcharge",
+  "contract": "catalogue",
+  "summary": "Fee & Surcharge Library",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "FeeSurchargeLibraryView"
+ },
+ "listFeeWaiverTax": {
+  "method": "GET",
+  "path": "/fee-waiver-tax",
+  "contract": "catalogue",
+  "summary": "Fee Waiver, Tax Exemption & Exception Rules",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "FeeWaiverTaxExemptionExceptionRulesView"
+ },
+ "listPriceCalculationSequence": {
+  "method": "GET",
+  "path": "/price-calculation-sequence",
+  "contract": "catalogue",
+  "summary": "Price Calculation Sequence & Formula Engine",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PriceCalculationSequenceFormulaEngineView"
+ },
+ "listTaxFeeCalculation": {
+  "method": "GET",
+  "path": "/tax-fee-calculation",
+  "contract": "catalogue",
+  "summary": "Tax, Fee & Calculation Command Center",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "tax",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "fee",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "surcharge",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "waiver",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "exemption",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "calculationProfile",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "roundingProfile",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "TaxFeeCalculationCommandCenterView"
+ },
+ "setFeeApplicabilityCharging": {
+  "method": "PUT",
+  "path": "/fee-applicability-charging",
+  "contract": "catalogue",
+  "summary": "Fee Applicability & Charging Rule Builder",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "FeeApplicabilityChargingRuleBuilderInput",
+  "responds": "FeeApplicabilityChargingRuleBuilderView"
+ },
+ "setTaxProfileJurisdiction": {
+  "method": "PUT",
+  "path": "/tax-profile-jurisdiction",
+  "contract": "catalogue",
+  "summary": "Tax Profile & Jurisdiction Configuration",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "TaxProfileJurisdictionConfigurationInput",
+  "responds": "TaxProfileJurisdictionConfigurationView"
+ },
+ "setTaxRuleTreatment": {
+  "method": "PUT",
+  "path": "/tax-rule-treatment",
+  "contract": "catalogue",
+  "summary": "Tax Rule & Treatment Builder",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "TaxRuleTreatmentBuilderInput",
+  "responds": "TaxRuleTreatmentBuilderView"
+ },
+ "simulatePriceBreakdownCalculation": {
+  "method": "PUT",
+  "path": "/price-breakdown-calculation",
+  "contract": "catalogue",
+  "summary": "Price Breakdown, Calculation Simulation & Explainability",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "PriceBreakdownCalculationSimulationExplainabilityInput",
+  "responds": "PriceBreakdownCalculationSimulationExplainabilityView"
+ }
+}

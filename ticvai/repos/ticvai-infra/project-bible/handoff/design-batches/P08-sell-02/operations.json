@@ -1,0 +1,851 @@
+{
+ "acquireInventoryHold": {
+  "method": "POST",
+  "path": "/inventory-holds",
+  "contract": "catalogue",
+  "summary": "Acquire an inventory lease",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AcquireLeaseRequest",
+  "responds": "InventoryHold"
+ },
+ "cancelPerformance": {
+  "method": "POST",
+  "path": "/performances/{performanceId}/cancel",
+  "contract": "catalogue",
+  "summary": "Cancel a performance",
+  "permission": "PERFORMANCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PerformanceCancellationResult"
+ },
+ "completeProductionRun": {
+  "method": "POST",
+  "path": "/production-runs/{runId}/complete",
+  "contract": "fnb",
+  "summary": "Record what was actually made",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProductionRun"
+ },
+ "createEvent": {
+  "method": "POST",
+  "path": "/events",
+  "contract": "catalogue",
+  "summary": "Create an event",
+  "permission": "EVENT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateEventRequest",
+  "responds": "Event"
+ },
+ "createPerformances": {
+  "method": "POST",
+  "path": "/events/{eventId}/performances",
+  "contract": "catalogue",
+  "summary": "Create performances, singly or by schedule",
+  "permission": "PERFORMANCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreatePerformancesRequest",
+  "responds": null
+ },
+ "forceReleaseInventoryHold": {
+  "method": "POST",
+  "path": "/inventory-holds/{inventoryHoldId}/force-release",
+  "contract": "catalogue",
+  "summary": "Reclaim a stranded lease",
+  "permission": "CAPACITY_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "InventoryHold"
+ },
+ "getEvent": {
+  "method": "GET",
+  "path": "/events/{eventId}",
+  "contract": "catalogue",
+  "summary": "Read an event",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Event"
+ },
+ "getLatestBundle": {
+  "method": "GET",
+  "path": "/catalogue/bundles/latest",
+  "contract": "catalogue",
+  "summary": "Pull the current bundle for this workstation's venue",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": "since",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "If-None-Match",
+    "in": "header",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CatalogueBundle"
+ },
+ "getOfflinePackage": {
+  "method": "GET",
+  "path": "/access/offline-package",
+  "contract": "access",
+  "summary": "Entitlement and rule set for offline validation",
+  "permission": "ACCESS_VALIDATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": "validFrom",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "validTo",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "If-None-Match",
+    "in": "header",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "OfflinePackage"
+ },
+ "getPerformance": {
+  "method": "GET",
+  "path": "/performances/{performanceId}",
+  "contract": "catalogue",
+  "summary": "Read a performance",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Performance"
+ },
+ "getSeatAvailability": {
+  "method": "GET",
+  "path": "/performances/{performanceId}/seat-availability",
+  "contract": "seating",
+  "summary": "Seat status for a performance",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "sectionCode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "availableOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "mode",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatAvailability"
+ },
+ "getUpsellSuggestions": {
+  "method": "POST",
+  "path": "/upsell-suggestions",
+  "contract": "promotions",
+  "summary": "Suggestions for a cart",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getVenueSettings": {
+  "method": "GET",
+  "path": "/venues/{venueId}/settings",
+  "contract": "tenancy",
+  "summary": "Operational settings for this venue",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VenueSettings"
+ },
+ "listCatalogueBundles": {
+  "method": "GET",
+  "path": "/catalogue/bundles",
+  "contract": "catalogue",
+  "summary": "List published bundles",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BundleSummary"
+ },
+ "listEvents": {
+  "method": "GET",
+  "path": "/events",
+  "contract": "catalogue",
+  "summary": "List events",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listInventoryHolds": {
+  "method": "GET",
+  "path": "/inventory-holds",
+  "contract": "catalogue",
+  "summary": "List leases",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "channelCapacityId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "holderWorkstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMenus": {
+  "method": "GET",
+  "path": "/menus",
+  "contract": "fnb",
+  "summary": "List menus",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "outletId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "activeAt",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listPerformances": {
+  "method": "GET",
+  "path": "/events/{eventId}/performances",
+  "contract": "catalogue",
+  "summary": "List performances of an event",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listRecipes": {
+  "method": "GET",
+  "path": "/recipes",
+  "contract": "fnb",
+  "summary": "List recipes",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listSyncRejections": {
+  "method": "GET",
+  "path": "/sync/rejections",
+  "contract": "orders",
+  "summary": "Entries the server refused",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listUpsellRules": {
+  "method": "GET",
+  "path": "/upsell-rules",
+  "contract": "promotions",
+  "summary": "List upsell and cross-sell rules",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "placement",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listWorkstations": {
+  "method": "GET",
+  "path": "/workstations",
+  "contract": "tenancy",
+  "summary": "List workstations",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "saleBoardKind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "planProductionRun": {
+  "method": "POST",
+  "path": "/production-runs",
+  "contract": "fnb",
+  "summary": "Plan a batch, for one outlet or several",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ProductionRun",
+  "responds": "ProductionRun"
+ },
+ "publishBundle": {
+  "method": "POST",
+  "path": "/catalogue/bundles",
+  "contract": "catalogue",
+  "summary": "Compute, sign and publish a catalogue bundle",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "BundleSummary"
+ },
+ "recommendSeats": {
+  "method": "POST",
+  "path": "/performances/{performanceId}/seat-recommendations",
+  "contract": "seating",
+  "summary": "Recommend seats for a party",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "SeatRecommendationRequest",
+  "responds": null
+ },
+ "relinquishInventoryHold": {
+  "method": "DELETE",
+  "path": "/inventory-holds/{inventoryHoldId}",
+  "contract": "catalogue",
+  "summary": "Return unsold units",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "InventoryHold"
+ },
+ "renewInventoryHold": {
+  "method": "POST",
+  "path": "/inventory-holds/{inventoryHoldId}/renew",
+  "contract": "catalogue",
+  "summary": "Extend a lease TTL",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "InventoryHold"
+ },
+ "reportBundleApplied": {
+  "method": "POST",
+  "path": "/catalogue/bundles/{version}/applied",
+  "contract": "catalogue",
+  "summary": "Report that a workstation applied a bundle",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setMenuSections": {
+  "method": "PUT",
+  "path": "/menus/{menuId}/sections",
+  "contract": "fnb",
+  "summary": "Set menu sections and their item ordering",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Menu"
+ },
+ "setOfflinePolicy": {
+  "method": "PUT",
+  "path": "/offline-policy",
+  "contract": "tenancy",
+  "summary": "What a workstation may do with no network, and for how long",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "OfflinePolicy",
+  "responds": "OfflinePolicy"
+ },
+ "setPathClosure": {
+  "method": "POST",
+  "path": "/venue-maps/{mapId}/paths/{pathId}/closure",
+  "contract": "venue-map",
+  "summary": "Close a route during works or an incident",
+  "permission": "VENUE_MAP_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "VenuePath"
+ },
+ "setRecipe": {
+  "method": "PUT",
+  "path": "/recipes",
+  "contract": "fnb",
+  "summary": "Define a recipe for a menu item",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Recipe",
+  "responds": "Recipe"
+ },
+ "setSubstitutionRules": {
+  "method": "PUT",
+  "path": "/substitution-rules",
+  "contract": "fnb",
+  "summary": "What may replace what",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SubstitutionRule"
+ },
+ "syncOrders": {
+  "method": "POST",
+  "path": "/sync/orders",
+  "contract": "orders",
+  "summary": "Replay orders recorded offline",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "OrderSyncResult"
+ },
+ "updateEvent": {
+  "method": "PATCH",
+  "path": "/events/{eventId}",
+  "contract": "catalogue",
+  "summary": "Amend an event",
+  "permission": "EVENT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Event"
+ },
+ "updateMenu": {
+  "method": "PATCH",
+  "path": "/menus/{menuId}",
+  "contract": "fnb",
+  "summary": "Amend a menu",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Menu"
+ },
+ "updateOutlet": {
+  "method": "PATCH",
+  "path": "/outlets/{outletId}",
+  "contract": "tenancy",
+  "summary": "Amend an outlet",
+  "permission": "REGION_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Outlet"
+ },
+ "updatePerformance": {
+  "method": "PATCH",
+  "path": "/performances/{performanceId}",
+  "contract": "catalogue",
+  "summary": "Amend a performance",
+  "permission": "PERFORMANCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Performance"
+ },
+ "updateSaleBoard": {
+  "method": "PUT",
+  "path": "/sale-boards/{saleBoardId}",
+  "contract": "tenancy",
+  "summary": "Update a sale board",
+  "permission": "WORKSTATION_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SaleBoard",
+  "responds": "SaleBoard"
+ },
+ "verifyAllergens": {
+  "method": "POST",
+  "path": "/menu-items/{menuItemId}/verify-allergens",
+  "contract": "fnb",
+  "summary": "Does this dish still match its claim?",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ }
+}

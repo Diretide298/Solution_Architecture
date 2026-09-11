@@ -1,0 +1,592 @@
+{
+ "acknowledgeAlert": {
+  "method": "POST",
+  "path": "/alerts/{alertId}/acknowledge",
+  "contract": "reporting",
+  "summary": "Mark it seen",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Alert"
+ },
+ "createGoodsReceipt": {
+  "method": "POST",
+  "path": "/goods-receipts",
+  "contract": "inventory",
+  "summary": "Receive goods against a purchase order",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateGoodsReceiptRequest",
+  "responds": "GoodsReceipt"
+ },
+ "createRequisition": {
+  "method": "POST",
+  "path": "/requisitions",
+  "contract": "inventory",
+  "summary": "Raise a requisition",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateRequisitionRequest",
+  "responds": "Requisition"
+ },
+ "createStockMovement": {
+  "method": "POST",
+  "path": "/stock-movements",
+  "contract": "inventory",
+  "summary": "Record an issue, return or adjustment",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateStockMovementRequest",
+  "responds": "StockMovement"
+ },
+ "createStockTransfer": {
+  "method": "POST",
+  "path": "/stock-transfers",
+  "contract": "inventory",
+  "summary": "Send stock to another location",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateStockTransferRequest",
+  "responds": "StockTransfer"
+ },
+ "enterCountLine": {
+  "method": "POST",
+  "path": "/stock-counts/{countId}/lines",
+  "contract": "fnb",
+  "summary": "What was actually on the shelf",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getCountVariance": {
+  "method": "GET",
+  "path": "/stock-counts/{countId}/variance",
+  "contract": "inventory",
+  "summary": "Variance between counted and expected",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CountVariance"
+ },
+ "getHaccpStatus": {
+  "method": "GET",
+  "path": "/food-safety/status",
+  "contract": "fnb",
+  "summary": "Where this venue stands, right now",
+  "permission": "INCIDENT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
+ "getStockPositions": {
+  "method": "GET",
+  "path": "/stock",
+  "contract": "inventory",
+  "summary": "Stock on hand by item and location",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "locationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "itemId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "includeZero",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "getStockTransfer": {
+  "method": "GET",
+  "path": "/stock-transfers/{transferId}",
+  "contract": "inventory",
+  "summary": "One transfer, its manifest and where it is",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
+ "listAlerts": {
+  "method": "GET",
+  "path": "/alerts",
+  "contract": "reporting",
+  "summary": "What is currently wrong",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Alert"
+ },
+ "listRequisitions": {
+  "method": "GET",
+  "path": "/requisitions",
+  "contract": "inventory",
+  "summary": "List requisitions",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "raisedByPrincipalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listSerialisedItems": {
+  "method": "GET",
+  "path": "/serialised-items",
+  "contract": "inventory",
+  "summary": "Where each individual item is",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "serial",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SerialisedItem"
+ },
+ "listStockLocations": {
+  "method": "GET",
+  "path": "/stock-locations",
+  "contract": "inventory",
+  "summary": "List stock locations",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "StockLocation"
+ },
+ "listStockMovements": {
+  "method": "GET",
+  "path": "/stock-movements",
+  "contract": "inventory",
+  "summary": "The movement ledger",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "itemId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "locationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "recordedFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "recordedTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "logColdChain": {
+  "method": "POST",
+  "path": "/food-safety/cold-chain",
+  "contract": "fnb",
+  "summary": "The temperature a delivery arrived at, and what was decided",
+  "permission": "INCIDENT_REPORT",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ColdChainEvent",
+  "responds": "ColdChainEvent"
+ },
+ "logTemperature": {
+  "method": "POST",
+  "path": "/food-safety/temperature-logs",
+  "contract": "fnb",
+  "summary": "Record a temperature check, in range or not",
+  "permission": "INCIDENT_REPORT",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "TemperatureLog",
+  "responds": null
+ },
+ "lookupMerchandise": {
+  "method": "GET",
+  "path": "/merchandise/lookup",
+  "contract": "retail",
+  "summary": "Price and stock check by barcode",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "barcode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "sku",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "includeSiblingOutlets",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PriceCheck"
+ },
+ "postStockCount": {
+  "method": "POST",
+  "path": "/stock-counts/{countId}/post",
+  "contract": "inventory",
+  "summary": "Post a count and adjust stock",
+  "permission": "LEDGER_POST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "StockCount"
+ },
+ "recordWaste": {
+  "method": "POST",
+  "path": "/outlets/{outletId}/waste",
+  "contract": "fnb",
+  "summary": "Record waste",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "rejectReceivedGoods": {
+  "method": "POST",
+  "path": "/goods-receipts/{receiptId}/reject",
+  "contract": "inventory",
+  "summary": "Reject received goods",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GoodsReceipt"
+ },
+ "requestRecount": {
+  "method": "POST",
+  "path": "/stock-counts/{countId}/recount",
+  "contract": "fnb",
+  "summary": "Send a line back to be counted again",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "reserveMerchandise": {
+  "method": "POST",
+  "path": "/outlets/{outletId}/reserve",
+  "contract": "retail",
+  "summary": "Reserve an item for collection",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MerchandiseReservation"
+ },
+ "setDailyCount": {
+  "method": "PUT",
+  "path": "/stock-counts/daily",
+  "contract": "inventory",
+  "summary": "Which items get counted every day",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setItemAvailability": {
+  "method": "PUT",
+  "path": "/menu-items/{itemId}/availability",
+  "contract": "fnb",
+  "summary": "Mark an item available or eighty-sixed",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MenuItem"
+ },
+ "signCorrectiveAction": {
+  "method": "POST",
+  "path": "/food-safety/corrective-actions/{actionId}/sign",
+  "contract": "fnb",
+  "summary": "Say what was done, and put a name to it",
+  "permission": "INCIDENT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CorrectiveAction"
+ },
+ "startStockCount": {
+  "method": "POST",
+  "path": "/stock-counts",
+  "contract": "inventory",
+  "summary": "Start a stock count",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "StartStockCountRequest",
+  "responds": "StockCount"
+ }
+}

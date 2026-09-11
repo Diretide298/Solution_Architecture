@@ -1,0 +1,158 @@
+{
+ "approveWaiverTesting": {
+  "method": "PUT",
+  "path": "/waiver-testing",
+  "contract": "marketing-crm",
+  "summary": "Waiver Approval, Testing & Publication Workspace",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "WaiverApprovalTestingPublicationWorkspaceInput",
+  "responds": "WaiverApprovalTestingPublicationWorkspaceView"
+ },
+ "listDynamicFieldQuestion": {
+  "method": "GET",
+  "path": "/dynamic-field-question",
+  "contract": "marketing-crm",
+  "summary": "Dynamic Fields, Questions & Conditional Logic",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "DynamicFieldsQuestionsConditionalLogicView"
+ },
+ "listProductEventExperience": {
+  "method": "GET",
+  "path": "/product-event-experience",
+  "contract": "marketing-crm",
+  "summary": "Product, Event & Experience Association",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ProductEventExperienceAssociationView"
+ },
+ "listVersioningEffectiveDate": {
+  "method": "GET",
+  "path": "/versioning-effective-date",
+  "contract": "marketing-crm",
+  "summary": "Versioning, Effective Dates & Legal Change Control",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VersioningEffectiveDatesLegalChangeControlView"
+ },
+ "listWaiverConsent": {
+  "method": "GET",
+  "path": "/waiver-consent",
+  "contract": "marketing-crm",
+  "summary": "Waiver & Consent Command Center",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "brand",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "effectiveDate",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "WaiverConsentCommandCenterView"
+ },
+ "listWaiverTemplateMaster": {
+  "method": "GET",
+  "path": "/waiver-template-master",
+  "contract": "marketing-crm",
+  "summary": "Waiver Template Library & Master Setup",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WaiverTemplateLibraryMasterSetupView"
+ },
+ "listWaiverTriggerEligibility": {
+  "method": "GET",
+  "path": "/waiver-trigger-eligibility",
+  "contract": "marketing-crm",
+  "summary": "Waiver Trigger, Eligibility & Completion Rules",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WaiverTriggerEligibilityCompletionRulesView"
+ },
+ "setDigitalWaiverForm": {
+  "method": "PUT",
+  "path": "/digital-waiver-form",
+  "contract": "marketing-crm",
+  "summary": "Digital Waiver & Form Builder",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "DigitalWaiverFormBuilderInput",
+  "responds": "DigitalWaiverFormBuilderView"
+ },
+ "setLocalizationBrandingCustomer": {
+  "method": "PUT",
+  "path": "/localization-branding-customer",
+  "contract": "marketing-crm",
+  "summary": "Localization, Branding & Customer Experience Configuration",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "LocalizationBrandingCustomerExperienceConfigurationInput",
+  "responds": "LocalizationBrandingCustomerExperienceConfigurationView"
+ },
+ "setSignatorySignatureGuardian": {
+  "method": "PUT",
+  "path": "/signatory-signature-guardian",
+  "contract": "marketing-crm",
+  "summary": "Signatory, Signature & Guardian Rule Configuration",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "SignatorySignatureGuardianRuleConfigurationInput",
+  "responds": "SignatorySignatureGuardianRuleConfigurationView"
+ }
+}

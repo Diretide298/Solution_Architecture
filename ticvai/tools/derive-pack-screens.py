@@ -86,6 +86,25 @@ PLACEMENT = {
     "Customer Service": ("P12", "marketing", "Support"),
     "Privacy  Consent   Preference Management": ("P13", "core", "Policy"),
     "Waiver, Consent & Digital Form Management": ("P13", "core", "Policy"),
+
+    # **The 11 September books, placed where the package already puts their domain.** None of
+    # this is new vocabulary: every licensed module is in `LicencePosition.licensedModules`.
+    #   DAM — `CMS-010 Media Library` is on P13, and `assets.yaml` serves every guest surface, so
+    #   a tenant without a media library is not a tenant: `core`.
+    #   Game & Ride — reader and RFID configuration already live on P08 (`BO-180`, `BO-199`).
+    #   Rental — venue-operated, and `resources.yaml` is exactly this entity: "a specific object
+    #   checked out to a named guest and returned". Boards 6–8 are also on P06, decided 11
+    #   September; those copies carry `source.sameAs`, not `source.pack`, so this entry stays the
+    #   one claimant — see `applied/apply-rental-staff-app.py`.
+    #   Subscription — `subscription.yaml` runs on the control plane and names P09 as its only
+    #   consumer, beside `ADM-008` and `ADM-011`. **Placed by who works each screen, 11 September**:
+    #   boards 7, 8 and screen 6.10 are the new customer's own admin and are P08's (`BOARD_PLACEMENT`,
+    #   `SCREEN_PLACEMENT`); boards 2, 4 and 5 stay here for the operator-led sale and are copied to
+    #   P17 Sign-up for the prospect by `applied/apply-subscription-placement.py`.
+    "Digital Asset Management DAM": ("P13", "core", "Media Library"),
+    "Game and Ride Module": ("P08", "games", "Games & Rides"),
+    "Rental Management": ("P08", "resources", "Rentals"),
+    "Subscription Licensing AI Self Service": ("P09", "core", "Tenants & Licensing"),
 }
 
 # (module, board) -> placement, or None for a board that is not drawn as screens of its own.
@@ -111,7 +130,26 @@ BOARD_PLACEMENT: dict[tuple[str, str], tuple[str, str, str] | None] = {
        for b in ("1", "4", "5")},
     **{("Unified BI Reporting and AI Analytics Platform", b): None
        for b in ("5", "6", "7", "8")},
+    **{("Subscription Licensing AI Self Service", b): ("P08", "core", "Setup & Go-Live")
+       for b in ("7", "8")},
 }
+
+# (module, board, number) -> placement, for the one screen a board does not share. Subscription 6.10
+# *Your TICVAI Environment Is Ready* speaks to the customer and "hands the customer directly to
+# Board 7"; the rest of board 6 is TICVAI watching provisioning. Decided 11 September.
+SCREEN_PLACEMENT: dict[tuple[str, str, str], tuple[str, str, str]] = {
+    ("Subscription Licensing AI Self Service", "6", "10"): ("P08", "core", "Setup & Go-Live"),
+}
+
+# (pack, number, page) -> the screen it was collapsed into. **A deletion this tool cannot see is a
+# screen it will add back.** Both are recorded where they were decided:
+#   `ADM-321` into `ADM-241` -- tools/applied/README.md, `apply-naming-and-navsets.py`, 9 September.
+#   `ANL-011` into `ANL-001` -- docs/active/pack-board-wiring-9-september.md, "removed, not wired".
+COLLAPSED: dict[tuple[str, str, str], str] = {
+    ("Approval_Workflows_and_Governance_Reference.pdf", "3", "13"): "ADM-241",
+    ("Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf", "1", "3"): "ANL-001",
+}
+
 
 # **A word in a title that says what the screen is.** Used only to choose components, so a
 # command centre gets tiles and a directory gets a table — not to decide what a screen means.
@@ -221,6 +259,7 @@ def main() -> int:
     # present is how ADM-038 was issued twice on 4 September.
     register = yaml.safe_load((SCREENS / "_id-register.yaml").read_text(encoding="utf-8"))
     docs, prefix, nextnum, held = {}, {}, {}, {}
+    by_id: dict = {}
     for f in sorted(SCREENS.glob("P*.yaml")):
         d = yaml.safe_load(f.read_text(encoding="utf-8"))
         code = d["platform"]["code"]
@@ -239,6 +278,14 @@ def main() -> int:
             src = s.get("source") or {}
             if src.get("pack"):
                 held[(src["pack"], str(src.get("number")), str(src.get("page")))] = (code, s)
+        by_id.update({s["id"]: (code, s) for s in d["screens"]})
+
+    # **A collapsed screen is claimed by the one it was collapsed into.** Found on 11 September:
+    # adding four books re-ran this over all 1,110 entries, and it would have brought back both
+    # screens deleted on 9 September, because nothing but prose remembered they had gone.
+    for key, survivor in COLLAPSED.items():
+        if key not in held and survivor in by_id:
+            held[key] = by_id[survivor]
 
     for code, pre in prefix.items():
         nextnum[code] = int((register["prefixes"].get(pre) or {}).get("nextFree") or 1)
@@ -257,7 +304,9 @@ def main() -> int:
                 gap[(rec["module"], rec["board"])].append(
                     (existing[1]["id"], rec["title"], rec.get("terms") or []))
             continue
-        place = BOARD_PLACEMENT.get((rec["module"], rec["board"]), PLACEMENT[rec["module"]])
+        place = SCREEN_PLACEMENT.get(
+            (rec["module"], str(rec["board"]), str(rec["number"])),
+            BOARD_PLACEMENT.get((rec["module"], rec["board"]), PLACEMENT[rec["module"]]))
         if place is None:
             not_drawn.append(rec)
             continue

@@ -25,10 +25,10 @@ scale:
   - qdrant:knowledge
   schemas: 27
   services: 16
-  platforms: 15
-  apps: 12
-  screens: 1235
-  flows: 168
+  platforms: 16
+  apps: 13
+  screens: 1629
+  flows: 202
   stateModels: 125
   events: 29
   decisions: 45
@@ -70,6 +70,12 @@ actors:
   - P14
   operations: 2
   note: Third parties against the public API, rate-limited and quota'd.
+- actor: prospect
+  reaches:
+  - P17
+  operations: 0
+  note: A business buying TICVAI, before it is a tenant. **No operation serves them yet** — every onboarding
+    operation is authenticated at tenant scope. Added 11 September.
 - actor: device
   reaches:
   - P07
@@ -199,7 +205,7 @@ surfaces:
   app: venue-staff-app
   formFactor: mobileApp
   offlineCapable: true
-  screens: 66
+  screens: 96
   modules:
   - access
   - ai
@@ -210,6 +216,7 @@ surfaces:
   - maintenance
   - marketing
   - queue
+  - resources
   - ticketing
   callsServices:
   - AccessService
@@ -249,13 +256,14 @@ surfaces:
   app: venue-management-web
   formFactor: web
   offlineCapable: false
-  screens: 393
+  screens: 614
   modules:
   - access
   - ai
   - analytics
   - core
   - fnb
+  - games
   - inventory
   - maintenance
   - marketing
@@ -289,7 +297,7 @@ surfaces:
   app: ticvai-web
   formFactor: web
   offlineCapable: false
-  screens: 367
+  screens: 446
   modules:
   - ai
   - analytics
@@ -370,7 +378,7 @@ surfaces:
   app: venue-management-web
   formFactor: web
   offlineCapable: false
-  screens: 60
+  screens: 100
   modules:
   - core
   - fnb
@@ -436,6 +444,18 @@ surfaces:
   - ReportingService
   - TenancyService
   ref: diagrams/lld/platforms/P16.yaml
+- platform: P17
+  name: TICVAI Sign-up — Onboarding & Purchase
+  audience: public
+  operator: public
+  app: signup-web
+  formFactor: web
+  offlineCapable: false
+  screens: 24
+  modules:
+  - core
+  callsServices: []
+  ref: diagrams/lld/platforms/P17.yaml
 services:
   count: 16
   view: diagrams/hld/02-services.yaml

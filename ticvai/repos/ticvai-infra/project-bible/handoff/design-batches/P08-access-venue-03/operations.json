@@ -1,0 +1,263 @@
+{
+ "authoriseStoredValue": {
+  "method": "POST",
+  "path": "/stored-value/authorisations",
+  "contract": "orders",
+  "summary": "Hold a balance on any stored-value instrument",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "StoredValueAuthorisation"
+ },
+ "bookResource": {
+  "method": "POST",
+  "path": "/resource-bookings",
+  "contract": "resources",
+  "summary": "Reserve a specific resource for a window",
+  "permission": "RESOURCE_BOOK",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceBooking"
+ },
+ "checkInResource": {
+  "method": "POST",
+  "path": "/resource-bookings/{bookingId}/check-in",
+  "contract": "resources",
+  "summary": "Take it back, and settle the deposit",
+  "permission": "RESOURCE_BOOK",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceBooking"
+ },
+ "checkOutResource": {
+  "method": "POST",
+  "path": "/resource-bookings/{bookingId}/check-out",
+  "contract": "resources",
+  "summary": "Hand it over, with a deposit against it",
+  "permission": "RESOURCE_BOOK",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceBooking"
+ },
+ "getResourceAvailability": {
+  "method": "GET",
+  "path": "/resources/{resourceId}/availability",
+  "contract": "resources",
+  "summary": "When it is free, with conflicts already resolved",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResourceAvailability"
+ },
+ "getSessionManifest": {
+  "method": "GET",
+  "path": "/sessions/{sessionId}/manifest",
+  "contract": "resources",
+  "summary": "Who is in a session, in what order",
+  "permission": "RESOURCE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SessionParticipant"
+ },
+ "getVenueSettings": {
+  "method": "GET",
+  "path": "/venues/{venueId}/settings",
+  "contract": "tenancy",
+  "summary": "Operational settings for this venue",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VenueSettings"
+ },
+ "listAccessPoints": {
+  "method": "GET",
+  "path": "/access-points",
+  "contract": "access",
+  "summary": "List access points",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listScans": {
+  "method": "GET",
+  "path": "/access/scans",
+  "contract": "access",
+  "summary": "List scan events",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "accessPointId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "ticketId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "outcome",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "recordedFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "recordedTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "relinquishStoredValue": {
+  "method": "POST",
+  "path": "/stored-value/authorisations/{authorisationId}/release",
+  "contract": "orders",
+  "summary": "Give a hold back",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "StoredValueAuthorisation"
+ },
+ "reorderSessionManifest": {
+  "method": "PUT",
+  "path": "/sessions/{sessionId}/manifest",
+  "contract": "resources",
+  "summary": "Change the running order",
+  "permission": "RESOURCE_BOOK",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SessionParticipant"
+ },
+ "setResourceQualifications": {
+  "method": "PUT",
+  "path": "/resources/{resourceId}/qualifications",
+  "contract": "resources",
+  "summary": "What a person resource is certified to do, and until when",
+  "permission": "RESOURCE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Qualification"
+ }
+}

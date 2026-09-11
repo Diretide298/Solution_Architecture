@@ -1,0 +1,209 @@
+{
+ "listCredential": {
+  "method": "GET",
+  "path": "/credential",
+  "contract": "access",
+  "summary": "Credential Operations Command Center",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "brand",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "date",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "media",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customer",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "CredentialOperationsCommandCenterView"
+ },
+ "listCredentialDeliveryDistribution": {
+  "method": "GET",
+  "path": "/credential-delivery-distribution",
+  "contract": "access",
+  "summary": "Credential Delivery & Distribution Operations",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CredentialDeliveryDistributionOperationsView"
+ },
+ "listCredentialGenerationIssuance": {
+  "method": "GET",
+  "path": "/credential-generation-issuance",
+  "contract": "access",
+  "summary": "Credential Generation & Issuance Monitor",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CredentialGenerationIssuanceMonitorView"
+ },
+ "listCredentialReplacementReissue": {
+  "method": "GET",
+  "path": "/credential-replacement-reissue",
+  "contract": "access",
+  "summary": "Credential Replacement, Reissue, Revocation & Recovery",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CredentialReplacementReissueRevocationRecoveryView"
+ },
+ "listCredentialSecurityOperational": {
+  "method": "GET",
+  "path": "/credential-security-operational",
+  "contract": "access",
+  "summary": "Credential Security, Audit & Operational Evidence",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CredentialSecurityAuditOperationalEvidenceView"
+ },
+ "listCredentialUsageCross": {
+  "method": "GET",
+  "path": "/credential-usage-cross",
+  "contract": "access",
+  "summary": "Credential Usage & Cross-Media Traceability",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CredentialUsageCrossMediaTraceabilityView"
+ },
+ "listFailedGenerationDelivery": {
+  "method": "GET",
+  "path": "/failed-generation-delivery",
+  "contract": "access",
+  "summary": "Failed Generation, Delivery & Credential Exception Management",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "FailedGenerationDeliveryCredentialExceptionManagemenView"
+ },
+ "listTicketMedia": {
+  "method": "GET",
+  "path": "/ticket-media",
+  "contract": "access",
+  "summary": "Ticket Media Analytics & AI Operations Intelligence",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "brand",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "media",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "provider",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "device",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "TicketMediaAnalyticsAiOperationsIntelligenceView"
+ },
+ "setMediaBindingActivation": {
+  "method": "PUT",
+  "path": "/media-binding-activation",
+  "contract": "access",
+  "summary": "Media Binding, Activation & Assignment Operations",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "MediaBindingActivationAssignmentOperationsInput",
+  "responds": "MediaBindingActivationAssignmentOperationsView"
+ },
+ "setVirtualTicketCredential": {
+  "method": "PUT",
+  "path": "/virtual-ticket-credential",
+  "contract": "access",
+  "summary": "Virtual Ticket & Credential 360° Workspace",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "VirtualTicketCredential360WorkspaceInput",
+  "responds": "VirtualTicketCredential360WorkspaceView"
+ }
+}

@@ -1,0 +1,214 @@
+{
+ "listMember": {
+  "method": "GET",
+  "path": "/member",
+  "contract": "subscription",
+  "summary": "Member Operations Command Center",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "memberType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "activation",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "expiry",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "renewal",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "usage",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerSegment",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "MemberOperationsCommandCenterView"
+ },
+ "listMemberExceptionOverride": {
+  "method": "GET",
+  "path": "/member-exception-override",
+  "contract": "subscription",
+  "summary": "Member Exceptions, Overrides & Service Recovery",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MemberExceptionsOverridesServiceRecoveryView"
+ },
+ "listMemberLifecycleCase": {
+  "method": "GET",
+  "path": "/member-lifecycle-case",
+  "contract": "subscription",
+  "summary": "Member Lifecycle History, Audit & Case Timeline",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MemberLifecycleHistoryAuditCaseTimelineView"
+ },
+ "listMembershipActivationCredential": {
+  "method": "GET",
+  "path": "/membership-activation-credential",
+  "contract": "subscription",
+  "summary": "Membership Activation, Assignment & Credential Management",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MembershipActivationAssignmentCredentialManagementView"
+ },
+ "listMembershipFreezeSuspension": {
+  "method": "GET",
+  "path": "/membership-freeze-suspension",
+  "contract": "subscription",
+  "summary": "Membership Freeze, Suspension & Reactivation Management",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MembershipFreezeSuspensionReactivationManagementView"
+ },
+ "listMembershipRenewalRetention": {
+  "method": "GET",
+  "path": "/membership-renewal-retention",
+  "contract": "subscription",
+  "summary": "Membership Analytics, Renewal Intelligence & AI Retention Center",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "membershipProduct",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "tier",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "purchaseMonth",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "acquisitionChannel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerSegment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "geography",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "renewalCohort",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "MembershipAnalyticsRenewalIntelligenceAiRetentionCenView"
+ },
+ "listMembershipUpgradeDowngrade": {
+  "method": "GET",
+  "path": "/membership-upgrade-downgrade",
+  "contract": "subscription",
+  "summary": "Membership Upgrade, Downgrade & Product Migration Operations",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MembershipUpgradeDowngradeProductMigrationOperationsView"
+ },
+ "listRenewalAuto": {
+  "method": "GET",
+  "path": "/renewal-auto",
+  "contract": "subscription",
+  "summary": "Renewal Operations & Auto-Renewal Management",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "RenewalOperationsAutoRenewalManagementView"
+ },
+ "listVisitAdmissionEntitlement": {
+  "method": "GET",
+  "path": "/visit-admission-entitlement",
+  "contract": "subscription",
+  "summary": "Visit, Admission & Entitlement Usage Monitor",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VisitAdmissionEntitlementUsageMonitorView"
+ },
+ "setMemberMembershipAccount": {
+  "method": "PUT",
+  "path": "/member-membership-account",
+  "contract": "subscription",
+  "summary": "Member 360° Membership Account Workspace",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": "Member360MembershipAccountWorkspaceInput",
+  "responds": "Member360MembershipAccountWorkspaceView"
+ }
+}

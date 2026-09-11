@@ -1,0 +1,1285 @@
+{
+ "acceptWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/accept",
+  "contract": "maintenance",
+  "summary": "The assignee takes the job",
+  "permission": "MAINTENANCE_EXECUTE",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
+ },
+ "addBlacklistEntry": {
+  "method": "POST",
+  "path": "/blacklist",
+  "contract": "access",
+  "summary": "Blacklist a media code",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "BlacklistEntry"
+ },
+ "approveRefund": {
+  "method": "POST",
+  "path": "/refunds/{refundId}/approve",
+  "contract": "orders",
+  "summary": "Approve a refund held for approval",
+  "permission": "ORDER_REFUND_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Refund"
+ },
+ "attachWorkOrderEvidence": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/attachments",
+  "contract": "maintenance",
+  "summary": "Photo, video, document, note or signature",
+  "permission": "MAINTENANCE_EXECUTE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrderAttachment"
+ },
+ "callNextParties": {
+  "method": "POST",
+  "path": "/queues/{queueId}/call-next",
+  "contract": "queue",
+  "summary": "Call the next parties forward",
+  "permission": "QUEUE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "cancelPerformance": {
+  "method": "POST",
+  "path": "/performances/{performanceId}/cancel",
+  "contract": "catalogue",
+  "summary": "Cancel a performance",
+  "permission": "PERFORMANCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PerformanceCancellationResult"
+ },
+ "cancelWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/cancel",
+  "contract": "maintenance",
+  "summary": "Cancel a work order",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
+ },
+ "closeWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/close",
+  "contract": "maintenance",
+  "summary": "Administratively closed",
+  "permission": "MAINTENANCE_APPROVE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
+ },
+ "completeWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/complete",
+  "contract": "maintenance",
+  "summary": "Complete a work order",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
+ },
+ "configureQueueFeed": {
+  "method": "PUT",
+  "path": "/queue-feeds",
+  "contract": "queue",
+  "summary": "Configure a sensor feed",
+  "permission": "QUEUE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "QueueFeed",
+  "responds": "QueueFeed"
+ },
+ "createAdmissionRules": {
+  "method": "POST",
+  "path": "/admission-rules",
+  "contract": "access",
+  "summary": "Create an admission profile",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AdmissionRules",
+  "responds": "AdmissionRules"
+ },
+ "createAsset": {
+  "method": "POST",
+  "path": "/assets",
+  "contract": "maintenance",
+  "summary": "Register an asset",
+  "permission": "ASSET_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateAssetRequest",
+  "responds": "Asset"
+ },
+ "createBulkRefund": {
+  "method": "POST",
+  "path": "/refunds/bulk",
+  "contract": "orders",
+  "summary": "Refund every order against an event, performance or date",
+  "permission": "ORDER_REFUND_BULK",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "createCampaign": {
+  "method": "POST",
+  "path": "/campaigns",
+  "contract": "marketing-crm",
+  "summary": "Create a campaign",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateCampaignRequest",
+  "responds": "Campaign"
+ },
+ "createEvent": {
+  "method": "POST",
+  "path": "/events",
+  "contract": "catalogue",
+  "summary": "Create an event",
+  "permission": "EVENT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateEventRequest",
+  "responds": "Event"
+ },
+ "createPerformances": {
+  "method": "POST",
+  "path": "/events/{eventId}/performances",
+  "contract": "catalogue",
+  "summary": "Create performances, singly or by schedule",
+  "permission": "PERFORMANCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreatePerformancesRequest",
+  "responds": null
+ },
+ "createQueue": {
+  "method": "POST",
+  "path": "/queues",
+  "contract": "queue",
+  "summary": "Create a queue",
+  "permission": "QUEUE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateQueueRequest",
+  "responds": "Queue"
+ },
+ "createWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders",
+  "contract": "maintenance",
+  "summary": "Raise a work order",
+  "permission": "WORK_ORDER_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateWorkOrderRequest",
+  "responds": "WorkOrder"
+ },
+ "getAsset": {
+  "method": "GET",
+  "path": "/assets/{assetId}",
+  "contract": "maintenance",
+  "summary": "Read an asset with history and documents",
+  "permission": "ASSET_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AssetDetail"
+ },
+ "getAssetHistory": {
+  "method": "GET",
+  "path": "/assets/{assetId}/history",
+  "contract": "maintenance",
+  "summary": "Service history",
+  "permission": "ASSET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "getCampaign": {
+  "method": "GET",
+  "path": "/campaigns/{campaignId}",
+  "contract": "marketing-crm",
+  "summary": "Read a campaign with performance",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CampaignDetail"
+ },
+ "getCampaignPerformance": {
+  "method": "GET",
+  "path": "/campaigns/{campaignId}/performance",
+  "contract": "marketing-crm",
+  "summary": "Delivery and engagement",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CampaignPerformance"
+ },
+ "getEvent": {
+  "method": "GET",
+  "path": "/events/{eventId}",
+  "contract": "catalogue",
+  "summary": "Read an event",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Event"
+ },
+ "getPerformance": {
+  "method": "GET",
+  "path": "/performances/{performanceId}",
+  "contract": "catalogue",
+  "summary": "Read a performance",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Performance"
+ },
+ "getQueue": {
+  "method": "GET",
+  "path": "/queues/{queueId}",
+  "contract": "queue",
+  "summary": "Read a queue with live position",
+  "permission": "QUEUE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "QueueDetail"
+ },
+ "getQueueFeedHealth": {
+  "method": "GET",
+  "path": "/queue-feeds/{feedId}/health",
+  "contract": "queue",
+  "summary": "Feed health",
+  "permission": "QUEUE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "QueueFeedHealth"
+ },
+ "getSeatAvailability": {
+  "method": "GET",
+  "path": "/performances/{performanceId}/seat-availability",
+  "contract": "seating",
+  "summary": "Seat status for a performance",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "sectionCode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "availableOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "mode",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SeatAvailability"
+ },
+ "getWaitTimes": {
+  "method": "GET",
+  "path": "/queues/wait-times",
+  "contract": "queue",
+  "summary": "Wait times across a venue",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "category",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WaitTime"
+ },
+ "getWorkOrder": {
+  "method": "GET",
+  "path": "/work-orders/{workOrderId}",
+  "contract": "maintenance",
+  "summary": "Read a work order",
+  "permission": "WORK_ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WorkOrderDetail"
+ },
+ "launchCampaign": {
+  "method": "POST",
+  "path": "/campaigns/{campaignId}/launch",
+  "contract": "marketing-crm",
+  "summary": "Launch or schedule a campaign",
+  "permission": "MARKETING_SEND",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "listAccessPoints": {
+  "method": "GET",
+  "path": "/access-points",
+  "contract": "access",
+  "summary": "List access points",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAdmissionRules": {
+  "method": "GET",
+  "path": "/admission-rules",
+  "contract": "access",
+  "summary": "List admission profiles",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAssets": {
+  "method": "GET",
+  "path": "/assets",
+  "contract": "maintenance",
+  "summary": "List assets",
+  "permission": "ASSET_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "maintenanceDue",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listBlacklist": {
+  "method": "GET",
+  "path": "/blacklist",
+  "contract": "access",
+  "summary": "List blacklisted media",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listCampaigns": {
+  "method": "GET",
+  "path": "/campaigns",
+  "contract": "marketing-crm",
+  "summary": "List campaigns",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listEvents": {
+  "method": "GET",
+  "path": "/events",
+  "contract": "catalogue",
+  "summary": "List events",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listParkingFacilities": {
+  "method": "GET",
+  "path": "/parking-facilities",
+  "contract": "access",
+  "summary": "Car parks at a venue, and how each integrates",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ParkingFacility"
+ },
+ "listPerformances": {
+  "method": "GET",
+  "path": "/events/{eventId}/performances",
+  "contract": "catalogue",
+  "summary": "List performances of an event",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listQueueEntries": {
+  "method": "GET",
+  "path": "/queues/{queueId}/entries",
+  "contract": "queue",
+  "summary": "List entries in a queue",
+  "permission": "QUEUE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listQueueFeeds": {
+  "method": "GET",
+  "path": "/queue-feeds",
+  "contract": "queue",
+  "summary": "List configured sensor feeds",
+  "permission": "QUEUE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "QueueFeed"
+ },
+ "listQueues": {
+  "method": "GET",
+  "path": "/queues",
+  "contract": "queue",
+  "summary": "List queues",
+  "permission": "QUEUE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "openOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listWorkOrders": {
+  "method": "GET",
+  "path": "/work-orders",
+  "contract": "maintenance",
+  "summary": "List work orders",
+  "permission": "WORK_ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "assignedToPrincipalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "priority",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "assetId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "overdueOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "lookupAsset": {
+  "method": "GET",
+  "path": "/assets/lookup",
+  "contract": "maintenance",
+  "summary": "Find an asset by tag or QR",
+  "permission": "ASSET_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "assetTag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "serialNumber",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AssetDetail"
+ },
+ "pauseCampaign": {
+  "method": "POST",
+  "path": "/campaigns/{campaignId}/pause",
+  "contract": "marketing-crm",
+  "summary": "Pause a campaign mid-send",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "recommendSeats": {
+  "method": "POST",
+  "path": "/performances/{performanceId}/seat-recommendations",
+  "contract": "seating",
+  "summary": "Recommend seats for a party",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "SeatRecommendationRequest",
+  "responds": null
+ },
+ "removeBlacklistEntry": {
+  "method": "DELETE",
+  "path": "/blacklist/{mediaCode}",
+  "contract": "access",
+  "summary": "Remove a blacklist entry",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setAssetStatus": {
+  "method": "PUT",
+  "path": "/assets/{assetId}/status",
+  "contract": "maintenance",
+  "summary": "Take an asset out of service or return it",
+  "permission": "ASSET_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SetAssetStatusRequest",
+  "responds": "AssetStatusResult"
+ },
+ "setParkingFacility": {
+  "method": "PUT",
+  "path": "/parking-facilities",
+  "contract": "access",
+  "summary": "Configure a car park and its integration",
+  "permission": "PARKING_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ParkingFacility",
+  "responds": "ParkingFacility"
+ },
+ "setQueueStatus": {
+  "method": "PUT",
+  "path": "/queues/{queueId}/status",
+  "contract": "queue",
+  "summary": "Open, pause or close a queue",
+  "permission": "QUEUE_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "QueueStatusResult"
+ },
+ "setWaitTime": {
+  "method": "PUT",
+  "path": "/queues/{queueId}/wait-time",
+  "contract": "queue",
+  "summary": "Manually set a wait time",
+  "permission": "QUEUE_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WaitTime"
+ },
+ "stopCampaign": {
+  "method": "POST",
+  "path": "/campaigns/{campaignId}/stop",
+  "contract": "marketing-crm",
+  "summary": "Stop a campaign mid-send",
+  "permission": "MARKETING_SEND",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Campaign"
+ },
+ "testQueueFeed": {
+  "method": "POST",
+  "path": "/queue-feeds/{feedId}/test",
+  "contract": "queue",
+  "summary": "Test a feed before trusting it",
+  "permission": "QUEUE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "FeedTestResult"
+ },
+ "testSendCampaign": {
+  "method": "POST",
+  "path": "/campaigns/{campaignId}/test-send",
+  "contract": "marketing-crm",
+  "summary": "Send a test to named recipients",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "unscheduleCampaign": {
+  "method": "POST",
+  "path": "/campaigns/{campaignId}/unschedule",
+  "contract": "marketing-crm",
+  "summary": "Pull a scheduled campaign before it sends",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "updateAccessPoint": {
+  "method": "PATCH",
+  "path": "/access-points/{accessPointId}",
+  "contract": "access",
+  "summary": "Update an access point",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessPoint"
+ },
+ "updateAdmissionRules": {
+  "method": "PUT",
+  "path": "/admission-rules/{profileId}",
+  "contract": "access",
+  "summary": "Update an admission profile",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AdmissionRules",
+  "responds": "AdmissionRules"
+ },
+ "updateAsset": {
+  "method": "PATCH",
+  "path": "/assets/{assetId}",
+  "contract": "maintenance",
+  "summary": "Amend an asset",
+  "permission": "ASSET_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Asset"
+ },
+ "updateCampaign": {
+  "method": "PATCH",
+  "path": "/campaigns/{campaignId}",
+  "contract": "marketing-crm",
+  "summary": "Amend, pause or resume a campaign",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Campaign"
+ },
+ "updateEvent": {
+  "method": "PATCH",
+  "path": "/events/{eventId}",
+  "contract": "catalogue",
+  "summary": "Amend an event",
+  "permission": "EVENT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Event"
+ },
+ "updatePerformance": {
+  "method": "PATCH",
+  "path": "/performances/{performanceId}",
+  "contract": "catalogue",
+  "summary": "Amend a performance",
+  "permission": "PERFORMANCE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Performance"
+ },
+ "updateQueue": {
+  "method": "PATCH",
+  "path": "/queues/{queueId}",
+  "contract": "queue",
+  "summary": "Amend queue configuration",
+  "permission": "QUEUE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Queue"
+ },
+ "verifyWorkOrder": {
+  "method": "POST",
+  "path": "/work-orders/{workOrderId}/verify",
+  "contract": "maintenance",
+  "summary": "Supervisor verification",
+  "permission": "WORK_ORDER_VERIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WorkOrder"
+ }
+}

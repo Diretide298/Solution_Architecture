@@ -1,0 +1,28 @@
+{
+ "issueAccreditationBadge": {
+  "method": "POST",
+  "path": "/accreditation-badges",
+  "contract": "approvals",
+  "summary": "Issue a badge",
+  "permission": "APPROVAL_ACT",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "AccreditationBadge",
+  "responds": "AccreditationBadge"
+ },
+ "listAccreditationBadges": {
+  "method": "GET",
+  "path": "/accreditation-badges",
+  "contract": "approvals",
+  "summary": "Badges issued and their state",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AccreditationBadge"
+ }
+}

@@ -1,0 +1,133 @@
+{
+ "Announcement": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.announcement",
+  "required": [
+   "title",
+   "body",
+   "kind",
+   "publishedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "title": {
+    "type": "string",
+    "maxLength": 140
+   },
+   "body": {
+    "type": "string",
+    "maxLength": 4000
+   },
+   "kind": {
+    "$ref": "#/components/schemas/AnnouncementKind"
+   },
+   "venueIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "departmentIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "roleIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "requiresAcknowledgement": {
+    "type": "boolean"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "publishedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "locale": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "AnnouncementKind": {
+  "type": "string",
+  "description": "`emergency` is not a louder `operational`. It overrides the home screen, bypasses quiet hours, requires acknowledgement, and carries a separate permission.\n",
+  "enum": [
+   "operational",
+   "safety",
+   "emergency",
+   "hr",
+   "celebration"
+  ]
+ },
+ "SupportNotice": {
+  "type": "object",
+  "x-ticvai-persistence": "control.support_notice",
+  "required": [
+   "id",
+   "version",
+   "supportEndsAt",
+   "publishedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "version": {
+    "type": "string"
+   },
+   "supportEndsAt": {
+    "type": "string",
+    "format": "date"
+   },
+   "message": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "affectedTenantIds": {
+    "type": "array",
+    "readOnly": true,
+    "description": "Computed from cell versions, never typed. A notice to the wrong list is worse than none.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "publishedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+   }
+  }
+ }
+}

@@ -1,0 +1,51 @@
+{
+ "AccreditationBadge": {
+  "type": "object",
+  "x-ticvai-persistence": "approvals.accreditation_badge",
+  "description": "**Drafted 4 September.** The credential an approved application produces. **Its lifetime is not the approval's** - a badge is revoked, lost or expires while the decision that authorised it still stands.",
+  "required": [
+   "id"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "holderName": {
+    "type": "string"
+   },
+   "zones": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Where this badge admits, which is the whole point of it."
+   },
+   "state": {
+    "type": "string",
+    "enum": [
+     "issued",
+     "collected",
+     "suspended",
+     "revoked",
+     "expired"
+    ]
+   },
+   "issuedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "revokedReason": {
+    "type": "string"
+   }
+  }
+ }
+}

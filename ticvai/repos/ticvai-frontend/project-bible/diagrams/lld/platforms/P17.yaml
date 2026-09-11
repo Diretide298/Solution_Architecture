@@ -1,0 +1,533 @@
+id: LLD-P17
+title: P17 TICVAI Sign-up — Onboarding & Purchase — 24 screens
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/00-platform.yaml
+audience: public
+operator: public
+app: signup-web
+formFactor: web
+runtime: reactWeb
+offlineCapable: false
+deployment:
+  target: browser
+  distribution: public, served from the Control Plane
+  bundleUpdate: immediate on deploy
+  hosting: Control Plane, outside every cell — a prospect has no cell yet. The application itself is
+    written to the prospect's regional control database (ADR-0043)
+  storeReview: false
+  deviceOwnership: prospect device, unmanaged
+  networkAssumption: public internet
+  releaseCadence: monthly
+why: null
+modulesUsed:
+- module: core
+  screens: 24
+servicesCalled: []
+coverage:
+  screens: 24
+  inAFlow: 0
+  drawn: 24
+  note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
+    has found a defect.'
+screens:
+- screen: SGN-001
+  name: Welcome & Start Your TICVAI Journey
+  module: Onboarding & Assessment
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SGN-002
+  boardFrames: null
+  wireframe: wireframes/P17 TICVAI Sign-up.dc.html#sgn-001
+  inFlows: null
+- screen: SGN-002
+  name: Customer & Organization Registration
+  module: Onboarding & Assessment
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SGN-001
+  - SGN-003
+  boardFrames: null
+  wireframe: wireframes/P17 TICVAI Sign-up.dc.html#sgn-002
+  inFlows: null
+- screen: SGN-003
+  name: Venue Type & Business Profile
+  module: Onboarding & Assessment
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SGN-002
+  - SGN-004
+  boardFrames: null
+  wireframe: wireframes/P17 TICVAI Sign-up.dc.html#sgn-003
+  inFlows: null
+- screen: SGN-004
+  name: Visitor, Capacity & Operational Scale
+  module: Onboarding & Assessment
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SGN-003
+  - SGN-005
+  boardFrames: null
+  wireframe: wireframes/P17 TICVAI Sign-up.dc.html#sgn-004
+  inFlows: null
+- screen: SGN-005
+  name: Sales Channel Assessment
+  module: Onboarding & Assessment
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SGN-004
+  - SGN-006
+  boardFrames: null
+  wireframe: wireframes/P17 TICVAI Sign-up.dc.html#sgn-005
+  inFlows: null
+- screen: SGN-006
+  name: Ticketing & Product Requirements
+  module: Onboarding & Assessment
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SGN-005
+  - SGN-007
+  boardFrames: null
+  wireframe: wireframes/P17 TICVAI Sign-up.dc.html#sgn-006
+  inFlows: null
+- screen: SGN-007
+  name: Access, Queue & Visitor Experience Assessment
+  module: Onboarding & Assessment
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SGN-006
+  - SGN-008
+  boardFrames: null
+  wireframe: wireframes/P17 TICVAI Sign-up.dc.html#sgn-007
+  inFlows: null
+- screen: SGN-008
+  name: Additional Business Module Assessment
+  module: Onboarding & Assessment
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SGN-007
+  - SGN-009
+  boardFrames: null
+  wireframe: wireframes/P17 TICVAI Sign-up.dc.html#sgn-008
+  inFlows: null
+- screen: SGN-009
+  name: Integration, Payment & Technical Readiness
+  module: Onboarding & Assessment
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SGN-008
+  - SGN-010
+  boardFrames: null
+  wireframe: wireframes/P17 TICVAI Sign-up.dc.html#sgn-009
+  inFlows: null
+- screen: SGN-010
+  name: AI Assessment Summary & Handoff
+  module: Onboarding & Assessment
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SGN-009
+  - SGN-011
+  boardFrames: null
+  wireframe: wireframes/P17 TICVAI Sign-up.dc.html#sgn-010
+  inFlows: null
+- screen: SGN-011
+  name: Recommended Package Overview
+  module: Package Builder
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SGN-010
+  - SGN-012
+  - SGN-013
+  - SGN-014
+  - SGN-015
+  - SGN-016
+  - SGN-017
+  - SGN-018
+  boardFrames: null
+  wireframe: wireframes/P17 TICVAI Sign-up.dc.html#sgn-011
+  inFlows: null
+- screen: SGN-012
+  name: Commercial Model & Tier Selection
+  module: Package Builder
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SGN-011
+  boardFrames: null
+  wireframe: wireframes/P17 TICVAI Sign-up.dc.html#sgn-012
+  inFlows: null
+- screen: SGN-013
+  name: Module Marketplace
+  module: Package Builder
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SGN-011
+  boardFrames: null
+  wireframe: wireframes/P17 TICVAI Sign-up.dc.html#sgn-013
+  inFlows: null
+- screen: SGN-014
+  name: AI Module & Package Recommendations
+  module: Package Builder
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SGN-011
+  boardFrames: null
+  wireframe: wireframes/P17 TICVAI Sign-up.dc.html#sgn-014
+  inFlows: null
+- screen: SGN-015
+  name: Module Detail & Commercial Treatment
+  module: Package Builder
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SGN-011
+  boardFrames: null
+  wireframe: wireframes/P17 TICVAI Sign-up.dc.html#sgn-015
+  inFlows: null
+- screen: SGN-016
+  name: Module Dependency & Compatibility Manager
+  module: Package Builder
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SGN-011
+  boardFrames: null
+  wireframe: wireframes/P17 TICVAI Sign-up.dc.html#sgn-016
+  inFlows: null
+- screen: SGN-017
+  name: Add-Ons, Capacity & Commercial Options
+  module: Package Builder
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SGN-011
+  boardFrames: null
+  wireframe: wireframes/P17 TICVAI Sign-up.dc.html#sgn-017
+  inFlows: null
+- screen: SGN-018
+  name: Purchase / Trial Journey Selection
+  module: Purchase & Activation
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SGN-011
+  - SGN-019
+  boardFrames: null
+  wireframe: wireframes/P17 TICVAI Sign-up.dc.html#sgn-018
+  inFlows: null
+- screen: SGN-019
+  name: Contract & Billing Cycle Selection
+  module: Purchase & Activation
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SGN-018
+  - SGN-020
+  boardFrames: null
+  wireframe: wireframes/P17 TICVAI Sign-up.dc.html#sgn-019
+  inFlows: null
+- screen: SGN-020
+  name: Billing & Legal Entity Information
+  module: Purchase & Activation
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SGN-019
+  - SGN-021
+  boardFrames: null
+  wireframe: wireframes/P17 TICVAI Sign-up.dc.html#sgn-020
+  inFlows: null
+- screen: SGN-021
+  name: Payment Method & Settlement Setup
+  module: Purchase & Activation
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SGN-020
+  - SGN-022
+  boardFrames: null
+  wireframe: wireframes/P17 TICVAI Sign-up.dc.html#sgn-021
+  inFlows: null
+- screen: SGN-022
+  name: Order & Commercial Pricing Review
+  module: Purchase & Activation
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SGN-021
+  - SGN-023
+  boardFrames: null
+  wireframe: wireframes/P17 TICVAI Sign-up.dc.html#sgn-022
+  inFlows: null
+- screen: SGN-023
+  name: Commercial Agreement, Billable Definition & Customer Acceptance
+  module: Purchase & Activation
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SGN-022
+  - SGN-024
+  boardFrames: null
+  wireframe: wireframes/P17 TICVAI Sign-up.dc.html#sgn-023
+  inFlows: null
+- screen: SGN-024
+  name: Subscription Confirmation & Commercial Activation
+  module: Purchase & Activation
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo: []
+  boardFrames: null
+  wireframe: wireframes/P17 TICVAI Sign-up.dc.html#sgn-024
+  inFlows: null

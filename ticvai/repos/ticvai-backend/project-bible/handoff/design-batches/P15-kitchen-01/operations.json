@@ -1,0 +1,496 @@
+{
+ "askReportingQuestion": {
+  "method": "POST",
+  "path": "/reports/ask",
+  "contract": "reporting",
+  "summary": "Natural-language reporting query",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "NaturalLanguageAnswer"
+ },
+ "chaseStation": {
+  "method": "POST",
+  "path": "/kitchen-stations/{stationId}/chase",
+  "contract": "fnb",
+  "summary": "The pass asks a station where an item is",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "fireCourse": {
+  "method": "POST",
+  "path": "/kitchen-tickets/{ticketId}/fire",
+  "contract": "fnb",
+  "summary": "Send a held course to the pass",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KitchenTicket"
+ },
+ "getDashboard": {
+  "method": "GET",
+  "path": "/dashboards/{dashboardId}",
+  "contract": "reporting",
+  "summary": "Read a dashboard with tile data",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "refresh",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DashboardData"
+ },
+ "getFnbOrder": {
+  "method": "GET",
+  "path": "/fnb-orders/{orderId}",
+  "contract": "fnb",
+  "summary": "Read an F&B order",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "FnbOrder"
+ },
+ "getHaccpStatus": {
+  "method": "GET",
+  "path": "/food-safety/status",
+  "contract": "fnb",
+  "summary": "Where this venue stands, right now",
+  "permission": "INCIDENT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
+ "holdCourse": {
+  "method": "POST",
+  "path": "/kitchen-tickets/{ticketId}/hold",
+  "contract": "fnb",
+  "summary": "Stop a course going out",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KitchenTicket"
+ },
+ "list86Events": {
+  "method": "GET",
+  "path": "/outlets/{outletId}/86-events",
+  "contract": "fnb",
+  "summary": "What came off the menu today, when, and for how long",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "listFnbOrders": {
+  "method": "GET",
+  "path": "/fnb-orders",
+  "contract": "fnb",
+  "summary": "List F&B orders",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "outletId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "tableVisitId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listKitchenStations": {
+  "method": "GET",
+  "path": "/kitchen/stations",
+  "contract": "fnb",
+  "summary": "List preparation stations and their routing",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KitchenStation"
+ },
+ "listKitchenTickets": {
+  "method": "GET",
+  "path": "/kitchen/tickets",
+  "contract": "fnb",
+  "summary": "Kitchen ticket queue",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "stationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KitchenTicket"
+ },
+ "logKitchenException": {
+  "method": "POST",
+  "path": "/kitchen-exceptions",
+  "contract": "fnb",
+  "summary": "Something went wrong that is not a refire",
+  "permission": "INCIDENT_REPORT",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "markOrderCollected": {
+  "method": "POST",
+  "path": "/orders/{orderId}/collected",
+  "contract": "fnb",
+  "summary": "The guest took it",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "notifyServer": {
+  "method": "POST",
+  "path": "/table-visits/{visitId}/notify-server",
+  "contract": "fnb",
+  "summary": "The kitchen calls the server to the pass",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "printOrderLabel": {
+  "method": "POST",
+  "path": "/kitchen-tickets/{ticketId}/label",
+  "contract": "fnb",
+  "summary": "A label for the bag",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "prioritiseKitchenTicket": {
+  "method": "POST",
+  "path": "/kitchen/tickets/{ticketId}/prioritise",
+  "contract": "fnb",
+  "summary": "Move a ticket up the queue",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KitchenTicket"
+ },
+ "recallKitchenTicket": {
+  "method": "POST",
+  "path": "/kitchen-tickets/{ticketId}/recall",
+  "contract": "fnb",
+  "summary": "Bring back a ticket that was bumped by mistake",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KitchenTicket"
+ },
+ "recordOrderHandover": {
+  "method": "POST",
+  "path": "/guest-orders/{orderId}/delivery",
+  "contract": "fnb",
+  "summary": "Record that an order reached the guest",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestOrderStatus"
+ },
+ "refireItem": {
+  "method": "POST",
+  "path": "/kitchen-tickets/{ticketId}/refire",
+  "contract": "fnb",
+  "summary": "Make it again",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KitchenTicket"
+ },
+ "setCourseRules": {
+  "method": "PUT",
+  "path": "/outlets/{outletId}/course-rules",
+  "contract": "fnb",
+  "summary": "How this outlet courses by default",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setItemAvailability": {
+  "method": "PUT",
+  "path": "/menu-items/{itemId}/availability",
+  "contract": "fnb",
+  "summary": "Mark an item available or eighty-sixed",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MenuItem"
+ },
+ "setKitchenStations": {
+  "method": "PUT",
+  "path": "/kitchen/stations",
+  "contract": "fnb",
+  "summary": "Configure stations and item routing",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KitchenStation"
+ },
+ "setKitchenTicketStatus": {
+  "method": "PUT",
+  "path": "/kitchen/tickets/{ticketId}/status",
+  "contract": "fnb",
+  "summary": "Advance a kitchen ticket",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "KitchenTicket"
+ },
+ "setVenueSettings": {
+  "method": "PUT",
+  "path": "/venues/{venueId}/settings",
+  "contract": "tenancy",
+  "summary": "Set support hours, quiet hours, segregated access and alerting",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "VenueSettings",
+  "responds": "VenueSettings"
+ }
+}

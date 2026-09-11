@@ -1,0 +1,138 @@
+id: F204
+name: 'Rental Management board 8: Rental Return Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Rental Management board 8. **This route is read from the
+    screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-564
+  entryPoints:
+  - Arrives at Rental Return Command Center
+steps:
+- step: 1
+  screen: BO-564
+  action: Opens Rental Return Command Center
+  operations: []
+  outcome: Provide operators with a live operational view of all expected, in-progress, partial, overdue
+    and completed returns.
+- step: 2
+  screen: BO-565
+  action: Works in Return Scan & Rental Retrieval
+  operations: []
+  outcome: Quickly identify which active rental the returned equipment belongs to. The original requirements
+    specifically require scanning the rented item and retrieving its reservation.
+- step: 3
+  screen: BO-564
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-566
+  action: Works in Return Summary & Actual Return Time
+  operations: []
+  outcome: Establish the operational return event before inspection and financial settlement.
+- step: 5
+  screen: BO-564
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-567
+  action: Works in Post-Rental Condition Inspection
+  operations: []
+  outcome: Perform a structured inspection of returned equipment.
+- step: 7
+  screen: BO-564
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-568
+  action: Works in Before vs After Condition Comparison
+  operations: []
+  outcome: Use the evidence captured during Board 6 checkout to establish whether damage existed before
+    the rental or occurred during it. This is one of the important capabilities I recommended adding.
+- step: 9
+  screen: BO-564
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-569
+  action: Works in Damage Assessment & Charge Workflow
+  operations: []
+  outcome: Convert confirmed equipment damage into a controlled operational and commercial case. The source
+    specifically recommends a formal damage assessment workflow.
+- step: 11
+  screen: BO-564
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-570
+  action: Works in Partial Return & Missing Equipment
+  operations: []
+  outcome: Handle multi-item and group rentals where equipment is returned at different times. This implements
+    the partial-return capability we added in Board 7.
+- step: 13
+  screen: BO-564
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-571
+  action: Works in Late Fees, Damage Fees & Final Settlement
+  operations: []
+  outcome: Calculate the customer's final rental financial position. Board 8 should consume, not recreate,
+    the commercial policies configured in Board 4.
+- step: 15
+  screen: BO-564
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-572
+  action: Works in Deposit Release, Capture & Customer Confirmation
+  operations: []
+  outcome: Complete the deposit lifecycle and provide the customer with a transparent final statement.
+    The source requires full refund/release, partial refund and deposit forfeiture, together with transaction
+    history.
+- step: 17
+  screen: BO-564
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-573
+  action: Works in Return Completion & Equipment Disposition
+  operations: []
+  outcome: Complete the rental while determining exactly what happens to every returned physical asset.
+    This is extremely important because returning an item does not necessarily mean it becomes immediately
+    available again.
+branches:
+- at: 1
+  condition: Nothing has been set up on Rental Return Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Rental Management board 8 visited
+primaryContract: unknown
+contracts:
+- unknown

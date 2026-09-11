@@ -728,3 +728,121 @@ accreditation screens that are `audience: public` with no public-audience operat
 PDF has not been agreed with anyone who has to build it. What changed is what a reviewer is looking
 at: an operation with named, typed fields each carrying the client's own sentence, instead of an
 envelope nobody could argue with.
+
+---
+
+## 11 September — `Latest Docs.zip`, four more books
+
+| document | pages | boards | screens | placed |
+|---|---:|---:|---:|---|
+| `Digital Asset Management DAM.pdf` | 81 | 4 | 40 | P13 · Media Library · `core` |
+| `Game_and_Ride_Module.pdf` | 105 | 10 | 100 | P08 · Games & Rides · `games` |
+| `Rental_Management.pdf` | 138 | 10 | 100 | P08 · Rentals · `resources` |
+| `Subscription_Licensing_AI_Self_Service.pdf` | 137 | 10 | 100 | P09 · Tenants & Licensing · `core` |
+| **Pack now** | | **111** | **1,110** | 23 books |
+
+**Counted from the headings before the parser ran**, so the gate in `parse-workshop-pack.py` was set
+from the documents and not from its own output. All four are exactly ten screens a board.
+
+### The chain, as run
+
+```
+parse-workshop-pack.py --check --apply          1,110 records; the 770 earlier ones byte-identical
+derive-pack-screens.py --apply                  +340 screens, 0 existing changed, 0 duplicate ids
+applied/wire-pack-boards-11-september.py        34 hubs off BO-100, ADM-002, CMS-001; 340 wired
+derive-board-flows.py --apply                   F183–F216; every one of the 107 boards has a flow
+generate-screens-from-pack.py --module <4>      pattern, regions, gaps for the 340; nothing else
+refresh.sh                                       1,575 screens; transition coverage 91% → 93%
+export-design-batch.py                          WS74–WS107, plus the three launcher batches
+```
+
+### Six defects, each fixed at the source
+
+- **Page numbers in titles.** The new books print them in their contents; every Rental and
+  Subscription screen would have been called `… Command Center 6`, and DAM matched 4 of 40 bodies.
+- **Two deleted screens coming back.** `ADM-321` and `ANL-011` were collapsed on 9 September and
+  nothing but prose remembered it. `derive-pack-screens.py` now reads a `COLLAPSED` table.
+- **`derive-board-flows.py` would have duplicated all 72 derived flows.** Its idempotence test
+  compared a file name built from a fresh id, so it could never be true. It now matches on the hub.
+- **KPI cards drawn as table columns.** A heading that says `KPI Cards` was overruled by a guess
+  from the labels; `BO-494 Rental Product Command Center` became a product table whose column
+  headers were its KPIs. Fixed for the new screens. The first rule read "Card" as a KPI card, and
+  Game & Ride means a play card: `BO-455 Card / Credential Profile` became tiles reading `Card ID`.
+  Tightened and tested against the real headings before WS79–WS87 and WS99 were re-cut.
+  **16 older screens carry the defect and were not regenerated** — BO-164; ADM-138, 158, 167, 168,
+  178, 188, 205, 208, 218, 233, 234, 329, 339; ANL-067, 069.
+- **`WS` codes renumbered on every intake.** Three tools enumerated boards in sorted order, so DAM and
+  Game & Ride moved 47 of 73 codes. Codes now live in `screens/_workshop-boards.yaml`; the 73 were
+  seeded from HEAD and still name the same boards and screens.
+- **`\uD83D\uDD34` in P02.** PyYAML reads the escape as two lone surrogates and one batch silently
+  produced an empty folder. Written as the character; `export-design-batch.py` repairs any others.
+
+### Left for a person
+
+- **None of the 340 calls an operation.** `workshop-contract-gap.md` lists what each needs.
+
+### Decided the same day
+
+- **Rental boards 6–8 are on both P06 and P08.** "They can go to staff app and also in venue
+  management." The attendant hands over and takes back on a handheld; a supervisor still watches
+  and settles from the back office. `applied/apply-rental-staff-app.py` made `EMP-071`–`EMP-100`,
+  one hub per board off `EMP-003 Home — on duty`, each with `source.sameAs` naming its P08 twin
+  rather than claiming the pack entry, and re-copies the twin's layout on every run so the two do
+  not drift. **Their offline state is `TODO`**: the book does not say what a rental counter does
+  without a connection, and P06 is offline-capable. They are batches `P06-rentals-01`–`03`.
+- **The `booking-skeletons/` and `Park_POS` deletions were intended.**
+- **The 15 older KPI-card screens were rebuilt** with a new `--only` on
+  `generate-screens-from-pack.py`, so a repair no longer means rebuilding a whole module. Diffed
+  first: only generator-owned fields changed — `apis`, navigation and notes are byte-identical — and
+  `ADM-167` was already right, so it is 15, not 16. **Two lost a table the book does have**:
+  `BO-164`'s *For each credential profile* and `ADM-329`'s matrix list are read as section names,
+  not columns, so the rebuilt screens show the KPI cards and no list. A parser limit, recorded.
+- **The Subscription book is placed by who works each screen**, after reading all 100.
+  `applied/apply-subscription-placement.py` has the table and the reasons.
+  - **Boards 7 and 8 and screen 6.10 moved to P08** as `BO-594`–`BO-614`, section *Setup &
+    Go-Live*: the new customer's own admin configuring and testing their venue, and the screen
+    that "hands the customer directly to Board 7". `ADM-428`–`ADM-448` are retired. `F213` and
+    `F214` keep their ids on the new screens; `F212` lost its last step.
+  - **P17 TICVAI Sign-up exists**: 24 screens, `SGN-001`–`SGN-024`, a public face of TICVAI
+    Control for a prospect with no tenant — all of board 2, 4.1–4.7, and 5.1–5.4, 5.6, 5.7, 5.9.
+    **P09 keeps boards 2, 4 and 5 whole** for the operator-led sale BL-165 already describes;
+    P17 carries `source.sameAs`. Not copied: 4.8 shows TICVAI's own revenue, 4.9–4.10 and 5.8 are
+    internal approval and validation, 5.5 sets trial rules, 5.10 is escalation.
+  - **Every operation P17's journey needs is authenticated.** `submitOnboardingApplication`
+    requires `TENANT_CONFIGURE` at tenant scope and `listPlans` a staff permission. P17 draws the
+    door; the contract still has to open it.
+- **`derive-design-manifest.py` now keeps a workshop board on one platform.** Board 6 is nine
+  screens on P09 and one on P08; the minority screen goes to its own platform's module batch.
+- **An independent review of the night's tools found seven defects; six are fixed.**
+  - *The KPI rule vouched for a whole block.* One heading naming KPIs kept every heading beside it
+    as tiles. Now only the named heading does. **15 screens rebuilt again**, each from a wall of up
+    to 25 tiles to the book's KPI cards plus a table — `BO-164`, `BO-414`, `BO-468`, `BO-587`,
+    `ADM-138`, `ADM-158`, `ADM-233`, `ADM-234`, `ADM-373`, `ADM-376`, `ADM-459`, `ADM-464`,
+    `CMS-099`, `ANL-067`, `ANL-069`.
+  - *6.10 was in no flow.* `BO-594` now opens `F213`, the way into the AI Setup hub.
+  - *Split boards were tagged on one board and batched on another.* `workshop_boards.home_platforms`
+    decides for both tools; the majority wins and a tie goes to the hub's platform.
+  - *P17 carried staff wording and ended in a dead end.* `emptyNoAccess` is now an honest `TODO`;
+    `SGN-024` hands off to `BO-594` with `crossesDevice`, the package's form for another app.
+    P17 is also `compact`, which `check-screens` holds every web platform to.
+  - *Nothing noticed a copy drifting.* `check-screens` now fails a `sameAs` screen whose generated
+    fields differ from its original, and names the tool to re-run.
+  - *`WS100`+ sorted as text*, and three writers wrote in place. Both fixed.
+  - **Not fixed: four book tables arrive as one run-together line** — `Card Customer Balance Last
+    Recharge…` — and yield no columns, so e.g. `BO-454` has its KPI cards and no table. One Game &
+    Ride, two Pricing & Revenue, one Rental; splitting them would be guessing at column breaks.
+- **The deep audit after the second refresh, 12 September.** Every navigation reference, flow step,
+  `sameAs` copy, pack claim and batch membership resolves; every pending batch has a current bundle;
+  `QUEUE.md` lists each once; P17 is reachable end to end from `SGN-001`. Two things it found that
+  predate the night:
+  - **`ADM-187 Bundle Preview, Simulation & AI Recommendation` carries another screen's body.**
+    `pack.json` gives Promotions board 5 screen 10 the same number and page (32) as board 2 screen
+    10, with board 2's sections, and every tool keys a pack entry on `(pack, number, page)` without
+    the board. Both screens were already so at HEAD. Needs the page found and the key widened.
+  - **`sync-counts.py` had rewritten three unrelated figures as the package total**:
+    `venue-scanner` has eleven screens, not the total; 759 are unreachable from their entry point
+    and 719 are too thin to draw, not all of them. Corrected in words `sync-counts` cannot match.
+- **Found, not fixed: `derive-id-register.py` does not remember a retired high-water mark.** It
+  takes `max()` of the ids present, so retiring the *highest* ids of a prefix would let them be
+  issued again — the exact failure its docstring says it prevents. Harmless today, because
+  `ADM-468` still exists above the retired range.

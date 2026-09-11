@@ -1,0 +1,84 @@
+{
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
+ "TenantAppStatus": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "tenantId",
+   "isPublished",
+   "isInMaintenance"
+  ],
+  "properties": {
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "isPublished": {
+    "type": "boolean"
+   },
+   "publishedVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "draftVersion": {
+    "type": "string"
+   },
+   "hasUnpublishedChanges": {
+    "type": "boolean"
+   },
+   "activeModuleCount": {
+    "type": "integer"
+   },
+   "licensedModuleCount": {
+    "type": "integer"
+   },
+   "activePageCount": {
+    "type": "integer"
+   },
+   "isInMaintenance": {
+    "type": "boolean"
+   },
+   "maintenanceMessage": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "expectedBackAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "recentChanges": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "area": {
+       "type": "string"
+      },
+      "description": {
+       "type": "string"
+      },
+      "principalId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "at": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
+   }
+  }
+ }
+}

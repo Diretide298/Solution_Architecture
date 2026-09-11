@@ -1,0 +1,189 @@
+{
+ "approveReviewDecision": {
+  "method": "PUT",
+  "path": "/review-decision",
+  "contract": "catalogue",
+  "summary": "Approval Review & Decision Workspace",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "ApprovalReviewDecisionWorkspaceInput",
+  "responds": "ApprovalReviewDecisionWorkspaceView"
+ },
+ "approveWorkflow": {
+  "method": "PUT",
+  "path": "/workflow",
+  "contract": "catalogue",
+  "summary": "Approval Workflow Designer",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "ApprovalWorkflowDesignerInput",
+  "responds": "ApprovalWorkflowDesignerView"
+ },
+ "listChangeImpactAnalysis": {
+  "method": "GET",
+  "path": "/change-impact-analysi",
+  "contract": "catalogue",
+  "summary": "Change Impact Analysis",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ChangeImpactAnalysisView"
+ },
+ "listChangePropagationDependency": {
+  "method": "GET",
+  "path": "/change-propagation-dependency",
+  "contract": "catalogue",
+  "summary": "Change Propagation & Dependency Control",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ChangePropagationDependencyControlView"
+ },
+ "listGovernanceRiskMonitoring": {
+  "method": "GET",
+  "path": "/governance-risk-monitoring",
+  "contract": "catalogue",
+  "summary": "Governance Risk, AI Monitoring & Control Center",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GovernanceRiskAiMonitoringControlCenterView"
+ },
+ "listProductGovernance": {
+  "method": "GET",
+  "path": "/product-governance",
+  "contract": "catalogue",
+  "summary": "Product Governance Command Center",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "productType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "owner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "department",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "risk",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "approver",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProductGovernanceCommandCenterView"
+ },
+ "listProductRetirementSuspension": {
+  "method": "GET",
+  "path": "/product-retirement-suspension",
+  "contract": "catalogue",
+  "summary": "Product Retirement, Suspension & Archive",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ProductRetirementSuspensionArchiveView"
+ },
+ "listProductTrailChange": {
+  "method": "GET",
+  "path": "/product-trail-change",
+  "contract": "catalogue",
+  "summary": "Product Audit Trail & Change History",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "date",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "approval",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "risk",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProductAuditTrailChangeHistoryView"
+ },
+ "listProductVersions": {
+  "method": "GET",
+  "path": "/products/{productId}/versions",
+  "contract": "catalogue",
+  "summary": "What this product used to be",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ProductVersion"
+ },
+ "listRollbackRecovery": {
+  "method": "GET",
+  "path": "/rollback-recovery",
+  "contract": "catalogue",
+  "summary": "Rollback & Recovery Management",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "RollbackRecoveryManagementView"
+ }
+}

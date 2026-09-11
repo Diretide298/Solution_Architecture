@@ -1,0 +1,163 @@
+{
+ "createCaseClassificationIntelligent": {
+  "method": "POST",
+  "path": "/case-classification-intelligent",
+  "contract": "marketing-crm",
+  "summary": "Case Creation, Classification & Intelligent Routing",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "CaseCreationClassificationIntelligentRoutingInput",
+  "responds": "CaseCreationClassificationIntelligentRoutingView"
+ },
+ "listCaseResolutionClosure": {
+  "method": "GET",
+  "path": "/case-resolution-closure",
+  "contract": "marketing-crm",
+  "summary": "Case Resolution, Closure & Customer Feedback",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CaseResolutionClosureCustomerFeedbackView"
+ },
+ "listCustomerService": {
+  "method": "GET",
+  "path": "/customer-service",
+  "contract": "marketing-crm",
+  "summary": "Customer Service Command Center",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CustomerServiceCommandCenterView"
+ },
+ "listCustomerServiceProfile": {
+  "method": "GET",
+  "path": "/customer-service-profile",
+  "contract": "marketing-crm",
+  "summary": "Customer 360° Service Profile",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Customer360ServiceProfileView"
+ },
+ "listEscalationCollaborationInternal": {
+  "method": "GET",
+  "path": "/escalation-collaboration-internal",
+  "contract": "marketing-crm",
+  "summary": "Escalation, Collaboration & Internal Resolution",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "EscalationCollaborationInternalResolutionView"
+ },
+ "listUnifiedInteractionCommunication": {
+  "method": "GET",
+  "path": "/unified-interaction-communication",
+  "contract": "marketing-crm",
+  "summary": "Unified Interaction & Communication History",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "keyword",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "date",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "agent",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "case",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "order",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ticket",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "UnifiedInteractionCommunicationHistoryView"
+ },
+ "setCaseInvestigationResolution": {
+  "method": "PUT",
+  "path": "/case-investigation-resolution",
+  "contract": "marketing-crm",
+  "summary": "Case Investigation & Resolution Workspace",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "CaseInvestigationResolutionWorkspaceInput",
+  "responds": "CaseInvestigationResolutionWorkspaceView"
+ },
+ "setCustomerServiceCopilot": {
+  "method": "PUT",
+  "path": "/customer-service-copilot",
+  "contract": "marketing-crm",
+  "summary": "AI Customer Service Copilot & Knowledge Workspace",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "AiCustomerServiceCopilotKnowledgeWorkspaceInput",
+  "responds": "AiCustomerServiceCopilotKnowledgeWorkspaceView"
+ },
+ "setOrderBookingTicket": {
+  "method": "PUT",
+  "path": "/order-booking-ticket",
+  "contract": "marketing-crm",
+  "summary": "Order, Booking & Ticket Service Workspace",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "OrderBookingTicketServiceWorkspaceInput",
+  "responds": "OrderBookingTicketServiceWorkspaceView"
+ },
+ "setRefundCompensationService": {
+  "method": "PUT",
+  "path": "/refund-compensation-service",
+  "contract": "marketing-crm",
+  "summary": "Refund, Compensation & Service Exception Workspace",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "RefundCompensationServiceExceptionWorkspaceInput",
+  "responds": "RefundCompensationServiceExceptionWorkspaceView"
+ }
+}

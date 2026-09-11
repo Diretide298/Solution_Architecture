@@ -1,0 +1,1200 @@
+{
+ "CommissionCalculationSettlementManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Commission Calculation & Settlement Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "commissionEarned": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Commission Earned"
+   },
+   "commissionPending": {
+    "type": "integer",
+    "description": "Commission Pending"
+   },
+   "approved": {
+    "type": "integer",
+    "description": "Approved"
+   },
+   "onHold": {
+    "type": "string",
+    "description": "On Hold"
+   },
+   "paid": {
+    "type": "string",
+    "description": "Paid"
+   },
+   "reversed": {
+    "type": "string",
+    "description": "Reversed"
+   },
+   "incentivesEarned": {
+    "type": "string",
+    "description": "Incentives Earned"
+   },
+   "nextSettlement": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Next Settlement"
+   },
+   "order": {
+    "type": "string",
+    "description": "Order"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "grossValue": {
+    "type": "string",
+    "description": "Gross Value"
+   },
+   "netRate": {
+    "type": "number",
+    "description": "Net Rate"
+   },
+   "commissionBasis": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Commission Basis"
+   },
+   "commission": {
+    "type": "number",
+    "description": "Commission %"
+   },
+   "commissionAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Commission Amount"
+   },
+   "incentive": {
+    "type": "string",
+    "description": "Incentive"
+   },
+   "adjustment": {
+    "type": "string",
+    "description": "Adjustment"
+   },
+   "payableAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Payable Amount"
+   },
+   "perTransaction": {
+    "type": "string",
+    "description": "Per Transaction"
+   },
+   "weekly": {
+    "type": "string",
+    "description": "Weekly"
+   },
+   "monthly": {
+    "type": "string",
+    "description": "Monthly"
+   },
+   "eventBased": {
+    "type": "string",
+    "description": "Event-Based"
+   },
+   "customCycle": {
+    "type": "string",
+    "description": "Custom Cycle"
+   },
+   "cancellation": {
+    "type": "string",
+    "description": "Cancellation"
+   },
+   "chargeback": {
+    "type": "string",
+    "description": "Chargeback"
+   },
+   "partialFulfillment": {
+    "type": "string",
+    "description": "Partial fulfillment"
+   },
+   "commissionCorrection": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Commission correction"
+   },
+   "incentiveQualification": {
+    "type": "string",
+    "description": "Incentive qualification"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "period": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Period"
+   },
+   "legalEntity": {
+    "type": "string",
+    "description": "Legal Entity"
+   }
+  }
+ },
+ "PartnerAiIntelligenceRelationshipOptimizationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Partner AI Intelligence & Relationship Optimization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "partnerProfile": {
+    "type": "string",
+    "description": "Partner profile"
+   },
+   "territory": {
+    "type": "string",
+    "description": "Territory"
+   },
+   "agreements": {
+    "type": "string",
+    "description": "Agreements"
+   },
+   "rates": {
+    "type": "string",
+    "description": "Rates"
+   },
+   "commission": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Commission"
+   },
+   "credit": {
+    "type": "string",
+    "description": "Credit"
+   },
+   "paymentBehavior": {
+    "type": "string",
+    "description": "Payment behavior"
+   },
+   "allocation": {
+    "type": "string",
+    "description": "Allocation"
+   },
+   "orders": {
+    "type": "string",
+    "description": "Orders"
+   },
+   "cancellations": {
+    "type": "string",
+    "description": "Cancellations"
+   },
+   "settlement": {
+    "type": "string",
+    "description": "Settlement"
+   },
+   "cases": {
+    "type": "string",
+    "description": "Cases"
+   },
+   "channelPerformance": {
+    "type": "string",
+    "description": "Channel performance"
+   },
+   "historicalTrends": {
+    "type": "string",
+    "description": "Historical trends"
+   },
+   "releasing320Tickets": {
+    "type": "string",
+    "description": "releasing 320 tickets"
+   },
+   "velocity": {
+    "type": "string",
+    "description": "velocity"
+   },
+   "usingConfigurableBusinessCriteria": {
+    "type": "string",
+    "description": "using configurable business criteria"
+   },
+   "additionalSales": {
+    "type": "string",
+    "description": "Additional Sales"
+   },
+   "revenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue"
+   },
+   "margin": {
+    "type": "number",
+    "description": "Margin"
+   },
+   "creditExposure": {
+    "type": "string",
+    "description": "Credit Exposure"
+   },
+   "inventoryRisk": {
+    "type": "string",
+    "description": "Inventory Risk"
+   },
+   "recommendation": {
+    "type": "string",
+    "description": "Recommendation"
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason"
+   },
+   "expectedImpact": {
+    "type": "string",
+    "description": "Expected Impact"
+   },
+   "confidence": {
+    "type": "string",
+    "description": "Confidence"
+   },
+   "risks": {
+    "type": "string",
+    "description": "Risks"
+   },
+   "supportingMetrics": {
+    "type": "string",
+    "description": "Supporting Metrics"
+   },
+   "management": {
+    "type": "string",
+    "description": "management"
+   },
+   "screenBackendScreenPrimaryResponsibility": {
+    "type": "string",
+    "description": "Screen Backend Screen Primary Responsibility"
+   },
+   "partnerReconciliationExceptionOperationalFinancial": {
+    "type": "string",
+    "description": "Partner Reconciliation & Exception Operational/financial"
+   },
+   "area8CompleteArchitecture": {
+    "type": "string",
+    "description": "Area 8 — Complete Architecture"
+   },
+   "whoIsThePartner": {
+    "type": "string",
+    "description": "Who is the partner?"
+   },
+   "board2CommercialManagement": {
+    "type": "string",
+    "description": "Board 2 — Commercial Management"
+   },
+   "billingAllocationLimits": {
+    "type": "string",
+    "description": "Billing → Allocation → Limits"
+   },
+   "howIsTheRelationshipPerforming": {
+    "type": "string",
+    "description": "How is the relationship performing?"
+   },
+   "ai": {
+    "type": "string",
+    "description": "AI"
+   },
+   "dashboard": {
+    "type": "string",
+    "description": "dashboard"
+   },
+   "launchTheAppropriateGovernedWorkflow": {
+    "type": "string",
+    "description": "launch the appropriate governed workflow"
+   },
+   "chartAddedAtTheEnd": {
+    "type": "string",
+    "description": "chart added at the end"
+   }
+  }
+ },
+ "PartnerCancellationsRefundsAmendmentsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Partner Cancellations, Refunds & Amendments displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "fullCancellation": {
+    "type": "string",
+    "description": "Full Cancellation"
+   },
+   "partialCancellation": {
+    "type": "string",
+    "description": "Partial Cancellation"
+   },
+   "dateChange": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date Change"
+   },
+   "performanceChange": {
+    "type": "string",
+    "description": "Performance Change"
+   },
+   "quantityReduction": {
+    "type": "integer",
+    "description": "Quantity Reduction"
+   },
+   "productChange": {
+    "type": "string",
+    "description": "Product Change"
+   },
+   "ticketReissue": {
+    "type": "string",
+    "description": "Ticket Reissue"
+   },
+   "customerNameChangeWherePermitted": {
+    "type": "string",
+    "description": "Customer Name Change where permitted"
+   },
+   "transactionValue": {
+    "type": "string",
+    "description": "Transaction value"
+   },
+   "eventProximity": {
+    "type": "string",
+    "description": "Event proximity"
+   },
+   "cancellationPercentage": {
+    "type": "number",
+    "description": "Cancellation percentage"
+   },
+   "partnerStatus": {
+    "type": "string",
+    "description": "Partner status"
+   },
+   "exceptionRequest": {
+    "type": "string",
+    "description": "Exception request"
+   },
+   "originalState": {
+    "type": "string",
+    "description": "Original state"
+   },
+   "newState": {
+    "type": "integer",
+    "description": "New state"
+   },
+   "user": {
+    "type": "string",
+    "description": "User"
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason"
+   },
+   "financialImpact": {
+    "type": "string",
+    "description": "Financial impact"
+   },
+   "approval": {
+    "type": "string",
+    "description": "Approval"
+   }
+  }
+ },
+ "PartnerDisputesCasesServiceManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Partner Disputes, Cases & Service Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "bookingDispute": {
+    "type": "string",
+    "description": "Booking Dispute"
+   },
+   "pricingDispute": {
+    "type": "string",
+    "description": "Pricing Dispute"
+   },
+   "commissionDispute": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Commission Dispute"
+   },
+   "creditDispute": {
+    "type": "string",
+    "description": "Credit Dispute"
+   },
+   "invoiceDispute": {
+    "type": "string",
+    "description": "Invoice Dispute"
+   },
+   "cancellationDispute": {
+    "type": "string",
+    "description": "Cancellation Dispute"
+   },
+   "ticketIssue": {
+    "type": "string",
+    "description": "Ticket Issue"
+   },
+   "allocationIssue": {
+    "type": "string",
+    "description": "Allocation Issue"
+   },
+   "apiIssue": {
+    "type": "string",
+    "description": "API Issue"
+   },
+   "settlementDispute": {
+    "type": "string",
+    "description": "Settlement Dispute"
+   },
+   "caseId": {
+    "type": "string",
+    "description": "Case ID"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner"
+   },
+   "contact": {
+    "type": "string",
+    "description": "Contact"
+   },
+   "category": {
+    "type": "string",
+    "description": "Category"
+   },
+   "priority": {
+    "type": "string",
+    "description": "Priority"
+   },
+   "relatedOrder": {
+    "type": "string",
+    "description": "Related Order"
+   },
+   "relatedInvoice": {
+    "type": "string",
+    "description": "Related Invoice"
+   },
+   "relatedSettlement": {
+    "type": "string",
+    "description": "Related Settlement"
+   },
+   "amountInDispute": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Amount in Dispute"
+   },
+   "description": {
+    "type": "string",
+    "description": "Description"
+   },
+   "evidence": {
+    "type": "string",
+    "description": "Evidence"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "sla": {
+    "type": "string",
+    "description": "SLA"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status"
+   },
+   "proposedResolvedClosed": {
+    "type": "integer",
+    "description": "Proposed → Resolved → Closed"
+   },
+   "firstResponse": {
+    "type": "string",
+    "description": "First Response"
+   },
+   "resolutionTarget": {
+    "type": "string",
+    "description": "Resolution Target"
+   },
+   "timeOpen": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time Open"
+   },
+   "slaBreach": {
+    "type": "string",
+    "description": "SLA Breach"
+   },
+   "notes": {
+    "type": "string",
+    "description": "Notes"
+   },
+   "attachments": {
+    "type": "string",
+    "description": "Attachments"
+   },
+   "assignments": {
+    "type": "string",
+    "description": "Assignments"
+   },
+   "departmentEscalation": {
+    "type": "string",
+    "description": "Department escalation"
+   },
+   "financeReview": {
+    "type": "string",
+    "description": "Finance review"
+   },
+   "technicalReview": {
+    "type": "string",
+    "description": "Technical review"
+   }
+  }
+ },
+ "PartnerOperationsCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Partner Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "partnerSalesToday": {
+    "type": "string",
+    "description": "Partner Sales Today"
+   },
+   "partnerSalesMtd": {
+    "type": "string",
+    "description": "Partner Sales MTD"
+   },
+   "activePartnerOrders": {
+    "type": "integer",
+    "description": "Active Partner Orders"
+   },
+   "activeReservations": {
+    "type": "integer",
+    "description": "Active Reservations"
+   },
+   "activeHolds": {
+    "type": "integer",
+    "description": "Active Holds"
+   },
+   "ticketsSold": {
+    "type": "string",
+    "description": "Tickets Sold"
+   },
+   "cancellations": {
+    "type": "integer",
+    "description": "Cancellations"
+   },
+   "refunds": {
+    "type": "integer",
+    "description": "Refunds"
+   },
+   "outstandingReceivables": {
+    "type": "integer",
+    "description": "Outstanding Receivables"
+   },
+   "commissionPayable": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Commission Payable"
+   },
+   "pendingSettlements": {
+    "type": "integer",
+    "description": "Pending Settlements"
+   },
+   "operationalExceptions": {
+    "type": "integer",
+    "description": "Operational Exceptions"
+   },
+   "partnersRequiringAttention": {
+    "type": "string",
+    "description": "Partners Requiring Attention"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner"
+   },
+   "partnerType": {
+    "type": "string",
+    "description": "Partner Type"
+   },
+   "accountManager": {
+    "type": "string",
+    "description": "Account Manager"
+   },
+   "orders": {
+    "type": "integer",
+    "description": "Orders"
+   },
+   "tickets": {
+    "type": "integer",
+    "description": "Tickets"
+   },
+   "grossSales": {
+    "type": "integer",
+    "description": "Gross Sales"
+   },
+   "netSales": {
+    "type": "integer",
+    "description": "Net Sales"
+   },
+   "commission": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Commission"
+   },
+   "outstandingBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Outstanding Balance"
+   },
+   "creditUtilization": {
+    "type": "number",
+    "description": "Credit Utilization"
+   },
+   "allocationUtilization": {
+    "type": "number",
+    "description": "Allocation Utilization"
+   },
+   "cancellationRate": {
+    "type": "number",
+    "description": "Cancellation Rate"
+   },
+   "operationalStatus": {
+    "type": "integer",
+    "description": "Operational Status"
+   },
+   "risk": {
+    "type": "string",
+    "description": "Risk"
+   }
+  }
+ },
+ "PartnerOrdersBookingManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Partner Orders & Booking Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "partnerReference": {
+    "type": "string",
+    "description": "Partner Reference"
+   },
+   "agentUser": {
+    "type": "string",
+    "description": "Agent/User"
+   },
+   "customerGuestWhereApplicable": {
+    "type": "string",
+    "description": "Customer/Guest where applicable"
+   },
+   "products": {
+    "type": "integer",
+    "description": "Products"
+   },
+   "quantity": {
+    "type": "integer",
+    "description": "Quantity"
+   },
+   "grossValue": {
+    "type": "string",
+    "description": "Gross Value"
+   },
+   "partnerRate": {
+    "type": "number",
+    "description": "Partner Rate"
+   },
+   "commission": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Commission"
+   },
+   "netAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Net Amount"
+   },
+   "paymentMethod": {
+    "type": "string",
+    "description": "Payment Method"
+   },
+   "billingStatus": {
+    "type": "integer",
+    "description": "Billing Status"
+   },
+   "fulfillmentStatus": {
+    "type": "integer",
+    "description": "Fulfillment Status"
+   },
+   "modify": {
+    "type": "string",
+    "description": "Modify"
+   },
+   "rebook": {
+    "type": "string",
+    "description": "Rebook"
+   },
+   "agreement": {
+    "type": "string",
+    "description": "Agreement"
+   },
+   "productEligibility": {
+    "type": "string",
+    "description": "Product eligibility"
+   },
+   "rate": {
+    "type": "number",
+    "description": "Rate"
+   },
+   "allocation": {
+    "type": "string",
+    "description": "Allocation"
+   },
+   "credit": {
+    "type": "string",
+    "description": "Credit"
+   },
+   "bookingLimit": {
+    "type": "integer",
+    "description": "Booking limit"
+   },
+   "cancellationPolicy": {
+    "type": "string",
+    "description": "Cancellation policy"
+   }
+  }
+ },
+ "PartnerPerformanceScorecardRiskMonitoringView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Partner Performance Scorecard & Risk Monitoring displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "sales": {
+    "type": "string",
+    "description": "Sales"
+   },
+   "revenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue"
+   },
+   "growth": {
+    "type": "string",
+    "description": "Growth"
+   },
+   "margin": {
+    "type": "number",
+    "description": "Margin"
+   },
+   "averageOrderValue": {
+    "type": "number",
+    "description": "Average Order Value"
+   },
+   "utilization": {
+    "type": "number",
+    "description": "Utilization"
+   },
+   "sellThrough": {
+    "type": "string",
+    "description": "Sell-through"
+   },
+   "returnedInventory": {
+    "type": "string",
+    "description": "Returned Inventory"
+   },
+   "paymentTimeliness": {
+    "type": "string",
+    "description": "Payment Timeliness"
+   },
+   "creditUtilization": {
+    "type": "number",
+    "description": "Credit Utilization"
+   },
+   "overdueBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Overdue Balance"
+   },
+   "cancellationRate": {
+    "type": "number",
+    "description": "Cancellation Rate"
+   },
+   "errorRate": {
+    "type": "number",
+    "description": "Error Rate"
+   },
+   "supportCases": {
+    "type": "string",
+    "description": "Support Cases"
+   },
+   "apiSuccess": {
+    "type": "string",
+    "description": "API Success"
+   },
+   "transactionFailureRate": {
+    "type": "number",
+    "description": "Transaction Failure Rate"
+   },
+   "documentation": {
+    "type": "string",
+    "description": "Documentation"
+   },
+   "agreementStatus": {
+    "type": "string",
+    "description": "Agreement Status"
+   },
+   "securityGuaranteeStatus": {
+    "type": "string",
+    "description": "Security/Guarantee Status"
+   },
+   "improving": {
+    "type": "string",
+    "description": "Improving"
+   },
+   "stable": {
+    "type": "string",
+    "description": "Stable"
+   },
+   "declining": {
+    "type": "string",
+    "description": "Declining"
+   },
+   "samePartnerType": {
+    "type": "string",
+    "description": "Same partner type"
+   },
+   "sameMarket": {
+    "type": "string",
+    "description": "Same market"
+   },
+   "sameChannel": {
+    "type": "string",
+    "description": "Same channel"
+   },
+   "portfolioAverage": {
+    "type": "number",
+    "description": "Portfolio average"
+   }
+  }
+ },
+ "PartnerReconciliationExceptionManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Partner Reconciliation & Exception Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "ticvaiOrders": {
+    "type": "string",
+    "description": "↔ TICVAI Orders"
+   },
+   "ticketsIssued": {
+    "type": "string",
+    "description": "↔ Tickets Issued"
+   },
+   "partnerRates": {
+    "type": "string",
+    "description": "↔ Partner Rates"
+   },
+   "paymentsCredit": {
+    "type": "string",
+    "description": "↔ Payments/Credit"
+   },
+   "commission": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "↔ Commission"
+   },
+   "invoices": {
+    "type": "string",
+    "description": "↔ Invoices"
+   },
+   "cancellationsRefunds": {
+    "type": "string",
+    "description": "↔ Cancellations/Refunds"
+   },
+   "recordsReconciled": {
+    "type": "string",
+    "description": "Records Reconciled"
+   },
+   "unmatchedOrders": {
+    "type": "integer",
+    "description": "Unmatched Orders"
+   },
+   "amountMismatches": {
+    "type": "integer",
+    "description": "Amount Mismatches"
+   },
+   "missingTickets": {
+    "type": "integer",
+    "description": "Missing Tickets"
+   },
+   "pricingDifferences": {
+    "type": "integer",
+    "description": "Pricing Differences"
+   },
+   "commissionDifferences": {
+    "type": "integer",
+    "description": "Commission Differences"
+   },
+   "paymentDifferences": {
+    "type": "integer",
+    "description": "Payment Differences"
+   },
+   "pendingInvestigation": {
+    "type": "integer",
+    "description": "Pending Investigation"
+   },
+   "partnerAmountAed12450": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Partner Amount: AED 12,450"
+   },
+   "differenceAed150": {
+    "type": "string",
+    "description": "Difference: AED 150"
+   },
+   "mismatchType": {
+    "type": "string",
+    "enum": [
+     "missingTransaction",
+     "duplicateTransaction",
+     "price",
+     "quantity",
+     "tax",
+     "commission",
+     "payment",
+     "cancellation",
+     "settlement"
+    ],
+    "description": "Vocabulary listed under Exception Types."
+   },
+   "match": {
+    "type": "string",
+    "description": "Match"
+   },
+   "correct": {
+    "type": "string",
+    "description": "Correct"
+   },
+   "acceptDifference": {
+    "type": "string",
+    "description": "Accept Difference"
+   },
+   "dispute": {
+    "type": "string",
+    "description": "Dispute"
+   }
+  }
+ },
+ "PartnerStatementAccountActivityView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Partner Statement & Account Activity displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "openingBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Opening Balance"
+   },
+   "sales": {
+    "type": "integer",
+    "description": "Sales"
+   },
+   "payments": {
+    "type": "integer",
+    "description": "Payments"
+   },
+   "credits": {
+    "type": "integer",
+    "description": "Credits"
+   },
+   "refunds": {
+    "type": "integer",
+    "description": "Refunds"
+   },
+   "commission": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Commission"
+   },
+   "adjustments": {
+    "type": "integer",
+    "description": "Adjustments"
+   },
+   "closingBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Closing Balance"
+   },
+   "overdueBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Overdue Balance"
+   },
+   "availableCredit": {
+    "type": "string",
+    "description": "Available Credit"
+   },
+   "current": {
+    "type": "string",
+    "description": "Current"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "transactionType": {
+    "type": "string",
+    "description": "Transaction Type"
+   },
+   "reference": {
+    "type": "string",
+    "description": "Reference"
+   },
+   "orderInvoice": {
+    "type": "string",
+    "description": "Order/Invoice"
+   },
+   "debit": {
+    "type": "string",
+    "description": "Debit"
+   },
+   "credit": {
+    "type": "string",
+    "description": "Credit"
+   },
+   "runningBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Running Balance"
+   },
+   "dueDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Due Date"
+   },
+   "status": {
+    "type": "integer",
+    "description": "Status"
+   },
+   "daily": {
+    "type": "string",
+    "description": "Daily"
+   },
+   "weekly": {
+    "type": "string",
+    "description": "Weekly"
+   },
+   "monthly": {
+    "type": "string",
+    "description": "Monthly"
+   },
+   "customDateRange": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Custom Date Range"
+   }
+  }
+ },
+ "ReservationsHoldsReleaseManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Reservations, Holds & Release Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "activeHolds": {
+    "type": "integer",
+    "description": "Active Holds"
+   },
+   "heldTickets": {
+    "type": "integer",
+    "description": "Held Tickets"
+   },
+   "heldValue": {
+    "type": "string",
+    "description": "Held Value"
+   },
+   "expiringToday": {
+    "type": "string",
+    "description": "Expiring Today"
+   },
+   "expiredHolds": {
+    "type": "integer",
+    "description": "Expired Holds"
+   },
+   "convertedHolds": {
+    "type": "integer",
+    "description": "Converted Holds"
+   },
+   "releasedInventory": {
+    "type": "string",
+    "description": "Released Inventory"
+   },
+   "holdId": {
+    "type": "string",
+    "description": "Hold ID"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "quantity": {
+    "type": "integer",
+    "description": "Quantity"
+   },
+   "seatZoneWhereApplicable": {
+    "type": "string",
+    "description": "Seat/Zone where applicable"
+   },
+   "holdCreated": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Hold Created"
+   },
+   "holdExpiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Hold Expiry"
+   },
+   "createdBy": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Created By"
+   },
+   "commercialValue": {
+    "type": "string",
+    "description": "Commercial Value"
+   },
+   "allocationSource": {
+    "type": "string",
+    "description": "Allocation Source"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status"
+   },
+   "maximumHoldQuantity": {
+    "type": "integer",
+    "description": "Maximum Hold Quantity"
+   },
+   "holdDuration": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Hold Duration"
+   },
+   "numberOfExtensions": {
+    "type": "integer",
+    "description": "Number of Extensions"
+   },
+   "partnerHoldLimit": {
+    "type": "integer",
+    "description": "Partner Hold Limit"
+   },
+   "eventCutoff": {
+    "type": "string",
+    "description": "Event Cutoff"
+   },
+   "approvalRequirement": {
+    "type": "string",
+    "description": "Approval Requirement"
+   },
+   "reduceHold": {
+    "type": "string",
+    "description": "Reduce Hold"
+   },
+   "reassignWherePermitted": {
+    "type": "string",
+    "description": "Reassign where permitted"
+   },
+   "unlessAnApprovedExtensionExists": {
+    "type": "string",
+    "description": "unless an approved extension exists"
+   }
+  }
+ }
+}

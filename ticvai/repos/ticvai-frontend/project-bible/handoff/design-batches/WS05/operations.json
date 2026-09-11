@@ -1,0 +1,173 @@
+{
+ "listBiometric": {
+  "method": "GET",
+  "path": "/biometric",
+  "contract": "access",
+  "summary": "Biometric Simulation, Audit & Publication",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "guest",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "credential",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "faceProfileReference",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "gate",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "device",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "operator",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "date",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "result",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "BiometricSimulationAuditPublicationView"
+ },
+ "listBiometricAccess": {
+  "method": "GET",
+  "path": "/biometric-access",
+  "contract": "access",
+  "summary": "Biometric Access Command Center",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BiometricAccessCommandCenterView"
+ },
+ "listBiometricConsentGuardian": {
+  "method": "GET",
+  "path": "/biometric-consent-guardian",
+  "contract": "access",
+  "summary": "Biometric Consent & Guardian Management",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BiometricConsentGuardianManagementView"
+ },
+ "listBiometricLifecycleRetention": {
+  "method": "GET",
+  "path": "/biometric-lifecycle-retention",
+  "contract": "access",
+  "summary": "Biometric Lifecycle, Retention & Deletion",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BiometricLifecycleRetentionDeletionView"
+ },
+ "listBiometricValidationGate": {
+  "method": "GET",
+  "path": "/biometric-validation-gate",
+  "contract": "access",
+  "summary": "Biometric Validation at Gate",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BiometricValidationAtGateView"
+ },
+ "listFaceChangeEnrollment": {
+  "method": "GET",
+  "path": "/face-change-enrollment",
+  "contract": "access",
+  "summary": "Face Change, Re-enrollment & Identity Protection",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "FaceChangeReEnrollmentIdentityProtectionView"
+ },
+ "listFaceMatchingVerification": {
+  "method": "GET",
+  "path": "/face-matching-verification",
+  "contract": "access",
+  "summary": "Face Matching & Verification Thresholds",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "FaceMatchingVerificationThresholdsView"
+ },
+ "listFaceTagTemporary": {
+  "method": "GET",
+  "path": "/face-tag-temporary",
+  "contract": "access",
+  "summary": "Face Tag Temporary Enrollment",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "FaceTagTemporaryEnrollmentView"
+ },
+ "setBiometricVerificationProfile": {
+  "method": "PUT",
+  "path": "/biometric-verification-profile",
+  "contract": "access",
+  "summary": "Biometric Verification Profile Builder",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "BiometricVerificationProfileBuilderInput",
+  "responds": "BiometricVerificationProfileBuilderView"
+ },
+ "setFacePassEnrollment": {
+  "method": "PUT",
+  "path": "/face-pass-enrollment",
+  "contract": "access",
+  "summary": "Face Pass Enrollment Configuration",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "FacePassEnrollmentConfigurationInput",
+  "responds": "FacePassEnrollmentConfigurationView"
+ }
+}

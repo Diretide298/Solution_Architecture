@@ -1,0 +1,336 @@
+{
+ "CreatePromotionRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "code",
+   "name",
+   "venueId",
+   "discount",
+   "validFrom"
+  ],
+  "properties": {
+   "code": {
+    "type": "string",
+    "maxLength": 64,
+    "pattern": "^[A-Za-z0-9_-]+$"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 1000
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "discount": {
+    "$ref": "#/components/schemas/Discount"
+   },
+   "conditions": {
+    "$ref": "#/components/schemas/PromotionConditions"
+   },
+   "stackingMode": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/StackingMode"
+     }
+    ],
+    "default": "bestOnly"
+   },
+   "stackingGroup": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "precedence": {
+    "type": "integer",
+    "default": 0,
+    "description": "Higher evaluates first where several could apply."
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "maxRedemptions": {
+    "type": "integer",
+    "nullable": true
+   },
+   "maxRedemptionsPerGuest": {
+    "type": "integer",
+    "nullable": true
+   },
+   "budgetCap": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Total discount value after which the promotion stops automatically."
+   }
+  }
+ },
+ "EvaluatePromotionsRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "venueId",
+   "channel",
+   "lines"
+  ],
+  "properties": {
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "channel": {
+    "type": "string"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "membershipTierId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "couponCodes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "evaluateAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "For back-office testing of a rule before publishing."
+   },
+   "lines": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "lineId",
+      "variantId",
+      "quantity",
+      "unitPrice"
+     ],
+     "properties": {
+      "lineId": {
+       "type": "string"
+      },
+      "variantId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "performanceId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "quantity": {
+       "type": "integer",
+       "minimum": 1
+      },
+      "unitPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Promotion": {
+  "x-ticvai-persistence": "promotions.promotion",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreatePromotionRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "status"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "status": {
+      "$ref": "#/components/schemas/PromotionStatus"
+     },
+     "isPaused": {
+      "type": "boolean"
+     },
+     "redemptionCount": {
+      "type": "integer"
+     },
+     "discountGiven": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "publishedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     }
+    }
+   }
+  ]
+ },
+ "PromotionEvaluation": {
+  "x-ticvai-persistence": "none — computed",
+  "parameters": [
+   {
+    "$ref": "../shared/common.yaml#/components/parameters/IdempotencyKey"
+   }
+  ],
+  "type": "object",
+  "required": [
+   "totalDiscount",
+   "lines",
+   "applied",
+   "rejected"
+  ],
+  "properties": {
+   "totalDiscount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "lineId",
+      "originalPrice",
+      "discountedPrice",
+      "discount"
+     ],
+     "properties": {
+      "lineId": {
+       "type": "string"
+      },
+      "originalPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "discountedPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "discount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "appliedPromotionIds": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "format": "uuid"
+       }
+      }
+     }
+    }
+   },
+   "applied": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "promotionId",
+      "promotionCode",
+      "discount"
+     ],
+     "properties": {
+      "promotionId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "promotionCode": {
+       "type": "string"
+      },
+      "promotionName": {
+       "type": "string"
+      },
+      "discount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "couponCode": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "rejected": {
+    "type": "array",
+    "description": "Promotions that matched the products but did not apply, with the reason. This is what a cashier reads to a guest who expected a discount.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "promotionCode",
+      "reason"
+     ],
+     "properties": {
+      "promotionCode": {
+       "type": "string"
+      },
+      "promotionName": {
+       "type": "string"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "conditionsNotMet",
+        "supersededByBetterOffer",
+        "exclusivePromotionApplied",
+        "redemptionLimitReached",
+        "budgetExhausted",
+        "outsideValidPeriod",
+        "wrongChannel",
+        "membershipRequired",
+        "couponRequired"
+       ]
+      },
+      "detail": {
+       "type": "string"
+      }
+     }
+    }
+   }
+  }
+ },
+ "PromotionStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "scheduled",
+   "live",
+   "paused",
+   "expired",
+   "ended"
+  ]
+ }
+}

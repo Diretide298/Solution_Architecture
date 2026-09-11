@@ -1,0 +1,1037 @@
+[
+ {
+  "id": "BO-096",
+  "name": "Resource Calendar",
+  "module": "Access & Venue",
+  "requiresModule": "resources",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/resources/calendar",
+   "component": "apps/venue-management-web/src/routes/resources/ResourceCalendar.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-095"
+   ],
+   "exitTo": [
+    "BO-097"
+   ],
+   "transitions": [
+    {
+     "to": "BO-097",
+     "trigger": "The guest arrives;",
+     "provenance": "flow F25 step 3→4",
+     "operation": "bookResource"
+    }
+   ]
+  },
+  "notes": "CF-125. **Conflict detection before assignment is the whole point** — two bookings on one cabana is a guest arriving to find somebody in their chair, and it must be impossible rather than unlikely.",
+  "density": "compact",
+  "pattern": "statusTracker",
+  "patternReason": "`getResourceAvailability` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "See what is free, and book it without double-booking.",
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected resource calendar",
+       "bindsTo": "ResourceAvailability",
+       "columns": [
+        "ResourceAvailability.resourceId",
+        "ResourceAvailability.freeWindows",
+        "ResourceAvailability.blockedWindows"
+       ],
+       "operation": "getResourceAvailability",
+       "provenance": "contract resources.yaml GET /resources/{resourceId}/availability"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Book",
+       "operation": "bookResource",
+       "provenance": "contract resources.yaml POST /resource-bookings"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "timeline",
+       "bindsTo": "ResourceAvailability",
+       "notes": "Setup and teardown render as their own bands, not as part of the booking — **a 30-minute turnaround is invisible if it is drawn inside the booking**",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Book",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "banner",
+       "notes": "Conflicts, named with times. *Not available* on something a guest can see is not an answer",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Calendar grid; today renders first",
+   "error": "Could not load availability. **Do not book blind** — a booking made against a stale calendar is the double-booking this screen exists to prevent.",
+   "emptyFirstRun": "Nothing booked in this window. **Free is the default state and it is worth showing plainly** — an empty calendar at a venue that takes bookings is either a quiet week or a resource nobody knows exists.",
+   "emptyNoResults": "No availability in this window. The response says why — booked, setup, teardown, maintenance or closed — because **wait and look elsewhere are different answers**.",
+   "emptyNoAccess": "You do not have RESOURCE_VIEW."
+  },
+  "apis": [
+   {
+    "operationId": "getResourceAvailability",
+    "contract": "resources",
+    "purpose": "Free windows",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "bookResource",
+    "contract": "resources",
+    "purpose": "Reserve",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "resourceId",
+     "from": "BO-095"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-096"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-097",
+  "name": "Check Out & Check In",
+  "module": "Access & Venue",
+  "requiresModule": "resources",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/resources/check-out",
+   "component": "apps/venue-management-web/src/routes/resources/ResourceCheckOutForm.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-095",
+    "BO-096"
+   ],
+   "exitTo": [
+    "BO-095",
+    "BO-096"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-095, BO-096.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-096",
+     "trigger": "Resource Calendar",
+     "carries": [
+      "resourceId"
+     ],
+     "provenance": "derived — BO-096 declares entryState.params resourceId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "CF-125, CF-126. **The deposit is held, not taken** — a deposit taken and refunded is two transactions and a fee. **Damage routes the resource to maintenance directly**, because routing through available leaves a window where the next guest books a broken item. **The deposit operations are declared here because this screen calls them** — F25 named them at steps 4 and 5 and the screen did not, which the flow checker refused. **A step calling an operation its screen does not declare is one of the two out of step**, and in this case it was the screen.",
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the screen declares only writes (`checkOutResource`, `checkInResource`, `authoriseStoredValue`) and no read of a population — it is settings, not a list",
+  "purpose": "Hand it over with a deposit, take it back, settle.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "amount",
+       "bindsTo": "Money.amount",
+       "provenance": "contract resources.yaml POST /resource-bookings/{bookingId}/check-out"
+      },
+      {
+       "kind": "textField",
+       "label": "currency",
+       "bindsTo": "Money.currency",
+       "provenance": "contract resources.yaml POST /resource-bookings/{bookingId}/check-out"
+      },
+      {
+       "kind": "textField",
+       "label": "scale",
+       "bindsTo": "Money.scale",
+       "provenance": "contract resources.yaml POST /resource-bookings/{bookingId}/check-out"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Check",
+       "operation": "checkOutResource",
+       "provenance": "contract resources.yaml POST /resource-bookings/{bookingId}/check-out"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Check",
+       "operation": "checkInResource",
+       "provenance": "contract resources.yaml POST /resource-bookings/{bookingId}/check-in"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Authorise",
+       "operation": "authoriseStoredValue",
+       "provenance": "contract orders.yaml POST /stored-value/authorisations"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Release hold",
+       "operation": "relinquishStoredValue",
+       "provenance": "contract orders.yaml POST /stored-value/authorisations/{authorisationId}/release"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "Condition note",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "fileUpload",
+       "label": "Condition photos",
+       "notes": "Taken on the way out, not only on the way back",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Check out",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Check in",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The booking and its condition history",
+   "error": "Could not load. **Check-out and check-in work offline** — the deposit hold reconciles on sync.",
+   "emptyFirstRun": "Nothing is out. **The list a poolside attendant checks at close** — anything still here at the end of the day is a conversation.",
+   "emptyNoAccess": "You do not have RESOURCE_BOOK.",
+   "offline": "Queued locally. The deposit is authorised on sync, and **the condition note taken now is the only defence against a dispute later**."
+  },
+  "apis": [
+   {
+    "operationId": "checkOutResource",
+    "contract": "resources",
+    "purpose": "Hand over",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "checkInResource",
+    "contract": "resources",
+    "purpose": "Take back",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "authoriseStoredValue",
+    "contract": "orders",
+    "purpose": "Hold the deposit",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "relinquishStoredValue",
+    "contract": "orders",
+    "purpose": "Release it",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "authorisationId",
+     "from": "deepLink"
+    },
+    {
+     "name": "bookingId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `authorisationId`, `bookingId`."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-097"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-098",
+  "name": "Qualifications",
+  "module": "Access & Venue",
+  "requiresModule": "resources",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/resources/qualifications",
+   "component": "apps/venue-management-web/src/routes/resources/QualificationList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-095"
+   ],
+   "exitTo": [
+    "BO-095"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-095.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product."
+  },
+  "notes": "CF-125. **Expiry is the field that makes this worth having** — a certification with no expiry is one nobody renews.",
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the screen declares only writes (`setResourceQualifications`) and no read of a population — it is settings, not a list",
+  "purpose": "What a person is certified to do, and until when.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "code",
+       "bindsTo": "Qualification.code",
+       "provenance": "contract resources.yaml PUT /resources/{resourceId}/qualifications"
+      },
+      {
+       "kind": "textField",
+       "label": "name",
+       "bindsTo": "Qualification.name",
+       "provenance": "contract resources.yaml PUT /resources/{resourceId}/qualifications"
+      },
+      {
+       "kind": "textField",
+       "label": "issuedAt",
+       "bindsTo": "Qualification.issuedAt",
+       "provenance": "contract resources.yaml PUT /resources/{resourceId}/qualifications"
+      },
+      {
+       "kind": "textField",
+       "label": "expiresAt",
+       "bindsTo": "Qualification.expiresAt",
+       "provenance": "contract resources.yaml PUT /resources/{resourceId}/qualifications"
+      },
+      {
+       "kind": "textField",
+       "label": "issuer",
+       "bindsTo": "Qualification.issuer",
+       "provenance": "contract resources.yaml PUT /resources/{resourceId}/qualifications"
+      },
+      {
+       "kind": "textField",
+       "label": "documentAssetId",
+       "bindsTo": "Qualification.documentAssetId",
+       "provenance": "contract resources.yaml PUT /resources/{resourceId}/qualifications"
+      },
+      {
+       "kind": "textField",
+       "label": "scopePath",
+       "bindsTo": "Qualification.scopePath",
+       "provenance": "contract resources.yaml PUT /resources/{resourceId}/qualifications"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "setResourceQualifications",
+       "provenance": "contract resources.yaml PUT /resources/{resourceId}/qualifications"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "dataTable",
+       "bindsTo": "Qualification[]",
+       "notes": "Sorted by expiry, not by name — **a lifeguard certificate that lapsed last month is a safety failure, not a data-quality one**",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "banner",
+       "notes": "Expired qualifications held by staff on today rota",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Qualifications with their expiry",
+   "error": "Could not load.",
+   "emptyFirstRun": "No qualifications recorded. **A role is not a skill** — 1.2.36 requires the check before assignment, not after.",
+   "emptyNoAccess": "You do not have RESOURCE_MANAGE."
+  },
+  "apis": [
+   {
+    "operationId": "setResourceQualifications",
+    "contract": "resources",
+    "purpose": "Set qualifications",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "resourceId",
+     "from": "BO-095"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-098"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-099",
+  "name": "Session Manifest",
+  "module": "Access & Venue",
+  "requiresModule": "resources",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/resources/session-manifest",
+   "component": "apps/venue-management-web/src/routes/resources/SessionManifest.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-096"
+   ],
+   "exitTo": [
+    "BO-096"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-096.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-096",
+     "trigger": "Resource Calendar",
+     "carries": [
+      "resourceId"
+     ],
+     "provenance": "derived — BO-096 declares entryState.params resourceId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "CF-125, CF-129. Distinct from duration, which variants already handle.",
+  "density": "compact",
+  "pattern": "statusTracker",
+  "patternReason": "`getSessionManifest` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Who is in a session, in what order.",
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected session manifest",
+       "bindsTo": "SessionParticipant",
+       "columns": [
+        "SessionParticipant.id",
+        "SessionParticipant.sessionId",
+        "SessionParticipant.subjectId",
+        "SessionParticipant.position",
+        "SessionParticipant.experienceLevel",
+        "SessionParticipant.packageName",
+        "SessionParticipant.notes",
+        "SessionParticipant.hasSignedWaiver"
+       ],
+       "operation": "getSessionManifest",
+       "provenance": "contract resources.yaml GET /sessions/{sessionId}/manifest"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Reorder",
+       "operation": "reorderSessionManifest",
+       "provenance": "contract resources.yaml PUT /sessions/{sessionId}/manifest"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "dataTable",
+       "bindsTo": "SessionParticipant[]",
+       "notes": "Drag to reorder. **The running order is operational** — an instructor takes beginners first, and booking order puts one between two advanced riders",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "banner",
+       "notes": "Unsigned waivers, named. **An instructor about to start does not want to discover one at the water edge**",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Participants in running order",
+   "error": "Could not load the manifest.",
+   "emptyFirstRun": "Nobody booked into this session yet.",
+   "emptyNoResults": "No participants match.",
+   "emptyNoAccess": "You do not have RESOURCE_VIEW.",
+   "offline": "The cached manifest. **An instructor at the water edge needs this more than anyone**, and that is where the signal is worst."
+  },
+  "apis": [
+   {
+    "operationId": "getSessionManifest",
+    "contract": "resources",
+    "purpose": "The manifest",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "reorderSessionManifest",
+    "contract": "resources",
+    "purpose": "Change the order",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "sessionId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-099"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-103",
+  "name": "Access & Venue",
+  "module": "Access & Venue",
+  "requiresModule": "core",
+  "wave": 1,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue",
+   "component": "apps/venue-management-web/src/routes/home/AccessVenueList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-001",
+    "BO-002",
+    "BO-003",
+    "BO-004",
+    "BO-005",
+    "BO-006",
+    "BO-030",
+    "BO-031",
+    "BO-032",
+    "BO-033",
+    "BO-034",
+    "BO-035",
+    "BO-038",
+    "BO-069",
+    "BO-071",
+    "BO-072",
+    "BO-092",
+    "BO-093",
+    "BO-094",
+    "BO-095",
+    "BO-096",
+    "BO-097",
+    "BO-098",
+    "BO-099"
+   ],
+   "transitions": [
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-002",
+     "trigger": "Queue Configuration",
+     "carries": [
+      "performanceId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-002 declares entryState.params performanceId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-003",
+     "trigger": "Queue Integration Setup",
+     "carries": [
+      "feedId",
+      "orderId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-003 declares entryState.params feedId, orderId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-004",
+     "trigger": "Manual Wait Time Entry",
+     "carries": [
+      "queueId",
+      "refundId"
+     ],
+     "provenance": "derived — BO-004 declares entryState.params queueId, refundId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-005",
+     "trigger": "Queue Monitor",
+     "carries": [
+      "campaignId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-005 declares entryState.params campaignId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-006",
+     "trigger": "Parking Configuration",
+     "carries": [
+      "accessPointId"
+     ],
+     "provenance": "derived — BO-006 declares entryState.params accessPointId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-030",
+     "trigger": "Work Order Verification",
+     "carries": [
+      "venueId",
+      "workOrderId"
+     ],
+     "provenance": "derived — BO-030 declares entryState.params venueId, workOrderId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-031",
+     "trigger": "Asset Register",
+     "carries": [
+      "assetId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-031 declares entryState.params assetId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-032",
+     "trigger": "Admission Profiles",
+     "carries": [
+      "profileId"
+     ],
+     "provenance": "derived — BO-032 declares entryState.params profileId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-033",
+     "trigger": "Blacklist Management",
+     "carries": [
+      "mediaCode"
+     ],
+     "provenance": "derived — BO-033 declares entryState.params mediaCode, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-038",
+     "trigger": "Reconciliation Queue",
+     "carries": [
+      "queueId"
+     ],
+     "provenance": "derived — BO-038 declares entryState.params queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-069",
+     "trigger": "Asset Register",
+     "carries": [
+      "assetId",
+      "gameId"
+     ],
+     "provenance": "derived — BO-069 declares entryState.params assetId, gameId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-071",
+     "trigger": "Planned Maintenance",
+     "carries": [
+      "roleId"
+     ],
+     "provenance": "derived — BO-071 declares entryState.params roleId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-072",
+     "trigger": "Incident Log",
+     "carries": [
+      "incidentId"
+     ],
+     "provenance": "derived — BO-072 declares entryState.params incidentId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-093",
+     "trigger": "Map Import & Labelling",
+     "carries": [
+      "mapId"
+     ],
+     "provenance": "derived — BO-093 declares entryState.params mapId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-094",
+     "trigger": "Map Editor & Publish",
+     "carries": [
+      "mapId",
+      "pathId"
+     ],
+     "provenance": "derived — BO-094 declares entryState.params mapId, pathId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-096",
+     "trigger": "Resource Calendar",
+     "carries": [
+      "resourceId"
+     ],
+     "provenance": "derived — BO-096 declares entryState.params resourceId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-097",
+     "trigger": "Check Out & Check In",
+     "carries": [
+      "authorisationId",
+      "bookingId"
+     ],
+     "provenance": "derived — BO-097 declares entryState.params authorisationId, bookingId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-098",
+     "trigger": "Qualifications",
+     "carries": [
+      "resourceId"
+     ],
+     "provenance": "derived — BO-098 declares entryState.params resourceId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-099",
+     "trigger": "Session Manifest",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — BO-099 declares entryState.params sessionId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Section landing. **24 screens reach the entry point through here** — before 20 August they reached it through nothing. **Given its section's own operations on 4 September.** It sat on `getVenueSettings` alone, which made it identical to every other section landing page — a hub that shows nothing of its section is a menu item, not a screen.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listAccessPoints` reads the population and `getVenueSettings` reads one of them — list, select, act",
+  "purpose": "Everything in access & venue, and what in it needs attention.",
+  "gaps": [
+   {
+    "operation": "listScans",
+    "why": "**1 declared operation reach no component on this screen**: listScans. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every access venue",
+       "bindsTo": "AccessPoint",
+       "columns": [
+        "AccessPoint.id",
+        "AccessPoint.code",
+        "AccessPoint.name",
+        "AccessPoint.venueId",
+        "AccessPoint.scopePath",
+        "AccessPoint.externalCredentialSources",
+        "AccessPoint.scanAnomalyRules",
+        "AccessPoint.operatingMode",
+        "AccessPoint.vehicleLocationCapture",
+        "AccessPoint.mode",
+        "AccessPoint.direction",
+        "AccessPoint.antiPassbackEnabled"
+       ],
+       "operation": "listAccessPoints",
+       "provenance": "contract access.yaml GET /access-points"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected access venue",
+       "bindsTo": "VenueSettings",
+       "columns": [
+        "VenueSettings.id",
+        "VenueSettings.venueId",
+        "VenueSettings.supportHours",
+        "VenueSettings.quietHours",
+        "VenueSettings.segregatedAccess",
+        "VenueSettings.alerting"
+       ],
+       "operation": "getVenueSettings",
+       "provenance": "contract tenancy.yaml GET /venues/{venueId}/settings"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "cardList",
+       "bindsTo": "screens",
+       "notes": "24 screens, each with what needs attention.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search access & venue",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The list, with counts.",
+   "error": "Could not load. Venue Home is still reachable.",
+   "emptyFirstRun": "**Nothing configured in access & venue yet.** The action is the first thing to set up, not a blank list.",
+   "emptyNoResults": "Nothing matches the filter.",
+   "emptyNoAccess": "You do not have permission for access & venue. **Said plainly** — an empty section reads as broken."
+  },
+  "apis": [
+   {
+    "operationId": "getVenueSettings",
+    "contract": "tenancy",
+    "purpose": "What is enabled here",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listAccessPoints",
+    "contract": "access",
+    "purpose": "Gates and lanes in this venue",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listScans",
+    "contract": "access",
+    "purpose": "Admissions as they happen",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "**Resolves from the session, so a cold arrival is the ordinary case** — a manager bookmarks the back office and opens it every morning. A principal with more than one venue is asked which before the page renders, rather than shown the first one.",
+   "preloaded": [
+    "VenueSettings.id",
+    "VenueSettings.venueId",
+    "VenueSettings.supportHours",
+    "VenueSettings.quietHours",
+    "VenueSettings.segregatedAccess"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-103"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

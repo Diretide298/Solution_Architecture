@@ -1,0 +1,148 @@
+{
+ "listAccess": {
+  "method": "GET",
+  "path": "/access",
+  "contract": "access",
+  "summary": "Access Control Command Center",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AccessControlCommandCenterView"
+ },
+ "listAccessLocationGrouping": {
+  "method": "GET",
+  "path": "/access-location-grouping",
+  "contract": "access",
+  "summary": "Access Location Grouping",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AccessLocationGroupingView"
+ },
+ "listAccessPoints": {
+  "method": "GET",
+  "path": "/access-points",
+  "contract": "access",
+  "summary": "List access points",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listOperatingCalendarSpecial": {
+  "method": "GET",
+  "path": "/operating-calendar-special",
+  "contract": "access",
+  "summary": "Operating Calendar & Special Access Days",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "OperatingCalendarSpecialAccessDaysView"
+ },
+ "listVenueParkAccess": {
+  "method": "GET",
+  "path": "/venue-park-access",
+  "contract": "access",
+  "summary": "Venue & Park Access Structure",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VenueParkAccessStructureView"
+ },
+ "publishTopologyValidation": {
+  "method": "PUT",
+  "path": "/topology-validation",
+  "contract": "access",
+  "summary": "Topology Validation & Publication",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "TopologyValidationPublicationInput",
+  "responds": "TopologyValidationPublicationView"
+ },
+ "setAccessAreaZone": {
+  "method": "PUT",
+  "path": "/access-area-zone",
+  "contract": "access",
+  "summary": "Access Area & Zone Builder",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "AccessAreaZoneBuilderInput",
+  "responds": "AccessAreaZoneBuilderView"
+ },
+ "setAccessGraphicalMap": {
+  "method": "PUT",
+  "path": "/access-graphical-map",
+  "contract": "access",
+  "summary": "Access Control Graphical Map Designer",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "AccessControlGraphicalMapDesignerInput",
+  "responds": "AccessControlGraphicalMapDesignerView"
+ },
+ "setAttractionAccess": {
+  "method": "PUT",
+  "path": "/attraction-access",
+  "contract": "access",
+  "summary": "Attraction Access Configuration",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "AttractionAccessConfigurationInput",
+  "responds": "AttractionAccessConfigurationView"
+ },
+ "setGateLane": {
+  "method": "PUT",
+  "path": "/gate-lane",
+  "contract": "access",
+  "summary": "Gate & Lane Configuration",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "GateLaneConfigurationInput",
+  "responds": "GateLaneConfigurationView"
+ }
+}

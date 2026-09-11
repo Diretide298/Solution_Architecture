@@ -1,0 +1,1660 @@
+[
+ {
+  "id": "ADM-128",
+  "name": "Product Governance Command Center",
+  "module": "Catalogue",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
+   "board": "2",
+   "number": "2.1",
+   "page": 15
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/catalogue/product-governance-command-center-adm-128",
+   "component": "apps/ticvai-web/src/routes/catalogue/ProductGovernanceCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "exitTo": [
+    "ADM-002",
+    "ADM-129",
+    "ADM-130",
+    "ADM-131",
+    "ADM-132",
+    "ADM-133",
+    "ADM-134",
+    "ADM-135",
+    "ADM-136",
+    "ADM-137"
+   ],
+   "inferred": false,
+   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
+   "transitions": [
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-131",
+     "trigger": "Product Version Management",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — ADM-131 declares entryState.params productId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-129",
+     "trigger": "Works in Approval Workflow Designer",
+     "provenance": "flow F153 step 1→2",
+     "operation": "listProductGovernance"
+    },
+    {
+     "to": "ADM-130",
+     "trigger": "Works in Approval Review & Decision Workspace",
+     "provenance": "flow F153 step 3→4",
+     "operation": "listProductGovernance"
+    },
+    {
+     "to": "ADM-132",
+     "trigger": "Works in Rollback & Recovery Management",
+     "provenance": "flow F153 step 7→8",
+     "operation": "listProductGovernance"
+    },
+    {
+     "to": "ADM-133",
+     "trigger": "Works in Change Impact Analysis",
+     "provenance": "flow F153 step 9→10",
+     "operation": "listProductGovernance"
+    },
+    {
+     "to": "ADM-134",
+     "trigger": "Works in Change Propagation & Dependency Control",
+     "provenance": "flow F153 step 11→12",
+     "operation": "listProductGovernance"
+    },
+    {
+     "to": "ADM-135",
+     "trigger": "Works in Product Retirement, Suspension & Archive",
+     "provenance": "flow F153 step 13→14",
+     "operation": "listProductGovernance"
+    },
+    {
+     "to": "ADM-136",
+     "trigger": "Works in Product Audit Trail & Change History",
+     "provenance": "flow F153 step 15→16",
+     "operation": "listProductGovernance"
+    },
+    {
+     "to": "ADM-137",
+     "trigger": "Works in Governance Risk, AI Monitoring & Control Center",
+     "provenance": "flow F153 step 17→18",
+     "operation": "listProductGovernance"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§The dashboard shall display; Each record should display) and no metric row",
+  "purpose": "Provide management and administrators with a single control center for all product governance activities.",
+  "purposeNote": "Authorized users can identify every product requiring governance attention and prioritize actions from a single dashboard.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search product governance",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 15 §Filter by"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "ProductGovernanceCommandCenterView.venue",
+        "Product type",
+        "Owner",
+        "Department",
+        "Status",
+        "Risk",
+        "ProductGovernanceCommandCenterView.changeType",
+        "Approver",
+        "ProductGovernanceCommandCenterView.effectiveDate",
+        "Channel"
+       ],
+       "notes": "The pack filters this screen by venue, product type, owner, department, status, risk and 4 more — which are present is a decision the pack already made.",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 15 §Filter by"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every product governance",
+       "columns": [
+        "ProductGovernanceCommandCenterView.productsAwaitingApproval",
+        "ProductGovernanceCommandCenterView.changesAwaitingApproval",
+        "ProductGovernanceCommandCenterView.rejectedChanges",
+        "ProductGovernanceCommandCenterView.productsWithGovernanceWarnings",
+        "ProductGovernanceCommandCenterView.scheduledChanges",
+        "ProductGovernanceCommandCenterView.productsWithUnpublishedChanges",
+        "ProductGovernanceCommandCenterView.productsWithDependencyConflicts",
+        "ProductGovernanceCommandCenterView.productsApproachingRetirement",
+        "ProductGovernanceCommandCenterView.recentlyPublishedVersions",
+        "Failed publications/rollbacks",
+        "ProductGovernanceCommandCenterView.highRiskConfigurationChanges",
+        "ProductGovernanceCommandCenterView.product",
+        "ProductGovernanceCommandCenterView.venue",
+        "ProductGovernanceCommandCenterView.productOwner",
+        "ProductGovernanceCommandCenterView.changeType",
+        "ProductGovernanceCommandCenterView.currentVersion",
+        "ProductGovernanceCommandCenterView.proposedVersion",
+        "ProductGovernanceCommandCenterView.requestedBy",
+        "ProductGovernanceCommandCenterView.requestedDate",
+        "ProductGovernanceCommandCenterView.riskLevel",
+        "ProductGovernanceCommandCenterView.approvalStatus",
+        "ProductGovernanceCommandCenterView.effectiveDate",
+        "ProductGovernanceCommandCenterView.impactedChannels",
+        "ProductGovernanceCommandCenterView.assignedApprover"
+       ],
+       "bindsTo": "ProductGovernanceCommandCenterView",
+       "operation": "listProductGovernance",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 15 §The dashboard shall display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected product governance",
+       "bindsTo": "ProductGovernanceCommandCenterView",
+       "columns": [
+        "ProductGovernanceCommandCenterView.productsAwaitingApproval",
+        "ProductGovernanceCommandCenterView.changesAwaitingApproval",
+        "ProductGovernanceCommandCenterView.rejectedChanges",
+        "ProductGovernanceCommandCenterView.productsWithGovernanceWarnings",
+        "ProductGovernanceCommandCenterView.scheduledChanges",
+        "ProductGovernanceCommandCenterView.productsWithUnpublishedChanges",
+        "ProductGovernanceCommandCenterView.productsWithDependencyConflicts",
+        "ProductGovernanceCommandCenterView.productsApproachingRetirement",
+        "ProductGovernanceCommandCenterView.recentlyPublishedVersions",
+        "Failed publications/rollbacks",
+        "ProductGovernanceCommandCenterView.highRiskConfigurationChanges",
+        "ProductGovernanceCommandCenterView.product",
+        "ProductGovernanceCommandCenterView.venue",
+        "ProductGovernanceCommandCenterView.productOwner",
+        "ProductGovernanceCommandCenterView.changeType",
+        "ProductGovernanceCommandCenterView.currentVersion",
+        "ProductGovernanceCommandCenterView.proposedVersion",
+        "ProductGovernanceCommandCenterView.requestedBy",
+        "ProductGovernanceCommandCenterView.requestedDate",
+        "ProductGovernanceCommandCenterView.riskLevel",
+        "ProductGovernanceCommandCenterView.approvalStatus",
+        "ProductGovernanceCommandCenterView.effectiveDate",
+        "ProductGovernanceCommandCenterView.impactedChannels",
+        "ProductGovernanceCommandCenterView.assignedApprover"
+       ],
+       "notes": null,
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 15 §The dashboard shall display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The product governance list.",
+   "error": "Could not load. Names which read failed and leaves the product governance untouched.",
+   "emptyFirstRun": "No product governance yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the product governance are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listProductGovernance",
+    "contract": "catalogue",
+    "purpose": "Product Governance Command Center",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "ProductGovernanceCommandCenterView.productsAwaitingApproval",
+    "ProductGovernanceCommandCenterView.changesAwaitingApproval",
+    "ProductGovernanceCommandCenterView.rejectedChanges",
+    "ProductGovernanceCommandCenterView.productsWithGovernanceWarnings",
+    "ProductGovernanceCommandCenterView.scheduledChanges",
+    "ProductGovernanceCommandCenterView.productsWithUnpublishedChanges"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-128"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 15. 26 of 34 labels bound to a contract property; 34 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-129",
+  "name": "Approval Workflow Designer",
+  "module": "Catalogue",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
+   "board": "2",
+   "number": "2.2",
+   "page": 17
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/catalogue/approval-workflow-designer-adm-129",
+   "component": "apps/ticvai-web/src/routes/catalogue/ApprovalWorkflowDesigner.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-128"
+   ],
+   "exitTo": [
+    "ADM-128"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-128, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-128",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F153 step 2→3",
+     "operation": "approveWorkflow"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Each workflow can define; Tax configuration) and no display directory — it is settings, not a population",
+  "purpose": "Configure reusable approval workflows governing product creation and modification.",
+  "purposeNote": "Administrators can configure product approval workflows without development work and route different types of changes through different approval paths.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Workflow name",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 17 §Each workflow can define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Applicable product types",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 17 §Each workflow can define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 17 §Each workflow can define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Department",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 17 §Each workflow can define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Change type",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 17 §Each workflow can define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Approval stages",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 17 §Each workflow can define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Approver role",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 17 §Each workflow can define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Specific approver",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 17 §Each workflow can define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Approval group",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 17 §Each workflow can define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Sequential/parallel approval",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 17 §Each workflow can define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Mandatory/optional stage",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 17 §Each workflow can define"
+      },
+      {
+       "kind": "selectField",
+       "label": "SLA",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 17 §Each workflow can define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Escalation",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 17 §Each workflow can define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Delegation",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 17 §Each workflow can define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Reminder frequency",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 17 §Each workflow can define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Rejection behavior",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 17 §Each workflow can define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Resubmission behavior",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 17 §Each workflow can define"
+      },
+      {
+       "kind": "selectField",
+       "label": "→ Finance",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 17 §Tax configuration"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Approve",
+       "provenance": "contract operation approveWorkflow"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The approval workflow designer configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the approval workflow designer untouched.",
+   "emptyFirstRun": "No approval workflow designer configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "approveWorkflow",
+    "contract": "catalogue",
+    "purpose": "Approval Workflow Designer",
+    "trigger": "onAction",
+    "invalidates": [
+     "approveWorkflow"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-129"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 17. 0 of 0 labels bound to a contract property; 18 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-130",
+  "name": "Approval Review & Decision Workspace",
+  "module": "Catalogue",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
+   "board": "2",
+   "number": "2.3",
+   "page": 18
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/catalogue/approval-review-decision-workspace-adm-130",
+   "component": "apps/ticvai-web/src/routes/catalogue/ApprovalReviewDecisionWorkspace.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-128"
+   ],
+   "exitTo": [
+    "ADM-128"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-128, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-128",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F153 step 4→5",
+     "operation": "approveReviewDecision"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Give approvers a clear interface for reviewing a proposed product or product change before making a decision.",
+  "purposeNote": "An approver can understand exactly what is changing, why it is changing and what it may affect before approving or rejecting the request.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 18"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 18"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Approve",
+       "provenance": "contract operation approveReviewDecision"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "approveReviewDecision"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The approval review decision list.",
+   "error": "Could not load. Names which read failed and leaves the approval review decision untouched.",
+   "emptyFirstRun": "No approval review decision yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the approval review decision are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "approveReviewDecision",
+    "contract": "catalogue",
+    "purpose": "Approval Review & Decision Workspace",
+    "trigger": "onAction",
+    "invalidates": [
+     "approveReviewDecision"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-130"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 18. 0 of 0 labels bound to a contract property; 0 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-131",
+  "name": "Product Version Management",
+  "module": "Catalogue",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
+   "board": "2",
+   "number": "2.4",
+   "page": 19
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/catalogue/product-version-management-adm-131",
+   "component": "apps/ticvai-web/src/routes/catalogue/ProductVersionManagement.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-128"
+   ],
+   "exitTo": [
+    "ADM-128"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-128, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-128",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F153 step 6→7",
+     "operation": "listProductVersions"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Maintain controlled versions of every governed product configuration. The source matrix specifically requires version history for products and the ability to roll back to earlier versions.",
+  "purposeNote": "Every governed product modification creates a traceable version, and authorized users can compare any two versions.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Pricing. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 19 §Users can compare"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 19"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 19"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Pricing",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 19 §Users can compare"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listProductVersions",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The product version list.",
+   "error": "Could not load. Names which read failed and leaves the product version untouched.",
+   "emptyFirstRun": "No product version yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the product version are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listProductVersions",
+    "contract": "catalogue",
+    "purpose": "What this product used to be",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "productId",
+     "from": "navigation"
+    }
+   ],
+   "coldEntry": "**Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that list — never an empty form that looks configurable.",
+   "preloaded": [
+    "ProductVersion.productId",
+    "ProductVersion.publishedAt",
+    "ProductVersion.publishedByPrincipalId",
+    "ProductVersion.note",
+    "ProductVersion.isCurrent"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-131"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 19. 0 of 0 labels bound to a contract property; 1 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-132",
+  "name": "Rollback & Recovery Management",
+  "module": "Catalogue",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
+   "board": "2",
+   "number": "2.5",
+   "page": 20
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/catalogue/rollback-recovery-management-adm-132",
+   "component": "apps/ticvai-web/src/routes/catalogue/RollbackRecoveryManagement.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-128"
+   ],
+   "exitTo": [
+    "ADM-128"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-128, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-128",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F153 step 8→9",
+     "operation": "listRollbackRecovery"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Safely restore an earlier product configuration when a newly published configuration causes an issue.",
+  "purposeNote": "An authorized user can restore a safe earlier configuration without corrupting historical sales, reservations or issued entitlements.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 20"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 20"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listRollbackRecovery",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The rollback recovery list.",
+   "error": "Could not load. Names which read failed and leaves the rollback recovery untouched.",
+   "emptyFirstRun": "No rollback recovery yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the rollback recovery are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listRollbackRecovery",
+    "contract": "catalogue",
+    "purpose": "Rollback & Recovery Management",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "RollbackRecoveryManagementView.identifyDependencies",
+    "RollbackRecoveryManagementView.enterRollbackReason",
+    "RollbackRecoveryManagementView.executeImmediateRollbackWhereAuthorized",
+    "RollbackRecoveryManagementView.monitorRollbackStatus",
+    "RollbackRecoveryManagementView.entireProduct"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-132"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 20. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-133",
+  "name": "Change Impact Analysis",
+  "module": "Catalogue",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
+   "board": "2",
+   "number": "2.6",
+   "page": 21
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/catalogue/change-impact-analysis-adm-133",
+   "component": "apps/ticvai-web/src/routes/catalogue/ChangeImpactAnalysis.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-128"
+   ],
+   "exitTo": [
+    "ADM-128"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-128, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-128",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F153 step 10→11",
+     "operation": "listChangeImpactAnalysis"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Show administrators what will be affected before a product change is approved or published. This directly addresses the matrix requirement to perform impact analysis before product changes are published.",
+  "purposeNote": "Before a material configuration change is approved or published, authorized users can see its potential cross-module and transactional impact.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 21"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 21"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listChangeImpactAnalysis",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The change impact analysis list.",
+   "error": "Could not load. Names which read failed and leaves the change impact analysis untouched.",
+   "emptyFirstRun": "No change impact analysis yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the change impact analysis are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listChangeImpactAnalysis",
+    "contract": "catalogue",
+    "purpose": "Change Impact Analysis",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "ChangeImpactAnalysisView.futureOrders",
+    "ChangeImpactAnalysisView.reservations",
+    "ChangeImpactAnalysisView.issuedTickets",
+    "ChangeImpactAnalysisView.capacity",
+    "ChangeImpactAnalysisView.pricing"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-133"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 21. 0 of 0 labels bound to a contract property; 0 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-134",
+  "name": "Change Propagation & Dependency Control",
+  "module": "Catalogue",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
+   "board": "2",
+   "number": "2.7",
+   "page": 22
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/catalogue/change-propagation-dependency-control-adm-134",
+   "component": "apps/ticvai-web/src/routes/catalogue/ChangePropagationDependencyControl.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-128"
+   ],
+   "exitTo": [
+    "ADM-128"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-128, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-128",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F153 step 12→13",
+     "operation": "listChangePropagationDependency"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Control whether approved product changes should automatically propagate to related products or dependent configurations. The source matrix requires controlled propagation of changes to linked products.",
+  "purposeNote": "Product changes can propagate through defined relationships without unintentionally overwriting approved local exceptions.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 22"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 22"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listChangePropagationDependency",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The change propagation dependency list.",
+   "error": "Could not load. Names which read failed and leaves the change propagation dependency untouched.",
+   "emptyFirstRun": "No change propagation dependency yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the change propagation dependency are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listChangePropagationDependency",
+    "contract": "catalogue",
+    "purpose": "Change Propagation & Dependency Control",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "ChangePropagationDependencyControlView.typesType",
+    "ChangePropagationDependencyControlView.adultAdmission",
+    "ChangePropagationDependencyControlView.childAdmission",
+    "ChangePropagationDependencyControlView.seniorAdmission",
+    "ChangePropagationDependencyControlView.residentAdmission"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-134"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 22. 0 of 0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-135",
+  "name": "Product Retirement, Suspension & Archive",
+  "module": "Catalogue",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
+   "board": "2",
+   "number": "2.8",
+   "page": 23
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/catalogue/product-retirement-suspension-archive-adm-135",
+   "component": "apps/ticvai-web/src/routes/catalogue/ProductRetirementSuspensionArchive.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-128"
+   ],
+   "exitTo": [
+    "ADM-128"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-128, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-128",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F153 step 14→15",
+     "operation": "listProductRetirementSuspension"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Administrator defines) and no display directory — it is settings, not a population",
+  "purpose": "Provide a governed end-of-life process for products. The source matrix explicitly requires disabling or retiring products without affecting previously sold tickets.",
+  "purposeNote": "A product can be safely removed from future sale while protecting existing valid customer transactions and identifying unresolved dependencies.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Suspend Sales, Temporarily Disable, End Sale, Archive. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 23 §Available Actions"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Retirement date",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 23 §Administrator defines"
+      },
+      {
+       "kind": "selectField",
+       "label": "End-of-sale date",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 23 §Administrator defines"
+      },
+      {
+       "kind": "selectField",
+       "label": "Channels",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 23 §Administrator defines"
+      },
+      {
+       "kind": "selectField",
+       "label": "Reason",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 23 §Administrator defines"
+      },
+      {
+       "kind": "selectField",
+       "label": "Replacement product",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 23 §Administrator defines"
+      },
+      {
+       "kind": "selectField",
+       "label": "Existing reservation treatment",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 23 §Administrator defines"
+      },
+      {
+       "kind": "selectField",
+       "label": "Existing ticket treatment",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 23 §Administrator defines"
+      },
+      {
+       "kind": "selectField",
+       "label": "Communication requirements",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 23 §Administrator defines"
+      },
+      {
+       "kind": "selectField",
+       "label": "Reporting treatment",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 23 §Administrator defines"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "destructiveButton",
+       "label": "Suspend Sales",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 23 §Available Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Temporarily Disable",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 23 §Available Actions"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "End Sale",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 23 §Available Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Retire",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 23 §Available Actions"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Archive",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 23 §Available Actions"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmSuspendSales",
+    "component": "confirmDialog",
+    "trigger": "Suspend Sales",
+    "body": "**Suspend Sales on a product retirement suspension is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
+    "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 23 §Available Actions"
+   },
+   {
+    "id": "confirmEndSale",
+    "component": "confirmDialog",
+    "trigger": "End Sale",
+    "body": "**End Sale on a product retirement suspension is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
+    "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 23 §Available Actions"
+   },
+   {
+    "id": "confirmArchive",
+    "component": "confirmDialog",
+    "trigger": "Archive",
+    "body": "**Archive on a product retirement suspension is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
+    "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 23 §Available Actions"
+   }
+  ],
+  "states": {
+   "loading": "The product retirement suspension configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the product retirement suspension untouched.",
+   "emptyFirstRun": "No product retirement suspension configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listProductRetirementSuspension",
+    "contract": "catalogue",
+    "purpose": "Product Retirement, Suspension & Archive",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-135"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 23. 0 of 0 labels bound to a contract property; 14 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-136",
+  "name": "Product Audit Trail & Change History",
+  "module": "Catalogue",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
+   "board": "2",
+   "number": "2.9",
+   "page": 24
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/catalogue/product-audit-trail-change-history-adm-136",
+   "component": "apps/ticvai-web/src/routes/catalogue/ProductAuditTrailChangeHistory.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-128"
+   ],
+   "exitTo": [
+    "ADM-128"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-128, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-128",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F153 step 16→17",
+     "operation": "listProductTrailChange"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Each entry should capture) and no display directory — it is settings, not a population",
+  "purpose": "Provide a complete, immutable history of product configuration and governance activity. The matrix requires tracking configuration changes with timestamps and user information.",
+  "purposeNote": "Every material product configuration and governance action is traceable to who performed it, when it occurred, what changed and under which approval.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search product audit trail",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 24 §Filter by"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "ProductAuditTrailChangeHistoryView.product",
+        "ProductAuditTrailChangeHistoryView.user",
+        "Date",
+        "ProductAuditTrailChangeHistoryView.action",
+        "ProductAuditTrailChangeHistoryView.version",
+        "ProductAuditTrailChangeHistoryView.configurationArea",
+        "Venue",
+        "Approval",
+        "Risk",
+        "ProductAuditTrailChangeHistoryView.environment"
+       ],
+       "notes": "The pack filters this screen by product, user, date, action, version, configuration area and 4 more — which are present is a decision the pack already made.",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 24 §Filter by"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Date/time",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 24 §Each entry should capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "User",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 24 §Each entry should capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Role",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 24 §Each entry should capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Product",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 24 §Each entry should capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Version",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 24 §Each entry should capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Action",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 24 §Each entry should capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Configuration area",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 24 §Each entry should capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Previous value",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 24 §Each entry should capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "New value",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 24 §Each entry should capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Reason",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 24 §Each entry should capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Approval reference",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 24 §Each entry should capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Source channel",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 24 §Each entry should capture"
+      },
+      {
+       "kind": "selectField",
+       "label": "Environment",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 24 §Each entry should capture"
+      },
+      {
+       "kind": "textField",
+       "label": "IP/device metadata where applicable",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 24 §Each entry should capture"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The product audit trail configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the product audit trail untouched.",
+   "emptyFirstRun": "No product audit trail configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoResults": "The filter narrowed it and the product audit trail are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listProductTrailChange",
+    "contract": "catalogue",
+    "purpose": "Product Audit Trail & Change History",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-136"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 24. 6 of 10 labels bound to a contract property; 24 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-137",
+  "name": "Governance Risk, AI Monitoring & Control Center",
+  "module": "Catalogue",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
+   "board": "2",
+   "number": "2.10",
+   "page": 26
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/catalogue/governance-risk-ai-monitoring-control-center-adm-137",
+   "component": "apps/ticvai-web/src/routes/catalogue/GovernanceRiskAiMonitoringControlCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-128"
+   ],
+   "exitTo": [
+    "ADM-128"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-128, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Use TICVAI intelligence to continuously identify catalogue governance risks rather than relying entirely on administrators to discover them manually.",
+  "purposeNote": "Administrators receive proactive governance intelligence with clear explanations and recommended actions while material product decisions remain controlled by the configured authorization framework. Board 2 — Final Screen Register",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every governance risk monitoring",
+       "columns": [
+        "Critical / High / Medium / Low",
+        "GovernanceRiskAiMonitoringControlCenterView.risk",
+        "GovernanceRiskAiMonitoringControlCenterView.product",
+        "GovernanceRiskAiMonitoringControlCenterView.venue",
+        "GovernanceRiskAiMonitoringControlCenterView.businessImpact",
+        "GovernanceRiskAiMonitoringControlCenterView.recommendedAction",
+        "GovernanceRiskAiMonitoringControlCenterView.owner",
+        "GovernanceRiskAiMonitoringControlCenterView.dueDate",
+        "GovernanceRiskAiMonitoringControlCenterView.status"
+       ],
+       "bindsTo": "GovernanceRiskAiMonitoringControlCenterView",
+       "operation": "listGovernanceRiskMonitoring",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 26 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected governance risk monitoring",
+       "bindsTo": "GovernanceRiskAiMonitoringControlCenterView",
+       "columns": [
+        "Critical / High / Medium / Low",
+        "GovernanceRiskAiMonitoringControlCenterView.risk",
+        "GovernanceRiskAiMonitoringControlCenterView.product",
+        "GovernanceRiskAiMonitoringControlCenterView.venue",
+        "GovernanceRiskAiMonitoringControlCenterView.businessImpact",
+        "GovernanceRiskAiMonitoringControlCenterView.recommendedAction",
+        "GovernanceRiskAiMonitoringControlCenterView.owner",
+        "GovernanceRiskAiMonitoringControlCenterView.dueDate",
+        "GovernanceRiskAiMonitoringControlCenterView.status"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Potential duplicate detected”, “Governance warning”, “Backend Screen Primary Responsibility”, “Restore previous”, “Pre-change impact”.",
+       "provenance": "pack Product_Lifecycle___Catalogue_Governance_Reference.pdf, page 26 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The governance risk monitoring list.",
+   "error": "Could not load. Names which read failed and leaves the governance risk monitoring untouched.",
+   "emptyFirstRun": "No governance risk monitoring yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the governance risk monitoring are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listGovernanceRiskMonitoring",
+    "contract": "catalogue",
+    "purpose": "Governance Risk, AI Monitoring & Control Center",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Critical / High / Medium / Low",
+    "GovernanceRiskAiMonitoringControlCenterView.risk",
+    "GovernanceRiskAiMonitoringControlCenterView.product",
+    "GovernanceRiskAiMonitoringControlCenterView.venue",
+    "GovernanceRiskAiMonitoringControlCenterView.businessImpact",
+    "GovernanceRiskAiMonitoringControlCenterView.recommendedAction"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-137"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 26. 8 of 9 labels bound to a contract property; 9 of 55 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

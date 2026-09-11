@@ -1,0 +1,133 @@
+id: F193
+name: 'Game and Ride board 7: Card Lifecycle Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Game and Ride board 7. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-454
+  entryPoints:
+  - Arrives at Card Lifecycle Command Center
+steps:
+- step: 1
+  screen: BO-454
+  action: Opens Card Lifecycle Command Center
+  operations: []
+  outcome: Give operations and management a central view of all active game cards / RFID credentials and
+    their lifecycle status.
+- step: 2
+  screen: BO-455
+  action: Works in Card / Credential Profile
+  operations: []
+  outcome: Provide the master backend profile for an individual physical or digital game credential.
+- step: 3
+  screen: BO-454
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-456
+  action: Works in Card Expiry Rule Configuration
+  operations: []
+  outcome: Configure the backend rule that determines when a card expires.
+- step: 5
+  screen: BO-454
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-457
+  action: Works in Last Recharge & Last Activity Tracking
+  operations: []
+  outcome: Maintain the two dates required for lifecycle calculation and show which events update them.
+- step: 7
+  screen: BO-454
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-458
+  action: Works in Expiry Monitoring & Upcoming Expiration
+  operations: []
+  outcome: Identify cards approaching expiry so operators can monitor liability and customer impact.
+- step: 9
+  screen: BO-454
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-459
+  action: Works in Card Expiry Runtime Validation
+  operations: []
+  outcome: Show how TICVAI automatically handles a card tap when the credential is active or expired.
+- step: 11
+  screen: BO-454
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-460
+  action: Works in Card Block, Suspend & Reactivation Control
+  operations: []
+  outcome: Allow authorized operators to disable a lost, suspicious or invalid card without affecting
+    the underlying wallet record.
+- step: 13
+  screen: BO-454
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-461
+  action: Works in Card Replacement & Wallet Relinking
+  operations: []
+  outcome: Allow a damaged, lost or replaced physical card to be substituted while retaining the customer's
+    wallet and entitlements.
+- step: 15
+  screen: BO-454
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-462
+  action: Works in Customer Balance & Credential Status View
+  operations: []
+  outcome: Provide the backend configuration/view that supports balance-check readers, operator kiosks
+    and self-service kiosks. The source requires a dedicated reader for checking customer balance and
+    also requires wallet credits to be viewable at ope
+- step: 17
+  screen: BO-454
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-463
+  action: Works in Card Lifecycle Audit & History
+  operations: []
+  outcome: Maintain full traceability of card lifecycle changes.
+branches:
+- at: 1
+  condition: Nothing has been set up on Card Lifecycle Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Game and Ride board 7 visited
+primaryContract: unknown
+contracts:
+- unknown

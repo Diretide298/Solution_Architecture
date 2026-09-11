@@ -1,0 +1,2722 @@
+[
+ {
+  "id": "EMP-014",
+  "name": "Ticket lookup",
+  "module": "Operations",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/ticket-lookup",
+   "component": "apps/venue-staff-app/src/routes/operations/TicketLookupDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "EMP-001",
+    "EMP-002",
+    "EMP-003"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "EMP-003"
+   ],
+   "notes": "**Reached from EMP-003** — the screen the device sits on between tasks. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "EMP-001",
+     "trigger": "Sign in",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-002",
+     "trigger": "Select venue & role",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listOrders` reads the population and `getOrder` reads one of them — list, select, act",
+  "purpose": "Answer a question without admitting anybody.",
+  "gaps": [
+   {
+    "operation": "getOrderStatement",
+    "why": "**2 declared operations reach no component on this screen**: getOrderStatement, listOrderRefunds. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every ticket lookup",
+       "bindsTo": "OrderSummary",
+       "columns": [
+        "OrderSummary.id",
+        "OrderSummary.orderNumber",
+        "OrderSummary.status",
+        "OrderSummary.grossAmount",
+        "OrderSummary.refundedAmount",
+        "OrderSummary.channel",
+        "OrderSummary.lineCount"
+       ],
+       "operation": "listOrders",
+       "provenance": "contract orders.yaml GET /orders"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected ticket lookup",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount",
+        "Order.totalPriceVariance",
+        "Order.lines",
+        "Order.payments",
+        "Order.principalId"
+       ],
+       "operation": "getOrder",
+       "provenance": "contract orders.yaml GET /orders/{orderId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createOrder",
+       "provenance": "contract orders.yaml POST /orders"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Apply",
+       "operation": "applyManualDiscount",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createRefund",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/refunds"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Exchange",
+       "operation": "exchangeOrderLines",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Hold",
+       "operation": "holdOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Modify",
+       "operation": "modifyOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reprint",
+       "operation": "reprintOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reschedule",
+       "operation": "rescheduleOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resume",
+       "operation": "resumeOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/resume"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Void",
+       "operation": "voidOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listOrders",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createOrder",
+       "label": "Create order",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "destructiveButton",
+       "derived": true,
+       "impliedBy": "voidOrder",
+       "label": "Void order",
+       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createOrder",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmVoidOrder",
+    "component": "confirmDialog",
+    "trigger": "Void",
+    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A ticket lookup this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
+   }
+  ],
+  "states": {
+   "loading": "The ticket lookup list.",
+   "error": "Could not load. Names which read failed and leaves the ticket lookup untouched.",
+   "emptyFirstRun": "No ticket lookup yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the ticket lookup are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Searches the bundle only. A ticket issued after the last sync will not be found, and the screen says so"
+  },
+  "apis": [
+   {
+    "operationId": "listOrders",
+    "contract": "orders",
+    "purpose": "List orders",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getOrder",
+    "contract": "orders",
+    "purpose": "Read an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createOrder",
+    "contract": "orders",
+    "purpose": "Create an order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "applyManualDiscount",
+    "contract": "orders",
+    "purpose": "Apply a discount a cashier chose",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "createRefund",
+    "contract": "orders",
+    "purpose": "Refund an order, wholly or in part",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "exchangeOrderLines",
+    "contract": "orders",
+    "purpose": "Exchange lines for different products or dates",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "getOrderStatement",
+    "contract": "orders",
+    "purpose": "Full financial history of an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "holdOrder",
+    "contract": "orders",
+    "purpose": "Park a sale and free the till",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "listOrderRefunds",
+    "contract": "orders",
+    "purpose": "List refunds against an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "modifyOrder",
+    "contract": "orders",
+    "purpose": "Add or remove lines on an existing order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "reprintOrder",
+    "contract": "orders",
+    "purpose": "Reprint or resend tickets",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "rescheduleOrder",
+    "contract": "orders",
+    "purpose": "Move an order to another performance",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "resumeOrder",
+    "contract": "orders",
+    "purpose": "Bring a parked sale back to a till",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "voidOrder",
+    "contract": "orders",
+    "purpose": "Void an order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
+   "preloaded": [
+    "Order.id",
+    "Order.orderNumber",
+    "Order.channel",
+    "Order.venueId",
+    "Order.scopePath"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-014"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-015",
+  "name": "Group scan",
+  "module": "Operations",
+  "requiresModule": "access",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/group-scan",
+   "component": "apps/venue-staff-app/src/routes/operations/GroupScanDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "EMP-001",
+    "EMP-002",
+    "EMP-003"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "EMP-010"
+   ],
+   "notes": "**Reached from EMP-010** — a group scan starts from a scan already open. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "EMP-001",
+     "trigger": "Sign in",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-002",
+     "trigger": "Select venue & role",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listScans` reads the population and `getOfflinePackage` reads one of them — list, select, act",
+  "purpose": "Admit a party on one credential.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every group scan",
+       "bindsTo": "ScanEvent",
+       "columns": [
+        "ScanEvent.id",
+        "ScanEvent.accessPointId",
+        "ScanEvent.venueId",
+        "ScanEvent.scopePath",
+        "ScanEvent.ticketId",
+        "ScanEvent.mediaCode",
+        "ScanEvent.outcome",
+        "ScanEvent.denyReason",
+        "ScanEvent.direction",
+        "ScanEvent.operatorPrincipalId",
+        "ScanEvent.deviceId",
+        "ScanEvent.overriddenByPrincipalId"
+       ],
+       "operation": "listScans",
+       "provenance": "contract access.yaml GET /access/scans"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected group scan",
+       "bindsTo": "OfflinePackage",
+       "columns": [
+        "OfflinePackage.generatedAt",
+        "OfflinePackage.validFrom",
+        "OfflinePackage.validTo",
+        "OfflinePackage.accessPointId",
+        "OfflinePackage.entitlements",
+        "OfflinePackage.delegatedRights",
+        "OfflinePackage.blacklist",
+        "OfflinePackage.admissionRules"
+       ],
+       "operation": "getOfflinePackage",
+       "provenance": "contract access.yaml GET /access/offline-package"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Sync",
+       "operation": "syncScans",
+       "provenance": "contract access.yaml POST /access/scans"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Lookup",
+       "operation": "lookupTicket",
+       "provenance": "contract access.yaml GET /access/lookup"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Override",
+       "operation": "overrideAccess",
+       "provenance": "contract access.yaml POST /access/override"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Validate",
+       "operation": "validateAccess",
+       "provenance": "contract access.yaml POST /access/validate"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Validate",
+       "operation": "validateGroupAccess",
+       "provenance": "contract access.yaml POST /access/group-validate"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "scanTarget",
+       "derived": true,
+       "impliedBy": "listScans",
+       "notes": "**A screen that validates a credential needs somewhere to point the camera.** `denied` and `hardwareError` look different because an operator facing a guest needs to know whether to try again or explain something.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "searchField",
+       "derived": true,
+       "impliedBy": "lookupTicket",
+       "label": "Search",
+       "notes": "A search that returns nothing must say so differently from a search not yet run.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "syncScans",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmOverrideAccess",
+    "component": "confirmDialog",
+    "trigger": "Override",
+    "body": "**Names what `overrideAccess` changes and what it leaves alone**, in the consequence rather than the verb. A group scan this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract access.yaml POST /access/override"
+   }
+  ],
+  "states": {
+   "loading": "The group scan list.",
+   "error": "Could not load. Names which read failed and leaves the group scan untouched.",
+   "emptyFirstRun": "No group scan yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the group scan are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Fully offline. Admits what is valid and states the shortfall"
+  },
+  "apis": [
+   {
+    "operationId": "listScans",
+    "contract": "access",
+    "purpose": "List scan events",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "syncScans",
+    "contract": "access",
+    "purpose": "Replay scans recorded offline",
+    "trigger": "onAction",
+    "invalidates": [
+     "listScans"
+    ]
+   },
+   {
+    "operationId": "getOfflinePackage",
+    "contract": "access",
+    "purpose": "Entitlement and rule set for offline validation",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "lookupTicket",
+    "contract": "access",
+    "purpose": "Read-only validity check without admitting",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "overrideAccess",
+    "contract": "access",
+    "purpose": "Admit against a failed validation",
+    "trigger": "onAction",
+    "invalidates": [
+     "listScans"
+    ]
+   },
+   {
+    "operationId": "validateAccess",
+    "contract": "access",
+    "purpose": "Validate media at an access point and admit or deny",
+    "trigger": "onAction",
+    "invalidates": [
+     "listScans"
+    ]
+   },
+   {
+    "operationId": "validateGroupAccess",
+    "contract": "access",
+    "purpose": "Admit a group on one read",
+    "trigger": "onAction",
+    "invalidates": [
+     "listScans"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "OfflinePackage.generatedAt",
+    "OfflinePackage.validFrom",
+    "OfflinePackage.validTo",
+    "OfflinePackage.accessPointId",
+    "OfflinePackage.entitlements"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-015"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-017",
+  "name": "Sync & reconciliation",
+  "module": "Operations",
+  "requiresModule": "access",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/sync-reconciliation",
+   "component": "apps/venue-staff-app/src/routes/operations/SyncReconciliationDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "EMP-001",
+    "EMP-002",
+    "EMP-003",
+    "EMP-009"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "EMP-003",
+    "EMP-008"
+   ],
+   "notes": "**Reached from EMP-003** — the screen the device sits on between tasks. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "EMP-009",
+     "trigger": "The supervisor closes it",
+     "provenance": "flow F72 step 2→3"
+    },
+    {
+     "to": "EMP-001",
+     "trigger": "Sign in",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-002",
+     "trigger": "Select venue & role",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listSyncRejections` reads the population and `getOfflinePackage` reads one of them — list, select, act",
+  "purpose": "Learn that the server disagreed with you.",
+  "gaps": [
+   {
+    "operation": "listScans",
+    "why": "**1 declared operation reach no component on this screen**: listScans. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every sync reconciliation",
+       "bindsTo": "SyncRejection",
+       "columns": [
+        "SyncRejection.id",
+        "SyncRejection.workstationId",
+        "SyncRejection.kind",
+        "SyncRejection.recordedAt",
+        "SyncRejection.rejectedAt",
+        "SyncRejection.problem",
+        "SyncRejection.payload",
+        "SyncRejection.resolvedAt",
+        "SyncRejection.resolvedByPrincipalId"
+       ],
+       "operation": "listSyncRejections",
+       "provenance": "contract orders.yaml GET /sync/rejections"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected sync reconciliation",
+       "bindsTo": "OfflinePackage",
+       "columns": [
+        "OfflinePackage.generatedAt",
+        "OfflinePackage.validFrom",
+        "OfflinePackage.validTo",
+        "OfflinePackage.accessPointId",
+        "OfflinePackage.entitlements",
+        "OfflinePackage.delegatedRights",
+        "OfflinePackage.blacklist",
+        "OfflinePackage.admissionRules"
+       ],
+       "operation": "getOfflinePackage",
+       "provenance": "contract access.yaml GET /access/offline-package"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Sync",
+       "operation": "syncScans",
+       "provenance": "contract access.yaml POST /access/scans"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Lookup",
+       "operation": "lookupTicket",
+       "provenance": "contract access.yaml GET /access/lookup"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Override",
+       "operation": "overrideAccess",
+       "provenance": "contract access.yaml POST /access/override"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Sync",
+       "operation": "syncOrders",
+       "provenance": "contract orders.yaml POST /sync/orders"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Validate",
+       "operation": "validateAccess",
+       "provenance": "contract access.yaml POST /access/validate"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Validate",
+       "operation": "validateGroupAccess",
+       "provenance": "contract access.yaml POST /access/group-validate"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "scanTarget",
+       "derived": true,
+       "impliedBy": "syncScans",
+       "notes": "**A screen that validates a credential needs somewhere to point the camera.** `denied` and `hardwareError` look different because an operator facing a guest needs to know whether to try again or explain something.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listSyncRejections",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "searchField",
+       "derived": true,
+       "impliedBy": "lookupTicket",
+       "label": "Search",
+       "notes": "A search that returns nothing must say so differently from a search not yet run.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "syncScans",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmOverrideAccess",
+    "component": "confirmDialog",
+    "trigger": "Override",
+    "body": "**Names what `overrideAccess` changes and what it leaves alone**, in the consequence rather than the verb. A sync reconciliation this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract access.yaml POST /access/override"
+   }
+  ],
+  "states": {
+   "loading": "The sync reconciliation list.",
+   "error": "Could not load. Names which read failed and leaves the sync reconciliation untouched.",
+   "emptyFirstRun": "No sync reconciliation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the sync reconciliation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Not applicable; this screen ends the offline period"
+  },
+  "apis": [
+   {
+    "operationId": "syncScans",
+    "contract": "access",
+    "purpose": "Replay scans recorded offline",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSyncRejections"
+    ]
+   },
+   {
+    "operationId": "listSyncRejections",
+    "contract": "orders",
+    "purpose": "Entries the server refused",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getOfflinePackage",
+    "contract": "access",
+    "purpose": "Entitlement and rule set for offline validation",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listScans",
+    "contract": "access",
+    "purpose": "List scan events",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "lookupTicket",
+    "contract": "access",
+    "purpose": "Read-only validity check without admitting",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "overrideAccess",
+    "contract": "access",
+    "purpose": "Admit against a failed validation",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSyncRejections"
+    ]
+   },
+   {
+    "operationId": "syncOrders",
+    "contract": "orders",
+    "purpose": "Replay orders recorded offline",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSyncRejections"
+    ]
+   },
+   {
+    "operationId": "validateAccess",
+    "contract": "access",
+    "purpose": "Validate media at an access point and admit or deny",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSyncRejections"
+    ]
+   },
+   {
+    "operationId": "validateGroupAccess",
+    "contract": "access",
+    "purpose": "Admit a group on one read",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSyncRejections"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "OfflinePackage.generatedAt",
+    "OfflinePackage.validFrom",
+    "OfflinePackage.validTo",
+    "OfflinePackage.accessPointId",
+    "OfflinePackage.entitlements"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-017"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-018",
+  "name": "Offline package",
+  "module": "Operations",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/offline-package",
+   "component": "apps/venue-staff-app/src/routes/operations/OfflinePackageDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "EMP-001",
+    "EMP-002",
+    "EMP-003",
+    "EMP-049"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "EMP-017",
+    "EMP-043"
+   ],
+   "notes": "**Reached from EMP-017** — the offline package is taken from the sync that reports it stale. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "EMP-049",
+     "trigger": "At the end of the session the journal is handed over",
+     "provenance": "flow F71 step 2→3"
+    },
+    {
+     "to": "EMP-001",
+     "trigger": "Sign in",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-002",
+     "trigger": "Select venue & role",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Removed 24 August**: publishBundle. **Bulk-attach residue, found by walking a journey.** A device-settings screen does not read guest loyalty, a venue map does not set a refund policy, a shift summary does not close the shift, and **a rota a steward can rewrite is not a rota.**",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listCatalogueBundles` reads the population and `getLatestBundle` reads one of them — list, select, act",
+  "purpose": "Know which rules this device is enforcing.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every offline package",
+       "bindsTo": "BundleSummary",
+       "columns": [
+        "BundleSummary.venueId",
+        "BundleSummary.publishedAt",
+        "BundleSummary.publishedBy",
+        "BundleSummary.contentHash",
+        "BundleSummary.signatureKeyId",
+        "BundleSummary.staleAfter",
+        "BundleSummary.sizeBytes",
+        "BundleSummary.note",
+        "BundleSummary.appliedByWorkstations"
+       ],
+       "operation": "listCatalogueBundles",
+       "provenance": "contract catalogue.yaml GET /catalogue/bundles"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected offline package",
+       "bindsTo": "CatalogueBundle",
+       "columns": [
+        "CatalogueBundle.venueId",
+        "CatalogueBundle.isDelta",
+        "CatalogueBundle.baseVersion",
+        "CatalogueBundle.signature",
+        "CatalogueBundle.signatureKeyId",
+        "CatalogueBundle.contentHash",
+        "CatalogueBundle.staleAfter",
+        "CatalogueBundle.payload"
+       ],
+       "operation": "getLatestBundle",
+       "provenance": "contract catalogue.yaml GET /catalogue/bundles/latest"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Report",
+       "operation": "reportBundleApplied",
+       "provenance": "contract catalogue.yaml POST /catalogue/bundles/{version}/applied"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listCatalogueBundles",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "reportBundleApplied",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The offline package list.",
+   "error": "Could not load. Names which read failed and leaves the offline package untouched.",
+   "emptyFirstRun": "No offline package yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the offline package are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cannot refresh. The existing bundle continues and its age is shown"
+  },
+  "apis": [
+   {
+    "operationId": "listCatalogueBundles",
+    "contract": "catalogue",
+    "purpose": "List published bundles",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getLatestBundle",
+    "contract": "catalogue",
+    "purpose": "Pull the current bundle for this workstation's venue",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "reportBundleApplied",
+    "contract": "catalogue",
+    "purpose": "Report that a workstation applied a bundle",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCatalogueBundles"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "version",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A version link is expected to point at something superseded — that is what versions are for.** The screen opens the requested version read-only, says it is not current, and links to the one that is. **An old version is history, not an error.** Arrives with `version`.",
+   "preloaded": [
+    "CatalogueBundle.venueId",
+    "CatalogueBundle.isDelta",
+    "CatalogueBundle.baseVersion",
+    "CatalogueBundle.signature",
+    "CatalogueBundle.signatureKeyId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-018"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-019",
+  "name": "AI assistant — home",
+  "module": "Operations",
+  "requiresModule": "ai",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/ai-assistant-home",
+   "component": "apps/venue-staff-app/src/routes/operations/AiAssistantHomeDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "EMP-001",
+    "EMP-002",
+    "EMP-003",
+    "EMP-020"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "EMP-003"
+   ],
+   "notes": "**Reached from EMP-003** — the screen the device sits on between tasks. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "EMP-020",
+     "trigger": "AI assistant — answer",
+     "provenance": "flow F101 step 1→2"
+    },
+    {
+     "to": "EMP-001",
+     "trigger": "Sign in",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-002",
+     "trigger": "Select venue & role",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. Pulled to Wave 1 (CF-101). CF-57: the client named AI configuration assistance as a Wave 1 priority, and F20 is Wave 1.",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listAiConversations` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "The tab that is already in the shell.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every assistant home",
+       "bindsTo": "AiConversation",
+       "columns": [
+        "AiConversation.id",
+        "AiConversation.principalId",
+        "AiConversation.scopePath",
+        "AiConversation.module",
+        "AiConversation.locale",
+        "AiConversation.messageCount",
+        "AiConversation.startedAt",
+        "AiConversation.lastMessageAt"
+       ],
+       "operation": "listAiConversations",
+       "provenance": "contract ai.yaml GET /conversations"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected assistant home",
+       "bindsTo": "AiConversation",
+       "columns": [
+        "AiConversation.id",
+        "AiConversation.principalId",
+        "AiConversation.scopePath",
+        "AiConversation.module",
+        "AiConversation.locale",
+        "AiConversation.messageCount",
+        "AiConversation.startedAt",
+        "AiConversation.lastMessageAt"
+       ],
+       "operation": "listAiConversations",
+       "provenance": "contract ai.yaml GET /conversations"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createAiConversation",
+       "provenance": "contract ai.yaml POST /conversations"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Send",
+       "operation": "sendAiMessage",
+       "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listAiConversations",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createAiConversation",
+       "label": "Create ai conversation",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createAiConversation",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The assistant home list.",
+   "error": "Could not load. Names which read failed and leaves the assistant home untouched.",
+   "emptyFirstRun": "No assistant home yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the assistant home are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Not available.** Retrieval needs the index"
+  },
+  "apis": [
+   {
+    "operationId": "listAiConversations",
+    "contract": "ai",
+    "purpose": "A principal's conversation history",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createAiConversation",
+    "contract": "ai",
+    "purpose": "Open a conversation",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAiConversations"
+    ]
+   },
+   {
+    "operationId": "sendAiMessage",
+    "contract": "ai",
+    "purpose": "Ask",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAiConversations"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "conversationId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom.",
+   "preloaded": [
+    "AiConversation.id",
+    "AiConversation.principalId",
+    "AiConversation.scopePath",
+    "AiConversation.module",
+    "AiConversation.locale"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-019"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-020",
+  "name": "AI assistant — answer",
+  "module": "Operations",
+  "requiresModule": "ai",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/ai-assistant-answer",
+   "component": "apps/venue-staff-app/src/routes/operations/AiAssistantAnswerDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "EMP-001",
+    "EMP-002",
+    "EMP-003",
+    "EMP-040"
+   ],
+   "inferred": false,
+   "fromFlows": true,
+   "entryFrom": [
+    "EMP-019"
+   ],
+   "notes": "**Reached from EMP-019** — an answer is reached from the question. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "EMP-040",
+     "trigger": "Knowledge base",
+     "provenance": "flow F101 step 2→3"
+    },
+    {
+     "to": "EMP-001",
+     "trigger": "Sign in",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-002",
+     "trigger": "Select venue & role",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-058",
+     "trigger": "Saves it as a report",
+     "provenance": "flow F20 step 2→3",
+     "operation": "sendAiMessage",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. Pulled to Wave 1 (CF-101) with EMP-019 — **the question and the answer are one screen pair** and splitting them across waves ships half a feature. **Cross-platform navigation removed 24 August**: BO-058. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listAiConversations` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Answer with the operation behind it visible.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every assistant answer",
+       "bindsTo": "AiConversation",
+       "columns": [
+        "AiConversation.id",
+        "AiConversation.principalId",
+        "AiConversation.scopePath",
+        "AiConversation.module",
+        "AiConversation.locale",
+        "AiConversation.messageCount",
+        "AiConversation.startedAt",
+        "AiConversation.lastMessageAt"
+       ],
+       "operation": "listAiConversations",
+       "provenance": "contract ai.yaml GET /conversations"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected assistant answer",
+       "bindsTo": "AiConversation",
+       "columns": [
+        "AiConversation.id",
+        "AiConversation.principalId",
+        "AiConversation.scopePath",
+        "AiConversation.module",
+        "AiConversation.locale",
+        "AiConversation.messageCount",
+        "AiConversation.startedAt",
+        "AiConversation.lastMessageAt"
+       ],
+       "operation": "listAiConversations",
+       "provenance": "contract ai.yaml GET /conversations"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Send",
+       "operation": "sendAiMessage",
+       "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createAiConversation",
+       "provenance": "contract ai.yaml POST /conversations"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "sendAiMessage",
+       "label": "Send ai message",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listAiConversations",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "sendAiMessage",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The assistant answer list.",
+   "error": "Could not load. Names which read failed and leaves the assistant answer untouched.",
+   "emptyFirstRun": "No assistant answer yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the assistant answer are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Not available"
+  },
+  "apis": [
+   {
+    "operationId": "sendAiMessage",
+    "contract": "ai",
+    "purpose": "Ask",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAiConversations"
+    ]
+   },
+   {
+    "operationId": "createAiConversation",
+    "contract": "ai",
+    "purpose": "Open a conversation",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAiConversations"
+    ]
+   },
+   {
+    "operationId": "listAiConversations",
+    "contract": "ai",
+    "purpose": "A principal's conversation history",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "conversationId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom.",
+   "preloaded": [
+    "AiConversation.id",
+    "AiConversation.principalId",
+    "AiConversation.scopePath",
+    "AiConversation.module",
+    "AiConversation.locale"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-020"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-021",
+  "name": "Roster",
+  "module": "Operations",
+  "requiresModule": "core",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/roster",
+   "component": "apps/venue-staff-app/src/routes/operations/RosterDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "EMP-001",
+    "EMP-002",
+    "EMP-003",
+    "EMP-022"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "EMP-003"
+   ],
+   "notes": "**Reached from EMP-003** — the screen the device sits on between tasks. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "EMP-022",
+     "trigger": "A steward reads their own shifts",
+     "provenance": "flow F68 step 1→2",
+     "operation": "listRotaAssignments"
+    },
+    {
+     "to": "EMP-001",
+     "trigger": "Sign in",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-002",
+     "trigger": "Select venue & role",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Removed 24 August**: createRotaAssignment, updateRotaAssignment. **Bulk-attach residue.** A device-settings screen does not merge guest profiles, a rota view does not author the rota, a shift summary does not open a shift, and **authority notification belongs where the incident is raised, not where it is read.**",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listRotaAssignments` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "See who is on, and where.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every roster",
+       "bindsTo": "RotaAssignment",
+       "columns": [
+        "RotaAssignment.overtimeMinutes",
+        "RotaAssignment.restPeriodBefore",
+        "RotaAssignment.breachesWorkingHourLimit",
+        "RotaAssignment.labourCost",
+        "RotaAssignment.id",
+        "RotaAssignment.principalId",
+        "RotaAssignment.displayName",
+        "RotaAssignment.venueId",
+        "RotaAssignment.departmentId",
+        "RotaAssignment.position",
+        "RotaAssignment.requiredRoleId",
+        "RotaAssignment.workstationId"
+       ],
+       "operation": "listRotaAssignments",
+       "provenance": "contract workforce.yaml GET /rota-assignments"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected roster",
+       "bindsTo": "RotaAssignment",
+       "columns": [
+        "RotaAssignment.overtimeMinutes",
+        "RotaAssignment.restPeriodBefore",
+        "RotaAssignment.breachesWorkingHourLimit",
+        "RotaAssignment.labourCost",
+        "RotaAssignment.id",
+        "RotaAssignment.principalId",
+        "RotaAssignment.displayName",
+        "RotaAssignment.venueId",
+        "RotaAssignment.departmentId",
+        "RotaAssignment.position",
+        "RotaAssignment.requiredRoleId",
+        "RotaAssignment.workstationId",
+        "RotaAssignment.startsAt",
+        "RotaAssignment.endsAt",
+        "RotaAssignment.status",
+        "RotaAssignment.breakMinutes"
+       ],
+       "operation": "listRotaAssignments",
+       "provenance": "contract workforce.yaml GET /rota-assignments"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Request",
+       "operation": "requestShiftSwap",
+       "provenance": "contract workforce.yaml POST /rota-assignments/{assignmentId}/swap"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listRotaAssignments",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "requestShiftSwap",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The roster list.",
+   "error": "Could not load. Names which read failed and leaves the roster untouched.",
+   "emptyFirstRun": "No roster yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the roster are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached roster with its age"
+  },
+  "apis": [
+   {
+    "operationId": "listRotaAssignments",
+    "contract": "workforce",
+    "purpose": "The rota",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "requestShiftSwap",
+    "contract": "workforce",
+    "purpose": "Ask someone to take your shift",
+    "trigger": "onAction",
+    "invalidates": [
+     "listRotaAssignments"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "assignmentId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `assignmentId`.",
+   "preloaded": [
+    "RotaAssignment.overtimeMinutes",
+    "RotaAssignment.restPeriodBefore",
+    "RotaAssignment.breachesWorkingHourLimit",
+    "RotaAssignment.labourCost",
+    "RotaAssignment.id"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-021"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-022",
+  "name": "My rota",
+  "module": "Operations",
+  "requiresModule": "core",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/my-rota",
+   "component": "apps/venue-staff-app/src/routes/operations/MyRotaDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "EMP-001",
+    "EMP-002",
+    "EMP-003",
+    "EMP-023"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "EMP-003",
+    "EMP-021"
+   ],
+   "notes": "**Reached from EMP-003** — the screen the device sits on between tasks. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "EMP-023",
+     "trigger": "They ask to swap one",
+     "provenance": "flow F68 step 2→3",
+     "operation": "listRotaAssignments"
+    },
+    {
+     "to": "EMP-001",
+     "trigger": "Sign in",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-002",
+     "trigger": "Select venue & role",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Removed 24 August**: createRotaAssignment, updateRotaAssignment. **Bulk-attach residue, found by walking a journey.** A device-settings screen does not read guest loyalty, a venue map does not set a refund policy, a shift summary does not close the shift, and **a rota a steward can rewrite is not a rota.**",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listRotaAssignments` reads the population and `getCurrentShift` reads one of them — list, select, act",
+  "purpose": "Know when to turn up next.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every rota",
+       "bindsTo": "RotaAssignment",
+       "columns": [
+        "RotaAssignment.overtimeMinutes",
+        "RotaAssignment.restPeriodBefore",
+        "RotaAssignment.breachesWorkingHourLimit",
+        "RotaAssignment.labourCost",
+        "RotaAssignment.id",
+        "RotaAssignment.principalId",
+        "RotaAssignment.displayName",
+        "RotaAssignment.venueId",
+        "RotaAssignment.departmentId",
+        "RotaAssignment.position",
+        "RotaAssignment.requiredRoleId",
+        "RotaAssignment.workstationId"
+       ],
+       "operation": "listRotaAssignments",
+       "provenance": "contract workforce.yaml GET /rota-assignments"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected rota",
+       "bindsTo": "Shift",
+       "columns": [
+        "Shift.id",
+        "Shift.workstationId",
+        "Shift.venueId",
+        "Shift.scopePath",
+        "Shift.principalId",
+        "Shift.principalDisplayName",
+        "Shift.incidents",
+        "Shift.status",
+        "Shift.currency",
+        "Shift.currencyScale",
+        "Shift.depositBoxCode",
+        "Shift.bagNumber",
+        "Shift.openingFloat",
+        "Shift.salesTotal",
+        "Shift.refundsTotal",
+        "Shift.liftsTotal"
+       ],
+       "operation": "getCurrentShift",
+       "provenance": "contract shift.yaml GET /shifts/current"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Request",
+       "operation": "requestShiftSwap",
+       "provenance": "contract workforce.yaml POST /rota-assignments/{assignmentId}/swap"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listRotaAssignments",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "requestShiftSwap",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The rota list.",
+   "error": "Could not load. Names which read failed and leaves the rota untouched.",
+   "emptyFirstRun": "No rota yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the rota are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached"
+  },
+  "apis": [
+   {
+    "operationId": "listRotaAssignments",
+    "contract": "workforce",
+    "purpose": "The rota",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "requestShiftSwap",
+    "contract": "workforce",
+    "purpose": "Ask someone to take your shift",
+    "trigger": "onAction",
+    "invalidates": [
+     "listRotaAssignments"
+    ]
+   },
+   {
+    "operationId": "getCurrentShift",
+    "contract": "shift",
+    "purpose": "The shift this person is on now",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "assignmentId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `assignmentId`.",
+   "preloaded": [
+    "Shift.id",
+    "Shift.workstationId",
+    "Shift.venueId",
+    "Shift.scopePath",
+    "Shift.principalId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-022"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-023",
+  "name": "Swap request",
+  "module": "Operations",
+  "requiresModule": "core",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/swap-request",
+   "component": "apps/venue-staff-app/src/routes/operations/SwapRequestDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "EMP-001",
+    "EMP-002",
+    "EMP-003",
+    "EMP-024"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "EMP-022"
+   ],
+   "notes": "**Reached from EMP-022** — a swap is requested against the rota that shows the clash. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "EMP-024",
+     "trigger": "On the day, they clock in",
+     "provenance": "flow F68 step 3→4",
+     "operation": "requestShiftSwap"
+    },
+    {
+     "to": "EMP-001",
+     "trigger": "Sign in",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-002",
+     "trigger": "Select venue & role",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Removed 24 August**: createRotaAssignment, updateRotaAssignment. **Bulk-attach residue, found by walking a journey.** A device-settings screen does not read guest loyalty, a venue map does not set a refund policy, a shift summary does not close the shift, and **a rota a steward can rewrite is not a rota.**",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listRotaAssignments` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Ask somebody to take a shift.",
+  "gaps": [
+   {
+    "operation": "listShiftSwapRequests",
+    "why": "**1 declared operation reach no component on this screen**: listShiftSwapRequests. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every swap request",
+       "bindsTo": "RotaAssignment",
+       "columns": [
+        "RotaAssignment.overtimeMinutes",
+        "RotaAssignment.restPeriodBefore",
+        "RotaAssignment.breachesWorkingHourLimit",
+        "RotaAssignment.labourCost",
+        "RotaAssignment.id",
+        "RotaAssignment.principalId",
+        "RotaAssignment.displayName",
+        "RotaAssignment.venueId",
+        "RotaAssignment.departmentId",
+        "RotaAssignment.position",
+        "RotaAssignment.requiredRoleId",
+        "RotaAssignment.workstationId"
+       ],
+       "operation": "listRotaAssignments",
+       "provenance": "contract workforce.yaml GET /rota-assignments"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected swap request",
+       "bindsTo": "RotaAssignment",
+       "columns": [
+        "RotaAssignment.overtimeMinutes",
+        "RotaAssignment.restPeriodBefore",
+        "RotaAssignment.breachesWorkingHourLimit",
+        "RotaAssignment.labourCost",
+        "RotaAssignment.id",
+        "RotaAssignment.principalId",
+        "RotaAssignment.displayName",
+        "RotaAssignment.venueId",
+        "RotaAssignment.departmentId",
+        "RotaAssignment.position",
+        "RotaAssignment.requiredRoleId",
+        "RotaAssignment.workstationId",
+        "RotaAssignment.startsAt",
+        "RotaAssignment.endsAt",
+        "RotaAssignment.status",
+        "RotaAssignment.breakMinutes"
+       ],
+       "operation": "listRotaAssignments",
+       "provenance": "contract workforce.yaml GET /rota-assignments"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Request",
+       "operation": "requestShiftSwap",
+       "provenance": "contract workforce.yaml POST /rota-assignments/{assignmentId}/swap"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listRotaAssignments",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "requestShiftSwap",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The swap request list.",
+   "error": "Could not load. Names which read failed and leaves the swap request untouched.",
+   "emptyFirstRun": "No swap request yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the swap request are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Queues locally"
+  },
+  "apis": [
+   {
+    "operationId": "requestShiftSwap",
+    "contract": "workforce",
+    "purpose": "Ask someone to take your shift",
+    "trigger": "onAction",
+    "invalidates": [
+     "listRotaAssignments"
+    ]
+   },
+   {
+    "operationId": "listRotaAssignments",
+    "contract": "workforce",
+    "purpose": "The rota",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listShiftSwapRequests",
+    "contract": "workforce",
+    "purpose": "Swap requests and their state",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "assignmentId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `assignmentId`.",
+   "preloaded": [
+    "RotaAssignment.overtimeMinutes",
+    "RotaAssignment.restPeriodBefore",
+    "RotaAssignment.breachesWorkingHourLimit",
+    "RotaAssignment.labourCost",
+    "RotaAssignment.id"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-023"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "EMP-024",
+  "name": "Clock in / out",
+  "module": "Operations",
+  "requiresModule": "core",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-staff-app",
+   "route": "/operations/clock-in-out",
+   "component": "apps/venue-staff-app/src/routes/operations/ClockInOutDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "EMP-001",
+    "EMP-002",
+    "EMP-003",
+    "EMP-025"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "EMP-003",
+    "EMP-023"
+   ],
+   "notes": "**Reached from EMP-003** — the screen the device sits on between tasks. Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "EMP-025",
+     "trigger": "They take a break and come back",
+     "provenance": "flow F68 step 4→5"
+    },
+    {
+     "to": "EMP-001",
+     "trigger": "Sign in",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-002",
+     "trigger": "Select venue & role",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — EMP-002 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "EMP-003",
+     "trigger": "Home — on duty",
+     "carries": [
+      "incidentId",
+      "shiftId"
+     ],
+     "provenance": "derived — EMP-003 declares entryState.params incidentId, shiftId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written.",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listAttendance` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Record attendance from the device already in hand.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every clock out",
+       "bindsTo": "AttendanceRecord",
+       "columns": [
+        "AttendanceRecord.id",
+        "AttendanceRecord.principalId",
+        "AttendanceRecord.assignmentId",
+        "AttendanceRecord.venueId",
+        "AttendanceRecord.kind",
+        "AttendanceRecord.occurredAt",
+        "AttendanceRecord.recordedAt",
+        "AttendanceRecord.accessPointId",
+        "AttendanceRecord.latitude",
+        "AttendanceRecord.longitude",
+        "AttendanceRecord.isAmended",
+        "AttendanceRecord.amendedByPrincipalId"
+       ],
+       "operation": "listAttendance",
+       "provenance": "contract workforce.yaml GET /attendance"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected clock out",
+       "bindsTo": "AttendanceRecord",
+       "columns": [
+        "AttendanceRecord.id",
+        "AttendanceRecord.principalId",
+        "AttendanceRecord.assignmentId",
+        "AttendanceRecord.venueId",
+        "AttendanceRecord.kind",
+        "AttendanceRecord.occurredAt",
+        "AttendanceRecord.recordedAt",
+        "AttendanceRecord.accessPointId",
+        "AttendanceRecord.latitude",
+        "AttendanceRecord.longitude",
+        "AttendanceRecord.isAmended",
+        "AttendanceRecord.amendedByPrincipalId",
+        "AttendanceRecord.amendmentReason",
+        "AttendanceRecord.originalOccurredAt",
+        "AttendanceRecord.exception"
+       ],
+       "operation": "listAttendance",
+       "provenance": "contract workforce.yaml GET /attendance"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Record",
+       "operation": "recordAttendance",
+       "provenance": "contract workforce.yaml POST /attendance/clock"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Amend",
+       "operation": "amendAttendance",
+       "provenance": "contract workforce.yaml POST /attendance/{recordId}/amend"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listAttendance",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "recordAttendance",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The clock out list.",
+   "error": "Could not load. Names which read failed and leaves the clock out untouched.",
+   "emptyFirstRun": "No clock out yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the clock out are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Device time is recorded and both are kept.** A steward clocking in at a gate with no signal is not late because the sync was"
+  },
+  "apis": [
+   {
+    "operationId": "recordAttendance",
+    "contract": "workforce",
+    "purpose": "Clock in, clock out, or take a break",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAttendance"
+    ]
+   },
+   {
+    "operationId": "listAttendance",
+    "contract": "workforce",
+    "purpose": "Who was here",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "amendAttendance",
+    "contract": "workforce",
+    "purpose": "A supervisor corrects a record",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAttendance"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "recordId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `recordId`.",
+   "preloaded": [
+    "AttendanceRecord.id",
+    "AttendanceRecord.principalId",
+    "AttendanceRecord.assignmentId",
+    "AttendanceRecord.venueId",
+    "AttendanceRecord.kind"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P06 Venue Staff App.dc.html#emp-024"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P06",
+   "audience": "staff",
+   "formFactor": "mobileApp",
+   "shortName": "Venue Staff App",
+   "name": "Venue Staff App — Operations",
+   "app": "venue-staff-app",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "mobile",
+    "siblings": [
+     "P07"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

@@ -1,0 +1,422 @@
+{
+ "addCartLine": {
+  "method": "POST",
+  "path": "/carts/{cartId}/lines",
+  "contract": "orders",
+  "summary": "Add something",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AddCartLineRequest",
+  "responds": "Cart"
+ },
+ "checkoutCart": {
+  "method": "POST",
+  "path": "/carts/{cartId}/checkout",
+  "contract": "orders",
+  "summary": "Turn the cart into an order",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Order"
+ },
+ "claimLocationSession": {
+  "method": "POST",
+  "path": "/location-sessions",
+  "contract": "fnb",
+  "summary": "Tell the platform where the guest is",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "LocationSession"
+ },
+ "createAiConversation": {
+  "method": "POST",
+  "path": "/conversations",
+  "contract": "ai",
+  "summary": "Open a conversation",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiConversation"
+ },
+ "createGuestFnbOrder": {
+  "method": "POST",
+  "path": "/guest-orders",
+  "contract": "fnb",
+  "summary": "A guest orders food",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateGuestOrderRequest",
+  "responds": "GuestOrderResult"
+ },
+ "getCart": {
+  "method": "GET",
+  "path": "/carts/{cartId}",
+  "contract": "orders",
+  "summary": "The cart, priced and checked, right now",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Cart"
+ },
+ "getGuestMenu": {
+  "method": "GET",
+  "path": "/outlets/{outletId}/guest-menu",
+  "contract": "fnb",
+  "summary": "The menu a guest sees",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "at",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "language",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestMenu"
+ },
+ "getGuestOrderStatus": {
+  "method": "GET",
+  "path": "/guest-orders/{orderId}",
+  "contract": "fnb",
+  "summary": "Track an order",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestOrderStatus"
+ },
+ "getWaitTimes": {
+  "method": "GET",
+  "path": "/queues/wait-times",
+  "contract": "queue",
+  "summary": "Wait times across a venue",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "category",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WaitTime"
+ },
+ "handoverToAgent": {
+  "method": "POST",
+  "path": "/conversations/{conversationId}/handover",
+  "contract": "marketing-crm",
+  "summary": "Pass an assistant conversation to a person",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Conversation"
+ },
+ "listCatalogueBundles": {
+  "method": "GET",
+  "path": "/catalogue/bundles",
+  "contract": "catalogue",
+  "summary": "List published bundles",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BundleSummary"
+ },
+ "listContentPages": {
+  "method": "GET",
+  "path": "/tenant-config/pages",
+  "contract": "white-label",
+  "summary": "List custom content pages",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listFaqs": {
+  "method": "GET",
+  "path": "/tenant-config/faqs",
+  "contract": "white-label",
+  "summary": "List FAQs",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "FaqCategory"
+ },
+ "listMyCases": {
+  "method": "GET",
+  "path": "/my/cases",
+  "contract": "marketing-crm",
+  "summary": "The cases this guest raised",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Case"
+ },
+ "listProducts": {
+  "method": "GET",
+  "path": "/products",
+  "contract": "catalogue",
+  "summary": "List products",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "isSellable",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "raiseMyCase": {
+  "method": "POST",
+  "path": "/my/cases",
+  "contract": "marketing-crm",
+  "summary": "Report something — lost property, a complaint, a question",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Case"
+ },
+ "replyToMyCase": {
+  "method": "POST",
+  "path": "/my/cases/{caseId}/messages",
+  "contract": "marketing-crm",
+  "summary": "Reply on a case the guest raised",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Case"
+ },
+ "requestSuggestion": {
+  "method": "POST",
+  "path": "/ai/suggestions",
+  "contract": "ai",
+  "summary": "Ask for an answer, however it is currently produced",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Suggestion"
+ },
+ "sendAiMessage": {
+  "method": "POST",
+  "path": "/conversations/{conversationId}/messages",
+  "contract": "ai",
+  "summary": "Ask",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiMessage"
+ },
+ "sendConversationMessage": {
+  "method": "POST",
+  "path": "/conversations/{conversationId}/messages",
+  "contract": "marketing-crm",
+  "summary": "Say something, as a guest or an agent",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ConversationMessage"
+ },
+ "submitReview": {
+  "method": "POST",
+  "path": "/reviews",
+  "contract": "marketing-crm",
+  "summary": "Submit a review",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SubmitReviewRequest",
+  "responds": "Review"
+ }
+}

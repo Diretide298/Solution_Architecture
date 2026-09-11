@@ -1,0 +1,659 @@
+[
+ {
+  "id": "ADM-001",
+  "name": "Platform Login / MFA",
+  "module": "Access & Identity",
+  "requiresModule": "core",
+  "wave": 1,
+  "capability": "C35",
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/general/platform-login-mfa",
+   "component": "apps/ticvai-web/src/routes/general/PlatformLoginMfaList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "ADM-002",
+    "ADM-003",
+    "ADM-004"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-003",
+     "trigger": "Cross-Tenant Health Dashboard",
+     "carries": [
+      "cellId",
+      "rightId"
+     ],
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+    },
+    {
+     "to": "PTR-001",
+     "trigger": "Partner Login / MFA",
+     "provenance": "flow F104 step 1→2",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listActiveSessions` reads the population and `getCurrentSession` reads one of them — list, select, act",
+  "purpose": "Get someone into the app, fast, on a device that may be shared.",
+  "gaps": [
+   {
+    "operation": "getGuestSession",
+    "why": "**3 declared operations reach no component on this screen**: getGuestSession, listMfaMethods, listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every platform login mfa",
+       "bindsTo": "ActiveSession",
+       "columns": [
+        "ActiveSession.sessionId",
+        "ActiveSession.principalId",
+        "ActiveSession.principalName",
+        "ActiveSession.roleId",
+        "ActiveSession.roleName",
+        "ActiveSession.workstationId",
+        "ActiveSession.workstationName",
+        "ActiveSession.venueId",
+        "ActiveSession.ipAddress",
+        "ActiveSession.deviceInfo",
+        "ActiveSession.hasOpenShift",
+        "ActiveSession.mfaSatisfied"
+       ],
+       "operation": "listActiveSessions",
+       "provenance": "contract identity.yaml GET /auth/sessions"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected platform login mfa",
+       "bindsTo": "Session",
+       "columns": [
+        "Session.sessionId",
+        "Session.principalId",
+        "Session.roleId",
+        "Session.displayName",
+        "Session.scope",
+        "Session.effectivePermissions",
+        "Session.permissionsByScope",
+        "Session.saleBoardId",
+        "Session.workstation",
+        "Session.openedAt",
+        "Session.expiresAt"
+       ],
+       "operation": "getCurrentSession",
+       "provenance": "contract identity.yaml GET /auth/session"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Login",
+       "operation": "login",
+       "provenance": "contract identity.yaml POST /auth/login"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Force",
+       "operation": "forceLogout",
+       "provenance": "contract identity.yaml POST /auth/sessions/{sessionId}/force-logout"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Revoke",
+       "operation": "revokeAllSessions",
+       "provenance": "contract identity.yaml POST /auth/sessions/revoke-all"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmForceLogout",
+    "component": "confirmDialog",
+    "trigger": "Force",
+    "body": "**Names what `forceLogout` changes and what it leaves alone**, in the consequence rather than the verb. A platform login mfa this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract identity.yaml POST /auth/sessions/{sessionId}/force-logout"
+   },
+   {
+    "id": "confirmRevokeAllSessions",
+    "component": "confirmDialog",
+    "trigger": "Revoke",
+    "body": "**Names what `revokeAllSessions` changes and what it leaves alone**, in the consequence rather than the verb. A platform login mfa this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract identity.yaml POST /auth/sessions/revoke-all"
+   }
+  ],
+  "states": {
+   "loading": "The platform login mfa list.",
+   "error": "Could not load. Names which read failed and leaves the platform login mfa untouched.",
+   "emptyFirstRun": "No platform login mfa yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the platform login mfa are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "login",
+    "contract": "identity",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "forceLogout",
+    "contract": "identity",
+    "purpose": "Supervisor termination of an abandoned session",
+    "trigger": "onAction",
+    "invalidates": [
+     "listActiveSessions"
+    ]
+   },
+   {
+    "operationId": "getCurrentSession",
+    "contract": "identity",
+    "purpose": "Current session and effective permissions",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getGuestSession",
+    "contract": "identity",
+    "purpose": "Read the current guest session",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listActiveSessions",
+    "contract": "identity",
+    "purpose": "List active sessions",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listMfaMethods",
+    "contract": "identity",
+    "purpose": "Enrolled MFA methods",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listSsoProviders",
+    "contract": "identity",
+    "purpose": "Identity providers configured for this tenant",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "revokeAllSessions",
+    "contract": "identity",
+    "purpose": "Revoke every session in scope",
+    "trigger": "onAction",
+    "invalidates": [
+     "listActiveSessions"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "Session.sessionId",
+    "Session.principalId",
+    "Session.roleId",
+    "Session.displayName",
+    "Session.scope"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-001"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-020",
+  "name": "Platform User Directory",
+  "module": "Access & Identity",
+  "requiresModule": "core",
+  "wave": 1,
+  "capability": "C56",
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/general/platform-user-directory",
+   "component": "apps/ticvai-web/src/routes/general/PlatformUserDirectoryList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "ADM-001",
+    "ADM-002",
+    "ADM-003"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-001",
+     "trigger": "Platform Login / MFA",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-003",
+     "trigger": "Cross-Tenant Health Dashboard",
+     "carries": [
+      "cellId",
+      "rightId"
+     ],
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listPrincipals` reads the population and `getPrincipal` reads one of them — list, select, act",
+  "purpose": "Find the right one quickly, and act on it without opening it.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every platform user",
+       "bindsTo": "Principal",
+       "columns": [
+        "Principal.id",
+        "Principal.username",
+        "Principal.displayName",
+        "Principal.isActive",
+        "Principal.validFrom",
+        "Principal.validTo",
+        "Principal.primaryRoleId",
+        "Principal.roles",
+        "Principal.lastLoginAt"
+       ],
+       "operation": "listPrincipals",
+       "provenance": "contract identity.yaml GET /principals"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected platform user",
+       "bindsTo": "Principal",
+       "columns": [
+        "Principal.id",
+        "Principal.username",
+        "Principal.displayName",
+        "Principal.isActive",
+        "Principal.validFrom",
+        "Principal.validTo",
+        "Principal.primaryRoleId",
+        "Principal.roles",
+        "Principal.lastLoginAt"
+       ],
+       "operation": "getPrincipal",
+       "provenance": "contract identity.yaml GET /principals/{principalId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createPrincipal",
+       "provenance": "contract identity.yaml POST /principals"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updatePrincipal",
+       "provenance": "contract identity.yaml PATCH /principals/{principalId}"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The platform user list.",
+   "error": "Could not load. Names which read failed and leaves the platform user untouched.",
+   "emptyFirstRun": "No platform user yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the platform user are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listPrincipals",
+    "contract": "identity",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createPrincipal",
+    "contract": "identity",
+    "purpose": "Create a principal",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPrincipals"
+    ]
+   },
+   {
+    "operationId": "getPrincipal",
+    "contract": "identity",
+    "purpose": "Read a principal",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "updatePrincipal",
+    "contract": "identity",
+    "purpose": "Update or deactivate a principal",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPrincipals"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "principalId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "Principal.id",
+    "Principal.username",
+    "Principal.displayName",
+    "Principal.isActive",
+    "Principal.validFrom"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-020"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-021",
+  "name": "Platform Role Management",
+  "module": "Access & Identity",
+  "requiresModule": "core",
+  "wave": 1,
+  "capability": "C56",
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/general/platform-role-management",
+   "component": "apps/ticvai-web/src/routes/general/PlatformRoleManagementForm.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "ADM-001",
+    "ADM-002",
+    "ADM-003"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-001",
+     "trigger": "Platform Login / MFA",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-003",
+     "trigger": "Cross-Tenant Health Dashboard",
+     "carries": [
+      "cellId",
+      "rightId"
+     ],
+     "provenance": "derived — ADM-003 declares entryState.params cellId, rightId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listRoles` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Find platform role management for this venue.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every platform role",
+       "bindsTo": "Role",
+       "columns": [
+        "Role.id",
+        "Role.code",
+        "Role.name",
+        "Role.description",
+        "Role.permissions",
+        "Role.inheritsFromRoleId",
+        "Role.isSystem",
+        "Role.principalCount",
+        "Role.grantCount"
+       ],
+       "operation": "listRoles",
+       "provenance": "contract identity.yaml GET /roles"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected platform role",
+       "bindsTo": "Role",
+       "columns": [
+        "Role.id",
+        "Role.code",
+        "Role.name",
+        "Role.description",
+        "Role.permissions",
+        "Role.inheritsFromRoleId",
+        "Role.isSystem",
+        "Role.principalCount",
+        "Role.grantCount"
+       ],
+       "operation": "listRoles",
+       "provenance": "contract identity.yaml GET /roles"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createRole",
+       "provenance": "contract identity.yaml POST /roles"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The platform role list.",
+   "error": "Could not load. Names which read failed and leaves the platform role untouched.",
+   "emptyFirstRun": "No platform role yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the platform role are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listRoles",
+    "contract": "identity",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createRole",
+    "contract": "identity",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Role.id",
+    "Role.code",
+    "Role.name",
+    "Role.description",
+    "Role.permissions"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-021"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

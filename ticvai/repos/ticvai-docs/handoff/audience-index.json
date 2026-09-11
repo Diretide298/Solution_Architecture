@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-10",
+ "generated": "2026-09-11",
  "note": "Derived from `x-ticvai-audience` on every operation. **One field, five values** \u2014 `x-ticvai-guest-callable` and `x-ticvai-auth` were two vocabularies answering the same question differently and were collapsed on 18 August (ADR-0025).",
  "field": "x-ticvai-audience",
  "values": [
@@ -99,12 +99,18 @@
    "app": "venue-management-web",
    "operator": "venue",
    "audience": "staff"
+  },
+  "P17": {
+   "name": "TICVAI Sign-up",
+   "app": "signup-web",
+   "operator": "public",
+   "audience": "public"
   }
  },
  "totals": {
   "operations": 1628,
-  "screens": 1235,
-  "flows": 168
+  "screens": 1629,
+  "flows": 202
  },
  "audiences": {
   "anonymous": {
@@ -1065,7 +1071,8 @@
   },
   "public": {
    "platforms": [
-    "P11"
+    "P11",
+    "P17"
    ],
    "operations": [
     "decideApprovalRequest",

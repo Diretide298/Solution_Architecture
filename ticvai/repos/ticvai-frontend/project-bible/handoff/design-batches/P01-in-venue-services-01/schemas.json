@@ -1,0 +1,1744 @@
+{
+ "Bill": {
+  "x-ticvai-persistence": "none — computed from visit orders",
+  "type": "object",
+  "required": [
+   "visitId",
+   "lines",
+   "subtotal",
+   "taxAmount",
+   "total"
+  ],
+  "properties": {
+   "visitId": {
+    "type": "string"
+   },
+   "covers": {
+    "type": "integer"
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "lineId",
+      "name",
+      "quantity",
+      "lineTotal"
+     ],
+     "properties": {
+      "lineId": {
+       "type": "string"
+      },
+      "orderId": {
+       "type": "string"
+      },
+      "name": {
+       "type": "string"
+      },
+      "quantity": {
+       "type": "integer"
+      },
+      "unitPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "lineTotal": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "categoryCode": {
+       "type": "string",
+       "nullable": true
+      },
+      "seatNumber": {
+       "type": "integer",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "subtotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "serviceCharge": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "discountAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "total": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  }
+ },
+ "CreateGuestOrderLine": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "menuItemId",
+   "quantity"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "menuItemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "quantity": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 20
+   },
+   "modifierOptionIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 200,
+    "description": "Free text to the kitchen. Allergy notes belong here and are surfaced prominently on the ticket.\n"
+   }
+  }
+ },
+ "CreateGuestOrderRequest": {
+  "type": "object",
+  "required": [
+   "id",
+   "lines",
+   "quotedTotal",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "locationSessionId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Where the order is going. Required for delivery to a table, seat, cabana or named location. Absent for collection, where the outlet is named instead.\n"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Required for collection. Ignored where a table session is supplied."
+   },
+   "lines": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "$ref": "#/components/schemas/CreateGuestOrderLine"
+    }
+   },
+   "quotedTotal": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "What the guest was shown. Checked against the server's recomputation — a guest is never trusted with a price, and a mismatch is refused rather than silently corrected in either direction.\n"
+   },
+   "paymentMethod": {
+    "type": "string",
+    "enum": [
+     "card",
+     "wallet",
+     "roomCharge",
+     "addToTab"
+    ]
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "DeliveryLocation": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.delivery_location",
+  "required": [
+   "id",
+   "venueId",
+   "kind",
+   "label",
+   "isServiceable"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/DeliveryLocationKind"
+   },
+   "label": {
+    "type": "string",
+    "description": "What a runner is told. \"Cabana 12\", \"Row H Seat 4\", \"Lawn — north gate\"."
+   },
+   "zone": {
+    "type": "string",
+    "nullable": true
+   },
+   "tableId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Set where the location is a restaurant table, so it shares table state."
+   },
+   "seatId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Set where the seat is the address. References the seat map."
+   },
+   "servingOutletIds": {
+    "type": "array",
+    "description": "Which outlets deliver here. A cabana served by the pool bar and not the restaurant is normal, and a location nothing serves is not an address.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "isServiceable": {
+    "type": "boolean",
+    "description": "False where the location exists but is not currently taking delivery — closed section, weather, no runner on shift.\n"
+   },
+   "unserviceableReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "walkTimeMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "description": "From the serving outlet. Feeds the guest's estimate — a cabana eight minutes away is not the same promise as a table by the kitchen.\n"
+   }
+  }
+ },
+ "DeliveryLocationKind": {
+  "type": "string",
+  "description": "4.6.26. One concept, because a runner needs one instruction.",
+  "enum": [
+   "table",
+   "seat",
+   "cabana",
+   "sunbed",
+   "poolside",
+   "box",
+   "suite",
+   "lawn",
+   "collectionPoint",
+   "namedLocation"
+  ]
+ },
+ "DiningOutlet": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over outlet, menu and table state",
+  "required": [
+   "outletId",
+   "name",
+   "kind",
+   "isOpenNow",
+   "orderingMethod"
+  ],
+  "properties": {
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string"
+   },
+   "zone": {
+    "type": "string",
+    "nullable": true
+   },
+   "cuisine": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "isOpenNow": {
+    "type": "boolean"
+   },
+   "opensAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "closesAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "orderingMethod": {
+    "$ref": "#/components/schemas/GuestOrderingMethod"
+   },
+   "estimatedWaitMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "description": "From current kitchen ticket volume, not a fixed figure. Null where the outlet has no KDS reporting — an invented wait time is worse than none.\n"
+   },
+   "imageAssetRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "menuId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   }
+  }
+ },
+ "FnbOrderStatus": {
+  "type": "string",
+  "description": "The full lifecycle from 4.6.35. Nine states, not six — the earlier enum collapsed `accepted` into `placed` and had no `collected` or `delivered` at all, which made collection and delivery indistinguishable from a server putting a plate down.\n`accepted` matters because an outlet may refuse: past last orders, out of a key ingredient, or simply too far behind. A guest whose order sat in `placed` for ten minutes and was then rejected has a worse experience than one refused immediately.\n",
+  "enum": [
+   "ordered",
+   "accepted",
+   "inPreparation",
+   "ready",
+   "served",
+   "collected",
+   "delivered",
+   "cancelled",
+   "refunded"
+  ]
+ },
+ "GuestMenu": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over menu, item and availability",
+  "required": [
+   "outletId",
+   "menuId",
+   "name",
+   "inForceUntil",
+   "sections"
+  ],
+  "properties": {
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "menuId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "inForceUntil": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When this menu stops applying. The client shows it, because a guest browsing breakfast at 10:55 should know.\n"
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "currencyScale": {
+    "type": "integer"
+   },
+   "sections": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "sortOrder": {
+       "type": "integer"
+      },
+      "items": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "required": [
+         "menuItemId",
+         "name",
+         "price",
+         "isAvailable",
+         "allergens"
+        ],
+        "properties": {
+         "menuItemId": {
+          "type": "string",
+          "format": "uuid"
+         },
+         "name": {
+          "type": "string"
+         },
+         "description": {
+          "type": "string",
+          "nullable": true
+         },
+         "price": {
+          "$ref": "../shared/common.yaml#/components/schemas/Money"
+         },
+         "imageAssetRef": {
+          "type": "string",
+          "nullable": true
+         },
+         "isAvailable": {
+          "type": "boolean",
+          "description": "Marked, not removed. A guest who saw a dish yesterday and cannot find it today assumes the app is broken; \"sold out\" is an answer.\n"
+         },
+         "unavailableReason": {
+          "type": "string",
+          "nullable": true
+         },
+         "allergens": {
+          "type": "array",
+          "description": "Always present. Not a field a tenant may choose to omit.",
+          "items": {
+           "type": "string"
+          }
+         },
+         "preparationMinutes": {
+          "type": "integer",
+          "nullable": true
+         },
+         "modifierGroups": {
+          "type": "array",
+          "items": {
+           "$ref": "#/components/schemas/ModifierGroup"
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "GuestOrderResult": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over fnb_order",
+  "required": [
+   "orderId",
+   "orderNumber",
+   "status",
+   "total"
+  ],
+  "properties": {
+   "orderId": {
+    "type": "string"
+   },
+   "orderNumber": {
+    "type": "string",
+    "description": "Short and readable. It gets called out across a counter."
+   },
+   "fulfilment": {
+    "type": "string",
+    "enum": [
+     "collect",
+     "deliverToLocation",
+     "tableService"
+    ]
+   },
+   "deliveryLabel": {
+    "type": "string",
+    "nullable": true,
+    "description": "Where it is going, as a runner would read it."
+   },
+   "status": {
+    "$ref": "#/components/schemas/FnbOrderStatus"
+   },
+   "total": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "estimatedReadyAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "collectionPoint": {
+    "type": "string",
+    "nullable": true
+   },
+   "tableLabel": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "GuestOrderStatus": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over kitchen_ticket",
+  "required": [
+   "orderId",
+   "status",
+   "lines"
+  ],
+  "properties": {
+   "orderId": {
+    "type": "string"
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/FnbOrderStatus"
+   },
+   "estimatedReadyAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "isReadyForCollection": {
+    "type": "boolean"
+   },
+   "lines": {
+    "type": "array",
+    "description": "Per-line status. A guest waiting on one dish should see which.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "quantity": {
+       "type": "integer"
+      },
+      "status": {
+       "$ref": "#/components/schemas/KitchenTicketStatus"
+      }
+     }
+    }
+   }
+  }
+ },
+ "GuestOrderingMethod": {
+  "x-ticvai-persistence": "none — enum",
+  "type": "string",
+  "description": "How a guest may order at this outlet. Varies within one venue, so it is per outlet rather than a venue setting.\n",
+  "enum": [
+   "tableService",
+   "appToTable",
+   "appToCollect",
+   "counterOnly",
+   "notAvailable"
+  ]
+ },
+ "JoinQueueRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "queueId",
+   "partySize",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "queueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "partySize": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "entitlementId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Fast Pass or priority entitlement. Owned by Product & Entitlement — this contract references it and never defines it.\n"
+   },
+   "partyHeightsCm": {
+    "type": "array",
+    "description": "Where the queue has a height requirement. Refusing here is far better than refusing at the ride, in front of a child who has already waited.\n",
+    "items": {
+     "type": "integer"
+    }
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "KitchenTicketStatus": {
+  "type": "string",
+  "enum": [
+   "received",
+   "preparing",
+   "ready",
+   "served",
+   "recalled",
+   "cancelled"
+  ]
+ },
+ "LocalisedText": {
+  "x-ticvai-persistence": "none — jsonb column",
+  "type": "object",
+  "additionalProperties": {
+   "type": "string"
+  }
+ },
+ "LocationSession": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.location_session",
+  "required": [
+   "id",
+   "locationId",
+   "kind",
+   "label",
+   "expiresAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/DeliveryLocationKind"
+   },
+   "label": {
+    "type": "string"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The outlet serving this location. Where several serve it, the guest chooses and this is set on the first order.\n"
+   },
+   "visitId": {
+    "type": "string",
+    "nullable": true,
+    "description": "The table visit this session orders onto, where the location is a table. Absent for a cabana or a seat, which have no visit concept — the order stands alone.\n"
+   },
+   "joinedExistingVisit": {
+    "type": "boolean"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Sessions expire so a guest who leaves cannot order to a lounger now occupied by someone else.\n"
+   }
+  }
+ },
+ "ModifierGroup": {
+  "x-ticvai-persistence": "fnb.modifier_group + fnb.modifier_option",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "minSelections",
+   "maxSelections",
+   "options"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "minSelections": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "Greater than zero makes the group required."
+   },
+   "maxSelections": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "options": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "id",
+      "name",
+      "priceDelta"
+     ],
+     "properties": {
+      "id": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "priceDelta": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "isDefault": {
+       "type": "boolean"
+      },
+      "isAvailable": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "ParkingEntitlement": {
+  "type": "object",
+  "x-ticvai-persistence": "access.parking_entitlement",
+  "required": [
+   "facilityId",
+   "orderId",
+   "validFrom",
+   "validTo"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "facilityId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "plateNumber": {
+    "type": "string",
+    "nullable": true,
+    "description": "Required in `plateWhitelist` mode, meaningless in the others. **Personal data** — a plate identifies a person, so it lives under the same rules as a contact point.\n"
+   },
+   "plateCountry": {
+    "type": "string",
+    "nullable": true
+   },
+   "mediaCode": {
+    "type": "string",
+    "nullable": true,
+    "description": "The code presented in `none` and `qrHandoff` modes."
+   },
+   "status": {
+    "$ref": "#/components/schemas/ParkingEntitlementStatus"
+   },
+   "pushedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "pushFailureReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "ParkingEntitlementStatus": {
+  "type": "string",
+  "enum": [
+   "pending",
+   "pushed",
+   "pushFailed",
+   "active",
+   "used",
+   "expired",
+   "revoked"
+  ]
+ },
+ "ParkingFacility": {
+  "type": "object",
+  "x-ticvai-persistence": "access.parking_facility",
+  "required": [
+   "name",
+   "venueId",
+   "mode"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "name": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "mode": {
+    "$ref": "#/components/schemas/ParkingIntegrationMode"
+   },
+   "capacity": {
+    "type": "integer",
+    "nullable": true
+   },
+   "takesPayment": {
+    "type": "boolean",
+    "readOnly": true,
+    "default": false,
+    "description": "**Always false, and stated rather than assumed** (19.2.78, CF-124). The requirement asks the guest app to take parking payments; the client decided on 14 August that it does not.\nAll three integration models are entitlement-based — the ticket carries the parking right and the platform pushes a plate or a code. **Pay-per-hour parking unrelated to a ticket runs on the parking system's own POS**, because taking that money here would make the venue an acquirer for parking, with a settlement path and a tax treatment nobody has designed.\nThe field exists so that a future reversal is a value change with a visible blast radius, rather than a silent gap somebody rediscovers.\n"
+   },
+   "vendorSwapTargetDays": {
+    "type": "integer",
+    "readOnly": true,
+    "default": 5,
+    "description": "**A new parking vendor should take days, not weeks** — Qossai, 14 August. The team has integrated parking APIs before and the architecture is expected to make the next one cheap.\nRecorded as a design constraint rather than a runtime value: **everything vendor-specific lives in `vendorName`, `endpoint` and `credentialRef`**, and the three modes are the adaptor surface (ADR-0012). A vendor needing a fourth mode is the signal this has been violated.\n"
+   },
+   "vendorName": {
+    "type": "string",
+    "nullable": true
+   },
+   "endpoint": {
+    "type": "string",
+    "nullable": true
+   },
+   "credentialRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "A vault reference, never the credential."
+   },
+   "pushLeadMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "description": "How far ahead of the visit a plate is pushed. **Too early and the whitelist fills with cars that will not arrive; too late and the guest is at the barrier.**\n"
+   },
+   "accessPointIds": {
+    "type": "array",
+    "description": "Where the platform validates its own code, in `none` and `qrHandoff` modes.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "ParkingIntegrationMode": {
+  "type": "string",
+  "description": "CF-52, settled 14 August. **Not variations of one thing** — each decides what happens at sale and what a guest presents at the barrier.\n",
+  "enum": [
+   "none",
+   "plateWhitelist",
+   "qrHandoff"
+  ]
+ },
+ "QueueEntryStatus": {
+  "type": "string",
+  "enum": [
+   "waiting",
+   "called",
+   "redeemed",
+   "expired",
+   "noShow",
+   "cancelled",
+   "released"
+  ]
+ },
+ "QueueStatus": {
+  "type": "string",
+  "enum": [
+   "open",
+   "paused",
+   "closed",
+   "atCapacity"
+  ]
+ },
+ "RestaurantWaitlist": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.waitlist_entry",
+  "description": "BL-130. **Distinct from `queue`, which is for rides.** A restaurant waitlist has a party size, a table preference and a walk-away point, and a guest who leaves is not the same as a guest who was served.\n",
+  "required": [
+   "id",
+   "outletId",
+   "partySize",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "partySize": {
+    "type": "integer"
+   },
+   "quotedWaitMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "seatingPreference": {
+    "type": "string",
+    "enum": [
+     "any",
+     "indoor",
+     "outdoor",
+     "bar",
+     "booth",
+     "highChair"
+    ],
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "waiting",
+     "notified",
+     "seated",
+     "walkedAway",
+     "noShow",
+     "cancelled"
+    ]
+   },
+   "notifiedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "holdExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**How long a table waits for somebody who was called.** Too short and a guest returning from the bathroom loses it; too long and the table sits empty at peak — which is why it is a setting rather than a constant.\n"
+   }
+  }
+ },
+ "TableReservation": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.table_reservation",
+  "required": [
+   "outletId",
+   "startsAt",
+   "partySize"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "guestName": {
+    "type": "string"
+   },
+   "contactPoint": {
+    "type": "string"
+   },
+   "partySize": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "startsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "durationMinutes": {
+    "type": "integer",
+    "description": "**How long the cover is held.** An outlet turning tables twice an evening needs this to be real, or the second sitting cannot be booked.\n"
+   },
+   "tableIds": {
+    "type": "array",
+    "description": "Usually empty until seating. **Committing a specific table at booking time refuses later bookings against a constraint that did not need to exist.**\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "status": {
+    "$ref": "#/components/schemas/TableReservationStatus"
+   },
+   "groupId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "5.1.2. Several bookings managed as one party across adjacent tables."
+   },
+   "notes": {
+    "type": "string",
+    "description": "Allergies",
+    "occasion": null,
+    "accessibility.": null
+   },
+   "actualPartySize": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true
+   },
+   "tableVisitId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "TableReservationStatus": {
+  "type": "string",
+  "enum": [
+   "booked",
+   "confirmed",
+   "seated",
+   "completed",
+   "cancelled",
+   "noShow"
+  ]
+ },
+ "TableSession": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.table_session",
+  "required": [
+   "id",
+   "outletId",
+   "tableId",
+   "tableLabel",
+   "visitId",
+   "expiresAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "outletName": {
+    "type": "string"
+   },
+   "tableId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "tableLabel": {
+    "type": "string"
+   },
+   "visitId": {
+    "type": "string",
+    "description": "The table visit this session orders onto. An existing open visit is joined rather than duplicated — a guest seated by a server and then ordering by app is one party, one bill.\n"
+   },
+   "joinedExistingVisit": {
+    "type": "boolean"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Sessions expire so a guest who leaves cannot order to a table now occupied by someone else.\n"
+   }
+  }
+ },
+ "VenueMap": {
+  "type": "object",
+  "x-ticvai-persistence": "venuemap.map",
+  "description": "A park map, or a floor plan. **Several per venue** — a guest on the second floor should not be shown the ground floor's toilets.\n",
+  "required": [
+   "id",
+   "name",
+   "venueId",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "park",
+     "floor",
+     "zone",
+     "parking"
+    ]
+   },
+   "floorLevel": {
+    "type": "integer",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "published",
+     "archived"
+    ]
+   },
+   "publishedVersion": {
+    "type": "integer",
+    "nullable": true
+   },
+   "isGeoreferenced": {
+    "type": "boolean",
+    "readOnly": true,
+    "description": "**Whether a guest can be located on it.** Without a georeference the map is a picture — useful, and not navigable.\n"
+   },
+   "baseAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The illustrated map a guest actually sees**, held in `assets` like any other media.\n**This is not the CAD drawing.** The drawing gives geometry — where things are, and how they connect. The base image is a designed illustration with the venue's own styling, and the two are different artefacts that happen to describe the same place. A park hands you an architect's plan and a beautiful painted map, and **the guest wants the second while the platform needs the first.**\nNull is valid. A map with geometry and no illustration renders as shapes — plain, and navigable.\n",
+    "x-ticvai-references": "assets.MediaAsset"
+   },
+   "baseImageAlignment": {
+    "type": "object",
+    "nullable": true,
+    "description": "**How the illustration lines up with the geometry.** They are drawn at different scales by different people, and a point placed on the plan lands in the wrong place on the painting unless something reconciles them.\nTwo known points is enough. **Without this the illustration is a picture behind the map rather than the map itself.**\n",
+    "properties": {
+     "imageWidthPx": {
+      "type": "integer"
+     },
+     "imageHeightPx": {
+      "type": "integer"
+     },
+     "anchors": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 4,
+      "items": {
+       "type": "object",
+       "properties": {
+        "planX": {
+         "type": "number"
+        },
+        "planY": {
+         "type": "number"
+        },
+        "imageX": {
+         "type": "number"
+        },
+        "imageY": {
+         "type": "number"
+        }
+       }
+      }
+     }
+    }
+   },
+   "tileSetRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "Where a base image is large enough to need zoom levels. **A 12,000-pixel park map is not something a phone downloads on arrival**, and a guest opening the map on venue wifi at the gate is the worst moment to send twenty megabytes.\nGenerated from the base asset. Null means the image is small enough to serve whole.\n"
+   },
+   "boundsGeoJson": {
+    "type": "string",
+    "nullable": true
+   },
+   "graphStatus": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "notBuilt",
+     "connected",
+     "disconnected",
+     "partial"
+    ],
+    "description": "**Whether every public point can actually be reached.** Computed at publish.\n`disconnected` means a point has no path to it at all — a toilet nobody can walk to is a toilet that does not exist. `partial` means every point is reachable and at least one only by steps, which is a different and quieter failure: **the map works until a wheelchair user opens it.**\n"
+   }
+  }
+ },
+ "VenueMapDetail": {
+  "type": "object",
+  "description": "19.2.55. **The whole map in one call**, so a client caches it and filters locally.",
+  "properties": {
+   "map": {
+    "$ref": "#/components/schemas/VenueMap"
+   },
+   "points": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/VenuePoint"
+    }
+   },
+   "paths": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/VenuePath"
+    }
+   }
+  }
+ },
+ "VenueMapGraph": {
+  "type": "object",
+  "description": "19.2.56. **What a client needs to route, and nothing more.** Small enough to cache, versioned so a stale route is detectable.\n",
+  "required": [
+   "mapId",
+   "version",
+   "nodes",
+   "edges"
+  ],
+  "properties": {
+   "mapId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "version": {
+    "type": "integer",
+    "description": "**Bumped by a publish or a closure.** A client holding an older version knows its route may cross something that closed, and asking for the graph is cheaper than asking whether the graph changed.\n"
+   },
+   "generatedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "nodes": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "pointId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "x": {
+       "type": "number"
+      },
+      "y": {
+       "type": "number"
+      },
+      "kind": {
+       "type": "string"
+      },
+      "isAccessible": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "edges": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "from": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "to": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "distanceMetres": {
+       "type": "number"
+      },
+      "isStepFree": {
+       "type": "boolean"
+      },
+      "throughPointId": {
+       "type": "string",
+       "nullable": true,
+       "description": "Where an access point restricts this edge. **The direction lives on that point**, not here, so a gate reconfigured to bidirectional changes routing without a map edit.\n"
+      },
+      "isClosed": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "components": {
+    "type": "integer",
+    "description": "How many disconnected parts. **One is the answer for a park.** More than one on a map that should be a single site means something is unreachable and the client can say so without walking the graph.\n"
+   }
+  }
+ },
+ "VenuePath": {
+  "type": "object",
+  "x-ticvai-persistence": "venuemap.path",
+  "description": "19.2.56. **The navigation graph.** The map supplies it; routing over it is a client concern, because a phone with the map cached routes offline and a server round-trip per step does not.\n",
+  "required": [
+   "id",
+   "mapId",
+   "fromPointId",
+   "toPointId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "mapId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "fromPointId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "toPointId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "geometry": {
+    "type": "string",
+    "nullable": true,
+    "description": "The centreline this edge follows, as an encoded polyline. **A walkway in a drawing is a polygon and a route is a line down the middle of it**, so extraction thins the polygon to a centreline and splits it at every fork.\nNull where the path was drawn on screen as a straight connection, which is normal for a venue with no walkway layer.\n"
+   },
+   "distanceMetres": {
+    "type": "number",
+    "nullable": true,
+    "description": "**Along the centreline, not point to point.** A path that curves round a lake is longer than the distance between its ends, and a guest told 80 metres who walks 200 stops trusting the map.\nRequires a georeference for real units; without one, distances are in drawing units and routing still works because **only the ratios matter to a shortest path.**\n"
+   },
+   "isStepFree": {
+    "type": "boolean",
+    "default": true,
+    "description": "**The single most important attribute on this object.** A wheelchair user routed up a staircase has been failed by the map, not by the venue.\n"
+   },
+   "isIndoor": {
+    "type": "boolean",
+    "default": false
+   },
+   "restrictedByPointId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Where a path is one-way, it is because of a thing on it — not because of the path.** Removed `isOneWay` on 18 August: a pedestrian walkway has no direction, and the three cases that look one-way are all a gate or a queue.\nA turnstile is one-way and `access.AccessPoint.direction` already says so. A queue line is one-way and `queue` owns it. **Putting the restriction on the path duplicated both and would have drifted from them** — a gate reconfigured to bidirectional would leave a path still marked one-way, and nothing would have noticed.\nSet where a path passes through an access point. The router reads the direction from the point.\n"
+   },
+   "closedReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Set during works or an incident. **A closed path removes routes rather than hiding the path**, so a guest sees why rather than wondering where it went.\n"
+   }
+  }
+ },
+ "VenuePoint": {
+  "type": "object",
+  "x-ticvai-persistence": "venuemap.point",
+  "description": "19.2.57 to 19.2.60. **What a venue places on the map**, and what a guest taps.\n",
+  "required": [
+   "id",
+   "mapId",
+   "kind",
+   "name",
+   "position"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "mapId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "ride",
+     "attraction",
+     "show",
+     "restaurant",
+     "cafe",
+     "shop",
+     "kiosk",
+     "toilet",
+     "babyCare",
+     "prayerRoom",
+     "firstAid",
+     "atm",
+     "lockers",
+     "entrance",
+     "exit",
+     "emergencyExit",
+     "assemblyPoint",
+     "parking",
+     "guestServices",
+     "smokingArea",
+     "waterFountain",
+     "chargingPoint",
+     "photoSpot",
+     "junction",
+     "other"
+    ],
+    "description": "**A closed set, and `emergencyExit` is separate from `exit` on purpose.** An exit is where a guest leaves; an emergency exit is where they are sent, and a map that cannot tell them apart is a map that routes a normal departure through a fire door.\n**`junction` is the one that is not a point of interest.** A path connects two points, so a fork in a walkway with nothing at it still needs a node — otherwise every bend has to be named as a destination, and a guest browsing the map sees forty entries called *Path junction 12*.\n**Junctions are hidden from guests and present in the graph.** Generated by extraction where paths meet; a venue never places one by hand.\n"
+   },
+   "name": {
+    "type": "string"
+   },
+   "nameLocalised": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": {
+     "type": "string"
+    }
+   },
+   "position": {
+    "type": "object",
+    "required": [
+     "x",
+     "y"
+    ],
+    "description": "Drawing coordinates. **Latitude and longitude are derived from the georeference**, not stored, so a map that is re-georeferenced does not need every point moved.\n",
+    "properties": {
+     "x": {
+      "type": "number"
+     },
+     "y": {
+      "type": "number"
+     }
+    }
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For a restaurant, cafe, shop or kiosk. **Tapping it should open the menu**, and that only works if the map knows which outlet it is.\n"
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For a ride or show — links to wait times and to booking."
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For an entrance or exit. **This is what makes 3.2.64 work** — live admission statistics drawn on the point they came from.\n"
+   },
+   "isAccessible": {
+    "type": "boolean",
+    "default": true,
+    "description": "Step-free. **Placed on the point rather than inferred from the path**, because a step-free route to a building with steps at the door is not a step-free route.\n"
+   },
+   "openingHours": {
+    "type": "string",
+    "nullable": true
+   },
+   "iconRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean",
+    "default": true
+   },
+   "isNavigable": {
+    "type": "boolean",
+    "default": true,
+    "description": "Whether a route may pass through it. **False for a point that marks a place without being reachable** — a stage a guest cannot walk onto, a zone label.\n"
+   },
+   "isDestination": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Whether a guest may be routed *to* it, and whether it appears in a list of places.** False for a `junction`, which exists in the graph and nowhere else.\nSeparate from `isNavigable` because the two differ: a junction is navigable and not a destination, and a fenced landmark is a destination you can be shown but not walked into.\n"
+   }
+  }
+ },
+ "WaitTime": {
+  "x-ticvai-persistence": "none — computed from readings and throughput",
+  "type": "object",
+  "required": [
+   "queueId",
+   "waitMinutes",
+   "source",
+   "asOf",
+   "isStale"
+  ],
+  "properties": {
+   "queueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "queueName": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "attractionProductId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "status": {
+    "$ref": "#/components/schemas/QueueStatus"
+   },
+   "waitMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Null where the queue is closed or no estimate is available."
+   },
+   "source": {
+    "$ref": "#/components/schemas/WaitTimeSource"
+   },
+   "isStale": {
+    "type": "boolean",
+    "description": "The underlying feed has gone quiet past its expected interval. The figure is shown with a caveat rather than frozen and presented as current.\n"
+   },
+   "heightRequirementCm": {
+    "type": "integer",
+    "nullable": true
+   },
+   "zone": {
+    "type": "string",
+    "nullable": true
+   },
+   "asOf": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "WaitTimeSource": {
+  "type": "string",
+  "description": "Where the estimate came from. Surfaced so an operator knows whether a figure is measured or guessed.\n",
+  "enum": [
+   "sensor",
+   "throughput",
+   "manual",
+   "unavailable"
+  ]
+ },
+ "WaitingGuest": {
+  "x-ticvai-persistence": "queue.waiting_guest",
+  "type": "object",
+  "required": [
+   "id",
+   "queueId",
+   "partyNumber",
+   "partySize",
+   "status",
+   "joinedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "queueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "queueName": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "partyNumber": {
+    "type": "integer",
+    "description": "What the guest sees and what appears on signage."
+   },
+   "partySize": {
+    "type": "integer"
+   },
+   "status": {
+    "$ref": "#/components/schemas/QueueEntryStatus"
+   },
+   "positionInQueue": {
+    "type": "integer",
+    "nullable": true
+   },
+   "partiesAhead": {
+    "type": "integer",
+    "nullable": true
+   },
+   "estimatedCallAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "isFastPass": {
+    "type": "boolean"
+   },
+   "entitlementId": {
+    "type": "string",
+    "nullable": true
+   },
+   "calledAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "returnWindowEndsAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "redeemedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "admittedCount": {
+    "type": "integer",
+    "nullable": true
+   },
+   "joinedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "WaitlistEntry": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.waitlist_entry",
+  "required": [
+   "performanceId",
+   "partySize"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "variantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "contactPoint": {
+    "type": "string",
+    "description": "**Where the offer goes.** An entry with no way to reach the guest is an entry that can never be honoured, so this is required even for an anonymous guest.\n"
+   },
+   "partySize": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "status": {
+    "$ref": "#/components/schemas/WaitlistStatus"
+   },
+   "position": {
+    "type": "integer",
+    "readOnly": true,
+    "description": "First in, first offered. Shown to the guest, because not knowing is worse than waiting."
+   },
+   "offeredAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "offerExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**The offer moves on when this passes.** Notifying everyone at once produces a race the fastest guest wins; holding indefinitely for someone asleep leaves the seat unsold.\n"
+   },
+   "joinedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "WaitlistStatus": {
+  "type": "string",
+  "enum": [
+   "waiting",
+   "offered",
+   "converted",
+   "expired",
+   "left"
+  ]
+ }
+}

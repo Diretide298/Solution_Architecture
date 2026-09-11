@@ -1,0 +1,682 @@
+{
+ "BiometricAccessCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Biometric Access Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "activeFacePassProfiles": {
+    "type": "integer",
+    "description": "Active Face Pass Profiles"
+   },
+   "activeFaceTags": {
+    "type": "integer",
+    "description": "Active Face Tags"
+   },
+   "enrollmentsToday": {
+    "type": "string",
+    "description": "Enrollments Today"
+   },
+   "successfulFaceVerifications": {
+    "type": "integer",
+    "description": "Successful Face Verifications"
+   },
+   "failedVerifications": {
+    "type": "integer",
+    "description": "Failed Verifications"
+   },
+   "manualReviews": {
+    "type": "integer",
+    "description": "Manual Reviews"
+   },
+   "reEnrollmentRequests": {
+    "type": "integer",
+    "description": "Re-enrollment Requests"
+   },
+   "blockedFaceChanges": {
+    "type": "integer",
+    "description": "Blocked Face Changes"
+   },
+   "profilesPendingDeletion": {
+    "type": "string",
+    "description": "Profiles Pending Deletion"
+   },
+   "cameraReaderHealth": {
+    "type": "string",
+    "description": "Camera/Reader Health"
+   },
+   "biometricSecurityAlerts": {
+    "type": "integer",
+    "description": "Biometric Security Alerts"
+   },
+   "ai": {
+    "type": "string",
+    "description": "AI"
+   }
+  }
+ },
+ "BiometricConsentGuardianManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Biometric Consent & Guardian Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "countryJurisdiction": {
+    "type": "string",
+    "description": "Country/Jurisdiction"
+   },
+   "tenant": {
+    "type": "string",
+    "description": "Tenant"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "credential": {
+    "type": "string",
+    "description": "Credential"
+   },
+   "enrollmentChannel": {
+    "type": "string",
+    "description": "Enrollment Channel"
+   },
+   "guestCategory": {
+    "type": "string",
+    "description": "Guest Category"
+   },
+   "consentRecordId": {
+    "type": "string",
+    "description": "Consent record ID"
+   },
+   "policyVersion": {
+    "type": "string",
+    "description": "Policy/version"
+   },
+   "timestamp": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Timestamp"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "guardianReferenceWhereApplicable": {
+    "type": "string",
+    "description": "Guardian reference where applicable"
+   },
+   "operatorWhereApplicable": {
+    "type": "string",
+    "description": "Operator where applicable"
+   },
+   "withdrawalDeletionStatus": {
+    "type": "string",
+    "description": "withdrawal/deletion status"
+   },
+   "from": {
+    "type": "string",
+    "description": "from"
+   },
+   "consentRecordMayBeRetained": {
+    "type": "string",
+    "description": "consent record may be retained"
+   }
+  }
+ },
+ "BiometricLifecycleRetentionDeletionView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Biometric Lifecycle, Retention & Deletion displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "verificationMethod": {
+    "type": "string",
+    "description": "verification method"
+   },
+   "activeCredential": {
+    "type": "integer",
+    "description": "Active Credential?"
+   },
+   "alreadyValidatedUsingFacePass": {
+    "type": "string",
+    "description": "Already validated using Face Pass?"
+   },
+   "reasonShown": {
+    "type": "string",
+    "description": "Reason shown"
+   },
+   "facePass": {
+    "type": "string",
+    "description": "Face Pass"
+   },
+   "faceTag": {
+    "type": "string",
+    "description": "Face Tag"
+   },
+   "failedEnrollmentCaptures": {
+    "type": "integer",
+    "description": "Failed enrollment captures"
+   },
+   "abandonedRegistrations": {
+    "type": "string",
+    "description": "abandoned registrations"
+   },
+   "temporaryCaptures": {
+    "type": "string",
+    "description": "temporary captures"
+   }
+  }
+ },
+ "BiometricSimulationAuditPublicationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Biometric Simulation, Audit & Publication displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "validFacePass": {
+    "type": "string",
+    "description": "Valid Face Pass"
+   },
+   "faceMismatch": {
+    "type": "string",
+    "description": "Face mismatch"
+   },
+   "noBiometricProfile": {
+    "type": "string",
+    "description": "No biometric profile"
+   },
+   "lowConfidenceMatch": {
+    "type": "string",
+    "description": "Low-confidence match"
+   },
+   "livenessFailure": {
+    "type": "string",
+    "description": "Liveness failure"
+   },
+   "reEnrollmentAttempt": {
+    "type": "string",
+    "description": "Re-enrollment attempt"
+   },
+   "childAssignedAdult": {
+    "type": "string",
+    "description": "Child + assigned adult"
+   },
+   "faceTagExpired": {
+    "type": "string",
+    "description": "Face Tag expired"
+   },
+   "faceTagDeleted": {
+    "type": "string",
+    "description": "Face Tag deleted"
+   },
+   "offlineBiometricScenario": {
+    "type": "integer",
+    "description": "Offline biometric scenario"
+   },
+   "cameraUnavailable": {
+    "type": "string",
+    "description": "Camera unavailable"
+   },
+   "alternativeVerificationFallback": {
+    "type": "string",
+    "description": "alternative verification fallback"
+   },
+   "faceProfileActive": {
+    "type": "integer",
+    "description": "✓ Face profile active"
+   },
+   "verificationPolicySatisfied": {
+    "type": "string",
+    "description": "✓ Verification policy satisfied"
+   },
+   "matchPolicySatisfied": {
+    "type": "string",
+    "description": "✓ Match policy satisfied"
+   },
+   "credentialResolved": {
+    "type": "string",
+    "description": "✓ Credential resolved"
+   },
+   "ticketValid": {
+    "type": "string",
+    "description": "✓ Ticket valid"
+   },
+   "accessEntitlementValid": {
+    "type": "string",
+    "description": "✓ Access entitlement valid"
+   },
+   "tenant": {
+    "type": "string",
+    "description": "Tenant"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "park": {
+    "type": "string",
+    "description": "Park"
+   },
+   "credentialType": {
+    "type": "string",
+    "description": "Credential type"
+   },
+   "gateGroup": {
+    "type": "string",
+    "description": "Gate group"
+   },
+   "withAppropriateFallbackRules": {
+    "type": "string",
+    "description": "with appropriate fallback rules"
+   },
+   "required": {
+    "type": "boolean",
+    "description": "required"
+   },
+   "hardware": {
+    "type": "string",
+    "description": "hardware"
+   }
+  }
+ },
+ "BiometricValidationAtGateView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Biometric Validation at Gate displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "decisionReturned": {
+    "type": "string",
+    "description": "Decision returned"
+   },
+   "biometricMatchValidAccess": {
+    "type": "string",
+    "description": "Biometric Match + Valid Access"
+   }
+  }
+ },
+ "BiometricVerificationProfileBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Biometric Verification Profile Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "selectType": {
+    "type": "string",
+    "enum": [
+     "ticketProduct",
+     "ticketType",
+     "membership",
+     "annualPass",
+     "multiDayTicket",
+     "multiAttractionTicket",
+     "vipCredential",
+     "accreditation",
+     "selectedCustomerSegments"
+    ],
+    "description": "Vocabulary listed under Select."
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "park": {
+    "type": "string",
+    "description": "Park"
+   },
+   "zone": {
+    "type": "string",
+    "description": "Zone"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "gate": {
+    "type": "string",
+    "description": "Gate"
+   },
+   "mainEntryFaceRequired": {
+    "type": "boolean",
+    "description": "Main Entry → Face Required"
+   },
+   "attractionsCredentialOnly": {
+    "type": "string",
+    "description": "Attractions → Credential Only"
+   },
+   "vipLoungeFaceRequired": {
+    "type": "boolean",
+    "description": "VIP Lounge → Face Required"
+   }
+  }
+ },
+ "BiometricVerificationProfileBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Biometric Verification Profile Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "facePass": {
+    "type": "string",
+    "description": "Face Pass"
+   },
+   "faceTag": {
+    "type": "string",
+    "description": "Face Tag"
+   },
+   "supportedFutureBiometricProvider": {
+    "type": "string",
+    "description": "Supported future biometric provider"
+   },
+   "selectType": {
+    "type": "string",
+    "enum": [
+     "ticketProduct",
+     "ticketType",
+     "membership",
+     "annualPass",
+     "multiDayTicket",
+     "multiAttractionTicket",
+     "vipCredential",
+     "accreditation",
+     "selectedCustomerSegments"
+    ],
+    "description": "Vocabulary listed under Select."
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "park": {
+    "type": "string",
+    "description": "Park"
+   },
+   "zone": {
+    "type": "string",
+    "description": "Zone"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "gate": {
+    "type": "string",
+    "description": "Gate"
+   },
+   "mainEntryFaceRequired": {
+    "type": "boolean",
+    "description": "Main Entry → Face Required"
+   },
+   "attractionsCredentialOnly": {
+    "type": "string",
+    "description": "Attractions → Credential Only"
+   },
+   "vipLoungeFaceRequired": {
+    "type": "boolean",
+    "description": "VIP Lounge → Face Required"
+   }
+  }
+ },
+ "FaceChangeReEnrollmentIdentityProtectionView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Face Change, Re-enrollment & Identity Protection displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "existingProfileReference": {
+    "type": "string",
+    "description": "Existing profile reference"
+   },
+   "newCaptureReference": {
+    "type": "integer",
+    "description": "New capture reference"
+   },
+   "matchResult": {
+    "type": "string",
+    "description": "match result"
+   },
+   "credential": {
+    "type": "string",
+    "description": "credential"
+   },
+   "guest": {
+    "type": "string",
+    "description": "guest"
+   },
+   "reasonForReEnrollment": {
+    "type": "string",
+    "description": "reason for re-enrollment"
+   },
+   "previousChanges": {
+    "type": "integer",
+    "description": "previous changes"
+   },
+   "operator": {
+    "type": "string",
+    "description": "operator"
+   },
+   "auditHistory": {
+    "type": "string",
+    "description": "audit history"
+   },
+   "reasonsType": {
+    "type": "string",
+    "enum": [
+     "appearanceChange",
+     "poorOriginalCapture",
+     "technicalIssue",
+     "guestRequest",
+     "recovery"
+    ],
+    "description": "Vocabulary listed under Change Reasons."
+   }
+  }
+ },
+ "FaceMatchingVerificationThresholdsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Face Matching & Verification Thresholds displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "venuePolicy": {
+    "type": "string",
+    "description": "venue policy"
+   },
+   "livenessCheck": {
+    "type": "string",
+    "description": "Liveness check"
+   },
+   "duplicateFaceCheck": {
+    "type": "string",
+    "description": "Duplicate-face check"
+   },
+   "imageQuality": {
+    "type": "string",
+    "description": "image quality"
+   },
+   "captureTimeout": {
+    "type": "string",
+    "description": "capture timeout"
+   },
+   "maskObstructionHandling": {
+    "type": "string",
+    "description": "mask/obstruction handling"
+   },
+   "operatorFallback": {
+    "type": "string",
+    "description": "operator fallback"
+   }
+  }
+ },
+ "FacePassEnrollmentConfigurationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Face Pass Enrollment Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "ticvaiApp": {
+    "type": "string",
+    "description": "☑ TICVAI App"
+   },
+   "ticketCounter": {
+    "type": "string",
+    "description": "☑ Ticket Counter"
+   },
+   "annualPassCounter": {
+    "type": "string",
+    "description": "☑ Annual Pass Counter"
+   },
+   "selfServiceKiosk": {
+    "type": "string",
+    "description": "☐ Self-Service Kiosk"
+   },
+   "otherAuthorizedChannel": {
+    "type": "string",
+    "description": "☐ Other authorized channel"
+   },
+   "accountLoginRequired": {
+    "type": "boolean",
+    "description": "Account login required"
+   },
+   "validTicketPassRequired": {
+    "type": "boolean",
+    "description": "Valid ticket/pass required"
+   },
+   "identityCheckRequired": {
+    "type": "boolean",
+    "description": "Identity check required"
+   },
+   "numberOfCaptureAttempts": {
+    "type": "integer",
+    "description": "Number of capture attempts"
+   },
+   "minimumImageQuality": {
+    "type": "string",
+    "description": "minimum image quality"
+   },
+   "operatorVerification": {
+    "type": "string",
+    "description": "operator verification"
+   },
+   "enrollmentExpiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "enrollment expiry"
+   },
+   "alreadyAssociatedWith": {
+    "type": "string",
+    "description": "already associated with"
+   }
+  }
+ },
+ "FacePassEnrollmentConfigurationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Face Pass Enrollment Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "ticvaiApp": {
+    "type": "string",
+    "description": "☑ TICVAI App"
+   },
+   "ticketCounter": {
+    "type": "string",
+    "description": "☑ Ticket Counter"
+   },
+   "annualPassCounter": {
+    "type": "string",
+    "description": "☑ Annual Pass Counter"
+   },
+   "selfServiceKiosk": {
+    "type": "string",
+    "description": "☐ Self-Service Kiosk"
+   },
+   "otherAuthorizedChannel": {
+    "type": "string",
+    "description": "☐ Other authorized channel"
+   },
+   "accountLoginRequired": {
+    "type": "boolean",
+    "description": "Account login required"
+   },
+   "validTicketPassRequired": {
+    "type": "boolean",
+    "description": "Valid ticket/pass required"
+   },
+   "identityCheckRequired": {
+    "type": "boolean",
+    "description": "Identity check required"
+   },
+   "numberOfCaptureAttempts": {
+    "type": "integer",
+    "description": "Number of capture attempts"
+   },
+   "minimumImageQuality": {
+    "type": "string",
+    "description": "minimum image quality"
+   },
+   "operatorVerification": {
+    "type": "string",
+    "description": "operator verification"
+   },
+   "enrollmentExpiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "enrollment expiry"
+   },
+   "alreadyAssociatedWith": {
+    "type": "string",
+    "description": "already associated with"
+   }
+  }
+ },
+ "FaceTagTemporaryEnrollmentView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Face Tag Temporary Enrollment displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "ticketCounter": {
+    "type": "string",
+    "description": "Ticket Counter"
+   },
+   "entryGate": {
+    "type": "string",
+    "description": "Entry Gate"
+   },
+   "ticket": {
+    "type": "string",
+    "description": "Ticket"
+   },
+   "visit": {
+    "type": "string",
+    "description": "Visit"
+   },
+   "temporaryCredential": {
+    "type": "string",
+    "description": "Temporary Credential"
+   },
+   "alternativeConfigurableTriggersWherePermitted": {
+    "type": "string",
+    "description": "Alternative configurable triggers where permitted"
+   },
+   "endOfVisit": {
+    "type": "string",
+    "description": "End of visit"
+   },
+   "ticketExpiration": {
+    "type": "string",
+    "description": "Ticket expiration"
+   },
+   "credentialCancellation": {
+    "type": "string",
+    "description": "Credential cancellation"
+   },
+   "operationalRetentionThreshold": {
+    "type": "integer",
+    "description": "operational retention threshold"
+   }
+  }
+ }
+}

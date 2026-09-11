@@ -1,0 +1,1495 @@
+[
+ {
+  "id": "ADM-168",
+  "name": "Advanced Offer Command Center",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "4",
+   "number": "1",
+   "page": 50
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/advanced-offer-command-center-adm-168",
+   "component": "apps/ticvai-web/src/routes/commercial/AdvancedOfferCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "exitTo": [
+    "ADM-002",
+    "ADM-169",
+    "ADM-170",
+    "ADM-171",
+    "ADM-172",
+    "ADM-173",
+    "ADM-174",
+    "ADM-175",
+    "ADM-176",
+    "ADM-177"
+   ],
+   "inferred": false,
+   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
+   "transitions": [
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-169",
+     "trigger": "Works in Buy X Get Y / BOGO Rule Builder",
+     "provenance": "flow F157 step 1→2",
+     "operation": "listAdvancedOffer"
+    },
+    {
+     "to": "ADM-170",
+     "trigger": "Works in Multi-Buy & Quantity Offer Configurator",
+     "provenance": "flow F157 step 3→4",
+     "operation": "listAdvancedOffer"
+    },
+    {
+     "to": "ADM-171",
+     "trigger": "Works in Cheapest / Lowest-Value Item Promotion",
+     "provenance": "flow F157 step 5→6",
+     "operation": "listAdvancedOffer"
+    },
+    {
+     "to": "ADM-172",
+     "trigger": "Works in Fixed-Price & “N for X” Offer Builder",
+     "provenance": "flow F157 step 7→8",
+     "operation": "listAdvancedOffer"
+    },
+    {
+     "to": "ADM-173",
+     "trigger": "Works in Gift, Free Product & Added-Value Offer Builder",
+     "provenance": "flow F157 step 9→10",
+     "operation": "listAdvancedOffer"
+    },
+    {
+     "to": "ADM-174",
+     "trigger": "Works in Cross-Category Promotion Builder",
+     "provenance": "flow F157 step 11→12",
+     "operation": "listAdvancedOffer"
+    },
+    {
+     "to": "ADM-175",
+     "trigger": "Works in Reward Selection, Substitution & Customer Choice",
+     "provenance": "flow F157 step 13→14",
+     "operation": "listAdvancedOffer"
+    },
+    {
+     "to": "ADM-176",
+     "trigger": "Works in Advanced Offer Guardrails & Conflict Controls",
+     "provenance": "flow F157 step 15→16",
+     "operation": "listAdvancedOffer"
+    },
+    {
+     "to": "ADM-177",
+     "trigger": "Works in Offer Simulation, Basket Trace & AI Optimization",
+     "provenance": "flow F157 step 17→18",
+     "operation": "listAdvancedOffer"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
+  "purpose": "Provide the centralized management workspace for all advanced promotional mechanics.",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search advanced offer",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 50 §Filter by"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "Buy X Get X",
+        "Buy X Get Y",
+        "Buy N Get X",
+        "Buy N Get Multiple",
+        "Cheapest Item Free",
+        "Percentage Off Another Product",
+        "Amount Off Another Product",
+        "Fixed Bundle Price",
+        "Gift with Purchase",
+        "Added Value",
+        "Cross-category reward",
+        "Upgrade offer"
+       ],
+       "notes": "The pack filters this screen by buy x get x, buy x get y, buy n get x, buy n get multiple, cheapest item free, percentage off another product and 6 more — which are present is a decision the pack already made.",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 50 §Filter by"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Active Advanced Offers",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 50 §KPI Cards",
+       "bindsTo": "AdvancedOfferCommandCenterView.activeAdvancedOffers"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Scheduled Offers",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 50 §KPI Cards",
+       "bindsTo": "AdvancedOfferCommandCenterView.scheduledOffers"
+      },
+      {
+       "kind": "metricTile",
+       "label": "BOGO Campaigns",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 50 §KPI Cards",
+       "bindsTo": "AdvancedOfferCommandCenterView.bogoCampaigns"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Gift-with-Purchase Offers",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 50 §KPI Cards",
+       "bindsTo": "AdvancedOfferCommandCenterView.giftWithPurchaseOffers"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Fixed-Price Offers",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 50 §KPI Cards",
+       "bindsTo": "AdvancedOfferCommandCenterView.fixedPriceOffers"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Cross-Category Offers",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 50 §KPI Cards",
+       "bindsTo": "AdvancedOfferCommandCenterView.crossCategoryOffers"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Total Redemptions",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 50 §KPI Cards",
+       "bindsTo": "AdvancedOfferCommandCenterView.totalRedemptions"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Free Items Issued",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 50 §KPI Cards",
+       "bindsTo": "AdvancedOfferCommandCenterView.freeItemsIssued"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Discount Granted",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 50 §KPI Cards",
+       "bindsTo": "AdvancedOfferCommandCenterView.discountGranted"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Revenue Generated",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 50 §KPI Cards",
+       "bindsTo": "AdvancedOfferCommandCenterView.revenueGenerated"
+      },
+      {
+       "kind": "metricTile",
+       "label": "AOV Uplift",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 50 §KPI Cards",
+       "bindsTo": "AdvancedOfferCommandCenterView.aovUplift"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Margin Impact",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 50 §KPI Cards",
+       "bindsTo": "AdvancedOfferCommandCenterView.marginImpact"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The advanced offer list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the advanced offer untouched.",
+   "emptyFirstRun": "No advanced offer yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the advanced offer are still there. The pack's own statuses are Draft — the state names which is selected.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listAdvancedOffer",
+    "contract": "promotions",
+    "purpose": "Advanced Offer Command Center",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "AdvancedOfferCommandCenterView.activeAdvancedOffers",
+    "AdvancedOfferCommandCenterView.scheduledOffers",
+    "AdvancedOfferCommandCenterView.bogoCampaigns",
+    "AdvancedOfferCommandCenterView.giftWithPurchaseOffers",
+    "AdvancedOfferCommandCenterView.fixedPriceOffers",
+    "AdvancedOfferCommandCenterView.crossCategoryOffers"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-168"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 50. 12 of 24 labels bound to a contract property; 33 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-169",
+  "name": "Buy X Get Y / BOGO Rule Builder",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "4",
+   "number": "2",
+   "page": 52
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/buy-x-get-y-bogo-rule-builder-adm-169",
+   "component": "apps/ticvai-web/src/routes/commercial/BuyXGetYBogoRuleBuilder.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-168"
+   ],
+   "exitTo": [
+    "ADM-168"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-168, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-168",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F157 step 2→3",
+     "operation": "setBuyGetBogo"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Configure the fundamental qualifier → reward relationship.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Product",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 52 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Product category",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 52 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Ticket type",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 52 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Quantity",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 52 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Minimum spend",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 52 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer segment",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 52 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Channel",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 52 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 52 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Date/time",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 52 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Same product",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 52 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Different product",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 52 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Free",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 52 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Percentage discount",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 52 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Fixed discount",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 52 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Fixed reward price",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 52 §Configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "provenance": "contract operation setBuyGetBogo"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The buy get bogo configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the buy get bogo untouched.",
+   "emptyFirstRun": "No buy get bogo configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setBuyGetBogo",
+    "contract": "promotions",
+    "purpose": "Buy X Get Y / BOGO Rule Builder",
+    "trigger": "onAction",
+    "invalidates": [
+     "setBuyGetBogo"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-169"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 52. 0 of 0 labels bound to a contract property; 15 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-170",
+  "name": "Multi-Buy & Quantity Offer Configurator",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "4",
+   "number": "3",
+   "page": 53
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/multi-buy-quantity-offer-configurator-adm-170",
+   "component": "apps/ticvai-web/src/routes/commercial/MultiBuyQuantityOfferConfigurator.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-168"
+   ],
+   "exitTo": [
+    "ADM-168"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-168, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-168",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F157 step 4→5",
+     "operation": "listMultiBuyQuantity"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Administrator shall configure) and no display directory — it is settings, not a population",
+  "purpose": "Configure advanced quantity relationships that go beyond simple BOGO.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**Multi-Buy & Quantity Offer Configurator declares no operation that writes anything** — its only declared call is `listMultiBuyQuantity`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Apply once",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 53 §Administrator shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Repeat automatically",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 53 §Administrator shall configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum repetitions",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 53 §Administrator shall configure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The multi-buy quantity offer configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the multi-buy quantity offer untouched.",
+   "emptyFirstRun": "No multi-buy quantity offer configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listMultiBuyQuantity",
+    "contract": "promotions",
+    "purpose": "Multi-Buy & Quantity Offer Configurator",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-170"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 53. 0 of 0 labels bound to a contract property; 3 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-171",
+  "name": "Cheapest / Lowest-Value Item Promotion",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "4",
+   "number": "4",
+   "page": 53
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/cheapest-lowest-value-item-promotion-adm-171",
+   "component": "apps/ticvai-web/src/routes/commercial/CheapestLowestValueItemPromotion.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-168"
+   ],
+   "exitTo": [
+    "ADM-168"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-168, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-168",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F157 step 6→7",
+     "operation": "listCheapestLowestValue"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configuration) and no display directory — it is settings, not a population",
+  "purpose": "Configure offers where TICVAI dynamically identifies the lowest-priced qualifying item. The matrix explicitly requires “buy multiple products and get cheapest item free” and adding cheaper qualifying items within the same transaction.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Eligible products",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 53 §Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Eligible categories",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 53 §Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Minimum quantity",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 53 §Configuration"
+      },
+      {
+       "kind": "textField",
+       "label": "Number of free items",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 53 §Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Cheapest/lowest-priced selection",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 53 §Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum free-item value",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 53 §Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum repetitions",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 53 §Configuration"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The cheapest lowest-value item configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the cheapest lowest-value item untouched.",
+   "emptyFirstRun": "No cheapest lowest-value item configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCheapestLowestValue",
+    "contract": "promotions",
+    "purpose": "Cheapest / Lowest-Value Item Promotion",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-171"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 53. 0 of 0 labels bound to a contract property; 7 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-172",
+  "name": "Fixed-Price & “N for X” Offer Builder",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "4",
+   "number": "5",
+   "page": 54
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/fixed-price-n-for-x-offer-builder-adm-172",
+   "component": "apps/ticvai-web/src/routes/commercial/FixedPriceNForXOfferBuilder.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-168"
+   ],
+   "exitTo": [
+    "ADM-168"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-168, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-168",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F157 step 8→9",
+     "operation": "setFixedPriceOffer"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configuration) and no display directory — it is settings, not a population",
+  "purpose": "Configure promotions where a qualifying collection of products is sold for a fixed promotional total.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Required quantity",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 54 §Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Required products",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 54 §Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Product category",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 54 §Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Mix-and-match allowed",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 54 §Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Fixed promotional price",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 54 §Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Currency",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 54 §Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum repetitions",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 54 §Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Minimum/maximum product values",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 54 §Configuration"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "provenance": "contract operation setFixedPriceOffer"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The fixed-price for offer configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the fixed-price for offer untouched.",
+   "emptyFirstRun": "No fixed-price for offer configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setFixedPriceOffer",
+    "contract": "promotions",
+    "purpose": "Fixed-Price & “N for X” Offer Builder",
+    "trigger": "onAction",
+    "invalidates": [
+     "setFixedPriceOffer"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-172"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 54. 0 of 0 labels bound to a contract property; 8 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-173",
+  "name": "Gift, Free Product & Added-Value Offer Builder",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "4",
+   "number": "6",
+   "page": 55
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/gift-free-product-added-value-offer-builder-adm-173",
+   "component": "apps/ticvai-web/src/routes/commercial/GiftFreeProductAddedValueOfferBuilder.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-168"
+   ],
+   "exitTo": [
+    "ADM-168"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-168, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-168",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F157 step 10→11",
+     "operation": "setGiftFreeProduct"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Configure promotions where a purchase generates an additional entitlement rather than simply reducing price. The matrix explicitly provides the example: “Buy for more than 200 AED and get a free pencil.”",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "Do not offer promotion",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 55 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Provide alternative reward",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 55 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Issue voucher",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 55 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Allow later fulfillment",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 55 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Escalate to operator",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 55 §Configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "provenance": "contract operation setGiftFreeProduct"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The gift free product configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the gift free product untouched.",
+   "emptyFirstRun": "No gift free product configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setGiftFreeProduct",
+    "contract": "promotions",
+    "purpose": "Gift, Free Product & Added-Value Offer Builder",
+    "trigger": "onAction",
+    "invalidates": [
+     "setGiftFreeProduct"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-173"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 55. 0 of 0 labels bound to a contract property; 5 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-174",
+  "name": "Cross-Category Promotion Builder",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "4",
+   "number": "7",
+   "page": 56
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/cross-category-promotion-builder-adm-174",
+   "component": "apps/ticvai-web/src/routes/commercial/CrossCategoryPromotionBuilder.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-168"
+   ],
+   "exitTo": [
+    "ADM-168"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-168, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-168",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F157 step 12→13",
+     "operation": "setCrossCategoryPromotion"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Create promotions spanning different TICVAI commercial domains.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 56"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 56"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "provenance": "contract operation setCrossCategoryPromotion"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setCrossCategoryPromotion"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The cross-category promotion list.",
+   "error": "Could not load. Names which read failed and leaves the cross-category promotion untouched.",
+   "emptyFirstRun": "No cross-category promotion yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the cross-category promotion are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setCrossCategoryPromotion",
+    "contract": "promotions",
+    "purpose": "Cross-Category Promotion Builder",
+    "trigger": "onAction",
+    "invalidates": [
+     "setCrossCategoryPromotion"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-174"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 56. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-175",
+  "name": "Reward Selection, Substitution & Customer Choice",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "4",
+   "number": "8",
+   "page": 57
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/reward-selection-substitution-customer-choice-adm-175",
+   "component": "apps/ticvai-web/src/routes/commercial/RewardSelectionSubstitutionCustomerChoice.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-168"
+   ],
+   "exitTo": [
+    "ADM-168"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-168, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-168",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F157 step 14→15",
+     "operation": "listRewardSelectionSubstitution"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Control situations where the customer can choose between multiple promotional rewards.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 57"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 57"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listRewardSelectionSubstitution",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The reward selection substitution list.",
+   "error": "Could not load. Names which read failed and leaves the reward selection substitution untouched.",
+   "emptyFirstRun": "No reward selection substitution yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the reward selection substitution are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listRewardSelectionSubstitution",
+    "contract": "promotions",
+    "purpose": "Reward Selection, Substitution & Customer Choice",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "RewardSelectionSubstitutionCustomerChoiceView.guestSelectsFromConfiguredOptions",
+    "RewardSelectionSubstitutionCustomerChoiceView.posCallCenterOperatorSelects"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-175"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 57. 0 of 0 labels bound to a contract property; 0 of 12 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-176",
+  "name": "Advanced Offer Guardrails & Conflict Controls",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "4",
+   "number": "9",
+   "page": 58
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/advanced-offer-guardrails-conflict-controls-adm-176",
+   "component": "apps/ticvai-web/src/routes/commercial/AdvancedOfferGuardrailsConflictControls.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-168"
+   ],
+   "exitTo": [
+    "ADM-168"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-168, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-168",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F157 step 16→17",
+     "operation": "listAdvancedOfferGuardrail"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Define preliminary behavior; Prevent configurations such as) and no display directory — it is settings, not a population",
+  "purpose": "Prevent advanced offers from generating unintended financial or operational outcomes. This screen handles offer-specific safeguards; the complete cross-promotion stacking hierarchy remains in Board 8.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Can combine",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 58 §Define preliminary behavior"
+      },
+      {
+       "kind": "selectField",
+       "label": "Cannot combine",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 58 §Define preliminary behavior"
+      },
+      {
+       "kind": "selectField",
+       "label": "Exclusive",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 58 §Define preliminary behavior"
+      },
+      {
+       "kind": "textField",
+       "label": "Defer to central stacking engine",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 58 §Define preliminary behavior"
+      },
+      {
+       "kind": "textField",
+       "label": "Product A gives Product B free",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 58 §Prevent configurations such as"
+      },
+      {
+       "kind": "textField",
+       "label": "Product B gives Product A free",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 58 §Prevent configurations such as"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The advanced offer guardrails configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the advanced offer guardrails untouched.",
+   "emptyFirstRun": "No advanced offer guardrails configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listAdvancedOfferGuardrail",
+    "contract": "promotions",
+    "purpose": "Advanced Offer Guardrails & Conflict Controls",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-176"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 58. 0 of 0 labels bound to a contract property; 6 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-177",
+  "name": "Offer Simulation, Basket Trace & AI Optimization",
+  "module": "Commercial",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Promotions___Bundles_Management_Reference.pdf",
+   "board": "4",
+   "number": "10",
+   "page": 59
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/offer-simulation-basket-trace-ai-optimization-adm-177",
+   "component": "apps/ticvai-web/src/routes/commercial/OfferSimulationBasketTraceAiOptimization.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-168"
+   ],
+   "exitTo": [
+    "ADM-168"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-168, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Test complex promotion mechanics before publication.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Sample customer segment, Forecast simulation, Bulk scenario testing. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 59 §Allow"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 59"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Promotions___Bundles_Management_Reference.pdf, page 59"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Sample customer segment",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 59 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Forecast simulation",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 59 §Allow"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Bulk scenario testing",
+       "provenance": "pack Promotions___Bundles_Management_Reference.pdf, page 59 §Allow"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The offer simulation basket list.",
+   "error": "Could not load. Names which read failed and leaves the offer simulation basket untouched.",
+   "emptyFirstRun": "No offer simulation basket yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the offer simulation basket are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listOfferBasketTrace",
+    "contract": "promotions",
+    "purpose": "Offer Simulation, Basket Trace & AI Optimization",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "OfferSimulationBasketTraceAiOptimizationView.yPrice",
+    "OfferSimulationBasketTraceAiOptimizationView.adult",
+    "OfferSimulationBasketTraceAiOptimizationView.child",
+    "OfferSimulationBasketTraceAiOptimizationView.subtotalAed750",
+    "OfferSimulationBasketTraceAiOptimizationView.originalTotalAed750"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-177"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Promotions___Bundles_Management_Reference.pdf page 59. 0 of 0 labels bound to a contract property; 3 of 71 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

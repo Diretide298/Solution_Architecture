@@ -594,7 +594,7 @@ marketing.invitation,product_id,catalogue.product,reference,declared,yes,yes
 marketing.invitation_campaign,event_id,catalogue.event,reference,declared,yes,yes
 marketing.invitation_campaign,product_id,catalogue.product,reference,declared,yes,yes
 marketing.journey_entrant,journey_id,marketing.journey,child,convention,,yes
-marketing.journey_entrant,step_id,approvals.step_up_policy,reference,convention,yes,
+marketing.journey_entrant,step_id,approvals.step_up_policy,reference,convention,yes,yes
 marketing.journey_entrant,subject_id,pii.subject,reference,convention,yes,yes
 marketing.kiosk_assist_session,cart_id,orders.cart,reference,declared,yes,yes
 marketing.kiosk_assist_session,device_id,platform.device,reference,declared,yes,yes

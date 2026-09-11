@@ -31,12 +31,10 @@ platform:
     networkAssumption: venue LAN with expected outages
     releaseCadence: monthly, never during trading
   designReferences:
-  - path: sources/designs/Park_POS_dc.html
-    note: Delivered client mockup. Six of the ten screens exist in it, and it is the source of the design
-      tokens the boards use.
-  - path: sources/designs/Park_POS_v1_dc.html
-    note: Delivered client mockup. Six of the ten screens exist in it, and it is the source of the design
-      tokens the boards use.
+  - path: sources/designs/TICVAI_POS_Terminal_client_approved.html
+    note: Client-approved POS build, 30 screens, and the fidelity reference for every other platform. It
+      replaced the two early Park_POS explorations, removed on purpose 11 September; screen notes that
+      cite Park_POS_dc.html record where a decision came from, not a file to open.
   operator: venue
   wireframeBoard: wireframes/P04 Venue POS.dc.html
   wireframeBoardNote: '**The generated board for the whole platform.** Individual screens keep the client-pack

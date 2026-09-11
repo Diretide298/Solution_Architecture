@@ -1,0 +1,1047 @@
+[
+ {
+  "id": "BO-124",
+  "name": "Layout & Journey Builder",
+  "module": "Sell",
+  "requiresModule": "core",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/layout-journey-builder",
+   "component": "apps/venue-management-web/src/routes/sell/LayoutJourneyBuilderList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-036",
+    "BO-102"
+   ],
+   "exitTo": [
+    "BO-102",
+    "BO-125"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-125",
+     "trigger": "Product & Category Button Configuration",
+     "provenance": "flow F95 step 2→3"
+    },
+    {
+     "to": "BO-102",
+     "trigger": "Sell",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not. **Owns POS board frame(s) POS-1D** (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse off than one who has none.",
+  "density": "compact",
+  "boardFrames": [
+   "POS Board 1.dc.html#pos-1d"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listAuditRecords` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Layout & Journey Builder — from the client design board, 20 August.",
+  "gaps": [
+   {
+    "operation": "listAuditRecords",
+    "why": "**2 declared operations reach no component on this screen**: listAuditRecords, listDevices. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "updateSaleBoard",
+       "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createSaleBoard",
+       "provenance": "contract tenancy.yaml POST /sale-boards"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Deploy",
+       "operation": "deployConfigurationProfile",
+       "provenance": "contract tenancy.yaml POST /configuration-profiles/{profileId}/deploy"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordDeviceHeartbeat",
+       "provenance": "contract tenancy.yaml POST /devices/{deviceId}/heartbeat"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
+       "provenance": "authored — required by check-screens"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search layout",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "deployConfigurationProfile",
+       "notes": "Declares `deployConfigurationProfile`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The layout journey list.",
+   "error": "Could not load. Names which read failed and leaves the layout journey untouched.",
+   "emptyFirstRun": "No layout journey yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the layout journey are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "updateSaleBoard",
+    "contract": "tenancy",
+    "purpose": "Update a sale board",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAuditRecords"
+    ]
+   },
+   {
+    "operationId": "createSaleBoard",
+    "contract": "tenancy",
+    "purpose": "Create a sale board",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAuditRecords"
+    ]
+   },
+   {
+    "operationId": "deployConfigurationProfile",
+    "contract": "tenancy",
+    "purpose": "deployConfigurationProfile",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAuditRecords"
+    ]
+   },
+   {
+    "operationId": "listAuditRecords",
+    "contract": "tenancy",
+    "purpose": "Who did what, where, and when",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listDevices",
+    "contract": "tenancy",
+    "purpose": "List registered devices",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordDeviceHeartbeat",
+    "contract": "tenancy",
+    "purpose": "Device heartbeat and status",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAuditRecords"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "saleBoardId",
+     "from": "deepLink"
+    },
+    {
+     "name": "deviceId",
+     "from": "deepLink"
+    },
+    {
+     "name": "profileId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders. A device opened from the registry. A profile opened from the list."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-124",
+   "source": "Claude Design POS pack, 24 August",
+   "note": "**Drawn by Claude Design on `POS Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-125",
+  "name": "Product & Category Button Configuration",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/product-category-button-configuration",
+   "component": "apps/venue-management-web/src/routes/sell/ProductCategoryButtonConfigurationList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-102",
+    "BO-124"
+   ],
+   "exitTo": [
+    "BO-102"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-102",
+     "trigger": "Sell",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not. **Owns POS board frame(s) POS-1E** (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse off than one who has none.",
+  "density": "compact",
+  "boardFrames": [
+   "POS Board 1.dc.html#pos-1e"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listProducts` reads the population and `getWorkstationHealth` reads one of them — list, select, act",
+  "purpose": "Product & Category Button Configuration — from the client design board, 20 August.",
+  "gaps": [
+   {
+    "operation": "getWorkstationHealth",
+    "why": "**2 declared operations reach no component on this screen**: getWorkstationHealth, listAlerts. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every product category button",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo"
+       ],
+       "operation": "listProducts",
+       "provenance": "contract catalogue.yaml GET /products"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "updateSaleBoard",
+       "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordDeviceHeartbeat",
+       "provenance": "contract tenancy.yaml POST /devices/{deviceId}/heartbeat"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Report",
+       "operation": "reportIncident",
+       "provenance": "contract maintenance.yaml POST /incidents"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search product",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The product category button list.",
+   "error": "Could not load. Names which read failed and leaves the product category button untouched.",
+   "emptyFirstRun": "No product category button yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the product category button are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "updateSaleBoard",
+    "contract": "tenancy",
+    "purpose": "Update a sale board",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProducts"
+    ]
+   },
+   {
+    "operationId": "listProducts",
+    "contract": "catalogue",
+    "purpose": "List products",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getWorkstationHealth",
+    "contract": "tenancy",
+    "purpose": "getWorkstationHealth",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listAlerts",
+    "contract": "reporting",
+    "purpose": "What is currently raised",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordDeviceHeartbeat",
+    "contract": "tenancy",
+    "purpose": "Device heartbeat and status",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProducts"
+    ]
+   },
+   {
+    "operationId": "reportIncident",
+    "contract": "maintenance",
+    "purpose": "Report an incident",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProducts"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "saleBoardId",
+     "from": "deepLink"
+    },
+    {
+     "name": "deviceId",
+     "from": "deepLink"
+    },
+    {
+     "name": "workstationId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders. A device opened from the registry. Resolves from the session — a till is signed into."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-125",
+   "source": "Claude Design POS pack, 24 August",
+   "note": "**Drawn by Claude Design on `POS Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-126",
+  "name": "Deployment, Preview & Audit",
+  "module": "Sell",
+  "requiresModule": "core",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/deployment-preview-audit",
+   "component": "apps/venue-management-web/src/routes/sell/DeploymentPreviewAuditList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-102",
+    "BO-118"
+   ],
+   "exitTo": [
+    "BO-036",
+    "BO-102"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-036",
+     "trigger": "Device Registry",
+     "provenance": "flow F79 step 1→2"
+    },
+    {
+     "to": "BO-102",
+     "trigger": "Sell",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not. **Owns POS board frame(s) POS-1F, POS-4F** (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse off than one who has none.",
+  "density": "compact",
+  "boardFrames": [
+   "POS Board 1.dc.html#pos-1f",
+   "POS Board 4.dc.html#pos-4f"
+  ],
+  "pattern": "commandCentre",
+  "patternReason": "3 independent reads and no read of one record — the screen watches a population rather than working one",
+  "purpose": "Deployment, Preview & Audit — from the client design board, 20 August.",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Audit records",
+       "bindsTo": null,
+       "operation": "listAuditRecords",
+       "provenance": "contract tenancy.yaml GET /audit-records"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Sale boards",
+       "bindsTo": "SaleBoard",
+       "operation": "listSaleBoards",
+       "provenance": "contract tenancy.yaml GET /sale-boards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Workstations",
+       "bindsTo": "Workstation",
+       "operation": "listWorkstations",
+       "provenance": "contract tenancy.yaml GET /workstations"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Deploy",
+       "operation": "deployConfigurationProfile",
+       "provenance": "contract tenancy.yaml POST /configuration-profiles/{profileId}/deploy"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateSaleBoard",
+       "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Run",
+       "operation": "runReport",
+       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Start",
+       "operation": "startRollout",
+       "provenance": "contract platform-ops.yaml POST /rollouts/{rolloutId}/start"
+      },
+      {
+       "kind": "publishGate",
+       "label": "What publishing changes",
+       "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
+       "provenance": "authored — required by check-screens"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search deployment, preview",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "publishGate",
+       "impliedBy": "deployConfigurationProfile",
+       "notes": "Declares `deployConfigurationProfile`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate.\n",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The deployment preview audit list.",
+   "error": "Could not load. Names which read failed and leaves the deployment preview audit untouched.",
+   "emptyFirstRun": "No deployment preview audit yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the deployment preview audit are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "deployConfigurationProfile",
+    "contract": "tenancy",
+    "purpose": "deployConfigurationProfile",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAuditRecords"
+    ]
+   },
+   {
+    "operationId": "updateSaleBoard",
+    "contract": "tenancy",
+    "purpose": "Update a sale board",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAuditRecords"
+    ]
+   },
+   {
+    "operationId": "listAuditRecords",
+    "contract": "tenancy",
+    "purpose": "Who did what, where, and when",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listSaleBoards",
+    "contract": "tenancy",
+    "purpose": "List sale boards",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listWorkstations",
+    "contract": "tenancy",
+    "purpose": "List workstations",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "runReport",
+    "contract": "reporting",
+    "purpose": "Run a report",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAuditRecords"
+    ]
+   },
+   {
+    "operationId": "startRollout",
+    "contract": "platform-ops",
+    "purpose": "Start or continue a rollout",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAuditRecords"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "profileId",
+     "from": "deepLink"
+    },
+    {
+     "name": "saleBoardId",
+     "from": "deepLink"
+    },
+    {
+     "name": "reportId",
+     "from": "deepLink"
+    },
+    {
+     "name": "rolloutId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-126",
+   "source": "Claude Design POS pack, 24 August",
+   "note": "**Drawn by Claude Design on `POS Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-142",
+  "name": "Store Rules, Controls & Permissions",
+  "module": "Sell",
+  "requiresModule": "core",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/store-rules-controls-permissions",
+   "component": "apps/venue-management-web/src/routes/ops/StoreRulesControlsPermissionsList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-102"
+   ],
+   "exitTo": [
+    "BO-102"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-102",
+     "trigger": "Sell",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not. **Drawn 31 August** — `Retail Board 1.dc.html` frame `ret-1j`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Store Rules, Controls &amp; Permissions* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
+  "density": "compact",
+  "boardFrames": [
+   "Retail Board 1.dc.html#ret-1j"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listRoles` reads the population and `getVenueSettings` reads one of them — list, select, act",
+  "purpose": "Store Rules, Controls & Permissions — from the client design board, 20 August.",
+  "gaps": [
+   {
+    "operation": "listStoreRules",
+    "why": "**1 declared operation reach no component on this screen**: listStoreRules. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every store rules controls",
+       "bindsTo": "Role",
+       "columns": [
+        "Role.id",
+        "Role.code",
+        "Role.name",
+        "Role.description",
+        "Role.permissions",
+        "Role.inheritsFromRoleId",
+        "Role.isSystem",
+        "Role.principalCount",
+        "Role.grantCount"
+       ],
+       "operation": "listRoles",
+       "provenance": "contract identity.yaml GET /roles"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected store rules controls",
+       "bindsTo": "VenueSettings",
+       "columns": [
+        "VenueSettings.id",
+        "VenueSettings.venueId",
+        "VenueSettings.supportHours",
+        "VenueSettings.quietHours",
+        "VenueSettings.segregatedAccess",
+        "VenueSettings.alerting"
+       ],
+       "operation": "getVenueSettings",
+       "provenance": "contract tenancy.yaml GET /venues/{venueId}/settings"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "setStoreRules",
+       "provenance": "contract retail.yaml PUT /store-rules"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search store rules, controls",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The store rules controls list.",
+   "error": "Could not load. Names which read failed and leaves the store rules controls untouched.",
+   "emptyFirstRun": "No store rules controls yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the store rules controls are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getVenueSettings",
+    "contract": "tenancy",
+    "purpose": "Operational settings for this venue",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listRoles",
+    "contract": "identity",
+    "purpose": "List roles",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listStoreRules",
+    "contract": "retail",
+    "purpose": "Rules and controls in force",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setStoreRules",
+    "contract": "retail",
+    "purpose": "Change a rule",
+    "trigger": "onAction",
+    "invalidates": [
+     "listRoles"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first.",
+   "preloaded": [
+    "VenueSettings.id",
+    "VenueSettings.venueId",
+    "VenueSettings.supportHours",
+    "VenueSettings.quietHours",
+    "VenueSettings.segregatedAccess"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-142",
+   "note": "**Drawn by Claude Design on `Retail Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-143",
+  "name": "Retail Global Settings & Controls",
+  "module": "Sell",
+  "requiresModule": "core",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/retail-global-settings-controls",
+   "component": "apps/venue-management-web/src/routes/ops/RetailGlobalSettingsControlsList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-102"
+   ],
+   "exitTo": [
+    "BO-102"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-102",
+     "trigger": "Sell",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not. **Drawn 31 August** — `Retail Board 1.dc.html` frame `ret-1k`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Retail Global Settings &amp; Controls* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
+  "density": "compact",
+  "boardFrames": [
+   "Retail Board 1.dc.html#ret-1k"
+  ],
+  "pattern": "statusTracker",
+  "patternReason": "`getVenueSettings` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Retail Global Settings & Controls — from the client design board, 20 August.",
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected retail global settings",
+       "bindsTo": "VenueSettings",
+       "columns": [
+        "VenueSettings.id",
+        "VenueSettings.venueId",
+        "VenueSettings.supportHours",
+        "VenueSettings.quietHours",
+        "VenueSettings.segregatedAccess",
+        "VenueSettings.alerting"
+       ],
+       "operation": "getVenueSettings",
+       "provenance": "contract tenancy.yaml GET /venues/{venueId}/settings"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "setVenueSettings",
+       "provenance": "contract tenancy.yaml PUT /venues/{venueId}/settings"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search retail global settings",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The retail global settings list.",
+   "error": "Could not load. Names which read failed and leaves the retail global settings untouched.",
+   "emptyFirstRun": "No retail global settings yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the retail global settings are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getVenueSettings",
+    "contract": "tenancy",
+    "purpose": "Operational settings for this venue",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setVenueSettings",
+    "contract": "tenancy",
+    "purpose": "Set support hours, quiet hours, segregated access and alerti",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-143",
+   "note": "**Drawn by Claude Design on `Retail Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

@@ -7,23 +7,30 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-10",
+ "generated": "2026-09-11",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
-  "screens": 60,
+  "screens": 100,
   "operations": 122,
   "contracts": 8,
-  "modules": 2,
+  "modules": 3,
   "undrawn": 0,
   "operationsWithNoScreen": 110
  },
  "waves": {
   "wave2": 20,
-  "wave3": 40
+  "wave3": 80
  },
  "modules": [
   {
    "module": "Policy",
+   "screens": 40,
+   "waves": [
+    3
+   ]
+  },
+  {
+   "module": "Media Library",
    "screens": 40,
    "waves": [
     3
@@ -610,6 +617,366 @@
    "wave": 3,
    "route": "/policy/ai-waiver-compliance-risk-intelligence-center-cms-060",
    "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-061",
+   "name": "Digital Asset Management Command Center",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/digital-asset-management-command-center-cms-061",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-062",
+   "name": "Central Digital Asset Library",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/central-digital-asset-library-cms-062",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-063",
+   "name": "Upload & Asset Ingestion Workspace",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/upload-asset-ingestion-workspace-cms-063",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-064",
+   "name": "Folder, Collection & Workspace Management",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/folder-collection-workspace-management-cms-064",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-065",
+   "name": "Metadata & Taxonomy Management",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/metadata-taxonomy-management-cms-065",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-066",
+   "name": "Tags, Keywords & Classification",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/tags-keywords-classification-cms-066",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-067",
+   "name": "Advanced Search & Discovery",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/advanced-search-discovery-cms-067",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-068",
+   "name": "Digital Asset 360\u00b0 Profile",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/digital-asset-360-profile-cms-068",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-069",
+   "name": "Bulk Asset Management Workspace",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/bulk-asset-management-workspace-cms-069",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-070",
+   "name": "Asset Activity, Recent Assets & Library Health",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/asset-activity-recent-assets-library-health-cms-070",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-071",
+   "name": "AI Asset Intelligence Command Center",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/ai-asset-intelligence-command-center-cms-071",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-072",
+   "name": "AI Auto-Tagging & Content Understanding",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/ai-auto-tagging-content-understanding-cms-072",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-073",
+   "name": "Semantic & Natural-Language Asset Search",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/semantic-natural-language-asset-search-cms-073",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-074",
+   "name": "Visual Similarity & Related Asset Discovery",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/visual-similarity-related-asset-discovery-cms-074",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-075",
+   "name": "Duplicate & Near-Duplicate Management",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/duplicate-near-duplicate-management-cms-075",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-076",
+   "name": "Asset Version Control & Revision History",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/asset-version-control-revision-history-cms-076",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-077",
+   "name": "Version Comparison & Replacement Impact",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/version-comparison-replacement-impact-cms-077",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-078",
+   "name": "Transformation & Rendition Management",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/transformation-rendition-management-cms-078",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-079",
+   "name": "Rendition Processing & Delivery Readiness",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/rendition-processing-delivery-readiness-cms-079",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-080",
+   "name": "AI Quality, Intelligence Review & Recommendations",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/ai-quality-intelligence-review-recommendations-cms-080",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-081",
+   "name": "DAM Governance & Rights Command Center",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/dam-governance-rights-command-center-cms-081",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-082",
+   "name": "Asset Ownership & Responsibility Management",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/asset-ownership-responsibility-management-cms-082",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-083",
+   "name": "Rights, License & Usage Policy Management",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/rights-license-usage-policy-management-cms-083",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-084",
+   "name": "Asset Approval Workflow Management",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/asset-approval-workflow-management-cms-084",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-085",
+   "name": "Publication Eligibility & Governance Validation",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/publication-eligibility-governance-validation-cms-085",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-086",
+   "name": "Role-Based Asset Access & Permission Management",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/role-based-asset-access-permission-management-cms-086",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-087",
+   "name": "Secure Internal & External Sharing",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/secure-internal-external-sharing-cms-087",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-088",
+   "name": "Rights Expiry, Renewal & Usage Impact",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/rights-expiry-renewal-usage-impact-cms-088",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-089",
+   "name": "Governance Audit Trail & Compliance Evidence",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/governance-audit-trail-compliance-evidence-cms-089",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-090",
+   "name": "Governance Risk, Compliance & AI Recommendations",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/governance-risk-compliance-ai-recommendations-cms-090",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-091",
+   "name": "Asset Distribution & Delivery Command Center",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/asset-distribution-delivery-command-center-cms-091",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-092",
+   "name": "Asset Usage & Distribution Map",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/asset-usage-distribution-map-cms-092",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-093",
+   "name": "Channel & Distribution Configuration",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/channel-distribution-configuration-cms-093",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-094",
+   "name": "Secure Delivery URL, CDN & Rendition Delivery",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/secure-delivery-url-cdn-rendition-delivery-cms-094",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-095",
+   "name": "Asset Replacement & Propagation Management",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/asset-replacement-propagation-management-cms-095",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-096",
+   "name": "Fallback, Expiry & Distribution Continuity",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/fallback-expiry-distribution-continuity-cms-096",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-097",
+   "name": "DAM API & Integration Hub",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/dam-api-integration-hub-cms-097",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-098",
+   "name": "Delivery Monitoring & Integration Health",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/delivery-monitoring-integration-health-cms-098",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-099",
+   "name": "Asset Usage & Performance Analytics",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/asset-usage-performance-analytics-cms-099",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "CMS-100",
+   "name": "Distribution Intelligence, AI Insights & Optimization",
+   "module": "Media Library",
+   "wave": 3,
+   "route": "/media-library/distribution-intelligence-ai-insights-optimization-cms-100",
+   "operations": 0,
    "drawn": true
   }
  ],

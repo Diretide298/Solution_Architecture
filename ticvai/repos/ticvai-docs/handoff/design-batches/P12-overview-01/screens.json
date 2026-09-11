@@ -1,0 +1,584 @@
+[
+ {
+  "id": "SUP-002",
+  "name": "Agent Dashboard",
+  "module": "Overview",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "capability": "C32",
+  "implementation": {
+   "app": "venue-support-web",
+   "route": "/general/agent-dashboard",
+   "component": "apps/venue-support-web/src/routes/general/AgentDashboard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "SUP-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "SUP-001",
+    "SUP-003",
+    "SUP-004"
+   ],
+   "transitions": [
+    {
+     "to": "SUP-001",
+     "trigger": "Agent Login",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "SUP-004",
+     "trigger": "Conversation Queue",
+     "carries": [
+      "caseId",
+      "conversationId"
+     ],
+     "provenance": "derived — SUP-004 declares entryState.params caseId, conversationId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `sup-002`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.",
+  "density": "compact",
+  "boardFrames": [
+   "Dashboards Board.dc.html#sup-002"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listCases` reads the population and `getCase` reads one of them — list, select, act",
+  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
+  "gaps": [
+   {
+    "operation": "listConversations",
+    "why": "**1 declared operation reach no component on this screen**: listConversations. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every agent",
+       "bindsTo": "Case",
+       "columns": [
+        "Case.id",
+        "Case.caseNumber",
+        "Case.subjectId",
+        "Case.guestName",
+        "Case.subject",
+        "Case.categoryId",
+        "Case.status",
+        "Case.priority",
+        "Case.assignedToPrincipalId",
+        "Case.venueId",
+        "Case.relatedOrderId",
+        "Case.slaDueAt"
+       ],
+       "operation": "listCases",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected agent",
+       "bindsTo": "CaseDetail",
+       "columns": [
+        "CaseDetail.id",
+        "CaseDetail.caseNumber",
+        "CaseDetail.subjectId",
+        "CaseDetail.guestName",
+        "CaseDetail.subject",
+        "CaseDetail.categoryId",
+        "CaseDetail.status",
+        "CaseDetail.priority",
+        "CaseDetail.assignedToPrincipalId",
+        "CaseDetail.venueId",
+        "CaseDetail.relatedOrderId",
+        "CaseDetail.slaDueAt",
+        "CaseDetail.isSlaBreached",
+        "CaseDetail.slaPausedSeconds",
+        "CaseDetail.escalationCount",
+        "CaseDetail.resolvedAt"
+       ],
+       "operation": "getCase",
+       "provenance": "contract marketing-crm.yaml GET /cases/{caseId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add",
+       "operation": "addCaseMessage",
+       "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/messages"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createCase",
+       "provenance": "contract marketing-crm.yaml POST /cases"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Escalate",
+       "operation": "escalateCase",
+       "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/escalate"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reopen",
+       "operation": "reopenCase",
+       "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/reopen"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateCase",
+       "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setAgentAvailability",
+       "provenance": "contract marketing-crm.yaml PUT /agent-availability"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The agent list.",
+   "error": "Could not load. Names which read failed and leaves the agent untouched.",
+   "emptyFirstRun": "No agent yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the agent are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCases",
+    "contract": "marketing-crm",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "addCaseMessage",
+    "contract": "marketing-crm",
+    "purpose": "Add a message or internal note",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCases"
+    ]
+   },
+   {
+    "operationId": "createCase",
+    "contract": "marketing-crm",
+    "purpose": "Raise a service case",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCases"
+    ]
+   },
+   {
+    "operationId": "escalateCase",
+    "contract": "marketing-crm",
+    "purpose": "Escalate a case",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCases"
+    ]
+   },
+   {
+    "operationId": "getCase",
+    "contract": "marketing-crm",
+    "purpose": "Read a case with its thread",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "reopenCase",
+    "contract": "marketing-crm",
+    "purpose": "Reopen a resolved case",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCases"
+    ]
+   },
+   {
+    "operationId": "updateCase",
+    "contract": "marketing-crm",
+    "purpose": "Assign, reprioritise or resolve a case",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCases"
+    ]
+   },
+   {
+    "operationId": "listConversations",
+    "contract": "marketing-crm",
+    "purpose": "The omnichannel inbox",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setAgentAvailability",
+    "contract": "marketing-crm",
+    "purpose": "An agent goes available, away or offline",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCases"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "caseId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `caseId`.",
+   "preloaded": [
+    "CaseDetail.id",
+    "CaseDetail.caseNumber",
+    "CaseDetail.subjectId",
+    "CaseDetail.guestName",
+    "CaseDetail.subject"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P12 Venue Support.dc.html#sup-002",
+   "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P12",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Support",
+   "name": "Venue Support — Agent Console",
+   "offlineCapable": false,
+   "app": "venue-support-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "SUP-008",
+  "name": "Agent Performance & SLA View",
+  "module": "Overview",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "capability": "C21",
+  "implementation": {
+   "app": "venue-support-web",
+   "route": "/general/agent-performance-and-sla-view",
+   "component": "apps/venue-support-web/src/routes/general/AgentPerformanceAndSlaViewDashboard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "SUP-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "SUP-001",
+    "SUP-002",
+    "SUP-003"
+   ],
+   "transitions": [
+    {
+     "to": "SUP-001",
+     "trigger": "Agent Login",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "SUP-002",
+     "trigger": "Agent Dashboard",
+     "carries": [
+      "caseId"
+     ],
+     "provenance": "derived — SUP-002 declares entryState.params caseId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listReports` reads the population and `getFinancialReport` reads one of them — list, select, act",
+  "purpose": "Produce agent performance & sla view for this venue.",
+  "gaps": [
+   {
+    "operation": "getReport",
+    "why": "**2 declared operations reach no component on this screen**: getReport, listConversations. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every agent performance sla",
+       "bindsTo": "ReportDefinition",
+       "columns": [
+        "ReportDefinition.name",
+        "ReportDefinition.description",
+        "ReportDefinition.category",
+        "ReportDefinition.dataSource",
+        "ReportDefinition.columns",
+        "ReportDefinition.filters",
+        "ReportDefinition.groupBy",
+        "ReportDefinition.parameters",
+        "ReportDefinition.requiredPermission",
+        "ReportDefinition.maxDateRangeDays",
+        "ReportDefinition.id",
+        "ReportDefinition.isSystem"
+       ],
+       "operation": "listReports",
+       "provenance": "contract reporting.yaml GET /reports"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected agent performance sla",
+       "bindsTo": "FinancialReport",
+       "columns": [
+        "FinancialReport.report",
+        "FinancialReport.fiscalPeriodId",
+        "FinancialReport.legalEntityId",
+        "FinancialReport.currency",
+        "FinancialReport.currencyScale",
+        "FinancialReport.generatedAt",
+        "FinancialReport.sections"
+       ],
+       "operation": "getFinancialReport",
+       "provenance": "contract finance.yaml GET /reports/financial"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Run",
+       "operation": "runReport",
+       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Ask",
+       "operation": "askReportingQuestion",
+       "provenance": "contract reporting.yaml POST /reports/ask"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createReport",
+       "provenance": "contract reporting.yaml POST /reports"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Delete",
+       "operation": "deleteReport",
+       "provenance": "contract reporting.yaml DELETE /reports/{reportId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save",
+       "operation": "saveNaturalLanguageQuery",
+       "provenance": "contract reporting.yaml POST /reports/ask/{conversationId}/save"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateReport",
+       "provenance": "contract reporting.yaml PUT /reports/{reportId}"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmDeleteReport",
+    "component": "confirmDialog",
+    "trigger": "Delete",
+    "body": "**Names what `deleteReport` changes and what it leaves alone**, in the consequence rather than the verb. A agent performance sla this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract reporting.yaml DELETE /reports/{reportId}"
+   }
+  ],
+  "states": {
+   "loading": "The agent performance sla list.",
+   "error": "Could not load. Names which read failed and leaves the agent performance sla untouched.",
+   "emptyFirstRun": "No agent performance sla yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the agent performance sla are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "runReport",
+    "contract": "reporting",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "askReportingQuestion",
+    "contract": "reporting",
+    "purpose": "Natural-language reporting query",
+    "trigger": "onAction",
+    "invalidates": [
+     "listReports"
+    ]
+   },
+   {
+    "operationId": "createReport",
+    "contract": "reporting",
+    "purpose": "Create a custom report definition",
+    "trigger": "onAction",
+    "invalidates": [
+     "listReports"
+    ]
+   },
+   {
+    "operationId": "deleteReport",
+    "contract": "reporting",
+    "purpose": "Retire a report definition",
+    "trigger": "onAction",
+    "invalidates": [
+     "listReports"
+    ]
+   },
+   {
+    "operationId": "getFinancialReport",
+    "contract": "finance",
+    "purpose": "P&L, balance sheet or cash flow",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getReport",
+    "contract": "reporting",
+    "purpose": "Read a report definition",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listReports",
+    "contract": "reporting",
+    "purpose": "List available report definitions",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "saveNaturalLanguageQuery",
+    "contract": "reporting",
+    "purpose": "Save a natural-language answer as a report definition",
+    "trigger": "onAction",
+    "invalidates": [
+     "listReports"
+    ]
+   },
+   {
+    "operationId": "updateReport",
+    "contract": "reporting",
+    "purpose": "Publish a new version of a definition",
+    "trigger": "onAction",
+    "invalidates": [
+     "listReports"
+    ]
+   },
+   {
+    "operationId": "listConversations",
+    "contract": "marketing-crm",
+    "purpose": "The omnichannel inbox",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "conversationId",
+     "from": "deepLink"
+    },
+    {
+     "name": "reportId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom.",
+   "preloaded": [
+    "FinancialReport.report",
+    "FinancialReport.fiscalPeriodId",
+    "FinancialReport.legalEntityId",
+    "FinancialReport.currency",
+    "FinancialReport.currencyScale"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P12 Venue Support.dc.html#sup-008"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P12",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Support",
+   "name": "Venue Support — Agent Console",
+   "offlineCapable": false,
+   "app": "venue-support-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

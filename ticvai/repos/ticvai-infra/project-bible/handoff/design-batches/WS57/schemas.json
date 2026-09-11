@@ -1,0 +1,1501 @@
+{
+ "ChannelCreationProfileConfigurationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Channel Creation & Profile Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "channelName": {
+    "type": "string",
+    "description": "Channel Name"
+   },
+   "channelCode": {
+    "type": "string",
+    "description": "Channel Code"
+   },
+   "channelType": {
+    "type": "string",
+    "description": "Channel Type"
+   },
+   "internalDescription": {
+    "type": "string",
+    "description": "Internal Description"
+   },
+   "customerFacingName": {
+    "type": "string",
+    "description": "Customer-Facing Name"
+   },
+   "tenant": {
+    "type": "string",
+    "description": "Tenant"
+   },
+   "brand": {
+    "type": "string",
+    "description": "Brand"
+   },
+   "businessUnit": {
+    "type": "string",
+    "description": "Business Unit"
+   },
+   "country": {
+    "type": "string",
+    "description": "Country"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "timeZone": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time Zone"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "responsibleDepartment": {
+    "type": "string",
+    "description": "Responsible Department"
+   },
+   "mayRequire": {
+    "type": "string",
+    "description": "may require"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "workstationGroups": {
+    "type": "string",
+    "description": "Workstation groups"
+   },
+   "cashierAccess": {
+    "type": "string",
+    "description": "Cashier access"
+   },
+   "webstore": {
+    "type": "string",
+    "description": "Webstore"
+   },
+   "domainBrand": {
+    "type": "string",
+    "description": "Domain/brand"
+   },
+   "digitalCustomerJourney": {
+    "type": "string",
+    "description": "Digital customer journey"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner"
+   },
+   "apiConnection": {
+    "type": "string",
+    "description": "API connection"
+   },
+   "allocationRules": {
+    "type": "string",
+    "description": "Allocation rules"
+   },
+   "global": {
+    "type": "string",
+    "description": "Global"
+   },
+   "region": {
+    "type": "string",
+    "description": "Region"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "location": {
+    "type": "string",
+    "description": "Location"
+   },
+   "selectedBusinessUnit": {
+    "type": "string",
+    "description": "Selected business unit"
+   },
+   "commercialOwner": {
+    "type": "string",
+    "description": "Commercial Owner"
+   },
+   "operationalOwner": {
+    "type": "string",
+    "description": "Operational Owner"
+   },
+   "technicalOwner": {
+    "type": "string",
+    "description": "Technical Owner"
+   },
+   "financeOwner": {
+    "type": "string",
+    "description": "Finance Owner"
+   }
+  }
+ },
+ "ChannelCreationProfileConfigurationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Channel Creation & Profile Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "channelName": {
+    "type": "string",
+    "description": "Channel Name"
+   },
+   "channelCode": {
+    "type": "string",
+    "description": "Channel Code"
+   },
+   "channelType": {
+    "type": "string",
+    "description": "Channel Type"
+   },
+   "internalDescription": {
+    "type": "string",
+    "description": "Internal Description"
+   },
+   "customerFacingName": {
+    "type": "string",
+    "description": "Customer-Facing Name"
+   },
+   "tenant": {
+    "type": "string",
+    "description": "Tenant"
+   },
+   "brand": {
+    "type": "string",
+    "description": "Brand"
+   },
+   "businessUnit": {
+    "type": "string",
+    "description": "Business Unit"
+   },
+   "country": {
+    "type": "string",
+    "description": "Country"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "timeZone": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time Zone"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "responsibleDepartment": {
+    "type": "string",
+    "description": "Responsible Department"
+   },
+   "mayRequire": {
+    "type": "string",
+    "description": "may require"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "workstationGroups": {
+    "type": "string",
+    "description": "Workstation groups"
+   },
+   "cashierAccess": {
+    "type": "string",
+    "description": "Cashier access"
+   },
+   "webstore": {
+    "type": "string",
+    "description": "Webstore"
+   },
+   "domainBrand": {
+    "type": "string",
+    "description": "Domain/brand"
+   },
+   "digitalCustomerJourney": {
+    "type": "string",
+    "description": "Digital customer journey"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner"
+   },
+   "apiConnection": {
+    "type": "string",
+    "description": "API connection"
+   },
+   "allocationRules": {
+    "type": "string",
+    "description": "Allocation rules"
+   },
+   "global": {
+    "type": "string",
+    "description": "Global"
+   },
+   "region": {
+    "type": "string",
+    "description": "Region"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "location": {
+    "type": "string",
+    "description": "Location"
+   },
+   "selectedBusinessUnit": {
+    "type": "string",
+    "description": "Selected business unit"
+   },
+   "commercialOwner": {
+    "type": "string",
+    "description": "Commercial Owner"
+   },
+   "operationalOwner": {
+    "type": "string",
+    "description": "Operational Owner"
+   },
+   "technicalOwner": {
+    "type": "string",
+    "description": "Technical Owner"
+   },
+   "financeOwner": {
+    "type": "string",
+    "description": "Finance Owner"
+   }
+  }
+ },
+ "ChannelFeesPaymentFulfillmentConfigurationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Channel Fees, Payment & Fulfillment Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "bookingFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Booking Fee"
+   },
+   "transactionFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Transaction Fee"
+   },
+   "channelFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Channel Fee"
+   },
+   "serviceFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Service Fee"
+   },
+   "deliveryFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Delivery Fee"
+   },
+   "paymentFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Payment Fee"
+   },
+   "creditDebitCard": {
+    "type": "string",
+    "description": "Credit/Debit Card"
+   },
+   "cash": {
+    "type": "string",
+    "description": "Cash"
+   },
+   "digitalWallet": {
+    "type": "string",
+    "description": "Digital Wallet"
+   },
+   "paymentLink": {
+    "type": "string",
+    "description": "Payment Link"
+   },
+   "accountCredit": {
+    "type": "string",
+    "description": "Account Credit"
+   },
+   "b2bCredit": {
+    "type": "string",
+    "description": "B2B Credit"
+   },
+   "otherConfiguredMethods": {
+    "type": "string",
+    "description": "Other configured methods"
+   },
+   "digitalTicket": {
+    "type": "string",
+    "description": "Digital Ticket"
+   },
+   "email": {
+    "type": "string",
+    "description": "Email"
+   },
+   "mobileApp": {
+    "type": "string",
+    "description": "Mobile App"
+   },
+   "appleGoogleWallet": {
+    "type": "string",
+    "description": "Apple/Google Wallet"
+   },
+   "posPrint": {
+    "type": "string",
+    "description": "POS Print"
+   },
+   "kioskPrint": {
+    "type": "string",
+    "description": "Kiosk Print"
+   },
+   "rfid": {
+    "type": "string",
+    "description": "RFID"
+   },
+   "nfc": {
+    "type": "string",
+    "description": "NFC"
+   },
+   "wristband": {
+    "type": "string",
+    "description": "Wristband"
+   },
+   "collection": {
+    "type": "string",
+    "description": "Collection"
+   },
+   "card": {
+    "type": "string",
+    "description": "Card"
+   },
+   "wallet": {
+    "type": "string",
+    "description": "Wallet"
+   },
+   "mobileWallet": {
+    "type": "string",
+    "description": "Mobile Wallet"
+   },
+   "printedTicket": {
+    "type": "string",
+    "description": "Printed Ticket"
+   },
+   "voucher": {
+    "type": "string",
+    "description": "Voucher"
+   },
+   "apiTicketDelivery": {
+    "type": "string",
+    "description": "API Ticket Delivery"
+   }
+  }
+ },
+ "ChannelFeesPaymentFulfillmentConfigurationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Channel Fees, Payment & Fulfillment Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "bookingFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Booking Fee"
+   },
+   "transactionFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Transaction Fee"
+   },
+   "channelFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Channel Fee"
+   },
+   "serviceFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Service Fee"
+   },
+   "deliveryFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Delivery Fee"
+   },
+   "paymentFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Payment Fee"
+   },
+   "creditDebitCard": {
+    "type": "string",
+    "description": "Credit/Debit Card"
+   },
+   "cash": {
+    "type": "string",
+    "description": "Cash"
+   },
+   "digitalWallet": {
+    "type": "string",
+    "description": "Digital Wallet"
+   },
+   "paymentLink": {
+    "type": "string",
+    "description": "Payment Link"
+   },
+   "accountCredit": {
+    "type": "string",
+    "description": "Account Credit"
+   },
+   "b2bCredit": {
+    "type": "string",
+    "description": "B2B Credit"
+   },
+   "otherConfiguredMethods": {
+    "type": "string",
+    "description": "Other configured methods"
+   },
+   "digitalTicket": {
+    "type": "string",
+    "description": "Digital Ticket"
+   },
+   "email": {
+    "type": "string",
+    "description": "Email"
+   },
+   "mobileApp": {
+    "type": "string",
+    "description": "Mobile App"
+   },
+   "appleGoogleWallet": {
+    "type": "string",
+    "description": "Apple/Google Wallet"
+   },
+   "posPrint": {
+    "type": "string",
+    "description": "POS Print"
+   },
+   "kioskPrint": {
+    "type": "string",
+    "description": "Kiosk Print"
+   },
+   "rfid": {
+    "type": "string",
+    "description": "RFID"
+   },
+   "nfc": {
+    "type": "string",
+    "description": "NFC"
+   },
+   "wristband": {
+    "type": "string",
+    "description": "Wristband"
+   },
+   "collection": {
+    "type": "string",
+    "description": "Collection"
+   },
+   "card": {
+    "type": "string",
+    "description": "Card"
+   },
+   "wallet": {
+    "type": "string",
+    "description": "Wallet"
+   },
+   "mobileWallet": {
+    "type": "string",
+    "description": "Mobile Wallet"
+   },
+   "printedTicket": {
+    "type": "string",
+    "description": "Printed Ticket"
+   },
+   "voucher": {
+    "type": "string",
+    "description": "Voucher"
+   },
+   "apiTicketDelivery": {
+    "type": "string",
+    "description": "API Ticket Delivery"
+   }
+  }
+ },
+ "ChannelPricingCommercialProfileAssignmentInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.price_list at 6%, so this is not an update to anything the package stores today and no new table has been decided",
+  "description": "**What Channel Pricing & Commercial Profile Assignment submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.\n\n**The pack defines this as a record**, under *For each assignment* - one of only 13 drafted writes that does. That is the client writing a row rather than a screen, and it is where the table conversation should start.",
+  "properties": {
+   "standardPriceList": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Standard Price List"
+   },
+   "channelPriceList": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Channel Price List"
+   },
+   "b2bRate": {
+    "type": "number",
+    "description": "B2B Rate"
+   },
+   "resellerRate": {
+    "type": "number",
+    "description": "Reseller Rate"
+   },
+   "otaRate": {
+    "type": "number",
+    "description": "OTA Rate"
+   },
+   "posPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "POS Price"
+   },
+   "promotionalPriceProfile": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Promotional Price Profile"
+   },
+   "dynamicPricingProfile": {
+    "type": "string",
+    "description": "Dynamic Pricing Profile"
+   },
+   "priceProfile": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price Profile"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "description": "Effective To"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer Segment"
+   },
+   "priority": {
+    "type": "string",
+    "description": "Priority"
+   }
+  },
+  "x-ticvai-record-definition": "For each assignment"
+ },
+ "ChannelPricingCommercialProfileAssignmentView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Channel Pricing & Commercial Profile Assignment displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "standardPriceList": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Standard Price List"
+   },
+   "channelPriceList": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Channel Price List"
+   },
+   "b2bRate": {
+    "type": "number",
+    "description": "B2B Rate"
+   },
+   "resellerRate": {
+    "type": "number",
+    "description": "Reseller Rate"
+   },
+   "otaRate": {
+    "type": "number",
+    "description": "OTA Rate"
+   },
+   "posPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "POS Price"
+   },
+   "promotionalPriceProfile": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Promotional Price Profile"
+   },
+   "dynamicPricingProfile": {
+    "type": "string",
+    "description": "Dynamic Pricing Profile"
+   },
+   "priceProfile": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price Profile"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "description": "Effective To"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer Segment"
+   },
+   "priority": {
+    "type": "string",
+    "description": "Priority"
+   }
+  }
+ },
+ "ChannelPublicationReadinessAiValidationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Channel Publication, Readiness & AI Validation submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "complete": {
+    "type": "string",
+    "description": "Complete"
+   },
+   "assigned": {
+    "type": "string",
+    "description": "Assigned"
+   },
+   "valid": {
+    "type": "string",
+    "description": "Valid"
+   },
+   "available": {
+    "type": "string",
+    "description": "Available"
+   },
+   "configured": {
+    "type": "string",
+    "description": "Configured"
+   },
+   "readyWhereRequired": {
+    "type": "boolean",
+    "description": "Ready where required"
+   },
+   "critical": {
+    "type": "string",
+    "description": "Critical"
+   },
+   "high": {
+    "type": "string",
+    "description": "High"
+   },
+   "medium": {
+    "type": "string",
+    "description": "Medium"
+   },
+   "low": {
+    "type": "string",
+    "description": "Low"
+   },
+   "recommendation": {
+    "type": "string",
+    "description": "Recommendation"
+   },
+   "period": {
+    "type": "string",
+    "format": "date-time",
+    "description": "period"
+   },
+   "preview": {
+    "type": "string",
+    "description": "Preview"
+   },
+   "returnForChanges": {
+    "type": "string",
+    "description": "Return for Changes"
+   },
+   "beforeActivation": {
+    "type": "string",
+    "description": "before activation"
+   },
+   "troubleshootGovernAndOptimizeThem": {
+    "type": "string",
+    "description": "troubleshoot, govern and optimize them?"
+   },
+   "managingAvailabilityAndSynchronization": {
+    "type": "string",
+    "description": "managing availability and synchronization"
+   }
+  }
+ },
+ "ChannelPublicationReadinessAiValidationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Channel Publication, Readiness & AI Validation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "complete": {
+    "type": "string",
+    "description": "Complete"
+   },
+   "assigned": {
+    "type": "string",
+    "description": "Assigned"
+   },
+   "valid": {
+    "type": "string",
+    "description": "Valid"
+   },
+   "available": {
+    "type": "string",
+    "description": "Available"
+   },
+   "configured": {
+    "type": "string",
+    "description": "Configured"
+   },
+   "readyWhereRequired": {
+    "type": "boolean",
+    "description": "Ready where required"
+   },
+   "critical": {
+    "type": "string",
+    "description": "Critical"
+   },
+   "high": {
+    "type": "string",
+    "description": "High"
+   },
+   "medium": {
+    "type": "string",
+    "description": "Medium"
+   },
+   "low": {
+    "type": "string",
+    "description": "Low"
+   },
+   "recommendation": {
+    "type": "string",
+    "description": "Recommendation"
+   },
+   "period": {
+    "type": "string",
+    "format": "date-time",
+    "description": "period"
+   },
+   "preview": {
+    "type": "string",
+    "description": "Preview"
+   },
+   "returnForChanges": {
+    "type": "string",
+    "description": "Return for Changes"
+   },
+   "beforeActivation": {
+    "type": "string",
+    "description": "before activation"
+   },
+   "troubleshootGovernAndOptimizeThem": {
+    "type": "string",
+    "description": "troubleshoot, govern and optimize them?"
+   },
+   "managingAvailabilityAndSynchronization": {
+    "type": "string",
+    "description": "managing availability and synchronization"
+   }
+  }
+ },
+ "ChannelSalesRulesLimitsRestrictionsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Channel Sales Rules, Limits & Restrictions displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "minimumQuantity": {
+    "type": "integer",
+    "description": "Minimum Quantity"
+   },
+   "maximumQuantity": {
+    "type": "integer",
+    "description": "Maximum Quantity"
+   },
+   "maximumPerTransaction": {
+    "type": "string",
+    "description": "Maximum Per Transaction"
+   },
+   "maximumPerCustomer": {
+    "type": "string",
+    "description": "Maximum Per Customer"
+   },
+   "maximumPerDay": {
+    "type": "string",
+    "description": "Maximum Per Day"
+   },
+   "maximumPerEvent": {
+    "type": "string",
+    "description": "Maximum Per Event"
+   },
+   "maximumPerProduct": {
+    "type": "string",
+    "description": "Maximum Per Product"
+   },
+   "reservationPermitted": {
+    "type": "string",
+    "description": "Reservation permitted"
+   },
+   "holdPermitted": {
+    "type": "string",
+    "description": "Hold permitted"
+   },
+   "paymentLinkPermitted": {
+    "type": "string",
+    "description": "Payment link permitted"
+   },
+   "partialPaymentPermitted": {
+    "type": "string",
+    "description": "Partial payment permitted"
+   },
+   "discountPermitted": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount permitted"
+   },
+   "promoCodePermitted": {
+    "type": "string",
+    "description": "Promo code permitted"
+   },
+   "exchangePermitted": {
+    "type": "string",
+    "description": "Exchange permitted"
+   },
+   "reschedulePermitted": {
+    "type": "string",
+    "description": "Reschedule permitted"
+   },
+   "permissionControlled": {
+    "type": "string",
+    "description": "Permission-controlled"
+   },
+   "visible": {
+    "type": "string",
+    "description": "Visible"
+   },
+   "effectiveDated": {
+    "type": "string",
+    "description": "Effective-dated"
+   },
+   "audited": {
+    "type": "string",
+    "description": "Audited"
+   },
+   "withControlledOverrideGovernance": {
+    "type": "string",
+    "description": "with controlled override governance"
+   }
+  }
+ },
+ "ChannelSalesScheduleAvailabilityWindowsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Channel Sales Schedule & Availability Windows displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "salesStartDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Sales Start Date"
+   },
+   "salesStartTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Sales Start Time"
+   },
+   "salesEndDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Sales End Date"
+   },
+   "salesEndTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Sales End Time"
+   },
+   "timeZone": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time Zone"
+   },
+   "daysOfWeek": {
+    "type": "string",
+    "description": "Days of Week"
+   },
+   "hoursOfOperation": {
+    "type": "string",
+    "description": "Hours of Operation"
+   },
+   "blackoutDates": {
+    "type": "string",
+    "description": "Blackout Dates"
+   },
+   "eventRelativeWindows": {
+    "type": "string",
+    "description": "Event-relative windows"
+   },
+   "activeSellingPeriods": {
+    "type": "integer",
+    "description": "Active selling periods"
+   },
+   "scheduledOpenings": {
+    "type": "integer",
+    "description": "Scheduled openings"
+   },
+   "scheduledClosures": {
+    "type": "integer",
+    "description": "Scheduled closures"
+   },
+   "blackouts": {
+    "type": "integer",
+    "description": "Blackouts"
+   },
+   "conflicts": {
+    "type": "integer",
+    "description": "Conflicts"
+   },
+   "eventDates": {
+    "type": "integer",
+    "description": "Event dates"
+   },
+   "changeApplicableRule": {
+    "type": "string",
+    "description": "Change applicable rule"
+   }
+  }
+ },
+ "CustomerEligibilityRulesByChannelView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Customer & Eligibility Rules by Channel displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "customerType": {
+    "type": "string",
+    "description": "Customer Type"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "loyaltyTier": {
+    "type": "string",
+    "description": "Loyalty Tier"
+   },
+   "country": {
+    "type": "string",
+    "description": "Country"
+   },
+   "residency": {
+    "type": "string",
+    "description": "Residency"
+   },
+   "age": {
+    "type": "string",
+    "description": "Age"
+   },
+   "corporateAccount": {
+    "type": "string",
+    "description": "Corporate Account"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer Segment"
+   },
+   "promoEligibility": {
+    "type": "string",
+    "description": "Promo Eligibility"
+   },
+   "authenticationStatus": {
+    "type": "string",
+    "description": "Authentication Status"
+   },
+   "purchaseHistory": {
+    "type": "string",
+    "description": "Purchase History"
+   },
+   "salesTerritory": {
+    "type": "string",
+    "description": "Sales Territory"
+   },
+   "b2c": {
+    "type": "string",
+    "description": "B2C"
+   },
+   "pos": {
+    "type": "string",
+    "description": "POS"
+   },
+   "ota": {
+    "type": "string",
+    "description": "OTA"
+   },
+   "internationalReseller": {
+    "type": "string",
+    "description": "International Reseller"
+   },
+   "guestAllowed": {
+    "type": "boolean",
+    "description": "Guest allowed"
+   },
+   "loginRequired": {
+    "type": "boolean",
+    "description": "Login required"
+   },
+   "membershipRequired": {
+    "type": "boolean",
+    "description": "Membership required"
+   },
+   "corporateAccountRequired": {
+    "type": "boolean",
+    "description": "Corporate account required"
+   },
+   "identityVerificationRequired": {
+    "type": "boolean",
+    "description": "Identity verification required"
+   },
+   "withExplanation": {
+    "type": "string",
+    "description": "with explanation"
+   }
+  }
+ },
+ "InventoryCapacityChannelAllocationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Inventory, Capacity & Channel Allocation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "exampleOtaReceives15": {
+    "type": "number",
+    "description": "Example: OTA receives 15%"
+   },
+   "productEvent": {
+    "type": "string",
+    "description": "Product/Event"
+   },
+   "capacityPool": {
+    "type": "integer",
+    "description": "Capacity Pool"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "allocation": {
+    "type": "string",
+    "description": "Allocation"
+   },
+   "minimum": {
+    "type": "string",
+    "description": "Minimum"
+   },
+   "maximum": {
+    "type": "string",
+    "description": "Maximum"
+   },
+   "replenishmentRule": {
+    "type": "string",
+    "description": "Replenishment Rule"
+   },
+   "oversellPermission": {
+    "type": "string",
+    "description": "Oversell Permission"
+   },
+   "waitlistBehaviorWhereApplicable": {
+    "type": "string",
+    "description": "Waitlist behavior where applicable"
+   },
+   "allocated": {
+    "type": "string",
+    "description": "Allocated"
+   },
+   "sold": {
+    "type": "string",
+    "description": "Sold"
+   },
+   "held": {
+    "type": "string",
+    "description": "Held"
+   },
+   "remaining": {
+    "type": "string",
+    "description": "Remaining"
+   },
+   "utilization": {
+    "type": "number",
+    "description": "Utilization %"
+   },
+   "released": {
+    "type": "string",
+    "description": "Released"
+   },
+   "returned": {
+    "type": "string",
+    "description": "Returned"
+   }
+  }
+ },
+ "ProductCatalogueAssignmentInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Product & Catalogue Assignment submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "individualProduct": {
+    "type": "string",
+    "description": "Individual product"
+   },
+   "productFamily": {
+    "type": "string",
+    "description": "Product family"
+   },
+   "productCategory": {
+    "type": "string",
+    "description": "Product category"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "venueCatalogue": {
+    "type": "string",
+    "description": "Venue catalogue"
+   },
+   "productCollection": {
+    "type": "string",
+    "description": "Product collection"
+   },
+   "entireApprovedCatalogue": {
+    "type": "string",
+    "description": "Entire approved catalogue"
+   },
+   "draftProducts": {
+    "type": "string",
+    "description": "Draft products"
+   },
+   "retiredProducts": {
+    "type": "string",
+    "description": "Retired products"
+   },
+   "productsOutsideValidity": {
+    "type": "string",
+    "description": "Products outside validity"
+   },
+   "productsUnavailableForTheChannel": {
+    "type": "string",
+    "description": "Products unavailable for the channel"
+   }
+  }
+ },
+ "ProductCatalogueAssignmentView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Product & Catalogue Assignment displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "individualProduct": {
+    "type": "string",
+    "description": "Individual product"
+   },
+   "productFamily": {
+    "type": "string",
+    "description": "Product family"
+   },
+   "productCategory": {
+    "type": "string",
+    "description": "Product category"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "venueCatalogue": {
+    "type": "string",
+    "description": "Venue catalogue"
+   },
+   "productCollection": {
+    "type": "string",
+    "description": "Product collection"
+   },
+   "entireApprovedCatalogue": {
+    "type": "string",
+    "description": "Entire approved catalogue"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "productType": {
+    "type": "string",
+    "description": "Product Type"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "status": {
+    "type": "integer",
+    "description": "Status"
+   },
+   "validity": {
+    "type": "string",
+    "description": "Validity"
+   },
+   "channelStatus": {
+    "type": "integer",
+    "description": "Channel Status"
+   },
+   "pricingStatus": {
+    "type": "integer",
+    "description": "Pricing Status"
+   },
+   "capacityStatus": {
+    "type": "integer",
+    "description": "Capacity Status"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "description": "Effective To"
+   },
+   "draftProducts": {
+    "type": "string",
+    "description": "Draft products"
+   },
+   "retiredProducts": {
+    "type": "string",
+    "description": "Retired products"
+   },
+   "productsOutsideValidity": {
+    "type": "string",
+    "description": "Products outside validity"
+   },
+   "productsUnavailableForTheChannel": {
+    "type": "string",
+    "description": "Products unavailable for the channel"
+   }
+  }
+ },
+ "SalesChannelCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Sales Channel Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "b2cWeb": {
+    "type": "string",
+    "description": "B2C Web"
+   },
+   "b2cMobileApp": {
+    "type": "string",
+    "description": "B2C Mobile App"
+   },
+   "pos": {
+    "type": "string",
+    "description": "POS"
+   },
+   "mobilePos": {
+    "type": "string",
+    "description": "Mobile POS"
+   },
+   "flyingPos": {
+    "type": "string",
+    "description": "Flying POS"
+   },
+   "kiosk": {
+    "type": "string",
+    "description": "Kiosk"
+   },
+   "callCenter": {
+    "type": "string",
+    "description": "Call Center"
+   },
+   "b2bPortal": {
+    "type": "string",
+    "description": "B2B Portal"
+   },
+   "reseller": {
+    "type": "string",
+    "description": "Reseller"
+   },
+   "ota": {
+    "type": "string",
+    "description": "OTA"
+   },
+   "api": {
+    "type": "string",
+    "description": "API"
+   },
+   "partnerPortal": {
+    "type": "string",
+    "description": "Partner Portal"
+   },
+   "marketplace": {
+    "type": "string",
+    "description": "Marketplace"
+   },
+   "thirdPartyChannel": {
+    "type": "string",
+    "description": "Third-Party Channel"
+   },
+   "customChannel": {
+    "type": "string",
+    "description": "Custom Channel"
+   },
+   "totalChannels": {
+    "type": "integer",
+    "description": "Total Channels"
+   },
+   "activeChannels": {
+    "type": "integer",
+    "description": "Active Channels"
+   },
+   "inactiveChannels": {
+    "type": "integer",
+    "description": "Inactive Channels"
+   },
+   "channelsInDraft": {
+    "type": "string",
+    "description": "Channels in Draft"
+   },
+   "channelsWithErrors": {
+    "type": "integer",
+    "description": "Channels With Errors"
+   },
+   "productsDistributed": {
+    "type": "string",
+    "description": "Products Distributed"
+   },
+   "channelsWithCapacityAlerts": {
+    "type": "integer",
+    "description": "Channels With Capacity Alerts"
+   },
+   "channelsWithPricingIssues": {
+    "type": "string",
+    "description": "Channels With Pricing Issues"
+   },
+   "scheduledActivations": {
+    "type": "integer",
+    "description": "Scheduled Activations"
+   },
+   "scheduledDeactivations": {
+    "type": "integer",
+    "description": "Scheduled Deactivations"
+   },
+   "channelId": {
+    "type": "string",
+    "description": "Channel ID"
+   },
+   "channelName": {
+    "type": "string",
+    "description": "Channel Name"
+   },
+   "channelType": {
+    "type": "string",
+    "description": "Channel Type"
+   },
+   "brand": {
+    "type": "string",
+    "description": "Brand"
+   },
+   "venueScope": {
+    "type": "string",
+    "description": "Venue/Scope"
+   },
+   "products": {
+    "type": "string",
+    "description": "Products"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status"
+   },
+   "publicationStatus": {
+    "type": "string",
+    "description": "Publication Status"
+   },
+   "integrationStatus": {
+    "type": "string",
+    "description": "Integration Status"
+   },
+   "lastUpdated": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last Updated"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "priceProfile": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "price profile"
+   }
+  }
+ }
+}

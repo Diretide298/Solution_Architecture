@@ -1,0 +1,166 @@
+[
+ {
+  "id": "GST-046",
+  "name": "Branded Queue / Waiting Room",
+  "module": "High-Demand Access",
+  "requiresModule": "queue",
+  "wave": 1,
+  "capability": "C98",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/general/branded-queue-waiting-room",
+   "component": "apps/guest-app/src/routes/general/BrandedQueueWaitingRoomDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "GST-001",
+    "GST-002",
+    "GST-003"
+   ],
+   "transitions": [
+    {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-003",
+     "trigger": "Event & Attraction Listing",
+     "carries": [
+      "eventId"
+     ],
+     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Cross-surface parity, 31 August**: added getWaitingGuest, joinQueue. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
+  "openQuestions": [
+   "Inventory cites `GET /waiting-room` — no matching operation. Written before the contracts existed."
+  ],
+  "density": "comfortable",
+  "pattern": "statusTracker",
+  "patternReason": "`getWaitTimes` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Find branded queue / waiting room for this venue.",
+  "gaps": [
+   {
+    "operation": "getWaitingGuest",
+    "why": "**1 declared operation reach no component on this screen**: getWaitingGuest. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected branded queue waiting",
+       "bindsTo": "WaitTime",
+       "columns": [
+        "WaitTime.queueId",
+        "WaitTime.queueName",
+        "WaitTime.attractionProductId",
+        "WaitTime.status",
+        "WaitTime.waitMinutes",
+        "WaitTime.source",
+        "WaitTime.isStale",
+        "WaitTime.heightRequirementCm",
+        "WaitTime.zone",
+        "WaitTime.asOf"
+       ],
+       "operation": "getWaitTimes",
+       "provenance": "contract queue.yaml GET /queues/wait-times"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Join",
+       "operation": "joinQueue",
+       "provenance": "contract queue.yaml POST /waiting-guests"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The branded queue waiting list.",
+   "error": "Could not load. Names which read failed and leaves the branded queue waiting untouched.",
+   "emptyFirstRun": "No branded queue waiting yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the branded queue waiting are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+  },
+  "apis": [
+   {
+    "operationId": "getWaitTimes",
+    "contract": "queue",
+    "purpose": "Wait times across a venue",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getWaitingGuest",
+    "contract": "queue",
+    "purpose": "Read a queue entry",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "joinQueue",
+    "contract": "queue",
+    "purpose": "Join a virtual queue",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "entryId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**Named, expired or withdrawn — never a 404** (ADR-0030). A guest holding a link that no longer resolves did nothing wrong; the screen says what happened and offers the list it came from."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-046"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

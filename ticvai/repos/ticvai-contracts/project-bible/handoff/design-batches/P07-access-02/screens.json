@@ -1,0 +1,237 @@
+[
+ {
+  "id": "SCN-016",
+  "name": "Gate mode",
+  "module": "Access",
+  "requiresModule": "access",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-scanner",
+   "route": "/access/gate-mode",
+   "component": "apps/venue-scanner/src/routes/access/GateModeDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "SCN-001",
+    "SCN-002",
+    "SCN-003"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "SCN-002"
+   ],
+   "notes": "**Reached from SCN-002** — gate mode is set for the access point being worked. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "SCN-001",
+     "trigger": "Sign in",
+     "carries": [
+      "sessionId",
+      "shiftId"
+     ],
+     "provenance": "derived — SCN-001 declares entryState.params sessionId, shiftId, so an edge into it must carry them"
+    },
+    {
+     "to": "SCN-002",
+     "trigger": "Access point & direction",
+     "carries": [
+      "accessPointId"
+     ],
+     "provenance": "derived — SCN-002 declares entryState.params accessPointId, so an edge into it must carry them"
+    },
+    {
+     "to": "SCN-003",
+     "trigger": "Ready to scan",
+     "carries": [
+      "mediaCode",
+      "rightId"
+     ],
+     "provenance": "derived — SCN-003 declares entryState.params mediaCode, rightId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. Components, states and operations still to be written. **Authoring operations removed 24 August**: createAccessPoint, setAccessPointGeofence, updateAccessPoint. **A scanner reads the gate configuration; it does not write it.** An access point is created in the back office and a geofence is a venue decision — a handheld at a lane that can redefine the lane is a handheld that can admit anywhere.",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listAccessPoints` reads the population and `getAccessPoint` reads one of them — list, select, act",
+  "purpose": "Podium operation. Changes what the gate does.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every gate mode",
+       "bindsTo": "AccessPoint",
+       "columns": [
+        "AccessPoint.id",
+        "AccessPoint.code",
+        "AccessPoint.name",
+        "AccessPoint.venueId",
+        "AccessPoint.scopePath",
+        "AccessPoint.externalCredentialSources",
+        "AccessPoint.scanAnomalyRules",
+        "AccessPoint.operatingMode",
+        "AccessPoint.vehicleLocationCapture",
+        "AccessPoint.mode",
+        "AccessPoint.direction",
+        "AccessPoint.antiPassbackEnabled"
+       ],
+       "operation": "listAccessPoints",
+       "provenance": "contract access.yaml GET /access-points"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected gate mode",
+       "bindsTo": "AccessPoint",
+       "columns": [
+        "AccessPoint.id",
+        "AccessPoint.code",
+        "AccessPoint.name",
+        "AccessPoint.venueId",
+        "AccessPoint.scopePath",
+        "AccessPoint.externalCredentialSources",
+        "AccessPoint.scanAnomalyRules",
+        "AccessPoint.operatingMode",
+        "AccessPoint.vehicleLocationCapture",
+        "AccessPoint.mode",
+        "AccessPoint.direction",
+        "AccessPoint.antiPassbackEnabled",
+        "AccessPoint.isActive",
+        "AccessPoint.lastHeartbeatAt"
+       ],
+       "operation": "getAccessPoint",
+       "provenance": "contract access.yaml GET /access-points/{accessPointId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "setTurnstileMode",
+       "provenance": "contract access.yaml PUT /access-points/{accessPointId}/mode"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setTurnstileMode",
+       "label": "Save turnstile mode",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listAccessPoints",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setTurnstileMode",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The gate mode list.",
+   "error": "Could not load. Names which read failed and leaves the gate mode untouched.",
+   "emptyFirstRun": "No gate mode yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the gate mode are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Requests only.** Hardware control is out of contract and the vendor SDK is outstanding (CF-33)"
+  },
+  "apis": [
+   {
+    "operationId": "setTurnstileMode",
+    "contract": "access",
+    "purpose": "From the flow it appears in",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getAccessPoint",
+    "contract": "access",
+    "purpose": "Read an access point",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listAccessPoints",
+    "contract": "access",
+    "purpose": "List access points",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "accessPointId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `accessPointId`.",
+   "preloaded": [
+    "AccessPoint.id",
+    "AccessPoint.code",
+    "AccessPoint.name",
+    "AccessPoint.venueId",
+    "AccessPoint.scopePath"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P07 Venue Scanner.dc.html#scn-016"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P07",
+   "audience": "staff",
+   "formFactor": "handheld",
+   "shortName": "Venue Scanner",
+   "name": "Venue Scanner — Access Control",
+   "app": "venue-scanner",
+   "offlineCapable": true,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-staff-mobile",
+    "name": "TICVAI Venue Staff",
+    "shell": "handheld",
+    "siblings": [
+     "P06"
+    ],
+    "note": "**Both offline-capable, both carried rather than sat at.** They cannot fold into venue management, which is online desktop web, and they share 69% with each other.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

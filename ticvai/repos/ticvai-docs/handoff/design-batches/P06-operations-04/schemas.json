@@ -1,0 +1,1399 @@
+{
+ "Announcement": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.announcement",
+  "required": [
+   "title",
+   "body",
+   "kind",
+   "publishedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "title": {
+    "type": "string",
+    "maxLength": 140
+   },
+   "body": {
+    "type": "string",
+    "maxLength": 4000
+   },
+   "kind": {
+    "$ref": "#/components/schemas/AnnouncementKind"
+   },
+   "venueIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "departmentIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "roleIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "requiresAcknowledgement": {
+    "type": "boolean"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "publishedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "locale": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "AnnouncementKind": {
+  "type": "string",
+  "description": "`emergency` is not a louder `operational`. It overrides the home screen, bypasses quiet hours, requires acknowledgement, and carries a separate permission.\n",
+  "enum": [
+   "operational",
+   "safety",
+   "emergency",
+   "hr",
+   "celebration"
+  ]
+ },
+ "AnnouncementReach": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed from workforce.announcement_receipt",
+  "properties": {
+   "announcementId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "targeted": {
+    "type": "integer"
+   },
+   "delivered": {
+    "type": "integer"
+   },
+   "acknowledged": {
+    "type": "integer"
+   },
+   "outstanding": {
+    "type": "array",
+    "description": "**The list that matters.** For an operational notice it measures whether anyone read it; during an emergency it is the roll call.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "principalId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "displayName": {
+       "type": "string"
+      },
+      "onShift": {
+       "type": "boolean"
+      }
+     }
+    }
+   }
+  }
+ },
+ "AppendEntitlementRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only",
+  "required": [
+   "id",
+   "lines",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "lines": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "variantId",
+      "quantity"
+     ],
+     "properties": {
+      "variantId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "quantity": {
+       "type": "integer",
+       "minimum": 1
+      },
+      "performanceId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "paymentMethod": {
+    "type": "string",
+    "enum": [
+     "card",
+     "cash",
+     "wallet",
+     "giftCard",
+     "chargeToAccount"
+    ]
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 300
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "AppendEntitlementResult": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed",
+  "required": [
+   "order",
+   "media"
+  ],
+  "properties": {
+   "order": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/Order"
+     }
+    ],
+    "description": "A **new** order. The original is untouched — it was paid, receipted and possibly reported on, and editing it would move yesterday's revenue.\n"
+   },
+   "media": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MediaEntitlements"
+     }
+    ],
+    "description": "The full set now on the media, so the cashier can say what the QR does."
+   },
+   "addedEntitlementIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   }
+  }
+ },
+ "CreatePaymentRequest": {
+  "type": "object",
+  "required": [
+   "id",
+   "orderId",
+   "tender",
+   "amount",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "orderId": {
+    "type": "string"
+   },
+   "tender": {
+    "$ref": "#/components/schemas/TenderKind"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "tenderedAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Cash only. Change is the difference."
+   },
+   "walletAuthorisationId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Cross-cell wallet hold, where the guest's home cell is elsewhere."
+   },
+   "deviceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "DeviceKind": {
+  "type": "string",
+  "enum": [
+   "receiptPrinter",
+   "ticketPrinter",
+   "labelPrinter",
+   "cashDrawer",
+   "barcodeScanner",
+   "rfidReader",
+   "nfcReader",
+   "cardReader",
+   "idReader",
+   "biometricReader",
+   "accessReader",
+   "paymentTerminal",
+   "customerDisplay",
+   "signageDisplay",
+   "kitchenDisplay",
+   "turnstileController",
+   "wristbandEncoder",
+   "signaturePad",
+   "scale",
+   "camera"
+  ]
+ },
+ "EntitlementStatus": {
+  "type": "string",
+  "description": "**What the storage layer holds, and what a guest is shown.** `MediaEntitlements` carried only `isValid` and a reason string — a boolean cannot distinguish a ticket that was used from one that expired, was refunded, or was transferred to somebody else, and those are four different conversations at a gate.\nAdded 17 August. `states/entitlement.yaml` had modelled these six since 14 August and the contract had no enum behind it, which the state checker reported correctly for three days.\n",
+  "enum": [
+   "issued",
+   "partiallyConsumed",
+   "fullyConsumed",
+   "expired",
+   "cancelled",
+   "surrendered"
+  ]
+ },
+ "GuestSession": {
+  "x-ticvai-persistence": "none — Redis session registry",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "tokens",
+   "isVerified",
+   "expiresAt"
+  ],
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "displayName": {
+    "type": "string",
+    "nullable": true
+   },
+   "tokens": {
+    "$ref": "#/components/schemas/TokenPair"
+   },
+   "isVerified": {
+    "type": "boolean",
+    "description": "False until an OTP or a verified provider identity confirms ownership. An unverified account may browse but not transact.\n"
+   },
+   "identityProviders": {
+    "type": "array",
+    "description": "Linked providers. Several may resolve to one account.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "password",
+      "otp",
+      "apple",
+      "google",
+      "uaePass"
+     ]
+    }
+   },
+   "guestLinkId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Present where the guest is linked across cells (ADR-0010)."
+   },
+   "homeCellName": {
+    "type": "string",
+    "nullable": true
+   },
+   "preferredLanguage": {
+    "type": "string",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Longer lived than a staff session. No single-session rule — a guest may be signed in on a phone and a laptop at once.\n"
+   }
+  }
+ },
+ "MediaAsset": {
+  "x-ticvai-persistence": "assets.media_asset",
+  "type": "object",
+  "required": [
+   "id",
+   "kind",
+   "status",
+   "filename",
+   "contentType",
+   "sizeBytes",
+   "referenceCount",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/MediaKind"
+   },
+   "status": {
+    "$ref": "#/components/schemas/MediaStatus"
+   },
+   "filename": {
+    "type": "string"
+   },
+   "contentType": {
+    "type": "string"
+   },
+   "sizeBytes": {
+    "type": "integer"
+   },
+   "title": {
+    "$ref": "#/components/schemas/LocalisedText"
+   },
+   "altText": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/LocalisedText"
+     }
+    ],
+    "description": "Required before use in a guest-facing surface. WCAG 2.2 AA."
+   },
+   "width": {
+    "type": "integer",
+    "nullable": true
+   },
+   "height": {
+    "type": "integer",
+    "nullable": true
+   },
+   "durationSeconds": {
+    "type": "number",
+    "nullable": true
+   },
+   "customMetadata": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": true,
+    "description": "BL-178. **`assets` is a strong contract and its metadata was fixed** — kind, title, alt text, dimensions, rights. A venue photographing four thousand products wants its own fields: shoot date, photographer, model release, season.\n**Free-form and searchable, not a schema.** Every venue would want a different one, and a fixed set would be wrong for all of them.\n"
+   },
+   "sharedWithTenantIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "BL-178. **Cross-tenant sharing, and it is refused by default for a reason.** A brand operating three venues wants one logo library; two unrelated tenants sharing an asset store is the isolation breach ADR-0011 exists to prevent.\n**Only within one tenant's own scope tree.** A share naming a tenant outside it is refused rather than warned about — this is the one place where a permissive default would be a cross-tenant data leak.\n"
+   },
+   "tags": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "url": {
+    "type": "string",
+    "description": "Signed and expiring for private assets; stable CDN URL for public ones."
+   },
+   "thumbnailUrl": {
+    "type": "string",
+    "nullable": true
+   },
+   "referenceCount": {
+    "type": "integer",
+    "description": "How many surfaces reference this asset. Non-zero refuses deletion.\n"
+   },
+   "rights": {
+    "$ref": "#/components/schemas/MediaRights"
+   },
+   "isRightsExpired": {
+    "type": "boolean"
+   },
+   "version": {
+    "type": "integer"
+   },
+   "uploadedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "MediaAssetDetail": {
+  "x-ticvai-persistence": "assets.media_asset",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/MediaAsset"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "derivatives": {
+      "type": "array",
+      "description": "Generated from the original, never uploaded separately. A new breakpoint is a re-render rather than a re-upload of everything.\n",
+      "items": {
+       "type": "object",
+       "properties": {
+        "label": {
+         "type": "string"
+        },
+        "width": {
+         "type": "integer"
+        },
+        "height": {
+         "type": "integer"
+        },
+        "sizeBytes": {
+         "type": "integer"
+        },
+        "url": {
+         "type": "string"
+        }
+       }
+      }
+     },
+     "usage": {
+      "type": "array",
+      "description": "Every place this asset is referenced.",
+      "items": {
+       "$ref": "#/components/schemas/MediaUsage"
+      }
+     },
+     "collections": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "id": {
+         "type": "string",
+         "format": "uuid"
+        },
+        "name": {
+         "type": "string"
+        }
+       }
+      }
+     },
+     "previousVersions": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "version": {
+         "type": "integer"
+        },
+        "replacedAt": {
+         "type": "string",
+         "format": "date-time"
+        },
+        "replacedByPrincipalId": {
+         "type": "string",
+         "format": "uuid"
+        }
+       }
+      }
+     }
+    }
+   }
+  ]
+ },
+ "MediaEntitlements": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over entitlement and scan history",
+  "required": [
+   "mediaCode",
+   "isValid",
+   "entitlements"
+  ],
+  "properties": {
+   "mediaCode": {
+    "type": "string"
+   },
+   "mediaKind": {
+    "type": "string",
+    "enum": [
+     "qr",
+     "wristband",
+     "card",
+     "nfc",
+     "mobilePass"
+    ]
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "isValid": {
+    "type": "boolean"
+   },
+   "invalidReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "canAcceptMore": {
+    "type": "boolean",
+    "description": "False where the media has been surrendered, expired or blocked. A cashier should know before taking money, not after.\n"
+   },
+   "entitlements": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "entitlementId": {
+       "type": "string"
+      },
+      "name": {
+       "type": "string"
+      },
+      "kind": {
+       "type": "string",
+       "enum": [
+        "admission",
+        "locker",
+        "fnb",
+        "retail",
+        "parking",
+        "rental",
+        "experience",
+        "membership"
+       ]
+      },
+      "orderId": {
+       "type": "string"
+      },
+      "addedAt": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "status": {
+       "allOf": [
+        {
+         "$ref": "#/components/schemas/EntitlementStatus"
+        }
+       ],
+       "description": "**Replaced `isRedeemed` on 17 August.** A boolean could not distinguish a ticket that was used from one that expired, was refunded, or was transferred — four different conversations at a gate, and the steward could see only \"not valid\".\n"
+      },
+      "entriesUsed": {
+       "type": "integer"
+      },
+      "entriesAllowed": {
+       "type": "integer",
+       "nullable": true
+      },
+      "redeemedAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "transferredToSubjectId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "validTo": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "MediaUsage": {
+  "x-ticvai-persistence": "assets.media_usage",
+  "type": "object",
+  "required": [
+   "surface",
+   "referenceId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "surface": {
+    "type": "string",
+    "enum": [
+     "tenantBranding",
+     "homepageBanner",
+     "promoBlock",
+     "contentPage",
+     "product",
+     "event",
+     "menuItem",
+     "merchandise",
+     "workOrder",
+     "incident",
+     "inspection",
+     "campaign"
+    ]
+   },
+   "referenceId": {
+    "type": "string"
+   },
+   "label": {
+    "type": "string"
+   },
+   "isLive": {
+    "type": "boolean",
+    "description": "True where the referencing surface is published to guests."
+   }
+  }
+ },
+ "MfaKind": {
+  "type": "string",
+  "enum": [
+   "totp",
+   "smsOtp",
+   "emailOtp",
+   "biometric",
+   "hardwareToken"
+  ]
+ },
+ "MfaMethod": {
+  "x-ticvai-persistence": "identity.mfa_method",
+  "type": "object",
+  "required": [
+   "id",
+   "kind",
+   "isActive",
+   "enrolledAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/MfaKind"
+   },
+   "label": {
+    "type": "string",
+    "nullable": true
+   },
+   "maskedTarget": {
+    "type": "string",
+    "nullable": true,
+    "description": "Partially masked destination, so a person can tell two methods apart."
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "isPrimary": {
+    "type": "boolean"
+   },
+   "enrolledAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "lastUsedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "Order": {
+  "x-ticvai-persistence": "orders.sales_order + orders.order_line",
+  "type": "object",
+  "required": [
+   "id",
+   "venueId",
+   "scopePath",
+   "channel",
+   "status",
+   "currency",
+   "currencyScale",
+   "grossAmount",
+   "taxAmount",
+   "netAmount",
+   "lines",
+   "createdAt",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OrderChannel"
+     }
+    ],
+    "description": "Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for within a month of launch.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/OrderStatus"
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4,
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "netAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "refundedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "totalPriceVariance": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Sum across lines. Zero on a normal order."
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/OrderLine"
+    }
+   },
+   "payments": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/Payment"
+    }
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "shiftId": {
+    "type": "string",
+    "nullable": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Payment": {
+  "x-ticvai-persistence": "orders.payment",
+  "type": "object",
+  "required": [
+   "id",
+   "orderId",
+   "tender",
+   "amount",
+   "status",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "orderId": {
+    "type": "string"
+   },
+   "tender": {
+    "$ref": "#/components/schemas/TenderKind"
+   },
+   "tenderCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "description": "4.6.11. **What the guest actually handed over**, which is not always what the venue books. A tourist paying USD cash at a till is a foreign tender; the sale is still recorded in base currency.\nEqual to the base currency for almost every payment. **Present on all of them so the foreign-tender report has a source** — `getForeignTenderReport` promised *what was taken in which currency* and nothing recorded it until 18 August.\n"
+   },
+   "tenderAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "The amount in `tenderCurrency`, at that currency's own scale."
+   },
+   "fxRate": {
+    "type": "number",
+    "nullable": true,
+    "description": "The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"
+   },
+   "fxRateSource": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "manual",
+     "feed",
+     "cardScheme"
+    ],
+    "description": "4.2.8. Manual or fed on a schedule. **`cardScheme` is where the terminal did the conversion and told us** — dynamic currency conversion, the scheme's rate rather than ours.\n"
+   },
+   "changeCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "changeAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "authorised",
+     "captured",
+     "pendingConfirmation",
+     "declined",
+     "failed",
+     "voided",
+     "refunded"
+    ]
+   },
+   "providerName": {
+    "type": "string",
+    "nullable": true
+   },
+   "providerReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "lastInquiryAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "RegisteredDevice": {
+  "x-ticvai-persistence": "platform.device",
+  "type": "object",
+  "required": [
+   "id",
+   "kind",
+   "driver",
+   "workstationId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/DeviceKind"
+   },
+   "driver": {
+    "type": "string",
+    "description": "Built to an open standard where one exists — ESC/POS, UnifiedPOS, OSDP. Adding a vendor is a driver plus configuration, not a core change (ADR-0015).\n"
+   },
+   "identifier": {
+    "type": "string",
+    "nullable": true
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "model": {
+    "type": "string",
+    "nullable": true
+   },
+   "pushToken": {
+    "type": "string",
+    "format": "password",
+    "nullable": true,
+    "description": "BL-163. **Guest devices register for push and staff devices did not** — `registerGuestDevice` exists with a token, platform and failure count, and a scanner that cannot be told anything is a scanner somebody has to walk to.\nWrite-only. **A push token is a credential**, and the rule that no surface holds a provider key applies here too.\n"
+   },
+   "pushPlatform": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "ios",
+     "android",
+     "web",
+     "windows"
+    ]
+   },
+   "pushFailureCount": {
+    "type": "integer",
+    "default": 0,
+    "description": "**Consecutive failures.** A token that has failed repeatedly is a device that was wiped or reassigned, and continuing to push to it is how a notification queue fills with nothing.\n"
+   },
+   "offlineScope": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "none",
+     "readOnly",
+     "sellAndScan",
+     "fullVenue"
+    ],
+    "description": "BL-163. **What this device may do with no connection**, which was unstated for the staff app while `venue-pos` and `venue-scanner` had it settled.\n**`fullVenue` on a personal handset is a decision, not a default** — a device that can do everything offline is a device that carries the whole venue's data in somebody's pocket.\n"
+   },
+   "firmwareVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "isRequired": {
+    "type": "boolean",
+    "description": "True blocks shift open when the device is unreachable."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "online",
+     "offline",
+     "error",
+     "consumableLow",
+     "needsAttention",
+     "unknown"
+    ]
+   },
+   "batteryPercent": {
+    "type": "integer",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 100,
+    "description": "Board 1 of the client's POS design set, 20 August. **A wristband encoder at 8% is a gate that stops working in an hour**, and nothing in the package carried it.\n**Null where the device has no battery**, which is most of them — a receipt printer reporting 100% forever is worse than one reporting nothing.\n"
+   },
+   "lastCheckedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**Distinct from `lastHeartbeatAt`.** A heartbeat is the workstation saying the device is attached; a check is the device answering. **A printer with no paper heartbeats perfectly**, which is why the client's board shows both columns.\n"
+   },
+   "health": {
+    "type": "string",
+    "enum": [
+     "healthy",
+     "warning",
+     "degraded",
+     "offline",
+     "unknown"
+    ],
+    "default": "unknown",
+    "description": "**Derived, not reported.** Computed from heartbeat age, battery, firmware currency and error rate — a device does not know whether it is healthy, and asking it produces a fleet that is 100% healthy and 12% broken.\n"
+   },
+   "lastHeartbeatAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "SearchResult": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed",
+  "properties": {
+   "kind": {
+    "type": "string"
+   },
+   "id": {
+    "type": "string"
+   },
+   "title": {
+    "type": "string"
+   },
+   "excerpt": {
+    "type": "string"
+   },
+   "relevance": {
+    "type": "number"
+   },
+   "collectionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string"
+   }
+  }
+ },
+ "Session": {
+  "type": "object",
+  "required": [
+   "sessionId",
+   "principalId",
+   "roleId",
+   "scope",
+   "effectivePermissions",
+   "saleBoardId"
+  ],
+  "properties": {
+   "sessionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "roleId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "displayName": {
+    "type": "string"
+   },
+   "scope": {
+    "type": "array",
+    "description": "Scope nodes this session may act within, resolved once at login from the ltree hierarchy with deny-overrides-allow. Clients filter navigation against this — they never compute it.\n",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/ScopeRef"
+    }
+   },
+   "effectivePermissions": {
+    "allOf": [
+     {
+      "$ref": "../shared/permissions.yaml#/components/schemas/PermissionSet"
+     }
+    ],
+    "description": "Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks. Anything scope-sensitive must use `permissionsByScope`.\n"
+   },
+   "permissionsByScope": {
+    "type": "array",
+    "description": "Permissions effective at each granted scope path. Clients filter navigation on this and never compute permissions themselves.\n",
+    "items": {
+     "$ref": "../shared/permissions.yaml#/components/schemas/ScopedPermissions"
+    }
+   },
+   "saleBoardId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). Ticketing, F&B or Retail board.\n"
+   },
+   "workstation": {
+    "$ref": "#/components/schemas/WorkstationContext"
+   },
+   "openedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "SsoProtocol": {
+  "type": "string",
+  "enum": [
+   "oidc",
+   "saml2"
+  ]
+ },
+ "SsoProvider": {
+  "x-ticvai-persistence": "identity.sso_provider",
+  "type": "object",
+  "required": [
+   "id",
+   "displayName",
+   "protocol"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "displayName": {
+    "type": "string"
+   },
+   "protocol": {
+    "$ref": "#/components/schemas/SsoProtocol"
+   },
+   "iconAssetRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "isEnforced": {
+    "type": "boolean",
+    "description": "True disables password login for principals covered by this provider."
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+   }
+  }
+ },
+ "TenderKind": {
+  "type": "string",
+  "enum": [
+   "cash",
+   "card",
+   "wallet",
+   "voucher",
+   "bankTransfer",
+   "hotelCharge",
+   "installment",
+   "giftCard",
+   "complimentary"
+  ]
+ },
+ "TokenPair": {
+  "x-ticvai-persistence": "none — transient",
+  "type": "object",
+  "required": [
+   "accessToken",
+   "refreshToken",
+   "expiresIn"
+  ],
+  "properties": {
+   "accessToken": {
+    "type": "string",
+    "description": "JWT carrying `sid`, validated per request against the session registry."
+   },
+   "refreshToken": {
+    "type": "string"
+   },
+   "expiresIn": {
+    "type": "integer",
+    "description": "Seconds"
+   }
+  }
+ },
+ "TrainingRecord": {
+  "type": "object",
+  "x-ticvai-persistence": "workforce.training_record",
+  "description": "**Drafted 4 September.** One person, one course, one outcome. **The field that matters is the expiry** - a lapsed food-safety or first-aid certificate is a person who may not work a station, and a list without it is a list nobody can roster from.",
+  "required": [
+   "id"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "courseName": {
+    "type": "string"
+   },
+   "required": {
+    "type": "boolean"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "state": {
+    "type": "string",
+    "enum": [
+     "notStarted",
+     "inProgress",
+     "passed",
+     "failed",
+     "expired"
+    ]
+   },
+   "evidenceRef": {
+    "type": "string"
+   }
+  }
+ },
+ "WorkstationContext": {
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "venueId",
+   "regionId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "regionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Inherited from the workstation, never selected by the operator."
+   },
+   "devices": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "driver"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "receiptPrinter",
+        "ticketPrinter",
+        "cashDrawer",
+        "barcodeScanner",
+        "rfidReader",
+        "paymentTerminal",
+        "customerDisplay"
+       ]
+      },
+      "driver": {
+       "type": "string"
+      },
+      "identifier": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4
+   },
+   "timezone": {
+    "type": "string"
+   },
+   "cellName": {
+    "type": "string",
+    "description": "The cell serving this workstation's region. One cell per tenant per region (ADR-0014). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves.\n"
+   },
+   "deploymentProfile": {
+    "type": "string",
+    "enum": [
+     "terminalLocal",
+     "venueEdge",
+     "thin"
+    ],
+    "description": "Whether this surface reads catalogue locally (ADR-0013). Determines which flows the client enables offline.\n"
+   }
+  }
+ }
+}

@@ -1,0 +1,1141 @@
+{
+ "AgentWorkloadAvailabilityWorkforceControlView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Agent Workload, Availability & Workforce Control displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "available": {
+    "type": "string",
+    "description": "Available"
+   },
+   "busy": {
+    "type": "string",
+    "description": "Busy"
+   },
+   "onCall": {
+    "type": "string",
+    "description": "On Call"
+   },
+   "chatting": {
+    "type": "string",
+    "description": "Chatting"
+   },
+   "afterCallWork": {
+    "type": "string",
+    "description": "After Call Work"
+   },
+   "break": {
+    "type": "string",
+    "description": "Break"
+   },
+   "training": {
+    "type": "string",
+    "description": "Training"
+   },
+   "offline": {
+    "type": "integer",
+    "description": "Offline"
+   },
+   "agent": {
+    "type": "string",
+    "description": "Agent"
+   },
+   "team": {
+    "type": "string",
+    "description": "Team"
+   },
+   "skills": {
+    "type": "integer",
+    "description": "Skills"
+   },
+   "languages": {
+    "type": "integer",
+    "description": "Languages"
+   },
+   "status": {
+    "type": "integer",
+    "description": "Status"
+   },
+   "activeCases": {
+    "type": "integer",
+    "description": "Active Cases"
+   },
+   "chats": {
+    "type": "integer",
+    "description": "Chats"
+   },
+   "calls": {
+    "type": "integer",
+    "description": "Calls"
+   },
+   "queue": {
+    "type": "string",
+    "description": "Queue"
+   },
+   "slaRiskCases": {
+    "type": "integer",
+    "description": "SLA Risk Cases"
+   },
+   "averageHandleTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Average Handle Time"
+   },
+   "resolutionRate": {
+    "type": "number",
+    "description": "Resolution Rate"
+   },
+   "utilization": {
+    "type": "number",
+    "description": "Utilization"
+   },
+   "reassignCases": {
+    "type": "string",
+    "description": "Reassign Cases"
+   },
+   "changeAvailability": {
+    "type": "string",
+    "description": "Change Availability"
+   },
+   "requestAssistance": {
+    "type": "string",
+    "description": "Request Assistance"
+   },
+   "managementWhereApplicable": {
+    "type": "string",
+    "description": "Management where applicable"
+   }
+  }
+ },
+ "AiContactCenterIntelligenceAutomationStudioView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What AI Contact Center Intelligence & Automation Studio displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "cases": {
+    "type": "string",
+    "description": "Cases"
+   },
+   "interactions": {
+    "type": "string",
+    "description": "Interactions"
+   },
+   "queues": {
+    "type": "string",
+    "description": "Queues"
+   },
+   "sla": {
+    "type": "string",
+    "description": "SLA"
+   },
+   "agentPerformance": {
+    "type": "string",
+    "description": "Agent Performance"
+   },
+   "qa": {
+    "type": "string",
+    "description": "QA"
+   },
+   "customerFeedback": {
+    "type": "string",
+    "description": "Customer Feedback"
+   },
+   "orders": {
+    "type": "string",
+    "description": "Orders"
+   },
+   "tickets": {
+    "type": "string",
+    "description": "Tickets"
+   },
+   "payments": {
+    "type": "string",
+    "description": "Payments"
+   },
+   "products": {
+    "type": "string",
+    "description": "Products"
+   },
+   "events": {
+    "type": "string",
+    "description": "Events"
+   },
+   "systemIncidents": {
+    "type": "string",
+    "description": "System Incidents"
+   },
+   "contactVolume": {
+    "type": "integer",
+    "description": "Contact Volume"
+   },
+   "queueDemand": {
+    "type": "string",
+    "description": "Queue Demand"
+   },
+   "requiredAgents": {
+    "type": "string",
+    "description": "Required Agents"
+   },
+   "slaRisk": {
+    "type": "string",
+    "description": "SLA Risk"
+   },
+   "expectedComplaints": {
+    "type": "string",
+    "description": "Expected Complaints"
+   },
+   "eventDaySupportDemand": {
+    "type": "string",
+    "description": "Event-Day Support Demand"
+   },
+   "level1RecommendOnly": {
+    "type": "string",
+    "description": "Level 1 — Recommend Only"
+   },
+   "aiSuggestsAction": {
+    "type": "string",
+    "description": "AI suggests action"
+   },
+   "level2AgentConfirmation": {
+    "type": "string",
+    "description": "Level 2 — Agent Confirmation"
+   },
+   "aiPreparesActionAgentApproves": {
+    "type": "string",
+    "description": "AI prepares action; agent approves"
+   },
+   "level3SupervisorGovernedAutomation": {
+    "type": "string",
+    "description": "Level 3 — Supervisor-Governed Automation"
+   },
+   "approvedLowRiskWorkflowsExecuteAutomatically": {
+    "type": "integer",
+    "description": "Approved low-risk workflows execute automatically"
+   },
+   "onlySpecificallyApprovedScenarios": {
+    "type": "string",
+    "description": "Only specifically approved scenarios"
+   },
+   "estimatedAutomationConfidence964": {
+    "type": "number",
+    "description": "Estimated automation confidence: 96.4%"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version"
+   },
+   "scope": {
+    "type": "string",
+    "description": "Scope"
+   },
+   "allowedActions": {
+    "type": "string",
+    "description": "Allowed Actions"
+   },
+   "confidenceThreshold": {
+    "type": "integer",
+    "description": "Confidence Threshold"
+   },
+   "exceptionHandling": {
+    "type": "string",
+    "description": "Exception Handling"
+   },
+   "approval": {
+    "type": "string",
+    "description": "Approval"
+   },
+   "auditTrail": {
+    "type": "string",
+    "description": "Audit Trail"
+   },
+   "effectiveDates": {
+    "type": "string",
+    "description": "Effective Dates"
+   },
+   "killSwitch": {
+    "type": "string",
+    "description": "Kill Switch"
+   },
+   "management": {
+    "type": "string",
+    "description": "management"
+   }
+  }
+ },
+ "ContactCenterOperationsCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Contact Center Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "casesToday": {
+    "type": "string",
+    "description": "Cases Today"
+   },
+   "unassignedCases": {
+    "type": "integer",
+    "description": "Unassigned Cases"
+   },
+   "customersWaiting": {
+    "type": "string",
+    "description": "Customers Waiting"
+   },
+   "criticalCases": {
+    "type": "integer",
+    "description": "Critical Cases"
+   },
+   "slaAtRisk": {
+    "type": "string",
+    "description": "SLA At Risk"
+   },
+   "slaBreached": {
+    "type": "string",
+    "description": "SLA Breached"
+   },
+   "casesResolvedToday": {
+    "type": "string",
+    "description": "Cases Resolved Today"
+   },
+   "firstResponseTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "First Response Time"
+   },
+   "averageResolutionTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Average Resolution Time"
+   },
+   "firstContactResolution": {
+    "type": "string",
+    "description": "First Contact Resolution"
+   },
+   "csat": {
+    "type": "string",
+    "description": "CSAT"
+   },
+   "activeAgents": {
+    "type": "integer",
+    "description": "Active Agents"
+   },
+   "agentUtilization": {
+    "type": "number",
+    "description": "Agent Utilization"
+   },
+   "email": {
+    "type": "string",
+    "description": "Email"
+   },
+   "phone": {
+    "type": "string",
+    "description": "Phone"
+   },
+   "liveChat": {
+    "type": "string",
+    "description": "Live Chat"
+   },
+   "whatsapp": {
+    "type": "string",
+    "description": "WhatsApp"
+   },
+   "webForm": {
+    "type": "string",
+    "description": "Web Form"
+   },
+   "mobileApp": {
+    "type": "string",
+    "description": "Mobile App"
+   },
+   "b2cPortal": {
+    "type": "string",
+    "description": "B2C Portal"
+   },
+   "socialChannelsWhereIntegrated": {
+    "type": "string",
+    "description": "Social channels where integrated"
+   },
+   "frontDesk": {
+    "type": "string",
+    "description": "Front Desk"
+   },
+   "frontPos": {
+    "type": "integer",
+    "description": "Front POS"
+   },
+   "nNgRiskTs": {
+    "type": "string",
+    "description": "n ng Risk ts"
+   },
+   "ng": {
+    "type": "string",
+    "description": "ng"
+   }
+  }
+ },
+ "CustomerSatisfactionFeedbackVoiceOfCustomerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Customer Satisfaction, Feedback & Voice of Customer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "csat": {
+    "type": "string",
+    "description": "CSAT"
+   },
+   "serviceRating": {
+    "type": "string",
+    "description": "Service Rating"
+   },
+   "npsWhereUsed": {
+    "type": "string",
+    "description": "NPS where used"
+   },
+   "postCaseSurvey": {
+    "type": "string",
+    "description": "Post-Case Survey"
+   },
+   "complaint": {
+    "type": "string",
+    "description": "Complaint"
+   },
+   "appFeedback": {
+    "type": "string",
+    "description": "App Feedback"
+   },
+   "webFeedback": {
+    "type": "string",
+    "description": "Web Feedback"
+   },
+   "directCustomerComment": {
+    "type": "string",
+    "description": "Direct Customer Comment"
+   },
+   "surveyResponseRate": {
+    "type": "number",
+    "description": "Survey Response Rate"
+   },
+   "positive": {
+    "type": "number",
+    "description": "Positive %"
+   },
+   "neutral": {
+    "type": "number",
+    "description": "Neutral %"
+   },
+   "negative": {
+    "type": "number",
+    "description": "Negative %"
+   },
+   "complaints": {
+    "type": "integer",
+    "description": "Complaints"
+   },
+   "repeatContactRate": {
+    "type": "number",
+    "description": "Repeat Contact Rate"
+   },
+   "customerEffortWhereMeasured": {
+    "type": "string",
+    "description": "Customer Effort where measured"
+   },
+   "agent": {
+    "type": "string",
+    "description": "Agent"
+   },
+   "team": {
+    "type": "string",
+    "description": "Team"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "caseType": {
+    "type": "string",
+    "description": "Case Type"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "customerType": {
+    "type": "string",
+    "description": "Customer Type"
+   },
+   "language": {
+    "type": "string",
+    "description": "Language"
+   },
+   "sentiment": {
+    "type": "string",
+    "description": "Sentiment"
+   },
+   "topic": {
+    "type": "string",
+    "description": "Topic"
+   },
+   "case": {
+    "type": "string",
+    "description": "Case"
+   },
+   "productEvent": {
+    "type": "string",
+    "description": "Product/Event"
+   },
+   "rating": {
+    "type": "string",
+    "description": "Rating"
+   },
+   "followUpCase": {
+    "type": "string",
+    "description": "Follow-up Case"
+   },
+   "supervisorTask": {
+    "type": "string",
+    "description": "Supervisor Task"
+   },
+   "complaintReview": {
+    "type": "string",
+    "description": "Complaint Review"
+   }
+  }
+ },
+ "EscalationCriticalCaseMonitorView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Escalation & Critical Case Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "escalatedCases": {
+    "type": "integer",
+    "description": "Escalated Cases"
+   },
+   "criticalCases": {
+    "type": "integer",
+    "description": "Critical Cases"
+   },
+   "slaBreaches": {
+    "type": "integer",
+    "description": "SLA Breaches"
+   },
+   "vipEscalations": {
+    "type": "integer",
+    "description": "VIP Escalations"
+   },
+   "financialEscalations": {
+    "type": "integer",
+    "description": "Financial Escalations"
+   },
+   "eventDayEscalations": {
+    "type": "integer",
+    "description": "Event-Day Escalations"
+   },
+   "managementEscalations": {
+    "type": "integer",
+    "description": "Management Escalations"
+   },
+   "technicalEscalations": {
+    "type": "integer",
+    "description": "Technical Escalations"
+   },
+   "case": {
+    "type": "string",
+    "description": "Case"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason"
+   },
+   "priority": {
+    "type": "string",
+    "description": "Priority"
+   },
+   "transactionValue": {
+    "type": "string",
+    "description": "Transaction Value"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "assignedAgent": {
+    "type": "string",
+    "description": "Assigned Agent"
+   },
+   "escalatedTo": {
+    "type": "string",
+    "description": "Escalated To"
+   },
+   "escalationTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Escalation Time"
+   },
+   "sla": {
+    "type": "string",
+    "description": "SLA"
+   },
+   "currentStatus": {
+    "type": "integer",
+    "description": "Current Status"
+   }
+  }
+ },
+ "IntelligentRoutingSkillsAssignmentEngineInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is marketing.message_trigger at 11%, so this is not an update to anything the package stores today and no new table has been decided",
+  "description": "**What Intelligent Routing, Skills & Assignment Engine submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "caseCategory": {
+    "type": "string",
+    "description": "Case Category"
+   },
+   "subcategory": {
+    "type": "string",
+    "description": "Subcategory"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "customerLanguage": {
+    "type": "string",
+    "description": "Customer Language"
+   },
+   "customerType": {
+    "type": "string",
+    "description": "Customer Type"
+   },
+   "membershipTier": {
+    "type": "string",
+    "description": "Membership Tier"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "priority": {
+    "type": "string",
+    "description": "Priority"
+   },
+   "sla": {
+    "type": "string",
+    "description": "SLA"
+   },
+   "agentSkill": {
+    "type": "string",
+    "description": "Agent Skill"
+   },
+   "agentAvailability": {
+    "type": "string",
+    "description": "Agent Availability"
+   },
+   "currentWorkload": {
+    "type": "string",
+    "description": "Current Workload"
+   },
+   "eventProximity": {
+    "type": "string",
+    "description": "Event Proximity"
+   },
+   "caseTicketReschedule": {
+    "type": "string",
+    "description": "Case: Ticket reschedule"
+   },
+   "languageArabic": {
+    "type": "string",
+    "description": "Language: Arabic"
+   },
+   "priorityHigh": {
+    "type": "string",
+    "description": "Priority: High"
+   },
+   "type": {
+    "type": "string",
+    "enum": [
+     "arabicSkill",
+     "ticketingSkill",
+     "currentWorkload62",
+     "slaCapability"
+    ],
+    "description": "Vocabulary listed under Reason."
+   }
+  }
+ },
+ "IntelligentRoutingSkillsAssignmentEngineView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Intelligent Routing, Skills & Assignment Engine displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "caseCategory": {
+    "type": "string",
+    "description": "Case Category"
+   },
+   "subcategory": {
+    "type": "string",
+    "description": "Subcategory"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "customerLanguage": {
+    "type": "string",
+    "description": "Customer Language"
+   },
+   "customerType": {
+    "type": "string",
+    "description": "Customer Type"
+   },
+   "membershipTier": {
+    "type": "string",
+    "description": "Membership Tier"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "priority": {
+    "type": "string",
+    "description": "Priority"
+   },
+   "sla": {
+    "type": "string",
+    "description": "SLA"
+   },
+   "agentSkill": {
+    "type": "string",
+    "description": "Agent Skill"
+   },
+   "agentAvailability": {
+    "type": "string",
+    "description": "Agent Availability"
+   },
+   "currentWorkload": {
+    "type": "string",
+    "description": "Current Workload"
+   },
+   "eventProximity": {
+    "type": "string",
+    "description": "Event Proximity"
+   },
+   "caseTicketReschedule": {
+    "type": "string",
+    "description": "Case: Ticket reschedule"
+   },
+   "languageArabic": {
+    "type": "string",
+    "description": "Language: Arabic"
+   },
+   "priorityHigh": {
+    "type": "string",
+    "description": "Priority: High"
+   },
+   "type": {
+    "type": "string",
+    "enum": [
+     "arabicSkill",
+     "ticketingSkill",
+     "currentWorkload62",
+     "slaCapability"
+    ],
+    "description": "Vocabulary listed under Reason."
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "QualityManagementAgentEvaluationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Quality Management & Agent Evaluation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "greeting": {
+    "type": "string",
+    "description": "Greeting"
+   },
+   "customerVerification": {
+    "type": "string",
+    "description": "Customer Verification"
+   },
+   "understanding": {
+    "type": "string",
+    "description": "Understanding"
+   },
+   "accuracy": {
+    "type": "string",
+    "description": "Accuracy"
+   },
+   "policyCompliance": {
+    "type": "string",
+    "description": "Policy Compliance"
+   },
+   "communicationQuality": {
+    "type": "string",
+    "description": "Communication Quality"
+   },
+   "empathy": {
+    "type": "string",
+    "description": "Empathy"
+   },
+   "resolution": {
+    "type": "string",
+    "description": "Resolution"
+   },
+   "documentation": {
+    "type": "string",
+    "description": "Documentation"
+   },
+   "closing": {
+    "type": "string",
+    "description": "Closing"
+   },
+   "call": {
+    "type": "string",
+    "description": "Call"
+   },
+   "chat": {
+    "type": "string",
+    "description": "Chat"
+   },
+   "email": {
+    "type": "string",
+    "description": "Email"
+   },
+   "whatsapp": {
+    "type": "string",
+    "description": "WhatsApp"
+   },
+   "case": {
+    "type": "string",
+    "description": "Case"
+   },
+   "complaint": {
+    "type": "string",
+    "description": "Complaint"
+   },
+   "policyAdherence": {
+    "type": "string",
+    "description": "Policy adherence"
+   },
+   "requiredStatements": {
+    "type": "string",
+    "description": "Required statements"
+   },
+   "tone": {
+    "type": "string",
+    "description": "Tone"
+   },
+   "resolutionQuality": {
+    "type": "string",
+    "description": "Resolution quality"
+   },
+   "missingCaseDocumentation": {
+    "type": "string",
+    "description": "Missing case documentation"
+   },
+   "productTraining": {
+    "type": "string",
+    "description": "Product Training"
+   },
+   "policyTraining": {
+    "type": "string",
+    "description": "Policy Training"
+   },
+   "communicationCoaching": {
+    "type": "string",
+    "description": "Communication Coaching"
+   },
+   "systemTraining": {
+    "type": "string",
+    "description": "System Training"
+   }
+  }
+ },
+ "ServiceAnalyticsRootCauseIntelligenceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Service Analytics & Root-Cause Intelligence displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "contactVolume": {
+    "type": "integer",
+    "description": "Contact Volume"
+   },
+   "cases": {
+    "type": "string",
+    "description": "Cases"
+   },
+   "firstResponseTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "First Response Time"
+   },
+   "resolutionTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Resolution Time"
+   },
+   "firstContactResolution": {
+    "type": "string",
+    "description": "First Contact Resolution"
+   },
+   "reopenRate": {
+    "type": "number",
+    "description": "Reopen Rate"
+   },
+   "escalationRate": {
+    "type": "number",
+    "description": "Escalation Rate"
+   },
+   "slaCompliance": {
+    "type": "string",
+    "description": "SLA Compliance"
+   },
+   "costPerCaseWhereAvailable": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Cost per Case where available"
+   },
+   "csat": {
+    "type": "string",
+    "description": "CSAT"
+   },
+   "complaintRate": {
+    "type": "number",
+    "description": "Complaint Rate"
+   },
+   "todayVsYesterday": {
+    "type": "string",
+    "description": "Today vs Yesterday"
+   },
+   "weekVsWeek": {
+    "type": "string",
+    "description": "Week vs Week"
+   },
+   "monthVsMonth": {
+    "type": "string",
+    "description": "Month vs Month"
+   },
+   "eventVsEvent": {
+    "type": "string",
+    "description": "Event vs Event"
+   },
+   "venueVsVenue": {
+    "type": "string",
+    "description": "Venue vs Venue"
+   },
+   "productVsProduct": {
+    "type": "string",
+    "description": "Product vs Product"
+   },
+   "betterB2cInformation": {
+    "type": "string",
+    "description": "Better B2C information"
+   },
+   "selfService": {
+    "type": "string",
+    "description": "Self-service"
+   },
+   "productConfiguration": {
+    "type": "string",
+    "description": "Product configuration"
+   },
+   "improvedNotifications": {
+    "type": "string",
+    "description": "Improved notifications"
+   },
+   "technicalFixes": {
+    "type": "string",
+    "description": "Technical fixes"
+   },
+   "betterTicketDelivery": {
+    "type": "string",
+    "description": "Better ticket delivery"
+   }
+  }
+ },
+ "SlaPolicyServiceLevelManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What SLA Policy & Service-Level Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "firstResponseSla": {
+    "type": "string",
+    "description": "First Response SLA"
+   },
+   "nextResponseSla": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Next Response SLA"
+   },
+   "resolutionSla": {
+    "type": "string",
+    "description": "Resolution SLA"
+   },
+   "internalEscalationSla": {
+    "type": "string",
+    "description": "Internal Escalation SLA"
+   },
+   "complaintResolutionSla": {
+    "type": "string",
+    "description": "Complaint Resolution SLA"
+   },
+   "caseType": {
+    "type": "string",
+    "description": "Case Type"
+   },
+   "priority": {
+    "type": "string",
+    "description": "Priority"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "customerTier": {
+    "type": "string",
+    "description": "Customer Tier"
+   },
+   "brand": {
+    "type": "string",
+    "description": "Brand"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner"
+   },
+   "groupCustomer": {
+    "type": "string",
+    "description": "Group Customer"
+   },
+   "firstResponse5Minutes": {
+    "type": "string",
+    "description": "First Response: 5 minutes"
+   },
+   "resolutionTarget30Minutes": {
+    "type": "string",
+    "description": "Resolution Target: 30 minutes"
+   },
+   "firstResponse4Hours": {
+    "type": "string",
+    "description": "First Response: 4 hours"
+   },
+   "resolutionTarget24Hours": {
+    "type": "string",
+    "description": "Resolution Target: 24 hours"
+   },
+   "calendarTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Calendar time"
+   },
+   "businessHours": {
+    "type": "string",
+    "description": "Business hours"
+   },
+   "venueOperatingHours": {
+    "type": "string",
+    "description": "Venue operating hours"
+   },
+   "pausedStates": {
+    "type": "string",
+    "description": "Paused states"
+   },
+   "holidayCalendars": {
+    "type": "string",
+    "description": "Holiday calendars"
+   },
+   "withinSla": {
+    "type": "string",
+    "description": "Within SLA"
+   },
+   "atRisk": {
+    "type": "string",
+    "description": "At Risk"
+   },
+   "breached": {
+    "type": "string",
+    "description": "Breached"
+   },
+   "averageResponse": {
+    "type": "number",
+    "description": "Average Response"
+   },
+   "averageResolution": {
+    "type": "number",
+    "description": "Average Resolution"
+   },
+   "slaCompliance": {
+    "type": "number",
+    "description": "SLA Compliance %"
+   }
+  }
+ }
+}

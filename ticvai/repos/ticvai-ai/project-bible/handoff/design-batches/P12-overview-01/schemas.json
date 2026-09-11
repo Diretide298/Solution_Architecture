@@ -1,0 +1,1073 @@
+{
+ "Case": {
+  "x-ticvai-persistence": "marketing.case",
+  "type": "object",
+  "required": [
+   "id",
+   "caseNumber",
+   "subject",
+   "status",
+   "priority",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "caseNumber": {
+    "type": "string"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "guestName": {
+    "type": "string",
+    "nullable": true
+   },
+   "subject": {
+    "type": "string"
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "status": {
+    "$ref": "#/components/schemas/CaseStatus"
+   },
+   "priority": {
+    "$ref": "#/components/schemas/CasePriority"
+   },
+   "assignedToPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "relatedOrderId": {
+    "type": "string",
+    "nullable": true
+   },
+   "slaDueAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "isSlaBreached": {
+    "type": "boolean"
+   },
+   "slaPausedSeconds": {
+    "type": "integer",
+    "description": "Accrued only while awaiting the guest. Waiting on an internal team does not pause the clock.\n"
+   },
+   "escalationCount": {
+    "type": "integer"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "CaseDetail": {
+  "x-ticvai-persistence": "marketing.case",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/Case"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "description": {
+      "type": "string"
+     },
+     "resolutionNote": {
+      "type": "string",
+      "nullable": true
+     },
+     "messages": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/CaseMessage"
+      }
+     }
+    }
+   }
+  ]
+ },
+ "CaseMessage": {
+  "x-ticvai-persistence": "marketing.case_message",
+  "type": "object",
+  "required": [
+   "id",
+   "body",
+   "isInternal",
+   "authorKind",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "body": {
+    "type": "string"
+   },
+   "isInternal": {
+    "type": "boolean"
+   },
+   "authorKind": {
+    "type": "string",
+    "enum": [
+     "agent",
+     "guest",
+     "system",
+     "ai"
+    ]
+   },
+   "authorPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "channel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "attachmentRefs": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "CasePriority": {
+  "type": "string",
+  "enum": [
+   "low",
+   "normal",
+   "high",
+   "urgent"
+  ]
+ },
+ "CaseStatus": {
+  "type": "string",
+  "enum": [
+   "open",
+   "inProgress",
+   "awaitingGuest",
+   "escalated",
+   "resolved",
+   "closed"
+  ]
+ },
+ "Conversation": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.conversation",
+  "description": "22.8. **A conversation is not a case.** A case is a ticket measured in hours; a conversation is a live session measured in seconds, with somebody waiting. A conversation may create a case; it is not one.\n",
+  "required": [
+   "id",
+   "channel",
+   "state"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "telephony": {
+    "type": "object",
+    "nullable": true,
+    "description": "BL-083. **`ConversationChannel` included `voice` with nothing behind it** — the model anticipated telephony and stopped at the enum.\n**Not an integration, a binding.** Genesys, Avaya, Amazon Connect, Teams and 3CX all do call control themselves; what the platform needs is the call bound to the guest and the case, so **an agent who answers already knows who is calling and what about.**\n",
+    "properties": {
+     "providerCallId": {
+      "type": "string"
+     },
+     "direction": {
+      "type": "string",
+      "enum": [
+       "inbound",
+       "outbound",
+       "transferred"
+      ]
+     },
+     "fromNumberMasked": {
+      "type": "string",
+      "nullable": true,
+      "description": "**Masked, and it is still personal data.** A phone number identifies a person more reliably than a name does.\n"
+     },
+     "recordingRef": {
+      "type": "string",
+      "nullable": true,
+      "description": "Held by the provider, referenced here. **Recording consent is jurisdictional and the platform does not assume it** — a reference with no consent record is a recording nobody may play.\n"
+     },
+     "agentState": {
+      "type": "string",
+      "enum": [
+       "available",
+       "onCall",
+       "wrapUp",
+       "away",
+       "offline"
+      ],
+      "nullable": true
+     }
+    }
+   },
+   "assistSessionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "BL-094. **`startKioskAssist` recorded a staff member helping a guest and `createCase` recorded a service interaction, and neither referenced the other** — so the traceability 2.13.20 asks for had no link to follow.\n**The link is here rather than on the assist session**, because a case may span several assists and an assist belongs to at most one case.\n"
+   },
+   "channel": {
+    "$ref": "#/components/schemas/ConversationChannel"
+   },
+   "state": {
+    "$ref": "#/components/schemas/ConversationState"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "22.8.3. Resolved from phone, email, membership number or a signed-in session. **A conversation with none of those stays anonymous rather than being guessed at.**\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "assignedPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "queueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "queuePosition": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true
+   },
+   "estimatedWaitSeconds": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true
+   },
+   "handoverReason": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "guestRequested",
+     "assistantRefused",
+     "assistantFailed",
+     "outOfScope",
+     "negativeSentiment",
+     "complexIntent",
+     "paymentIssue"
+    ]
+   },
+   "handoverSummary": {
+    "type": "string",
+    "nullable": true,
+    "description": "**The assistant's own account of what the guest wants**, so an agent opens with context rather than reading a transcript while somebody waits.\n"
+   },
+   "sentiment": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "positive",
+     "neutral",
+     "negative",
+     "escalating"
+    ],
+    "description": "22.8.16. **`escalating` is a routing signal**, not a report line."
+   },
+   "intent": {
+    "type": "string",
+    "nullable": true,
+    "description": "22.8.13. What the guest appears to want, used for routing."
+   },
+   "locale": {
+    "type": "string"
+   },
+   "caseId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "22.8.12. Where the conversation raised one."
+   },
+   "messages": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ConversationMessage"
+    }
+   },
+   "firstResponseSeconds": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "closedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "outcome": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "resolved",
+     "caseRaised",
+     "abandonedByGuest",
+     "timedOut",
+     "spam"
+    ]
+   }
+  }
+ },
+ "ConversationChannel": {
+  "type": "string",
+  "enum": [
+   "webChat",
+   "inAppChat",
+   "whatsapp",
+   "sms",
+   "email",
+   "kiosk",
+   "voice"
+  ]
+ },
+ "ConversationMessage": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.conversation_message",
+  "required": [
+   "id",
+   "sender",
+   "body",
+   "sentAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sender": {
+    "type": "string",
+    "enum": [
+     "guest",
+     "agent",
+     "assistant",
+     "system"
+    ],
+    "description": "**Resolved, never declared.** The assistant is labelled as one — a guest talking to a bot that presents as a person is a complaint waiting for the moment they find out.\n"
+   },
+   "senderPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "body": {
+    "type": "string"
+   },
+   "attachments": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "assetId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "kind": {
+       "type": "string",
+       "enum": [
+        "image",
+        "video",
+        "document",
+        "ticket",
+        "qr",
+        "paymentLink"
+       ]
+      }
+     }
+    }
+   },
+   "aiInteractionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where the assistant sent it. **Links the message to its tokens and cost**, so a conversation's spend is attributable (CF-14).\n"
+   },
+   "sentAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "readAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "ConversationState": {
+  "type": "string",
+  "description": "**`withAssistant` and `queued` are different, and the second has a person waiting.** Merging them makes the service level unmeasurable, because time with a bot is not time in a queue.\n",
+  "enum": [
+   "withAssistant",
+   "queued",
+   "withAgent",
+   "waitingOnGuest",
+   "resolved",
+   "abandoned",
+   "timedOut"
+  ]
+ },
+ "CreateCaseRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "subject",
+   "description",
+   "channel",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subject": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 10000
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "priority": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/CasePriority"
+     }
+    ],
+    "default": "normal"
+   },
+   "channel": {
+    "$ref": "#/components/schemas/MessageChannel"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "relatedOrderId": {
+    "type": "string"
+   },
+   "attachmentRefs": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "CreateReportRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "name",
+   "category",
+   "dataSource",
+   "columns",
+   "requiredPermission"
+  ],
+  "properties": {
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 1000
+   },
+   "category": {
+    "$ref": "#/components/schemas/ReportCategory"
+   },
+   "dataSource": {
+    "$ref": "#/components/schemas/DataSource"
+   },
+   "columns": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "$ref": "#/components/schemas/ReportColumn"
+    }
+   },
+   "filters": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ReportFilter"
+    }
+   },
+   "groupBy": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "parameters": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/ReportParameter"
+    }
+   },
+   "requiredPermission": {
+    "type": "string",
+    "description": "Permission needed to run this report. **The author cannot assign one they do not hold** — otherwise a venue user could build themselves a tenant-wide view.\n"
+   },
+   "maxDateRangeDays": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Guards against a query spanning years of scan events."
+   }
+  }
+ },
+ "DataSource": {
+  "type": "string",
+  "description": "What a report may be built over. **A closed set, and that is the point** — a builder that accepts any table will happily produce a report over data nobody maintains.\n**Eight sources added 18 August** (BL-143), each because the matrix asks for a report the builder could not source. `stockCounts` and `waste`: 6.1.21 wants count variance and `stockMovements` records the movement rather than **the count that found the discrepancy**. `workstations`, `devices` and `principals`: 6.1.28 — **who did what at which till** is the question an auditor asks first and it had no source. `loyalty`: 6.1.37, points earned, burned and expiring. `reviews`: 6.1.46. `queueEntries`: **wait times are already measured and nothing could report on them.**\n**Adding a source is a decision, not an omission.** `principals`, `guests`, `loyalty` and `reviews` all name a person, and `REPORT_EXPORT_PII` gates them.\n",
+  "enum": [
+   "orders",
+   "orderLines",
+   "payments",
+   "refunds",
+   "shifts",
+   "scanEvents",
+   "entitlements",
+   "products",
+   "inventory",
+   "stockMovements",
+   "stockCounts",
+   "waste",
+   "workstations",
+   "devices",
+   "principals",
+   "loyalty",
+   "reviews",
+   "queueEntries",
+   "guests",
+   "campaigns",
+   "cases",
+   "ledgerEntries",
+   "workOrders",
+   "approvals",
+   "purchaseOrders",
+   "receipts",
+   "requisitions",
+   "stockBatches",
+   "resourceBookings",
+   "delegations",
+   "forms",
+   "challenges",
+   "wallets",
+   "resaleListings"
+  ]
+ },
+ "FieldType": {
+  "type": "string",
+  "enum": [
+   "string",
+   "integer",
+   "decimal",
+   "money",
+   "boolean",
+   "date",
+   "dateTime",
+   "uuid",
+   "enum"
+  ]
+ },
+ "FinancialReport": {
+  "x-ticvai-persistence": "none — computed from replica",
+  "type": "object",
+  "required": [
+   "report",
+   "fiscalPeriodId",
+   "currency",
+   "generatedAt",
+   "sections"
+  ],
+  "properties": {
+   "report": {
+    "type": "string"
+   },
+   "fiscalPeriodId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "currencyScale": {
+    "type": "integer"
+   },
+   "generatedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "sections": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "name",
+      "lines",
+      "total"
+     ],
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "lines": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "properties": {
+         "label": {
+          "type": "string"
+         },
+         "accountCode": {
+          "type": "string",
+          "nullable": true
+         },
+         "amount": {
+          "$ref": "../shared/common.yaml#/components/schemas/Money"
+         },
+         "priorPeriodAmount": {
+          "$ref": "../shared/common.yaml#/components/schemas/Money"
+         }
+        }
+       }
+      },
+      "total": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   }
+  }
+ },
+ "MessageChannel": {
+  "type": "string",
+  "enum": [
+   "email",
+   "sms",
+   "whatsapp",
+   "push",
+   "inApp",
+   "post"
+  ]
+ },
+ "NaturalLanguageAnswer": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "conversationId",
+   "question",
+   "interpretation",
+   "result",
+   "confidence"
+  ],
+  "properties": {
+   "conversationId": {
+    "type": "string"
+   },
+   "question": {
+    "type": "string"
+   },
+   "interpretation": {
+    "type": "string",
+    "description": "What the question was understood to mean, in plain language."
+   },
+   "generatedQuery": {
+    "type": "object",
+    "description": "The structured query produced — data source, columns, filters, grouping. Returned so the answer can be checked. An answer nobody can verify is worse than no answer.\n",
+    "properties": {
+     "dataSource": {
+      "$ref": "#/components/schemas/DataSource"
+     },
+     "columns": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/ReportColumn"
+      }
+     },
+     "filters": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/ReportFilter"
+      }
+     },
+     "groupBy": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "result": {
+    "$ref": "#/components/schemas/ReportResult"
+   },
+   "confidence": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1
+   },
+   "suggestedFollowUps": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "modelVersion": {
+    "type": "string"
+   },
+   "tokensUsed": {
+    "type": "integer"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "ReportCategory": {
+  "type": "string",
+  "enum": [
+   "sales",
+   "admission",
+   "financial",
+   "inventory",
+   "guest",
+   "operations",
+   "marketing",
+   "workforce",
+   "compliance",
+   "custom"
+  ]
+ },
+ "ReportColumn": {
+  "x-ticvai-persistence": "reporting.report_column",
+  "type": "object",
+  "required": [
+   "field"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "field": {
+    "type": "string"
+   },
+   "label": {
+    "type": "string"
+   },
+   "aggregation": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/Aggregation"
+     }
+    ],
+    "default": "none"
+   },
+   "sortOrder": {
+    "type": "integer"
+   },
+   "sortDirection": {
+    "type": "string",
+    "enum": [
+     "asc",
+     "desc"
+    ]
+   },
+   "format": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "ReportDefinition": {
+  "x-ticvai-persistence": "reporting.report_definition + reporting.report_column + reporting.report_filter",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateReportRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "version",
+     "isSystem",
+     "isRetired",
+     "createdAt"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "version": {
+      "type": "string"
+     },
+     "isSystem": {
+      "type": "boolean",
+      "description": "Shipped with the platform. Cannot be amended, only cloned."
+     },
+     "isRetired": {
+      "type": "boolean"
+     },
+     "estimatedCost": {
+      "type": "string",
+      "enum": [
+       "low",
+       "medium",
+       "high"
+      ],
+      "description": "Informs whether it may run inline or must be queued."
+     },
+     "createdByPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "nullable": true
+     },
+     "createdAt": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "lastRunAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "scopePath": {
+      "type": "string",
+      "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+     }
+    }
+   }
+  ]
+ },
+ "ReportFilter": {
+  "x-ticvai-persistence": "reporting.report_filter",
+  "type": "object",
+  "required": [
+   "field",
+   "operator"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "field": {
+    "type": "string"
+   },
+   "operator": {
+    "type": "string",
+    "enum": [
+     "equals",
+     "notEquals",
+     "greaterThan",
+     "lessThan",
+     "between",
+     "in",
+     "notIn",
+     "contains",
+     "isNull",
+     "isNotNull"
+    ]
+   },
+   "value": {},
+   "values": {
+    "type": "array",
+    "items": {}
+   },
+   "isParameter": {
+    "type": "boolean",
+    "default": false,
+    "description": "Prompted at run time rather than fixed. Parameters narrow the result; they never widen scope.\n"
+   }
+  }
+ },
+ "ReportParameter": {
+  "x-ticvai-persistence": "reporting.report_parameter",
+  "type": "object",
+  "required": [
+   "key",
+   "label",
+   "type",
+   "isRequired"
+  ],
+  "properties": {
+   "key": {
+    "type": "string"
+   },
+   "label": {
+    "type": "string"
+   },
+   "type": {
+    "$ref": "#/components/schemas/FieldType"
+   },
+   "isRequired": {
+    "type": "boolean"
+   },
+   "defaultValue": {}
+  }
+ },
+ "ReportResult": {
+  "x-ticvai-persistence": "none — result set, cached in object storage",
+  "type": "object",
+  "required": [
+   "executionId",
+   "columns",
+   "rows"
+  ],
+  "properties": {
+   "executionId": {
+    "type": "string"
+   },
+   "columns": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "key": {
+       "type": "string"
+      },
+      "label": {
+       "type": "string"
+      },
+      "type": {
+       "$ref": "#/components/schemas/FieldType"
+      }
+     }
+    }
+   },
+   "rows": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "additionalProperties": true
+    }
+   },
+   "totals": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "rowCount": {
+    "type": "integer"
+   },
+   "nextCursor": {
+    "type": "string",
+    "nullable": true
+   },
+   "generatedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "dataAsOf": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it prevents an argument about a figure that moved.\n"
+   }
+  }
+ },
+ "RunReportRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "properties": {
+   "parameters": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Narrows to one venue. Omitting it returns everything the caller's scope permits — it cannot be used to reach beyond that.\n"
+   },
+   "dateFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "dateTo": {
+    "type": "string",
+    "format": "date"
+   },
+   "forceAsync": {
+    "type": "boolean",
+    "default": false,
+    "description": "Queue regardless of size, for a result to be collected later."
+   }
+  }
+ }
+}

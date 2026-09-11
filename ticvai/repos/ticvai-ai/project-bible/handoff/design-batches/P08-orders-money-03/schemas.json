@@ -1,0 +1,2488 @@
+{
+ "Account": {
+  "x-ticvai-persistence": "ledger.account",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "type",
+   "legalEntityId",
+   "isPostable",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "externalCode": {
+    "type": "string",
+    "nullable": true,
+    "description": "Code in the client's own chart. Used on export so their team sees their codes."
+   },
+   "isSuspense": {
+    "type": "boolean",
+    "default": false,
+    "description": "5.7.x. **Where a posting with no account mapping goes.** Today it has no destination, and a posting event that cannot be booked is a posting event that is silently dropped.\n**A suspense balance is a work queue, not a resting place.** It should trend to zero, and a balance that grows is the signal that a mapping is missing — which is the whole reason for having one rather than refusing the posting.\n"
+   },
+   "subType": {
+    "type": "string",
+    "nullable": true,
+    "description": "5.7.27. **`AccountType` stays a closed enum of asset, liability, equity, revenue and expense because that is correct accounting**, and a venue wanting *Deferred Revenue — Annual Pass* is asking for a sub-type rather than a sixth type.\n"
+   },
+   "tags": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "How a venue groups accounts for its own reporting. Free-form, and outside the type."
+   },
+   "notes": {
+    "type": "string",
+    "nullable": true,
+    "description": "5.7.27. Annotations on the account, which an auditor reads before the balance."
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "type": {
+    "$ref": "#/components/schemas/AccountType"
+   },
+   "parentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "isPostable": {
+    "type": "boolean",
+    "description": "False for parent accounts, which aggregate only."
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "balance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  }
+ },
+ "AccountMapping": {
+  "x-ticvai-persistence": "ledger.account_mapping",
+  "type": "object",
+  "required": [
+   "eventType",
+   "debitAccountId",
+   "creditAccountId"
+  ],
+  "properties": {
+   "eventType": {
+    "$ref": "#/components/schemas/PostingEventType"
+   },
+   "debitAccountId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "creditAccountId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Null applies the mapping to every venue in the region."
+   }
+  }
+ },
+ "AccountType": {
+  "type": "string",
+  "enum": [
+   "asset",
+   "liability",
+   "equity",
+   "revenue",
+   "expense"
+  ]
+ },
+ "Channel": {
+  "type": "string",
+  "enum": [
+   "pos",
+   "kiosk",
+   "web",
+   "mobile",
+   "b2b",
+   "ota",
+   "callCentre"
+  ]
+ },
+ "CostCenter": {
+  "x-ticvai-persistence": "ledger.cost_center",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "parentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "CreateAccountRequest": {
+  "type": "object",
+  "required": [
+   "code",
+   "name",
+   "type",
+   "legalEntityId"
+  ],
+  "properties": {
+   "code": {
+    "type": "string",
+    "maxLength": 64,
+    "pattern": "^[A-Za-z0-9._-]+$"
+   },
+   "externalCode": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "type": {
+    "$ref": "#/components/schemas/AccountType"
+   },
+   "parentId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "isPostable": {
+    "type": "boolean",
+    "default": true
+   }
+  }
+ },
+ "CreateJournalEntryRequest": {
+  "type": "object",
+  "required": [
+   "id",
+   "fiscalPeriodId",
+   "description",
+   "lines"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "fiscalPeriodId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "postingDate": {
+    "type": "string",
+    "format": "date"
+   },
+   "description": {
+    "type": "string",
+    "minLength": 3,
+    "maxLength": 500
+   },
+   "reference": {
+    "type": "string",
+    "maxLength": 128
+   },
+   "lines": {
+    "type": "array",
+    "minItems": 2,
+    "items": {
+     "$ref": "#/components/schemas/JournalLine"
+    }
+   }
+  }
+ },
+ "CreateOrderLine": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "variantId",
+   "quantity",
+   "quotedUnitPrice"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "variantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "inventoryHoldId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Lease the units were drawn from. Absent for uncontended products."
+   },
+   "seatIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Seated products only. Not available offline."
+   },
+   "quantity": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "quotedUnitPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "What the client charged, from its local bundle."
+   },
+   "holderName": {
+    "type": "string",
+    "nullable": true
+   },
+   "dataMaskValues": {
+    "type": "object",
+    "additionalProperties": true
+   }
+  }
+ },
+ "CreateOrderRequest": {
+  "type": "object",
+  "required": [
+   "id",
+   "venueId",
+   "channel",
+   "lines",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+    "description": "Client-generated ULID. Also the idempotency key."
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "channel": {
+    "$ref": "#/components/schemas/Channel"
+   },
+   "shiftId": {
+    "type": "string"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Null for an anonymous sale. Identity and entitlement are separate."
+   },
+   "guestLinkId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Present where the guest is linked across cells."
+   },
+   "catalogueBundleVersion": {
+    "type": "string",
+    "description": "The bundle the client priced from. Lets the server explain a variance rather than merely report one.\n"
+   },
+   "lines": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "$ref": "#/components/schemas/CreateOrderLine"
+    }
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "CreateTaxCodeRequest": {
+  "type": "object",
+  "required": [
+   "code",
+   "name",
+   "countryCode",
+   "rate",
+   "effectiveFrom",
+   "accountId"
+  ],
+  "properties": {
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "countryCode": {
+    "type": "string",
+    "pattern": "^[A-Z]{2}$"
+   },
+   "rate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100
+   },
+   "compoundOnTaxCodeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "isInclusive": {
+    "type": "boolean",
+    "default": false
+   },
+   "accountId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date"
+   }
+  }
+ },
+ "DeferredRevenueReport": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "asAt",
+   "total",
+   "buckets"
+  ],
+  "properties": {
+   "asAt": {
+    "type": "string",
+    "format": "date"
+   },
+   "total": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "buckets": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "label",
+      "amount",
+      "itemCount"
+     ],
+     "properties": {
+      "label": {
+       "type": "string",
+       "description": "Ageing band by expected recognition date."
+      },
+      "amount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "itemCount": {
+       "type": "integer"
+      },
+      "method": {
+       "$ref": "#/components/schemas/RecognitionMethod"
+      }
+     }
+    }
+   }
+  }
+ },
+ "DeliveryLocation": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.delivery_location",
+  "required": [
+   "id",
+   "venueId",
+   "kind",
+   "label",
+   "isServiceable"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/DeliveryLocationKind"
+   },
+   "label": {
+    "type": "string",
+    "description": "What a runner is told. \"Cabana 12\", \"Row H Seat 4\", \"Lawn — north gate\"."
+   },
+   "zone": {
+    "type": "string",
+    "nullable": true
+   },
+   "tableId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Set where the location is a restaurant table, so it shares table state."
+   },
+   "seatId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Set where the seat is the address. References the seat map."
+   },
+   "servingOutletIds": {
+    "type": "array",
+    "description": "Which outlets deliver here. A cabana served by the pool bar and not the restaurant is normal, and a location nothing serves is not an address.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "isServiceable": {
+    "type": "boolean",
+    "description": "False where the location exists but is not currently taking delivery — closed section, weather, no runner on shift.\n"
+   },
+   "unserviceableReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "walkTimeMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "description": "From the serving outlet. Feeds the guest's estimate — a cabana eight minutes away is not the same promise as a table by the kitchen.\n"
+   }
+  }
+ },
+ "DeliveryLocationKind": {
+  "type": "string",
+  "description": "4.6.26. One concept, because a runner needs one instruction.",
+  "enum": [
+   "table",
+   "seat",
+   "cabana",
+   "sunbed",
+   "poolside",
+   "box",
+   "suite",
+   "lawn",
+   "collectionPoint",
+   "namedLocation"
+  ]
+ },
+ "DiningOutlet": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over outlet, menu and table state",
+  "required": [
+   "outletId",
+   "name",
+   "kind",
+   "isOpenNow",
+   "orderingMethod"
+  ],
+  "properties": {
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string"
+   },
+   "zone": {
+    "type": "string",
+    "nullable": true
+   },
+   "cuisine": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "isOpenNow": {
+    "type": "boolean"
+   },
+   "opensAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "closesAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "orderingMethod": {
+    "$ref": "#/components/schemas/GuestOrderingMethod"
+   },
+   "estimatedWaitMinutes": {
+    "type": "integer",
+    "nullable": true,
+    "description": "From current kitchen ticket volume, not a fixed figure. Null where the outlet has no KDS reporting — an invented wait time is worse than none.\n"
+   },
+   "imageAssetRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "menuId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   }
+  }
+ },
+ "ExchangeOrderRequest": {
+  "type": "object",
+  "required": [
+   "id",
+   "outgoingLineIds",
+   "incomingLines",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "outgoingLineIds": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "string"
+    }
+   },
+   "incomingLines": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "$ref": "#/components/schemas/CreateOrderLine"
+    }
+   },
+   "waiveFee": {
+    "type": "boolean",
+    "default": false
+   },
+   "reason": {
+    "type": "string",
+    "maxLength": 500
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "FiscalPeriod": {
+  "x-ticvai-persistence": "ledger.fiscal_period",
+  "type": "object",
+  "required": [
+   "id",
+   "legalEntityId",
+   "name",
+   "startDate",
+   "endDate",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "legalEntityId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "startDate": {
+    "type": "string",
+    "format": "date"
+   },
+   "endDate": {
+    "type": "string",
+    "format": "date"
+   },
+   "status": {
+    "$ref": "#/components/schemas/PeriodStatus"
+   },
+   "closedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "closedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "FxRate": {
+  "type": "object",
+  "x-ticvai-persistence": "ledger.fx_rate",
+  "required": [
+   "fromCurrency",
+   "toCurrency",
+   "rate",
+   "purpose",
+   "effectiveFrom"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "fromCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "toCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "rate": {
+    "type": "number",
+    "description": "Units of `toCurrency` per one `fromCurrency`. Six decimal places — a two-place rate on a three-place currency loses money on every transaction, quietly.\n"
+   },
+   "purpose": {
+    "$ref": "#/components/schemas/FxRatePurpose"
+   },
+   "source": {
+    "$ref": "#/components/schemas/FxRateSource"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "A rate change is a new row. The old one is never edited — a transaction posted last Tuesday must still reconcile at last Tuesday's rate.\n"
+   },
+   "setByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "providerReference": {
+    "type": "string",
+    "nullable": true,
+    "description": "The provider's own identifier for this quote. **What makes a rate reproducible** — an auditor asking why a payment converted at 3.6725 gets an answer that is checkable against the source rather than a number somebody typed."
+   },
+   "fetchedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When the rate was pulled. **Distinct from `effectiveFrom`**, which is when it applies — a rate fetched at 06:00 for a business day starting at 00:00 has two different times and conflating them makes a late feed look like a backdated rate."
+   }
+  }
+ },
+ "FxRatePurpose": {
+  "type": "string",
+  "description": "A venue does not accept dollars at the rate it books an intercompany balance at. Separating them is what stops a spread on the counter appearing as a loss in the accounts.\n",
+  "enum": [
+   "tender",
+   "interEntity",
+   "reporting",
+   "revaluation"
+  ]
+ },
+ "FxRateSource": {
+  "type": "string",
+  "description": "**Where the rate came from, and which provider specifically.** `source: provider` said a feed set it and not which one — two tenants on different feeds were indistinguishable in the ledger, and a rate cannot be defended in an audit without naming its origin.\n\n**`uaeCentralBank` is the default for AED pairs.** The UAE Central Bank publishes an official daily rate and it is what a UAE auditor expects to see — a commercial feed is defensible for tender and awkward for statutory reporting.\n\n**`openExchangeRates` and `ecb` are the commercial and reference options.** ECB publishes daily reference rates free and is the usual fallback for non-AED pairs; Open Exchange Rates is the common commercial feed with intraday granularity. **The choice is per purpose, not per platform** — a tender rate wants intraday, a reporting rate wants the official daily close.",
+  "enum": [
+   "manual",
+   "uaeCentralBank",
+   "ecb",
+   "openExchangeRates",
+   "cardScheme",
+   "provider"
+  ]
+ },
+ "GuestOrderingMethod": {
+  "x-ticvai-persistence": "none — enum",
+  "type": "string",
+  "description": "How a guest may order at this outlet. Varies within one venue, so it is per outlet rather than a venue setting.\n",
+  "enum": [
+   "tableService",
+   "appToTable",
+   "appToCollect",
+   "counterOnly",
+   "notAvailable"
+  ]
+ },
+ "JournalEntry": {
+  "x-ticvai-persistence": "ledger.journal_entry + ledger.journal_line",
+  "type": "object",
+  "required": [
+   "id",
+   "entryNumber",
+   "fiscalPeriodId",
+   "status",
+   "source",
+   "description",
+   "lines",
+   "totalDebit",
+   "totalCredit",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "entryNumber": {
+    "type": "string"
+   },
+   "fiscalPeriodId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "status": {
+    "$ref": "#/components/schemas/JournalStatus"
+   },
+   "source": {
+    "$ref": "#/components/schemas/JournalSource"
+   },
+   "sourceId": {
+    "type": "string",
+    "nullable": true,
+    "description": "The order, refund or run that generated this entry."
+   },
+   "description": {
+    "type": "string"
+   },
+   "reference": {
+    "type": "string",
+    "nullable": true
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/JournalLine"
+    }
+   },
+   "totalDebit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "totalCredit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "postedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "approvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "reversalOfEntryId": {
+    "type": "string",
+    "nullable": true
+   },
+   "reversedByEntryId": {
+    "type": "string",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "postedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "JournalLine": {
+  "type": "object",
+  "required": [
+   "accountId",
+   "debit",
+   "credit"
+  ],
+  "properties": {
+   "accountId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "debit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "credit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "costCenterId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 500
+   }
+  }
+ },
+ "JournalSource": {
+  "type": "string",
+  "enum": [
+   "manual",
+   "order",
+   "refund",
+   "void",
+   "shift",
+   "recognition",
+   "settlement",
+   "variance",
+   "reversal"
+  ]
+ },
+ "JournalStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "pendingApproval",
+   "posted",
+   "reversed"
+  ]
+ },
+ "LegalEntity": {
+  "x-ticvai-persistence": "ledger.legal_entity",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "countryCode",
+   "currency",
+   "currencyScale",
+   "fiscalYearStartMonth"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "countryCode": {
+    "type": "string",
+    "pattern": "^[A-Z]{2}$"
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4
+   },
+   "taxRegistrationNumber": {
+    "type": "string",
+    "nullable": true
+   },
+   "fiscalYearStartMonth": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 12
+   },
+   "regionIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+   }
+  }
+ },
+ "ManualDiscountRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only",
+  "required": [
+   "id",
+   "reason",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "lineId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Omit to discount the order rather than a line."
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "percentage": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100
+   },
+   "reason": {
+    "type": "string",
+    "minLength": 3,
+    "maxLength": 300,
+    "description": "Required, and free text rather than a code list. A cashier forced to pick the nearest reason picks the first one, and the register stops meaning anything.\n"
+   },
+   "reasonCode": {
+    "type": "string",
+    "nullable": true,
+    "description": "Optional alongside the free text, where the venue maintains a list."
+   },
+   "approverPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Required above the venue threshold. May not be the requester."
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "ModifyOrderRequest": {
+  "type": "object",
+  "required": [
+   "id",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "addLines": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/CreateOrderLine"
+    }
+   },
+   "removeLineIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "reason": {
+    "type": "string",
+    "maxLength": 500
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "Order": {
+  "x-ticvai-persistence": "orders.sales_order + orders.order_line",
+  "type": "object",
+  "required": [
+   "id",
+   "venueId",
+   "scopePath",
+   "channel",
+   "status",
+   "currency",
+   "currencyScale",
+   "grossAmount",
+   "taxAmount",
+   "netAmount",
+   "lines",
+   "createdAt",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/OrderChannel"
+     }
+    ],
+    "description": "Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for within a month of launch.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/OrderStatus"
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4,
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"
+   },
+   "grossAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "netAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "refundedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "totalPriceVariance": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Sum across lines. Zero on a normal order."
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/OrderLine"
+    }
+   },
+   "payments": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/Payment"
+    }
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "shiftId": {
+    "type": "string",
+    "nullable": true
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "OrderChannel": {
+  "type": "string",
+  "description": "Where the order originated. Added when guest self-ordering was contracted — an order a guest placed on their own phone is commercially and operationally different from one a cashier typed, and reporting that cannot separate them cannot answer whether self-ordering is working.\n",
+  "enum": [
+   "pos",
+   "kiosk",
+   "guestApp",
+   "guestWeb",
+   "callCentre",
+   "partner",
+   "api",
+   "backOffice"
+  ]
+ },
+ "OrderExchangeResult": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "orderId",
+   "outgoingValue",
+   "incomingValue",
+   "difference"
+  ],
+  "properties": {
+   "orderId": {
+    "type": "string"
+   },
+   "outgoingValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "incomingValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "exchangeFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "difference": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Only the difference settles. The replacement is held before the original is released, never the other way round.\n"
+   },
+   "newLineIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "revokedEntitlementIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "issuedEntitlementIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   }
+  }
+ },
+ "OrderLine": {
+  "x-ticvai-persistence": "orders.order_line",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateOrderLine"
+   },
+   {
+    "type": "object",
+    "required": [
+     "serverUnitPrice",
+     "taxAmount",
+     "netAmount",
+     "grossAmount"
+    ],
+    "properties": {
+     "serverUnitPrice": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "description": "What the server computed on ingest."
+     },
+     "priceVariance": {
+      "allOf": [
+       {
+        "$ref": "../shared/common.yaml#/components/schemas/Money"
+       }
+      ],
+      "description": "Server minus quoted. Non-zero means the quoted price was honoured and the difference posted to the variance account.\n"
+     },
+     "taxAmount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "netAmount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "grossAmount": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "entitlementIds": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "crossRegionRightIds": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      },
+      "description": "Redemption rights propagated to other cells for this line."
+     }
+    }
+   }
+  ]
+ },
+ "OrderModificationResult": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "order",
+   "balanceDue"
+  ],
+  "properties": {
+   "order": {
+    "$ref": "#/components/schemas/Order"
+   },
+   "addedValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "removedValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "balanceDue": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Positive means the guest pays; negative means a refund is due."
+   },
+   "refundId": {
+    "type": "string",
+    "nullable": true
+   },
+   "revokedEntitlementIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "issuedEntitlementIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   }
+  }
+ },
+ "OrderResumeResult": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed",
+  "required": [
+   "order",
+   "hasChanged"
+  ],
+  "properties": {
+   "order": {
+    "$ref": "#/components/schemas/Order"
+   },
+   "hasChanged": {
+    "type": "boolean",
+    "description": "True where anything moved while the sale was parked. The cashier decides — silently charging the old price loses money, silently charging the new one loses the guest.\n"
+   },
+   "changes": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "priceChanged",
+        "promotionExpired",
+        "promotionNowApplies",
+        "soldOut",
+        "seatHoldExpired",
+        "productWithdrawn"
+       ]
+      },
+      "lineId": {
+       "type": "string"
+      },
+      "detail": {
+       "type": "string"
+      },
+      "wasAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "nowAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   }
+  }
+ },
+ "OrderStatement": {
+  "x-ticvai-persistence": "none — computed from order, payment, refund and ledger",
+  "type": "object",
+  "required": [
+   "orderId",
+   "orderNumber",
+   "currency",
+   "entries",
+   "currentBalance"
+  ],
+  "properties": {
+   "orderId": {
+    "type": "string"
+   },
+   "orderNumber": {
+    "type": "string"
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "x-ticvai-persisted": false,
+    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"
+   },
+   "entries": {
+    "type": "array",
+    "description": "Sequential. What an agent reads to a guest asking about a charge.",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "amount",
+      "runningBalance",
+      "occurredAt"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "sale",
+        "payment",
+        "refund",
+        "void",
+        "modification",
+        "exchange",
+        "fee",
+        "variance",
+        "chargeback"
+       ]
+      },
+      "description": {
+       "type": "string"
+      },
+      "amount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "runningBalance": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "referenceId": {
+       "type": "string",
+       "nullable": true
+      },
+      "principalId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "occurredAt": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
+   },
+   "totalPaid": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "totalRefunded": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "currentBalance": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Positive means the guest owes; negative means a refund is outstanding."
+   }
+  }
+ },
+ "OrderStatus": {
+  "type": "string",
+  "enum": [
+   "pending",
+   "held",
+   "paid",
+   "partiallyPaid",
+   "completed",
+   "voided",
+   "refunded",
+   "partiallyRefunded",
+   "failed"
+  ],
+  "description": "`held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that accumulates parked sales across a shift cannot be closed.\n"
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Payment": {
+  "x-ticvai-persistence": "orders.payment",
+  "type": "object",
+  "required": [
+   "id",
+   "orderId",
+   "tender",
+   "amount",
+   "status",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "orderId": {
+    "type": "string"
+   },
+   "tender": {
+    "$ref": "#/components/schemas/TenderKind"
+   },
+   "tenderCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "description": "4.6.11. **What the guest actually handed over**, which is not always what the venue books. A tourist paying USD cash at a till is a foreign tender; the sale is still recorded in base currency.\nEqual to the base currency for almost every payment. **Present on all of them so the foreign-tender report has a source** — `getForeignTenderReport` promised *what was taken in which currency* and nothing recorded it until 18 August.\n"
+   },
+   "tenderAmount": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "The amount in `tenderCurrency`, at that currency's own scale."
+   },
+   "fxRate": {
+    "type": "number",
+    "nullable": true,
+    "description": "The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"
+   },
+   "fxRateSource": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "manual",
+     "feed",
+     "cardScheme"
+    ],
+    "description": "4.2.8. Manual or fed on a schedule. **`cardScheme` is where the terminal did the conversion and told us** — dynamic currency conversion, the scheme's rate rather than ours.\n"
+   },
+   "changeCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "description": "4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "changeAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "authorised",
+     "captured",
+     "pendingConfirmation",
+     "declined",
+     "failed",
+     "voided",
+     "refunded"
+    ]
+   },
+   "providerName": {
+    "type": "string",
+    "nullable": true
+   },
+   "providerReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "lastInquiryAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "PeriodCloseResult": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "fiscalPeriodId",
+   "dryRun",
+   "passed",
+   "checks"
+  ],
+  "properties": {
+   "fiscalPeriodId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "dryRun": {
+    "type": "boolean"
+   },
+   "passed": {
+    "type": "boolean"
+   },
+   "checks": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "check",
+      "passed"
+     ],
+     "properties": {
+      "check": {
+       "type": "string",
+       "enum": [
+        "trialBalanceBalances",
+        "noUnapprovedJournals",
+        "noOpenShifts",
+        "settlementsReconciled",
+        "recognitionRunComplete",
+        "priorPeriodClosed",
+        "varianceExceptionsReviewed"
+       ]
+      },
+      "passed": {
+       "type": "boolean"
+      },
+      "detail": {
+       "type": "string"
+      },
+      "blockingCount": {
+       "type": "integer"
+      }
+     }
+    }
+   }
+  }
+ },
+ "PeriodStatus": {
+  "type": "string",
+  "enum": [
+   "open",
+   "closing",
+   "closed"
+  ]
+ },
+ "PostingEventType": {
+  "type": "string",
+  "description": "Every event that generates a ledger posting.",
+  "enum": [
+   "ticketRevenue",
+   "fnbRevenue",
+   "retailRevenue",
+   "rentalRevenue",
+   "taxPayable",
+   "cashReceived",
+   "cardReceived",
+   "walletReceived",
+   "refundIssued",
+   "voidReversal",
+   "deferredRevenue",
+   "recognisedRevenue",
+   "breakageRevenue",
+   "priceVariance",
+   "cashOverShort",
+   "settlementFee",
+   "settlementClearing"
+  ]
+ },
+ "PriceVariance": {
+  "x-ticvai-persistence": "ledger.price_variance",
+  "type": "object",
+  "required": [
+   "id",
+   "orderId",
+   "orderLineId",
+   "venueId",
+   "quotedPrice",
+   "serverPrice",
+   "variance",
+   "isException",
+   "occurredAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "orderId": {
+    "type": "string"
+   },
+   "orderLineId": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "variantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "quotedPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "serverPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "variance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "catalogueBundleVersion": {
+    "type": "string",
+    "nullable": true,
+    "description": "The bundle the terminal priced from. Turns \"the price was wrong\" into \"the terminal was two bundles behind\", which is actionable.\n"
+   },
+   "isException": {
+    "type": "boolean",
+    "description": "Above the venue's configured variance threshold."
+   },
+   "reviewStatus": {
+    "$ref": "#/components/schemas/VarianceReviewStatus"
+   },
+   "reviewOutcome": {
+    "type": "string",
+    "nullable": true
+   },
+   "reviewedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "journalEntryId": {
+    "type": "string",
+    "nullable": true
+   },
+   "occurredAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "RecognitionMethod": {
+  "type": "string",
+  "enum": [
+   "immediate",
+   "onRedemption",
+   "straightLine",
+   "perVisit",
+   "onExpiry"
+  ]
+ },
+ "RecognitionRunResult": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "fiscalPeriodId",
+   "dryRun",
+   "recognisedTotal",
+   "breakageTotal",
+   "entryCount"
+  ],
+  "properties": {
+   "fiscalPeriodId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "dryRun": {
+    "type": "boolean"
+   },
+   "recognisedTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "breakageTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "entryCount": {
+    "type": "integer"
+   },
+   "byMethod": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "method": {
+       "$ref": "#/components/schemas/RecognitionMethod"
+      },
+      "amount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "itemCount": {
+       "type": "integer"
+      }
+     }
+    }
+   },
+   "journalEntryIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   }
+  }
+ },
+ "RecognitionSchedule": {
+  "x-ticvai-persistence": "ledger.recognition_schedule",
+  "type": "object",
+  "required": [
+   "id",
+   "name",
+   "method",
+   "productKinds"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "method": {
+    "$ref": "#/components/schemas/RecognitionMethod"
+   },
+   "priority": {
+    "type": "integer",
+    "default": 100,
+    "description": "**Two schedules may both claim a product kind and nothing resolved which wins** — a silent double-recognition, which is the worst kind of accounting defect because the numbers look plausible.\nLowest priority wins, and **two schedules at the same priority claiming the same kind is refused at save** rather than resolved at run time.\n"
+   },
+   "recognitionSite": {
+    "type": "string",
+    "enum": [
+     "sale",
+     "admission",
+     "consumption"
+    ],
+    "default": "sale",
+    "description": "**Where revenue is earned, which is not always where it was sold.** A ticket sold at one venue and admitted at another earns at the gate, and recognising at the sale site puts the revenue in the wrong entity's books.\n`consumption` is for stored value — a wallet top-up is not revenue until it is spent.\n"
+   },
+   "frequency": {
+    "type": "string",
+    "enum": [
+     "daily",
+     "weekly",
+     "monthly",
+     "onEvent",
+     "onPeriodClose"
+    ],
+    "default": "onPeriodClose",
+    "description": "**Driven by the schedule rather than by whoever runs the job.** Recognition that happens when somebody remembers is recognition with no cut-off.\n"
+   },
+   "revalidateOnValidityChange": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Changing an entitlement's validity did not re-time its deferred balance.** A pass extended by three months has three more months of deferral, and a schedule that ignores that recognises revenue the venue has not yet earned.\n"
+   },
+   "productKinds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "deferredAccountId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "recognisedAccountId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "breakageAccountId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "noShowTrigger": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "performanceEnd",
+     "validityEnd",
+     "none"
+    ],
+    "description": "8.1.1. **A no-show is breakage with a known moment**, and the mechanism already existed — `breakageAfterDays` moves deferred revenue to earned after a period. A ticket for a performance that has finished does not need a waiting period: **the guest cannot arrive any more.**\n`performanceEnd` recognises when the performance completes. `validityEnd` recognises when an open-dated entitlement lapses, which is where `breakageAfterDays` still applies.\n**`none` keeps the current behaviour** — recognise on the schedule and nothing else — so no existing schedule changes.\n"
+   },
+   "noShowAccountId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where no-show revenue lands. **Separate from `recognisedAccountId` by default**, because revenue from a guest who came and revenue from one who did not are different lines to whoever reads the P&L — and 8.1.2 asks for a report on exactly that distinction.\n"
+   },
+   "breakageAfterDays": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Days after expiry at which unredeemed value becomes breakage."
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Refund": {
+  "x-ticvai-persistence": "orders.refund",
+  "type": "object",
+  "required": [
+   "id",
+   "orderId",
+   "amount",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "orderId": {
+    "type": "string"
+   },
+   "fxRate": {
+    "type": "number",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The rate on the original payment, not today's** (BL-087, CF-118).\n`Payment` records `tenderCurrency`, `fxRate` and `fxRateSource` at the moment of sale, so the sale rate is always retrievable. **Refunding at today's rate repays a different amount of money than was taken** — a guest who paid 100 USD at 3.67 and is refunded at 3.72 gets back more AED than they gave, and the venue carries the difference on every refund.\nThe exposure runs both ways and neither direction is defensible: a guest short-changed by a moving rate has a complaint the venue cannot answer, because **the guest did nothing but wait.**\n"
+   },
+   "taxReversalEntryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**A refund reverses the tax entry it created, and this is where that is stated rather than implied.** `reverseJournalEntry` and `calculateTax` both exist, so both halves were present and the obligation was assumed — **an implied obligation is one a developer can miss without failing anything.**\nNull only where the original sale carried no tax.\n"
+   },
+   "settleTo": {
+    "type": "string",
+    "enum": [
+     "originalTender",
+     "advanceBalance",
+     "wireTransfer",
+     "storeCredit"
+    ],
+    "default": "originalTender",
+    "description": "BL-086. **A refund could only go back the way it came.** A guest whose card has expired, a partner settling by wire, a guest who would rather have the credit — three real cases with one answer.\n**`originalTender` stays the default** because refunding elsewhere is how money laundering works, and anything else needs a reason.\n"
+   },
+   "fxVariance": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Where the sale rate and the current rate differ, **the difference is booked as an FX variance rather than hidden in the refund**. `runFxRevaluation` already handles this class of movement and this is the same act at a smaller scale.\n"
+   },
+   "amount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "appliedPercentage": {
+    "type": "number",
+    "description": "From the venue's time bands, or an approver override."
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pendingApproval",
+     "pendingGateway",
+     "completed",
+     "declined",
+     "failed"
+    ]
+   },
+   "reason": {
+    "type": "string"
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "secondaryPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "approvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "ledgerEntryId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Written before the gateway is called."
+   },
+   "gatewayReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "RefundPolicy": {
+  "x-ticvai-persistence": "orders.refund_policy",
+  "type": "object",
+  "description": "Venue-configured. Thresholds are policy, not permission scope — venues run different policies and the permission model should not encode commercial rules.\n",
+  "required": [
+   "venueId",
+   "selfAuthoriseLimit",
+   "requiresApprovalAbove"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "selfAuthoriseLimit": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Up to this, a holder of ORDER_REFUND refunds alone. Zero means every refund needs a second authoriser.\n"
+   },
+   "requiresSecondUserAbove": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Above this, a second user — cashier OR supervisor — names themselves as audit control. Dual-authorisation, not escalation (2.12.3).\n"
+   },
+   "requiresApprovalAbove": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Above this, an ORDER_REFUND_APPROVE holder must approve."
+   },
+   "timeBands": {
+    "type": "array",
+    "description": "Refundable percentage by time before the performance. Evaluated most-specific first.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "hoursBefore",
+      "percentage"
+     ],
+     "properties": {
+      "hoursBefore": {
+       "type": "integer",
+       "minimum": 0
+      },
+      "percentage": {
+       "type": "number",
+       "minimum": 0,
+       "maximum": 100
+      }
+     }
+    }
+   },
+   "allowPartial": {
+    "type": "boolean",
+    "default": true
+   },
+   "refundWindowDays": {
+    "type": "integer",
+    "nullable": true
+   },
+   "varianceThreshold": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Price variance above this is an exception requiring review rather than a routine posting (CF-38). Venue-configured.\n"
+   }
+  }
+ },
+ "TaxCode": {
+  "x-ticvai-persistence": "ledger.tax_code",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "countryCode",
+   "rate",
+   "effectiveFrom",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "countryCode": {
+    "type": "string",
+    "pattern": "^[A-Z]{2}$"
+   },
+   "appliesTo": {
+    "type": "array",
+    "description": "**What this code covers, and `donation` is why the field exists** (CF-84). Donation tax treatment varies by jurisdiction — **0% is a valid rate, not an absence of one** — and it is set here rather than assumed in the posting.\nThe liability-account posting stays the default and is no longer the only option.\n",
+    "items": {
+     "type": "string",
+     "enum": [
+      "goods",
+      "services",
+      "admission",
+      "food",
+      "accommodation",
+      "donation",
+      "gratuity",
+      "fee"
+     ]
+    }
+   },
+   "rate": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100
+   },
+   "compoundOnTaxCodeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "When set, this tax applies to the base **plus** the referenced tax, not to the base alone. Ordering is explicit rather than implied.\n"
+   },
+   "isInclusive": {
+    "type": "boolean",
+    "description": "True when the displayed price already contains this tax."
+   },
+   "accountId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "TaxExemption": {
+  "x-ticvai-persistence": "ledger.tax_exemption",
+  "type": "object",
+  "required": [
+   "id",
+   "scope",
+   "taxCodeId",
+   "reason"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scope": {
+    "type": "string",
+    "enum": [
+     "account",
+     "productKind",
+     "channel",
+     "legalEntity"
+    ]
+   },
+   "scopeRef": {
+    "type": "string",
+    "description": "Identifier of the exempt subject, matching `scope`."
+   },
+   "taxCodeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "reason": {
+    "type": "string",
+    "maxLength": 500
+   },
+   "certificateReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   }
+  }
+ },
+ "TrialBalance": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "fiscalPeriodId",
+   "isBalanced",
+   "totalDebit",
+   "totalCredit",
+   "accounts"
+  ],
+  "properties": {
+   "fiscalPeriodId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "isBalanced": {
+    "type": "boolean",
+    "description": "False indicates a defect, not a business condition. Double-entry cannot be unbalanced by legitimate activity.\n"
+   },
+   "totalDebit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "totalCredit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "accounts": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "accountId",
+      "accountCode",
+      "accountName",
+      "debit",
+      "credit",
+      "balance"
+     ],
+     "properties": {
+      "accountId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "accountCode": {
+       "type": "string"
+      },
+      "accountName": {
+       "type": "string"
+      },
+      "type": {
+       "$ref": "#/components/schemas/AccountType"
+      },
+      "debit": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "credit": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "balance": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   }
+  }
+ },
+ "VarianceReviewStatus": {
+  "type": "string",
+  "enum": [
+   "notRequired",
+   "pendingReview",
+   "reviewed"
+  ]
+ },
+ "VenueSettings": {
+  "type": "object",
+  "x-ticvai-persistence": "platform.venue_settings",
+  "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "supportHours": {
+    "type": "object",
+    "description": "CF-100. **A venue decides whether its support desk is 24/7 or bounded, and the platform does not.** This was recorded as an open question for eleven days and was never one — the code is identical either way, and what was missing was somewhere to put the answer.\n",
+    "properties": {
+     "mode": {
+      "type": "string",
+      "enum": [
+       "alwaysOn",
+       "businessHours",
+       "custom",
+       "none"
+      ]
+     },
+     "timezone": {
+      "type": "string"
+     },
+     "windows": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "day": {
+         "type": "string",
+         "enum": [
+          "mon",
+          "tue",
+          "wed",
+          "thu",
+          "fri",
+          "sat",
+          "sun"
+         ]
+        },
+        "from": {
+         "type": "string"
+        },
+        "to": {
+         "type": "string"
+        }
+       }
+      }
+     },
+     "outOfHoursMessage": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   },
+   "quietHours": {
+    "type": "object",
+    "nullable": true,
+    "description": "**When the platform does not send.** A wallet low-balance alert at 3am is a complaint, and journeys and message triggers both respect this.\n**Operational messages ignore it** — a queue-turn alert is why a guest is holding the phone.\n",
+    "properties": {
+     "from": {
+      "type": "string"
+     },
+     "to": {
+      "type": "string"
+     }
+    }
+   },
+   "segregatedAccess": {
+    "type": "object",
+    "nullable": true,
+    "description": "CF-130. **Configured at venue level because it changes by region and the venue is where it is known** — a Ladies Night, a family session, a prayer-time closure.\n**The platform does not infer gender.** 3.2.45 asks for automatic gender recognition and 3.2.46 for rule-based facial recognition validation, and neither is built. Two reasons, and the second is the one that decided it:\n**A Ladies Night ticket is already gendered at the point of sale**, so the gate checks the entitlement the platform issued rather than the face in front of it — deterministic, auditable, and already contracted through `admissionRules`.\n**And these events are staffed.** A steward at the entrance is making the judgment anyway, and a classifier that overrules a person who can see more than it can is a machine and a human disagreeing while a guest waits.\n**`genderVerification` is a switch, not an implementation.** Where a venue's access hardware offers the capability and the venue chooses to use it, this turns it on — following ADR-0015's standards-first driver model, where the device does what the device does. **Not everything needs to be built.**\n",
+    "properties": {
+     "isEnabled": {
+      "type": "boolean",
+      "default": false
+     },
+     "appliesToAccessPointIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "schedule": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "day": {
+         "type": "string"
+        },
+        "from": {
+         "type": "string"
+        },
+        "to": {
+         "type": "string"
+        },
+        "admits": {
+         "type": "string",
+         "enum": [
+          "all",
+          "women",
+          "womenAndChildren",
+          "families",
+          "members"
+         ]
+        }
+       }
+      }
+     },
+     "entitlementGated": {
+      "type": "boolean",
+      "default": true,
+      "readOnly": true,
+      "description": "**Always true, and stated rather than assumed.** The gate admits on the entitlement. Everything below is advisory on top of that, and nothing replaces it.\n"
+     },
+     "genderVerification": {
+      "type": "string",
+      "enum": [
+       false,
+       "staffAssisted",
+       "deviceAssisted"
+      ],
+      "default": false,
+      "description": "`off` — the entitlement decides and a steward handles exceptions. **The default, and what is contracted.**\n`staffAssisted` — the steward's screen shows the ticket type so they can ask. No inference anywhere.\n`deviceAssisted` — **the venue's access hardware performs the check, not the platform.** Available only where the driver reports the capability, and the result is **advisory to the steward rather than decisive at the turnstile** (3.2.45 asks for rejection; this deviates deliberately).\n"
+     },
+     "overrideRateAlertThreshold": {
+      "type": "number",
+      "nullable": true,
+      "description": "Where `deviceAssisted` is on. **An override rate near zero means the steward has stopped deciding**, and that is the number that says whether the human safeguard is working or decorative.\n"
+     }
+    }
+   },
+   "alerting": {
+    "type": "object",
+    "description": "CF-134. **On-platform notification, marked as read.** Six contracts detect their own trouble and none told a person.\n**The panel is the default and email or WhatsApp only where the matrix names them** — an operational alert that arrives by email is an alert nobody sees in time.\n",
+    "properties": {
+     "channel": {
+      "type": "string",
+      "enum": [
+       "dashboardPanel",
+       "dashboardAndEmail",
+       "dashboardAndWhatsapp"
+      ],
+      "default": "dashboardPanel"
+     },
+     "acknowledgementRequired": {
+      "type": "boolean",
+      "default": true
+     },
+     "escalateAfterMinutes": {
+      "type": "integer",
+      "nullable": true
+     }
+    }
+   }
+  }
+ }
+}

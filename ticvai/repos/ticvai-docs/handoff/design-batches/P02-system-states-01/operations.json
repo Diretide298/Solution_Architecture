@@ -1,0 +1,15 @@
+{
+ "getTenantAppStatus": {
+  "method": "GET",
+  "path": "/tenant-config/status",
+  "contract": "white-label",
+  "summary": "App status and recent changes",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "TenantAppStatus"
+ }
+}

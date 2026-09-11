@@ -1,0 +1,148 @@
+{
+ "listCommercialPricing": {
+  "method": "GET",
+  "path": "/commercial-pricing",
+  "contract": "catalogue",
+  "summary": "Commercial Pricing Command Center",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "country",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "productType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "priceListType",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "CommercialPricingCommandCenterView"
+ },
+ "listCommercialPricingStructure": {
+  "method": "GET",
+  "path": "/commercial-pricing-structure",
+  "contract": "catalogue",
+  "summary": "Commercial Pricing Structure Validation",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CommercialPricingStructureValidationView"
+ },
+ "listMarketVenueCurrency": {
+  "method": "GET",
+  "path": "/market-venue-currency",
+  "contract": "catalogue",
+  "summary": "Market, Venue & Currency Pricing Structure",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MarketVenueCurrencyPricingStructureView"
+ },
+ "listPackageBundleAdd": {
+  "method": "GET",
+  "path": "/package-bundle-add",
+  "contract": "catalogue",
+  "summary": "Package, Bundle & Add-On Pricing",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PackageBundleAddOnPricingView"
+ },
+ "listPriceCategoryRate": {
+  "method": "GET",
+  "path": "/price-category-rate",
+  "contract": "catalogue",
+  "summary": "Price Category & Rate Type Library",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PriceCategoryRateTypeLibraryView"
+ },
+ "listPriceListTemplate": {
+  "method": "GET",
+  "path": "/price-list-template",
+  "contract": "catalogue",
+  "summary": "Price List Templates, Clone & Reuse",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PriceListTemplatesCloneReuseView"
+ },
+ "setPriceHierarchyInheritance": {
+  "method": "PUT",
+  "path": "/price-hierarchy-inheritance",
+  "contract": "catalogue",
+  "summary": "Price Hierarchy & Inheritance Configuration",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "PriceHierarchyInheritanceConfigurationInput",
+  "responds": "PriceHierarchyInheritanceConfigurationView"
+ },
+ "setPriceListMaster": {
+  "method": "PUT",
+  "path": "/price-list-master",
+  "contract": "catalogue",
+  "summary": "Price List Master Configuration",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "PriceListMasterConfigurationInput",
+  "responds": "PriceListMasterConfigurationView"
+ },
+ "setProductServicePrice": {
+  "method": "PUT",
+  "path": "/product-service-price",
+  "contract": "catalogue",
+  "summary": "Product & Service Price Assignment",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "ProductServicePriceAssignmentInput",
+  "responds": "ProductServicePriceAssignmentView"
+ },
+ "setRateStructure": {
+  "method": "PUT",
+  "path": "/rate-structure",
+  "contract": "catalogue",
+  "summary": "Rate Structure Builder",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "RateStructureBuilderInput",
+  "responds": "RateStructureBuilderView"
+ }
+}

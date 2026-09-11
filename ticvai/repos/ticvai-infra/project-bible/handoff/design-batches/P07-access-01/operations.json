@@ -1,0 +1,455 @@
+{
+ "consumeCrossRegionEntitlement": {
+  "method": "POST",
+  "path": "/cross-region-entitlements/{rightId}/consume",
+  "contract": "cross-region",
+  "summary": "Consume entries against a right, locally authoritative",
+  "permission": "ACCESS_VALIDATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CrossRegionEntitlement"
+ },
+ "getAccessPoint": {
+  "method": "GET",
+  "path": "/access-points/{accessPointId}",
+  "contract": "access",
+  "summary": "Read an access point",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AccessPoint"
+ },
+ "getCrossRegionEntitlement": {
+  "method": "GET",
+  "path": "/cross-region-entitlements/{rightId}",
+  "contract": "cross-region",
+  "summary": "Read a redemption right",
+  "permission": "TICKET_LOOKUP",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CrossRegionEntitlement"
+ },
+ "getCurrentSession": {
+  "method": "GET",
+  "path": "/auth/session",
+  "contract": "identity",
+  "summary": "Current session and effective permissions",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Session"
+ },
+ "getCurrentShift": {
+  "method": "GET",
+  "path": "/shifts/current",
+  "contract": "shift",
+  "summary": "The open or suspended shift on the session's workstation",
+  "permission": "SHIFT_OPEN",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Shift"
+ },
+ "getGuestSession": {
+  "method": "GET",
+  "path": "/auth/guest/session",
+  "contract": "identity",
+  "summary": "Read the current guest session",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestSession"
+ },
+ "getOfflinePackage": {
+  "method": "GET",
+  "path": "/access/offline-package",
+  "contract": "access",
+  "summary": "Entitlement and rule set for offline validation",
+  "permission": "ACCESS_VALIDATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": "validFrom",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "validTo",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "If-None-Match",
+    "in": "header",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "OfflinePackage"
+ },
+ "listAccessPoints": {
+  "method": "GET",
+  "path": "/access-points",
+  "contract": "access",
+  "summary": "List access points",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listBlacklist": {
+  "method": "GET",
+  "path": "/blacklist",
+  "contract": "access",
+  "summary": "List blacklisted media",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMfaMethods": {
+  "method": "GET",
+  "path": "/auth/mfa/methods",
+  "contract": "identity",
+  "summary": "Enrolled MFA methods",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MfaMethod"
+ },
+ "listScans": {
+  "method": "GET",
+  "path": "/access/scans",
+  "contract": "access",
+  "summary": "List scan events",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "accessPointId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "ticketId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "outcome",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "recordedFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "recordedTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listSsoProviders": {
+  "method": "GET",
+  "path": "/auth/sso/providers",
+  "contract": "identity",
+  "summary": "Identity providers configured for this tenant",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SsoProvider"
+ },
+ "listSyncRejections": {
+  "method": "GET",
+  "path": "/sync/rejections",
+  "contract": "orders",
+  "summary": "Entries the server refused",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "workstationId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "login": {
+  "method": "POST",
+  "path": "/auth/login",
+  "contract": "identity",
+  "summary": "Authenticate and open a session",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "LoginRequest",
+  "responds": "LoginResponse"
+ },
+ "lookupTicket": {
+  "method": "GET",
+  "path": "/access/lookup",
+  "contract": "access",
+  "summary": "Read-only validity check without admitting",
+  "permission": "TICKET_LOOKUP",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "mediaCode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "ticketId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TicketStatus"
+ },
+ "overrideAccess": {
+  "method": "POST",
+  "path": "/access/override",
+  "contract": "access",
+  "summary": "Admit against a failed validation",
+  "permission": "ACCESS_OVERRIDE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ValidationResult"
+ },
+ "resolvePermissions": {
+  "method": "POST",
+  "path": "/permissions/resolve",
+  "contract": "identity",
+  "summary": "Simulate a principal's effective permissions",
+  "permission": "PERMISSION_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "selectRole": {
+  "method": "POST",
+  "path": "/auth/select-role",
+  "contract": "identity",
+  "summary": "Choose a role for a multi-role session",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Session"
+ },
+ "setTurnstileMode": {
+  "method": "PUT",
+  "path": "/access-points/{accessPointId}/mode",
+  "contract": "access",
+  "summary": "Set the operating mode of an access point",
+  "permission": "TURNSTILE_MODE_SET",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AccessPoint"
+ },
+ "syncOrders": {
+  "method": "POST",
+  "path": "/sync/orders",
+  "contract": "orders",
+  "summary": "Replay orders recorded offline",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "OrderSyncResult"
+ },
+ "syncScans": {
+  "method": "POST",
+  "path": "/access/scans",
+  "contract": "access",
+  "summary": "Replay scans recorded offline",
+  "permission": "ACCESS_VALIDATE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ScanSyncResult"
+ },
+ "validateAccess": {
+  "method": "POST",
+  "path": "/access/validate",
+  "contract": "access",
+  "summary": "Validate media at an access point and admit or deny",
+  "permission": "ACCESS_VALIDATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ValidateRequest",
+  "responds": "ValidationResult"
+ },
+ "validateGroupAccess": {
+  "method": "POST",
+  "path": "/access/group-validate",
+  "contract": "access",
+  "summary": "Admit a group on one read",
+  "permission": "ACCESS_VALIDATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ValidationResult"
+ }
+}

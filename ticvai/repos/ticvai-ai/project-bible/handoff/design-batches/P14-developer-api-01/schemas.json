@@ -1,0 +1,616 @@
+{
+ "ApiClient": {
+  "type": "object",
+  "x-ticvai-persistence": "control.api_client",
+  "description": "CF-135a. **The one credential model.** 2.7.52, 7.1.25 and 7.1.30 each asserted their own, so a partner API key, a POS integration credential and a webstore credential were three unrelated things with three lifecycles.\n",
+  "required": [
+   "id",
+   "developerId",
+   "name",
+   "environment",
+   "scopes",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "developerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "clientId": {
+    "type": "string",
+    "readOnly": true
+   },
+   "environment": {
+    "type": "string",
+    "enum": [
+     "sandbox",
+     "production"
+    ],
+    "description": "**Bound to one, stated on the object rather than by naming convention.** A key that works in both is a key somebody will use in the wrong one.\n"
+   },
+   "scopes": {
+    "type": "array",
+    "description": "**Resolved against the tenant's licence at token issue** (13.3.24). A scope granted here and not licensed there produces no token — and the refusal is at issue rather than at call time, so an integrator finds out in testing.\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "allowedTenantIds": {
+    "type": "array",
+    "description": "13.1.46. **Which tenants this client may act for.** A developer integrating for one venue must not reach another, and a client with an empty list reaches none.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "ipAllowList": {
+    "type": "array",
+    "description": "13.1.38. Optional, and the strongest control available where an integrator has fixed egress.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "suspended",
+     "revoked"
+    ]
+   },
+   "lastUsedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**A credential unused for a year is a credential nobody will notice being stolen.**\n"
+   }
+  }
+ },
+ "ApiLicence": {
+  "type": "object",
+  "x-ticvai-persistence": "control.api_licence",
+  "description": "13.3.24, decision D5. **Configuration, not code** — rates and terms change without a release.\n**The rates themselves are CF-135c and remain open.** This is the surface they will be set through.\n",
+  "required": [
+   "tenantId",
+   "licensedModules"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "licensedModules": {
+    "type": "array",
+    "description": "**The example in the requirement is the shape**: a venue licensing the ticketing API and not the F&B one.\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "callAllowancePerMonth": {
+    "type": "integer",
+    "nullable": true
+   },
+   "overageRatePerThousand": {
+    "type": "number",
+    "nullable": true
+   },
+   "revenueSharePercent": {
+    "type": "number",
+    "nullable": true
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   }
+  }
+ },
+ "ApiQuota": {
+  "type": "object",
+  "x-ticvai-persistence": "control.api_quota",
+  "description": "13.1.36 and 13.1.37. **A quota protects the venue, not the developer.**\n",
+  "required": [
+   "clientId",
+   "sustainedPerMinute"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "clientId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sustainedPerMinute": {
+    "type": "integer"
+   },
+   "burstPerSecond": {
+    "type": "integer",
+    "description": "**Separate from the sustained rate**, because a nightly sync is a legitimate spike and a flat per-second limit either blocks it or permits the flood it was meant to stop.\n"
+   },
+   "dailyCap": {
+    "type": "integer",
+    "nullable": true
+   },
+   "perOperationOverrides": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "integer"
+    },
+    "description": "**Availability checks and order creation deserve different limits** — one is cheap and polled, the other is expensive and rare.\n"
+   },
+   "onBreach": {
+    "type": "string",
+    "enum": [
+     "throttle",
+     "reject",
+     "queue"
+    ],
+    "default": "throttle"
+   }
+  }
+ },
+ "ApiUsageSummary": {
+  "type": "object",
+  "description": "13.1.16 to 13.1.20, 13.1.41 to 13.1.45. **One endpoint because they are one question asked five ways.**\n",
+  "properties": {
+   "totalCalls": {
+    "type": "integer"
+   },
+   "successRate": {
+    "type": "number"
+   },
+   "clientErrorRate": {
+    "type": "number",
+    "description": "**4xx — the integrator's problem.** Separated because a single error rate lets both sides blame the other.\n"
+   },
+   "serverErrorRate": {
+    "type": "number",
+    "description": "5xx — TICVAI's problem."
+   },
+   "p50LatencyMs": {
+    "type": "number"
+   },
+   "p95LatencyMs": {
+    "type": "number"
+   },
+   "p99LatencyMs": {
+    "type": "number"
+   },
+   "quotaBreaches": {
+    "type": "integer"
+   },
+   "byOperation": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "operationId": {
+       "type": "string"
+      },
+      "calls": {
+       "type": "integer"
+      },
+      "errorRate": {
+       "type": "number"
+      }
+     }
+    }
+   }
+  }
+ },
+ "ApiVersion": {
+  "type": "object",
+  "x-ticvai-persistence": "control.api_version",
+  "description": "13.1.31 to 13.1.35, ADR-0026. **CF-141 is sharper under D1**: a single supported production version was tenable when only Softlabs called the API, and **with third parties a breaking change with no window breaks somebody else's business.**\n",
+  "required": [
+   "version",
+   "status"
+  ],
+  "properties": {
+   "version": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "preview",
+     "current",
+     "deprecated",
+     "sunset"
+    ]
+   },
+   "releasedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "deprecatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "sunsetAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "minimumNoticeMonths": {
+    "type": "integer",
+    "default": 12,
+    "description": "**The commitment, not the intention.** A deprecation policy without a stated minimum is a policy that shortens under pressure.\n"
+   },
+   "migrationGuideUrl": {
+    "type": "string",
+    "nullable": true
+   },
+   "activeClientCount": {
+    "type": "integer",
+    "readOnly": true
+   }
+  }
+ },
+ "DeveloperAccount": {
+  "type": "object",
+  "x-ticvai-persistence": "control.developer_account",
+  "description": "13.1.6 to 13.1.9. **An organisation, because an integration outlives the engineer who built it.** A credential tied to somebody's personal account dies when they leave.\n**Not a tenant and not a partner.** A partner resells tickets; a developer writes software, and one organisation may be both.\n",
+  "required": [
+   "id",
+   "organisationName",
+   "contactEmail",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "organisationName": {
+    "type": "string"
+   },
+   "contactEmail": {
+    "type": "string",
+    "format": "email"
+   },
+   "websiteUrl": {
+    "type": "string",
+    "nullable": true
+   },
+   "countryCode": {
+    "type": "string"
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where this developer is also a commercial partner. **The link exists and the two are not the same record**, which is what CF-135a was about.\n"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "verified",
+     "suspended",
+     "closed"
+    ]
+   },
+   "verifiedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "IntegrationListing": {
+  "type": "object",
+  "x-ticvai-persistence": "control.integration_listing",
+  "description": "13.1.50, decision D1. **A listing, not an installation.** The integration runs on the developer's own infrastructure.\n**Third-party code does not execute inside TICVAI** — stated rather than assumed, because that is a different product with a different threat model.\n",
+  "required": [
+   "id",
+   "developerId",
+   "name",
+   "category",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "developerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "category": {
+    "type": "string",
+    "enum": [
+     "crm",
+     "marketing",
+     "accounting",
+     "hotel",
+     "transport",
+     "analytics",
+     "accessibility",
+     "other"
+    ]
+   },
+   "description": {
+    "type": "string"
+   },
+   "integrationUrl": {
+    "type": "string"
+   },
+   "requiredScopes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "draft",
+     "submitted",
+     "inReview",
+     "certified",
+     "rejected",
+     "revoked",
+     "delisted"
+    ]
+   },
+   "certifiedUntil": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "**Certification expires.** An integration certified against v1 and still listed after v3 is TICVAI vouching for something it has not looked at in two years.\n"
+   },
+   "certifiedAgainstVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "listingFeeModel": {
+    "type": "string",
+    "enum": [
+     "none",
+     "flat",
+     "revenueShare"
+    ],
+    "nullable": true
+   }
+  }
+ },
+ "Sandbox": {
+  "type": "object",
+  "x-ticvai-persistence": "control.sandbox",
+  "description": "D2 and D3. **One shared TICVAI sandbox, synthetic data only.**\n",
+  "required": [
+   "id",
+   "name",
+   "status",
+   "dataProfile"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "developerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "provisioning",
+     "active",
+     "resetting",
+     "expired",
+     "deleted"
+    ]
+   },
+   "dataProfile": {
+    "$ref": "#/components/schemas/SyntheticDataProfile"
+   },
+   "containsProductionData": {
+    "type": "boolean",
+    "default": false,
+    "readOnly": true,
+    "description": "**Always false, and stated rather than assumed** (D2). No cloning, no masking. It is a field so that a future reversal is a visible change rather than a silent one — and because **the whole PDPL and DESC argument for this contract rests on it.**\n"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "lastResetAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "SyntheticDataProfile": {
+  "type": "object",
+  "description": "13.2.5 and 13.2.13. **What the synthetic dataset contains**, so a developer can test against a shape that resembles a real venue without any of it being real.\n**Generated, not sampled.** Sampling production and calling it synthetic is masking with extra steps.\n",
+  "properties": {
+   "venueKind": {
+    "type": "string",
+    "enum": [
+     "themePark",
+     "waterPark",
+     "museum",
+     "theatre",
+     "stadium",
+     "arena",
+     "mixed"
+    ]
+   },
+   "productCount": {
+    "type": "integer",
+    "default": 200
+   },
+   "guestCount": {
+    "type": "integer",
+    "default": 5000
+   },
+   "seatMapIncluded": {
+    "type": "boolean",
+    "default": true
+   },
+   "historicalMonths": {
+    "type": "integer",
+    "default": 12,
+    "description": "**Backdated synthetic orders**, because an integration reading a reporting API against an empty venue tests nothing.\n"
+   },
+   "locale": {
+    "type": "string",
+    "default": "en-AE"
+   }
+  }
+ },
+ "WebhookDelivery": {
+  "type": "object",
+  "x-ticvai-persistence": "control.webhook_delivery",
+  "description": "13.1.30. **The log a developer needs most**, and without it every question becomes a support ticket.\n",
+  "required": [
+   "id",
+   "subscriptionId",
+   "eventType",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subscriptionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "eventId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "eventType": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "delivered",
+     "failed",
+     "retrying",
+     "abandoned"
+    ]
+   },
+   "attemptCount": {
+    "type": "integer"
+   },
+   "responseCode": {
+    "type": "integer",
+    "nullable": true
+   },
+   "responseBodyExcerpt": {
+    "type": "string",
+    "nullable": true,
+    "description": "**Truncated, and it is what makes the log useful** — a 500 with the receiver's own error message in it answers the question without a conversation.\n"
+   },
+   "isReplay": {
+    "type": "boolean",
+    "default": false
+   },
+   "deliveredAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "WebhookSubscription": {
+  "type": "object",
+  "x-ticvai-persistence": "control.webhook_subscription",
+  "description": "13.1.26, 13.3.18 and 13.3.22. **The 29 events already exist and nothing outside could receive one.**\n",
+  "required": [
+   "id",
+   "clientId",
+   "endpointUrl",
+   "eventTypes",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "clientId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "endpointUrl": {
+    "type": "string"
+   },
+   "eventTypes": {
+    "type": "array",
+    "description": "**Filtered at subscription, not at delivery.** A subscriber taking every event and discarding 99% is a subscriber the platform pays to talk to.\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "filters": {
+    "type": "object",
+    "nullable": true,
+    "description": "13.3.22. Tenant, venue, or a business condition on the payload.",
+    "additionalProperties": true
+   },
+   "signingSecret": {
+    "type": "string",
+    "format": "password",
+    "description": "**How the receiver knows it was TICVAI.** Without a signature an endpoint accepts a ticket-sale event from anybody who learns the URL.\n"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pendingVerification",
+     "active",
+     "paused",
+     "failing",
+     "disabled"
+    ]
+   },
+   "consecutiveFailures": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "disabledReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "13.1.29. **An endpoint failing for days is disabled rather than retried forever**, and the developer is told — a queue growing against a dead endpoint is a cost the platform carries silently.\n"
+   }
+  }
+ }
+}

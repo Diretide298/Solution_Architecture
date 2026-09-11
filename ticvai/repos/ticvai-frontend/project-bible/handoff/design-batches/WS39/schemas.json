@@ -1,0 +1,1235 @@
+{
+ "AiDemandForecastingBookingCurveStudioView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What AI Demand Forecasting & Booking Curve Studio displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "performance": {
+    "type": "string",
+    "description": "Performance"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "timeslot": {
+    "type": "string",
+    "description": "Timeslot"
+   },
+   "priceCategory": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price Category"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "intraday": {
+    "type": "string",
+    "description": "Intraday"
+   },
+   "tomorrow": {
+    "type": "string",
+    "description": "Tomorrow"
+   },
+   "eventHorizon": {
+    "type": "string",
+    "description": "Event Horizon"
+   },
+   "seasonalHorizon": {
+    "type": "string",
+    "description": "Seasonal Horizon"
+   },
+   "confidence91": {
+    "type": "number",
+    "description": "Confidence: 91%"
+   },
+   "strongHistoricalData": {
+    "type": "string",
+    "description": "Strong Historical Data"
+   },
+   "stableBookingPattern": {
+    "type": "string",
+    "description": "Stable Booking Pattern"
+   },
+   "reliableExternalSignals": {
+    "type": "integer",
+    "description": "Reliable External Signals"
+   },
+   "expectedAtT7": {
+    "type": "string",
+    "description": "Expected at T−7"
+   },
+   "forecastFinalOccupancy": {
+    "type": "integer",
+    "description": "Forecast Final Occupancy (the pack shows 97%)"
+   },
+   "demand": {
+    "type": "string",
+    "description": "Demand"
+   },
+   "attendance": {
+    "type": "integer",
+    "description": "Attendance"
+   },
+   "occupancy": {
+    "type": "integer",
+    "description": "Occupancy"
+   },
+   "sellThrough": {
+    "type": "string",
+    "description": "Sell-Through"
+   },
+   "expectedSellOutTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expected Sell-Out Time"
+   },
+   "revenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue"
+   },
+   "conversion": {
+    "type": "number",
+    "description": "Conversion"
+   },
+   "remainingInventory": {
+    "type": "string",
+    "description": "Remaining Inventory"
+   },
+   "internalSales35": {
+    "type": "number",
+    "description": "Internal Sales: 35%"
+   },
+   "bookingVelocity20": {
+    "type": "number",
+    "description": "Booking Velocity: 20%"
+   },
+   "historicalEvents15": {
+    "type": "number",
+    "description": "Historical Events: 15%"
+   },
+   "nearbyExhibition10": {
+    "type": "number",
+    "description": "Nearby Exhibition: 10%"
+   },
+   "weather8": {
+    "type": "number",
+    "description": "Weather: 8%"
+   },
+   "marketTourism7": {
+    "type": "number",
+    "description": "Market/Tourism: 7%"
+   },
+   "competitor5": {
+    "type": "number",
+    "description": "Competitor: 5%"
+   },
+   "mape": {
+    "type": "string",
+    "description": "MAPE"
+   },
+   "forecastBias": {
+    "type": "integer",
+    "description": "Forecast Bias"
+   },
+   "overForecast": {
+    "type": "string",
+    "description": "Over-Forecast"
+   },
+   "underForecast": {
+    "type": "string",
+    "description": "Under-Forecast"
+   }
+  }
+ },
+ "AiPricingIntelligenceCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What AI Pricing Intelligence Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "activeAiRecommendations": {
+    "type": "integer",
+    "description": "Active AI Recommendations"
+   },
+   "highPriorityOpportunities": {
+    "type": "integer",
+    "description": "High-Priority Opportunities"
+   },
+   "estimatedRevenueOpportunity": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Estimated Revenue Opportunity"
+   },
+   "demandSurgesDetected": {
+    "type": "string",
+    "description": "Demand Surges Detected"
+   },
+   "demandRisksDetected": {
+    "type": "string",
+    "description": "Demand Risks Detected"
+   },
+   "externalSignalsActive": {
+    "type": "integer",
+    "description": "External Signals Active"
+   },
+   "nearbyEventsDetected": {
+    "type": "string",
+    "description": "Nearby Events Detected"
+   },
+   "weatherImpacts": {
+    "type": "integer",
+    "description": "Weather Impacts"
+   },
+   "competitorMovements": {
+    "type": "integer",
+    "description": "Competitor Movements"
+   },
+   "forecastAccuracy": {
+    "type": "string",
+    "description": "Forecast Accuracy"
+   },
+   "averageAiConfidence": {
+    "type": "number",
+    "description": "Average AI Confidence"
+   },
+   "dataQualityIssues": {
+    "type": "integer",
+    "description": "Data Quality Issues"
+   },
+   "productEvent": {
+    "type": "string",
+    "description": "Product/Event"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "currentPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Current Price"
+   },
+   "recommendedPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Recommended Price"
+   },
+   "adjustment": {
+    "type": "number",
+    "description": "Adjustment %"
+   },
+   "demandForecast": {
+    "type": "string",
+    "description": "Demand Forecast"
+   },
+   "revenueOpportunity": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue Opportunity"
+   },
+   "primaryDrivers": {
+    "type": "string",
+    "description": "Primary Drivers"
+   },
+   "confidence": {
+    "type": "string",
+    "description": "Confidence"
+   },
+   "risk": {
+    "type": "string",
+    "description": "Risk"
+   },
+   "urgency": {
+    "type": "string",
+    "description": "Urgency"
+   },
+   "currentAed250": {
+    "type": "string",
+    "description": "Current: AED 250"
+   },
+   "recommendedAed270": {
+    "type": "string",
+    "description": "Recommended: AED 270"
+   },
+   "expectedRevenueUpliftAed73400": {
+    "type": "number",
+    "description": "Expected Revenue Uplift: +AED 73,400"
+   },
+   "confidence91": {
+    "type": "number",
+    "description": "Confidence: 91%"
+   },
+   "nearbyExhibition": {
+    "type": "string",
+    "description": "↑ Nearby Exhibition"
+   },
+   "bookingVelocity": {
+    "type": "string",
+    "description": "↑ Booking Velocity"
+   },
+   "competitorPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "↑ Competitor Price"
+   },
+   "remainingCapacity": {
+    "type": "integer",
+    "description": "↓ Remaining Capacity"
+   },
+   "exhibitions": {
+    "type": "string",
+    "description": "Exhibitions"
+   },
+   "conferences": {
+    "type": "string",
+    "description": "Conferences"
+   },
+   "concerts": {
+    "type": "string",
+    "description": "Concerts"
+   },
+   "sportsEvents": {
+    "type": "string",
+    "description": "Sports Events"
+   },
+   "festivals": {
+    "type": "string",
+    "description": "Festivals"
+   },
+   "tourismEvents": {
+    "type": "string",
+    "description": "Tourism Events"
+   },
+   "weatherConditions": {
+    "type": "string",
+    "description": "Weather Conditions"
+   }
+  }
+ },
+ "AiPricingRecommendationExplainabilityCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What AI Pricing Recommendation & Explainability Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "expectedRevenueImpact": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Expected Revenue Impact (the pack shows +AED 73,400)"
+   },
+   "expectedOccupancy": {
+    "type": "integer",
+    "description": "Expected Occupancy (the pack shows 96%)"
+   },
+   "confidence": {
+    "type": "string",
+    "description": "Confidence (the pack shows 91%)"
+   },
+   "bookingVelocity": {
+    "type": "string",
+    "description": "+ Booking Velocity"
+   },
+   "nearbyExhibition": {
+    "type": "string",
+    "description": "+ Nearby Exhibition"
+   },
+   "weather": {
+    "type": "string",
+    "description": "+ Weather"
+   },
+   "occupancy": {
+    "type": "integer",
+    "description": "+ Occupancy"
+   },
+   "competitorPricing": {
+    "type": "string",
+    "description": "+ Competitor Pricing"
+   },
+   "priceElasticity": {
+    "type": "number",
+    "description": "− Price Elasticity"
+   },
+   "overall": {
+    "type": "string",
+    "description": "Overall (the pack shows 91%)"
+   },
+   "accept": {
+    "type": "string",
+    "description": "Accept"
+   },
+   "modify": {
+    "type": "string",
+    "description": "Modify"
+   },
+   "ignore": {
+    "type": "string",
+    "description": "Ignore"
+   },
+   "executionBelongsDownstream": {
+    "type": "string",
+    "description": "Execution belongs downstream"
+   }
+  }
+ },
+ "AiSignalRegistryDataQualityModelGovernanceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What AI Signal Registry, Data Quality & Model Governance displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "signal": {
+    "type": "string",
+    "description": "Signal"
+   },
+   "category": {
+    "type": "string",
+    "description": "Category"
+   },
+   "provider": {
+    "type": "string",
+    "description": "Provider"
+   },
+   "source": {
+    "type": "string",
+    "description": "Source"
+   },
+   "internalExternal": {
+    "type": "string",
+    "description": "Internal/External"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "refreshFrequency": {
+    "type": "string",
+    "description": "Refresh Frequency"
+   },
+   "lastUpdate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last Update"
+   },
+   "freshness": {
+    "type": "string",
+    "description": "Freshness"
+   },
+   "reliability": {
+    "type": "string",
+    "description": "Reliability"
+   },
+   "historicalCorrelation": {
+    "type": "string",
+    "description": "Historical Correlation"
+   },
+   "status": {
+    "type": "integer",
+    "description": "Status"
+   },
+   "ssTy": {
+    "type": "string",
+    "description": "ss ty"
+   },
+   "weather10Min97": {
+    "type": "number",
+    "description": "Weather 10 min 97%"
+   },
+   "nearbyEvents1Hr91": {
+    "type": "number",
+    "description": "Nearby Events 1 hr 91%"
+   },
+   "competitorA8Hr83": {
+    "type": "number",
+    "description": "Competitor A 8 hr 83%"
+   },
+   "daily88": {
+    "type": "number",
+    "description": "Daily 88%"
+   },
+   "missingData": {
+    "type": "string",
+    "description": "Missing Data"
+   },
+   "delayedData": {
+    "type": "string",
+    "description": "Delayed Data"
+   },
+   "outliers": {
+    "type": "integer",
+    "description": "Outliers"
+   },
+   "invalidValues": {
+    "type": "integer",
+    "description": "Invalid Values"
+   },
+   "unexpectedChanges": {
+    "type": "integer",
+    "description": "Unexpected Changes"
+   },
+   "sourceFailure": {
+    "type": "string",
+    "description": "Source Failure"
+   },
+   "approved": {
+    "type": "integer",
+    "description": "Approved"
+   },
+   "experimental": {
+    "type": "string",
+    "description": "Experimental"
+   },
+   "advisoryOnly": {
+    "type": "string",
+    "description": "Advisory Only"
+   },
+   "blocked": {
+    "type": "string",
+    "description": "Blocked"
+   },
+   "modelName": {
+    "type": "string",
+    "description": "Model Name"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version"
+   },
+   "purpose": {
+    "type": "string",
+    "description": "Purpose"
+   },
+   "deploymentDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Deployment Date"
+   },
+   "trainingWindow": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Training Window"
+   },
+   "validationResult": {
+    "type": "string",
+    "description": "Validation Result"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "forecastAccuracy": {
+    "type": "string",
+    "description": "Forecast Accuracy"
+   },
+   "bias": {
+    "type": "integer",
+    "description": "Bias"
+   },
+   "recommendationAccuracy": {
+    "type": "string",
+    "description": "Recommendation Accuracy"
+   },
+   "revenuePerformance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue Performance"
+   },
+   "drift": {
+    "type": "string",
+    "description": "Drift"
+   },
+   "confidenceExplanation": {
+    "type": "string",
+    "description": "Confidence → Explanation"
+   }
+  }
+ },
+ "CompetitorPricingMarketPositionIntelligenceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Competitor Pricing & Market Position Intelligence displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "competitor": {
+    "type": "string",
+    "description": "Competitor"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "venueProduct": {
+    "type": "string",
+    "description": "Venue/Product"
+   },
+   "comparableTicvaiProduct": {
+    "type": "string",
+    "description": "Comparable TICVAI Product"
+   },
+   "source": {
+    "type": "string",
+    "description": "Source"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "collectionMethod": {
+    "type": "string",
+    "description": "Collection Method"
+   },
+   "refreshFrequency": {
+    "type": "string",
+    "description": "Refresh Frequency"
+   },
+   "reliability": {
+    "type": "string",
+    "description": "Reliability"
+   },
+   "publishedPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Published Price"
+   },
+   "promotionalPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Promotional Price"
+   },
+   "weekendPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Weekend Price"
+   },
+   "peakPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Peak Price"
+   },
+   "residentPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Resident Price"
+   },
+   "memberPriceWherePubliclyAvailable": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Member Price where publicly available"
+   },
+   "availability": {
+    "type": "string",
+    "description": "Availability"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "timeslot": {
+    "type": "string",
+    "description": "Timeslot"
+   },
+   "against": {
+    "type": "string",
+    "description": "against"
+   },
+   "vipPremiumPackage": {
+    "type": "string",
+    "description": "VIP Premium Package"
+   },
+   "demand": {
+    "type": "string",
+    "description": "Demand"
+   },
+   "conversion": {
+    "type": "number",
+    "description": "Conversion"
+   },
+   "priceSensitivity": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price Sensitivity"
+   }
+  }
+ },
+ "InternalDemandBookingSignalHubView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Internal Demand & Booking Signal Hub displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "ticketsSold": {
+    "type": "string",
+    "description": "Tickets Sold"
+   },
+   "orders": {
+    "type": "string",
+    "description": "Orders"
+   },
+   "revenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue"
+   },
+   "averageSellingPrice": {
+    "type": "number",
+    "description": "Average Selling Price"
+   },
+   "conversionRate": {
+    "type": "number",
+    "description": "Conversion Rate"
+   },
+   "cartAbandonment": {
+    "type": "string",
+    "description": "Cart Abandonment"
+   },
+   "searchToPurchaseConversion": {
+    "type": "number",
+    "description": "Search-to-Purchase Conversion"
+   },
+   "capacity": {
+    "type": "integer",
+    "description": "Capacity"
+   },
+   "remainingInventory": {
+    "type": "string",
+    "description": "Remaining Inventory"
+   },
+   "availability": {
+    "type": "string",
+    "description": "Availability"
+   },
+   "occupancy": {
+    "type": "integer",
+    "description": "Occupancy"
+   },
+   "seatZoneAvailability": {
+    "type": "string",
+    "description": "Seat/Zone Availability"
+   },
+   "salesPerHour": {
+    "type": "string",
+    "description": "Sales per Hour"
+   },
+   "salesPerDay": {
+    "type": "string",
+    "description": "Sales per Day"
+   },
+   "bookingVelocity": {
+    "type": "string",
+    "description": "Booking Velocity"
+   },
+   "revenueVelocity": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue Velocity"
+   },
+   "accelerationDeceleration": {
+    "type": "string",
+    "description": "Acceleration/Deceleration"
+   },
+   "segment": {
+    "type": "string",
+    "description": "Segment"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "geography": {
+    "type": "string",
+    "description": "Geography"
+   },
+   "repeatPurchase": {
+    "type": "string",
+    "description": "Repeat Purchase"
+   },
+   "leadTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Lead Time"
+   },
+   "cancellation": {
+    "type": "string",
+    "description": "Cancellation"
+   },
+   "noShow": {
+    "type": "string",
+    "description": "No-Show"
+   },
+   "reschedule": {
+    "type": "string",
+    "description": "Reschedule"
+   },
+   "yesterday": {
+    "type": "string",
+    "description": "Yesterday"
+   },
+   "previousWeek": {
+    "type": "string",
+    "description": "Previous Week"
+   },
+   "sameDayLastYear": {
+    "type": "string",
+    "description": "Same Day Last Year"
+   },
+   "previousEvent": {
+    "type": "string",
+    "description": "Previous Event"
+   },
+   "similarEvent": {
+    "type": "string",
+    "description": "Similar Event"
+   },
+   "forecastBaseline": {
+    "type": "string",
+    "description": "Forecast Baseline"
+   },
+   "conversion": {
+    "type": "number",
+    "description": "Conversion (the pack shows +7.2%)"
+   },
+   "channelTimeslot": {
+    "type": "string",
+    "description": "Channel → Timeslot"
+   }
+  }
+ },
+ "MarketTourismHolidayContextualSignalHubView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Market, Tourism, Holiday & Contextual Signal Hub displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "publicHolidays": {
+    "type": "string",
+    "description": "Public Holidays"
+   },
+   "schoolHolidays": {
+    "type": "string",
+    "description": "School Holidays"
+   },
+   "ramadan": {
+    "type": "string",
+    "description": "Ramadan"
+   },
+   "eid": {
+    "type": "string",
+    "description": "Eid"
+   },
+   "christmas": {
+    "type": "string",
+    "description": "Christmas"
+   },
+   "newYear": {
+    "type": "integer",
+    "description": "New Year"
+   },
+   "longWeekends": {
+    "type": "string",
+    "description": "Long Weekends"
+   },
+   "visitorArrivals": {
+    "type": "string",
+    "description": "Visitor Arrivals"
+   },
+   "tourismDemand": {
+    "type": "string",
+    "description": "Tourism Demand"
+   },
+   "hotelOccupancy": {
+    "type": "integer",
+    "description": "Hotel Occupancy"
+   },
+   "hotelRates": {
+    "type": "string",
+    "description": "Hotel Rates"
+   },
+   "destinationDemand": {
+    "type": "string",
+    "description": "Destination Demand"
+   },
+   "flightArrivals": {
+    "type": "string",
+    "description": "Flight Arrivals"
+   },
+   "airportPassengerVolume": {
+    "type": "integer",
+    "description": "Airport Passenger Volume"
+   },
+   "publicTransportDemand": {
+    "type": "string",
+    "description": "Public Transport Demand"
+   },
+   "trafficConditions": {
+    "type": "string",
+    "description": "Traffic Conditions"
+   },
+   "consumerDemandTrends": {
+    "type": "string",
+    "description": "Consumer Demand Trends"
+   },
+   "destinationPopularity": {
+    "type": "string",
+    "description": "Destination Popularity"
+   },
+   "marketActivity": {
+    "type": "string",
+    "description": "Market Activity"
+   },
+   "source": {
+    "type": "string",
+    "description": "Source"
+   },
+   "geography": {
+    "type": "string",
+    "description": "Geography"
+   },
+   "refreshFrequency": {
+    "type": "string",
+    "description": "Refresh Frequency"
+   },
+   "weight": {
+    "type": "string",
+    "description": "Weight"
+   },
+   "reliability": {
+    "type": "string",
+    "description": "Reliability"
+   },
+   "historicalCorrelation": {
+    "type": "string",
+    "description": "Historical Correlation"
+   },
+   "activeInactive": {
+    "type": "integer",
+    "description": "Active/Inactive"
+   },
+   "dubaiHotelOccupancy": {
+    "type": "integer",
+    "description": "Dubai Hotel Occupancy (the pack shows 92%)"
+   },
+   "venueDemand8": {
+    "type": "number",
+    "description": "Venue demand +8%"
+   },
+   "currentEstimatedImpact": {
+    "type": "string",
+    "description": "Current Estimated Impact (the pack shows +6%)"
+   }
+  }
+ },
+ "NearbyEventExhibitionLocalDemandIntelligenceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Nearby Event, Exhibition & Local Demand Intelligence displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "exhibition": {
+    "type": "string",
+    "description": "Exhibition"
+   },
+   "conference": {
+    "type": "string",
+    "description": "Conference"
+   },
+   "concert": {
+    "type": "string",
+    "description": "Concert"
+   },
+   "sportsEvent": {
+    "type": "string",
+    "description": "Sports Event"
+   },
+   "festival": {
+    "type": "string",
+    "description": "Festival"
+   },
+   "tradeShow": {
+    "type": "string",
+    "description": "Trade Show"
+   },
+   "convention": {
+    "type": "string",
+    "description": "Convention"
+   },
+   "publicCelebration": {
+    "type": "string",
+    "description": "Public Celebration"
+   },
+   "majorAttractionEvent": {
+    "type": "string",
+    "description": "Major Attraction Event"
+   },
+   "schoolEvent": {
+    "type": "string",
+    "description": "School Event"
+   },
+   "customLocalEvent": {
+    "type": "string",
+    "description": "Custom Local Event"
+   },
+   "eventName": {
+    "type": "string",
+    "description": "Event Name"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "location": {
+    "type": "string",
+    "description": "Location"
+   },
+   "distanceFromTicvaiVenue": {
+    "type": "string",
+    "description": "Distance from TICVAI Venue"
+   },
+   "startEndDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Start/End Date"
+   },
+   "startEndTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Start/End Time"
+   },
+   "expectedAttendance": {
+    "type": "integer",
+    "description": "Expected Attendance"
+   },
+   "eventType": {
+    "type": "string",
+    "description": "Event Type"
+   },
+   "audienceType": {
+    "type": "string",
+    "description": "Audience Type"
+   },
+   "source": {
+    "type": "string",
+    "description": "Source"
+   },
+   "confidence": {
+    "type": "string",
+    "description": "Confidence"
+   },
+   "distance12Km": {
+    "type": "string",
+    "description": "Distance: 1.2 km"
+   },
+   "attendance60000": {
+    "type": "integer",
+    "description": "Attendance: 60,000"
+   },
+   "duration4Days": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Duration: 4 days"
+   },
+   "predictedImpact": {
+    "type": "string",
+    "description": "Predicted Impact (the pack shows +14–21%)"
+   },
+   "beforeEvent": {
+    "type": "string",
+    "description": "Before Event"
+   },
+   "duringEvent": {
+    "type": "string",
+    "description": "During Event"
+   },
+   "lunchPeriod": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Lunch Period"
+   },
+   "afterEvent": {
+    "type": "string",
+    "description": "After Event"
+   },
+   "evening": {
+    "type": "string",
+    "description": "Evening"
+   },
+   "followingDay": {
+    "type": "string",
+    "description": "Following Day"
+   },
+   "ticvaiEvents": {
+    "type": "string",
+    "description": "TICVAI Events"
+   },
+   "demandForecast": {
+    "type": "string",
+    "description": "Demand Forecast"
+   },
+   "occupancy": {
+    "type": "integer",
+    "description": "Occupancy"
+   },
+   "currentPricing": {
+    "type": "string",
+    "description": "Current Pricing"
+   }
+  }
+ },
+ "PriceElasticityRevenueResponseIntelligenceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Price Elasticity & Revenue Response Intelligence displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "price": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price"
+   },
+   "demand": {
+    "type": "string",
+    "description": "Demand"
+   },
+   "conversion": {
+    "type": "number",
+    "description": "Conversion"
+   },
+   "revenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue"
+   },
+   "margin": {
+    "type": "number",
+    "description": "Margin"
+   },
+   "occupancy": {
+    "type": "integer",
+    "description": "Occupancy"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer Segment"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "time": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "elasticityConfidenceLow": {
+    "type": "number",
+    "description": "Elasticity Confidence: Low"
+   }
+  }
+ },
+ "WeatherIntelligenceDemandImpactConfigurationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Weather Intelligence & Demand Impact Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "temperature": {
+    "type": "string",
+    "description": "Temperature"
+   },
+   "feelsLikeTemperature": {
+    "type": "string",
+    "description": "Feels-Like Temperature"
+   },
+   "rain": {
+    "type": "string",
+    "description": "Rain"
+   },
+   "rainProbability": {
+    "type": "string",
+    "description": "Rain Probability"
+   },
+   "humidity": {
+    "type": "string",
+    "description": "Humidity"
+   },
+   "wind": {
+    "type": "string",
+    "description": "Wind"
+   },
+   "visibility": {
+    "type": "string",
+    "description": "Visibility"
+   },
+   "storm": {
+    "type": "string",
+    "description": "Storm"
+   },
+   "extremeHeat": {
+    "type": "string",
+    "description": "Extreme Heat"
+   },
+   "airQualityWhereAvailable": {
+    "type": "string",
+    "description": "Air Quality where available"
+   },
+   "currentConditions": {
+    "type": "string",
+    "description": "Current Conditions"
+   },
+   "hourlyForecast": {
+    "type": "string",
+    "description": "Hourly Forecast"
+   },
+   "dailyForecast": {
+    "type": "string",
+    "description": "Daily Forecast"
+   },
+   "today": {
+    "type": "string",
+    "description": "Today"
+   },
+   "configurableFutureWindow": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Configurable Future Window"
+   },
+   "andWeatherSensitivity": {
+    "type": "string",
+    "description": "and weather sensitivity"
+   },
+   "extremeHeatNegative": {
+    "type": "string",
+    "description": "Extreme Heat → Negative"
+   },
+   "extremeHeatPotentialPositive": {
+    "type": "string",
+    "description": "Extreme Heat → Potential Positive"
+   },
+   "highTemperaturePositive": {
+    "type": "string",
+    "description": "High Temperature → Positive"
+   },
+   "heavyRainStrongNegative": {
+    "type": "string",
+    "description": "Heavy Rain → Strong Negative"
+   },
+   "demandImpact8": {
+    "type": "number",
+    "description": "Demand Impact +8%"
+   },
+   "demandImpact17": {
+    "type": "number",
+    "description": "Demand Impact −17%"
+   },
+   "weatherForecastConfidence93": {
+    "type": "number",
+    "description": "Weather Forecast Confidence: 93%"
+   },
+   "estimatedDemandImpact812": {
+    "type": "number",
+    "description": "Estimated Demand Impact: +8–12%"
+   }
+  }
+ }
+}

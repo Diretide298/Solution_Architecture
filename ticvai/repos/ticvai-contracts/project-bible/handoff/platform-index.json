@@ -73,17 +73,17 @@
   "app": "venue-staff-app",
   "operator": "venue",
   "counts": {
-   "screens": 66,
+   "screens": 96,
    "operations": 184,
    "contracts": 17,
-   "modules": 3,
+   "modules": 4,
    "undrawn": 0,
    "operationsWithNoScreen": 125
   },
   "waves": {
    "wave1": 25,
    "wave2": 40,
-   "wave3": 1
+   "wave3": 31
   }
  },
  "P07": {
@@ -107,17 +107,17 @@
   "app": "venue-management-web",
   "operator": "venue",
   "counts": {
-   "screens": 393,
+   "screens": 614,
    "operations": 666,
    "contracts": 27,
-   "modules": 8,
+   "modules": 11,
    "undrawn": 0,
    "operationsWithNoScreen": 229
   },
   "waves": {
    "wave1": 60,
    "wave2": 79,
-   "wave3": 254
+   "wave3": 475
   }
  },
  "P09": {
@@ -125,7 +125,7 @@
   "app": "ticvai-web",
   "operator": "ticvai",
   "counts": {
-   "screens": 367,
+   "screens": 446,
    "operations": 404,
    "contracts": 15,
    "modules": 13,
@@ -135,7 +135,7 @@
   "waves": {
    "wave1": 12,
    "wave2": 16,
-   "wave3": 339
+   "wave3": 418
   }
  },
  "P10": {
@@ -193,16 +193,16 @@
   "app": "venue-management-web",
   "operator": "venue",
   "counts": {
-   "screens": 60,
+   "screens": 100,
    "operations": 122,
    "contracts": 8,
-   "modules": 2,
+   "modules": 3,
    "undrawn": 0,
    "operationsWithNoScreen": 110
   },
   "waves": {
    "wave2": 20,
-   "wave3": 40
+   "wave3": 80
   }
  },
  "P14": {
@@ -252,6 +252,22 @@
   },
   "waves": {
    "wave3": 69
+  }
+ },
+ "P17": {
+  "shortName": "TICVAI Sign-up",
+  "app": "signup-web",
+  "operator": "public",
+  "counts": {
+   "screens": 24,
+   "operations": 0,
+   "contracts": 0,
+   "modules": 3,
+   "undrawn": 0,
+   "operationsWithNoScreen": 0
+  },
+  "waves": {
+   "wave3": 24
   }
  }
 }

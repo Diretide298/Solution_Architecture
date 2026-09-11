@@ -1,0 +1,576 @@
+{
+ "CreatePrincipalRequest": {
+  "type": "object",
+  "required": [
+   "username",
+   "displayName"
+  ],
+  "properties": {
+   "username": {
+    "type": "string",
+    "maxLength": 256
+   },
+   "displayName": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "initialCredential": {
+    "type": "string",
+    "maxLength": 512
+   },
+   "mustChangeCredential": {
+    "type": "boolean",
+    "default": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "roleIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   }
+  }
+ },
+ "GuestSession": {
+  "x-ticvai-persistence": "none — Redis session registry",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "tokens",
+   "isVerified",
+   "expiresAt"
+  ],
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "displayName": {
+    "type": "string",
+    "nullable": true
+   },
+   "tokens": {
+    "$ref": "#/components/schemas/TokenPair"
+   },
+   "isVerified": {
+    "type": "boolean",
+    "description": "False until an OTP or a verified provider identity confirms ownership. An unverified account may browse but not transact.\n"
+   },
+   "identityProviders": {
+    "type": "array",
+    "description": "Linked providers. Several may resolve to one account.",
+    "items": {
+     "type": "string",
+     "enum": [
+      "password",
+      "otp",
+      "apple",
+      "google",
+      "uaePass"
+     ]
+    }
+   },
+   "guestLinkId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Present where the guest is linked across cells (ADR-0010)."
+   },
+   "homeCellName": {
+    "type": "string",
+    "nullable": true
+   },
+   "preferredLanguage": {
+    "type": "string",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Longer lived than a staff session. No single-session rule — a guest may be signed in on a phone and a laptop at once.\n"
+   }
+  }
+ },
+ "LoginRequest": {
+  "type": "object",
+  "required": [
+   "username",
+   "credential",
+   "workstationId"
+  ],
+  "properties": {
+   "username": {
+    "type": "string",
+    "maxLength": 256
+   },
+   "credential": {
+    "type": "string",
+    "description": "Password, PIN, card token or RFID token depending on `method`.\n",
+    "maxLength": 512
+   },
+   "method": {
+    "type": "string",
+    "description": "**`pin` is how a till is actually used.** A cashier signs in at a shared terminal between guests, and a password on a touchscreen with somebody waiting is a password that gets shortened, shared or written on the drawer. The employee number goes in `username` and the PIN in `credential`, so the shape of the request does not change — only what the operator types.\n\n**A PIN is weaker than a password and the difference is bounded by the device, not by the secret.** `workstationId` is required on every login and is *NOT a permission source*: it says which till, and the till is on a venue network in a staff area. A PIN is a reasonable credential there and nowhere else, which is why this is an enum value and not a policy flag — a surface that wants it has to ask for it by name.\n\nAdded 10 September 2026 for `POS-000 Sign In`.\n",
+    "enum": [
+     "password",
+     "pin",
+     "card",
+     "rfid",
+     "sso"
+    ],
+    "default": "password"
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Identifies the device. Determines Sale Board, connected hardware, till identity and Access Point inheritance. NOT a permission source.\n"
+   },
+   "deviceFingerprint": {
+    "type": "string",
+    "maxLength": 256
+   }
+  }
+ },
+ "LoginResponse": {
+  "x-ticvai-persistence": "none — computed",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/TokenPair"
+   },
+   {
+    "type": "object",
+    "required": [
+     "requiresRoleSelection"
+    ],
+    "properties": {
+     "requiresRoleSelection": {
+      "type": "boolean"
+     },
+     "availableRoles": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/RoleSummary"
+      }
+     },
+     "session": {
+      "$ref": "#/components/schemas/Session"
+     }
+    }
+   }
+  ]
+ },
+ "MfaKind": {
+  "type": "string",
+  "enum": [
+   "totp",
+   "smsOtp",
+   "emailOtp",
+   "biometric",
+   "hardwareToken"
+  ]
+ },
+ "MfaMethod": {
+  "x-ticvai-persistence": "identity.mfa_method",
+  "type": "object",
+  "required": [
+   "id",
+   "kind",
+   "isActive",
+   "enrolledAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/MfaKind"
+   },
+   "label": {
+    "type": "string",
+    "nullable": true
+   },
+   "maskedTarget": {
+    "type": "string",
+    "nullable": true,
+    "description": "Partially masked destination, so a person can tell two methods apart."
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "isPrimary": {
+    "type": "boolean"
+   },
+   "enrolledAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "lastUsedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Principal": {
+  "x-ticvai-persistence": "identity.principal",
+  "type": "object",
+  "required": [
+   "id",
+   "username",
+   "displayName",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "username": {
+    "type": "string"
+   },
+   "displayName": {
+    "type": "string"
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Past this, resolution returns DENY regardless of grants."
+   },
+   "primaryRoleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Determines the landing screen when the principal holds several roles and picks one at login.\n"
+   },
+   "roles": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/RoleSummary"
+    }
+   },
+   "lastLoginAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "Role": {
+  "x-ticvai-persistence": "identity.role",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string"
+   },
+   "permissions": {
+    "type": "array",
+    "description": "**A role that grants no permissions is not a role.** `Role` carried a code, a name and two counts until 18 August, and `identity.role_permission` derived from it with exactly one column — `role_id`. **A join table that joins to nothing**, found by Hrushikant in review and missed by the schema audit that ran the same day.\n**The audit asked whether every table had columns, a relationship and an owner, and this table had all three.** What it did not ask is whether a table with one column can do the job its name claims.\n",
+    "items": {
+     "$ref": "../shared/permissions.yaml#/components/schemas/Permission"
+    }
+   },
+   "inheritsFromRoleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Role composition, one level deep and no deeper.** A supervisor role that is a cashier plus three permissions is how venues actually describe them.\n**Cycles are refused and depth is capped at one**, because a permission set nobody can read off the screen is a permission set nobody audits.\n"
+   },
+   "isSystem": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Seeded roles ship and are editable; deleting one is refused.** A venue that removes `cashier` and rebuilds it has two roles with one name in the audit log.\n"
+   },
+   "principalCount": {
+    "type": "integer"
+   },
+   "grantCount": {
+    "type": "integer"
+   }
+  }
+ },
+ "RoleSummary": {
+  "x-ticvai-persistence": "none — projection over role",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "isPrimary": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Session": {
+  "type": "object",
+  "required": [
+   "sessionId",
+   "principalId",
+   "roleId",
+   "scope",
+   "effectivePermissions",
+   "saleBoardId"
+  ],
+  "properties": {
+   "sessionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "roleId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "displayName": {
+    "type": "string"
+   },
+   "scope": {
+    "type": "array",
+    "description": "Scope nodes this session may act within, resolved once at login from the ltree hierarchy with deny-overrides-allow. Clients filter navigation against this — they never compute it.\n",
+    "items": {
+     "$ref": "../shared/common.yaml#/components/schemas/ScopeRef"
+    }
+   },
+   "effectivePermissions": {
+    "allOf": [
+     {
+      "$ref": "../shared/permissions.yaml#/components/schemas/PermissionSet"
+     }
+    ],
+    "description": "Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks. Anything scope-sensitive must use `permissionsByScope`.\n"
+   },
+   "permissionsByScope": {
+    "type": "array",
+    "description": "Permissions effective at each granted scope path. Clients filter navigation on this and never compute permissions themselves.\n",
+    "items": {
+     "$ref": "../shared/permissions.yaml#/components/schemas/ScopedPermissions"
+    }
+   },
+   "saleBoardId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). Ticketing, F&B or Retail board.\n"
+   },
+   "workstation": {
+    "$ref": "#/components/schemas/WorkstationContext"
+   },
+   "openedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "SsoProtocol": {
+  "type": "string",
+  "enum": [
+   "oidc",
+   "saml2"
+  ]
+ },
+ "SsoProvider": {
+  "x-ticvai-persistence": "identity.sso_provider",
+  "type": "object",
+  "required": [
+   "id",
+   "displayName",
+   "protocol"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "displayName": {
+    "type": "string"
+   },
+   "protocol": {
+    "$ref": "#/components/schemas/SsoProtocol"
+   },
+   "iconAssetRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "isEnforced": {
+    "type": "boolean",
+    "description": "True disables password login for principals covered by this provider."
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"
+   }
+  }
+ },
+ "TokenPair": {
+  "x-ticvai-persistence": "none — transient",
+  "type": "object",
+  "required": [
+   "accessToken",
+   "refreshToken",
+   "expiresIn"
+  ],
+  "properties": {
+   "accessToken": {
+    "type": "string",
+    "description": "JWT carrying `sid`, validated per request against the session registry."
+   },
+   "refreshToken": {
+    "type": "string"
+   },
+   "expiresIn": {
+    "type": "integer",
+    "description": "Seconds"
+   }
+  }
+ },
+ "WorkstationContext": {
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "venueId",
+   "regionId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "regionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "accessPointId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Inherited from the workstation, never selected by the operator."
+   },
+   "devices": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "driver"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "receiptPrinter",
+        "ticketPrinter",
+        "cashDrawer",
+        "barcodeScanner",
+        "rfidReader",
+        "paymentTerminal",
+        "customerDisplay"
+       ]
+      },
+      "driver": {
+       "type": "string"
+      },
+      "identifier": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4
+   },
+   "timezone": {
+    "type": "string"
+   },
+   "cellName": {
+    "type": "string",
+    "description": "The cell serving this workstation's region. One cell per tenant per region (ADR-0014). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves.\n"
+   },
+   "deploymentProfile": {
+    "type": "string",
+    "enum": [
+     "terminalLocal",
+     "venueEdge",
+     "thin"
+    ],
+    "description": "Whether this surface reads catalogue locally (ADR-0013). Determines which flows the client enables offline.\n"
+   }
+  }
+ }
+}

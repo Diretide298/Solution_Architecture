@@ -13,7 +13,7 @@
 | **Tables** | 51 |
 | **Screens** | 34 |
 | **Flows** | 11 |
-| **Documents** | 22 |
+| **Documents** | 23 |
 | **Open conflicts** | 1 |
 
 ## Reached outside the contract
@@ -236,6 +236,7 @@
 | [Screen estate audit — duplication, connectivity, and stranded capability](..\docs\active\screen-estate-audit.md) |  | 3 |
 | [Regenerating the screen layer — plan](..\docs\active\screen-regeneration-plan.md) |  | 1 |
 | [Viewer — what changed in the package on 20 August](..\docs\active\viewer-update-brief-20aug.md) |  | 1 |
+| [Workshop pack — what the new screens need from the contracts](..\docs\active\workshop-contract-gap.md) |  | 1 |
 | [Workshop pack — what was done, and how to re-verify it](..\docs\active\workshop-pack-log.md) |  | 3 |
 | [ADR-0007: Hybrid repository topology](..\docs\adr\0007-hybrid-repository-topology.md) | Accepted | 1 |
 | [ADR-0020 — Where AI runs, and what it is isolated from](..\docs\adr\0020-ai-isolation-boundary.md) | Proposed · 17 August 2026 | 14 |

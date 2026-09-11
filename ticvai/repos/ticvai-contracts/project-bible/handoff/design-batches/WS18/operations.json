@@ -1,0 +1,47 @@
+{
+ "listMfaMethods": {
+  "method": "GET",
+  "path": "/auth/mfa/methods",
+  "contract": "identity",
+  "summary": "Enrolled MFA methods",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MfaMethod"
+ },
+ "listStepUpPolicies": {
+  "method": "GET",
+  "path": "/step-up-policies",
+  "contract": "approvals",
+  "summary": "What needs a second factor here",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "effective",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "StepUpPolicy"
+ },
+ "setStepUpPolicy": {
+  "method": "PUT",
+  "path": "/step-up-policies",
+  "contract": "approvals",
+  "summary": "Raise what needs a second factor",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": "StepUpPolicy",
+  "responds": "StepUpPolicy"
+ }
+}

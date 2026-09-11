@@ -1,0 +1,133 @@
+id: F207
+name: 'Subscription Licensing AI Self Service board 1: Commercial Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Subscription Licensing AI Self Service board 1. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-369
+  entryPoints:
+  - Arrives at Commercial Command Center
+steps:
+- step: 1
+  screen: ADM-369
+  action: Opens Commercial Command Center
+  operations: []
+  outcome: Provide TICVAI management with a real-time executive overview of the entire subscription and
+    commercial business.
+- step: 2
+  screen: ADM-370
+  action: Works in Customer Subscription & Commercial Portfolio
+  operations: []
+  outcome: Provide a central portfolio of every TICVAI customer and their current commercial position.
+- step: 3
+  screen: ADM-369
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-371
+  action: Works in Customer Commercial 360°
+  operations: []
+  outcome: Provide the complete commercial, operational and subscription profile for one customer. This
+    screen must clearly separate commercial charging from technical/operational classification.
+- step: 5
+  screen: ADM-369
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-372
+  action: Works in Operational Profile, VSI & Commercial Model Intelligence
+  operations: []
+  outcome: Analyze whether customers' operational profiles and commercial structures remain appropriate.
+    This replaces the previous focus only on Tier Distribution & VSI.
+- step: 7
+  screen: ADM-369
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-373
+  action: Works in Revenue & Commercial Model Analytics
+  operations: []
+  outcome: Analyze TICVAI revenue across all commercial structures.
+- step: 9
+  screen: ADM-369
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-374
+  action: Works in Trial & Conversion Monitor
+  operations: []
+  outcome: Monitor trial customers and their expected transition into paid commercial agreements.
+- step: 11
+  screen: ADM-369
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-375
+  action: Works in Renewal & Retention Center
+  operations: []
+  outcome: Manage upcoming renewals and identify retention or commercial restructuring requirements.
+- step: 13
+  screen: ADM-369
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-376
+  action: Works in Commercial Optimization & Expansion Opportunities
+  operations: []
+  outcome: Identify opportunities beyond traditional tier upgrades. This is a key revision from the original
+    Upgrade, Downgrade & Expansion Opportunities screen.
+- step: 15
+  screen: ADM-369
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-377
+  action: Works in Subscription Exceptions & Commercial Alerts
+  operations: []
+  outcome: Provide management with one consolidated view of subscription, licensing, commercial, billing
+    and metering exceptions.
+- step: 17
+  screen: ADM-369
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-378
+  action: Works in Executive AI Commercial Intelligence
+  operations: []
+  outcome: Provide TICVAI leadership with an AI-powered executive commercial intelligence layer.
+branches:
+- at: 1
+  condition: Nothing has been set up on Commercial Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Subscription Licensing AI Self Service board 1 visited
+primaryContract: unknown
+contracts:
+- unknown

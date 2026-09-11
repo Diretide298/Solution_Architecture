@@ -1,0 +1,851 @@
+{
+ "BestOfferCustomerBenefitResolverView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Best Offer & Customer Benefit Resolver displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "useTheHighestRankedPromotion": {
+    "type": "string",
+    "description": "Use the highest-ranked promotion"
+   },
+   "favorAStrategicallySelectedCampaign": {
+    "type": "string",
+    "description": "Favor a strategically selected campaign"
+   },
+   "honorContractualCustomerSpecificPricingFirst": {
+    "type": "string",
+    "description": "Honor contractual/customer-specific pricing first"
+   },
+   "family15Aed": {
+    "type": "string",
+    "description": "FAMILY15 + AED"
+   },
+   "bank1011750": {
+    "type": "string",
+    "description": "BANK10 117.50"
+   },
+   "saving": {
+    "type": "string",
+    "description": "Saving (the pack shows AED 117.50)"
+   },
+   "bestAvailableOfferAppliedAutomatically": {
+    "type": "string",
+    "description": "Best available offer applied automatically"
+   }
+  }
+ },
+ "ConflictDetectionResolutionCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Conflict Detection & Resolution Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "sameProduct": {
+    "type": "string",
+    "description": "Same product"
+   },
+   "sameAudience": {
+    "type": "string",
+    "description": "Same audience"
+   },
+   "sameChannel": {
+    "type": "string",
+    "description": "Same channel"
+   },
+   "sameValidity": {
+    "type": "string",
+    "description": "Same validity"
+   },
+   "incompatiblePromotions": {
+    "type": "string",
+    "description": "Incompatible promotions"
+   },
+   "missingHierarchy": {
+    "type": "string",
+    "description": "Missing hierarchy"
+   },
+   "missingStackingRule": {
+    "type": "string",
+    "description": "Missing stacking rule"
+   },
+   "discountCapBreach": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount-cap breach"
+   },
+   "circularDependency": {
+    "type": "string",
+    "description": "Circular dependency"
+   },
+   "family20": {
+    "type": "string",
+    "description": "FAMILY20"
+   },
+   "vip15": {
+    "type": "string",
+    "description": "VIP15"
+   },
+   "summer25": {
+    "type": "string",
+    "description": "SUMMER25"
+   },
+   "bank10": {
+    "type": "string",
+    "description": "BANK10"
+   },
+   "automatic": {
+    "type": "string",
+    "description": "Automatic"
+   },
+   "ruleBased": {
+    "type": "string",
+    "description": "Rule-based"
+   },
+   "bestPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Best price"
+   },
+   "priority": {
+    "type": "string",
+    "description": "Priority"
+   },
+   "manualIntervention": {
+    "type": "string",
+    "description": "Manual intervention"
+   }
+  }
+ },
+ "ConflictSimulationAiOptimizationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Conflict Simulation & AI Optimization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer segment"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "loyalty": {
+    "type": "string",
+    "description": "Loyalty"
+   },
+   "products": {
+    "type": "string",
+    "description": "Products"
+   },
+   "basket": {
+    "type": "string",
+    "description": "Basket"
+   },
+   "coupon": {
+    "type": "string",
+    "description": "Coupon"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "paymentMethod": {
+    "type": "string",
+    "description": "Payment method"
+   },
+   "dateTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date/time"
+   },
+   "whoQualifies": {
+    "type": "string",
+    "description": "Who qualifies?"
+   },
+   "boards24PromotionMechanics": {
+    "type": "string",
+    "description": "Boards 2–4 — Promotion Mechanics"
+   },
+   "collectFinalAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Collect final amount"
+   },
+   "sameCentralizedEngine": {
+    "type": "string",
+    "description": "same centralized engine"
+   },
+   "paymentMethodOffers": {
+    "type": "string",
+    "description": "Payment-method offers"
+   },
+   "goldMember15": {
+    "type": "number",
+    "description": "Gold Member 15%"
+   },
+   "buy4Pay3": {
+    "type": "string",
+    "description": "Buy 4 Pay 3"
+   },
+   "summer20": {
+    "type": "string",
+    "description": "SUMMER20"
+   },
+   "bankAbc10": {
+    "type": "number",
+    "description": "Bank ABC 10%"
+   },
+   "gND": {
+    "type": "string",
+    "description": "g n d"
+   },
+   "member36": {
+    "type": "number",
+    "description": "Member 36% ✓"
+   },
+   "bogo29": {
+    "type": "number",
+    "description": "BOGO 29% ✓"
+   },
+   "coupon33": {
+    "type": "number",
+    "description": "Coupon 33% ✓"
+   },
+   "memberAed": {
+    "type": "string",
+    "description": "Member + AED"
+   },
+   "bogoBank24": {
+    "type": "number",
+    "description": "BOGO + Bank 24% ✓"
+   },
+   "bogoAed": {
+    "type": "string",
+    "description": "BOGO + AED"
+   },
+   "margin": {
+    "type": "number",
+    "description": "Margin (the pack shows 24%)"
+   },
+   "mutuallyExclusive": {
+    "type": "string",
+    "description": "mutually exclusive"
+   },
+   "estimatedProtectedMarginAed284kMonth": {
+    "type": "number",
+    "description": "Estimated protected margin: AED 284K/month"
+   },
+   "areCommercialLimitsRespected": {
+    "type": "string",
+    "description": "Are commercial limits respected?"
+   },
+   "calculateAuthoritativeFinalPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Calculate authoritative final price"
+   },
+   "marketingAdministrator": {
+    "type": "string",
+    "description": "Marketing Administrator"
+   },
+   "campaignManager": {
+    "type": "string",
+    "description": "Campaign Manager"
+   },
+   "commercialManager": {
+    "type": "string",
+    "description": "Commercial Manager"
+   },
+   "revenueManager": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue Manager"
+   },
+   "finance": {
+    "type": "string",
+    "description": "Finance"
+   },
+   "b2bManager": {
+    "type": "string",
+    "description": "B2B Manager"
+   },
+   "systemAdministrator": {
+    "type": "string",
+    "description": "System Administrator"
+   },
+   "approver": {
+    "type": "string",
+    "description": "Approver"
+   },
+   "auditor": {
+    "type": "string",
+    "description": "Auditor"
+   }
+  }
+ },
+ "DiscountCalculationApplicationSequenceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Discount Calculation & Application Sequence displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "aed100Aed80": {
+    "type": "string",
+    "description": "AED 100 → AED 80"
+   },
+   "then10": {
+    "type": "number",
+    "description": "Then 10%"
+   },
+   "aed80Aed72": {
+    "type": "string",
+    "description": "AED 80 → AED 72"
+   },
+   "aed100Aed70": {
+    "type": "string",
+    "description": "AED 100 → AED 70"
+   },
+   "sequential": {
+    "type": "string",
+    "description": "Sequential"
+   },
+   "additivePercentage": {
+    "type": "number",
+    "description": "Additive percentage"
+   },
+   "fixedThenPercentage": {
+    "type": "number",
+    "description": "Fixed then percentage"
+   },
+   "percentageThenFixed": {
+    "type": "number",
+    "description": "Percentage then fixed"
+   },
+   "bestPriceOnly": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Best price only"
+   },
+   "highestValueDiscountOnly": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Highest-value discount only"
+   },
+   "lowestPriceResult": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Lowest-price result"
+   },
+   "priorityOrder": {
+    "type": "string",
+    "description": "Priority order"
+   },
+   "beforeTax": {
+    "type": "string",
+    "description": "Before tax"
+   },
+   "afterTax": {
+    "type": "string",
+    "description": "After tax"
+   },
+   "beforeFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Before fee"
+   },
+   "afterFee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "After fee"
+   },
+   "productOnly": {
+    "type": "string",
+    "description": "Product only"
+   },
+   "transactionTotal": {
+    "type": "string",
+    "description": "Transaction total"
+   }
+  }
+ },
+ "DiscountCapMaximumBenefitControllerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Discount Cap & Maximum Benefit Controller displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "maximumTotalDiscount": {
+    "type": "number",
+    "description": "Maximum total discount %"
+   },
+   "maximumTotalDiscountAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Maximum total discount amount"
+   },
+   "minimumTransactionValue": {
+    "type": "string",
+    "description": "Minimum transaction value"
+   },
+   "minimumProductPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Minimum product price"
+   },
+   "minimumMargin": {
+    "type": "number",
+    "description": "Minimum margin"
+   },
+   "maximumFreeItemValue": {
+    "type": "string",
+    "description": "Maximum free-item value"
+   },
+   "maximumPromotionalBenefit": {
+    "type": "string",
+    "description": "Maximum promotional benefit"
+   },
+   "maximumPromotionsPerBasket": {
+    "type": "string",
+    "description": "Maximum promotions per basket"
+   },
+   "membership15": {
+    "type": "number",
+    "description": "Membership 15%"
+   },
+   "bank10": {
+    "type": "number",
+    "description": "Bank 10%"
+   },
+   "coupon20": {
+    "type": "number",
+    "description": "Coupon 20%"
+   },
+   "potentialCombinedBenefit": {
+    "type": "string",
+    "description": "Potential combined benefit (the pack shows 45%)"
+   },
+   "configuredMaximum": {
+    "type": "string",
+    "description": "Configured maximum (the pack shows 30%)"
+   },
+   "tenant": {
+    "type": "string",
+    "description": "Tenant"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "category": {
+    "type": "string",
+    "description": "Category"
+   },
+   "campaign": {
+    "type": "string",
+    "description": "Campaign"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner"
+   },
+   "transaction": {
+    "type": "string",
+    "description": "Transaction"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "reduceDiscount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Reduce discount"
+   },
+   "useBestPermittedCombination": {
+    "type": "string",
+    "description": "Use best permitted combination"
+   },
+   "requireApproval": {
+    "type": "boolean",
+    "description": "Require approval"
+   }
+  }
+ },
+ "PromotionDecisionTraceTransactionExplainerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Promotion Decision Trace & Transaction Explainer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "family20": {
+    "type": "string",
+    "description": "FAMILY20 ✓"
+   },
+   "summer25": {
+    "type": "string",
+    "description": "SUMMER25 ✓"
+   },
+   "bank10": {
+    "type": "string",
+    "description": "BANK10 ✓"
+   },
+   "loyalty5": {
+    "type": "string",
+    "description": "LOYALTY5 ✓"
+   },
+   "family20Eligible": {
+    "type": "string",
+    "description": "FAMILY20 eligible"
+   },
+   "family20Retained": {
+    "type": "string",
+    "description": "FAMILY20 retained"
+   },
+   "bank10StackableWithFamily20": {
+    "type": "string",
+    "description": "BANK10 stackable with FAMILY20"
+   },
+   "bestPermittedCombinationCalculated": {
+    "type": "string",
+    "description": "Best permitted combination calculated"
+   },
+   "aed160": {
+    "type": "string",
+    "description": "−AED 160"
+   },
+   "aed64": {
+    "type": "string",
+    "description": "−AED 64"
+   },
+   "totalSaving": {
+    "type": "integer",
+    "description": "Total Saving (the pack shows AED 224 / 28%)"
+   }
+  }
+ },
+ "PromotionExclusionCompatibilityMatrixView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Promotion Exclusion & Compatibility Matrix displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "nHipTyKO": {
+    "type": "string",
+    "description": "n hip ty k O"
+   },
+   "allowed": {
+    "type": "boolean",
+    "description": "Allowed"
+   },
+   "notAllowed": {
+    "type": "boolean",
+    "description": "Not Allowed"
+   },
+   "conditional": {
+    "type": "string",
+    "description": "Conditional"
+   },
+   "priorityBased": {
+    "type": "string",
+    "description": "Priority Based"
+   },
+   "notConfigured": {
+    "type": "string",
+    "description": "Not Configured"
+   },
+   "applicableProducts": {
+    "type": "integer",
+    "description": "Applicable products"
+   },
+   "applicableVenues": {
+    "type": "integer",
+    "description": "Applicable venues"
+   },
+   "channels": {
+    "type": "integer",
+    "description": "Channels"
+   },
+   "customerSegments": {
+    "type": "integer",
+    "description": "Customer segments"
+   },
+   "rule": {
+    "type": "string",
+    "description": "Rule"
+   },
+   "priority": {
+    "type": "string",
+    "description": "Priority"
+   },
+   "effectiveDates": {
+    "type": "integer",
+    "description": "Effective dates"
+   },
+   "exceptions": {
+    "type": "integer",
+    "description": "Exceptions"
+   }
+  }
+ },
+ "PromotionPriorityHierarchyManagerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Promotion Priority & Hierarchy Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "promotionFamily": {
+    "type": "string",
+    "description": "Promotion family"
+   },
+   "promotion": {
+    "type": "string",
+    "description": "Promotion"
+   },
+   "priorityNumber": {
+    "type": "string",
+    "description": "Priority number"
+   },
+   "priorityGroup": {
+    "type": "string",
+    "description": "Priority group"
+   },
+   "effectiveDates": {
+    "type": "string",
+    "description": "Effective dates"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer segment"
+   },
+   "priority200": {
+    "type": "string",
+    "description": "Priority: 200"
+   },
+   "priority300": {
+    "type": "string",
+    "description": "Priority: 300"
+   },
+   "tenant": {
+    "type": "string",
+    "description": "Tenant"
+   },
+   "businessEntity": {
+    "type": "string",
+    "description": "Business entity"
+   },
+   "productCategory": {
+    "type": "string",
+    "description": "Product category"
+   },
+   "customerType": {
+    "type": "string",
+    "description": "Customer type"
+   },
+   "campaign": {
+    "type": "string",
+    "description": "Campaign"
+   }
+  }
+ },
+ "PromotionStackingRuleBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Promotion Stacking Rule Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "promotionAPromotionB": {
+    "type": "string",
+    "description": "Promotion A + Promotion B"
+   },
+   "onlyOnePromotionCanApply": {
+    "type": "string",
+    "description": "Only one promotion can apply"
+   },
+   "but": {
+    "type": "string",
+    "description": "but"
+   },
+   "couponDiscount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Coupon Discount"
+   },
+   "entireTransaction": {
+    "type": "string",
+    "description": "Entire transaction"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "productCategory": {
+    "type": "string",
+    "description": "Product category"
+   },
+   "individualTicket": {
+    "type": "string",
+    "description": "Individual ticket"
+   },
+   "bundleComponent": {
+    "type": "string",
+    "description": "Bundle component"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   }
+  }
+ },
+ "PromotionStackingRuleBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Promotion Stacking Rule Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "promotionAPromotionB": {
+    "type": "string",
+    "description": "Promotion A + Promotion B"
+   },
+   "onlyOnePromotionCanApply": {
+    "type": "string",
+    "description": "Only one promotion can apply"
+   },
+   "but": {
+    "type": "string",
+    "description": "but"
+   },
+   "couponDiscount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Coupon Discount"
+   },
+   "entireTransaction": {
+    "type": "string",
+    "description": "Entire transaction"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "productCategory": {
+    "type": "string",
+    "description": "Product category"
+   },
+   "individualTicket": {
+    "type": "string",
+    "description": "Individual ticket"
+   },
+   "bundleComponent": {
+    "type": "string",
+    "description": "Bundle component"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   }
+  }
+ },
+ "StackingConflictCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Stacking & Conflict Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "activePromotionRules": {
+    "type": "integer",
+    "description": "Active Promotion Rules"
+   },
+   "stackablePromotions": {
+    "type": "integer",
+    "description": "Stackable Promotions"
+   },
+   "exclusivePromotions": {
+    "type": "integer",
+    "description": "Exclusive Promotions"
+   },
+   "priorityRules": {
+    "type": "integer",
+    "description": "Priority Rules"
+   },
+   "conflictsDetected": {
+    "type": "string",
+    "description": "Conflicts Detected"
+   },
+   "criticalConflicts": {
+    "type": "integer",
+    "description": "Critical Conflicts"
+   },
+   "autoResolvedConflicts": {
+    "type": "integer",
+    "description": "Auto-Resolved Conflicts"
+   },
+   "transactionsWithMultipleOffers": {
+    "type": "string",
+    "description": "Transactions with Multiple Offers"
+   },
+   "averagePromotionsPerTransaction": {
+    "type": "number",
+    "description": "Average Promotions per Transaction"
+   },
+   "discountExposure": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount Exposure"
+   },
+   "preventedOverDiscount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Prevented Over-Discount"
+   },
+   "revenueProtected": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue Protected"
+   },
+   "promotionType": {
+    "type": "string",
+    "enum": [
+     "vs",
+     "couponVs",
+     "couponVsCoupon",
+     "bogoVsDiscount",
+     "bundleVs",
+     "membershipVs",
+     "loyaltyVs",
+     "bankOfferVs",
+     "partnerOfferVs",
+     "specialPriceVs"
+    ],
+    "description": "Vocabulary listed under Conflict Categories."
+   },
+   "information": {
+    "type": "string",
+    "description": "Information"
+   },
+   "warning": {
+    "type": "string",
+    "description": "Warning"
+   },
+   "high": {
+    "type": "string",
+    "description": "High"
+   },
+   "critical": {
+    "type": "string",
+    "description": "Critical"
+   }
+  }
+ }
+}

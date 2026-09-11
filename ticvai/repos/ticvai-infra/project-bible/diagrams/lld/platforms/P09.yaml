@@ -1,5 +1,5 @@
 id: LLD-P09
-title: P09 TICVAI Web — Platform Console — 367 screens
+title: P09 TICVAI Web — Platform Console — 446 screens
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 audience: platformAdmin
@@ -19,12 +19,12 @@ deployment:
   releaseCadence: weekly
 why: null
 modulesUsed:
+- module: core
+  screens: 164
 - module: ticketing
   screens: 150
 - module: marketing
   screens: 110
-- module: core
-  screens: 85
 - module: membership
   screens: 19
 - module: ai
@@ -53,9 +53,9 @@ servicesCalled:
 - service: CrossRegionService
   operationCalls: 3
 coverage:
-  screens: 367
-  inAFlow: 352
-  drawn: 367
+  screens: 446
+  inAFlow: 431
+  drawn: 446
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
@@ -129,6 +129,14 @@ screens:
   - ADM-339
   - ADM-349
   - ADM-359
+  - ADM-369
+  - ADM-379
+  - ADM-389
+  - ADM-399
+  - ADM-409
+  - ADM-419
+  - ADM-449
+  - ADM-459
   boardFrames:
   - Dashboards Board.dc.html#adm-002
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-002
@@ -8647,3 +8655,1733 @@ screens:
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-368
   inFlows:
   - 'F130 Approval Workflows and Governance board 8: Approval Executive KPI Dashboard'
+- screen: ADM-369
+  name: Commercial Command Center
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-370
+  - ADM-371
+  - ADM-372
+  - ADM-373
+  - ADM-374
+  - ADM-375
+  - ADM-376
+  - ADM-377
+  - ADM-378
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-369
+  inFlows:
+  - 'F207 Subscription Licensing AI Self Service board 1: Commercial Command Center'
+- screen: ADM-370
+  name: Customer Subscription & Commercial Portfolio
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-369
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-370
+  inFlows:
+  - 'F207 Subscription Licensing AI Self Service board 1: Commercial Command Center'
+- screen: ADM-371
+  name: Customer Commercial 360°
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-369
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-371
+  inFlows:
+  - 'F207 Subscription Licensing AI Self Service board 1: Commercial Command Center'
+- screen: ADM-372
+  name: Operational Profile, VSI & Commercial Model Intelligence
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-369
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-372
+  inFlows:
+  - 'F207 Subscription Licensing AI Self Service board 1: Commercial Command Center'
+- screen: ADM-373
+  name: Revenue & Commercial Model Analytics
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-369
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-373
+  inFlows:
+  - 'F207 Subscription Licensing AI Self Service board 1: Commercial Command Center'
+- screen: ADM-374
+  name: Trial & Conversion Monitor
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-369
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-374
+  inFlows:
+  - 'F207 Subscription Licensing AI Self Service board 1: Commercial Command Center'
+- screen: ADM-375
+  name: Renewal & Retention Center
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-369
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-375
+  inFlows:
+  - 'F207 Subscription Licensing AI Self Service board 1: Commercial Command Center'
+- screen: ADM-376
+  name: Commercial Optimization & Expansion Opportunities
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-369
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-376
+  inFlows:
+  - 'F207 Subscription Licensing AI Self Service board 1: Commercial Command Center'
+- screen: ADM-377
+  name: Subscription Exceptions & Commercial Alerts
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-369
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-377
+  inFlows:
+  - 'F207 Subscription Licensing AI Self Service board 1: Commercial Command Center'
+- screen: ADM-378
+  name: Executive AI Commercial Intelligence
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-369
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-378
+  inFlows:
+  - 'F207 Subscription Licensing AI Self Service board 1: Commercial Command Center'
+- screen: ADM-379
+  name: Welcome & Start Your TICVAI Journey
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-380
+  - ADM-381
+  - ADM-382
+  - ADM-383
+  - ADM-384
+  - ADM-385
+  - ADM-386
+  - ADM-387
+  - ADM-388
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-379
+  inFlows:
+  - 'F208 Subscription Licensing AI Self Service board 2: Welcome & Start Your TICVAI Journey'
+- screen: ADM-380
+  name: Customer & Organization Registration
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-379
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-380
+  inFlows:
+  - 'F208 Subscription Licensing AI Self Service board 2: Welcome & Start Your TICVAI Journey'
+- screen: ADM-381
+  name: Venue Type & Business Profile
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-379
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-381
+  inFlows:
+  - 'F208 Subscription Licensing AI Self Service board 2: Welcome & Start Your TICVAI Journey'
+- screen: ADM-382
+  name: Visitor, Capacity & Operational Scale
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-379
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-382
+  inFlows:
+  - 'F208 Subscription Licensing AI Self Service board 2: Welcome & Start Your TICVAI Journey'
+- screen: ADM-383
+  name: Sales Channel Assessment
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-379
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-383
+  inFlows:
+  - 'F208 Subscription Licensing AI Self Service board 2: Welcome & Start Your TICVAI Journey'
+- screen: ADM-384
+  name: Ticketing & Product Requirements
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-379
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-384
+  inFlows:
+  - 'F208 Subscription Licensing AI Self Service board 2: Welcome & Start Your TICVAI Journey'
+- screen: ADM-385
+  name: Access, Queue & Visitor Experience Assessment
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-379
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-385
+  inFlows:
+  - 'F208 Subscription Licensing AI Self Service board 2: Welcome & Start Your TICVAI Journey'
+- screen: ADM-386
+  name: Additional Business Module Assessment
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-379
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-386
+  inFlows:
+  - 'F208 Subscription Licensing AI Self Service board 2: Welcome & Start Your TICVAI Journey'
+- screen: ADM-387
+  name: Integration, Payment & Technical Readiness
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-379
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-387
+  inFlows:
+  - 'F208 Subscription Licensing AI Self Service board 2: Welcome & Start Your TICVAI Journey'
+- screen: ADM-388
+  name: AI Assessment Summary & Handoff
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-379
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-388
+  inFlows:
+  - 'F208 Subscription Licensing AI Self Service board 2: Welcome & Start Your TICVAI Journey'
+- screen: ADM-389
+  name: Commercial Rules Engine Overview
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-390
+  - ADM-391
+  - ADM-392
+  - ADM-393
+  - ADM-394
+  - ADM-395
+  - ADM-396
+  - ADM-397
+  - ADM-398
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-389
+  inFlows:
+  - 'F209 Subscription Licensing AI Self Service board 3: Commercial Rules Engine Overview'
+- screen: ADM-390
+  name: VSI Model Builder
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-389
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-390
+  inFlows:
+  - 'F209 Subscription Licensing AI Self Service board 3: Commercial Rules Engine Overview'
+- screen: ADM-391
+  name: VSI Scoring & Tier Threshold Configuration
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-389
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-391
+  inFlows:
+  - 'F209 Subscription Licensing AI Self Service board 3: Commercial Rules Engine Overview'
+- screen: ADM-392
+  name: Subscription Tier Configuration
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-389
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-392
+  inFlows:
+  - 'F209 Subscription Licensing AI Self Service board 3: Commercial Rules Engine Overview'
+- screen: ADM-393
+  name: Tier Included Allowances
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-389
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-393
+  inFlows:
+  - 'F209 Subscription Licensing AI Self Service board 3: Commercial Rules Engine Overview'
+- screen: ADM-394
+  name: Commercial & Licensing Model Configuration
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-389
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-394
+  inFlows:
+  - 'F209 Subscription Licensing AI Self Service board 3: Commercial Rules Engine Overview'
+- screen: ADM-395
+  name: Billable Unit, Minimum Guarantee & Enforcement Rules
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-389
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-395
+  inFlows:
+  - 'F209 Subscription Licensing AI Self Service board 3: Commercial Rules Engine Overview'
+- screen: ADM-396
+  name: Overage Pricing & Capacity Packs
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-389
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-396
+  inFlows:
+  - 'F209 Subscription Licensing AI Self Service board 3: Commercial Rules Engine Overview'
+- screen: ADM-397
+  name: Commercial Model & Rule Simulation
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-389
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-397
+  inFlows:
+  - 'F209 Subscription Licensing AI Self Service board 3: Commercial Rules Engine Overview'
+- screen: ADM-398
+  name: Rule Versioning, Approval & Publication
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-389
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-398
+  inFlows:
+  - 'F209 Subscription Licensing AI Self Service board 3: Commercial Rules Engine Overview'
+- screen: ADM-399
+  name: Recommended Package Overview
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-400
+  - ADM-401
+  - ADM-402
+  - ADM-403
+  - ADM-404
+  - ADM-405
+  - ADM-406
+  - ADM-407
+  - ADM-408
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-399
+  inFlows:
+  - 'F210 Subscription Licensing AI Self Service board 4: Recommended Package Overview'
+- screen: ADM-400
+  name: Commercial Model & Tier Selection
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-399
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-400
+  inFlows:
+  - 'F210 Subscription Licensing AI Self Service board 4: Recommended Package Overview'
+- screen: ADM-401
+  name: Module Marketplace
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-399
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-401
+  inFlows:
+  - 'F210 Subscription Licensing AI Self Service board 4: Recommended Package Overview'
+- screen: ADM-402
+  name: AI Module & Package Recommendations
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-399
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-402
+  inFlows:
+  - 'F210 Subscription Licensing AI Self Service board 4: Recommended Package Overview'
+- screen: ADM-403
+  name: Module Detail & Commercial Treatment
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-399
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-403
+  inFlows:
+  - 'F210 Subscription Licensing AI Self Service board 4: Recommended Package Overview'
+- screen: ADM-404
+  name: Module Dependency & Compatibility Manager
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-399
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-404
+  inFlows:
+  - 'F210 Subscription Licensing AI Self Service board 4: Recommended Package Overview'
+- screen: ADM-405
+  name: Add-Ons, Capacity & Commercial Options
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-399
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-405
+  inFlows:
+  - 'F210 Subscription Licensing AI Self Service board 4: Recommended Package Overview'
+- screen: ADM-406
+  name: Commercial Package Simulator
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-399
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-406
+  inFlows:
+  - 'F210 Subscription Licensing AI Self Service board 4: Recommended Package Overview'
+- screen: ADM-407
+  name: Package Review & Commercial Summary
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-399
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-407
+  inFlows:
+  - 'F210 Subscription Licensing AI Self Service board 4: Recommended Package Overview'
+- screen: ADM-408
+  name: Final Package Approval & Handoff
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-399
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-408
+  inFlows:
+  - 'F210 Subscription Licensing AI Self Service board 4: Recommended Package Overview'
+- screen: ADM-409
+  name: Purchase / Trial Journey Selection
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-410
+  - ADM-411
+  - ADM-412
+  - ADM-413
+  - ADM-414
+  - ADM-415
+  - ADM-416
+  - ADM-417
+  - ADM-418
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-409
+  inFlows:
+  - 'F211 Subscription Licensing AI Self Service board 5: Purchase / Trial Journey Selection'
+- screen: ADM-410
+  name: Contract & Billing Cycle Selection
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-409
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-410
+  inFlows:
+  - 'F211 Subscription Licensing AI Self Service board 5: Purchase / Trial Journey Selection'
+- screen: ADM-411
+  name: Billing & Legal Entity Information
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-409
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-411
+  inFlows:
+  - 'F211 Subscription Licensing AI Self Service board 5: Purchase / Trial Journey Selection'
+- screen: ADM-412
+  name: Payment Method & Settlement Setup
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-409
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-412
+  inFlows:
+  - 'F211 Subscription Licensing AI Self Service board 5: Purchase / Trial Journey Selection'
+- screen: ADM-413
+  name: Trial Configuration & Conversion Rules
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-409
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-413
+  inFlows:
+  - 'F211 Subscription Licensing AI Self Service board 5: Purchase / Trial Journey Selection'
+- screen: ADM-414
+  name: Order & Commercial Pricing Review
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-409
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-414
+  inFlows:
+  - 'F211 Subscription Licensing AI Self Service board 5: Purchase / Trial Journey Selection'
+- screen: ADM-415
+  name: Commercial Agreement, Billable Definition & Customer Acceptance
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-409
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-415
+  inFlows:
+  - 'F211 Subscription Licensing AI Self Service board 5: Purchase / Trial Journey Selection'
+- screen: ADM-416
+  name: Payment, Contract & Commercial Validation
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-409
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-416
+  inFlows:
+  - 'F211 Subscription Licensing AI Self Service board 5: Purchase / Trial Journey Selection'
+- screen: ADM-417
+  name: Subscription Confirmation & Commercial Activation
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-409
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-417
+  inFlows:
+  - 'F211 Subscription Licensing AI Self Service board 5: Purchase / Trial Journey Selection'
+- screen: ADM-418
+  name: Subscription Lifecycle & Trial-to-Paid Handoff
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-409
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-418
+  inFlows:
+  - 'F211 Subscription Licensing AI Self Service board 5: Purchase / Trial Journey Selection'
+- screen: ADM-419
+  name: Provisioning Command Center
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-420
+  - ADM-421
+  - ADM-422
+  - ADM-423
+  - ADM-424
+  - ADM-425
+  - ADM-426
+  - ADM-427
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-419
+  inFlows:
+  - 'F212 Subscription Licensing AI Self Service board 6: Provisioning Command Center'
+- screen: ADM-420
+  name: Tenant & Organization Provisioning
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-419
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-420
+  inFlows:
+  - 'F212 Subscription Licensing AI Self Service board 6: Provisioning Command Center'
+- screen: ADM-421
+  name: Venue & Operational Structure Creation
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-419
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-421
+  inFlows:
+  - 'F212 Subscription Licensing AI Self Service board 6: Provisioning Command Center'
+- screen: ADM-422
+  name: Administrator & Security Initialization
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-419
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-422
+  inFlows:
+  - 'F212 Subscription Licensing AI Self Service board 6: Provisioning Command Center'
+- screen: ADM-423
+  name: License & Entitlement Activation
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-419
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-423
+  inFlows:
+  - 'F212 Subscription Licensing AI Self Service board 6: Provisioning Command Center'
+- screen: ADM-424
+  name: Module Activation & Dependency Validation
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-419
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-424
+  inFlows:
+  - 'F212 Subscription Licensing AI Self Service board 6: Provisioning Command Center'
+- screen: ADM-425
+  name: Venue Template Application
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-419
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-425
+  inFlows:
+  - 'F212 Subscription Licensing AI Self Service board 6: Provisioning Command Center'
+- screen: ADM-426
+  name: Initial Configuration & Regional Defaults
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-419
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-426
+  inFlows:
+  - 'F212 Subscription Licensing AI Self Service board 6: Provisioning Command Center'
+- screen: ADM-427
+  name: Provisioning Validation & Exception Management
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-419
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-427
+  inFlows:
+  - 'F212 Subscription Licensing AI Self Service board 6: Provisioning Command Center'
+- screen: ADM-449
+  name: Usage & License Command Center
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-450
+  - ADM-451
+  - ADM-452
+  - ADM-453
+  - ADM-454
+  - ADM-455
+  - ADM-456
+  - ADM-457
+  - ADM-458
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-449
+  inFlows:
+  - 'F215 Subscription Licensing AI Self Service board 9: Usage & License Command Center'
+- screen: ADM-450
+  name: Entitlement & License Inventory
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-449
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-450
+  inFlows:
+  - 'F215 Subscription Licensing AI Self Service board 9: Usage & License Command Center'
+- screen: ADM-451
+  name: Commercial Consumption & Billable Event Metering
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-449
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-451
+  inFlows:
+  - 'F215 Subscription Licensing AI Self Service board 9: Usage & License Command Center'
+- screen: ADM-452
+  name: Operational Usage & Threshold Monitor
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-449
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-452
+  inFlows:
+  - 'F215 Subscription Licensing AI Self Service board 9: Usage & License Command Center'
+- screen: ADM-453
+  name: License Enforcement & Decision Engine
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-449
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-453
+  inFlows:
+  - 'F215 Subscription Licensing AI Self Service board 9: Usage & License Command Center'
+- screen: ADM-454
+  name: Minimum Guarantee & Variable Consumption Monitor
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-449
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-454
+  inFlows:
+  - 'F215 Subscription Licensing AI Self Service board 9: Usage & License Command Center'
+- screen: ADM-455
+  name: Overage, Capacity & Temporary Exception Management
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-449
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-455
+  inFlows:
+  - 'F215 Subscription Licensing AI Self Service board 9: Usage & License Command Center'
+- screen: ADM-456
+  name: Usage Alerts, Reconciliation & Exception Center
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-449
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-456
+  inFlows:
+  - 'F215 Subscription Licensing AI Self Service board 9: Usage & License Command Center'
+- screen: ADM-457
+  name: AI Usage Forecast & Commercial Optimization
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-449
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-457
+  inFlows:
+  - 'F215 Subscription Licensing AI Self Service board 9: Usage & License Command Center'
+- screen: ADM-458
+  name: License, Metering & Commercial Synchronization Audit
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-449
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-458
+  inFlows:
+  - 'F215 Subscription Licensing AI Self Service board 9: Usage & License Command Center'
+- screen: ADM-459
+  name: Billing & Commercial Command Center
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-460
+  - ADM-461
+  - ADM-462
+  - ADM-463
+  - ADM-464
+  - ADM-465
+  - ADM-466
+  - ADM-467
+  - ADM-468
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-459
+  inFlows:
+  - 'F216 Subscription Licensing AI Self Service board 10: Billing & Commercial Command Center'
+- screen: ADM-460
+  name: Billing Calculation & Charge Breakdown
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-459
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-460
+  inFlows:
+  - 'F216 Subscription Licensing AI Self Service board 10: Billing & Commercial Command Center'
+- screen: ADM-461
+  name: Consumption Reconciliation & Billing Approval
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-459
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-461
+  inFlows:
+  - 'F216 Subscription Licensing AI Self Service board 10: Billing & Commercial Command Center'
+- screen: ADM-462
+  name: Invoice & Payment Management
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-459
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-462
+  inFlows:
+  - 'F216 Subscription Licensing AI Self Service board 10: Billing & Commercial Command Center'
+- screen: ADM-463
+  name: Subscription & Commercial Change Management
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-459
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-463
+  inFlows:
+  - 'F216 Subscription Licensing AI Self Service board 10: Billing & Commercial Command Center'
+- screen: ADM-464
+  name: Renewal Management Center
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-459
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-464
+  inFlows:
+  - 'F216 Subscription Licensing AI Self Service board 10: Billing & Commercial Command Center'
+- screen: ADM-465
+  name: AI Upgrade, Downgrade & Commercial Right-Sizing
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-459
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-465
+  inFlows:
+  - 'F216 Subscription Licensing AI Self Service board 10: Billing & Commercial Command Center'
+- screen: ADM-466
+  name: Commercial Scenario Simulator
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-459
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-466
+  inFlows:
+  - 'F216 Subscription Licensing AI Self Service board 10: Billing & Commercial Command Center'
+- screen: ADM-467
+  name: Discount, Credit & Commercial Override Management
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-459
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-467
+  inFlows:
+  - 'F216 Subscription Licensing AI Self Service board 10: Billing & Commercial Command Center'
+- screen: ADM-468
+  name: Renewal Approval, Activation & Commercial Handoff
+  module: Tenants & Licensing
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-459
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-468
+  inFlows:
+  - 'F216 Subscription Licensing AI Self Service board 10: Billing & Commercial Command Center'

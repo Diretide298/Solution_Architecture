@@ -1,0 +1,407 @@
+{
+ "addCaseMessage": {
+  "method": "POST",
+  "path": "/cases/{caseId}/messages",
+  "contract": "marketing-crm",
+  "summary": "Add a message or internal note",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CaseMessage"
+ },
+ "askReportingQuestion": {
+  "method": "POST",
+  "path": "/reports/ask",
+  "contract": "reporting",
+  "summary": "Natural-language reporting query",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "NaturalLanguageAnswer"
+ },
+ "createCase": {
+  "method": "POST",
+  "path": "/cases",
+  "contract": "marketing-crm",
+  "summary": "Raise a service case",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateCaseRequest",
+  "responds": "Case"
+ },
+ "createReport": {
+  "method": "POST",
+  "path": "/reports",
+  "contract": "reporting",
+  "summary": "Create a custom report definition",
+  "permission": "REPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateReportRequest",
+  "responds": "ReportDefinition"
+ },
+ "deleteReport": {
+  "method": "DELETE",
+  "path": "/reports/{reportId}",
+  "contract": "reporting",
+  "summary": "Retire a report definition",
+  "permission": "REPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "escalateCase": {
+  "method": "POST",
+  "path": "/cases/{caseId}/escalate",
+  "contract": "marketing-crm",
+  "summary": "Escalate a case",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Case"
+ },
+ "getCase": {
+  "method": "GET",
+  "path": "/cases/{caseId}",
+  "contract": "marketing-crm",
+  "summary": "Read a case with its thread",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CaseDetail"
+ },
+ "getFinancialReport": {
+  "method": "GET",
+  "path": "/reports/financial",
+  "contract": "finance",
+  "summary": "P&L, balance sheet or cash flow",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "report",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "fiscalPeriodId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "legalEntityId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "costCenterId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "FinancialReport"
+ },
+ "getReport": {
+  "method": "GET",
+  "path": "/reports/{reportId}",
+  "contract": "reporting",
+  "summary": "Read a report definition",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ReportDefinition"
+ },
+ "listCases": {
+  "method": "GET",
+  "path": "/cases",
+  "contract": "marketing-crm",
+  "summary": "List service cases",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "assignedToPrincipalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "breachedSla",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "priority",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listConversations": {
+  "method": "GET",
+  "path": "/conversations",
+  "contract": "marketing-crm",
+  "summary": "The omnichannel inbox",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "state",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "assignedToMe",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Conversation"
+ },
+ "listReports": {
+  "method": "GET",
+  "path": "/reports",
+  "contract": "reporting",
+  "summary": "List available report definitions",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "category",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "reopenCase": {
+  "method": "POST",
+  "path": "/cases/{caseId}/reopen",
+  "contract": "marketing-crm",
+  "summary": "Reopen a resolved case",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "runReport": {
+  "method": "POST",
+  "path": "/reports/{reportId}/run",
+  "contract": "reporting",
+  "summary": "Run a report",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RunReportRequest",
+  "responds": "ReportResult"
+ },
+ "saveNaturalLanguageQuery": {
+  "method": "POST",
+  "path": "/reports/ask/{conversationId}/save",
+  "contract": "reporting",
+  "summary": "Save a natural-language answer as a report definition",
+  "permission": "REPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ReportDefinition"
+ },
+ "setAgentAvailability": {
+  "method": "PUT",
+  "path": "/agent-availability",
+  "contract": "marketing-crm",
+  "summary": "An agent goes available, away or offline",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "updateCase": {
+  "method": "PATCH",
+  "path": "/cases/{caseId}",
+  "contract": "marketing-crm",
+  "summary": "Assign, reprioritise or resolve a case",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Case"
+ },
+ "updateReport": {
+  "method": "PUT",
+  "path": "/reports/{reportId}",
+  "contract": "reporting",
+  "summary": "Publish a new version of a definition",
+  "permission": "REPORT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateReportRequest",
+  "responds": "ReportDefinition"
+ }
+}

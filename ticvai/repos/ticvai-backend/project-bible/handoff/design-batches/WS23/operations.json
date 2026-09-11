@@ -1,0 +1,199 @@
+{
+ "listCommissionCalculationSettlement": {
+  "method": "GET",
+  "path": "/commission-calculation-settlement",
+  "contract": "subscription",
+  "summary": "Commission Calculation & Settlement Management",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CommissionCalculationSettlementManagementView"
+ },
+ "listPartner2": {
+  "method": "GET",
+  "path": "/partner-2",
+  "contract": "subscription",
+  "summary": "Partner Operations Command Center",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "market",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "date",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "PartnerOperationsCommandCenterView"
+ },
+ "listPartnerCancellationRefund": {
+  "method": "GET",
+  "path": "/partner-cancellation-refund",
+  "contract": "subscription",
+  "summary": "Partner Cancellations, Refunds & Amendments",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PartnerCancellationsRefundsAmendmentsView"
+ },
+ "listPartnerDisputeCase": {
+  "method": "GET",
+  "path": "/partner-dispute-case",
+  "contract": "subscription",
+  "summary": "Partner Disputes, Cases & Service Management",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PartnerDisputesCasesServiceManagementView"
+ },
+ "listPartnerOrderBooking": {
+  "method": "GET",
+  "path": "/partner-order-booking",
+  "contract": "subscription",
+  "summary": "Partner Orders & Booking Management",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "partner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partnerOrderReference",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ticvaiOrderId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "bookingDate",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "visitEventDate",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "PartnerOrdersBookingManagementView"
+ },
+ "listPartnerPerformanceScorecard": {
+  "method": "GET",
+  "path": "/partner-performance-scorecard",
+  "contract": "subscription",
+  "summary": "Partner Performance Scorecard & Risk Monitoring",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PartnerPerformanceScorecardRiskMonitoringView"
+ },
+ "listPartnerReconciliationException": {
+  "method": "GET",
+  "path": "/partner-reconciliation-exception",
+  "contract": "subscription",
+  "summary": "Partner Reconciliation & Exception Management",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PartnerReconciliationExceptionManagementView"
+ },
+ "listPartnerRelationship": {
+  "method": "GET",
+  "path": "/partner-relationship",
+  "contract": "subscription",
+  "summary": "Partner AI Intelligence & Relationship Optimization",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PartnerAiIntelligenceRelationshipOptimizationView"
+ },
+ "listPartnerStatementAccount": {
+  "method": "GET",
+  "path": "/partner-statement-account",
+  "contract": "subscription",
+  "summary": "Partner Statement & Account Activity",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PartnerStatementAccountActivityView"
+ },
+ "listReservationHoldRelease": {
+  "method": "GET",
+  "path": "/reservation-hold-release",
+  "contract": "subscription",
+  "summary": "Reservations, Holds & Release Management",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ReservationsHoldsReleaseManagementView"
+ }
+}

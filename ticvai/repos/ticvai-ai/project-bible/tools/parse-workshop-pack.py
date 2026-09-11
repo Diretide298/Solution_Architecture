@@ -52,9 +52,12 @@ OUT = SRC / "pack.json"
 
 # 17 documents and 590 screens on 3 September; `Approval Workflows & Governance`
 # (8 boards) and `Unified BI Reporting & AI Analytics` (10 boards) arrived on
-# 9 September in the OneDrive export.
-EXPECTED_SCREENS = 770
-EXPECTED_BOARDS = 77
+# 9 September in the OneDrive export. `Latest Docs.zip` on 11 September added four more —
+# Digital Asset Management (4 boards), Game & Ride (10), Rental Management (10) and
+# Subscription Licensing & AI Self-Service (10) — counted from their headings before the parser
+# was run, not from its output.
+EXPECTED_SCREENS = 1110
+EXPECTED_BOARDS = 111
 
 DASH = r"[—–-]"
 
@@ -131,6 +134,14 @@ def parse_toc(block: str) -> tuple[list[dict], list[str], list[str]]:
             continue
         if m := SCREEN_LINE.match(line):
             number, title = m.group(1), m.group(2).strip()
+            # **The 11 September documents print their page numbers in the contents.**
+            # `Digital Asset Management` uses dot leaders — `Command Center ........ 3` — and
+            # matched 4 of its 40 screens to a body; `Rental` and `Subscription` set the number
+            # after a space, so all 200 of theirs found a body and would have been named
+            # `Rental Product Command Center 6` on every board and in every screen file. None of
+            # the 770 earlier titles ends in a number, which is what makes the second cut safe.
+            title = re.sub(r"\s*\.{2,}.*$", "", title)
+            title = re.sub(r"\s+\d{1,3}$", "", title).strip()
             # **A title repeated in the contents is a page-break artefact, not a screen.** The
             # number is unreliable for de-duplication because the three conventions collide:
             # `Screen 7` in board 1 and `7` from `11.1.7` are different screens.

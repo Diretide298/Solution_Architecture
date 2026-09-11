@@ -1,0 +1,140 @@
+id: F188
+name: 'Game and Ride board 2: Reader Management Dashboard'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Game and Ride board 2. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-404
+  entryPoints:
+  - Arrives at Reader Management Dashboard
+steps:
+- step: 1
+  screen: BO-404
+  action: Opens Reader Management Dashboard
+  operations: []
+  outcome: Provide a centralized operational overview of all game and ride readers deployed across venues.
+- step: 2
+  screen: BO-405
+  action: Works in Reader Directory
+  operations: []
+  outcome: Maintain the master inventory of physical readers connected to TICVAI. The source requires
+    the ability to define a minimum of three reader types.
+- step: 3
+  screen: BO-404
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-406
+  action: Works in Reader Profile & Device Setup
+  operations: []
+  outcome: Configure the technical and operational identity of an individual reader.
+- step: 5
+  screen: BO-404
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-407
+  action: Works in Reader Credit & Payment Configuration
+  operations: []
+  outcome: 'Define exactly what type of wallet value a reader accepts and how much is required to start
+    the game or ride. This directly implements requirement 10.2.6, which requires configurable: Credit
+    type accepted Credit amount required Attraction t'
+- step: 7
+  screen: BO-404
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-408
+  action: Works in Reader / Attraction Assignment
+  operations: []
+  outcome: Assign a physical reader to the appropriate game, ride, or attraction.
+- step: 9
+  screen: BO-404
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-409
+  action: Works in Retap Delay & Transaction Protection
+  operations: []
+  outcome: Prevent accidental repeated deductions when a customer taps the card multiple times within
+    a short period. The requirement explicitly states that a configurable delay—example 5 seconds—must
+    exist between the first tap and subsequent taps.
+- step: 11
+  screen: BO-404
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-410
+  action: Works in Free Game Glow & Reader Display Rules
+  operations: []
+  outcome: Configure how the reader visually communicates that a game or ride is available free of charge.
+    The source specifically requires free games to display a different color on the reader, allowing the
+    customer to recognize that the game is free
+- step: 13
+  screen: BO-404
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-411
+  action: Works in Reader Theme & Experience Configuration
+  operations: []
+  outcome: Configure different visual experiences for reader categories. The source requires custom themes
+    controlled from BOS, with skill games and rides able to have different reader themes.
+- step: 15
+  screen: BO-404
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-412
+  action: Works in Real-Time Tap Validation & Reader Response
+  operations: []
+  outcome: 'Define and visualize what occurs when a customer taps their card/device before gameplay. This
+    screen directly addresses requirement 10.2.13: the system must validate the customer''s credit/card
+    balance, bonus and entitlements in real time be'
+- step: 17
+  screen: BO-404
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-413
+  action: Works in Balance Check Reader & Device Test Console
+  operations: []
+  outcome: Configure dedicated balance-check readers and provide administrators with a test environment
+    for deployed reader configurations. Requirement 10.2.20 specifically requires a reader through which
+    the customer can check their balance.
+branches:
+- at: 1
+  condition: Nothing has been set up on Reader Management Dashboard yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Game and Ride board 2 visited
+primaryContract: unknown
+contracts:
+- unknown

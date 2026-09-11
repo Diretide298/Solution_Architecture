@@ -8725,19 +8725,22 @@ screens:
       - subjectId
       provenance: derived — GST-039 declares entryState.params subjectId, so an edge into it must carry
         them
-  notes: "\uD83D\uDD34 **Biometric enrolment had no guest-facing consent step.** `enrolFacePass` was callable\
-    \ by a guest and reachable from nowhere, which means enrolment was happening at a desk with somebody\
-    \ else operating the screen.\n\n**`pii.subject_biometric` is separate from contact and document precisely\
-    \ so consent and erasure differ per kind.** Revocation sits beside enrolment for the same reason —\
-    \ a face a guest cannot withdraw is a face they did not really consent to."
+  notes: '🔴 **Biometric enrolment had no guest-facing consent step.** `enrolFacePass` was callable by
+    a guest and reachable from nowhere, which means enrolment was happening at a desk with somebody else
+    operating the screen.
+
+
+    **`pii.subject_biometric` is separate from contact and document precisely so consent and erasure differ
+    per kind.** Revocation sits beside enrolment for the same reason — a face a guest cannot withdraw
+    is a face they did not really consent to.'
   density: comfortable
   offline: false
   pattern: statusTracker
   patternReason: '`getFacePassEnrolment` reads one record and nothing reads a population — the screen
     is about that one thing'
-  purpose: "\uD83D\uDD34 **Biometric enrolment had no guest-facing consent step.** `enrolFacePass` was\
-    \ callable by a guest and reachable from nowhere, which means enrolment was happening at a desk with\
-    \ somebody else operat"
+  purpose: 🔴 **Biometric enrolment had no guest-facing consent step.** `enrolFacePass` was callable by
+    a guest and reachable from nowhere, which means enrolment was happening at a desk with somebody else
+    operat
   layout:
     template: detail
     regions:

@@ -1,0 +1,1136 @@
+[
+ {
+  "id": "WEB-036",
+  "name": "F&B – Browse & Order",
+  "module": "In-venue Services",
+  "requiresModule": "fnb",
+  "wave": 2,
+  "implementation": {
+   "app": "guest-web",
+   "route": "/fandb--browse-and-order",
+   "component": "apps/guest-web/src/routes/FBBrowseOrder.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "exitTo": [
+    "WEB-001"
+   ]
+  },
+  "notes": "**A guest scans a QR on a table and lands in a browser.** That is the single most common F&B ordering pattern anywhere, and until 24 August it was the one thing this surface could not do — `claimTableSession` and `claimLocationSession` were app-only. **Nobody installs an app to order a coffee.** **Renamed 31 August** from *F&B — Browse & Order*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added getGuestOrderStatus. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listDiningOutlets` reads the population and `getGuestMenu` reads one of them — list, select, act",
+  "purpose": "Order food from a table, a lounger or a seat.",
+  "gaps": [
+   {
+    "operation": "listModifierGroups",
+    "why": "**3 declared operations reach no component on this screen**: listModifierGroups, listDeliveryLocations, getGuestOrderStatus. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every browse order",
+       "bindsTo": "DiningOutlet",
+       "columns": [
+        "DiningOutlet.outletId",
+        "DiningOutlet.name",
+        "DiningOutlet.kind",
+        "DiningOutlet.zone",
+        "DiningOutlet.cuisine",
+        "DiningOutlet.isOpenNow",
+        "DiningOutlet.opensAt",
+        "DiningOutlet.closesAt",
+        "DiningOutlet.orderingMethod",
+        "DiningOutlet.estimatedWaitMinutes",
+        "DiningOutlet.imageAssetRef",
+        "DiningOutlet.menuId"
+       ],
+       "operation": "listDiningOutlets",
+       "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected browse order",
+       "bindsTo": "GuestMenu",
+       "columns": [
+        "GuestMenu.outletId",
+        "GuestMenu.menuId",
+        "GuestMenu.name",
+        "GuestMenu.inForceUntil",
+        "GuestMenu.currency",
+        "GuestMenu.currencyScale",
+        "GuestMenu.sections"
+       ],
+       "operation": "getGuestMenu",
+       "provenance": "contract fnb.yaml GET /outlets/{outletId}/guest-menu"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Claim",
+       "operation": "claimLocationSession",
+       "provenance": "contract fnb.yaml POST /location-sessions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Claim",
+       "operation": "claimTableSession",
+       "provenance": "contract fnb.yaml POST /table-sessions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createGuestFnbOrder",
+       "provenance": "contract fnb.yaml POST /guest-orders"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "cardList",
+       "label": "F&B — Browse & Order",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Detail",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Content resolves in place.",
+   "error": "Could not load. **The rest of the site is unaffected.**",
+   "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
+   "emptyNoResults": "Nothing matches.",
+   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused."
+  },
+  "apis": [
+   {
+    "operationId": "getGuestMenu",
+    "contract": "fnb",
+    "purpose": "The menu a guest sees",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listDiningOutlets",
+    "contract": "fnb",
+    "purpose": "Where a guest can eat, right now",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listModifierGroups",
+    "contract": "fnb",
+    "purpose": "List modifier groups",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "claimLocationSession",
+    "contract": "fnb",
+    "purpose": "Tell the platform where the guest is",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDiningOutlets"
+    ]
+   },
+   {
+    "operationId": "claimTableSession",
+    "contract": "fnb",
+    "purpose": "Identify which table a guest is sitting at",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDiningOutlets"
+    ]
+   },
+   {
+    "operationId": "createGuestFnbOrder",
+    "contract": "fnb",
+    "purpose": "A guest orders food",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDiningOutlets"
+    ]
+   },
+   {
+    "operationId": "listDeliveryLocations",
+    "contract": "fnb",
+    "purpose": "Where an order can be delivered",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getGuestOrderStatus",
+    "contract": "fnb",
+    "purpose": "Track an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createTableReservation",
+    "contract": "fnb",
+    "purpose": "Reserve a table",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "joinRestaurantWaitlist",
+    "contract": "fnb",
+    "purpose": "Join the waitlist when nothing is free",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "outletId",
+     "from": "deepLink"
+    },
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land here, and the person holding it did nothing wrong. Arrives with `outletId`.",
+   "preloaded": [
+    "GuestMenu.outletId",
+    "GuestMenu.menuId",
+    "GuestMenu.name",
+    "GuestMenu.inForceUntil",
+    "GuestMenu.currency"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-036"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-037",
+  "name": "Menu Item Detail",
+  "module": "In-venue Services",
+  "requiresModule": "fnb",
+  "wave": 2,
+  "implementation": {
+   "app": "guest-web",
+   "route": "/menu-item-detail",
+   "component": "apps/guest-web/src/routes/MenuItemDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "exitTo": [
+    "WEB-001"
+   ]
+  },
+  "notes": "**Allergens are read here more often than anywhere else in the platform**, and a guest checking one on a phone browser is the ordinary case rather than the exception.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listModifierGroups` reads the population and `getGuestMenu` reads one of them — list, select, act",
+  "purpose": "What is in it, and what may be changed.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every menu item",
+       "bindsTo": "ModifierGroup",
+       "columns": [
+        "ModifierGroup.id",
+        "ModifierGroup.code",
+        "ModifierGroup.name",
+        "ModifierGroup.minSelections",
+        "ModifierGroup.maxSelections",
+        "ModifierGroup.options",
+        "ModifierGroup.scopePath"
+       ],
+       "operation": "listModifierGroups",
+       "provenance": "contract fnb.yaml GET /modifier-groups"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected menu item",
+       "bindsTo": "GuestMenu",
+       "columns": [
+        "GuestMenu.outletId",
+        "GuestMenu.menuId",
+        "GuestMenu.name",
+        "GuestMenu.inForceUntil",
+        "GuestMenu.currency",
+        "GuestMenu.currencyScale",
+        "GuestMenu.sections"
+       ],
+       "operation": "getGuestMenu",
+       "provenance": "contract fnb.yaml GET /outlets/{outletId}/guest-menu"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "cardList",
+       "label": "Menu Item Detail",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Detail",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Content resolves in place.",
+   "error": "Could not load. **The rest of the site is unaffected.**",
+   "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
+   "emptyNoResults": "Nothing matches.",
+   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused."
+  },
+  "apis": [
+   {
+    "operationId": "getGuestMenu",
+    "contract": "fnb",
+    "purpose": "The menu a guest sees",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listModifierGroups",
+    "contract": "fnb",
+    "purpose": "List modifier groups",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "outletId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land here, and the person holding it did nothing wrong. Arrives with `outletId`.",
+   "preloaded": [
+    "GuestMenu.outletId",
+    "GuestMenu.menuId",
+    "GuestMenu.name",
+    "GuestMenu.inForceUntil",
+    "GuestMenu.currency"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-037"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-038",
+  "name": "F&B – Order Tracking",
+  "module": "In-venue Services",
+  "requiresModule": "fnb",
+  "wave": 2,
+  "implementation": {
+   "app": "guest-web",
+   "route": "/fandb--order-tracking",
+   "component": "apps/guest-web/src/routes/FBOrderTracking.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "exitTo": [
+    "WEB-001"
+   ]
+  },
+  "notes": "**Order to ready is the kitchen's number; ready to collected is the counter's.** A guest watching a status that never changes walks to the counter. **Renamed 31 August** from *F&B — Order Tracking*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest.",
+  "density": "compact",
+  "pattern": "statusTracker",
+  "patternReason": "`getGuestOrderStatus` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Watch it being made, and settle the bill.",
+  "gaps": [
+   {
+    "operation": "getGuestBill",
+    "why": "**1 declared operation reach no component on this screen**: getGuestBill. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected order tracking",
+       "bindsTo": "GuestOrderStatus",
+       "columns": [
+        "GuestOrderStatus.orderId",
+        "GuestOrderStatus.orderNumber",
+        "GuestOrderStatus.status",
+        "GuestOrderStatus.estimatedReadyAt",
+        "GuestOrderStatus.isReadyForCollection",
+        "GuestOrderStatus.lines"
+       ],
+       "operation": "getGuestOrderStatus",
+       "provenance": "contract fnb.yaml GET /guest-orders/{orderId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Claim",
+       "operation": "claimTableSession",
+       "provenance": "contract fnb.yaml POST /table-sessions"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "cardList",
+       "label": "F&B — Order Tracking",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Detail",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Content resolves in place.",
+   "error": "Could not load. **The rest of the site is unaffected.**",
+   "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
+   "emptyNoResults": "Nothing matches.",
+   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused."
+  },
+  "apis": [
+   {
+    "operationId": "getGuestOrderStatus",
+    "contract": "fnb",
+    "purpose": "Track an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getGuestBill",
+    "contract": "fnb",
+    "purpose": "The bill for the guest's table",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "claimTableSession",
+    "contract": "fnb",
+    "purpose": "Identify which table a guest is sitting at",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    },
+    {
+     "name": "sessionId",
+     "from": "deepLink"
+    },
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land here, and the person holding it did nothing wrong. Arrives with `orderId`, `sessionId`."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-038"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-039",
+  "name": "Venue Map & Wait Times",
+  "module": "In-venue Services",
+  "requiresModule": "queue",
+  "wave": 2,
+  "implementation": {
+   "app": "guest-web",
+   "route": "/venue-map-and-wait-times",
+   "component": "apps/guest-web/src/routes/VenueMapWaitTimes.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "exitTo": [
+    "WEB-001"
+   ]
+  },
+  "notes": "**`getVenueMap` was already `guest` audience and offline-capable and no web screen drew it.** A map in a browser is a map. **Drawn 26 August** — `Seat Board 3.dc.html` frame `seat-3c`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**",
+  "density": "compact",
+  "boardFrames": [
+   "Seat Board 3.dc.html#seat-3c"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listQueues` reads the population and `getVenueMap` reads one of them — list, select, act",
+  "purpose": "Where things are, and how long they take.",
+  "gaps": [
+   {
+    "operation": "getVenueMapGraph",
+    "why": "**2 declared operations reach no component on this screen**: getVenueMapGraph, getWaitTimes. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every venue map wait",
+       "bindsTo": "Queue",
+       "columns": [
+        "Queue.code",
+        "Queue.name",
+        "Queue.venueId",
+        "Queue.attractionProductId",
+        "Queue.assetId",
+        "Queue.accessPointId",
+        "Queue.kind",
+        "Queue.operatingWindows",
+        "Queue.parentQueueId",
+        "Queue.loadBalanceWithQueueIds",
+        "Queue.inQueueOfferEnabled",
+        "Queue.notifyBeforeCallMinutes"
+       ],
+       "operation": "listQueues",
+       "provenance": "contract queue.yaml GET /queues"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected venue map wait",
+       "bindsTo": "VenueMapDetail",
+       "columns": [
+        "VenueMapDetail.map",
+        "VenueMapDetail.points",
+        "VenueMapDetail.paths"
+       ],
+       "operation": "getVenueMap",
+       "provenance": "contract venue-map.yaml GET /venue-maps/{mapId}"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "cardList",
+       "label": "Venue Map & Wait Times",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Detail",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Content resolves in place.",
+   "error": "Could not load. **The rest of the site is unaffected.**",
+   "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
+   "emptyNoResults": "Nothing matches.",
+   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused."
+  },
+  "apis": [
+   {
+    "operationId": "getVenueMap",
+    "contract": "venue-map",
+    "purpose": "A map with its points and paths",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getVenueMapGraph",
+    "contract": "venue-map",
+    "purpose": "The navigation graph, ready to route over",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getWaitTimes",
+    "contract": "queue",
+    "purpose": "Wait times across a venue",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listQueues",
+    "contract": "queue",
+    "purpose": "List queues",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "mapId",
+     "from": "deepLink"
+    },
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land here, and the person holding it did nothing wrong. Arrives with `mapId`.",
+   "preloaded": [
+    "VenueMapDetail.map",
+    "VenueMapDetail.points",
+    "VenueMapDetail.paths"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-039",
+   "note": "**Drawn by Claude Design on `Seat Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-040",
+  "name": "Virtual Queue",
+  "module": "In-venue Services",
+  "requiresModule": "queue",
+  "wave": 2,
+  "implementation": {
+   "app": "guest-web",
+   "route": "/virtual-queue",
+   "component": "apps/guest-web/src/routes/VirtualQueue.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "exitTo": [
+    "WEB-001"
+   ]
+  },
+  "notes": "**The point of a virtual queue is that the guest walks away** — which works the same in a browser tab as in an app.",
+  "density": "compact",
+  "pattern": "statusTracker",
+  "patternReason": "`getWaitingGuest` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Hold a place without standing in one.",
+  "gaps": [
+   {
+    "operation": "getWaitTimes",
+    "why": "**1 declared operation reach no component on this screen**: getWaitTimes. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected virtual queue",
+       "bindsTo": "WaitingGuest",
+       "columns": [
+        "WaitingGuest.id",
+        "WaitingGuest.queueId",
+        "WaitingGuest.queueName",
+        "WaitingGuest.subjectId",
+        "WaitingGuest.partyNumber",
+        "WaitingGuest.partySize",
+        "WaitingGuest.status",
+        "WaitingGuest.positionInQueue",
+        "WaitingGuest.partiesAhead",
+        "WaitingGuest.estimatedCallAt",
+        "WaitingGuest.isFastPass",
+        "WaitingGuest.entitlementId",
+        "WaitingGuest.calledAt",
+        "WaitingGuest.returnWindowEndsAt",
+        "WaitingGuest.redeemedAt",
+        "WaitingGuest.admittedCount"
+       ],
+       "operation": "getWaitingGuest",
+       "provenance": "contract queue.yaml GET /waiting-guests/{entryId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Join",
+       "operation": "joinQueue",
+       "provenance": "contract queue.yaml POST /waiting-guests"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Leave",
+       "operation": "leaveQueue",
+       "provenance": "contract queue.yaml DELETE /waiting-guests/{entryId}"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "cardList",
+       "label": "Virtual Queue",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Detail",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Content resolves in place.",
+   "error": "Could not load. **The rest of the site is unaffected.**",
+   "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
+   "emptyNoResults": "Nothing matches.",
+   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused."
+  },
+  "apis": [
+   {
+    "operationId": "joinQueue",
+    "contract": "queue",
+    "purpose": "Join a virtual queue",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getWaitingGuest",
+    "contract": "queue",
+    "purpose": "Read a queue entry",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "leaveQueue",
+    "contract": "queue",
+    "purpose": "Leave a queue",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getWaitTimes",
+    "contract": "queue",
+    "purpose": "Wait times across a venue",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "joinWaitlist",
+    "contract": "catalogue",
+    "purpose": "Join a virtual queue",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "leaveWaitlist",
+    "contract": "catalogue",
+    "purpose": "Leave it",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "entryId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land here, and the person holding it did nothing wrong. Arrives with `entryId`."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-040"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-041",
+  "name": "Parking – Reserve & Pay",
+  "module": "In-venue Services",
+  "requiresModule": "access",
+  "wave": 2,
+  "implementation": {
+   "app": "guest-web",
+   "route": "/parking--reserve-and-pay",
+   "component": "apps/guest-web/src/routes/ParkingReservePay.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "exitTo": [
+    "WEB-001"
+   ]
+  },
+  "notes": "**A guest reserves parking on the drive, from whatever is open on their phone.** Requiring an install for a car park is requiring an install to arrive. **Renamed 31 August** from *Parking — Reserve & Pay*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listParkingFacilities` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Reserve a facility before arriving.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every parking reserve pay",
+       "bindsTo": "ParkingFacility",
+       "columns": [
+        "ParkingFacility.id",
+        "ParkingFacility.name",
+        "ParkingFacility.venueId",
+        "ParkingFacility.mode",
+        "ParkingFacility.capacity",
+        "ParkingFacility.takesPayment",
+        "ParkingFacility.vendorSwapTargetDays",
+        "ParkingFacility.vendorName",
+        "ParkingFacility.endpoint",
+        "ParkingFacility.credentialRef",
+        "ParkingFacility.pushLeadMinutes",
+        "ParkingFacility.accessPointIds"
+       ],
+       "operation": "listParkingFacilities",
+       "provenance": "contract access.yaml GET /parking-facilities"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected parking reserve pay",
+       "bindsTo": "ParkingFacility",
+       "columns": [
+        "ParkingFacility.id",
+        "ParkingFacility.name",
+        "ParkingFacility.venueId",
+        "ParkingFacility.mode",
+        "ParkingFacility.capacity",
+        "ParkingFacility.takesPayment",
+        "ParkingFacility.vendorSwapTargetDays",
+        "ParkingFacility.vendorName",
+        "ParkingFacility.endpoint",
+        "ParkingFacility.credentialRef",
+        "ParkingFacility.pushLeadMinutes",
+        "ParkingFacility.accessPointIds",
+        "ParkingFacility.isActive"
+       ],
+       "operation": "listParkingFacilities",
+       "provenance": "contract access.yaml GET /parking-facilities"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createParkingEntitlement",
+       "provenance": "contract access.yaml POST /parking-entitlements"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateParkingEntitlement",
+       "provenance": "contract access.yaml PATCH /parking-entitlements/{entitlementId}"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "cardList",
+       "label": "Parking — Reserve & Pay",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Detail",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Content resolves in place.",
+   "error": "Could not load. **The rest of the site is unaffected.**",
+   "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
+   "emptyNoResults": "Nothing matches.",
+   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused."
+  },
+  "apis": [
+   {
+    "operationId": "listParkingFacilities",
+    "contract": "access",
+    "purpose": "Car parks at a venue, and how each integrates",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createParkingEntitlement",
+    "contract": "access",
+    "purpose": "A guest bought parking",
+    "trigger": "onAction",
+    "invalidates": [
+     "listParkingFacilities"
+    ]
+   },
+   {
+    "operationId": "updateParkingEntitlement",
+    "contract": "access",
+    "purpose": "Change the plate, or revoke",
+    "trigger": "onAction",
+    "invalidates": [
+     "listParkingFacilities"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "entitlementId",
+     "from": "deepLink"
+    },
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land here, and the person holding it did nothing wrong. Arrives with `entitlementId`.",
+   "preloaded": [
+    "ParkingFacility.id",
+    "ParkingFacility.name",
+    "ParkingFacility.venueId",
+    "ParkingFacility.mode",
+    "ParkingFacility.capacity"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-041"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

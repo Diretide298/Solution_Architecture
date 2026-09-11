@@ -1,0 +1,140 @@
+id: F213
+name: 'Subscription Licensing AI Self Service board 7: AI Setup Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Subscription Licensing AI Self Service board 7. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-595
+  entryPoints:
+  - Arrives at Environment Ready & Handoff to AI Setup
+  - Arrives at AI Setup Command Center
+steps:
+- step: 1
+  screen: BO-594
+  action: Arrives at Environment Ready & Handoff to AI Setup
+  operations: []
+  outcome: Confirm that provisioning is complete and move the customer into Board 7.
+- step: 2
+  screen: BO-595
+  action: Opens AI Setup Command Center
+  operations: []
+  outcome: Provide the customer with one central place to understand the overall configuration status
+    and what needs to be completed.
+- step: 3
+  screen: BO-596
+  action: Works in Guided Setup Plan
+  operations: []
+  outcome: Turn a complex TICVAI implementation into a simple sequence of configuration tasks. Instead
+    of expecting the customer to understand all TICVAI modules, the system creates a personalized setup
+    plan.
+- step: 4
+  screen: BO-595
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 5
+  screen: BO-597
+  action: Works in AI Configuration Workspace
+  operations: []
+  outcome: Allow the customer to configure TICVAI using natural language. This is the main AI configuration
+    screen.
+- step: 6
+  screen: BO-595
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 7
+  screen: BO-598
+  action: Works in AI Draft Review & Approval
+  operations: []
+  outcome: Provide structured review of AI-generated configuration before it is committed.
+- step: 8
+  screen: BO-595
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 9
+  screen: BO-599
+  action: Works in Manual Configuration Center
+  operations: []
+  outcome: Allow customers who prefer traditional administration to configure TICVAI without AI.
+- step: 10
+  screen: BO-595
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 11
+  screen: BO-600
+  action: Works in Venue, Calendar & Operational Setup
+  operations: []
+  outcome: Provide a guided workspace for the fundamental venue configuration.
+- step: 12
+  screen: BO-595
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 13
+  screen: BO-601
+  action: Works in Product, Pricing & Sales Channel Setup
+  operations: []
+  outcome: Configure the customer's initial products and where they can be sold.
+- step: 14
+  screen: BO-595
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 15
+  screen: BO-602
+  action: Works in POS, Payment & Access Setup
+  operations: []
+  outcome: Guide the customer through the key operational configuration required to actually sell and
+    validate tickets.
+- step: 16
+  screen: BO-595
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 17
+  screen: BO-603
+  action: Works in Configuration Health & AI Review
+  operations: []
+  outcome: Allow AI to analyze the complete configuration and identify missing, inconsistent, or potentially
+    incorrect settings before formal go-live validation.
+- step: 18
+  screen: BO-595
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 19
+  screen: BO-604
+  action: Works in Setup Completion & Handoff to Go-Live
+  operations: []
+  outcome: Confirm that customer configuration is sufficiently complete to begin formal Board 8 validation.
+branches:
+- at: 2
+  condition: Nothing has been set up on AI Setup Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 2
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Subscription Licensing AI Self Service board 7 visited
+primaryContract: unknown
+contracts:
+- unknown

@@ -1,0 +1,1186 @@
+{
+ "addLicenceAddOn": {
+  "method": "POST",
+  "path": "/tenants/{tenantId}/licences/add-ons",
+  "contract": "subscription",
+  "summary": "License a module outside the plan",
+  "permission": "PLATFORM_TENANT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "LicenceAddOn",
+  "responds": "LicencePosition"
+ },
+ "appendEntitlementToMedia": {
+  "method": "POST",
+  "path": "/media/{mediaCode}/entitlements",
+  "contract": "orders",
+  "summary": "Add something to a ticket the guest already holds",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AppendEntitlementRequest",
+  "responds": "AppendEntitlementResult"
+ },
+ "completeUpload": {
+  "method": "POST",
+  "path": "/media/uploads/{uploadId}/complete",
+  "contract": "assets",
+  "summary": "Confirm an upload and create the asset",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaAsset"
+ },
+ "createAsset": {
+  "method": "POST",
+  "path": "/assets",
+  "contract": "maintenance",
+  "summary": "Register an asset",
+  "permission": "ASSET_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateAssetRequest",
+  "responds": "Asset"
+ },
+ "createCollection": {
+  "method": "POST",
+  "path": "/media/collections",
+  "contract": "assets",
+  "summary": "Create a collection",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Collection"
+ },
+ "createMenu": {
+  "method": "POST",
+  "path": "/menus",
+  "contract": "fnb",
+  "summary": "Create a menu",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateMenuRequest",
+  "responds": "Menu"
+ },
+ "createPreview": {
+  "method": "POST",
+  "path": "/tenant-config/preview",
+  "contract": "white-label",
+  "summary": "Generate a preview link",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Preview"
+ },
+ "createTenant": {
+  "method": "POST",
+  "path": "/tenants",
+  "contract": "subscription",
+  "summary": "Create a tenant",
+  "permission": "PLATFORM_TENANT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateTenantRequest",
+  "responds": "Tenant"
+ },
+ "createUpload": {
+  "method": "POST",
+  "path": "/media/uploads",
+  "contract": "assets",
+  "summary": "Request a signed upload URL",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "UploadTicket"
+ },
+ "deleteMediaAsset": {
+  "method": "DELETE",
+  "path": "/media/{mediaId}",
+  "contract": "assets",
+  "summary": "Delete an asset",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "diffConfigVersion": {
+  "method": "GET",
+  "path": "/tenant-config/versions/{version}/diff",
+  "contract": "white-label",
+  "summary": "Compare a version against the working draft",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "against",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ConfigDiff"
+ },
+ "generateInvoice": {
+  "method": "POST",
+  "path": "/tenants/{tenantId}/invoices",
+  "contract": "subscription",
+  "summary": "Generate an invoice for a period",
+  "permission": "PLATFORM_BILLING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SubscriptionInvoice"
+ },
+ "getAsset": {
+  "method": "GET",
+  "path": "/assets/{assetId}",
+  "contract": "maintenance",
+  "summary": "Read an asset with history and documents",
+  "permission": "ASSET_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AssetDetail"
+ },
+ "getAssetHistory": {
+  "method": "GET",
+  "path": "/assets/{assetId}/history",
+  "contract": "maintenance",
+  "summary": "Service history",
+  "permission": "ASSET_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "getBrandIdentity": {
+  "method": "GET",
+  "path": "/tenant-config/brand",
+  "contract": "white-label",
+  "summary": "Read brand identity",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BrandIdentity"
+ },
+ "getEntitlementUsage": {
+  "method": "GET",
+  "path": "/tenants/{tenantId}/entitlement-usage",
+  "contract": "subscription",
+  "summary": "Usage against licensed limits",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "EntitlementUsage"
+ },
+ "getExpiringRights": {
+  "method": "GET",
+  "path": "/media/rights-expiring",
+  "contract": "assets",
+  "summary": "Assets whose licence is expiring or expired",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "withinDays",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ExpiringMedia"
+ },
+ "getFonts": {
+  "method": "GET",
+  "path": "/tenant-config/fonts",
+  "contract": "white-label",
+  "summary": "Read font configuration",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "FontConfig"
+ },
+ "getHomepageLayout": {
+  "method": "GET",
+  "path": "/tenant-config/homepage",
+  "contract": "white-label",
+  "summary": "Read homepage layout",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "HomepageLayout"
+ },
+ "getMediaAsset": {
+  "method": "GET",
+  "path": "/media/{mediaId}",
+  "contract": "assets",
+  "summary": "Read an asset with derivatives and usage",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MediaAssetDetail"
+ },
+ "getMediaEntitlements": {
+  "method": "GET",
+  "path": "/media/{mediaCode}/entitlements",
+  "contract": "orders",
+  "summary": "What is already on this media",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MediaEntitlements"
+ },
+ "getMenu": {
+  "method": "GET",
+  "path": "/menus/{menuId}",
+  "contract": "fnb",
+  "summary": "Read a menu with sections and items",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Menu"
+ },
+ "getSsoConfig": {
+  "method": "GET",
+  "path": "/tenants/sso-config",
+  "contract": "identity",
+  "summary": "Read SSO configuration",
+  "permission": "USER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SsoProviderConfig"
+ },
+ "getSubscription": {
+  "method": "GET",
+  "path": "/tenants/{tenantId}/subscription",
+  "contract": "subscription",
+  "summary": "Read the current subscription",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Subscription"
+ },
+ "getTenant": {
+  "method": "GET",
+  "path": "/tenants/{tenantId}",
+  "contract": "subscription",
+  "summary": "Read a tenant with cells and subscription",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "TenantDetail"
+ },
+ "getTenantLicences": {
+  "method": "GET",
+  "path": "/tenants/{tenantId}/licences",
+  "contract": "subscription",
+  "summary": "What a tenant is licensed to use",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "LicencePosition"
+ },
+ "getTheme": {
+  "method": "GET",
+  "path": "/tenant-config/theme",
+  "contract": "white-label",
+  "summary": "Read colour theme",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Theme"
+ },
+ "getUsageMetering": {
+  "method": "GET",
+  "path": "/tenants/{tenantId}/usage",
+  "contract": "subscription",
+  "summary": "Metered usage for a period",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "periodStart",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "periodEnd",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "metric",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "UsageReport"
+ },
+ "listAssets": {
+  "method": "GET",
+  "path": "/assets",
+  "contract": "maintenance",
+  "summary": "List assets",
+  "permission": "ASSET_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "maintenanceDue",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listBanners": {
+  "method": "GET",
+  "path": "/tenant-config/banners",
+  "contract": "white-label",
+  "summary": "List banners",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "state",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listCollections": {
+  "method": "GET",
+  "path": "/media/collections",
+  "contract": "assets",
+  "summary": "List collections",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Collection"
+ },
+ "listConfigVersions": {
+  "method": "GET",
+  "path": "/tenant-config/versions",
+  "contract": "white-label",
+  "summary": "Version history",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMenus": {
+  "method": "GET",
+  "path": "/menus",
+  "contract": "fnb",
+  "summary": "List menus",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "outletId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "activeAt",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listPromoBlocks": {
+  "method": "GET",
+  "path": "/tenant-config/promo-blocks",
+  "contract": "white-label",
+  "summary": "List promotional blocks",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PromoBlock"
+ },
+ "listSubscriptionInvoices": {
+  "method": "GET",
+  "path": "/tenants/{tenantId}/invoices",
+  "contract": "subscription",
+  "summary": "List subscription invoices",
+  "permission": "PLATFORM_BILLING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listTenantCells": {
+  "method": "GET",
+  "path": "/tenants/{tenantId}/cells",
+  "contract": "subscription",
+  "summary": "List a tenant's cells",
+  "permission": "PLATFORM_CELL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Cell"
+ },
+ "listTenants": {
+  "method": "GET",
+  "path": "/tenants",
+  "contract": "subscription",
+  "summary": "List tenants",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "planId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "lookupAsset": {
+  "method": "GET",
+  "path": "/assets/lookup",
+  "contract": "maintenance",
+  "summary": "Find an asset by tag or QR",
+  "permission": "ASSET_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "assetTag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "serialNumber",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AssetDetail"
+ },
+ "previewSubscriptionChange": {
+  "method": "POST",
+  "path": "/tenants/{tenantId}/subscription/preview",
+  "contract": "subscription",
+  "summary": "Preview the effect of a plan change",
+  "permission": "PLATFORM_TENANT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SetSubscriptionRequest",
+  "responds": "SubscriptionPreview"
+ },
+ "provisionCell": {
+  "method": "POST",
+  "path": "/tenants/{tenantId}/cells",
+  "contract": "subscription",
+  "summary": "Provision a cell for a region",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ProvisionCellRequest",
+  "responds": null
+ },
+ "publishTenantConfig": {
+  "method": "POST",
+  "path": "/tenant-config/publish",
+  "contract": "white-label",
+  "summary": "Publish the working draft",
+  "permission": "TENANT_PUBLISH",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ConfigVersion"
+ },
+ "reactivateTenant": {
+  "method": "POST",
+  "path": "/tenants/{tenantId}/reactivate",
+  "contract": "subscription",
+  "summary": "Lift a suspension",
+  "permission": "PLATFORM_TENANT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Tenant"
+ },
+ "removeLicenceAddOn": {
+  "method": "DELETE",
+  "path": "/tenants/{tenantId}/licences/add-ons",
+  "contract": "subscription",
+  "summary": "Remove an add-on",
+  "permission": "PLATFORM_TENANT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "LicencePosition"
+ },
+ "replaceMediaAsset": {
+  "method": "POST",
+  "path": "/media/{mediaId}/replace",
+  "contract": "assets",
+  "summary": "Replace the file behind an asset",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaReplaceResult"
+ },
+ "restoreConfigVersion": {
+  "method": "POST",
+  "path": "/tenant-config/versions/{version}/restore",
+  "contract": "white-label",
+  "summary": "Restore a previous version",
+  "permission": "TENANT_PUBLISH",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TenantConfig"
+ },
+ "searchMedia": {
+  "method": "GET",
+  "path": "/media",
+  "contract": "assets",
+  "summary": "Search the asset library",
+  "permission": "ASSET_LIBRARY_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "tag",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "collectionId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "unusedOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "rightsExpiringWithinDays",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "setAssetStatus": {
+  "method": "PUT",
+  "path": "/assets/{assetId}/status",
+  "contract": "maintenance",
+  "summary": "Take an asset out of service or return it",
+  "permission": "ASSET_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SetAssetStatusRequest",
+  "responds": "AssetStatusResult"
+ },
+ "setBrandIdentity": {
+  "method": "PUT",
+  "path": "/tenant-config/brand",
+  "contract": "white-label",
+  "summary": "Set logo, favicon and splash",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "BrandIdentity",
+  "responds": "BrandIdentity"
+ },
+ "setFonts": {
+  "method": "PUT",
+  "path": "/tenant-config/fonts",
+  "contract": "white-label",
+  "summary": "Set fonts",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "FontConfig",
+  "responds": "FontConfig"
+ },
+ "setHomepageLayout": {
+  "method": "PUT",
+  "path": "/tenant-config/homepage",
+  "contract": "white-label",
+  "summary": "Set homepage section order",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "HomepageLayout",
+  "responds": "HomepageLayout"
+ },
+ "setMenuSections": {
+  "method": "PUT",
+  "path": "/menus/{menuId}/sections",
+  "contract": "fnb",
+  "summary": "Set menu sections and their item ordering",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Menu"
+ },
+ "setSsoConfig": {
+  "method": "PUT",
+  "path": "/tenants/sso-config",
+  "contract": "identity",
+  "summary": "Configure an identity provider",
+  "permission": "USER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SsoProviderConfig",
+  "responds": "SsoProviderConfig"
+ },
+ "setSubscription": {
+  "method": "PUT",
+  "path": "/tenants/{tenantId}/subscription",
+  "contract": "subscription",
+  "summary": "Assign or change a subscription",
+  "permission": "PLATFORM_TENANT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SetSubscriptionRequest",
+  "responds": "Subscription"
+ },
+ "setTheme": {
+  "method": "PUT",
+  "path": "/tenant-config/theme",
+  "contract": "white-label",
+  "summary": "Set colour theme",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Theme",
+  "responds": "Theme"
+ },
+ "suspendTenant": {
+  "method": "POST",
+  "path": "/tenants/{tenantId}/suspend",
+  "contract": "subscription",
+  "summary": "Suspend a tenant",
+  "permission": "PLATFORM_TENANT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Tenant"
+ },
+ "terminateTenant": {
+  "method": "POST",
+  "path": "/tenants/{tenantId}/terminate",
+  "contract": "subscription",
+  "summary": "Begin termination",
+  "permission": "PLATFORM_TENANT_TERMINATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "updateAsset": {
+  "method": "PATCH",
+  "path": "/assets/{assetId}",
+  "contract": "maintenance",
+  "summary": "Amend an asset",
+  "permission": "ASSET_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Asset"
+ },
+ "updateMediaAsset": {
+  "method": "PATCH",
+  "path": "/media/{mediaId}",
+  "contract": "assets",
+  "summary": "Amend metadata, tags or rights",
+  "permission": "ASSET_LIBRARY_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MediaAsset"
+ },
+ "updateMenu": {
+  "method": "PATCH",
+  "path": "/menus/{menuId}",
+  "contract": "fnb",
+  "summary": "Amend a menu",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Menu"
+ },
+ "updateTenant": {
+  "method": "PATCH",
+  "path": "/tenants/{tenantId}",
+  "contract": "subscription",
+  "summary": "Amend tenant details",
+  "permission": "PLATFORM_TENANT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Tenant"
+ }
+}

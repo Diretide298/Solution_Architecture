@@ -1,0 +1,143 @@
+{
+ "listEntryTemporaryExit": {
+  "method": "GET",
+  "path": "/entry-temporary-exit",
+  "contract": "access",
+  "summary": "Re-entry & Temporary Exit Journey",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ReEntryTemporaryExitJourneyView"
+ },
+ "listFamilyChildPod": {
+  "method": "GET",
+  "path": "/family-child-pod",
+  "contract": "access",
+  "summary": "Family, Child, POD & Companion Journey",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "FamilyChildPodCompanionJourneyView"
+ },
+ "listFastPassAttraction": {
+  "method": "GET",
+  "path": "/fast-pass-attraction",
+  "contract": "access",
+  "summary": "Fast Pass & Attraction Access Journey",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "FastPassAttractionAccessJourneyView"
+ },
+ "listGroupAttendancePartial": {
+  "method": "GET",
+  "path": "/group-attendance-partial",
+  "contract": "access",
+  "summary": "Group Attendance & Partial Entry Manager",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GroupAttendancePartialEntryManagerView"
+ },
+ "listGroupLeaderFast": {
+  "method": "GET",
+  "path": "/group-leader-fast",
+  "contract": "access",
+  "summary": "Group Leader & Fast B2B Validation",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GroupLeaderFastB2bValidationView"
+ },
+ "listGuestJourney": {
+  "method": "GET",
+  "path": "/guest-journey",
+  "contract": "access",
+  "summary": "Guest Journey Command Center",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestJourneyCommandCenterView"
+ },
+ "listJourneys": {
+  "method": "GET",
+  "path": "/journeys",
+  "contract": "marketing-crm",
+  "summary": "Automated journeys",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Journey"
+ },
+ "listMultiParkCrossover2": {
+  "method": "GET",
+  "path": "/multi-park-crossover-2",
+  "contract": "access",
+  "summary": "Multi-Park & Crossover Journey Orchestrator",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MultiParkCrossoverJourneyOrchestratorView"
+ },
+ "listSpecialEventFree": {
+  "method": "GET",
+  "path": "/special-event-free",
+  "contract": "access",
+  "summary": "Special Event, Free View & Alternative Admission",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SpecialEventFreeViewAlternativeAdmissionView"
+ },
+ "setGroupAdmissionProfile": {
+  "method": "PUT",
+  "path": "/group-admission-profile",
+  "contract": "access",
+  "summary": "Group & B2B Admission Profile Builder",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "GroupB2bAdmissionProfileBuilderInput",
+  "responds": "GroupB2bAdmissionProfileBuilderView"
+ }
+}

@@ -1,0 +1,134 @@
+id: F200
+name: 'Rental Management board 4: Rental Pricing Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Rental Management board 4. **This route is read from the
+    screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-524
+  entryPoints:
+  - Arrives at Rental Pricing Command Center
+steps:
+- step: 1
+  screen: BO-524
+  action: Opens Rental Pricing Command Center
+  operations: []
+  outcome: Central management screen for all rental pricing and commercial policies.
+- step: 2
+  screen: BO-525
+  action: Works in Pricing Profile Builder
+  operations: []
+  outcome: Create the master commercial pricing profile associated with a rental product.
+- step: 3
+  screen: BO-524
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-526
+  action: Works in Duration & Tiered Pricing Configuration
+  operations: []
+  outcome: Configure pricing according to rental duration. This directly implements the fixed and dynamic-duration
+    requirements.
+- step: 5
+  screen: BO-524
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-527
+  action: Works in Calendar, Peak & Seasonal Pricing
+  operations: []
+  outcome: Allow price differentiation according to date and time.
+- step: 7
+  screen: BO-524
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-528
+  action: Works in Dynamic Pricing & AI Recommendation
+  operations: []
+  outcome: Connect Rental Management to TICVAI's broader Dynamic Pricing capability without duplicating
+    the core Dynamic Pricing module. The original rental requirements explicitly support dynamic pricing.
+- step: 9
+  screen: BO-524
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-529
+  action: Works in Deposit & Security Hold Policy
+  operations: []
+  outcome: Configure financial security required before equipment is released. The original scope supports
+    fixed and percentage deposits and multiple deposit methods.
+- step: 11
+  screen: BO-524
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-530
+  action: Works in Deposit Lifecycle & Settlement Rules
+  operations: []
+  outcome: Control what happens to the deposit throughout the rental lifecycle.
+- step: 13
+  screen: BO-524
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-531
+  action: Works in Late Fee, Grace Period & Extension Pricing
+  operations: []
+  outcome: Configure the commercial treatment of rentals that extend beyond the original return time.
+    The source explicitly requires automatic late-fee calculation and grace-period configuration.
+- step: 15
+  screen: BO-524
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-532
+  action: Works in Commercial Exceptions, Waivers & Overrides
+  operations: []
+  outcome: Control authorized deviations from normal commercial policies.
+- step: 17
+  screen: BO-524
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-533
+  action: Works in Pricing Simulation, Validation & AI Commercial Intelligence
+  operations: []
+  outcome: Allow administrators to test commercial configuration before publishing it. This is particularly
+    important because rental pricing can involve duration, calendar, location, deposit and dynamic pricing
+    simultaneously.
+branches:
+- at: 1
+  condition: Nothing has been set up on Rental Pricing Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Rental Management board 4 visited
+primaryContract: unknown
+contracts:
+- unknown

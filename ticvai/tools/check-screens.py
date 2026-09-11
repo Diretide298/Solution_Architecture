@@ -28,7 +28,6 @@ from pathlib import Path
 
 import json
 import re
-import json
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -1176,6 +1175,43 @@ def main() -> int:
                     f"{_pre}-{_over[0]:03d}: issued above the register's high-water mark of "
                     f"{_rec.get('highWaterMark')} — run tools/derive-id-register.py --apply and "
                     "commit it in the same change, so the next allocator can see the number is spent")
+
+    # ── a copy stays a copy ──────────────────────────────────────────────────────────────────
+    #
+    # **`source.sameAs` is a promise that two screens are one piece of work drawn twice** — Rental
+    # on the staff app and on venue management, the prospect's half of the Subscription book on P17
+    # and P09. The generated layer is copied, and `generate-screens-from-pack.py` rebuilds only the
+    # original, so regenerating a module silently leaves its copies behind. Added 11 September.
+    # The two sanctioned differences are the ones the copying tools write on purpose.
+    _all: dict = {}
+    for f in files:
+        _d = yaml.safe_load(f.read_text(encoding="utf-8"))
+        for sc in _d.get("screens") or []:
+            _all[sc["id"]] = (_d["platform"]["code"], sc)
+    _copied = ("purpose", "pattern", "patternReason", "layout", "states", "gaps", "overlays",
+               "apis", "apisNote", "entryState")
+    _tool = {"P06": "apply-rental-staff-app.py", "P17": "apply-subscription-placement.py"}
+    for _sid, (_code, sc) in sorted(_all.items()):
+        _twin_id = (sc.get("source") or {}).get("sameAs")
+        if not _twin_id:
+            continue
+        if _twin_id not in _all:
+            ERRORS.append(f"{_sid}: source.sameAs names {_twin_id}, which does not exist")
+            continue
+        _twin = _all[_twin_id][1]
+        _drift = []
+        for _k in _copied:
+            _a, _b = sc.get(_k), _twin.get(_k)
+            if _k == "states":
+                _skip = {"P06": "offline", "P17": "emptyNoAccess"}.get(_code)
+                _a = {x: y for x, y in (_a or {}).items() if x != _skip}
+                _b = {x: y for x, y in (_b or {}).items() if x != _skip}
+            if json.dumps(_a, sort_keys=True, default=str) != json.dumps(_b, sort_keys=True, default=str):
+                _drift.append(_k)
+        if _drift:
+            ERRORS.append(
+                f"{_sid}: has drifted from {_twin_id} in {', '.join(_drift)} — re-run "
+                f"tools/applied/{_tool.get(_code, '<the tool that made it>')} --apply")
 
     for w in WARNINGS:
         print(f"  WARN  {w}")

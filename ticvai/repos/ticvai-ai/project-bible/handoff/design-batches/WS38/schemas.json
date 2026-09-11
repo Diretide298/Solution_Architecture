@@ -1,0 +1,1369 @@
+{
+ "BookingVelocityTimeToEventRuleBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Booking Velocity & Time-to-Event Rule Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "salesPerHour": {
+    "type": "string",
+    "description": "Sales per Hour"
+   },
+   "salesPerDay": {
+    "type": "string",
+    "description": "Sales per Day"
+   },
+   "salesPerWeek": {
+    "type": "string",
+    "description": "Sales per Week"
+   },
+   "currentBookingPace": {
+    "type": "string",
+    "description": "Current Booking Pace"
+   },
+   "expectedBookingPace": {
+    "type": "string",
+    "description": "Expected Booking Pace"
+   },
+   "historicalBookingCurve": {
+    "type": "string",
+    "description": "Historical Booking Curve"
+   },
+   "paceVariance": {
+    "type": "number",
+    "description": "Pace Variance %"
+   },
+   "remainingInventory": {
+    "type": "string",
+    "description": "Remaining Inventory"
+   },
+   "t180": {
+    "type": "string",
+    "description": "T−180"
+   },
+   "t90": {
+    "type": "string",
+    "description": "T−90"
+   },
+   "t60": {
+    "type": "string",
+    "description": "T−60"
+   },
+   "t30": {
+    "type": "string",
+    "description": "T−30"
+   },
+   "t14": {
+    "type": "string",
+    "description": "T−14"
+   },
+   "t7": {
+    "type": "string",
+    "description": "T−7"
+   },
+   "t3": {
+    "type": "string",
+    "description": "T−3"
+   },
+   "t1": {
+    "type": "string",
+    "description": "T−1"
+   },
+   "sameDay": {
+    "type": "string",
+    "description": "Same Day"
+   },
+   "orCustomIntervals": {
+    "type": "string",
+    "description": "or custom intervals"
+   },
+   "increaseCurrentPriceBy5": {
+    "type": "number",
+    "description": "Increase current price by 5%"
+   },
+   "t2Days": {
+    "type": "string",
+    "description": "T−2 Days"
+   },
+   "then15": {
+    "type": "number",
+    "description": "THEN +15%"
+   }
+  }
+ },
+ "BookingVelocityTimeToEventRuleBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Booking Velocity & Time-to-Event Rule Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "salesPerHour": {
+    "type": "string",
+    "description": "Sales per Hour"
+   },
+   "salesPerDay": {
+    "type": "string",
+    "description": "Sales per Day"
+   },
+   "salesPerWeek": {
+    "type": "string",
+    "description": "Sales per Week"
+   },
+   "currentBookingPace": {
+    "type": "string",
+    "description": "Current Booking Pace"
+   },
+   "expectedBookingPace": {
+    "type": "string",
+    "description": "Expected Booking Pace"
+   },
+   "historicalBookingCurve": {
+    "type": "string",
+    "description": "Historical Booking Curve"
+   },
+   "paceVariance": {
+    "type": "number",
+    "description": "Pace Variance %"
+   },
+   "remainingInventory": {
+    "type": "string",
+    "description": "Remaining Inventory"
+   },
+   "t180": {
+    "type": "string",
+    "description": "T−180"
+   },
+   "t90": {
+    "type": "string",
+    "description": "T−90"
+   },
+   "t60": {
+    "type": "string",
+    "description": "T−60"
+   },
+   "t30": {
+    "type": "string",
+    "description": "T−30"
+   },
+   "t14": {
+    "type": "string",
+    "description": "T−14"
+   },
+   "t7": {
+    "type": "string",
+    "description": "T−7"
+   },
+   "t3": {
+    "type": "string",
+    "description": "T−3"
+   },
+   "t1": {
+    "type": "string",
+    "description": "T−1"
+   },
+   "sameDay": {
+    "type": "string",
+    "description": "Same Day"
+   },
+   "orCustomIntervals": {
+    "type": "string",
+    "description": "or custom intervals"
+   },
+   "velocity": {
+    "type": "string",
+    "description": "Velocity (the pack shows +45%)"
+   },
+   "increaseCurrentPriceBy5": {
+    "type": "number",
+    "description": "Increase current price by 5%"
+   },
+   "t2Days": {
+    "type": "string",
+    "description": "T−2 Days"
+   },
+   "then15": {
+    "type": "number",
+    "description": "THEN +15%"
+   }
+  }
+ },
+ "ChannelCustomerSegmentLocationDynamicRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Channel, Customer Segment & Location Dynamic Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "b2c": {
+    "type": "string",
+    "description": "B2C"
+   },
+   "mobileApp": {
+    "type": "string",
+    "description": "Mobile App"
+   },
+   "pos": {
+    "type": "string",
+    "description": "POS"
+   },
+   "kiosk": {
+    "type": "string",
+    "description": "Kiosk"
+   },
+   "callCenter": {
+    "type": "string",
+    "description": "Call Center"
+   },
+   "b2b": {
+    "type": "string",
+    "description": "B2B"
+   },
+   "reseller": {
+    "type": "string",
+    "description": "Reseller"
+   },
+   "ota": {
+    "type": "string",
+    "description": "OTA"
+   },
+   "api": {
+    "type": "string",
+    "description": "API"
+   },
+   "dynamicRange15": {
+    "type": "number",
+    "description": "Dynamic range ±15%"
+   },
+   "dynamicRange0To10": {
+    "type": "number",
+    "description": "Dynamic range +0% to +10%"
+   },
+   "standardCustomer": {
+    "type": "string",
+    "description": "Standard Customer"
+   },
+   "member": {
+    "type": "string",
+    "description": "Member"
+   },
+   "loyaltyTier": {
+    "type": "string",
+    "description": "Loyalty Tier"
+   },
+   "resident": {
+    "type": "string",
+    "description": "Resident"
+   },
+   "vip": {
+    "type": "string",
+    "description": "VIP"
+   },
+   "corporate": {
+    "type": "string",
+    "description": "Corporate"
+   },
+   "group": {
+    "type": "string",
+    "description": "Group"
+   },
+   "customSegment": {
+    "type": "string",
+    "description": "Custom Segment"
+   },
+   "country": {
+    "type": "string",
+    "description": "Country"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "zone": {
+    "type": "string",
+    "description": "Zone"
+   },
+   "eventLocation": {
+    "type": "string",
+    "description": "Event Location"
+   },
+   "maximumDynamicUplift20": {
+    "type": "number",
+    "description": "Maximum dynamic uplift +20%"
+   },
+   "maximum15": {
+    "type": "number",
+    "description": "Maximum +15%"
+   },
+   "partnerContractRates": {
+    "type": "string",
+    "description": "Partner Contract Rates"
+   },
+   "corporateAgreements": {
+    "type": "string",
+    "description": "Corporate Agreements"
+   },
+   "membershipGuarantees": {
+    "type": "string",
+    "description": "Membership Guarantees"
+   },
+   "fixedGroupRates": {
+    "type": "string",
+    "description": "Fixed Group Rates"
+   }
+  }
+ },
+ "DemandOccupancyAvailabilityRuleBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Demand, Occupancy & Availability Rule Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "ticketsSold": {
+    "type": "string",
+    "description": "Tickets Sold"
+   },
+   "currentDemand": {
+    "type": "string",
+    "description": "Current Demand"
+   },
+   "occupancy": {
+    "type": "integer",
+    "description": "Occupancy %"
+   },
+   "remainingCapacity": {
+    "type": "integer",
+    "description": "Remaining Capacity"
+   },
+   "remainingInventory": {
+    "type": "string",
+    "description": "Remaining Inventory"
+   },
+   "availableSeats": {
+    "type": "integer",
+    "description": "Available Seats"
+   },
+   "capacityUtilization": {
+    "type": "integer",
+    "description": "Capacity Utilization"
+   },
+   "salesPace": {
+    "type": "string",
+    "description": "Sales Pace"
+   },
+   "cyAction": {
+    "type": "string",
+    "description": "cy Action"
+   }
+  }
+ },
+ "DemandOccupancyAvailabilityRuleBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Demand, Occupancy & Availability Rule Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "ticketsSold": {
+    "type": "string",
+    "description": "Tickets Sold"
+   },
+   "currentDemand": {
+    "type": "string",
+    "description": "Current Demand"
+   },
+   "occupancy": {
+    "type": "integer",
+    "description": "Occupancy %"
+   },
+   "remainingCapacity": {
+    "type": "integer",
+    "description": "Remaining Capacity"
+   },
+   "remainingInventory": {
+    "type": "string",
+    "description": "Remaining Inventory"
+   },
+   "availableSeats": {
+    "type": "integer",
+    "description": "Available Seats"
+   },
+   "capacityUtilization": {
+    "type": "integer",
+    "description": "Capacity Utilization"
+   },
+   "salesPace": {
+    "type": "string",
+    "description": "Sales Pace"
+   },
+   "cyAction": {
+    "type": "string",
+    "description": "cy Action"
+   }
+  }
+ },
+ "DynamicPriceBandsLaddersAdjustmentMatrixView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Dynamic Price Bands, Ladders & Adjustment Matrix displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "p1": {
+    "type": "string",
+    "description": "P1"
+   },
+   "p2": {
+    "type": "string",
+    "description": "P2"
+   },
+   "p3": {
+    "type": "string",
+    "description": "P3"
+   },
+   "p4": {
+    "type": "string",
+    "description": "P4"
+   },
+   "p5": {
+    "type": "string",
+    "description": "P5"
+   },
+   "p6": {
+    "type": "string",
+    "description": "P6"
+   },
+   "p7": {
+    "type": "string",
+    "description": "P7"
+   },
+   "fixedPriceBands": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fixed Price Bands"
+   },
+   "percentageBands": {
+    "type": "number",
+    "description": "Percentage Bands"
+   },
+   "fixedAmountSteps": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fixed Amount Steps"
+   },
+   "derivedBands": {
+    "type": "string",
+    "description": "Derived Bands"
+   },
+   "continuousRangeWherePermitted": {
+    "type": "string",
+    "description": "Continuous Range where permitted"
+   },
+   "maximumBandsPerMovement": {
+    "type": "string",
+    "description": "Maximum Bands per Movement"
+   },
+   "minimumTimeBetweenMovements": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Minimum Time Between Movements"
+   },
+   "upwardMovement": {
+    "type": "string",
+    "description": "Upward Movement"
+   },
+   "downwardMovement": {
+    "type": "string",
+    "description": "Downward Movement"
+   },
+   "reversalRules": {
+    "type": "string",
+    "description": "Reversal Rules"
+   },
+   "cooldownPeriod": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Cooldown Period"
+   },
+   "maximum5PerAdjustment": {
+    "type": "number",
+    "description": "Maximum +5% per adjustment"
+   },
+   "maximum10": {
+    "type": "number",
+    "description": "Maximum −10%"
+   },
+   "whereRequired": {
+    "type": "boolean",
+    "description": "where required"
+   },
+   "minimumBaseMaximum": {
+    "type": "string",
+    "description": "Minimum → Base → Maximum"
+   }
+  }
+ },
+ "DynamicPricingAutomationPolicyControlView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Dynamic Pricing Automation Policy & Control displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "mode0Monitor": {
+    "type": "string",
+    "description": "Mode 0 — Monitor"
+   },
+   "mode1Recommend": {
+    "type": "string",
+    "description": "Mode 1 — Recommend"
+   },
+   "mode2PrepareChange": {
+    "type": "string",
+    "description": "Mode 2 — Prepare Change"
+   },
+   "nt": {
+    "type": "string",
+    "description": "nt"
+   },
+   "thresholdMet": {
+    "type": "integer",
+    "description": "threshold met"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "strategy": {
+    "type": "string",
+    "description": "Strategy"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "maximumAutomaticChangesDay": {
+    "type": "string",
+    "description": "Maximum Automatic Changes / Day"
+   },
+   "minimumTimeBetweenChanges": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Minimum Time Between Changes"
+   },
+   "noChangeWindows": {
+    "type": "string",
+    "description": "No-Change Windows"
+   },
+   "user": {
+    "type": "string",
+    "description": "User"
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason"
+   },
+   "start": {
+    "type": "string",
+    "description": "Start"
+   },
+   "expiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry"
+   },
+   "returnBehavior": {
+    "type": "string",
+    "description": "Return Behavior"
+   }
+  }
+ },
+ "DynamicPricingGuardrailsCommercialProtectionView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Dynamic Pricing Guardrails & Commercial Protection displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "absoluteMinimumPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Absolute Minimum Price"
+   },
+   "absoluteMaximumPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Absolute Maximum Price"
+   },
+   "minimumMargin": {
+    "type": "number",
+    "description": "Minimum Margin"
+   },
+   "maximumUplift": {
+    "type": "number",
+    "description": "Maximum Uplift %"
+   },
+   "maximumReduction": {
+    "type": "number",
+    "description": "Maximum Reduction %"
+   },
+   "maximumSingleChange": {
+    "type": "string",
+    "description": "Maximum Single Change"
+   },
+   "maximumDailyChange": {
+    "type": "string",
+    "description": "Maximum Daily Change"
+   },
+   "maximumWeeklyChange": {
+    "type": "string",
+    "description": "Maximum Weekly Change"
+   },
+   "minimumChangeInterval": {
+    "type": "string",
+    "description": "Minimum Change Interval"
+   },
+   "maximumChangesPerDay": {
+    "type": "string",
+    "description": "Maximum Changes per Day"
+   },
+   "minimumInventory": {
+    "type": "string",
+    "description": "Minimum Inventory"
+   },
+   "maximumOccupancyTrigger": {
+    "type": "integer",
+    "description": "Maximum Occupancy Trigger"
+   },
+   "contractRates": {
+    "type": "string",
+    "description": "Contract Rates"
+   },
+   "membershipRates": {
+    "type": "string",
+    "description": "Membership Rates"
+   },
+   "corporateRates": {
+    "type": "string",
+    "description": "Corporate Rates"
+   },
+   "promotionalLockedRates": {
+    "type": "string",
+    "description": "Promotional Locked Rates"
+   },
+   "regulatoryPrices": {
+    "type": "string",
+    "description": "Regulatory Prices"
+   },
+   "complimentaryRates": {
+    "type": "string",
+    "description": "Complimentary Rates"
+   },
+   "alreadyPurchasedTickets": {
+    "type": "string",
+    "description": "Already Purchased Tickets"
+   },
+   "existingReservationsWhereApplicable": {
+    "type": "string",
+    "description": "Existing Reservations where applicable"
+   },
+   "returnToBasePrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Return to Base Price"
+   },
+   "controlForCriticalIncidents": {
+    "type": "string",
+    "description": "control for critical incidents"
+   }
+  }
+ },
+ "DynamicPricingStrategyBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Dynamic Pricing Strategy Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "strategyName": {
+    "type": "string",
+    "description": "Strategy Name"
+   },
+   "strategyCode": {
+    "type": "string",
+    "description": "Strategy Code"
+   },
+   "description": {
+    "type": "string",
+    "description": "Description"
+   },
+   "strategyType": {
+    "type": "string",
+    "description": "Strategy Type"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "businessUnit": {
+    "type": "string",
+    "description": "Business Unit"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "performance": {
+    "type": "string",
+    "description": "Performance"
+   },
+   "timeslot": {
+    "type": "string",
+    "description": "Timeslot"
+   },
+   "priceCategory": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price Category"
+   },
+   "basePriceSource": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Base Price Source"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "description": "Effective To"
+   },
+   "evaluationFrequency": {
+    "type": "string",
+    "description": "Evaluation Frequency"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status"
+   },
+   "singleProduct": {
+    "type": "string",
+    "description": "Single Product"
+   },
+   "productFamily": {
+    "type": "string",
+    "description": "Product Family"
+   },
+   "multiplePerformances": {
+    "type": "string",
+    "description": "Multiple Performances"
+   },
+   "selectedTimeslots": {
+    "type": "string",
+    "description": "Selected Timeslots"
+   },
+   "selectedPriceCategories": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Selected Price Categories"
+   },
+   "operatesIndependently": {
+    "type": "string",
+    "description": "Operates Independently"
+   },
+   "canCombineWithOtherStrategies": {
+    "type": "boolean",
+    "description": "Can Combine with Other Strategies"
+   },
+   "hasExclusiveControl": {
+    "type": "boolean",
+    "description": "Has Exclusive Control"
+   },
+   "actsAsFallback": {
+    "type": "string",
+    "description": "Acts as Fallback"
+   },
+   "canBecome": {
+    "type": "boolean",
+    "description": "can become"
+   }
+  }
+ },
+ "DynamicPricingStrategyBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Dynamic Pricing Strategy Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "strategyName": {
+    "type": "string",
+    "description": "Strategy Name"
+   },
+   "strategyCode": {
+    "type": "string",
+    "description": "Strategy Code"
+   },
+   "description": {
+    "type": "string",
+    "description": "Description"
+   },
+   "strategyType": {
+    "type": "string",
+    "description": "Strategy Type"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "businessUnit": {
+    "type": "string",
+    "description": "Business Unit"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "performance": {
+    "type": "string",
+    "description": "Performance"
+   },
+   "timeslot": {
+    "type": "string",
+    "description": "Timeslot"
+   },
+   "priceCategory": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price Category"
+   },
+   "basePriceSource": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Base Price Source"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "description": "Effective To"
+   },
+   "evaluationFrequency": {
+    "type": "string",
+    "description": "Evaluation Frequency"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status"
+   },
+   "singleProduct": {
+    "type": "string",
+    "description": "Single Product"
+   },
+   "productFamily": {
+    "type": "string",
+    "description": "Product Family"
+   },
+   "multiplePerformances": {
+    "type": "string",
+    "description": "Multiple Performances"
+   },
+   "selectedTimeslots": {
+    "type": "string",
+    "description": "Selected Timeslots"
+   },
+   "selectedPriceCategories": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Selected Price Categories"
+   },
+   "operatesIndependently": {
+    "type": "string",
+    "description": "Operates Independently"
+   },
+   "canCombineWithOtherStrategies": {
+    "type": "boolean",
+    "description": "Can Combine with Other Strategies"
+   },
+   "hasExclusiveControl": {
+    "type": "boolean",
+    "description": "Has Exclusive Control"
+   },
+   "actsAsFallback": {
+    "type": "string",
+    "description": "Acts as Fallback"
+   },
+   "canBecome": {
+    "type": "boolean",
+    "description": "can become"
+   }
+  }
+ },
+ "DynamicPricingStrategyCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Dynamic Pricing Strategy Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "activeStrategies": {
+    "type": "integer",
+    "description": "Active Strategies"
+   },
+   "draftStrategies": {
+    "type": "integer",
+    "description": "Draft Strategies"
+   },
+   "productsUnderDynamicPricing": {
+    "type": "string",
+    "description": "Products Under Dynamic Pricing"
+   },
+   "eventsUnderDynamicPricing": {
+    "type": "string",
+    "description": "Events Under Dynamic Pricing"
+   },
+   "performancesUnderDynamicPricing": {
+    "type": "string",
+    "description": "Performances Under Dynamic Pricing"
+   },
+   "rulesActive": {
+    "type": "integer",
+    "description": "Rules Active"
+   },
+   "currentPriceAdjustments": {
+    "type": "integer",
+    "description": "Current Price Adjustments"
+   },
+   "pricesAtMaximumGuardrail": {
+    "type": "string",
+    "description": "Prices at Maximum Guardrail"
+   },
+   "pricesAtMinimumGuardrail": {
+    "type": "string",
+    "description": "Prices at Minimum Guardrail"
+   },
+   "ruleConflicts": {
+    "type": "integer",
+    "description": "Rule Conflicts"
+   },
+   "frozenStrategies": {
+    "type": "integer",
+    "description": "Frozen Strategies"
+   },
+   "upcomingActivations": {
+    "type": "integer",
+    "description": "Upcoming Activations"
+   },
+   "strategyId": {
+    "type": "string",
+    "description": "Strategy ID"
+   },
+   "strategyName": {
+    "type": "string",
+    "description": "Strategy Name"
+   },
+   "strategyType": {
+    "type": "string",
+    "description": "Strategy Type"
+   },
+   "productEvent": {
+    "type": "string",
+    "description": "Product/Event"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "basePriceSource": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Base Price Source"
+   },
+   "currentPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Current Price"
+   },
+   "adjustmentRange": {
+    "type": "string",
+    "description": "Adjustment Range"
+   },
+   "ruleCount": {
+    "type": "integer",
+    "description": "Rule Count"
+   },
+   "effectivePeriod": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Effective Period"
+   },
+   "automationMode": {
+    "type": "string",
+    "description": "Automation Mode"
+   },
+   "status": {
+    "type": "integer",
+    "description": "Status"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "demandBased": {
+    "type": "string",
+    "description": "Demand Based"
+   },
+   "occupancyBased": {
+    "type": "integer",
+    "description": "Occupancy Based"
+   },
+   "availabilityBased": {
+    "type": "string",
+    "description": "Availability Based"
+   },
+   "inventoryBased": {
+    "type": "string",
+    "description": "Inventory Based"
+   },
+   "bookingVelocity": {
+    "type": "string",
+    "description": "Booking Velocity"
+   },
+   "timeToEvent": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time-to-Event"
+   },
+   "seasonal": {
+    "type": "string",
+    "description": "Seasonal"
+   },
+   "dayOfWeek": {
+    "type": "string",
+    "description": "Day-of-Week"
+   },
+   "timeslot": {
+    "type": "string",
+    "description": "Timeslot"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "segment": {
+    "type": "string",
+    "description": "Segment"
+   },
+   "location": {
+    "type": "string",
+    "description": "Location"
+   },
+   "hybrid": {
+    "type": "string",
+    "description": "Hybrid"
+   },
+   "test": {
+    "type": "string",
+    "description": "Test"
+   },
+   "retire": {
+    "type": "string",
+    "description": "Retire"
+   }
+  }
+ },
+ "RulePriorityConflictResolutionDynamicPricingTestConsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Rule Priority, Conflict Resolution & Dynamic Pricing Test Console displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "basePriceAed250": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Base Price: AED 250"
+   },
+   "weekend5": {
+    "type": "number",
+    "description": "Weekend → +5%"
+   },
+   "occupancy8710": {
+    "type": "integer",
+    "description": "Occupancy 87% → +10%"
+   },
+   "bookingVelocity305": {
+    "type": "number",
+    "description": "Booking Velocity +30% → +5%"
+   },
+   "t3Days8": {
+    "type": "number",
+    "description": "T−3 Days → +8%"
+   },
+   "highestPriorityWins": {
+    "type": "string",
+    "description": "Highest Priority Wins"
+   },
+   "mostSpecificRuleWins": {
+    "type": "string",
+    "description": "Most Specific Rule Wins"
+   },
+   "cumulativeAdjustment": {
+    "type": "string",
+    "description": "Cumulative Adjustment"
+   },
+   "maximumAdjustmentWins": {
+    "type": "string",
+    "description": "Maximum Adjustment Wins"
+   },
+   "minimumAdjustmentWins": {
+    "type": "string",
+    "description": "Minimum Adjustment Wins"
+   },
+   "weightedCombination": {
+    "type": "string",
+    "description": "Weighted Combination"
+   },
+   "stopProcessing": {
+    "type": "string",
+    "description": "Stop Processing"
+   },
+   "customGovernedResolution": {
+    "type": "string",
+    "description": "Custom Governed Resolution"
+   },
+   "administratorsConfigureRuleHierarchy": {
+    "type": "string",
+    "description": "Administrators configure rule hierarchy"
+   },
+   "contradictoryRules": {
+    "type": "string",
+    "description": "Contradictory Rules"
+   },
+   "samePriority": {
+    "type": "string",
+    "description": "Same Priority"
+   },
+   "impossibleCondition": {
+    "type": "string",
+    "description": "Impossible Condition"
+   },
+   "overlappingStrategy": {
+    "type": "string",
+    "description": "Overlapping Strategy"
+   },
+   "circularDependency": {
+    "type": "string",
+    "description": "Circular Dependency"
+   },
+   "missingFallback": {
+    "type": "string",
+    "description": "Missing Fallback"
+   },
+   "guardrailConflict": {
+    "type": "string",
+    "description": "Guardrail Conflict"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "performance": {
+    "type": "string",
+    "description": "Performance"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "timeslot": {
+    "type": "string",
+    "description": "Timeslot"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer Segment"
+   },
+   "basePrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Base Price"
+   },
+   "occupancy": {
+    "type": "integer",
+    "description": "Occupancy"
+   },
+   "inventory": {
+    "type": "string",
+    "description": "Inventory"
+   },
+   "bookingVelocity": {
+    "type": "string",
+    "description": "Booking Velocity"
+   },
+   "timeToEvent": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time-to-Event"
+   },
+   "occupancy10": {
+    "type": "integer",
+    "description": "Occupancy +10%"
+   },
+   "velocity5": {
+    "type": "number",
+    "description": "Velocity +5%"
+   },
+   "whyAed300": {
+    "type": "string",
+    "description": "Why AED 300?"
+   },
+   "withTheCompleteCalculationPath": {
+    "type": "string",
+    "description": "with the complete calculation path"
+   },
+   "lowDemand": {
+    "type": "string",
+    "description": "Low Demand"
+   },
+   "highDemand": {
+    "type": "string",
+    "description": "High Demand"
+   },
+   "nearSellOut": {
+    "type": "string",
+    "description": "Near Sell-Out"
+   }
+  }
+ },
+ "SeasonalCalendarDayTimeslotDynamicRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Seasonal, Calendar, Day & Timeslot Dynamic Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "season": {
+    "type": "string",
+    "description": "Season"
+   },
+   "month": {
+    "type": "string",
+    "description": "Month"
+   },
+   "week": {
+    "type": "string",
+    "description": "Week"
+   },
+   "dateRange": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date Range"
+   },
+   "publicHoliday": {
+    "type": "string",
+    "description": "Public Holiday"
+   },
+   "schoolHoliday": {
+    "type": "string",
+    "description": "School Holiday"
+   },
+   "dayOfWeek": {
+    "type": "string",
+    "description": "Day of Week"
+   },
+   "weekend": {
+    "type": "string",
+    "description": "Weekend"
+   },
+   "timeOfDay": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time of Day"
+   },
+   "timeslot": {
+    "type": "string",
+    "description": "Timeslot"
+   },
+   "performance": {
+    "type": "string",
+    "description": "Performance"
+   },
+   "specialDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Special Date"
+   },
+   "base20": {
+    "type": "number",
+    "description": "Base → +20%"
+   },
+   "baseTo15": {
+    "type": "number",
+    "description": "Base to +15%"
+   },
+   "baseTo20": {
+    "type": "number",
+    "description": "Base to +20%"
+   },
+   "ramadan": {
+    "type": "string",
+    "description": "Ramadan"
+   },
+   "eid": {
+    "type": "string",
+    "description": "Eid"
+   },
+   "christmas": {
+    "type": "string",
+    "description": "Christmas"
+   },
+   "newYear": {
+    "type": "integer",
+    "description": "New Year"
+   },
+   "schoolBreak": {
+    "type": "string",
+    "description": "School Break"
+   },
+   "nationalDay": {
+    "type": "string",
+    "description": "National Day"
+   },
+   "customCommercialCalendar": {
+    "type": "string",
+    "description": "Custom Commercial Calendar"
+   }
+  }
+ }
+}

@@ -1,0 +1,142 @@
+{
+ "addCartLine": {
+  "method": "POST",
+  "path": "/carts/{cartId}/lines",
+  "contract": "orders",
+  "summary": "Add something",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AddCartLineRequest",
+  "responds": "Cart"
+ },
+ "listMerchandise": {
+  "method": "GET",
+  "path": "/merchandise",
+  "contract": "retail",
+  "summary": "List merchandise",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "outletId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "inStockOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "lookupMerchandise": {
+  "method": "GET",
+  "path": "/merchandise/lookup",
+  "contract": "retail",
+  "summary": "Price and stock check by barcode",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "barcode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "sku",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "includeSiblingOutlets",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PriceCheck"
+ },
+ "lookupShopAndDrop": {
+  "method": "GET",
+  "path": "/shop-and-drop/lookup",
+  "contract": "retail",
+  "summary": "Find a guest's dropped goods",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "entitlementId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "dropReference",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "receiptNumber",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ShopAndDrop"
+ },
+ "reserveMerchandise": {
+  "method": "POST",
+  "path": "/outlets/{outletId}/reserve",
+  "contract": "retail",
+  "summary": "Reserve an item for collection",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MerchandiseReservation"
+ }
+}

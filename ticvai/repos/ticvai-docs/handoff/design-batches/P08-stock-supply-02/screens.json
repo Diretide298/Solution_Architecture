@@ -1,0 +1,925 @@
+[
+ {
+  "id": "BO-137",
+  "name": "Recipe Consumption & Theoretical Inventory",
+  "module": "Stock & Supply",
+  "requiresModule": "fnb",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/stock-supply/recipe-consumption-theoretical-inventory",
+   "component": "apps/venue-management-web/src/routes/ops/RecipeConsumptionTheoreticalInventoryList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-079",
+    "BO-105",
+    "BO-136"
+   ],
+   "exitTo": [
+    "BO-008",
+    "BO-105"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-105.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "provenance": "flow F85 step 2→3"
+    },
+    {
+     "to": "BO-105",
+     "trigger": "Stock & Supply",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-105 declares entryState.params venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them.",
+  "density": "compact",
+  "boardFrames": [
+   "FnB Board 2.dc.html#fnb-2f",
+   "FnB Board 5.dc.html#fnb-5c"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listRecipes` reads the population and `getCountVariance` reads one of them — list, select, act",
+  "purpose": "Recipe Consumption & Theoretical Inventory — from the client design board, 20 August.",
+  "gaps": [
+   {
+    "operation": "listProductionRuns",
+    "why": "**2 declared operations reach no component on this screen**: listProductionRuns, getProductionRun. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every recipe consumption theoretical",
+       "bindsTo": "Recipe",
+       "columns": [
+        "Recipe.menuItemId",
+        "Recipe.yield",
+        "Recipe.ingredients",
+        "Recipe.costPerPortion"
+       ],
+       "operation": "listRecipes",
+       "provenance": "contract fnb.yaml GET /recipes"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected recipe consumption theoretical",
+       "bindsTo": "CountVariance",
+       "columns": [
+        "CountVariance.countId",
+        "CountVariance.totalVarianceValue",
+        "CountVariance.exceptionCount",
+        "CountVariance.lines"
+       ],
+       "operation": "getCountVariance",
+       "provenance": "contract inventory.yaml GET /stock-counts/{countId}/variance"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search recipe consumption",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The recipe consumption theoretical list.",
+   "error": "Could not load. Names which read failed and leaves the recipe consumption theoretical untouched.",
+   "emptyFirstRun": "No recipe consumption theoretical yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the recipe consumption theoretical are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listRecipes",
+    "contract": "fnb",
+    "purpose": "List recipes",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getCountVariance",
+    "contract": "inventory",
+    "purpose": "Variance between counted and expected",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listProductionRuns",
+    "contract": "fnb",
+    "purpose": "What is being made, and what was",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getProductionRun",
+    "contract": "fnb",
+    "purpose": "One run — its plan, its output, and the gap",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "countId",
+     "from": "deepLink"
+    },
+    {
+     "name": "runId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first. A run opened from the list.",
+   "preloaded": [
+    "CountVariance.countId",
+    "CountVariance.totalVarianceValue",
+    "CountVariance.exceptionCount",
+    "CountVariance.lines"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-137",
+   "source": "Claude Design F&B pack, 24 August",
+   "note": "**Drawn by Claude Design on `FnB Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-138",
+  "name": "Production Execution & Batch Management",
+  "module": "Stock & Supply",
+  "requiresModule": "fnb",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/stock-supply/production-execution-batch-management",
+   "component": "apps/venue-management-web/src/routes/ops/ProductionExecutionBatchManagementList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-105"
+   ],
+   "exitTo": [
+    "BO-105"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-105.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-105",
+     "trigger": "Stock & Supply",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-105 declares entryState.params venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listExpiringBatches` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Production Execution & Batch Management — from the client design board, 20 August.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every production execution batch",
+       "bindsTo": "StockBatch",
+       "columns": [
+        "StockBatch.id",
+        "StockBatch.itemId",
+        "StockBatch.locationId",
+        "StockBatch.batchCode",
+        "StockBatch.lotNumber",
+        "StockBatch.quantity",
+        "StockBatch.receivedAt",
+        "StockBatch.expiresAt",
+        "StockBatch.supplierId",
+        "StockBatch.status"
+       ],
+       "operation": "listExpiringBatches",
+       "provenance": "contract inventory.yaml GET /stock-batches/expiring"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected production execution batch",
+       "bindsTo": "StockBatch",
+       "columns": [
+        "StockBatch.id",
+        "StockBatch.itemId",
+        "StockBatch.locationId",
+        "StockBatch.batchCode",
+        "StockBatch.lotNumber",
+        "StockBatch.quantity",
+        "StockBatch.receivedAt",
+        "StockBatch.expiresAt",
+        "StockBatch.supplierId",
+        "StockBatch.status"
+       ],
+       "operation": "listExpiringBatches",
+       "provenance": "contract inventory.yaml GET /stock-batches/expiring"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Plan",
+       "operation": "planProductionRun",
+       "provenance": "contract fnb.yaml POST /production-runs"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Complete",
+       "operation": "completeProductionRun",
+       "provenance": "contract fnb.yaml POST /production-runs/{runId}/complete"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search production execution",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The production execution batch list.",
+   "error": "Could not load. Names which read failed and leaves the production execution batch untouched.",
+   "emptyFirstRun": "No production execution batch yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the production execution batch are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "planProductionRun",
+    "contract": "fnb",
+    "purpose": "Plan a batch, for one outlet or several",
+    "trigger": "onAction",
+    "invalidates": [
+     "listExpiringBatches"
+    ]
+   },
+   {
+    "operationId": "completeProductionRun",
+    "contract": "fnb",
+    "purpose": "Record what was actually made",
+    "trigger": "onAction",
+    "invalidates": [
+     "listExpiringBatches"
+    ]
+   },
+   {
+    "operationId": "listExpiringBatches",
+    "contract": "inventory",
+    "purpose": "What is about to go out of date",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "runId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first.",
+   "preloaded": [
+    "StockBatch.id",
+    "StockBatch.itemId",
+    "StockBatch.locationId",
+    "StockBatch.batchCode",
+    "StockBatch.lotNumber"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-138"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-139",
+  "name": "Wastage, Spoilage, Returns & Write-Off",
+  "module": "Stock & Supply",
+  "requiresModule": "fnb",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/stock-supply/wastage-spoilage-returns-write-off",
+   "component": "apps/venue-management-web/src/routes/ops/WastageSpoilageReturnsWriteOffList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-105"
+   ],
+   "exitTo": [
+    "BO-105"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-105.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-105",
+     "trigger": "Stock & Supply",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-105 declares entryState.params venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them.",
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the screen declares only writes (`recordWaste`) and no read of a population — it is settings, not a list",
+  "purpose": "Wastage, Spoilage, Returns & Write-Off — from the client design board, 20 August.",
+  "gaps": [
+   {
+    "operation": "recordWaste",
+    "why": "**`recordWaste` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
+    "source": "contract fnb.yaml POST /outlets/{outletId}/waste"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Record",
+       "operation": "recordWaste",
+       "provenance": "contract fnb.yaml POST /outlets/{outletId}/waste"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search wastage, spoilage, returns",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The saved wastage spoilage returns.",
+   "error": "Could not load. Names which read failed and leaves the wastage spoilage returns untouched.",
+   "emptyFirstRun": "No wastage spoilage returns configured. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "recordWaste",
+    "contract": "fnb",
+    "purpose": "Record waste",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "outletId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-139"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-140",
+  "name": "Product Availability, 86 & Operational Food Safety",
+  "module": "Stock & Supply",
+  "requiresModule": "fnb",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/stock-supply/product-availability-86-operational-food-safet",
+   "component": "apps/venue-management-web/src/routes/ops/ProductAvailability86OperationalFoodSaList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-105"
+   ],
+   "exitTo": [
+    "BO-105"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-105.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-105",
+     "trigger": "Stock & Supply",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-105 declares entryState.params venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listExpiringBatches` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Product Availability, 86 & Operational Food Safety — from the client design board, 20 August.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every product availability operational",
+       "bindsTo": "StockBatch",
+       "columns": [
+        "StockBatch.id",
+        "StockBatch.itemId",
+        "StockBatch.locationId",
+        "StockBatch.batchCode",
+        "StockBatch.lotNumber",
+        "StockBatch.quantity",
+        "StockBatch.receivedAt",
+        "StockBatch.expiresAt",
+        "StockBatch.supplierId",
+        "StockBatch.status"
+       ],
+       "operation": "listExpiringBatches",
+       "provenance": "contract inventory.yaml GET /stock-batches/expiring"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected product availability operational",
+       "bindsTo": "StockBatch",
+       "columns": [
+        "StockBatch.id",
+        "StockBatch.itemId",
+        "StockBatch.locationId",
+        "StockBatch.batchCode",
+        "StockBatch.lotNumber",
+        "StockBatch.quantity",
+        "StockBatch.receivedAt",
+        "StockBatch.expiresAt",
+        "StockBatch.supplierId",
+        "StockBatch.status"
+       ],
+       "operation": "listExpiringBatches",
+       "provenance": "contract inventory.yaml GET /stock-batches/expiring"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "setItemAvailability",
+       "provenance": "contract fnb.yaml PUT /menu-items/{itemId}/availability"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search product availability, 86",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The product availability operational list.",
+   "error": "Could not load. Names which read failed and leaves the product availability operational untouched.",
+   "emptyFirstRun": "No product availability operational yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the product availability operational are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setItemAvailability",
+    "contract": "fnb",
+    "purpose": "Mark an item available or eighty-sixed",
+    "trigger": "onAction",
+    "invalidates": [
+     "listExpiringBatches"
+    ]
+   },
+   {
+    "operationId": "listExpiringBatches",
+    "contract": "inventory",
+    "purpose": "What is about to go out of date",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "itemId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first.",
+   "preloaded": [
+    "StockBatch.id",
+    "StockBatch.itemId",
+    "StockBatch.locationId",
+    "StockBatch.batchCode",
+    "StockBatch.lotNumber"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-140"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-141",
+  "name": "Operational Alerts, AI Replenishment & Action Center",
+  "module": "Stock & Supply",
+  "requiresModule": "analytics",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/stock-supply/operational-alerts-ai-replenishment-action-cen",
+   "component": "apps/venue-management-web/src/routes/ops/OperationalAlertsAiReplenishmentActionList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-105"
+   ],
+   "exitTo": [
+    "BO-105"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-105.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-105",
+     "trigger": "Stock & Supply",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-105 declares entryState.params venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listAlerts` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Operational Alerts, AI Replenishment & Action Center — from the client design board, 20 August.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every operational alerts replenishment",
+       "bindsTo": "Alert",
+       "columns": [
+        "Alert.id",
+        "Alert.ruleId",
+        "Alert.raisedAt",
+        "Alert.severity",
+        "Alert.status",
+        "Alert.observedValue",
+        "Alert.threshold",
+        "Alert.scopePath",
+        "Alert.acknowledgedByPrincipalId",
+        "Alert.acknowledgedAt",
+        "Alert.resolvedAt",
+        "Alert.escalatedAt"
+       ],
+       "operation": "listAlerts",
+       "provenance": "contract reporting.yaml GET /alerts"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected operational alerts replenishment",
+       "bindsTo": "Alert",
+       "columns": [
+        "Alert.id",
+        "Alert.ruleId",
+        "Alert.raisedAt",
+        "Alert.severity",
+        "Alert.status",
+        "Alert.observedValue",
+        "Alert.threshold",
+        "Alert.scopePath",
+        "Alert.acknowledgedByPrincipalId",
+        "Alert.acknowledgedAt",
+        "Alert.resolvedAt",
+        "Alert.escalatedAt"
+       ],
+       "operation": "listAlerts",
+       "provenance": "contract reporting.yaml GET /alerts"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Acknowledge",
+       "operation": "acknowledgeAlert",
+       "provenance": "contract reporting.yaml POST /alerts/{alertId}/acknowledge"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createRequisition",
+       "provenance": "contract inventory.yaml POST /requisitions"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search operational alerts, ai replenishment",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The operational alerts replenishment list.",
+   "error": "Could not load. Names which read failed and leaves the operational alerts replenishment untouched.",
+   "emptyFirstRun": "No operational alerts replenishment yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the operational alerts replenishment are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listAlerts",
+    "contract": "reporting",
+    "purpose": "What is currently raised",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "acknowledgeAlert",
+    "contract": "reporting",
+    "purpose": "Take responsibility for it",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAlerts"
+    ]
+   },
+   {
+    "operationId": "createRequisition",
+    "contract": "inventory",
+    "purpose": "Raise a requisition",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAlerts"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "alertId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first.",
+   "preloaded": [
+    "Alert.id",
+    "Alert.ruleId",
+    "Alert.raisedAt",
+    "Alert.severity",
+    "Alert.status"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-141"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

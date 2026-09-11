@@ -1,0 +1,1676 @@
+[
+ {
+  "id": "BO-334",
+  "name": "Virtual Ticket Command Center",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "1",
+   "number": "15.1.1",
+   "page": 4
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/virtual-ticket-command-center-bo-334",
+   "component": "apps/venue-management-web/src/routes/access-venue/VirtualTicketCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-335",
+    "BO-336",
+    "BO-337",
+    "BO-338",
+    "BO-339",
+    "BO-340",
+    "BO-341",
+    "BO-342",
+    "BO-343"
+   ],
+   "inferred": false,
+   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Venue Home",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-335",
+     "trigger": "Works in Virtual Ticket Identity & Master Record Configuration",
+     "provenance": "flow F168 step 1→2",
+     "operation": "listVirtualTicket"
+    },
+    {
+     "to": "BO-336",
+     "trigger": "Works in Virtual Ticket Status & Lifecycle Model",
+     "provenance": "flow F168 step 3→4",
+     "operation": "listVirtualTicket"
+    },
+    {
+     "to": "BO-337",
+     "trigger": "Works in Media Type & Credential Technology Registry",
+     "provenance": "flow F168 step 5→6",
+     "operation": "listVirtualTicket"
+    },
+    {
+     "to": "BO-338",
+     "trigger": "Works in Multi-Media Binding & Association Rules",
+     "provenance": "flow F168 step 7→8",
+     "operation": "listVirtualTicket"
+    },
+    {
+     "to": "BO-339",
+     "trigger": "Works in Credential Identity, Token & Reference Mapping",
+     "provenance": "flow F168 step 9→10",
+     "operation": "listVirtualTicket"
+    },
+    {
+     "to": "BO-340",
+     "trigger": "Works in Entitlement & Cross-Media Synchronization Rules",
+     "provenance": "flow F168 step 11→12",
+     "operation": "listVirtualTicket"
+    },
+    {
+     "to": "BO-341",
+     "trigger": "Works in Media Activation, Priority & Fallback Rules",
+     "provenance": "flow F168 step 13→14",
+     "operation": "listVirtualTicket"
+    },
+    {
+     "to": "BO-342",
+     "trigger": "Works in Media Replacement, Revocation & Rebinding Rules",
+     "provenance": "flow F168 step 15→16",
+     "operation": "listVirtualTicket"
+    },
+    {
+     "to": "BO-343",
+     "trigger": "Works in Virtual Ticket Architecture Testing, Governance & Audit",
+     "provenance": "flow F168 step 17→18",
+     "operation": "listVirtualTicket"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each record should show) — counts over a population, then the population",
+  "purpose": "Provide administrators and operations teams with a centralized view of all Virtual Tickets and their associated media across TICVAI. This is the primary administrative entry point into the Virtual Ticket architecture.",
+  "purposeNote": "Authorized users can locate any Virtual Ticket and immediately understand its ticket status, entitlement, usage state and all associated media from one centralized workspace.",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search virtual ticket",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Filter by"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "Brand",
+        "Venue",
+        "Event",
+        "VirtualTicketCommandCenterView.product",
+        "Performance",
+        "VirtualTicketCommandCenterView.ticketType",
+        "Channel",
+        "Customer",
+        "Virtual Ticket Status",
+        "Media Type",
+        "Number of Media",
+        "Validity",
+        "VirtualTicketCommandCenterView.usageStatus"
+       ],
+       "notes": "The pack filters this screen by brand, venue, event, product, performance, ticket type and 7 more — which are present is a decision the pack already made.",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Filter by"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Total Virtual Tickets",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
+       "bindsTo": "VirtualTicketCommandCenterView.totalVirtualTickets"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Active",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
+       "bindsTo": "VirtualTicketCommandCenterView.active"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pending Activation",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
+       "bindsTo": "VirtualTicketCommandCenterView.pendingActivation"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Suspended",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
+       "bindsTo": "VirtualTicketCommandCenterView.suspended"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Used / Consumed",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
+       "bindsTo": "VirtualTicketCommandCenterView.usedConsumed"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Partially Consumed",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
+       "bindsTo": "VirtualTicketCommandCenterView.partiallyConsumed"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Expired",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
+       "bindsTo": "VirtualTicketCommandCenterView.expired"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Cancelled",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
+       "bindsTo": "VirtualTicketCommandCenterView.cancelled"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Revoked",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
+       "bindsTo": "VirtualTicketCommandCenterView.revoked"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Virtual Tickets with Multiple Media",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
+       "bindsTo": "VirtualTicketCommandCenterView.virtualTicketsWithMultipleMedia"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Virtual Tickets with No Active Media",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Media Binding Exceptions",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
+       "bindsTo": "VirtualTicketCommandCenterView.mediaBindingExceptions"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Credential Synchronization Issues",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Display",
+       "bindsTo": "VirtualTicketCommandCenterView.credentialSynchronizationIssues"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "moduleTiles",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every virtual ticket",
+       "columns": [
+        "VirtualTicketCommandCenterView.virtualTicketId",
+        "VirtualTicketCommandCenterView.product",
+        "VirtualTicketCommandCenterView.eventPerformance",
+        "VirtualTicketCommandCenterView.ticketHolder",
+        "VirtualTicketCommandCenterView.orderReference",
+        "VirtualTicketCommandCenterView.ticketType",
+        "VirtualTicketCommandCenterView.seatResourceWhereApplicable",
+        "VirtualTicketCommandCenterView.validFromTo",
+        "VirtualTicketCommandCenterView.ticketStatus",
+        "VirtualTicketCommandCenterView.usageStatus",
+        "VirtualTicketCommandCenterView.numberOfLinkedMedia",
+        "VirtualTicketCommandCenterView.primaryMedia",
+        "VirtualTicketCommandCenterView.lastCredentialActivity",
+        "VirtualTicketCommandCenterView.lastModified"
+       ],
+       "bindsTo": "VirtualTicketCommandCenterView",
+       "operation": "listVirtualTicket",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Each record should show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected virtual ticket",
+       "bindsTo": "VirtualTicketCommandCenterView",
+       "columns": [
+        "VirtualTicketCommandCenterView.virtualTicketId",
+        "VirtualTicketCommandCenterView.product",
+        "VirtualTicketCommandCenterView.eventPerformance",
+        "VirtualTicketCommandCenterView.ticketHolder",
+        "VirtualTicketCommandCenterView.orderReference",
+        "VirtualTicketCommandCenterView.ticketType",
+        "VirtualTicketCommandCenterView.seatResourceWhereApplicable",
+        "VirtualTicketCommandCenterView.validFromTo",
+        "VirtualTicketCommandCenterView.ticketStatus",
+        "VirtualTicketCommandCenterView.usageStatus",
+        "VirtualTicketCommandCenterView.numberOfLinkedMedia",
+        "VirtualTicketCommandCenterView.primaryMedia",
+        "VirtualTicketCommandCenterView.lastCredentialActivity",
+        "VirtualTicketCommandCenterView.lastModified"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “VT-2026-009821”.",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Each record should show"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "banner",
+       "label": "Permissions this screen separates",
+       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** View Virtual Ticket, View Media, Bind Media, Replace Media, Suspend, Reactivate, Revoke Media, View Usage, View Audit, Diagnose Credential. Each needs attaching to the control it gates, or the screen needs the control.",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 4 §Authorized users may"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The virtual ticket list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the virtual ticket untouched.",
+   "emptyFirstRun": "No virtual ticket yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the virtual ticket are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listVirtualTicket",
+    "contract": "access",
+    "purpose": "Virtual Ticket Command Center",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-334"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 4. 29 of 39 labels bound to a contract property; 50 of 69 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-335",
+  "name": "Virtual Ticket Identity & Master Record Configuration",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "1",
+   "number": "15.1.2",
+   "page": 6
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/virtual-ticket-identity-master-record-configuration-bo-335",
+   "component": "apps/venue-management-web/src/routes/access-venue/VirtualTicketIdentityMasterRecordConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-334"
+   ],
+   "exitTo": [
+    "BO-334"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-334, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-334",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F168 step 2→3",
+     "operation": "setVirtualTicketIdentity"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Define the authoritative Virtual Ticket object used throughout TICVAI. This screen is extremely important because the Virtual Ticket—not the QR/RFID/card— is the master ticket record.",
+  "purposeNote": "Every issued ticket has one persistent, media-independent Virtual Ticket identity that remains authoritative regardless of which credential technologies are attached to it.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "ID generation pattern",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 6 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Ticket classification",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 6 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Ticket ownership model",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 6 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Holder assignment requirements",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 6 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Transferability reference",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 6 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Validity model",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 6 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Consumption model",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 6 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Entitlement model",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 6 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Media requirements",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 6 §Configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "provenance": "contract operation setVirtualTicketIdentity"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The virtual ticket identity configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the virtual ticket identity untouched.",
+   "emptyFirstRun": "No virtual ticket identity configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setVirtualTicketIdentity",
+    "contract": "access",
+    "purpose": "Virtual Ticket Identity & Master Record Configuration",
+    "trigger": "onAction",
+    "invalidates": [
+     "setVirtualTicketIdentity"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-335"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 6. 0 of 0 labels bound to a contract property; 9 of 59 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-336",
+  "name": "Virtual Ticket Status & Lifecycle Model",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "1",
+   "number": "15.1.3",
+   "page": 8
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/virtual-ticket-status-lifecycle-model-bo-336",
+   "component": "apps/venue-management-web/src/routes/access-venue/VirtualTicketStatusLifecycleModel.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-334"
+   ],
+   "exitTo": [
+    "BO-334"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-334, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-334",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F168 step 4→5",
+     "operation": "listVirtualTicketStatus"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure the standardized lifecycle of a Virtual Ticket independently from the lifecycle of individual media.",
+  "purposeNote": "state changes across every credential associated with that ticket.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 8"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 8"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listVirtualTicketStatus",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The virtual ticket status list.",
+   "error": "Could not load. Names which read failed and leaves the virtual ticket status untouched.",
+   "emptyFirstRun": "No virtual ticket status yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the virtual ticket status are still there. The pack's own statuses are Order Management — the state names which is selected.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listVirtualTicketStatus",
+    "contract": "access",
+    "purpose": "Virtual Ticket Status & Lifecycle Model",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "VirtualTicketStatusLifecycleModelView.withGovernedAlternativeStates",
+    "VirtualTicketStatusLifecycleModelView.suspended",
+    "VirtualTicketStatusLifecycleModelView.cancelled",
+    "VirtualTicketStatusLifecycleModelView.voided",
+    "VirtualTicketStatusLifecycleModelView.reissuedSuperseded"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-336"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 11 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-337",
+  "name": "Media Type & Credential Technology Registry",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "1",
+   "number": "15.1.4",
+   "page": 9
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/media-type-credential-technology-registry-bo-337",
+   "component": "apps/venue-management-web/src/routes/access-venue/MediaTypeCredentialTechnologyRegistry.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-334"
+   ],
+   "exitTo": [
+    "BO-334"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-334, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-334",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F168 step 6→7",
+     "operation": "listMediaTypeCredential"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§For each technology configure) and no display directory — it is settings, not a population",
+  "purpose": "Maintain the centralized catalogue of credential technologies supported by TICVAI. This makes the credential architecture extensible rather than hard-coded.",
+  "purposeNote": "technologies with their capabilities, providers and technical behavior.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Media Type ID",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 9 §For each technology configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Name",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 9 §For each technology configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Category",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 9 §For each technology configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Provider",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 9 §For each technology configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Technology",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 9 §For each technology configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Token format",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 9 §For each technology configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Generation method",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 9 §For each technology configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Validation mechanism",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 9 §For each technology configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Supports visual design",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 9 §For each technology configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Supports dynamic update",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 9 §For each technology configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Supports revocation",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 9 §For each technology configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Supports expiration",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 9 §For each technology configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Supports offline reference",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 9 §For each technology configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Supports replacement",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 9 §For each technology configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Supports encryption/signing",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 9 §For each technology configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Supported channels",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 9 §For each technology configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Supported devices",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 9 §For each technology configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Integration adapter",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 9 §For each technology configure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The media type credential configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the media type credential untouched.",
+   "emptyFirstRun": "No media type credential configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listMediaTypeCredential",
+    "contract": "access",
+    "purpose": "Media Type & Credential Technology Registry",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-337"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 18 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-338",
+  "name": "Multi-Media Binding & Association Rules",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "1",
+   "number": "15.1.5",
+   "page": 11
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/multi-media-binding-association-rules-bo-338",
+   "component": "apps/venue-management-web/src/routes/access-venue/MultiMediaBindingAssociationRules.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-334"
+   ],
+   "exitTo": [
+    "BO-334"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-334, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-334",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F168 step 8→9",
+     "operation": "listMultiMediaBinding"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Configure how one Virtual Ticket can be associated with multiple media simultaneously. This is one of the most important screens in Area 15.",
+  "purposeNote": "Ticket without creating duplicate ticket entitlements.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Allowed media",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 11 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Mandatory media",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 11 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Optional media",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 11 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum active media",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 11 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Minimum media required",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 11 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Primary media",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 11 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Secondary media",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 11 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Backup media",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 11 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Temporary media",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 11 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Media combination",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 11 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Simultaneous activation",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 11 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Exclusive activation",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 11 §Configure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The multi-media binding association configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the multi-media binding association untouched.",
+   "emptyFirstRun": "No multi-media binding association configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listMultiMediaBinding",
+    "contract": "access",
+    "purpose": "Multi-Media Binding & Association Rules",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-338"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 12 of 42 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-339",
+  "name": "Credential Identity, Token & Reference Mapping",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "1",
+   "number": "15.1.6",
+   "page": 12
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/credential-identity-token-reference-mapping-bo-339",
+   "component": "apps/venue-management-web/src/routes/access-venue/CredentialIdentityTokenReferenceMapping.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-334"
+   ],
+   "exitTo": [
+    "BO-334"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-334, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-334",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F168 step 10→11",
+     "operation": "listCredentialIdentityToken"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Define how individual media identifiers resolve securely back to the authoritative Virtual Ticket.",
+  "purposeNote": "Every supported credential can securely and consistently resolve to its authoritative Virtual Ticket without duplicating ticket entitlement data within individual media.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 12"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 12"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listCredentialIdentityToken",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The credential identity token list.",
+   "error": "Could not load. Names which read failed and leaves the credential identity token untouched.",
+   "emptyFirstRun": "No credential identity token yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the credential identity token are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCredentialIdentityToken",
+    "contract": "access",
+    "purpose": "Credential Identity, Token & Reference Mapping",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "CredentialIdentityTokenReferenceMappingView.qrToken",
+    "CredentialIdentityTokenReferenceMappingView.rfidUid",
+    "CredentialIdentityTokenReferenceMappingView.walletObject",
+    "CredentialIdentityTokenReferenceMappingView.nfcToken",
+    "CredentialIdentityTokenReferenceMappingView.faceReference"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-339"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 12. 0 of 0 labels bound to a contract property; 0 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-340",
+  "name": "Entitlement & Cross-Media Synchronization Rules",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "1",
+   "number": "15.1.7",
+   "page": 14
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/entitlement-cross-media-synchronization-rules-bo-340",
+   "component": "apps/venue-management-web/src/routes/access-venue/EntitlementCrossMediaSynchronizationRules.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-334"
+   ],
+   "exitTo": [
+    "BO-334"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-334, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-334",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F168 step 12→13",
+     "operation": "listEntitlementCrossMedia"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Detect) and no metric row",
+  "purpose": "Ensure all media attached to a Virtual Ticket share the same authoritative ticket and entitlement state.",
+  "purposeNote": "All credential media consistently consume and represent the same authoritative Virtual Ticket entitlement and usage state.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every entitlement cross-media synchronization",
+       "columns": [
+        "EntitlementCrossMediaSynchronizationRulesView.delayedUpdates",
+        "EntitlementCrossMediaSynchronizationRulesView.conflictingStates",
+        "EntitlementCrossMediaSynchronizationRulesView.offlineTransactionsPendingSynchronization",
+        "EntitlementCrossMediaSynchronizationRulesView.providerUpdateFailures",
+        "EntitlementCrossMediaSynchronizationRulesView.staleWalletCredentials"
+       ],
+       "bindsTo": "EntitlementCrossMediaSynchronizationRulesView",
+       "operation": "listEntitlementCrossMedia",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 14 §Detect"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected entitlement cross-media synchronization",
+       "bindsTo": "EntitlementCrossMediaSynchronizationRulesView",
+       "columns": [
+        "EntitlementCrossMediaSynchronizationRulesView.delayedUpdates",
+        "EntitlementCrossMediaSynchronizationRulesView.conflictingStates",
+        "EntitlementCrossMediaSynchronizationRulesView.offlineTransactionsPendingSynchronization",
+        "EntitlementCrossMediaSynchronizationRulesView.providerUpdateFailures",
+        "EntitlementCrossMediaSynchronizationRulesView.staleWalletCredentials"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Critical Principle”, “For example, TICVAI must prevent”, “Instead”, “Face Credential”, “Virtual Ticket resolved”, “Access transaction recorded”.",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 14 §Detect"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The entitlement cross-media synchronization list.",
+   "error": "Could not load. Names which read failed and leaves the entitlement cross-media synchronization untouched.",
+   "emptyFirstRun": "No entitlement cross-media synchronization yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the entitlement cross-media synchronization are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listEntitlementCrossMedia",
+    "contract": "access",
+    "purpose": "Entitlement & Cross-Media Synchronization Rules",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "EntitlementCrossMediaSynchronizationRulesView.delayedUpdates",
+    "EntitlementCrossMediaSynchronizationRulesView.conflictingStates",
+    "EntitlementCrossMediaSynchronizationRulesView.offlineTransactionsPendingSynchronization",
+    "EntitlementCrossMediaSynchronizationRulesView.providerUpdateFailures",
+    "EntitlementCrossMediaSynchronizationRulesView.staleWalletCredentials"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-340"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 14. 5 of 5 labels bound to a contract property; 17 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-341",
+  "name": "Media Activation, Priority & Fallback Rules",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "1",
+   "number": "15.1.8",
+   "page": 15
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/media-activation-priority-fallback-rules-bo-341",
+   "component": "apps/venue-management-web/src/routes/access-venue/MediaActivationPriorityFallbackRules.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-334"
+   ],
+   "exitTo": [
+    "BO-334"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-334, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-334",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F168 step 14→15",
+     "operation": "listMediaActivationPriority"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Configure when each credential becomes active and how alternative media behave if the preferred credential cannot be used.",
+  "purposeNote": "options without compromising the underlying Virtual Ticket.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Temporary media",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Validity duration",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "One-time use",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Automatic expiration",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Replacement behavior",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Original-media impact",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 15 §Configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "On ticket activation",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 15 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The media activation priority configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the media activation priority untouched.",
+   "emptyFirstRun": "No media activation priority configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listMediaActivationPriority",
+    "contract": "access",
+    "purpose": "Media Activation, Priority & Fallback Rules",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-341"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 7 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-342",
+  "name": "Media Replacement, Revocation & Rebinding Rules",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "1",
+   "number": "15.1.9",
+   "page": 16
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/media-replacement-revocation-rebinding-rules-bo-342",
+   "component": "apps/venue-management-web/src/routes/access-venue/MediaReplacementRevocationRebindingRules.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-334"
+   ],
+   "exitTo": [
+    "BO-334"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-334, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-334",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F168 step 16→17",
+     "operation": "listMediaReplacementRevocation"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Configure controlled handling of lost, stolen, damaged, compromised or replaced credential media.",
+  "purposeNote": "Credential media can be securely replaced, revoked and rebound while maintaining continuity of the underlying Virtual Ticket and a complete audit history.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Printed ticket replacement, Suspend Media, Revoke Media. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Ticket_Media___Credential_Management_Reference.pdf, page 16 §Support"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Reissue allowed",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 16 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Number of replacements",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 16 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Replacement fee reference",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 16 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Approval required",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 16 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Identity verification",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 16 §Configure"
+      },
+      {
+       "kind": "textField",
+       "label": "Old media automatically revoked",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 16 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Grace period",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 16 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Simultaneous media policy",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 16 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Reason mandatory",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 16 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Supervisor approval",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 16 §Configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Printed ticket replacement",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 16 §Support"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Suspend Media",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 16 §Allow immediate"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Revoke Media",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 16 §Allow immediate"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmSuspendMedia",
+    "component": "confirmDialog",
+    "trigger": "Suspend Media",
+    "body": "**Suspend Media on a media replacement revocation is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
+    "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 16 §Allow immediate"
+   },
+   {
+    "id": "confirmRevokeMedia",
+    "component": "confirmDialog",
+    "trigger": "Revoke Media",
+    "body": "**Revoke Media on a media replacement revocation is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
+    "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 16 §Allow immediate"
+   }
+  ],
+  "states": {
+   "loading": "The media replacement revocation configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the media replacement revocation untouched.",
+   "emptyFirstRun": "No media replacement revocation configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listMediaReplacementRevocation",
+    "contract": "access",
+    "purpose": "Media Replacement, Revocation & Rebinding Rules",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-342"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 13 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-343",
+  "name": "Virtual Ticket Architecture Testing, Governance & Audit",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket_Media___Credential_Management_Reference.pdf",
+   "board": "1",
+   "number": "15.1.10",
+   "page": 17
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/virtual-ticket-architecture-testing-governance-audit-bo-343",
+   "component": "apps/venue-management-web/src/routes/access-venue/VirtualTicketArchitectureTestingGovernanceAudit.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-334"
+   ],
+   "exitTo": [
+    "BO-334"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-334, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configuration Simulator; Configuration Owner; AI Configuration Review) and no display directory — it is settings, not a population",
+  "purpose": "Provide the final testing and governance environment for Virtual Ticket and multi-media configurations. Board 1 established what the Virtual Ticket is and how multiple credentials can point to the same authoritative ticket. Board 2 defines how each media type is created, designed, configured, branded, populated with data, previewed, tested and published.",
+  "purposeNote": "and retain complete traceability of configuration and credential-binding changes. Board 1 — Final Screen Register",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "→ Technical Review",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 17 §Configuration Owner"
+      },
+      {
+       "kind": "textField",
+       "label": "→ Security Review where applicable",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 17 §Configuration Owner"
+      },
+      {
+       "kind": "selectField",
+       "label": "→ Operations Review",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 17 §Configuration Owner"
+      },
+      {
+       "kind": "selectField",
+       "label": "→ Approval",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 17 §Configuration Owner"
+      },
+      {
+       "kind": "selectField",
+       "label": "→ Publication",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 17 §Configuration Owner"
+      },
+      {
+       "kind": "textField",
+       "label": "configured lost-credential security policy.”",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 17 §AI Configuration Review"
+      },
+      {
+       "kind": "textField",
+       "label": "Replacement/Rebinding → Test & Govern",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 17 §Board 1 configuration flow"
+      },
+      {
+       "kind": "textField",
+       "label": "Multi-Format Ticket Media Design Studio—including dedicated design/configuration",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 17 §Board 1 configuration flow"
+      },
+      {
+       "kind": "textField",
+       "label": "Preview → Validate → Approve & Publish",
+       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 17 §The configuration flow is"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The virtual ticket architecture configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the virtual ticket architecture untouched.",
+   "emptyFirstRun": "No virtual ticket architecture configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listVirtualTicketArchitecture",
+    "contract": "access",
+    "purpose": "Virtual Ticket Architecture Testing, Governance & Audit",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-343"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 17. 0 of 0 labels bound to a contract property; 9 of 116 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

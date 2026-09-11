@@ -1,0 +1,261 @@
+{
+ "listComplianceEvidenceWaiver": {
+  "method": "GET",
+  "path": "/compliance-evidence-waiver",
+  "contract": "marketing-crm",
+  "summary": "Compliance Evidence, Audit & Waiver Repository",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "participant",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customer",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ticket",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "booking",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "waiver",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "version",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "signatory",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "ComplianceEvidenceAuditWaiverRepositoryView"
+ },
+ "listDigitalSigningCollection": {
+  "method": "GET",
+  "path": "/digital-signing-collection",
+  "contract": "marketing-crm",
+  "summary": "Digital Signing & Collection Operations",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "DigitalSigningCollectionOperationsView"
+ },
+ "listMinorGuardianGroup": {
+  "method": "GET",
+  "path": "/minor-guardian-group",
+  "contract": "marketing-crm",
+  "summary": "Minor, Guardian & Group Consent Management",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MinorGuardianGroupConsentManagementView"
+ },
+ "listMissingExpiredInvalid": {
+  "method": "GET",
+  "path": "/missing-expired-invalid",
+  "contract": "marketing-crm",
+  "summary": "Missing, Expired & Invalid Waiver Management",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MissingExpiredInvalidWaiverManagementView"
+ },
+ "listParticipantWaiverStatus": {
+  "method": "GET",
+  "path": "/participant-waiver-statu",
+  "contract": "marketing-crm",
+  "summary": "Participant Waiver Status & Tracking",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "email",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "mobile",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "waiverId",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "ParticipantWaiverStatusTrackingView"
+ },
+ "listSiteWaiverException": {
+  "method": "GET",
+  "path": "/site-waiver-exception",
+  "contract": "marketing-crm",
+  "summary": "On-Site Waiver & Exception Handling",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "OnSiteWaiverExceptionHandlingView"
+ },
+ "listWaiver": {
+  "method": "GET",
+  "path": "/waiver",
+  "contract": "marketing-crm",
+  "summary": "Waiver Operations Command Center",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "brand",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "waiver",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "date",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "participantType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "bookingChannel",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "WaiverOperationsCommandCenterView"
+ },
+ "listWaiverComplianceOperational": {
+  "method": "GET",
+  "path": "/waiver-compliance-operational",
+  "contract": "marketing-crm",
+  "summary": "Waiver Analytics, Compliance & Operational Insights",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "waiver",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "version",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "participantType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "WaiverAnalyticsComplianceOperationalInsightsView"
+ },
+ "listWaiverComplianceRisk": {
+  "method": "GET",
+  "path": "/waiver-compliance-risk",
+  "contract": "marketing-crm",
+  "summary": "AI Waiver Compliance & Risk Intelligence Center",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiWaiverComplianceRiskIntelligenceCenterView"
+ },
+ "setWaiverVerificationValidation": {
+  "method": "PUT",
+  "path": "/waiver-verification-validation",
+  "contract": "marketing-crm",
+  "summary": "Waiver Verification & Validation Workspace",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "WaiverVerificationValidationWorkspaceInput",
+  "responds": "WaiverVerificationValidationWorkspaceView"
+ }
+}

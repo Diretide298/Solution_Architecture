@@ -1,0 +1,442 @@
+[
+ {
+  "id": "WEB-033",
+  "name": "Shop",
+  "module": "Retail",
+  "requiresModule": "retail",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/shop",
+   "component": "apps/guest-web/src/routes/Shop.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "WEB-001"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "notes": "**Reached from WEB-001** — a top-level section of the site. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "GST-062",
+     "trigger": "On the way out they find their collection point",
+     "provenance": "flow F51 step 2→3",
+     "operation": "reserveMerchandise",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "Added 17 August for parity with GST-026. **Not on the wireframe board** — needs drawing. CF-93.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listMerchandise` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Merchandise, browsable before you arrive.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every shop",
+       "bindsTo": "MerchandiseItem",
+       "columns": [
+        "MerchandiseItem.id",
+        "MerchandiseItem.sku",
+        "MerchandiseItem.barcode",
+        "MerchandiseItem.name",
+        "MerchandiseItem.outletId",
+        "MerchandiseItem.categoryId",
+        "MerchandiseItem.variantId",
+        "MerchandiseItem.inventoryItemId",
+        "MerchandiseItem.price",
+        "MerchandiseItem.onHand",
+        "MerchandiseItem.isReturnable",
+        "MerchandiseItem.returnWindowDays"
+       ],
+       "operation": "listMerchandise",
+       "provenance": "contract retail.yaml GET /merchandise"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected shop",
+       "bindsTo": "MerchandiseItem",
+       "columns": [
+        "MerchandiseItem.id",
+        "MerchandiseItem.sku",
+        "MerchandiseItem.barcode",
+        "MerchandiseItem.name",
+        "MerchandiseItem.outletId",
+        "MerchandiseItem.categoryId",
+        "MerchandiseItem.variantId",
+        "MerchandiseItem.inventoryItemId",
+        "MerchandiseItem.price",
+        "MerchandiseItem.onHand",
+        "MerchandiseItem.isReturnable",
+        "MerchandiseItem.returnWindowDays",
+        "MerchandiseItem.requiresSerialNumber",
+        "MerchandiseItem.imageAssetRef",
+        "MerchandiseItem.isActive"
+       ],
+       "operation": "listMerchandise",
+       "provenance": "contract retail.yaml GET /merchandise"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Lookup",
+       "operation": "lookupMerchandise",
+       "provenance": "contract retail.yaml GET /merchandise/lookup"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reserve",
+       "operation": "reserveMerchandise",
+       "provenance": "contract retail.yaml POST /outlets/{outletId}/reserve"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Add",
+       "operation": "addCartLine",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "derived": true,
+       "impliedBy": "lookupMerchandise",
+       "label": "Search",
+       "notes": "A search that returns nothing must say so differently from a search not yet run.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "reserveMerchandise",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The shop list.",
+   "error": "Could not load. Names which read failed and leaves the shop untouched.",
+   "emptyFirstRun": "No shop yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the shop are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listMerchandise",
+    "contract": "retail",
+    "purpose": "List merchandise",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "lookupMerchandise",
+    "contract": "retail",
+    "purpose": "Price and stock check by barcode",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "reserveMerchandise",
+    "contract": "retail",
+    "purpose": "Reserve an item for collection",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMerchandise"
+    ]
+   },
+   {
+    "operationId": "addCartLine",
+    "contract": "orders",
+    "purpose": "Add something",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMerchandise"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "cartId",
+     "from": "session"
+    },
+    {
+     "name": "outletId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `outletId`.",
+   "preloaded": [
+    "MerchandiseItem.id",
+    "MerchandiseItem.sku",
+    "MerchandiseItem.barcode",
+    "MerchandiseItem.name",
+    "MerchandiseItem.outletId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-033"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-042",
+  "name": "Retail & Shop and Drop",
+  "module": "Retail",
+  "requiresModule": "retail",
+  "wave": 2,
+  "implementation": {
+   "app": "guest-web",
+   "route": "/retail-and-shop-and-drop",
+   "component": "apps/guest-web/src/routes/RetailShopAndDrop.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "exitTo": [
+    "WEB-001"
+   ]
+  },
+  "notes": "**The web could sell merchandise and could not arrange collection.** `lookupShopAndDrop` was app-only, which made the service half-available on the surface most guests use.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listMerchandise` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Buy merchandise and collect it on the way out.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every retail shop and",
+       "bindsTo": "MerchandiseItem",
+       "columns": [
+        "MerchandiseItem.id",
+        "MerchandiseItem.sku",
+        "MerchandiseItem.barcode",
+        "MerchandiseItem.name",
+        "MerchandiseItem.outletId",
+        "MerchandiseItem.categoryId",
+        "MerchandiseItem.variantId",
+        "MerchandiseItem.inventoryItemId",
+        "MerchandiseItem.price",
+        "MerchandiseItem.onHand",
+        "MerchandiseItem.isReturnable",
+        "MerchandiseItem.returnWindowDays"
+       ],
+       "operation": "listMerchandise",
+       "provenance": "contract retail.yaml GET /merchandise"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected retail shop and",
+       "bindsTo": "MerchandiseItem",
+       "columns": [
+        "MerchandiseItem.id",
+        "MerchandiseItem.sku",
+        "MerchandiseItem.barcode",
+        "MerchandiseItem.name",
+        "MerchandiseItem.outletId",
+        "MerchandiseItem.categoryId",
+        "MerchandiseItem.variantId",
+        "MerchandiseItem.inventoryItemId",
+        "MerchandiseItem.price",
+        "MerchandiseItem.onHand",
+        "MerchandiseItem.isReturnable",
+        "MerchandiseItem.returnWindowDays",
+        "MerchandiseItem.requiresSerialNumber",
+        "MerchandiseItem.imageAssetRef",
+        "MerchandiseItem.isActive"
+       ],
+       "operation": "listMerchandise",
+       "provenance": "contract retail.yaml GET /merchandise"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Lookup",
+       "operation": "lookupMerchandise",
+       "provenance": "contract retail.yaml GET /merchandise/lookup"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reserve",
+       "operation": "reserveMerchandise",
+       "provenance": "contract retail.yaml POST /outlets/{outletId}/reserve"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Lookup",
+       "operation": "lookupShopAndDrop",
+       "provenance": "contract retail.yaml GET /shop-and-drop/lookup"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "cardList",
+       "label": "Retail & Shop and Drop",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "detailPanel",
+       "label": "Detail",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Content resolves in place.",
+   "error": "Could not load. **The rest of the site is unaffected.**",
+   "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
+   "emptyNoResults": "Nothing matches.",
+   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused."
+  },
+  "apis": [
+   {
+    "operationId": "listMerchandise",
+    "contract": "retail",
+    "purpose": "List merchandise",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "lookupMerchandise",
+    "contract": "retail",
+    "purpose": "Price and stock check by barcode",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "reserveMerchandise",
+    "contract": "retail",
+    "purpose": "Reserve an item for collection",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMerchandise"
+    ]
+   },
+   {
+    "operationId": "lookupShopAndDrop",
+    "contract": "retail",
+    "purpose": "Find a guest's dropped goods",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "outletId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land here, and the person holding it did nothing wrong. Arrives with `outletId`.",
+   "preloaded": [
+    "MerchandiseItem.id",
+    "MerchandiseItem.sku",
+    "MerchandiseItem.barcode",
+    "MerchandiseItem.name",
+    "MerchandiseItem.outletId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-042"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

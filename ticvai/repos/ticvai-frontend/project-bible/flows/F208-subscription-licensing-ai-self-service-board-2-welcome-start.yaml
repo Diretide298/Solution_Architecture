@@ -1,0 +1,130 @@
+id: F208
+name: 'Subscription Licensing AI Self Service board 2: Welcome & Start Your TICVAI Journey'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Subscription Licensing AI Self Service board 2. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-379
+  entryPoints:
+  - Arrives at Welcome & Start Your TICVAI Journey
+steps:
+- step: 1
+  screen: ADM-379
+  action: Opens Welcome & Start Your TICVAI Journey
+  operations: []
+  outcome: Provide the entry point for a new customer starting self-service onboarding.
+- step: 2
+  screen: ADM-380
+  action: Works in Customer & Organization Registration
+  operations: []
+  outcome: Create the initial customer account and organization profile.
+- step: 3
+  screen: ADM-379
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-381
+  action: Works in Venue Type & Business Profile
+  operations: []
+  outcome: Understand what type of operation the customer runs.
+- step: 5
+  screen: ADM-379
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-382
+  action: Works in Visitor, Capacity & Operational Scale
+  operations: []
+  outcome: Collect the information required to understand venue size and eventually calculate the VSI.
+- step: 7
+  screen: ADM-379
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-383
+  action: Works in Sales Channel Assessment
+  operations: []
+  outcome: Understand how the customer intends to sell tickets and products.
+- step: 9
+  screen: ADM-379
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-384
+  action: Works in Ticketing & Product Requirements
+  operations: []
+  outcome: Understand what the venue intends to sell.
+- step: 11
+  screen: ADM-379
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-385
+  action: Works in Access, Queue & Visitor Experience Assessment
+  operations: []
+  outcome: Determine admission and visitor-flow requirements.
+- step: 13
+  screen: ADM-379
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-386
+  action: Works in Additional Business Module Assessment
+  operations: []
+  outcome: Identify additional TICVAI operational modules based on the customer's business.
+- step: 15
+  screen: ADM-379
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-387
+  action: Works in Integration, Payment & Technical Readiness
+  operations: []
+  outcome: Understand external systems and technical requirements that could affect complexity, implementation
+    approach and commercial scope.
+- step: 17
+  screen: ADM-379
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-388
+  action: Works in AI Assessment Summary & Handoff
+  operations: []
+  outcome: Consolidate everything learned during onboarding and prepare the customer for Board 3/4 commercial
+    recommendation.
+branches:
+- at: 1
+  condition: Nothing has been set up on Welcome & Start Your TICVAI Journey yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Subscription Licensing AI Self Service board 2 visited
+primaryContract: unknown
+contracts:
+- unknown

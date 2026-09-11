@@ -1,0 +1,820 @@
+[
+ {
+  "id": "BO-068",
+  "name": "Audit Log",
+  "module": "Guests & Marketing",
+  "requiresModule": "core",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/audit-log",
+   "component": "apps/venue-management-web/src/routes/venue-operations/AuditLogDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-007",
+    "BO-008",
+    "BO-009"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-007",
+     "trigger": "Product Directory",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "carries": [
+      "productId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Pricing Rules",
+     "carries": [
+      "priceListId"
+     ],
+     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Carried `listAiInteractions` alone** — an audit log showing only AI prompts. The platform audit record is `identity.audit_event`. **Rewired 20 August.** **`listAuditRecords` wired 24 August.** This screen declared zero operations — an audit log with nothing behind it — and `platform.audit_record` was written by nothing and read by nothing. **Found by mapping the POS pack**, where four separate frames wanted an audit view. **Retail board operations wired 24 August.**",
+  "density": "compact",
+  "boardFrames": [
+   "Retail Board 6.dc.html#ret-6j"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listAuditRecords` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "See who changed what at this venue.",
+  "gaps": [
+   {
+    "operation": "listAuditRecords",
+    "why": "**1 declared operation reach no component on this screen**: listAuditRecords. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Resolve",
+       "operation": "resolvePermissions",
+       "provenance": "contract identity.yaml POST /permissions/resolve"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listAuditRecords",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "resolvePermissions",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The audit log list.",
+   "error": "Could not load. Names which read failed and leaves the audit log untouched.",
+   "emptyFirstRun": "No audit log yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the audit log are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listAuditRecords",
+    "contract": "tenancy",
+    "purpose": "Who did what, where, and when",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "resolvePermissions",
+    "contract": "identity",
+    "purpose": "Simulate a principal's effective permissions",
+    "trigger": "onAction",
+    "invalidates": [
+     "listAuditRecords"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-068",
+   "source": "Claude Design Retail pack, 24 August",
+   "note": "**Drawn by Claude Design on `Retail Board 6.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-073",
+  "name": "Lost & Found Register",
+  "module": "Guests & Marketing",
+  "requiresModule": "marketing",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/lost-found-register",
+   "component": "apps/venue-management-web/src/routes/venue-operations/LostFoundRegisterDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-007",
+    "BO-008",
+    "BO-009"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-007",
+     "trigger": "Product Directory",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "carries": [
+      "productId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Pricing Rules",
+     "carries": [
+      "priceListId"
+     ],
+     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Carried `listCases` and `createCase`.** `LostItem` exists — CL-07 built it as one entity in two directions, lost and found — and a service case is a different thing. **Rewired 20 August.**",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listLostItems` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Match what was lost to what was handed in.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every lost found register",
+       "bindsTo": "LostItem",
+       "columns": [
+        "LostItem.id",
+        "LostItem.foundOrLost",
+        "LostItem.kind",
+        "LostItem.description",
+        "LostItem.colour",
+        "LostItem.brand",
+        "LostItem.venueId",
+        "LostItem.lastSeenPointId",
+        "LostItem.reportedAt",
+        "LostItem.reportedBySubjectId",
+        "LostItem.storageLocation",
+        "LostItem.status"
+       ],
+       "operation": "listLostItems",
+       "provenance": "contract marketing-crm.yaml GET /lost-items"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected lost found register",
+       "bindsTo": "LostItem",
+       "columns": [
+        "LostItem.id",
+        "LostItem.foundOrLost",
+        "LostItem.kind",
+        "LostItem.description",
+        "LostItem.colour",
+        "LostItem.brand",
+        "LostItem.venueId",
+        "LostItem.lastSeenPointId",
+        "LostItem.reportedAt",
+        "LostItem.reportedBySubjectId",
+        "LostItem.storageLocation",
+        "LostItem.status",
+        "LostItem.photoAssetIds",
+        "LostItem.disposeAfter"
+       ],
+       "operation": "listLostItems",
+       "provenance": "contract marketing-crm.yaml GET /lost-items"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Find matches",
+       "operation": "matchLostItem",
+       "provenance": "contract marketing-crm.yaml POST /lost-items/{itemId}/match"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listLostItems",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "matchLostItem",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The lost found register list.",
+   "error": "Could not load. Names which read failed and leaves the lost found register untouched.",
+   "emptyFirstRun": "No lost found register yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the lost found register are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listLostItems",
+    "contract": "marketing-crm",
+    "purpose": "Reported and found, with suggested matches",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "matchLostItem",
+    "contract": "marketing-crm",
+    "purpose": "Tie a report to a found item, or hand it back",
+    "trigger": "onAction",
+    "invalidates": [
+     "listLostItems"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "itemId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "LostItem.id",
+    "LostItem.foundOrLost",
+    "LostItem.kind",
+    "LostItem.description",
+    "LostItem.colour"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-073"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-091",
+  "name": "AI Policy & Spend",
+  "module": "Guests & Marketing",
+  "requiresModule": "ai",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/ai/policy",
+   "component": "apps/venue-management-web/src/routes/AiPolicySpend.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-004",
+     "trigger": "Platform Audit Log",
+     "provenance": "flow F100 step 2→3",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "Added 17 August. **Staff and guest spend shown separately** — a venue can manage the first and cannot stop guests asking questions. At the ceiling the manager decides whether to continue; the assistant does not stop on its own (CF-14). **Index failures sit beside spend on purpose** - both answer the same two questions, is the assistant working and what is it costing, and a failure rate is the cheaper half of that answer.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listIndexFailures` reads the population and `getAiPolicy` reads one of them — list, select, act",
+  "purpose": "What the assistant may do here, what it has cost, and what happens at the ceiling.",
+  "gaps": [
+   {
+    "operation": "getAiUsage",
+    "why": "**1 declared operation reach no component on this screen**: getAiUsage. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every policy spend",
+       "bindsTo": "IndexFailure",
+       "columns": [
+        "IndexFailure.id",
+        "IndexFailure.jobId",
+        "IndexFailure.sourceId",
+        "IndexFailure.documentRef",
+        "IndexFailure.stage",
+        "IndexFailure.error",
+        "IndexFailure.attempts"
+       ],
+       "operation": "listIndexFailures",
+       "provenance": "contract ai.yaml GET /index-failures"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected policy spend",
+       "bindsTo": "AiPolicy",
+       "columns": [
+        "AiPolicy.id",
+        "AiPolicy.scopeLevel",
+        "AiPolicy.enabledCapabilities",
+        "AiPolicy.allowedRoleIds",
+        "AiPolicy.maskedFields",
+        "AiPolicy.requiresApprovalFor",
+        "AiPolicy.monthlyTokenCeiling",
+        "AiPolicy.ceilingBehaviour",
+        "AiPolicy.ceilingWarningPercent",
+        "AiPolicy.guestCapabilityScope",
+        "AiPolicy.retrieveTopK",
+        "AiPolicy.rerankTopK",
+        "AiPolicy.cacheAnswers",
+        "AiPolicy.cacheTtlMinutes",
+        "AiPolicy.retainInteractionsDays",
+        "AiPolicy.semanticCacheThreshold"
+       ],
+       "operation": "getAiPolicy",
+       "provenance": "contract ai.yaml GET /policy"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "setAiPolicy",
+       "provenance": "contract ai.yaml PUT /policy"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setAiPolicy",
+       "label": "Save ai policy",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setAiPolicy",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The policy spend list.",
+   "error": "Could not load. Names which read failed and leaves the policy spend untouched.",
+   "emptyFirstRun": "No policy spend yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the policy spend are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getAiPolicy",
+    "contract": "ai",
+    "purpose": "What the assistant may do here",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setAiPolicy",
+    "contract": "ai",
+    "purpose": "Set the policy",
+    "trigger": "onAction",
+    "invalidates": [
+     "listIndexFailures"
+    ]
+   },
+   {
+    "operationId": "getAiUsage",
+    "contract": "ai",
+    "purpose": "Usage, cost and performance",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listIndexFailures",
+    "contract": "ai",
+    "purpose": "Records an index could not embed, and at which stage",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "AiPolicy.id",
+    "AiPolicy.scopeLevel",
+    "AiPolicy.enabledCapabilities",
+    "AiPolicy.allowedRoleIds",
+    "AiPolicy.maskedFields"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-091"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-107",
+  "name": "Guests & Marketing",
+  "module": "Guests & Marketing",
+  "requiresModule": "core",
+  "wave": 1,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/guests-marketing",
+   "component": "apps/venue-management-web/src/routes/home/GuestsMarketingList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-068",
+    "BO-073",
+    "BO-091"
+   ],
+   "transitions": [
+    {
+     "to": "BO-073",
+     "trigger": "Lost & Found Register",
+     "carries": [
+      "itemId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-073 declares entryState.params itemId, venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Section landing. **3 screens reach the entry point through here** — before 20 August they reached it through nothing.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listCampaigns` reads the population and `getVenueSettings` reads one of them — list, select, act",
+  "purpose": "Everything in guests & marketing, and what in it needs attention.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every guests marketing",
+       "bindsTo": "Campaign",
+       "columns": [
+        "Campaign.name",
+        "Campaign.kind",
+        "Campaign.channel",
+        "Campaign.venueId",
+        "Campaign.segmentId",
+        "Campaign.content",
+        "Campaign.trigger",
+        "Campaign.scheduledFor",
+        "Campaign.consentPurpose",
+        "Campaign.sendWindow",
+        "Campaign.id",
+        "Campaign.budgetCap"
+       ],
+       "operation": "listCampaigns",
+       "provenance": "contract marketing-crm.yaml GET /campaigns"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected guests marketing",
+       "bindsTo": "VenueSettings",
+       "columns": [
+        "VenueSettings.id",
+        "VenueSettings.venueId",
+        "VenueSettings.supportHours",
+        "VenueSettings.quietHours",
+        "VenueSettings.segregatedAccess",
+        "VenueSettings.alerting"
+       ],
+       "operation": "getVenueSettings",
+       "provenance": "contract tenancy.yaml GET /venues/{venueId}/settings"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createCampaign",
+       "provenance": "contract marketing-crm.yaml POST /campaigns"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "cardList",
+       "bindsTo": "screens",
+       "notes": "3 screens, each with what needs attention.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search guests & marketing",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The list, with counts.",
+   "error": "Could not load. Venue Home is still reachable.",
+   "emptyFirstRun": "**Nothing configured in guests & marketing yet.** The action is the first thing to set up, not a blank list.",
+   "emptyNoResults": "Nothing matches the filter.",
+   "emptyNoAccess": "You do not have permission for guests & marketing. **Said plainly** — an empty section reads as broken."
+  },
+  "apis": [
+   {
+    "operationId": "getVenueSettings",
+    "contract": "tenancy",
+    "purpose": "What is enabled here",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCampaigns",
+    "contract": "marketing-crm",
+    "purpose": "Campaigns and their reach",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createCampaign",
+    "contract": "marketing-crm",
+    "purpose": "Start a campaign",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCampaigns"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "**Resolves from the session, so a cold arrival is the ordinary case** — a manager bookmarks the back office and opens it every morning. A principal with more than one venue is asked which before the page renders, rather than shown the first one.",
+   "preloaded": [
+    "VenueSettings.id",
+    "VenueSettings.venueId",
+    "VenueSettings.supportHours",
+    "VenueSettings.quietHours",
+    "VenueSettings.segregatedAccess"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-107"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

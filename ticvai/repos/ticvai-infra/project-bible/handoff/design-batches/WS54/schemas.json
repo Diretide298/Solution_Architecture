@@ -1,0 +1,969 @@
+{
+ "AiOptimizationNextBestActionCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What AI Optimization & Next-Best-Action Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "increaseDiscount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Increase discount"
+   },
+   "reduceDiscount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Reduce discount"
+   },
+   "changeMechanic": {
+    "type": "string",
+    "description": "Change mechanic"
+   },
+   "endPromotion": {
+    "type": "string",
+    "description": "End promotion"
+   },
+   "changeThreshold": {
+    "type": "integer",
+    "description": "Change threshold"
+   },
+   "expandSegment": {
+    "type": "string",
+    "description": "Expand segment"
+   },
+   "narrowSegment": {
+    "type": "string",
+    "description": "Narrow segment"
+   },
+   "excludeSegment": {
+    "type": "string",
+    "description": "Exclude segment"
+   },
+   "changeBundlePrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Change bundle price"
+   },
+   "expandChannel": {
+    "type": "string",
+    "description": "Expand channel"
+   },
+   "restrictChannel": {
+    "type": "string",
+    "description": "Restrict channel"
+   },
+   "reallocateCampaignBudget": {
+    "type": "string",
+    "description": "Reallocate campaign budget"
+   },
+   "changeDay": {
+    "type": "string",
+    "description": "Change day"
+   },
+   "changeTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Change time"
+   },
+   "reduceCampaignDuration": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Reduce campaign duration"
+   },
+   "revenueAed42k": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue: −AED 42K"
+   },
+   "grossProfitAed186k": {
+    "type": "string",
+    "description": "Gross Profit: +AED 186K"
+   },
+   "acceptAsDraft": {
+    "type": "string",
+    "description": "Accept as Draft"
+   },
+   "simulate": {
+    "type": "string",
+    "description": "Simulate"
+   },
+   "snooze": {
+    "type": "string",
+    "description": "Snooze"
+   }
+  }
+ },
+ "BundleBogoAdvancedOfferAnalyticsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Bundle, BOGO & Advanced Offer Analytics displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "bundleSales": {
+    "type": "integer",
+    "description": "Bundle Sales"
+   },
+   "bundleRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Bundle Revenue"
+   },
+   "bundleConversion": {
+    "type": "number",
+    "description": "Bundle Conversion"
+   },
+   "bundleAov": {
+    "type": "string",
+    "description": "Bundle AOV"
+   },
+   "componentAttachRate": {
+    "type": "number",
+    "description": "Component Attach Rate"
+   },
+   "componentRedemption": {
+    "type": "string",
+    "description": "Component Redemption"
+   },
+   "bundleMargin": {
+    "type": "number",
+    "description": "Bundle Margin"
+   },
+   "bundleVsStandaloneRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Bundle vs Standalone Revenue"
+   },
+   "substitutionRate": {
+    "type": "number",
+    "description": "Substitution Rate"
+   },
+   "availabilityFailureRate": {
+    "type": "number",
+    "description": "Availability Failure Rate"
+   },
+   "bogoTransactions": {
+    "type": "integer",
+    "description": "BOGO transactions"
+   },
+   "freeItemsIssued": {
+    "type": "string",
+    "description": "Free items issued"
+   },
+   "averageRewardValue": {
+    "type": "number",
+    "description": "Average reward value"
+   },
+   "incrementalUnits": {
+    "type": "integer",
+    "description": "Incremental units"
+   },
+   "incrementalRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Incremental revenue"
+   },
+   "marginImpact": {
+    "type": "number",
+    "description": "Margin impact"
+   },
+   "waterPark100": {
+    "type": "number",
+    "description": "Water Park — 100%"
+   },
+   "aquarium100": {
+    "type": "number",
+    "description": "Aquarium — 100%"
+   },
+   "mealA68": {
+    "type": "number",
+    "description": "Meal A — 68%"
+   },
+   "mealB22": {
+    "type": "number",
+    "description": "Meal B — 22%"
+   },
+   "mealC10": {
+    "type": "number",
+    "description": "Meal C — 10%"
+   },
+   "photoAddOn31": {
+    "type": "number",
+    "description": "Photo Add-on — 31%"
+   },
+   "parking42": {
+    "type": "number",
+    "description": "Parking — 42%"
+   }
+  }
+ },
+ "CampaignPromotionPerformanceExplorerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Campaign & Promotion Performance Explorer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "aed38": {
+    "type": "string",
+    "description": "AED 3.8"
+   },
+   "family20310k740k29118": {
+    "type": "number",
+    "description": "FAMILY20 310K 740K 29% 11.8%"
+   },
+   "summer1Aed26": {
+    "type": "string",
+    "description": "SUMMER1 AED 2.6"
+   },
+   "aed41": {
+    "type": "string",
+    "description": "AED 4.1"
+   },
+   "app1092k310k34132": {
+    "type": "number",
+    "description": "APP10 92K 310K 34% 13.2%"
+   },
+   "revenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue"
+   },
+   "transactions": {
+    "type": "string",
+    "description": "Transactions"
+   },
+   "units": {
+    "type": "string",
+    "description": "Units"
+   },
+   "redemptions": {
+    "type": "string",
+    "description": "Redemptions"
+   },
+   "discount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount"
+   },
+   "margin": {
+    "type": "number",
+    "description": "Margin"
+   },
+   "conversion": {
+    "type": "number",
+    "description": "Conversion"
+   },
+   "aov": {
+    "type": "string",
+    "description": "AOV"
+   },
+   "roi": {
+    "type": "string",
+    "description": "ROI"
+   },
+   "customerAcquisition": {
+    "type": "string",
+    "description": "Customer acquisition"
+   },
+   "repeatPurchase": {
+    "type": "string",
+    "description": "Repeat purchase"
+   },
+   "excellent": {
+    "type": "string",
+    "description": "Excellent"
+   },
+   "healthy": {
+    "type": "string",
+    "description": "Healthy"
+   },
+   "monitor": {
+    "type": "string",
+    "description": "Monitor"
+   },
+   "underperforming": {
+    "type": "string",
+    "description": "Underperforming"
+   },
+   "marginRisk": {
+    "type": "number",
+    "description": "Margin Risk"
+   },
+   "critical": {
+    "type": "string",
+    "description": "Critical"
+   },
+   "subjectToUserPermissions": {
+    "type": "string",
+    "description": "subject to user permissions"
+   }
+  }
+ },
+ "CustomerSegmentChannelPartnerAnalyticsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Customer, Segment, Channel & Partner Analytics displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "customersReached": {
+    "type": "string",
+    "description": "Customers reached"
+   },
+   "newCustomers": {
+    "type": "integer",
+    "description": "New customers"
+   },
+   "returningCustomers": {
+    "type": "integer",
+    "description": "Returning customers"
+   },
+   "conversion": {
+    "type": "number",
+    "description": "Conversion"
+   },
+   "revenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue"
+   },
+   "discount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount"
+   },
+   "aov": {
+    "type": "string",
+    "description": "AOV"
+   },
+   "margin": {
+    "type": "number",
+    "description": "Margin"
+   },
+   "repeatPurchase": {
+    "type": "string",
+    "description": "Repeat purchase"
+   },
+   "redemption": {
+    "type": "string",
+    "description": "Redemption"
+   },
+   "ntOnN": {
+    "type": "string",
+    "description": "nt on n"
+   },
+   "aed44": {
+    "type": "string",
+    "description": "AED 4.4"
+   },
+   "families14229": {
+    "type": "number",
+    "description": "Families 14.2% 29%"
+   },
+   "aed32": {
+    "type": "string",
+    "description": "AED 3.2"
+   },
+   "tourists9834": {
+    "type": "number",
+    "description": "Tourists 9.8% 34%"
+   },
+   "memberAed51": {
+    "type": "string",
+    "description": "Member AED 5.1"
+   },
+   "s710X": {
+    "type": "string",
+    "description": "s 710 x"
+   },
+   "b2c": {
+    "type": "string",
+    "description": "B2C"
+   },
+   "mobileApp": {
+    "type": "string",
+    "description": "Mobile App"
+   },
+   "pos": {
+    "type": "string",
+    "description": "POS"
+   },
+   "kiosk": {
+    "type": "string",
+    "description": "Kiosk"
+   },
+   "b2b": {
+    "type": "string",
+    "description": "B2B"
+   },
+   "callCenter": {
+    "type": "string",
+    "description": "Call Center"
+   },
+   "ota": {
+    "type": "string",
+    "description": "OTA"
+   },
+   "reseller": {
+    "type": "string",
+    "description": "Reseller"
+   },
+   "api": {
+    "type": "string",
+    "description": "API"
+   },
+   "partnerRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Partner revenue"
+   },
+   "partnerRedemptions": {
+    "type": "integer",
+    "description": "Partner redemptions"
+   },
+   "discountCost": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount cost"
+   },
+   "commission": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Commission"
+   },
+   "netContribution": {
+    "type": "string",
+    "description": "Net contribution"
+   },
+   "campaignRoi": {
+    "type": "string",
+    "description": "Campaign ROI"
+   }
+  }
+ },
+ "DiscountMarginProfitabilityAnalyticsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Discount, Margin & Profitability Analytics displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "grossRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Gross Revenue"
+   },
+   "discountValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount Value"
+   },
+   "netRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Net Revenue"
+   },
+   "productCost": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Product Cost"
+   },
+   "promotionCost": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Promotion Cost"
+   },
+   "grossProfit": {
+    "type": "string",
+    "description": "Gross Profit"
+   },
+   "grossMargin": {
+    "type": "number",
+    "description": "Gross Margin %"
+   },
+   "marginChange": {
+    "type": "number",
+    "description": "Margin Change"
+   },
+   "revenueUplift": {
+    "type": "number",
+    "description": "Revenue Uplift"
+   },
+   "profitUplift": {
+    "type": "number",
+    "description": "Profit Uplift"
+   },
+   "roi": {
+    "type": "string",
+    "description": "ROI"
+   },
+   "toIdentify": {
+    "type": "string",
+    "description": "to identify"
+   },
+   "highRevenueHighMargin": {
+    "type": "number",
+    "description": "High revenue / high margin"
+   },
+   "highRevenueLowMargin": {
+    "type": "number",
+    "description": "High revenue / low margin"
+   },
+   "lowRevenueHighMargin": {
+    "type": "number",
+    "description": "Low revenue / high margin"
+   },
+   "lowRevenueLowMargin": {
+    "type": "number",
+    "description": "Low revenue / low margin"
+   }
+  }
+ },
+ "ExecutivePromotionIntelligenceReportingStudioView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Executive Promotion Intelligence & Reporting Studio displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "dashboards": {
+    "type": "string",
+    "description": "dashboards"
+   },
+   "productRelationship": {
+    "type": "string",
+    "description": "product relationship"
+   },
+   "higherValueOption": {
+    "type": "string",
+    "description": "higher-value option"
+   },
+   "by": {
+    "type": "string",
+    "description": "by"
+   },
+   "incrementalRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Incremental revenue"
+   },
+   "profit": {
+    "type": "string",
+    "description": "Profit"
+   },
+   "roi": {
+    "type": "string",
+    "description": "ROI"
+   },
+   "conversion": {
+    "type": "number",
+    "description": "Conversion"
+   },
+   "aov": {
+    "type": "string",
+    "description": "AOV"
+   },
+   "negativeMarginImpact": {
+    "type": "number",
+    "description": "Negative margin impact"
+   },
+   "lowConversion": {
+    "type": "number",
+    "description": "Low conversion"
+   },
+   "highDiscountCost": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "High discount cost"
+   },
+   "lowIncrementality": {
+    "type": "string",
+    "description": "Low incrementality"
+   },
+   "metric": {
+    "type": "string",
+    "description": "Metric"
+   },
+   "dimension": {
+    "type": "string",
+    "description": "Dimension"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "comparisonPeriod": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Comparison period"
+   },
+   "grouping": {
+    "type": "string",
+    "description": "Grouping"
+   },
+   "visualization": {
+    "type": "string",
+    "description": "Visualization"
+   },
+   "excel": {
+    "type": "string",
+    "description": "Excel"
+   },
+   "csv": {
+    "type": "string",
+    "description": "CSV"
+   },
+   "pdf": {
+    "type": "string",
+    "description": "PDF"
+   },
+   "powerBi": {
+    "type": "string",
+    "description": "Power BI"
+   },
+   "api": {
+    "type": "string",
+    "description": "API"
+   },
+   "scheduledReport": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Scheduled report"
+   },
+   "transactionPromotionEvents": {
+    "type": "string",
+    "description": "Transaction + Promotion Events"
+   },
+   "reward": {
+    "type": "string",
+    "description": "reward"
+   },
+   "accordingToConfiguredFinancialRules": {
+    "type": "string",
+    "description": "according to configured financial rules"
+   },
+   "executive": {
+    "type": "string",
+    "description": "Executive"
+   },
+   "marketing": {
+    "type": "string",
+    "description": "Marketing"
+   },
+   "commercial": {
+    "type": "string",
+    "description": "Commercial"
+   },
+   "revenueManagement": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue Management"
+   },
+   "finance": {
+    "type": "string",
+    "description": "Finance"
+   },
+   "venueManagement": {
+    "type": "string",
+    "description": "Venue Management"
+   },
+   "b2b": {
+    "type": "string",
+    "description": "B2B"
+   },
+   "crm": {
+    "type": "string",
+    "description": "CRM"
+   },
+   "dataAnalyst": {
+    "type": "string",
+    "description": "Data Analyst"
+   },
+   "auditor": {
+    "type": "string",
+    "description": "Auditor"
+   },
+   "systemAdministrator": {
+    "type": "string",
+    "description": "System Administrator"
+   },
+   "familySegmentConversion142": {
+    "type": "number",
+    "description": "Family Segment — Conversion 14.2%"
+   }
+  }
+ },
+ "IncrementalityAttributionCannibalizationAnalysisView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Incrementality, Attribution & Cannibalization Analysis displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "directAttribution": {
+    "type": "string",
+    "description": "Direct attribution"
+   },
+   "promotionCodeAttribution": {
+    "type": "string",
+    "description": "Promotion-code attribution"
+   },
+   "campaignAttribution": {
+    "type": "string",
+    "description": "Campaign attribution"
+   },
+   "controlGroupComparison": {
+    "type": "string",
+    "description": "Control-group comparison"
+   },
+   "aBTestAttribution": {
+    "type": "string",
+    "description": "A/B test attribution"
+   },
+   "prePostComparison": {
+    "type": "string",
+    "description": "Pre/post comparison"
+   },
+   "matchedAudienceAnalysis": {
+    "type": "string",
+    "description": "Matched audience analysis"
+   },
+   "aiEstimatedIncrementality": {
+    "type": "string",
+    "description": "AI-estimated incrementality"
+   },
+   "aed50m": {
+    "type": "string",
+    "description": "AED 5.0M"
+   },
+   "aed38m": {
+    "type": "string",
+    "description": "AED 3.8M"
+   },
+   "aed12m": {
+    "type": "string",
+    "description": "AED 1.2M"
+   },
+   "standardTicketDiscountedTicket": {
+    "type": "string",
+    "description": "Standard ticket → discounted ticket"
+   },
+   "higherMarginBundleLowerMarginPromotion": {
+    "type": "number",
+    "description": "Higher-margin bundle → lower-margin promotion"
+   },
+   "channelMigrationCausedByDiscounting": {
+    "type": "string",
+    "description": "Channel migration caused by discounting"
+   }
+  }
+ },
+ "PromotionPerformanceCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Promotion Performance Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "dateRange": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date range"
+   },
+   "businessEntity": {
+    "type": "string",
+    "description": "Business entity"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "campaign": {
+    "type": "string",
+    "description": "Campaign"
+   },
+   "promotion": {
+    "type": "string",
+    "description": "Promotion"
+   },
+   "bundle": {
+    "type": "string",
+    "description": "Bundle"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer segment"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "grossSales": {
+    "type": "integer",
+    "description": "Gross Sales"
+   },
+   "promotionInfluencedRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Promotion-Influenced Revenue"
+   },
+   "estimatedIncrementalRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Estimated Incremental Revenue"
+   },
+   "discountGranted": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount Granted"
+   },
+   "netRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Net Revenue"
+   },
+   "grossMargin": {
+    "type": "number",
+    "description": "Gross Margin"
+   },
+   "promotionCost": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Promotion Cost"
+   },
+   "roi": {
+    "type": "string",
+    "description": "ROI"
+   },
+   "transactions": {
+    "type": "integer",
+    "description": "Transactions"
+   },
+   "redemptions": {
+    "type": "integer",
+    "description": "Redemptions"
+   },
+   "conversionRate": {
+    "type": "number",
+    "description": "Conversion Rate"
+   },
+   "averageOrderValue": {
+    "type": "number",
+    "description": "Average Order Value"
+   },
+   "revenuePerRedemption": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue per Redemption"
+   },
+   "activeCampaigns": {
+    "type": "integer",
+    "description": "Active Campaigns"
+   },
+   "overTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "over time"
+   }
+  }
+ },
+ "RedemptionConversionFunnelAnalyticsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Redemption, Conversion & Funnel Analytics displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "exposureRate": {
+    "type": "number",
+    "description": "Exposure rate"
+   },
+   "engagementRate": {
+    "type": "number",
+    "description": "Engagement rate"
+   },
+   "cartRate": {
+    "type": "number",
+    "description": "Cart rate"
+   },
+   "conversionRate": {
+    "type": "number",
+    "description": "Conversion rate"
+   },
+   "redemptionRate": {
+    "type": "number",
+    "description": "Redemption rate"
+   },
+   "abandonment": {
+    "type": "string",
+    "description": "Abandonment"
+   },
+   "unusedPromotionRate": {
+    "type": "number",
+    "description": "Unused promotion rate"
+   },
+   "expiredBenefitRate": {
+    "type": "integer",
+    "description": "Expired benefit rate"
+   }
+  }
+ },
+ "UpsellCrossSellAttachRateAnalyticsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Upsell, Cross-Sell & Attach-Rate Analytics displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "crossSellRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Cross-Sell Revenue"
+   },
+   "upsellRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Upsell Revenue"
+   },
+   "attachRate": {
+    "type": "number",
+    "description": "Attach Rate"
+   },
+   "itemsPerTransaction": {
+    "type": "string",
+    "description": "Items per Transaction"
+   },
+   "revenuePerTransaction": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue per Transaction"
+   },
+   "recommendedOfferAcceptance": {
+    "type": "string",
+    "description": "Recommended Offer Acceptance"
+   },
+   "incrementalBasketValue": {
+    "type": "string",
+    "description": "Incremental Basket Value"
+   },
+   "crossCategoryConversion": {
+    "type": "number",
+    "description": "Cross-Category Conversion"
+   },
+   "ticketTicket": {
+    "type": "string",
+    "description": "Ticket → Ticket"
+   },
+   "ticketFB": {
+    "type": "string",
+    "description": "Ticket → F&B"
+   },
+   "ticketRetail": {
+    "type": "string",
+    "description": "Ticket → Retail"
+   },
+   "ticketExperience": {
+    "type": "string",
+    "description": "Ticket → Experience"
+   },
+   "ticketMembership": {
+    "type": "string",
+    "description": "Ticket → Membership"
+   },
+   "fBRetail": {
+    "type": "string",
+    "description": "F&B → Retail"
+   },
+   "retailFB": {
+    "type": "string",
+    "description": "Retail → F&B"
+   },
+   "membershipExperience": {
+    "type": "string",
+    "description": "Membership → Experience"
+   }
+  }
+ }
+}

@@ -1,0 +1,198 @@
+[
+ {
+  "id": "ADM-318",
+  "name": "Dead Letters",
+  "module": "Platform Ops",
+  "requiresModule": "core",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/dead-letters",
+   "component": "apps/ticvai-web/src/routes/DeadLetters.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "ADM-001"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "notes": "**Reached from ADM-002** — a top-level console section. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "ADM-001",
+     "trigger": "Platform Login / MFA",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — ADM-001 declares entryState.params sessionId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Added 4 September. **47 consumers declare `retryThenDeadLetter` and all 47 are marked `isCritical`, and until this screen existed nothing in the package read the table they land in.** Deliberately not DEV-005 Webhooks: `replayEvents` is partner-facing redelivery of a customer's own integration, and handling a platform failure as a customer integration question is how it stays unfixed.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listDeadLetters` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Every event the platform gave up on, and the act that puts it back. A dead letter is work the platform accepted and did not do.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every dead letters",
+       "bindsTo": "DeadLetter",
+       "columns": [
+        "DeadLetter.id",
+        "DeadLetter.outboxId",
+        "DeadLetter.eventName",
+        "DeadLetter.consumer",
+        "DeadLetter.payload",
+        "DeadLetter.attempts",
+        "DeadLetter.lastError",
+        "DeadLetter.lastAttemptAt",
+        "DeadLetter.replayCount",
+        "DeadLetter.scopePath"
+       ],
+       "operation": "listDeadLetters",
+       "provenance": "contract platform-ops.yaml GET /dead-letters"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected dead letters",
+       "bindsTo": "DeadLetter",
+       "columns": [
+        "DeadLetter.id",
+        "DeadLetter.outboxId",
+        "DeadLetter.eventName",
+        "DeadLetter.consumer",
+        "DeadLetter.payload",
+        "DeadLetter.attempts",
+        "DeadLetter.lastError",
+        "DeadLetter.lastAttemptAt",
+        "DeadLetter.replayCount",
+        "DeadLetter.scopePath"
+       ],
+       "operation": "listDeadLetters",
+       "provenance": "contract platform-ops.yaml GET /dead-letters"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Replay",
+       "operation": "replayDeadLetter",
+       "provenance": "contract platform-ops.yaml POST /dead-letters/{deadLetterId}/replay"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listDeadLetters",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, and this table is written by the retry path while it is read. **Filtered by consumer and by age** - 47 consumers declare `retryThenDeadLetter` and all 47 are `isCritical`, so an unfiltered list is 47 different problems wearing one shape.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "replayDeadLetter",
+       "label": "Replay",
+       "notes": "**The act the screen exists for.** Replay is idempotent at the consumer; the screen still confirms, because a replay of a payment event is not a refresh.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The dead letters list.",
+   "error": "Could not load. Names which read failed and leaves the dead letters untouched.",
+   "emptyFirstRun": "No dead letters yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the dead letters are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listDeadLetters",
+    "contract": "platform-ops",
+    "purpose": "Events the retry path gave up on",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "replayDeadLetter",
+    "contract": "platform-ops",
+    "purpose": "Put one back on the queue",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDeadLetters"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "deadLetterId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**The ordinary path is a row on this screen**, and `replayDeadLetter` takes the id from the row the operator chose. A deep link is how an alert reaches one directly; if that id is already replayed or gone the screen says so and shows the list, because a replay issued against a row nobody can see is a replay nobody can account for.",
+   "preloaded": [
+    "DeadLetter.id",
+    "DeadLetter.outboxId",
+    "DeadLetter.eventName",
+    "DeadLetter.consumer",
+    "DeadLetter.payload"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-318"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

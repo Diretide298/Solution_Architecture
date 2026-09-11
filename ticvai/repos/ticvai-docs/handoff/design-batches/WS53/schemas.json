@@ -1,0 +1,1086 @@
+{
+ "ApprovalInboxDecisionWorkspaceInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Approval Inbox & Decision Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "aed500kAed750k": {
+    "type": "string",
+    "description": "AED 500K → AED 750K"
+   },
+   "returnForChange": {
+    "type": "string",
+    "description": "Return for Change"
+   },
+   "requestInformation": {
+    "type": "string",
+    "description": "Request Information"
+   },
+   "delegate": {
+    "type": "string",
+    "description": "Delegate"
+   }
+  }
+ },
+ "ApprovalInboxDecisionWorkspaceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Approval Inbox & Decision Workspace displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "campaign": {
+    "type": "string",
+    "description": "Campaign"
+   },
+   "promotion": {
+    "type": "string",
+    "description": "Promotion"
+   },
+   "requestedBy": {
+    "type": "string",
+    "description": "Requested by"
+   },
+   "requestDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Request date"
+   },
+   "requestedAction": {
+    "type": "string",
+    "description": "Requested action"
+   },
+   "discount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount"
+   },
+   "budget": {
+    "type": "string",
+    "description": "Budget"
+   },
+   "estimatedRedemptions": {
+    "type": "integer",
+    "description": "Estimated redemptions"
+   },
+   "estimatedRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Estimated revenue"
+   },
+   "marginImpact": {
+    "type": "number",
+    "description": "Margin impact"
+   },
+   "customerReach": {
+    "type": "string",
+    "description": "Customer reach"
+   },
+   "riskLevel": {
+    "type": "string",
+    "description": "Risk level"
+   },
+   "aiForecast": {
+    "type": "string",
+    "description": "AI forecast"
+   },
+   "aed500kAed750k": {
+    "type": "string",
+    "description": "AED 500K → AED 750K"
+   },
+   "returnForChange": {
+    "type": "string",
+    "description": "Return for Change"
+   },
+   "requestInformation": {
+    "type": "string",
+    "description": "Request Information"
+   },
+   "delegate": {
+    "type": "string",
+    "description": "Delegate"
+   },
+   "marketing": {
+    "type": "string",
+    "description": "Marketing ✓"
+   },
+   "commercial": {
+    "type": "string",
+    "description": "Commercial ✓"
+   }
+  }
+ },
+ "BudgetConsumptionForecastMonitorView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Budget Consumption & Forecast Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "originalBudget": {
+    "type": "string",
+    "description": "Original budget"
+   },
+   "consumed": {
+    "type": "string",
+    "description": "Consumed"
+   },
+   "committed": {
+    "type": "string",
+    "description": "Committed"
+   },
+   "reserved": {
+    "type": "string",
+    "description": "Reserved"
+   },
+   "remaining": {
+    "type": "string",
+    "description": "Remaining"
+   },
+   "forecastFinalSpend": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Forecast final spend"
+   },
+   "dailyBurnRate": {
+    "type": "number",
+    "description": "Daily burn rate"
+   },
+   "completedTransaction": {
+    "type": "string",
+    "description": "Completed transaction"
+   }
+  }
+ },
+ "CampaignApprovalWorkflowDesignerInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is promotions.coupon_campaign at 6%, so this is not an update to anything the package stores today and no new table has been decided",
+  "description": "**What Campaign Approval Workflow Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "discount": {
+    "type": "number",
+    "description": "Discount %"
+   },
+   "campaignBudget": {
+    "type": "string",
+    "description": "Campaign budget"
+   },
+   "margin": {
+    "type": "number",
+    "description": "Margin"
+   },
+   "promotionType": {
+    "type": "string",
+    "description": "Promotion type"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "freeProductValue": {
+    "type": "string",
+    "description": "Free-product value"
+   },
+   "campaignDuration": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Campaign duration"
+   },
+   "financialExposure": {
+    "type": "string",
+    "description": "Financial exposure"
+   },
+   "discount1025": {
+    "type": "number",
+    "description": "Discount 10–25%"
+   },
+   "sequentialApproval": {
+    "type": "string",
+    "description": "Sequential approval"
+   },
+   "parallelApproval": {
+    "type": "string",
+    "description": "Parallel approval"
+   },
+   "conditionalApproval": {
+    "type": "string",
+    "description": "Conditional approval"
+   },
+   "mandatoryApproval": {
+    "type": "string",
+    "description": "Mandatory approval"
+   },
+   "optionalReview": {
+    "type": "string",
+    "description": "Optional review"
+   },
+   "delegation": {
+    "type": "string",
+    "description": "Delegation"
+   },
+   "escalation": {
+    "type": "string",
+    "description": "Escalation"
+   }
+  }
+ },
+ "CampaignApprovalWorkflowDesignerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Campaign Approval Workflow Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "discount": {
+    "type": "number",
+    "description": "Discount %"
+   },
+   "campaignBudget": {
+    "type": "string",
+    "description": "Campaign budget"
+   },
+   "margin": {
+    "type": "number",
+    "description": "Margin"
+   },
+   "promotionType": {
+    "type": "string",
+    "description": "Promotion type"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "freeProductValue": {
+    "type": "string",
+    "description": "Free-product value"
+   },
+   "campaignDuration": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Campaign duration"
+   },
+   "financialExposure": {
+    "type": "string",
+    "description": "Financial exposure"
+   },
+   "discount1025": {
+    "type": "number",
+    "description": "Discount 10–25%"
+   },
+   "sequentialApproval": {
+    "type": "string",
+    "description": "Sequential approval"
+   },
+   "parallelApproval": {
+    "type": "string",
+    "description": "Parallel approval"
+   },
+   "conditionalApproval": {
+    "type": "string",
+    "description": "Conditional approval"
+   },
+   "mandatoryApproval": {
+    "type": "string",
+    "description": "Mandatory approval"
+   },
+   "optionalReview": {
+    "type": "string",
+    "description": "Optional review"
+   },
+   "delegation": {
+    "type": "string",
+    "description": "Delegation"
+   },
+   "escalation": {
+    "type": "string",
+    "description": "Escalation"
+   }
+  }
+ },
+ "CampaignBudgetFinancialLimitSetupInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Campaign Budget & Financial Limit Setup submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "totalCampaignBudget": {
+    "type": "integer",
+    "description": "Total campaign budget"
+   },
+   "discountBudget": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount budget"
+   },
+   "rewardBudget": {
+    "type": "string",
+    "description": "Reward budget"
+   },
+   "freeProductBudget": {
+    "type": "string",
+    "description": "Free-product budget"
+   },
+   "partnerFundedBudget": {
+    "type": "string",
+    "description": "Partner-funded budget"
+   },
+   "marketingFundedBudget": {
+    "type": "string",
+    "description": "Marketing-funded budget"
+   },
+   "venueBudget": {
+    "type": "string",
+    "description": "Venue budget"
+   },
+   "departmentBudget": {
+    "type": "string",
+    "description": "Department budget"
+   },
+   "campaign": {
+    "type": "string",
+    "description": "Campaign"
+   },
+   "budgetAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Budget amount"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "effectiveDates": {
+    "type": "string",
+    "description": "Effective dates"
+   },
+   "budgetOwner": {
+    "type": "string",
+    "description": "Budget owner"
+   },
+   "costCenter": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Cost center"
+   },
+   "businessEntity": {
+    "type": "string",
+    "description": "Business entity"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "department": {
+    "type": "string",
+    "description": "Department"
+   },
+   "fundingSource": {
+    "type": "string",
+    "description": "Funding source"
+   },
+   "entireCampaign": {
+    "type": "string",
+    "description": "Entire campaign"
+   },
+   "promotion": {
+    "type": "string",
+    "description": "Promotion"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer segment"
+   }
+  }
+ },
+ "CampaignBudgetFinancialLimitSetupView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Campaign Budget & Financial Limit Setup displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "totalCampaignBudget": {
+    "type": "integer",
+    "description": "Total campaign budget"
+   },
+   "discountBudget": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount budget"
+   },
+   "rewardBudget": {
+    "type": "string",
+    "description": "Reward budget"
+   },
+   "freeProductBudget": {
+    "type": "string",
+    "description": "Free-product budget"
+   },
+   "partnerFundedBudget": {
+    "type": "string",
+    "description": "Partner-funded budget"
+   },
+   "marketingFundedBudget": {
+    "type": "string",
+    "description": "Marketing-funded budget"
+   },
+   "venueBudget": {
+    "type": "string",
+    "description": "Venue budget"
+   },
+   "departmentBudget": {
+    "type": "string",
+    "description": "Department budget"
+   },
+   "campaign": {
+    "type": "string",
+    "description": "Campaign"
+   },
+   "budgetAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Budget amount"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "effectiveDates": {
+    "type": "string",
+    "description": "Effective dates"
+   },
+   "budgetOwner": {
+    "type": "string",
+    "description": "Budget owner"
+   },
+   "costCenter": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Cost center"
+   },
+   "businessEntity": {
+    "type": "string",
+    "description": "Business entity"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "department": {
+    "type": "string",
+    "description": "Department"
+   },
+   "fundingSource": {
+    "type": "string",
+    "description": "Funding source"
+   },
+   "entireCampaign": {
+    "type": "string",
+    "description": "Entire campaign"
+   },
+   "promotion": {
+    "type": "string",
+    "description": "Promotion"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer segment"
+   }
+  }
+ },
+ "CampaignExperimentABTestManagerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Campaign Experiment & A/B Test Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "freeFBVoucher": {
+    "type": "string",
+    "description": "Free F&B voucher"
+   },
+   "a40": {
+    "type": "number",
+    "description": "A — 40%"
+   },
+   "b40": {
+    "type": "number",
+    "description": "B — 40%"
+   },
+   "control20": {
+    "type": "number",
+    "description": "Control — 20%"
+   },
+   "discount": {
+    "type": "number",
+    "description": "Discount %"
+   },
+   "discountValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount value"
+   },
+   "promotionType": {
+    "type": "string",
+    "description": "Promotion type"
+   },
+   "bundle": {
+    "type": "string",
+    "description": "Bundle"
+   },
+   "reward": {
+    "type": "string",
+    "description": "Reward"
+   },
+   "audience": {
+    "type": "string",
+    "description": "Audience"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "validity": {
+    "type": "string",
+    "description": "Validity"
+   },
+   "messageOffer": {
+    "type": "string",
+    "description": "Message/offer"
+   },
+   "timing": {
+    "type": "string",
+    "description": "Timing"
+   },
+   "conversion": {
+    "type": "number",
+    "description": "Conversion"
+   },
+   "revenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue"
+   },
+   "aov": {
+    "type": "string",
+    "description": "AOV"
+   },
+   "redemption": {
+    "type": "string",
+    "description": "Redemption"
+   },
+   "discountCost": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount cost"
+   },
+   "margin": {
+    "type": "number",
+    "description": "Margin"
+   },
+   "incrementalRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Incremental revenue"
+   },
+   "roi": {
+    "type": "string",
+    "description": "ROI"
+   },
+   "manualWinner": {
+    "type": "string",
+    "description": "Manual winner"
+   },
+   "ruleBasedWinner": {
+    "type": "string",
+    "description": "Rule-based winner"
+   },
+   "aiRecommendation": {
+    "type": "string",
+    "description": "AI recommendation"
+   }
+  }
+ },
+ "CampaignFinancialCommercialSimulatorView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Campaign Financial & Commercial Simulator displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "audience": {
+    "type": "string",
+    "description": "Audience"
+   },
+   "products": {
+    "type": "string",
+    "description": "Products"
+   },
+   "promotion": {
+    "type": "string",
+    "description": "Promotion"
+   },
+   "discount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount"
+   },
+   "duration": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Duration"
+   },
+   "channels": {
+    "type": "string",
+    "description": "Channels"
+   },
+   "historicalConversion": {
+    "type": "number",
+    "description": "Historical conversion"
+   },
+   "expectedTraffic": {
+    "type": "string",
+    "description": "Expected traffic"
+   },
+   "redemptionLimit": {
+    "type": "integer",
+    "description": "Redemption limit"
+   },
+   "budget": {
+    "type": "string",
+    "description": "Budget"
+   },
+   "eligibleAudience": {
+    "type": "string",
+    "description": "Eligible audience"
+   },
+   "expectedTransactions": {
+    "type": "integer",
+    "description": "Expected transactions"
+   },
+   "expectedRedemptions": {
+    "type": "integer",
+    "description": "Expected redemptions"
+   },
+   "grossRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Gross revenue"
+   },
+   "discountCost": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount cost"
+   },
+   "netRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Net revenue"
+   },
+   "incrementalRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Incremental revenue"
+   },
+   "averageOrderValue": {
+    "type": "number",
+    "description": "Average order value"
+   },
+   "grossMargin": {
+    "type": "number",
+    "description": "Gross margin"
+   },
+   "marginImpact": {
+    "type": "number",
+    "description": "Margin impact"
+   },
+   "expectedBudgetConsumption": {
+    "type": "string",
+    "description": "Expected budget consumption"
+   },
+   "roi": {
+    "type": "string",
+    "description": "ROI"
+   }
+  }
+ },
+ "CampaignGovernanceBudgetCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Campaign Governance & Budget Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "activeCampaigns": {
+    "type": "integer",
+    "description": "Active Campaigns"
+   },
+   "campaignBudget": {
+    "type": "string",
+    "description": "Campaign Budget"
+   },
+   "budgetConsumed": {
+    "type": "string",
+    "description": "Budget Consumed"
+   },
+   "remainingBudget": {
+    "type": "string",
+    "description": "Remaining Budget"
+   },
+   "discountExposure": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount Exposure"
+   },
+   "redemptionValue": {
+    "type": "string",
+    "description": "Redemption Value"
+   },
+   "revenueGenerated": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue Generated"
+   },
+   "incrementalRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Incremental Revenue"
+   },
+   "campaignRoi": {
+    "type": "string",
+    "description": "Campaign ROI"
+   },
+   "campaignsNearBudgetLimit": {
+    "type": "integer",
+    "description": "Campaigns Near Budget Limit"
+   },
+   "pendingApprovals": {
+    "type": "integer",
+    "description": "Pending Approvals"
+   },
+   "suspendedCampaigns": {
+    "type": "integer",
+    "description": "Suspended Campaigns"
+   },
+   "healthy": {
+    "type": "string",
+    "description": "Healthy"
+   },
+   "monitor": {
+    "type": "string",
+    "description": "Monitor"
+   },
+   "warning": {
+    "type": "string",
+    "description": "Warning"
+   },
+   "critical": {
+    "type": "string",
+    "description": "Critical"
+   },
+   "budgetExhausted": {
+    "type": "string",
+    "description": "Budget Exhausted"
+   },
+   "suspended": {
+    "type": "string",
+    "description": "Suspended"
+   },
+   "budgetAed500000": {
+    "type": "string",
+    "description": "Budget: AED 500,000"
+   },
+   "consumedAed387500": {
+    "type": "string",
+    "description": "Consumed: AED 387,500"
+   },
+   "remainingAed112500": {
+    "type": "string",
+    "description": "Remaining: AED 112,500"
+   },
+   "utilization775": {
+    "type": "number",
+    "description": "Utilization: 77.5%"
+   },
+   "revenueAed284m": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue: AED 2.84M"
+   },
+   "roi53x": {
+    "type": "string",
+    "description": "ROI: 5.3x"
+   },
+   "statusHealthy": {
+    "type": "string",
+    "description": "Status: HEALTHY"
+   }
+  }
+ },
+ "GovernanceAuditAiRiskLaunchReadinessView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Governance Audit, AI Risk & Launch Readiness displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "promotionConfiguration": {
+    "type": "string",
+    "description": "Promotion Configuration ✓"
+   },
+   "eligibility": {
+    "type": "string",
+    "description": "Eligibility ✓"
+   },
+   "stackingRules": {
+    "type": "string",
+    "description": "Stacking Rules ✓"
+   },
+   "budget": {
+    "type": "string",
+    "description": "Budget ✓"
+   },
+   "redemptionLimits": {
+    "type": "string",
+    "description": "Redemption Limits ✓"
+   },
+   "marginGuardrail": {
+    "type": "number",
+    "description": "Margin Guardrail ✓"
+   },
+   "simulationCompleted": {
+    "type": "string",
+    "description": "Simulation Completed ✓"
+   },
+   "requiredApproval": {
+    "type": "string",
+    "description": "Required Approval ✓"
+   },
+   "channelPublication": {
+    "type": "string",
+    "description": "Channel Publication ✓"
+   },
+   "auditRequirements": {
+    "type": "string",
+    "description": "Audit Requirements ✓"
+   },
+   "budgetCreation": {
+    "type": "string",
+    "description": "Budget creation"
+   },
+   "budgetChange": {
+    "type": "string",
+    "description": "Budget change"
+   },
+   "limitChanges": {
+    "type": "integer",
+    "description": "Limit changes"
+   },
+   "approvalSubmissions": {
+    "type": "string",
+    "description": "Approval submissions"
+   },
+   "approvalDecisions": {
+    "type": "string",
+    "description": "Approval decisions"
+   },
+   "overrides": {
+    "type": "string",
+    "description": "Overrides"
+   },
+   "automaticSuspension": {
+    "type": "string",
+    "description": "Automatic suspension"
+   },
+   "reactivation": {
+    "type": "string",
+    "description": "Reactivation"
+   },
+   "simulationResults": {
+    "type": "string",
+    "description": "Simulation results"
+   },
+   "experimentChanges": {
+    "type": "string",
+    "description": "Experiment changes"
+   },
+   "campaignLaunch": {
+    "type": "string",
+    "description": "Campaign launch"
+   },
+   "level1Advisory": {
+    "type": "string",
+    "description": "Level 1 — Advisory"
+   },
+   "aiRecommends": {
+    "type": "string",
+    "description": "AI recommends"
+   },
+   "humanDecides": {
+    "type": "string",
+    "description": "Human decides"
+   },
+   "level2GovernedAutomation": {
+    "type": "string",
+    "description": "Level 2 — Governed Automation"
+   },
+   "campaignOperationalStatus": {
+    "type": "string",
+    "description": "Campaign operational status"
+   },
+   "boards24PromotionMechanics": {
+    "type": "string",
+    "description": "Boards 2–4 — Promotion Mechanics"
+   },
+   "discountRewardExposure": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount/reward exposure"
+   },
+   "boards56Bundles": {
+    "type": "string",
+    "description": "Boards 5–6 — Bundles"
+   },
+   "bundleFinancialImpact": {
+    "type": "string",
+    "description": "Bundle financial impact"
+   },
+   "board7Targeting": {
+    "type": "string",
+    "description": "Board 7 — Targeting"
+   },
+   "audienceSize": {
+    "type": "string",
+    "description": "Audience size"
+   },
+   "board8Stacking": {
+    "type": "string",
+    "description": "Board 8 — Stacking"
+   },
+   "combinedDiscountExposure": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Combined discount exposure"
+   },
+   "priceAndMargin": {
+    "type": "number",
+    "description": "Price and margin"
+   },
+   "audienceAndHistoricalResponse": {
+    "type": "string",
+    "description": "Audience and historical response"
+   },
+   "budgetAccountingAndProfitability": {
+    "type": "string",
+    "description": "Budget, accounting and profitability"
+   },
+   "actualTransactionValues": {
+    "type": "string",
+    "description": "Actual transaction values"
+   },
+   "forecastsAndCampaignAnalytics": {
+    "type": "string",
+    "description": "Forecasts and campaign analytics"
+   },
+   "approvalAuthority": {
+    "type": "string",
+    "description": "Approval authority"
+   }
+  }
+ },
+ "RedemptionDiscountExposureLimitManagerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Redemption, Discount & Exposure Limit Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "typesType": {
+    "type": "string",
+    "enum": [
+     "maximumRedemptions",
+     "maximumDiscountValue",
+     "maximumDiscount",
+     "maximumRewardQuantity",
+     "maximumFreeTickets",
+     "maximumFreeProducts",
+     "maximumTransactions",
+     "maximumCustomers",
+     "maximumRedemptionsPerCustomer",
+     "maximumDailyExposure"
+    ],
+    "description": "Vocabulary listed under Limit Types."
+   },
+   "maximumRedemptions": {
+    "type": "integer",
+    "description": "Maximum redemptions (the pack shows 50,000)"
+   },
+   "maximumCustomerRedemption": {
+    "type": "string",
+    "description": "Maximum customer redemption (the pack shows 2)"
+   },
+   "dailyRedemptionLimit": {
+    "type": "integer",
+    "description": "Daily redemption limit (the pack shows 5,000)"
+   },
+   "orCustomThresholds": {
+    "type": "string",
+    "description": "or custom thresholds"
+   }
+  }
+ },
+ "ThresholdActionsAutomaticSuspensionView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Threshold Actions & Automatic Suspension displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "warn": {
+    "type": "string",
+    "description": "Warn"
+   },
+   "requireApproval": {
+    "type": "boolean",
+    "description": "Require approval"
+   },
+   "reduceAllocation": {
+    "type": "string",
+    "description": "Reduce allocation"
+   },
+   "stopSpecificChannel": {
+    "type": "string",
+    "description": "Stop specific channel"
+   },
+   "stopPartner": {
+    "type": "string",
+    "description": "Stop partner"
+   },
+   "stopPromotion": {
+    "type": "string",
+    "description": "Stop promotion"
+   },
+   "stopCampaign": {
+    "type": "string",
+    "description": "Stop campaign"
+   },
+   "allowGraceAmount": {
+    "type": "boolean",
+    "description": "Allow grace amount"
+   },
+   "continueWithExecutiveAuthorization": {
+    "type": "string",
+    "description": "Continue with executive authorization"
+   }
+  }
+ }
+}

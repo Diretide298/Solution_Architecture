@@ -1,0 +1,680 @@
+{
+ "ExternalPartnerCredentialMappingView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What External & Partner Credential Mapping displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "localMapping": {
+    "type": "string",
+    "description": "Local Mapping"
+   },
+   "apiValidation": {
+    "type": "string",
+    "description": "API Validation"
+   },
+   "tokenValidation": {
+    "type": "string",
+    "description": "Token Validation"
+   },
+   "cachedValidation": {
+    "type": "string",
+    "description": "Cached Validation"
+   },
+   "offlineMapping": {
+    "type": "integer",
+    "description": "Offline Mapping"
+   },
+   "hybrid": {
+    "type": "string",
+    "description": "Hybrid"
+   },
+   "dependingOnPolicy": {
+    "type": "string",
+    "description": "depending on policy"
+   }
+  }
+ },
+ "HotelWalletExternalMediaIntegrationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Hotel, Wallet & External Media Integration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "accessDecisionProceedsNormally": {
+    "type": "string",
+    "description": "Access decision proceeds normally"
+   }
+  }
+ },
+ "MediaCompatibilityTestingPublicationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Media Compatibility, Testing & Publication submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "rfid": {
+    "type": "string",
+    "description": "RFID ✓ ✓ ✓ ✓"
+   },
+   "nfc": {
+    "type": "string",
+    "description": "NFC ✓ ✓ ✓ ✓"
+   },
+   "tenant": {
+    "type": "string",
+    "description": "Tenant"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "park": {
+    "type": "string",
+    "description": "Park"
+   },
+   "gate": {
+    "type": "string",
+    "description": "Gate"
+   },
+   "deviceGroup": {
+    "type": "string",
+    "description": "Device group"
+   },
+   "communicate": {
+    "type": "string",
+    "description": "communicate"
+   },
+   "theTicketIsFullyRedeemed": {
+    "type": "string",
+    "description": "the ticket is fully redeemed"
+   },
+   "retentionDeletionAudit": {
+    "type": "string",
+    "description": "Retention/Deletion → Audit"
+   }
+  }
+ },
+ "MediaCompatibilityTestingPublicationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Media Compatibility, Testing & Publication displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "rfid": {
+    "type": "string",
+    "description": "RFID ✓ ✓ ✓ ✓"
+   },
+   "nfc": {
+    "type": "string",
+    "description": "NFC ✓ ✓ ✓ ✓"
+   },
+   "tenant": {
+    "type": "string",
+    "description": "Tenant"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "park": {
+    "type": "string",
+    "description": "Park"
+   },
+   "gate": {
+    "type": "string",
+    "description": "Gate"
+   },
+   "deviceGroup": {
+    "type": "string",
+    "description": "Device group"
+   },
+   "communicate": {
+    "type": "string",
+    "description": "communicate"
+   },
+   "theTicketIsFullyRedeemed": {
+    "type": "string",
+    "description": "the ticket is fully redeemed"
+   },
+   "retentionDeletionAudit": {
+    "type": "string",
+    "description": "Retention/Deletion → Audit"
+   }
+  }
+ },
+ "MediaCredentialCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Media & Credential Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "activeMediaProfiles": {
+    "type": "integer",
+    "description": "Active Media Profiles"
+   },
+   "qrCredentials": {
+    "type": "integer",
+    "description": "QR Credentials"
+   },
+   "rfidCredentials": {
+    "type": "integer",
+    "description": "RFID Credentials"
+   },
+   "nfcCredentials": {
+    "type": "integer",
+    "description": "NFC Credentials"
+   },
+   "walletCredentials": {
+    "type": "integer",
+    "description": "Wallet Credentials"
+   },
+   "biometricCredentials": {
+    "type": "integer",
+    "description": "Biometric Credentials"
+   },
+   "externalCredentials": {
+    "type": "integer",
+    "description": "External Credentials"
+   },
+   "mediaSwapsToday": {
+    "type": "string",
+    "description": "Media Swaps Today"
+   },
+   "failedMediaReads": {
+    "type": "integer",
+    "description": "Failed Media Reads"
+   },
+   "unknownCredentials": {
+    "type": "integer",
+    "description": "Unknown Credentials"
+   },
+   "verificationExceptions": {
+    "type": "integer",
+    "description": "Verification Exceptions"
+   },
+   "ai": {
+    "type": "string",
+    "description": "AI"
+   }
+  }
+ },
+ "MediaIssuanceEncodingProfileView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Media Issuance & Encoding Profile displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "credentialIdentifier": {
+    "type": "string",
+    "description": "Credential identifier"
+   },
+   "randomizedMediaIdentifier": {
+    "type": "string",
+    "description": "Randomized media identifier"
+   },
+   "ticketIdReference": {
+    "type": "string",
+    "description": "Ticket ID reference"
+   },
+   "secureToken": {
+    "type": "string",
+    "description": "Secure token"
+   },
+   "secureReference": {
+    "type": "string",
+    "description": "Secure reference"
+   },
+   "encodingFormat": {
+    "type": "string",
+    "description": "Encoding format"
+   },
+   "offlinePayloadProfile": {
+    "type": "integer",
+    "description": "offline payload profile"
+   },
+   "checksumSignatureWhereApplicable": {
+    "type": "string",
+    "description": "checksum/signature where applicable"
+   },
+   "identifierCollisionCheckEnabled": {
+    "type": "boolean",
+    "description": "Identifier Collision Check — ENABLED"
+   },
+   "randomizationEnabled": {
+    "type": "boolean",
+    "description": "Randomization — ENABLED"
+   },
+   "insteadAdministratorsSelectAControlled": {
+    "type": "string",
+    "description": "Instead administrators select a controlled"
+   }
+  }
+ },
+ "MediaSwapReplacementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Media Swap & Replacement displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "to": {
+    "type": "string",
+    "description": "To"
+   },
+   "ticket": {
+    "type": "string",
+    "description": "✓ Ticket"
+   },
+   "guest": {
+    "type": "string",
+    "description": "✓ Guest"
+   },
+   "remainingEntitlements": {
+    "type": "string",
+    "description": "✓ Remaining entitlements"
+   },
+   "entryHistory": {
+    "type": "string",
+    "description": "✓ Entry history"
+   },
+   "reEntryStatus": {
+    "type": "string",
+    "description": "✓ Re-entry status"
+   },
+   "fastPassBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "✓ Fast Pass balance"
+   },
+   "reservations": {
+    "type": "string",
+    "description": "✓ Reservations"
+   },
+   "membershipAssociation": {
+    "type": "string",
+    "description": "✓ Membership association"
+   },
+   "reasonsType": {
+    "type": "string",
+    "enum": [
+     "lost",
+     "damaged",
+     "deviceChange",
+     "upgrade",
+     "guestRequest",
+     "operationalReplacement",
+     "fraudSecurity",
+     "accessibility"
+    ],
+    "description": "Vocabulary listed under Swap Reasons."
+   }
+  }
+ },
+ "MediaTypeTechnologyLibraryView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Media Type & Technology Library displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "qr": {
+    "type": "string",
+    "description": "QR"
+   },
+   "contact": {
+    "type": "string",
+    "description": "Contact"
+   },
+   "proximity": {
+    "type": "string",
+    "description": "Proximity"
+   },
+   "iso15693": {
+    "type": "string",
+    "description": "ISO 15693"
+   },
+   "otherSupportedStandards": {
+    "type": "string",
+    "description": "Other supported standards"
+   },
+   "appCredential": {
+    "type": "string",
+    "description": "App Credential"
+   },
+   "mobileWallet": {
+    "type": "string",
+    "description": "Mobile Wallet"
+   },
+   "paperTicket": {
+    "type": "string",
+    "description": "Paper Ticket"
+   },
+   "wristband": {
+    "type": "string",
+    "description": "Wristband"
+   },
+   "plasticCard": {
+    "type": "string",
+    "description": "Plastic Card"
+   },
+   "hotelCard": {
+    "type": "string",
+    "description": "Hotel Card"
+   },
+   "facePass": {
+    "type": "string",
+    "description": "Face Pass"
+   },
+   "faceTag": {
+    "type": "string",
+    "description": "Face Tag"
+   },
+   "partnerQr": {
+    "type": "string",
+    "description": "Partner QR"
+   },
+   "externalBarcode": {
+    "type": "string",
+    "description": "External Barcode"
+   },
+   "thirdPartyCredential": {
+    "type": "string",
+    "description": "Third-party Credential"
+   },
+   "technology": {
+    "type": "string",
+    "description": "technology"
+   },
+   "encodingFormat": {
+    "type": "string",
+    "description": "encoding format"
+   },
+   "supportedReaderTypes": {
+    "type": "string",
+    "description": "supported reader types"
+   },
+   "onlineOfflineCapability": {
+    "type": "integer",
+    "description": "online/offline capability"
+   },
+   "writableReadOnly": {
+    "type": "string",
+    "description": "writable/read-only"
+   },
+   "securityClassification": {
+    "type": "string",
+    "description": "security classification"
+   },
+   "applicableVenues": {
+    "type": "string",
+    "description": "applicable venues"
+   },
+   "applicableProducts": {
+    "type": "string",
+    "description": "applicable products"
+   }
+  }
+ },
+ "RfidNfcConfigurationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What RFID & NFC Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "rfidStandard": {
+    "type": "string",
+    "description": "RFID standard"
+   },
+   "tagCardType": {
+    "type": "string",
+    "description": "tag/card type"
+   },
+   "frequencyInterfaceProfile": {
+    "type": "string",
+    "description": "frequency/interface profile"
+   },
+   "readerCompatibility": {
+    "type": "string",
+    "description": "reader compatibility"
+   },
+   "readWriteBehavior": {
+    "type": "string",
+    "description": "read/write behavior"
+   },
+   "encodingProfile": {
+    "type": "string",
+    "description": "encoding profile"
+   },
+   "securityProfile": {
+    "type": "string",
+    "description": "security profile"
+   },
+   "nfcTicket": {
+    "type": "string",
+    "description": "NFC ticket"
+   },
+   "membership": {
+    "type": "string",
+    "description": "membership"
+   },
+   "mobileDevice": {
+    "type": "string",
+    "description": "mobile device"
+   },
+   "walletCredential": {
+    "type": "string",
+    "description": "wallet credential"
+   },
+   "supportedReaders": {
+    "type": "string",
+    "description": "supported readers"
+   },
+   "offlineCapability": {
+    "type": "integer",
+    "description": "offline capability"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "zone": {
+    "type": "string",
+    "description": "Zone"
+   },
+   "gate": {
+    "type": "string",
+    "description": "Gate"
+   },
+   "credential": {
+    "type": "string",
+    "description": "Credential"
+   },
+   "journey": {
+    "type": "string",
+    "description": "Journey"
+   }
+  }
+ },
+ "RfidNfcConfigurationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What RFID & NFC Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "rfidStandard": {
+    "type": "string",
+    "description": "RFID standard"
+   },
+   "tagCardType": {
+    "type": "string",
+    "description": "tag/card type"
+   },
+   "frequencyInterfaceProfile": {
+    "type": "string",
+    "description": "frequency/interface profile"
+   },
+   "readerCompatibility": {
+    "type": "string",
+    "description": "reader compatibility"
+   },
+   "readWriteBehavior": {
+    "type": "string",
+    "description": "read/write behavior"
+   },
+   "encodingProfile": {
+    "type": "string",
+    "description": "encoding profile"
+   },
+   "securityProfile": {
+    "type": "string",
+    "description": "security profile"
+   },
+   "nfcTicket": {
+    "type": "string",
+    "description": "NFC ticket"
+   },
+   "membership": {
+    "type": "string",
+    "description": "membership"
+   },
+   "mobileDevice": {
+    "type": "string",
+    "description": "mobile device"
+   },
+   "walletCredential": {
+    "type": "string",
+    "description": "wallet credential"
+   },
+   "supportedReaders": {
+    "type": "string",
+    "description": "supported readers"
+   },
+   "offlineCapability": {
+    "type": "integer",
+    "description": "offline capability"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "zone": {
+    "type": "string",
+    "description": "Zone"
+   },
+   "gate": {
+    "type": "string",
+    "description": "Gate"
+   },
+   "credential": {
+    "type": "string",
+    "description": "Credential"
+   },
+   "journey": {
+    "type": "string",
+    "description": "Journey"
+   }
+  }
+ },
+ "VerificationMethodSelectionLockingView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Verification Method Selection & Locking displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "dynamicQr": {
+    "type": "string",
+    "description": "☑ Dynamic QR"
+   },
+   "physicalCard": {
+    "type": "string",
+    "description": "☑ Physical Card"
+   },
+   "rfid": {
+    "type": "string",
+    "description": "☑ RFID"
+   },
+   "facePass": {
+    "type": "string",
+    "description": "☑ Face Pass"
+   },
+   "faceTag": {
+    "type": "string",
+    "description": "☑ Face Tag"
+   },
+   "guestNotAllowed": {
+    "type": "boolean",
+    "description": "Guest — Not Allowed"
+   },
+   "operationsSupervisorApproval": {
+    "type": "string",
+    "description": "Operations — Supervisor Approval"
+   },
+   "verificationMethodLocked": {
+    "type": "string",
+    "description": "🔒 VERIFICATION METHOD LOCKED"
+   },
+   "reason": {
+    "type": "string",
+    "enum": [
+     "lostPhone",
+     "damagedWristband",
+     "accessibility",
+     "deviceFailure",
+     "guestService",
+     "everyChangeIsAudited"
+    ],
+    "description": "Vocabulary listed under Reason."
+   }
+  }
+ },
+ "VirtualCredentialMediaAssociationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Virtual Credential & Media Association displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "andThereforeToTheSame": {
+    "type": "string",
+    "description": "and therefore to the same"
+   },
+   "ticket": {
+    "type": "string",
+    "description": "Ticket"
+   },
+   "guest": {
+    "type": "string",
+    "description": "Guest"
+   },
+   "entitlements": {
+    "type": "string",
+    "description": "Entitlements"
+   },
+   "accessHistory": {
+    "type": "string",
+    "description": "Access history"
+   },
+   "consumptionState": {
+    "type": "string",
+    "description": "Consumption state"
+   },
+   "simultaneously": {
+    "type": "string",
+    "description": "simultaneously"
+   },
+   "qr8x72": {
+    "type": "string",
+    "description": "QR 8X72"
+   },
+   "rfid298173": {
+    "type": "string",
+    "description": "RFID 298173"
+   },
+   "walletCredential827": {
+    "type": "string",
+    "description": "Wallet Credential 827"
+   },
+   "resolvesTo": {
+    "type": "string",
+    "description": "resolves to"
+   }
+  }
+ }
+}

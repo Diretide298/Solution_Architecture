@@ -1,0 +1,1190 @@
+{
+ "AiInteraction": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.interaction",
+  "required": [
+   "id",
+   "principalId",
+   "capability",
+   "outcome",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "conversationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "audience": {
+    "type": "string",
+    "enum": [
+     "staff",
+     "guest"
+    ],
+    "description": "**Billing divides on this.** Staff usage is bounded by headcount; guest usage is bounded by footfall and curiosity, and a venue cannot stop guests asking questions.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The guest, where the audience is `guest`. `principalId` is null in that case — **a guest is not a principal**, and attributing their tokens to a staff member would be wrong twice.\n"
+   },
+   "billableToTenantId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Resolved from `scopePath` at write time, not derived later. **Billing must not depend on walking a scope tree that has since been reorganised.**\n"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "capability": {
+    "type": "string"
+   },
+   "prompt": {
+    "type": "string"
+   },
+   "response": {
+    "type": "string"
+   },
+   "sources": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/AiSource"
+    }
+   },
+   "outcome": {
+    "type": "string",
+    "enum": [
+     "answered",
+     "refused",
+     "applied",
+     "rejected",
+     "failed"
+    ]
+   },
+   "refusalReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "provider": {
+    "$ref": "#/components/schemas/AiProviderKind"
+   },
+   "model": {
+    "type": "string"
+   },
+   "promptTokens": {
+    "type": "integer"
+   },
+   "completionTokens": {
+    "type": "integer"
+   },
+   "costMinor": {
+    "type": "integer",
+    "description": "In the region's base currency",
+    "minor units": null
+   },
+   "latencyMs": {
+    "type": "integer"
+   },
+   "maskedFieldCount": {
+    "type": "integer",
+    "description": "How many fields were redacted. Zero on a prompt touching guest data is a defect."
+   },
+   "traceId": {
+    "type": "string"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "AiProviderKind": {
+  "type": "string",
+  "enum": [
+   "openai",
+   "gemini",
+   "anthropic",
+   "azureOpenai",
+   "localLlm"
+  ]
+ },
+ "AiSource": {
+  "type": "object",
+  "x-ticvai-persistence": "none — embedded in the interaction",
+  "description": "What the answer was grounded in (8.3.70). **An answer with no sources is a guess**, and the interface should show it as one.\n",
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "document",
+     "product",
+     "entitlement",
+     "report",
+     "record"
+    ]
+   },
+   "id": {
+    "type": "string"
+   },
+   "title": {
+    "type": "string"
+   },
+   "collectionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "excerpt": {
+    "type": "string"
+   },
+   "relevance": {
+    "type": "number"
+   }
+  }
+ },
+ "Cell": {
+  "x-ticvai-persistence": "control.cell",
+  "x-ticvai-retired-columns": [
+   "tenant_id"
+  ],
+  "type": "object",
+  "required": [
+   "id",
+   "name",
+   "regionId",
+   "countryCode",
+   "tier",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/CellKind"
+   },
+   "clusterId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "isReachable": {
+    "type": "boolean",
+    "default": true,
+    "description": "False for `onPremise`. The Control Plane holds the record for licensing and support and **cannot reach the installation** — it may sit behind a firewall with no inbound route. Every operation assuming reachability must handle absence rather than timing out, and a cell that has not called home for a month is not necessarily broken.\n"
+   },
+   "lastContactAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When the site last called out. The only liveness signal for an unreachable cell, and the number a support engineer asks for first.\n"
+   },
+   "licenceExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "On-premise only. Licensing cannot be enforced by a Control Plane the site cannot reach, so a signed licence file is verified locally. **An expired licence degrades rather than stops** — a venue whose gates refuse entry because a licence lapsed over a weekend is worse than one running unlicensed until Monday.\n"
+   },
+   "participatesInCrossCell": {
+    "type": "boolean",
+    "default": true,
+    "description": "False by default for `onPremise`. Redeeming a pass issued elsewhere requires reaching the issuing cell at that moment, and an on-premise site may not be able to. Exclusion is the honest default; local-then-reconcile carries a double-redemption risk that needs a decision rather than an assumption.\n"
+   },
+   "regionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "regionName": {
+    "type": "string"
+   },
+   "countryCode": {
+    "type": "string"
+   },
+   "tier": {
+    "$ref": "#/components/schemas/CellTier"
+   },
+   "status": {
+    "$ref": "#/components/schemas/CellStatus"
+   },
+   "cloudProvider": {
+    "type": "string",
+    "nullable": true
+   },
+   "cloudRegion": {
+    "type": "string",
+    "nullable": true
+   },
+   "apiEndpoint": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueCount": {
+    "type": "integer"
+   },
+   "provisionedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "deploymentRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "**A pointer to where this cell runs, not a description of it.** A Kubernetes namespace, an ECS cluster ARN, a stack name — whatever the orchestrator calls the thing.\n\n**The platform does not model instances, nodes or shards** (31 August). Kubernetes already holds instance counts and they change by the second; a table copying them drifts within minutes and the copy would win.\n\n**The line is: routing decisions belong to the platform, provisioning facts belong to the orchestrator.** Qdrant is the proof — ADR-0021 makes the tenant *the* shard key, so nine operations route without a lookup and **a stored shard assignment would be a second copy of something derivable.**\n\n**CF-161 needed a table after all, and this said it did not.** The claim here was that one database per cell or one per service is a build-time decision and the DDL is identical either way. **ADR-0038 answered it per tenant**, which drops `Cell.tenantId`, adds `CellTenant`, `RolloutTenant` and a per-tenant migration row, and takes `control` out of the tenant template. `tools/derive-ddl.py` carried the same claim in its docstring.\n\n**A claim that a question cannot affect your artefact is the one most likely to be left standing after it does**, which is why the correction is recorded here rather than the sentence simply deleted."
+   }
+  }
+ },
+ "CellCapacity": {
+  "type": "object",
+  "x-ticvai-persistence": "none — measured, not stored",
+  "required": [
+   "cellId",
+   "isConstrained",
+   "dimensions",
+   "measuredAt"
+  ],
+  "properties": {
+   "cellId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/CellKind"
+   },
+   "tenantCount": {
+    "type": "integer",
+    "description": "Reported, and **deliberately not the sizing signal.** Forty quiet tenants may load a cell less than three busy ones.\n"
+   },
+   "isConstrained": {
+    "type": "boolean"
+   },
+   "constrainedDimension": {
+    "type": "string",
+    "nullable": true
+   },
+   "dimensions": {
+    "type": "array",
+    "description": "Per dimension, because the response differs. Short of connections and long on storage is a different problem from short of both.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "dimension",
+      "used",
+      "headroom"
+     ],
+     "properties": {
+      "dimension": {
+       "type": "string",
+       "enum": [
+        "concurrentUsers",
+        "transactionsPerSecond",
+        "scansPerSecond",
+        "databaseConnections",
+        "storageGb",
+        "replicationLag",
+        "cpu"
+       ]
+      },
+      "used": {
+       "type": "number"
+      },
+      "limit": {
+       "type": "number"
+      },
+      "headroom": {
+       "type": "number",
+       "description": "Fraction remaining. Negative means already over."
+      },
+      "peakAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "forecastBreachAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When the constrained dimension is projected to run out at the current trend. Null where there is no trend to project — an honest null beats an invented date.\n"
+   },
+   "measuredAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "CellDetail": {
+  "x-ticvai-persistence": "control.cell",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/Cell"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "health": {
+      "$ref": "#/components/schemas/CellHealth"
+     },
+     "activeJobs": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/CellJob"
+      }
+     }
+    }
+   }
+  ]
+ },
+ "CellHealth": {
+  "x-ticvai-persistence": "none — polled, not stored",
+  "type": "object",
+  "required": [
+   "cellId",
+   "isHealthy",
+   "schemaVersion",
+   "checkedAt"
+  ],
+  "properties": {
+   "cellId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "isHealthy": {
+    "type": "boolean"
+   },
+   "schemaVersion": {
+    "type": "string",
+    "description": "From the cell's version register. Skew across a tenant's cells is expected during rollout; unexplained skew is a defect.\n"
+   },
+   "isSchemaBehind": {
+    "type": "boolean"
+   },
+   "databaseStatus": {
+    "type": "string"
+   },
+   "replicationLagSeconds": {
+    "type": "number",
+    "nullable": true
+   },
+   "lastBackupAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "lastRestoreDrillAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "checkedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "CellJob": {
+  "x-ticvai-persistence": "control.cell_job",
+  "type": "object",
+  "required": [
+   "id",
+   "cellId",
+   "kind",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "cellId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "provision",
+     "tierMigration",
+     "schemaMigration",
+     "backup",
+     "restore",
+     "decommission"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "queued",
+     "running",
+     "completed",
+     "failed",
+     "rolledBack"
+    ]
+   },
+   "progressPercent": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100
+   },
+   "message": {
+    "type": "string",
+    "nullable": true
+   },
+   "error": {
+    "type": "string",
+    "nullable": true
+   },
+   "scheduledFor": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "CellKind": {
+  "type": "string",
+  "description": "Four deployment models (ADR-0017). `shared` is the default; the others exist because a client asked or a law requires it.\n\n\n**`burst` added 31 August.** An environment stood up for one on-sale and torn down after (CF-162 scenario c). **It is not a jurisdiction and it is not permanent** — it holds a catalogue snapshot, three services of sixteen, and 17 tables of 380.\n\n**The other four are places data lives. This one is a place data passes through**, which is why it has its own lifecycle and a reconciliation obligation the others do not.",
+  "enum": [
+   "shared",
+   "dedicated",
+   "onPremise",
+   "controlPlane",
+   "burst"
+  ]
+ },
+ "CellStatus": {
+  "type": "string",
+  "enum": [
+   "provisioning",
+   "active",
+   "migrating",
+   "suspended",
+   "decommissioning",
+   "failed"
+  ]
+ },
+ "CellTier": {
+  "type": "string",
+  "enum": [
+   "shared",
+   "dedicated",
+   "isolated",
+   "clientHosted"
+  ]
+ },
+ "CrossRegionEntitlement": {
+  "x-ticvai-persistence": "platform.cross_region_entitlement",
+  "type": "object",
+  "required": [
+   "rightId",
+   "ticketId",
+   "issuingCellName",
+   "consumingCellName",
+   "validFrom",
+   "validTo",
+   "entriesAllowed",
+   "entriesConsumed",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "rightId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "ticketId": {
+    "type": "string"
+   },
+   "guestLinkId": {
+    "type": "string",
+    "nullable": true
+   },
+   "issuingCellName": {
+    "type": "string"
+   },
+   "consumingCellName": {
+    "type": "string"
+   },
+   "mediaCodes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "admissionRulesId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Null where the right is valid at any venue in the consuming cell."
+   },
+   "entriesAllowed": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Null means unlimited."
+   },
+   "entriesConsumed": {
+    "type": "integer"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "exhausted",
+     "revoked",
+     "expired"
+    ]
+   },
+   "lastConsumedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "lastReconciledAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "EntitlementLimit": {
+  "type": "object",
+  "required": [
+   "metric",
+   "limit"
+  ],
+  "properties": {
+   "metric": {
+    "$ref": "#/components/schemas/UsageMetric"
+   },
+   "limit": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Null means unlimited."
+   },
+   "overageAllowed": {
+    "type": "boolean",
+    "default": false
+   },
+   "overageUnitPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   }
+  }
+ },
+ "EntitlementUsage": {
+  "x-ticvai-persistence": "none — aggregated from usage_record",
+  "type": "object",
+  "required": [
+   "tenantId",
+   "metrics"
+  ],
+  "properties": {
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "metrics": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "metric",
+      "current",
+      "isNearLimit"
+     ],
+     "properties": {
+      "metric": {
+       "$ref": "#/components/schemas/UsageMetric"
+      },
+      "current": {
+       "type": "integer"
+      },
+      "limit": {
+       "type": "integer",
+       "nullable": true
+      },
+      "percentUsed": {
+       "type": "number",
+       "nullable": true
+      },
+      "isNearLimit": {
+       "type": "boolean",
+       "description": "Approaching a limit is an account conversation. Hitting one silently at a gate is an incident.\n"
+      },
+      "isExceeded": {
+       "type": "boolean"
+      }
+     }
+    }
+   },
+   "asAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "LicencePosition": {
+  "x-ticvai-persistence": "none — union of plan and add-ons",
+  "type": "object",
+  "required": [
+   "tenantId",
+   "licensedModules",
+   "limits"
+  ],
+  "properties": {
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "licensedModules": {
+    "type": "array",
+    "description": "Union of plan modules and add-ons. The White Label Builder reads this and cannot enable anything absent from it.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "moduleKey",
+      "source"
+     ],
+     "properties": {
+      "moduleKey": {
+       "type": "string"
+      },
+      "displayName": {
+       "type": "string"
+      },
+      "source": {
+       "type": "string",
+       "enum": [
+        "plan",
+        "addOn"
+       ]
+      },
+      "validTo": {
+       "type": "string",
+       "format": "date",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "limits": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/EntitlementLimit"
+    }
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PropagateRightRequest": {
+  "type": "object",
+  "required": [
+   "rightId",
+   "ticketId",
+   "issuingCellName",
+   "validFrom",
+   "validTo",
+   "admissionRulesId",
+   "entriesAllowed"
+  ],
+  "properties": {
+   "rightId": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "ticketId": {
+    "type": "string"
+   },
+   "guestLinkId": {
+    "type": "string"
+   },
+   "issuingCellName": {
+    "type": "string"
+   },
+   "mediaCodes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "admissionRulesId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "entriesAllowed": {
+    "type": "integer",
+    "nullable": true
+   }
+  }
+ },
+ "Rollout": {
+  "type": "object",
+  "x-ticvai-persistence": "control.rollout",
+  "required": [
+   "id",
+   "reinventoryHoldId",
+   "environment",
+   "status",
+   "startedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "reinventoryHoldId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "environment": {
+    "$ref": "#/components/schemas/EnvironmentKind"
+   },
+   "status": {
+    "$ref": "#/components/schemas/RolloutStatus"
+   },
+   "cellsTotal": {
+    "type": "integer"
+   },
+   "cellsComplete": {
+    "type": "integer"
+   },
+   "cellsFailed": {
+    "type": "integer"
+   },
+   "startedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "approvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "pausedReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "RolloutCell": {
+  "type": "object",
+  "x-ticvai-persistence": "control.rollout_cell",
+  "required": [
+   "cellId",
+   "status"
+  ],
+  "properties": {
+   "cellId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "cellName": {
+    "type": "string"
+   },
+   "regionName": {
+    "type": "string"
+   },
+   "countryCode": {
+    "type": "string"
+   },
+   "isCanary": {
+    "type": "boolean"
+   },
+   "wave": {
+    "type": "integer"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "running",
+     "complete",
+     "failed",
+     "skipped",
+     "rolledBack"
+    ]
+   },
+   "fromVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "toVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "error": {
+    "type": "string",
+    "nullable": true
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "RolloutDetail": {
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/Rollout"
+   },
+   {
+    "type": "object",
+    "x-ticvai-persistence": "none — projection over rollout and cell state",
+    "properties": {
+     "cells": {
+      "type": "array",
+      "description": "Per-cell state. \"60% complete\" says nothing about whether the failing 40% is one region or forty venues.\n",
+      "items": {
+       "$ref": "#/components/schemas/RolloutCell"
+      }
+     }
+    }
+   }
+  ]
+ },
+ "SsoGroupMapping": {
+  "x-ticvai-persistence": "identity.sso_group_mapping",
+  "type": "object",
+  "required": [
+   "externalGroup",
+   "roleId"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The table had no key at all — the response returned the external group, the role and the scope, which is everything a caller needs and not the row own identity.\n**(provider, external_group) is unique and would serve**, but a mapping is edited and revoked by an administrator, and **a row addressed by the values it holds cannot be corrected** — changing the group means deleting a mapping and creating another, which loses who granted it and when.\n"
+   },
+   "externalGroup": {
+    "type": "string"
+   },
+   "roleId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "Scope the mapped role is granted at."
+   }
+  }
+ },
+ "SsoProtocol": {
+  "type": "string",
+  "enum": [
+   "oidc",
+   "saml2"
+  ]
+ },
+ "SsoProviderConfig": {
+  "x-ticvai-persistence": "identity.sso_provider",
+  "type": "object",
+  "required": [
+   "id",
+   "displayName",
+   "protocol",
+   "groupMappings"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "displayName": {
+    "type": "string"
+   },
+   "protocol": {
+    "$ref": "#/components/schemas/SsoProtocol"
+   },
+   "metadataUrl": {
+    "type": "string",
+    "nullable": true
+   },
+   "issuer": {
+    "type": "string",
+    "nullable": true
+   },
+   "clientId": {
+    "type": "string",
+    "nullable": true
+   },
+   "clientSecretRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "Key vault reference. The secret itself is never returned."
+   },
+   "groupMappings": {
+    "type": "array",
+    "minItems": 1,
+    "description": "**A group with no mapping grants nothing.** No default role, ever — otherwise the identity provider becomes a way to mint access nobody configured.\n",
+    "items": {
+     "$ref": "#/components/schemas/SsoGroupMapping"
+    }
+   },
+   "autoProvisionPrincipals": {
+    "type": "boolean",
+    "default": false,
+    "description": "Create a principal on first successful sign-in."
+   },
+   "isEnforced": {
+    "type": "boolean",
+    "default": false
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Subscription": {
+  "x-ticvai-persistence": "control.subscription",
+  "type": "object",
+  "required": [
+   "tenantId",
+   "planId",
+   "planVersion",
+   "status",
+   "startsAt"
+  ],
+  "properties": {
+   "tenantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "planName": {
+    "type": "string"
+   },
+   "planVersion": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "trial",
+     "active",
+     "pastDue",
+     "cancelled",
+     "expired"
+    ]
+   },
+   "startsAt": {
+    "type": "string",
+    "format": "date"
+   },
+   "renewsAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "cancelledAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "currentPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "billingPeriod": {
+    "type": "string"
+   }
+  }
+ },
+ "Tenant": {
+  "x-ticvai-persistence": "control.tenant",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/TenantStatus"
+   },
+   "suspensionMode": {
+    "$ref": "#/components/schemas/SuspensionMode"
+   },
+   "suspensionReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "planId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "planName": {
+    "type": "string",
+    "nullable": true
+   },
+   "cellCount": {
+    "type": "integer"
+   },
+   "venueCount": {
+    "type": "integer"
+   },
+   "billingEmail": {
+    "type": "string"
+   },
+   "accountManagerPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "activatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "TenantDetail": {
+  "x-ticvai-persistence": "control.tenant",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/Tenant"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "subscription": {
+      "$ref": "#/components/schemas/Subscription"
+     },
+     "cells": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/Cell"
+      }
+     },
+     "licences": {
+      "$ref": "#/components/schemas/LicencePosition"
+     }
+    }
+   }
+  ]
+ },
+ "UsageMetric": {
+  "type": "string",
+  "enum": [
+   "venues",
+   "workstations",
+   "activeUsers",
+   "devices",
+   "brandedApps",
+   "aiTokens",
+   "apiCalls",
+   "storageGb",
+   "transactions",
+   "guestProfiles"
+  ]
+ }
+}

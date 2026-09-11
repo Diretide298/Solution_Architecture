@@ -1,0 +1,138 @@
+{
+ "createBulkProductCatalogue": {
+  "method": "POST",
+  "path": "/bulk-product-catalogue",
+  "contract": "catalogue",
+  "summary": "Bulk Product Creation & Catalogue Import",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "BulkProductCreationCatalogueImportInput",
+  "responds": "BulkProductCreationCatalogueImportView"
+ },
+ "createProduct": {
+  "method": "POST",
+  "path": "/products",
+  "contract": "catalogue",
+  "summary": "Create a product",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateProductRequest",
+  "responds": "Product"
+ },
+ "listProductDuplicationTemplate": {
+  "method": "GET",
+  "path": "/product-duplication-template",
+  "contract": "catalogue",
+  "summary": "Product Duplication & Template Library",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ProductDuplicationTemplateLibraryView"
+ },
+ "listProductImportExport": {
+  "method": "GET",
+  "path": "/product-import-export",
+  "contract": "catalogue",
+  "summary": "Product Import / Export & Environment Transfer",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ProductImportExportEnvironmentTransferView"
+ },
+ "listProductLifecycle": {
+  "method": "GET",
+  "path": "/product-lifecycle",
+  "contract": "catalogue",
+  "summary": "Product Lifecycle Command Center",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ProductLifecycleCommandCenterView"
+ },
+ "publishActivationScheduler": {
+  "method": "PUT",
+  "path": "/activation-scheduler",
+  "contract": "catalogue",
+  "summary": "Publication & Activation Scheduler",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "PublicationActivationSchedulerInput",
+  "responds": "PublicationActivationSchedulerView"
+ },
+ "publishChannelAvailability": {
+  "method": "PUT",
+  "path": "/channel-availability",
+  "contract": "catalogue",
+  "summary": "Channel Publication & Availability",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "ChannelPublicationAvailabilityInput",
+  "responds": "ChannelPublicationAvailabilityView"
+ },
+ "setCatalogueReview": {
+  "method": "PUT",
+  "path": "/catalogue-review",
+  "contract": "catalogue",
+  "summary": "AI Catalogue Builder & Configuration Review",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "AiCatalogueBuilderConfigurationReviewInput",
+  "responds": "AiCatalogueBuilderConfigurationReviewView"
+ },
+ "setLifecycleStatuWorkflow": {
+  "method": "PUT",
+  "path": "/lifecycle-statu-workflow",
+  "contract": "catalogue",
+  "summary": "Lifecycle Status & Workflow Configuration",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "LifecycleStatusWorkflowConfigurationInput",
+  "responds": "LifecycleStatusWorkflowConfigurationView"
+ },
+ "setProductContextOwnership": {
+  "method": "PUT",
+  "path": "/product-context-ownership",
+  "contract": "catalogue",
+  "summary": "Product Context, Ownership & Assignment",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "ProductContextOwnershipAssignmentInput",
+  "responds": "ProductContextOwnershipAssignmentView"
+ }
+}

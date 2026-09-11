@@ -1,0 +1,516 @@
+{
+ "Money": {
+  "type": "object",
+  "x-ticvai-persistence-kind": "valueObject",
+  "x-ticvai-persistence-column": "numeric(18,4)",
+  "description": "**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n",
+  "required": [
+   "amount",
+   "currency",
+   "scale"
+  ],
+  "properties": {
+   "amount": {
+    "type": "string",
+    "description": "Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n",
+    "pattern": "^-?\\d+(\\.\\d{1,4})?$"
+   },
+   "currency": {
+    "type": "string",
+    "description": "**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "scale": {
+    "type": "integer",
+    "description": "Resolved from the region alongside `currency`.",
+    "minimum": 0,
+    "maximum": 4
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Qualification": {
+  "type": "object",
+  "x-ticvai-persistence": "resources.qualification",
+  "description": "1.2.36. **A role is not a skill**, and the check happens before assignment rather than after.\n",
+  "required": [
+   "code",
+   "name"
+  ],
+  "properties": {
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "issuedAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "**The field that makes this worth having.** A certification with no expiry is one nobody renews, and a lifeguard certificate that lapsed last month is a safety failure rather than a data-quality one.\n"
+   },
+   "issuer": {
+    "type": "string",
+    "nullable": true
+   },
+   "documentAssetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "ResourceAvailability": {
+  "type": "object",
+  "description": "**Free windows, with setup and teardown already subtracted.** A client computing this from bookings will forget the turnaround.\n",
+  "properties": {
+   "resourceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "freeWindows": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "from": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "to": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
+   },
+   "blockedWindows": {
+    "type": "array",
+    "description": "**With a reason, because they are not the same.** Booked and under repair need different responses from an operator looking for something free — wait, or look elsewhere.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "from": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "to": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "booked",
+        "setup",
+        "teardown",
+        "maintenance",
+        "blackout",
+        "closed"
+       ]
+      }
+     }
+    }
+   }
+  }
+ },
+ "ResourceBooking": {
+  "type": "object",
+  "x-ticvai-persistence": "resources.booking",
+  "required": [
+   "id",
+   "resourceId",
+   "from",
+   "to",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "resourceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "from": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "to": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "reserved",
+     "checkedOut",
+     "returned",
+     "overdue",
+     "cancelled",
+     "noShow"
+    ]
+   },
+   "recurrenceGroupId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Ties the occurrences of a recurring booking. **Cancelling one week does not cancel the series**, and cancelling the series is a separate act with a separate confirmation.\n"
+   },
+   "depositAuthorisationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The hold, through `orders.authoriseStoredValue` (CF-126). **A deposit taken and refunded is two transactions and a fee; held and released is neither.**\n"
+   },
+   "checkedOutAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "dueBackAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "returnedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "conditionOut": {
+    "type": "string",
+    "nullable": true
+   },
+   "conditionIn": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "SessionParticipant": {
+  "type": "object",
+  "x-ticvai-persistence": "resources.session_participant",
+  "description": "1.3.44. **The running order is operational.** An instructor takes beginners first, and a manifest sorted by booking time puts one between two advanced riders.\n",
+  "required": [
+   "id",
+   "sessionId",
+   "subjectId",
+   "position"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sessionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "position": {
+    "type": "integer"
+   },
+   "experienceLevel": {
+    "type": "string",
+    "enum": [
+     "firstTime",
+     "beginner",
+     "intermediate",
+     "advanced"
+    ],
+    "nullable": true
+   },
+   "packageName": {
+    "type": "string",
+    "nullable": true
+   },
+   "notes": {
+    "type": "string",
+    "nullable": true
+   },
+   "hasSignedWaiver": {
+    "type": "boolean",
+    "readOnly": true,
+    "description": "2.15.9. **Shown on the manifest because that is where it is acted on** — an instructor about to start does not want to discover an unsigned waiver at the water's edge.\n"
+   }
+  }
+ },
+ "StoredValueAuthorisation": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.stored_value_authorisation",
+  "description": "A hold against any stored-value instrument. **Two-phase by necessity, not by preference** — an arcade machine, a kitchen and a gate all take time between committing to a spend and knowing it succeeded, and a balance that cannot be held is a balance that gets double-spent or refunded by hand.\n",
+  "required": [
+   "id",
+   "kind",
+   "instrumentId",
+   "amount",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/StoredValueKind"
+   },
+   "instrumentId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The wallet, card, voucher or position being held against."
+   },
+   "amount": {
+    "$ref": "#/components/schemas/Money"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "held",
+     "partiallyCaptured",
+     "captured",
+     "released",
+     "expired"
+    ],
+    "description": "**Mirrors `cross-region.WalletAuthorisation` exactly**, which is the point — one lifecycle rather than six.\n"
+   },
+   "capturedAmount": {
+    "$ref": "#/components/schemas/Money"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "**Released automatically.** A hold nobody releases is a guest whose balance is short with no explanation, and the arcade is where that happens most.\n"
+   },
+   "reference": {
+    "type": "string",
+    "description": "What the hold is for — an order, a play, a table visit."
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "StoredValueKind": {
+  "type": "string",
+  "description": "**Six things in this package hold a balance and behave the same way** — a wallet, a gift card, a game card, a voucher, a loyalty position and a prepaid entitlement. They were built separately across three sessions and each grew its own balance, bonus balance, status, blocked reason and expiry (CF-126).\n**The concern is not tidiness. Only one of the six could hold an authorisation.** `authoriseWalletSpend` / `captureWalletAuthorisation` / `relinquishWalletAuthorisation` gave two-phase spend to the retail wallet alone, so **a guest with 200 game credits starting a play the machine then failed had no held balance** — the credits were either taken or not, with no third state.\nThe entities stay distinct because their lifecycles genuinely differ — a gift card activates at a till, a loyalty position never expires the same way. **What is shared is the spend mechanism**, and this enum is what lets it be shared.\n",
+  "enum": [
+   "wallet",
+   "giftCard",
+   "gameCard",
+   "voucher",
+   "loyalty",
+   "prepaidEntitlement"
+  ]
+ },
+ "VenueSettings": {
+  "type": "object",
+  "x-ticvai-persistence": "platform.venue_settings",
+  "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n",
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "supportHours": {
+    "type": "object",
+    "description": "CF-100. **A venue decides whether its support desk is 24/7 or bounded, and the platform does not.** This was recorded as an open question for eleven days and was never one — the code is identical either way, and what was missing was somewhere to put the answer.\n",
+    "properties": {
+     "mode": {
+      "type": "string",
+      "enum": [
+       "alwaysOn",
+       "businessHours",
+       "custom",
+       "none"
+      ]
+     },
+     "timezone": {
+      "type": "string"
+     },
+     "windows": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "day": {
+         "type": "string",
+         "enum": [
+          "mon",
+          "tue",
+          "wed",
+          "thu",
+          "fri",
+          "sat",
+          "sun"
+         ]
+        },
+        "from": {
+         "type": "string"
+        },
+        "to": {
+         "type": "string"
+        }
+       }
+      }
+     },
+     "outOfHoursMessage": {
+      "type": "string",
+      "nullable": true
+     }
+    }
+   },
+   "quietHours": {
+    "type": "object",
+    "nullable": true,
+    "description": "**When the platform does not send.** A wallet low-balance alert at 3am is a complaint, and journeys and message triggers both respect this.\n**Operational messages ignore it** — a queue-turn alert is why a guest is holding the phone.\n",
+    "properties": {
+     "from": {
+      "type": "string"
+     },
+     "to": {
+      "type": "string"
+     }
+    }
+   },
+   "segregatedAccess": {
+    "type": "object",
+    "nullable": true,
+    "description": "CF-130. **Configured at venue level because it changes by region and the venue is where it is known** — a Ladies Night, a family session, a prayer-time closure.\n**The platform does not infer gender.** 3.2.45 asks for automatic gender recognition and 3.2.46 for rule-based facial recognition validation, and neither is built. Two reasons, and the second is the one that decided it:\n**A Ladies Night ticket is already gendered at the point of sale**, so the gate checks the entitlement the platform issued rather than the face in front of it — deterministic, auditable, and already contracted through `admissionRules`.\n**And these events are staffed.** A steward at the entrance is making the judgment anyway, and a classifier that overrules a person who can see more than it can is a machine and a human disagreeing while a guest waits.\n**`genderVerification` is a switch, not an implementation.** Where a venue's access hardware offers the capability and the venue chooses to use it, this turns it on — following ADR-0015's standards-first driver model, where the device does what the device does. **Not everything needs to be built.**\n",
+    "properties": {
+     "isEnabled": {
+      "type": "boolean",
+      "default": false
+     },
+     "appliesToAccessPointIds": {
+      "type": "array",
+      "items": {
+       "type": "string",
+       "format": "uuid"
+      }
+     },
+     "schedule": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "day": {
+         "type": "string"
+        },
+        "from": {
+         "type": "string"
+        },
+        "to": {
+         "type": "string"
+        },
+        "admits": {
+         "type": "string",
+         "enum": [
+          "all",
+          "women",
+          "womenAndChildren",
+          "families",
+          "members"
+         ]
+        }
+       }
+      }
+     },
+     "entitlementGated": {
+      "type": "boolean",
+      "default": true,
+      "readOnly": true,
+      "description": "**Always true, and stated rather than assumed.** The gate admits on the entitlement. Everything below is advisory on top of that, and nothing replaces it.\n"
+     },
+     "genderVerification": {
+      "type": "string",
+      "enum": [
+       false,
+       "staffAssisted",
+       "deviceAssisted"
+      ],
+      "default": false,
+      "description": "`off` — the entitlement decides and a steward handles exceptions. **The default, and what is contracted.**\n`staffAssisted` — the steward's screen shows the ticket type so they can ask. No inference anywhere.\n`deviceAssisted` — **the venue's access hardware performs the check, not the platform.** Available only where the driver reports the capability, and the result is **advisory to the steward rather than decisive at the turnstile** (3.2.45 asks for rejection; this deviates deliberately).\n"
+     },
+     "overrideRateAlertThreshold": {
+      "type": "number",
+      "nullable": true,
+      "description": "Where `deviceAssisted` is on. **An override rate near zero means the steward has stopped deciding**, and that is the number that says whether the human safeguard is working or decorative.\n"
+     }
+    }
+   },
+   "alerting": {
+    "type": "object",
+    "description": "CF-134. **On-platform notification, marked as read.** Six contracts detect their own trouble and none told a person.\n**The panel is the default and email or WhatsApp only where the matrix names them** — an operational alert that arrives by email is an alert nobody sees in time.\n",
+    "properties": {
+     "channel": {
+      "type": "string",
+      "enum": [
+       "dashboardPanel",
+       "dashboardAndEmail",
+       "dashboardAndWhatsapp"
+      ],
+      "default": "dashboardPanel"
+     },
+     "acknowledgementRequired": {
+      "type": "boolean",
+      "default": true
+     },
+     "escalateAfterMinutes": {
+      "type": "integer",
+      "nullable": true
+     }
+    }
+   }
+  }
+ }
+}

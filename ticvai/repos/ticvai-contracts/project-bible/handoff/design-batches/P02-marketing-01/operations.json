@@ -1,0 +1,71 @@
+{
+ "getMarketingSubscription": {
+  "method": "GET",
+  "path": "/marketing-subscriptions",
+  "contract": "marketing-crm",
+  "summary": "What this guest has opted into",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MarketingSubscription"
+ },
+ "listConsentPurposes": {
+  "method": "GET",
+  "path": "/consent-purposes",
+  "contract": "marketing-crm",
+  "summary": "Configured consent purposes",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ConsentPurposeConfig"
+ },
+ "recordConsent": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/consents",
+  "contract": "marketing-crm",
+  "summary": "Record a consent decision",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RecordConsentRequest",
+  "responds": "ConsentState"
+ },
+ "setMarketingSubscription": {
+  "method": "PUT",
+  "path": "/marketing-subscriptions",
+  "contract": "marketing-crm",
+  "summary": "Subscribe or unsubscribe",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": "MarketingSubscription",
+  "responds": "MarketingSubscription"
+ }
+}

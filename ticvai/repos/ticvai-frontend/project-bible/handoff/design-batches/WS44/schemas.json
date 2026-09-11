@@ -1,0 +1,888 @@
+{
+ "ApprovalReviewDecisionWorkspaceInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Approval Review & Decision Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "onD": {
+    "type": "string",
+    "description": "on d"
+   },
+   "refundableLe": {
+    "type": "string",
+    "description": "refundable le"
+   },
+   "requestChanges": {
+    "type": "string",
+    "description": "Request Changes"
+   },
+   "reassign": {
+    "type": "string",
+    "description": "Reassign"
+   },
+   "delegate": {
+    "type": "string",
+    "description": "Delegate"
+   },
+   "requester": {
+    "type": "string",
+    "description": "Requester"
+   },
+   "reasonForChange": {
+    "type": "string",
+    "description": "Reason for change"
+   },
+   "businessJustification": {
+    "type": "string",
+    "description": "Business justification"
+   },
+   "attachments": {
+    "type": "string",
+    "description": "Attachments"
+   },
+   "effectiveDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Effective date"
+   },
+   "currentSales": {
+    "type": "string",
+    "description": "Current sales"
+   },
+   "futureReservations": {
+    "type": "string",
+    "description": "Future reservations"
+   },
+   "channelsAffected": {
+    "type": "string",
+    "description": "Channels affected"
+   },
+   "pricingImpact": {
+    "type": "string",
+    "description": "Pricing impact"
+   },
+   "capacityImpact": {
+    "type": "integer",
+    "description": "Capacity impact"
+   },
+   "financeImpact": {
+    "type": "string",
+    "description": "Finance impact"
+   },
+   "accessImpact": {
+    "type": "string",
+    "description": "Access impact"
+   }
+  }
+ },
+ "ApprovalReviewDecisionWorkspaceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Approval Review & Decision Workspace displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "onD": {
+    "type": "string",
+    "description": "on d"
+   },
+   "refundableLe": {
+    "type": "string",
+    "description": "refundable le"
+   },
+   "requestChanges": {
+    "type": "string",
+    "description": "Request Changes"
+   },
+   "reassign": {
+    "type": "string",
+    "description": "Reassign"
+   },
+   "delegate": {
+    "type": "string",
+    "description": "Delegate"
+   },
+   "requester": {
+    "type": "string",
+    "description": "Requester"
+   },
+   "reasonForChange": {
+    "type": "string",
+    "description": "Reason for change"
+   },
+   "businessJustification": {
+    "type": "string",
+    "description": "Business justification"
+   },
+   "attachments": {
+    "type": "string",
+    "description": "Attachments"
+   },
+   "effectiveDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Effective date"
+   },
+   "currentSales": {
+    "type": "string",
+    "description": "Current sales"
+   },
+   "futureReservations": {
+    "type": "string",
+    "description": "Future reservations"
+   },
+   "channelsAffected": {
+    "type": "string",
+    "description": "Channels affected"
+   },
+   "pricingImpact": {
+    "type": "string",
+    "description": "Pricing impact"
+   },
+   "capacityImpact": {
+    "type": "integer",
+    "description": "Capacity impact"
+   },
+   "financeImpact": {
+    "type": "string",
+    "description": "Finance impact"
+   },
+   "accessImpact": {
+    "type": "string",
+    "description": "Access impact"
+   }
+  }
+ },
+ "ApprovalWorkflowDesignerInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Approval Workflow Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "workflowName": {
+    "type": "string",
+    "description": "Workflow name"
+   },
+   "applicableProductTypes": {
+    "type": "string",
+    "description": "Applicable product types"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "department": {
+    "type": "string",
+    "description": "Department"
+   },
+   "changeType": {
+    "type": "string",
+    "description": "Change type"
+   },
+   "approvalStages": {
+    "type": "string",
+    "description": "Approval stages"
+   },
+   "approverRole": {
+    "type": "string",
+    "description": "Approver role"
+   },
+   "specificApprover": {
+    "type": "string",
+    "description": "Specific approver"
+   },
+   "approvalGroup": {
+    "type": "string",
+    "description": "Approval group"
+   },
+   "sequentialParallelApproval": {
+    "type": "string",
+    "description": "Sequential/parallel approval"
+   },
+   "mandatoryOptionalStage": {
+    "type": "string",
+    "description": "Mandatory/optional stage"
+   },
+   "sla": {
+    "type": "string",
+    "description": "SLA"
+   },
+   "escalation": {
+    "type": "string",
+    "description": "Escalation"
+   },
+   "delegation": {
+    "type": "string",
+    "description": "Delegation"
+   },
+   "reminderFrequency": {
+    "type": "string",
+    "description": "Reminder frequency"
+   },
+   "rejectionBehavior": {
+    "type": "string",
+    "description": "Rejection behavior"
+   },
+   "resubmissionBehavior": {
+    "type": "string",
+    "description": "Resubmission behavior"
+   }
+  }
+ },
+ "ApprovalWorkflowDesignerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Approval Workflow Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "workflowName": {
+    "type": "string",
+    "description": "Workflow name"
+   },
+   "applicableProductTypes": {
+    "type": "string",
+    "description": "Applicable product types"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "department": {
+    "type": "string",
+    "description": "Department"
+   },
+   "changeType": {
+    "type": "string",
+    "description": "Change type"
+   },
+   "approvalStages": {
+    "type": "string",
+    "description": "Approval stages"
+   },
+   "approverRole": {
+    "type": "string",
+    "description": "Approver role"
+   },
+   "specificApprover": {
+    "type": "string",
+    "description": "Specific approver"
+   },
+   "approvalGroup": {
+    "type": "string",
+    "description": "Approval group"
+   },
+   "sequentialParallelApproval": {
+    "type": "string",
+    "description": "Sequential/parallel approval"
+   },
+   "mandatoryOptionalStage": {
+    "type": "string",
+    "description": "Mandatory/optional stage"
+   },
+   "sla": {
+    "type": "string",
+    "description": "SLA"
+   },
+   "escalation": {
+    "type": "string",
+    "description": "Escalation"
+   },
+   "delegation": {
+    "type": "string",
+    "description": "Delegation"
+   },
+   "reminderFrequency": {
+    "type": "string",
+    "description": "Reminder frequency"
+   },
+   "rejectionBehavior": {
+    "type": "string",
+    "description": "Rejection behavior"
+   },
+   "resubmissionBehavior": {
+    "type": "string",
+    "description": "Resubmission behavior"
+   }
+  }
+ },
+ "ChangeImpactAnalysisView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Change Impact Analysis displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "futureOrders": {
+    "type": "string",
+    "description": "Future orders"
+   },
+   "reservations": {
+    "type": "string",
+    "description": "Reservations"
+   },
+   "issuedTickets": {
+    "type": "string",
+    "description": "Issued tickets"
+   },
+   "capacity": {
+    "type": "integer",
+    "description": "Capacity"
+   },
+   "pricing": {
+    "type": "string",
+    "description": "Pricing"
+   },
+   "tax": {
+    "type": "string",
+    "description": "Tax"
+   },
+   "promotions": {
+    "type": "string",
+    "description": "Promotions"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "entitlements": {
+    "type": "string",
+    "description": "Entitlements"
+   },
+   "accessControl": {
+    "type": "string",
+    "description": "Access control"
+   },
+   "salesChannels": {
+    "type": "string",
+    "description": "Sales channels"
+   },
+   "b2bPartners": {
+    "type": "string",
+    "description": "B2B partners"
+   },
+   "otas": {
+    "type": "string",
+    "description": "OTAs"
+   },
+   "pos": {
+    "type": "string",
+    "description": "POS"
+   },
+   "b2c": {
+    "type": "string",
+    "description": "B2C"
+   },
+   "kiosk": {
+    "type": "string",
+    "description": "Kiosk"
+   },
+   "media": {
+    "type": "string",
+    "description": "Media"
+   },
+   "finance": {
+    "type": "string",
+    "description": "Finance"
+   },
+   "reporting": {
+    "type": "string",
+    "description": "Reporting"
+   },
+   "low": {
+    "type": "string",
+    "description": "Low"
+   },
+   "medium": {
+    "type": "string",
+    "description": "Medium"
+   },
+   "high": {
+    "type": "string",
+    "description": "High"
+   },
+   "critical": {
+    "type": "string",
+    "description": "Critical"
+   }
+  }
+ },
+ "ChangePropagationDependencyControlView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Change Propagation & Dependency Control displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "typesType": {
+    "type": "string",
+    "enum": [
+     "parentProduct",
+     "childProduct",
+     "bundle",
+     "addOn",
+     "upgrade",
+     "membership",
+     "package",
+     "promotion",
+     "priceProfile",
+     "capacityPool",
+     "entitlement",
+     "salesChannel",
+     "mediaTemplate"
+    ],
+    "description": "Vocabulary listed under Dependency Types."
+   },
+   "adultAdmission": {
+    "type": "string",
+    "description": "Adult Admission"
+   },
+   "childAdmission": {
+    "type": "string",
+    "description": "Child Admission"
+   },
+   "seniorAdmission": {
+    "type": "string",
+    "description": "Senior Admission"
+   },
+   "residentAdmission": {
+    "type": "string",
+    "description": "Resident Admission"
+   },
+   "propagates": {
+    "type": "string",
+    "description": "propagates"
+   },
+   "overwritten": {
+    "type": "string",
+    "description": "overwritten"
+   }
+  }
+ },
+ "GovernanceRiskAiMonitoringControlCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Governance Risk, AI Monitoring & Control Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "with": {
+    "type": "string",
+    "description": "with"
+   },
+   "risk": {
+    "type": "string",
+    "description": "Risk"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "businessImpact": {
+    "type": "string",
+    "description": "Business impact"
+   },
+   "recommendedAction": {
+    "type": "string",
+    "description": "Recommended action"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "dueDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Due date"
+   },
+   "status": {
+    "type": "integer",
+    "description": "Status"
+   },
+   "configurations": {
+    "type": "string",
+    "description": "configurations"
+   },
+   "assessment": {
+    "type": "string",
+    "description": "assessment"
+   }
+  }
+ },
+ "ProductAuditTrailChangeHistoryView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Product Audit Trail & Change History displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "dateTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date/time"
+   },
+   "user": {
+    "type": "string",
+    "description": "User"
+   },
+   "role": {
+    "type": "string",
+    "description": "Role"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version"
+   },
+   "action": {
+    "type": "string",
+    "description": "Action"
+   },
+   "configurationArea": {
+    "type": "string",
+    "description": "Configuration area"
+   },
+   "previousValue": {
+    "type": "string",
+    "description": "Previous value"
+   },
+   "newValue": {
+    "type": "integer",
+    "description": "New value"
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason"
+   },
+   "approvalReference": {
+    "type": "string",
+    "description": "Approval reference"
+   },
+   "sourceChannel": {
+    "type": "string",
+    "description": "Source channel"
+   },
+   "environment": {
+    "type": "string",
+    "description": "Environment"
+   },
+   "ipDeviceMetadataWhereApplicable": {
+    "type": "string",
+    "description": "IP/device metadata where applicable"
+   }
+  }
+ },
+ "ProductGovernanceCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Product Governance Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "productsAwaitingApproval": {
+    "type": "string",
+    "description": "Products awaiting approval"
+   },
+   "changesAwaitingApproval": {
+    "type": "string",
+    "description": "Changes awaiting approval"
+   },
+   "rejectedChanges": {
+    "type": "integer",
+    "description": "Rejected changes"
+   },
+   "productsWithGovernanceWarnings": {
+    "type": "string",
+    "description": "Products with governance warnings"
+   },
+   "scheduledChanges": {
+    "type": "integer",
+    "description": "Scheduled changes"
+   },
+   "productsWithUnpublishedChanges": {
+    "type": "string",
+    "description": "Products with unpublished changes"
+   },
+   "productsWithDependencyConflicts": {
+    "type": "string",
+    "description": "Products with dependency conflicts"
+   },
+   "productsApproachingRetirement": {
+    "type": "string",
+    "description": "Products approaching retirement"
+   },
+   "recentlyPublishedVersions": {
+    "type": "integer",
+    "description": "Recently published versions"
+   },
+   "failedPublications": {
+    "type": "integer",
+    "description": "Failed publications"
+   },
+   "failedRollbacks": {
+    "type": "integer",
+    "description": "Failed rollbacks"
+   },
+   "highRiskConfigurationChanges": {
+    "type": "integer",
+    "description": "High-risk configuration changes"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "productOwner": {
+    "type": "string",
+    "description": "Product owner"
+   },
+   "changeType": {
+    "type": "string",
+    "description": "Change type"
+   },
+   "currentVersion": {
+    "type": "string",
+    "description": "Current version"
+   },
+   "proposedVersion": {
+    "type": "string",
+    "description": "Proposed version"
+   },
+   "requestedBy": {
+    "type": "string",
+    "description": "Requested by"
+   },
+   "requestedDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Requested date"
+   },
+   "riskLevel": {
+    "type": "string",
+    "description": "Risk level"
+   },
+   "approvalStatus": {
+    "type": "string",
+    "description": "Approval status"
+   },
+   "effectiveDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Effective date"
+   },
+   "impactedChannels": {
+    "type": "string",
+    "description": "Impacted channels"
+   },
+   "assignedApprover": {
+    "type": "string",
+    "description": "Assigned approver"
+   }
+  }
+ },
+ "ProductRetirementSuspensionArchiveView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Product Retirement, Suspension & Archive displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "temporarilyDisable": {
+    "type": "string",
+    "description": "Temporarily Disable"
+   },
+   "endSale": {
+    "type": "string",
+    "description": "End Sale"
+   },
+   "retire": {
+    "type": "string",
+    "description": "Retire"
+   },
+   "retirementDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Retirement date"
+   },
+   "endOfSaleDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "End-of-sale date"
+   },
+   "channels": {
+    "type": "string",
+    "description": "Channels"
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason"
+   },
+   "replacementProduct": {
+    "type": "string",
+    "description": "Replacement product"
+   },
+   "existingReservationTreatment": {
+    "type": "string",
+    "description": "Existing reservation treatment"
+   },
+   "existingTicketTreatment": {
+    "type": "string",
+    "description": "Existing ticket treatment"
+   },
+   "communicationRequirements": {
+    "type": "string",
+    "description": "Communication requirements"
+   },
+   "reportingTreatment": {
+    "type": "string",
+    "description": "Reporting treatment"
+   },
+   "from": {
+    "type": "string",
+    "description": "from"
+   },
+   "validityOfPreviouslyIssuedTickets": {
+    "type": "string",
+    "description": "validity of previously issued tickets"
+   },
+   "validityOfPreviouslyIssuedEntitlements": {
+    "type": "string",
+    "description": "validity of previously issued entitlements"
+   },
+   "activePromotions": {
+    "type": "integer",
+    "description": "Active promotions"
+   },
+   "bundles": {
+    "type": "string",
+    "description": "Bundles"
+   },
+   "membershipBenefits": {
+    "type": "string",
+    "description": "Membership benefits"
+   },
+   "resellerAgreements": {
+    "type": "string",
+    "description": "Reseller agreements"
+   },
+   "futureReservations": {
+    "type": "string",
+    "description": "Future reservations"
+   },
+   "activePriceLists": {
+    "type": "integer",
+    "description": "Active price lists"
+   },
+   "channelAssignments": {
+    "type": "string",
+    "description": "Channel assignments"
+   }
+  }
+ },
+ "ProductVersion": {
+  "type": "object",
+  "x-ticvai-persistence": "catalogue.product_version",
+  "description": "1.1.47, 1.4.9 to 1.4.11. **Follows `white-label.ConfigVersion`** — the same pattern for the same reason, and the fourth place this mechanism was asked for.\n",
+  "required": [
+   "version",
+   "publishedAt",
+   "publishedByPrincipalId"
+  ],
+  "properties": {
+   "version": {
+    "type": "integer"
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "publishedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "publishedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   },
+   "isCurrent": {
+    "type": "boolean"
+   },
+   "contentHash": {
+    "type": "string",
+    "description": "**Lets a diff be cheap and a no-op change be recognised.** Republishing an unchanged product should not create a version.\n"
+   },
+   "restoredFromVersion": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Set where this version was created by a restore. **A restore is a new version, not a rewind** — a price that was wrong for three days stays visible, because a finance query run next quarter has to reproduce what was charged.\n"
+   }
+  }
+ },
+ "RollbackRecoveryManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Rollback & Recovery Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "identifyDependencies": {
+    "type": "string",
+    "description": "Identify dependencies"
+   },
+   "enterRollbackReason": {
+    "type": "string",
+    "description": "Enter rollback reason"
+   },
+   "executeImmediateRollbackWhereAuthorized": {
+    "type": "string",
+    "description": "Execute immediate rollback where authorized"
+   },
+   "monitorRollbackStatus": {
+    "type": "string",
+    "description": "Monitor rollback status"
+   },
+   "entireProduct": {
+    "type": "string",
+    "description": "Entire product"
+   },
+   "pricingAssociation": {
+    "type": "string",
+    "description": "Pricing association"
+   },
+   "channelAssociation": {
+    "type": "string",
+    "description": "Channel association"
+   },
+   "validityConfiguration": {
+    "type": "string",
+    "description": "Validity configuration"
+   },
+   "media": {
+    "type": "string",
+    "description": "Media"
+   },
+   "policy": {
+    "type": "string",
+    "description": "Policy"
+   },
+   "entitlementConfiguration": {
+    "type": "string",
+    "description": "Entitlement configuration"
+   },
+   "subjectToSystemGovernance": {
+    "type": "string",
+    "description": "subject to system governance"
+   },
+   "enhancedAuditLogging": {
+    "type": "string",
+    "description": "enhanced audit logging"
+   }
+  }
+ }
+}

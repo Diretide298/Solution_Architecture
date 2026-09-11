@@ -1,0 +1,992 @@
+{
+ "AiWaiverComplianceRiskIntelligenceCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What AI Waiver Compliance & Risk Intelligence Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "templates": {
+    "type": "string",
+    "description": "Templates"
+   },
+   "versions": {
+    "type": "string",
+    "description": "Versions"
+   },
+   "questions": {
+    "type": "string",
+    "description": "Questions"
+   },
+   "signatoryRules": {
+    "type": "string",
+    "description": "Signatory Rules"
+   },
+   "productAssociations": {
+    "type": "string",
+    "description": "Product Associations"
+   },
+   "participants": {
+    "type": "string",
+    "description": "Participants"
+   },
+   "completion": {
+    "type": "string",
+    "description": "Completion"
+   },
+   "verification": {
+    "type": "string",
+    "description": "Verification"
+   },
+   "exceptions": {
+    "type": "string",
+    "description": "Exceptions"
+   },
+   "accessBlocks": {
+    "type": "string",
+    "description": "Access Blocks"
+   },
+   "customerInteractions": {
+    "type": "string",
+    "description": "Customer Interactions"
+   },
+   "operationalTrends": {
+    "type": "string",
+    "description": "Operational Trends"
+   },
+   "missing": {
+    "type": "string",
+    "description": "missing"
+   },
+   "nextWeek": {
+    "type": "string",
+    "format": "date-time",
+    "description": "next week"
+   },
+   "aWaiverIssue": {
+    "type": "string",
+    "description": "a waiver issue.”"
+   },
+   "requirements": {
+    "type": "string",
+    "description": "requirements"
+   },
+   "relationships": {
+    "type": "string",
+    "description": "relationships"
+   },
+   "area11CompleteStructure": {
+    "type": "string",
+    "description": "Area 11 — Complete Structure"
+   }
+  }
+ },
+ "ComplianceEvidenceAuditWaiverRepositoryView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Compliance Evidence, Audit & Waiver Repository displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "waiverId": {
+    "type": "string",
+    "description": "Waiver ID"
+   },
+   "exactVersion": {
+    "type": "string",
+    "description": "Exact Version"
+   },
+   "signatoryType": {
+    "type": "string",
+    "description": "Signatory Type"
+   },
+   "submissionDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Submission Date"
+   },
+   "submissionTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Submission Time"
+   },
+   "responses": {
+    "type": "string",
+    "description": "Responses"
+   },
+   "acknowledgements": {
+    "type": "string",
+    "description": "Acknowledgements"
+   },
+   "signatureEvidence": {
+    "type": "string",
+    "description": "Signature Evidence"
+   },
+   "verification": {
+    "type": "string",
+    "description": "Verification"
+   },
+   "relatedBooking": {
+    "type": "string",
+    "description": "Related Booking"
+   },
+   "relatedTicket": {
+    "type": "string",
+    "description": "Related Ticket"
+   },
+   "applicableProduct": {
+    "type": "string",
+    "description": "Applicable Product"
+   },
+   "applicableEvent": {
+    "type": "string",
+    "description": "Applicable Event"
+   },
+   "auditEvents": {
+    "type": "string",
+    "description": "Audit Events"
+   },
+   "legalWording": {
+    "type": "string",
+    "description": "Legal wording"
+   },
+   "questions": {
+    "type": "string",
+    "description": "Questions"
+   },
+   "waiverVersion": {
+    "type": "string",
+    "description": "Waiver version"
+   },
+   "signatoryEvidence": {
+    "type": "string",
+    "description": "Signatory evidence"
+   },
+   "role": {
+    "type": "string",
+    "description": "Role"
+   },
+   "businessUnit": {
+    "type": "string",
+    "description": "Business Unit"
+   },
+   "legalEntity": {
+    "type": "string",
+    "description": "Legal Entity"
+   },
+   "dataSensitivity": {
+    "type": "string",
+    "description": "Data sensitivity"
+   },
+   "requirements": {
+    "type": "string",
+    "description": "requirements"
+   }
+  }
+ },
+ "DigitalSigningCollectionOperationsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Digital Signing & Collection Operations displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "emailLink": {
+    "type": "string",
+    "description": "Email Link"
+   },
+   "smsLink": {
+    "type": "string",
+    "description": "SMS Link"
+   },
+   "whatsappWhereIntegrated": {
+    "type": "string",
+    "description": "WhatsApp where integrated"
+   },
+   "b2cAccount": {
+    "type": "string",
+    "description": "B2C Account"
+   },
+   "mobileApp": {
+    "type": "string",
+    "description": "Mobile App"
+   },
+   "groupPortal": {
+    "type": "string",
+    "description": "Group Portal"
+   },
+   "qrCode": {
+    "type": "string",
+    "description": "QR Code"
+   },
+   "pos": {
+    "type": "string",
+    "description": "POS"
+   },
+   "kiosk": {
+    "type": "string",
+    "description": "Kiosk"
+   },
+   "staffAssistedDevice": {
+    "type": "string",
+    "description": "Staff-Assisted Device"
+   },
+   "sent": {
+    "type": "string",
+    "description": "Sent"
+   },
+   "delivered": {
+    "type": "string",
+    "description": "Delivered"
+   },
+   "opened": {
+    "type": "string",
+    "description": "Opened"
+   },
+   "started": {
+    "type": "string",
+    "description": "Started"
+   },
+   "completed": {
+    "type": "string",
+    "description": "Completed"
+   },
+   "failed": {
+    "type": "integer",
+    "description": "Failed"
+   },
+   "expiredLinks": {
+    "type": "integer",
+    "description": "Expired Links"
+   },
+   "singleMultiUse": {
+    "type": "string",
+    "description": "Single/Multi Use"
+   },
+   "authentication": {
+    "type": "string",
+    "description": "Authentication"
+   },
+   "participant": {
+    "type": "string",
+    "description": "Participant"
+   },
+   "booking": {
+    "type": "string",
+    "description": "Booking"
+   },
+   "waiverVersion": {
+    "type": "string",
+    "description": "Waiver Version"
+   },
+   "activityWaiverV32": {
+    "type": "string",
+    "description": "Activity Waiver v3.2"
+   },
+   "participantOmarAhmed": {
+    "type": "string",
+    "description": "Participant: Omar Ahmed"
+   }
+  }
+ },
+ "MinorGuardianGroupConsentManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Minor, Guardian & Group Consent Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "minor": {
+    "type": "string",
+    "description": "Minor"
+   },
+   "guardian": {
+    "type": "string",
+    "description": "Guardian"
+   },
+   "relationship": {
+    "type": "string",
+    "description": "Relationship"
+   },
+   "contact": {
+    "type": "string",
+    "description": "Contact"
+   },
+   "verificationStatus": {
+    "type": "string",
+    "description": "Verification Status"
+   },
+   "consentStatus": {
+    "type": "string",
+    "description": "Consent Status"
+   },
+   "signatureStatus": {
+    "type": "string",
+    "description": "Signature Status"
+   },
+   "oneGuardianOneMinor": {
+    "type": "string",
+    "description": "One Guardian → One Minor"
+   },
+   "oneGuardianMultipleMinors": {
+    "type": "string",
+    "description": "One Guardian → Multiple Minors"
+   },
+   "organization": {
+    "type": "string",
+    "description": "Organization"
+   },
+   "groupLeader": {
+    "type": "string",
+    "description": "Group Leader"
+   },
+   "groupBooking": {
+    "type": "string",
+    "description": "Group Booking"
+   },
+   "responsibility": {
+    "type": "string",
+    "description": "Responsibility"
+   },
+   "permittedActions": {
+    "type": "integer",
+    "description": "Permitted Actions"
+   }
+  }
+ },
+ "MissingExpiredInvalidWaiverManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Missing, Expired & Invalid Waiver Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "missingWaiver": {
+    "type": "string",
+    "description": "Missing Waiver"
+   },
+   "incomplete": {
+    "type": "string",
+    "description": "Incomplete"
+   },
+   "missingSignature": {
+    "type": "string",
+    "description": "Missing Signature"
+   },
+   "guardianMissing": {
+    "type": "string",
+    "description": "Guardian Missing"
+   },
+   "expired": {
+    "type": "integer",
+    "description": "Expired"
+   },
+   "wrongVersion": {
+    "type": "string",
+    "description": "Wrong Version"
+   },
+   "rejected": {
+    "type": "integer",
+    "description": "Rejected"
+   },
+   "verificationFailed": {
+    "type": "integer",
+    "description": "Verification Failed"
+   },
+   "participantMismatch": {
+    "type": "string",
+    "description": "Participant Mismatch"
+   },
+   "requiredCorrection": {
+    "type": "string",
+    "description": "Required Correction"
+   },
+   "participant": {
+    "type": "string",
+    "description": "Participant"
+   },
+   "booking": {
+    "type": "string",
+    "description": "Booking"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "visitTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Visit Time"
+   },
+   "waiver": {
+    "type": "string",
+    "description": "Waiver"
+   },
+   "problem": {
+    "type": "string",
+    "description": "Problem"
+   },
+   "timeRemaining": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time Remaining"
+   },
+   "accessImpact": {
+    "type": "string",
+    "description": "Access Impact"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "status": {
+    "type": "integer",
+    "description": "Status"
+   },
+   "eventProximity": {
+    "type": "string",
+    "description": "Event proximity"
+   },
+   "mandatoryWaiver": {
+    "type": "string",
+    "description": "Mandatory waiver"
+   },
+   "accessBlocking": {
+    "type": "string",
+    "description": "Access blocking"
+   },
+   "minorGuardianIssue": {
+    "type": "string",
+    "description": "Minor/guardian issue"
+   },
+   "groupSize": {
+    "type": "string",
+    "description": "Group size"
+   },
+   "operationalImpact": {
+    "type": "string",
+    "description": "Operational impact"
+   },
+   "requestReSign": {
+    "type": "string",
+    "description": "Request Re-Sign"
+   },
+   "contactCustomer": {
+    "type": "string",
+    "description": "Contact Customer"
+   },
+   "contactGuardian": {
+    "type": "string",
+    "description": "Contact Guardian"
+   },
+   "requestVerification": {
+    "type": "string",
+    "description": "Request Verification"
+   },
+   "startExceptionWorkflow": {
+    "type": "string",
+    "description": "Start Exception Workflow"
+   }
+  }
+ },
+ "OnSiteWaiverExceptionHandlingView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What On-Site Waiver & Exception Handling displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "ticket": {
+    "type": "string",
+    "description": "Ticket"
+   },
+   "qr": {
+    "type": "string",
+    "description": "QR"
+   },
+   "booking": {
+    "type": "string",
+    "description": "Booking"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "participant": {
+    "type": "string",
+    "description": "Participant"
+   },
+   "group": {
+    "type": "string",
+    "description": "Group"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "displayQrForCustomer": {
+    "type": "string",
+    "description": "Display QR for Customer"
+   },
+   "completeOnKiosk": {
+    "type": "string",
+    "description": "Complete on Kiosk"
+   },
+   "completeOnStaffTablet": {
+    "type": "string",
+    "description": "Complete on Staff Tablet"
+   },
+   "contactGuardian": {
+    "type": "string",
+    "description": "Contact Guardian"
+   },
+   "reSignUpdatedWaiver": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Re-Sign Updated Waiver"
+   },
+   "requestSupervisorException": {
+    "type": "string",
+    "description": "Request Supervisor Exception"
+   },
+   "oneTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "One-Time"
+   },
+   "ticketSpecific": {
+    "type": "string",
+    "description": "Ticket-Specific"
+   },
+   "activitySpecific": {
+    "type": "string",
+    "description": "Activity-Specific"
+   },
+   "timeLimited": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time-Limited"
+   },
+   "signatureEvidenceExists": {
+    "type": "string",
+    "description": "signature/evidence exists"
+   },
+   "waiverStatusVerified": {
+    "type": "string",
+    "description": "Waiver Status → Verified"
+   },
+   "accessControlReceivesUpdatedEligibility": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Access Control receives updated eligibility"
+   }
+  }
+ },
+ "ParticipantWaiverStatusTrackingView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Participant Waiver Status & Tracking displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "participant": {
+    "type": "string",
+    "description": "Participant"
+   },
+   "participantId": {
+    "type": "string",
+    "description": "Participant ID"
+   },
+   "customerPurchaser": {
+    "type": "string",
+    "description": "Customer/Purchaser"
+   },
+   "booking": {
+    "type": "string",
+    "description": "Booking"
+   },
+   "ticket": {
+    "type": "string",
+    "description": "Ticket"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "visitDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Visit Date"
+   },
+   "ageCategory": {
+    "type": "string",
+    "description": "Age Category"
+   },
+   "group": {
+    "type": "string",
+    "description": "Group"
+   },
+   "waiverRequirements": {
+    "type": "integer",
+    "description": "Waiver Requirements"
+   },
+   "completionStatus": {
+    "type": "integer",
+    "description": "Completion Status"
+   },
+   "requestCorrection": {
+    "type": "string",
+    "description": "Request Correction"
+   },
+   "recordException": {
+    "type": "string",
+    "description": "Record Exception"
+   }
+  }
+ },
+ "WaiverAnalyticsComplianceOperationalInsightsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Waiver Analytics, Compliance & Operational Insights displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "waiversAssigned": {
+    "type": "string",
+    "description": "Waivers Assigned"
+   },
+   "completionRate": {
+    "type": "number",
+    "description": "Completion Rate"
+   },
+   "preArrivalCompletion": {
+    "type": "string",
+    "description": "Pre-Arrival Completion"
+   },
+   "onSiteCompletion": {
+    "type": "string",
+    "description": "On-Site Completion"
+   },
+   "averageCompletionTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Average Completion Time"
+   },
+   "guardianCompletionRate": {
+    "type": "number",
+    "description": "Guardian Completion Rate"
+   },
+   "rejectionRate": {
+    "type": "number",
+    "description": "Rejection Rate"
+   },
+   "exceptionRate": {
+    "type": "number",
+    "description": "Exception Rate"
+   },
+   "accessBlocks": {
+    "type": "string",
+    "description": "Access Blocks"
+   },
+   "reminderEffectiveness": {
+    "type": "string",
+    "description": "Reminder Effectiveness"
+   },
+   "checkInDelays": {
+    "type": "string",
+    "description": "Check-in delays"
+   },
+   "staffInterventions": {
+    "type": "string",
+    "description": "Staff interventions"
+   },
+   "onSiteCompletions": {
+    "type": "string",
+    "description": "On-site completions"
+   },
+   "exceptions": {
+    "type": "string",
+    "description": "Exceptions"
+   }
+  }
+ },
+ "WaiverOperationsCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Waiver Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "waiversRequired": {
+    "type": "boolean",
+    "description": "Waivers Required"
+   },
+   "completed": {
+    "type": "string",
+    "description": "Completed"
+   },
+   "pending": {
+    "type": "integer",
+    "description": "Pending"
+   },
+   "partiallyCompleted": {
+    "type": "string",
+    "description": "Partially Completed"
+   },
+   "expiring": {
+    "type": "string",
+    "description": "Expiring"
+   },
+   "invalid": {
+    "type": "string",
+    "description": "Invalid"
+   },
+   "rejected": {
+    "type": "integer",
+    "description": "Rejected"
+   },
+   "guardianConsentPending": {
+    "type": "integer",
+    "description": "Guardian Consent Pending"
+   },
+   "upcomingParticipantsMissingWaiver": {
+    "type": "string",
+    "description": "Upcoming Participants Missing Waiver"
+   },
+   "accessBlocked": {
+    "type": "string",
+    "description": "Access Blocked"
+   },
+   "manualExceptions": {
+    "type": "integer",
+    "description": "Manual Exceptions"
+   },
+   "completionRate": {
+    "type": "number",
+    "description": "Completion Rate"
+   },
+   "today": {
+    "type": "string",
+    "description": "Today"
+   },
+   "tomorrow": {
+    "type": "string",
+    "description": "Tomorrow"
+   },
+   "thisWeek": {
+    "type": "string",
+    "description": "This Week"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "activity": {
+    "type": "string",
+    "description": "Activity"
+   },
+   "group": {
+    "type": "string",
+    "description": "Group"
+   },
+   "booking": {
+    "type": "string",
+    "description": "Booking"
+   },
+   "waiverType": {
+    "type": "string",
+    "description": "Waiver Type"
+   },
+   "eventActivity": {
+    "type": "string",
+    "description": "Event/Activity"
+   },
+   "dateTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date/Time"
+   },
+   "participants": {
+    "type": "integer",
+    "description": "Participants"
+   },
+   "missing": {
+    "type": "string",
+    "description": "Missing"
+   },
+   "completion": {
+    "type": "number",
+    "description": "Completion %"
+   },
+   "guardianPending": {
+    "type": "integer",
+    "description": "Guardian Pending"
+   },
+   "exceptions": {
+    "type": "integer",
+    "description": "Exceptions"
+   },
+   "operationalRisk": {
+    "type": "string",
+    "description": "Operational Risk"
+   },
+   "sEG": {
+    "type": "string",
+    "description": "s e g"
+   },
+   "youthAttentio": {
+    "type": "string",
+    "description": "Youth Attentio (the pack shows 180 174 6)"
+   }
+  }
+ },
+ "WaiverVerificationValidationWorkspaceInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Waiver Verification & Validation Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "requiredFieldsComplete": {
+    "type": "string",
+    "description": "Required Fields Complete"
+   },
+   "requiredQuestionsAnswered": {
+    "type": "string",
+    "description": "Required Questions Answered"
+   },
+   "requiredAcknowledgementsAccepted": {
+    "type": "string",
+    "description": "Required Acknowledgements Accepted"
+   },
+   "signaturePresent": {
+    "type": "string",
+    "description": "Signature Present"
+   },
+   "guardianRelationshipPresent": {
+    "type": "string",
+    "description": "Guardian Relationship Present"
+   },
+   "correctWaiverVersion": {
+    "type": "string",
+    "description": "Correct Waiver Version"
+   },
+   "participantMatch": {
+    "type": "string",
+    "description": "Participant Match"
+   },
+   "bookingMatch": {
+    "type": "string",
+    "description": "Booking Match"
+   },
+   "effectiveDateValid": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Effective Date Valid"
+   },
+   "requiredEvidencePresent": {
+    "type": "string",
+    "description": "Required Evidence Present"
+   },
+   "requestCorrection": {
+    "type": "string",
+    "description": "Request Correction"
+   }
+  }
+ },
+ "WaiverVerificationValidationWorkspaceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Waiver Verification & Validation Workspace displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "submissionId": {
+    "type": "string",
+    "description": "Submission ID"
+   },
+   "participant": {
+    "type": "string",
+    "description": "Participant"
+   },
+   "waiver": {
+    "type": "string",
+    "description": "Waiver"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version"
+   },
+   "booking": {
+    "type": "string",
+    "description": "Booking"
+   },
+   "signatory": {
+    "type": "string",
+    "description": "Signatory"
+   },
+   "submitted": {
+    "type": "string",
+    "description": "Submitted"
+   },
+   "verificationReason": {
+    "type": "string",
+    "description": "Verification Reason"
+   },
+   "risk": {
+    "type": "string",
+    "description": "Risk"
+   },
+   "status": {
+    "type": "integer",
+    "description": "Status"
+   },
+   "requiredFieldsComplete": {
+    "type": "string",
+    "description": "Required Fields Complete"
+   },
+   "requiredQuestionsAnswered": {
+    "type": "string",
+    "description": "Required Questions Answered"
+   },
+   "requiredAcknowledgementsAccepted": {
+    "type": "string",
+    "description": "Required Acknowledgements Accepted"
+   },
+   "signaturePresent": {
+    "type": "string",
+    "description": "Signature Present"
+   },
+   "guardianRelationshipPresent": {
+    "type": "string",
+    "description": "Guardian Relationship Present"
+   },
+   "correctWaiverVersion": {
+    "type": "string",
+    "description": "Correct Waiver Version"
+   },
+   "participantMatch": {
+    "type": "string",
+    "description": "Participant Match"
+   },
+   "bookingMatch": {
+    "type": "string",
+    "description": "Booking Match"
+   },
+   "effectiveDateValid": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Effective Date Valid"
+   },
+   "requiredEvidencePresent": {
+    "type": "string",
+    "description": "Required Evidence Present"
+   },
+   "requestCorrection": {
+    "type": "string",
+    "description": "Request Correction"
+   }
+  }
+ }
+}

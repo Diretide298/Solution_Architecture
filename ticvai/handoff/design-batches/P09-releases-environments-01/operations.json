@@ -1,0 +1,370 @@
+{
+ "applyMigration": {
+  "method": "POST",
+  "path": "/migrations/apply",
+  "contract": "platform-ops",
+  "summary": "Apply a planned migration run",
+  "permission": "PLATFORM_MIGRATION_APPLY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "createRelease": {
+  "method": "POST",
+  "path": "/releases",
+  "contract": "platform-ops",
+  "summary": "Cut a release",
+  "permission": "PLATFORM_RELEASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateReleaseRequest",
+  "responds": "Release"
+ },
+ "deprecateApiVersion": {
+  "method": "POST",
+  "path": "/api-versions/{version}/deprecate",
+  "contract": "public-api",
+  "summary": "Announce a sunset date and notify subscribers",
+  "permission": "DEVELOPER_ADMIN",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApiVersion"
+ },
+ "getMigrationRun": {
+  "method": "GET",
+  "path": "/migrations/runs/{runId}",
+  "contract": "platform-ops",
+  "summary": "Migration run progress per cell",
+  "permission": "PLATFORM_MIGRATION_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MigrationRun"
+ },
+ "getRelease": {
+  "method": "GET",
+  "path": "/releases/{reinventoryHoldId}",
+  "contract": "platform-ops",
+  "summary": "Read a release with its rollout state",
+  "permission": "PLATFORM_RELEASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ReleaseDetail"
+ },
+ "getReleaseReadiness": {
+  "method": "GET",
+  "path": "/releases/{reinventoryHoldId}/readiness",
+  "contract": "platform-ops",
+  "summary": "Whether a release can be promoted, and what blocks it",
+  "permission": "PLATFORM_RELEASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ReleaseReadiness"
+ },
+ "getVersionSkew": {
+  "method": "GET",
+  "path": "/migrations/version-skew",
+  "contract": "platform-ops",
+  "summary": "Schema and application version across every cell",
+  "permission": "PLATFORM_MIGRATION_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VersionSkewReport"
+ },
+ "listEnvironments": {
+  "method": "GET",
+  "path": "/environments",
+  "contract": "platform-ops",
+  "summary": "The environment registry",
+  "permission": "PLATFORM_RELEASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Environment"
+ },
+ "listMigrations": {
+  "method": "GET",
+  "path": "/migrations",
+  "contract": "platform-ops",
+  "summary": "The migration register",
+  "permission": "PLATFORM_MIGRATION_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "appliedTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "pendingOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listReleases": {
+  "method": "GET",
+  "path": "/releases",
+  "contract": "platform-ops",
+  "summary": "List releases",
+  "permission": "PLATFORM_RELEASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "environment",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listSupportNotices": {
+  "method": "GET",
+  "path": "/support-notices",
+  "contract": "platform-ops",
+  "summary": "End-of-support notices",
+  "permission": "PLATFORM_RELEASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SupportNotice"
+ },
+ "listUpgradeSchedules": {
+  "method": "GET",
+  "path": "/upgrade-schedules",
+  "contract": "platform-ops",
+  "summary": "Scheduled tenant upgrades",
+  "permission": "PLATFORM_RELEASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "UpgradeSchedule"
+ },
+ "planMigration": {
+  "method": "POST",
+  "path": "/migrations/plan",
+  "contract": "platform-ops",
+  "summary": "Plan a migration run without applying it",
+  "permission": "PLATFORM_MIGRATION_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MigrationPlan"
+ },
+ "promoteRelease": {
+  "method": "POST",
+  "path": "/releases/{reinventoryHoldId}/promote",
+  "contract": "platform-ops",
+  "summary": "Promote a release to the next environment",
+  "permission": "PLATFORM_RELEASE_PROMOTE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "publishSupportNotice": {
+  "method": "POST",
+  "path": "/support-notices",
+  "contract": "platform-ops",
+  "summary": "Publish an end-of-support notice",
+  "permission": "PLATFORM_RELEASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SupportNotice",
+  "responds": "SupportNotice"
+ },
+ "registerEnvironment": {
+  "method": "POST",
+  "path": "/environments",
+  "contract": "platform-ops",
+  "summary": "Register an environment",
+  "permission": "PLATFORM_RELEASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Environment",
+  "responds": "Environment"
+ },
+ "rejectRelease": {
+  "method": "POST",
+  "path": "/releases/{reinventoryHoldId}/reject",
+  "contract": "platform-ops",
+  "summary": "Reject a release back a stage",
+  "permission": "PLATFORM_RELEASE_PROMOTE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "rollbackMigrationRun": {
+  "method": "POST",
+  "path": "/migrations/runs/{runId}/rollback",
+  "contract": "platform-ops",
+  "summary": "Roll a migration run back",
+  "permission": "PLATFORM_MIGRATION_APPLY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "scheduleTenantUpgrade": {
+  "method": "POST",
+  "path": "/upgrade-schedules",
+  "contract": "platform-ops",
+  "summary": "Schedule or defer a tenant upgrade",
+  "permission": "PLATFORM_RELEASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "UpgradeSchedule",
+  "responds": "UpgradeSchedule"
+ },
+ "withdrawRelease": {
+  "method": "POST",
+  "path": "/releases/{reinventoryHoldId}/withdraw",
+  "contract": "platform-ops",
+  "summary": "Withdraw a release",
+  "permission": "PLATFORM_RELEASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ }
+}

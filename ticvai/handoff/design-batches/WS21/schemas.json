@@ -1,0 +1,1463 @@
+{
+ "Partner360ProfileReadinessAiReviewView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Partner 360° Profile, Readiness & AI Review displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "companyInformationAndHierarchy": {
+    "type": "string",
+    "description": "Company information and hierarchy"
+   },
+   "keyPartnerContacts": {
+    "type": "string",
+    "description": "Key partner contacts"
+   },
+   "activeB2bUsers": {
+    "type": "integer",
+    "description": "Active B2B users"
+   },
+   "authorizedMarkets": {
+    "type": "string",
+    "description": "Authorized markets"
+   },
+   "brandsAndVenues": {
+    "type": "string",
+    "description": "Brands and venues"
+   },
+   "complianceStatus": {
+    "type": "string",
+    "description": "Compliance status"
+   },
+   "authorizedCapabilities": {
+    "type": "string",
+    "description": "Authorized capabilities"
+   },
+   "agreementCreditSummaryFromBoard2": {
+    "type": "string",
+    "description": "Agreement/credit summary from Board 2"
+   },
+   "connectedChannelsFromArea4": {
+    "type": "string",
+    "description": "Connected channels from Area 4"
+   },
+   "summaryFromBoard3": {
+    "type": "string",
+    "description": "Summary from Board 3"
+   },
+   "approvedLimit": {
+    "type": "integer",
+    "description": "approved limit"
+   },
+   "returnForChanges": {
+    "type": "string",
+    "description": "Return for Changes"
+   },
+   "restrict": {
+    "type": "string",
+    "description": "Restrict"
+   },
+   "configuredHumanAuthorization": {
+    "type": "string",
+    "description": "configured human authorization"
+   },
+   "authorization": {
+    "type": "string",
+    "description": "authorization"
+   },
+   "allocationsIntoBoard1": {
+    "type": "string",
+    "description": "allocations into Board 1"
+   }
+  }
+ },
+ "PartnerAccessRolesPermissionProfileView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Partner Access, Roles & Permission Profile displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "holdInventory": {
+    "type": "string",
+    "description": "Hold Inventory"
+   },
+   "confirmBooking": {
+    "type": "string",
+    "description": "Confirm Booking"
+   },
+   "modifyBooking": {
+    "type": "string",
+    "description": "Modify Booking"
+   },
+   "accessCustomerDetails": {
+    "type": "string",
+    "description": "Access Customer Details"
+   },
+   "useCredit": {
+    "type": "string",
+    "description": "Use Credit"
+   },
+   "usePaymentCard": {
+    "type": "string",
+    "description": "Use Payment Card"
+   },
+   "accessReports": {
+    "type": "string",
+    "description": "Access Reports"
+   },
+   "useApi": {
+    "type": "string",
+    "description": "Use API"
+   },
+   "manualPriceOverride": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Manual price override"
+   },
+   "creditAdjustment": {
+    "type": "string",
+    "description": "Credit adjustment"
+   },
+   "highValueBooking": {
+    "type": "string",
+    "description": "High-value booking"
+   },
+   "customerDataExport": {
+    "type": "string",
+    "description": "Customer data export"
+   },
+   "mayRequireAdditionalInternalApproval": {
+    "type": "string",
+    "description": "may require additional internal approval"
+   },
+   "permanent": {
+    "type": "string",
+    "description": "Permanent"
+   },
+   "temporary": {
+    "type": "string",
+    "description": "Temporary"
+   },
+   "seasonal": {
+    "type": "string",
+    "description": "Seasonal"
+   },
+   "eventSpecific": {
+    "type": "string",
+    "description": "Event-specific"
+   }
+  }
+ },
+ "PartnerApprovalStatusLifecycleManagementInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Partner Approval, Status & Lifecycle Management submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "thenPotentially": {
+    "type": "string",
+    "description": "then potentially"
+   },
+   "restrict": {
+    "type": "string",
+    "description": "Restrict"
+   },
+   "reactivate": {
+    "type": "string",
+    "description": "Reactivate"
+   },
+   "terminate": {
+    "type": "string",
+    "description": "Terminate"
+   },
+   "commercial": {
+    "type": "string",
+    "description": "Commercial"
+   },
+   "compliance": {
+    "type": "string",
+    "description": "Compliance"
+   },
+   "credit": {
+    "type": "string",
+    "description": "Credit"
+   },
+   "fraud": {
+    "type": "string",
+    "description": "Fraud"
+   },
+   "contractExpiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Contract Expiry"
+   },
+   "performance": {
+    "type": "string",
+    "description": "Performance"
+   },
+   "technical": {
+    "type": "string",
+    "description": "Technical"
+   },
+   "managementDecision": {
+    "type": "string",
+    "description": "Management Decision"
+   },
+   "orSelectedRestrictions": {
+    "type": "string",
+    "description": "or selected restrictions"
+   },
+   "stopNewBookings": {
+    "type": "string",
+    "description": "Stop New Bookings"
+   },
+   "stopCreditSales": {
+    "type": "string",
+    "description": "Stop Credit Sales"
+   },
+   "stopApi": {
+    "type": "string",
+    "description": "Stop API"
+   },
+   "stopSpecificVenue": {
+    "type": "string",
+    "description": "Stop Specific Venue"
+   },
+   "stopSpecificMarket": {
+    "type": "string",
+    "description": "Stop Specific Market"
+   },
+   "futureBookings": {
+    "type": "string",
+    "description": "Future bookings"
+   },
+   "activeHolds": {
+    "type": "integer",
+    "description": "Active holds"
+   },
+   "outstandingBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Outstanding balance"
+   },
+   "pendingSettlement": {
+    "type": "integer",
+    "description": "Pending settlement"
+   },
+   "activeUsers": {
+    "type": "integer",
+    "description": "Active users"
+   },
+   "activeIntegrations": {
+    "type": "integer",
+    "description": "Active integrations"
+   },
+   "existingCustomers": {
+    "type": "string",
+    "description": "Existing customers"
+   },
+   "existingTickets": {
+    "type": "string",
+    "description": "Existing tickets"
+   },
+   "currentAllocations": {
+    "type": "string",
+    "description": "Current allocations"
+   },
+   "customers": {
+    "type": "string",
+    "description": "customers"
+   }
+  }
+ },
+ "PartnerApprovalStatusLifecycleManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Partner Approval, Status & Lifecycle Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "thenPotentially": {
+    "type": "string",
+    "description": "then potentially"
+   },
+   "restrict": {
+    "type": "string",
+    "description": "Restrict"
+   },
+   "reactivate": {
+    "type": "string",
+    "description": "Reactivate"
+   },
+   "terminate": {
+    "type": "string",
+    "description": "Terminate"
+   },
+   "commercial": {
+    "type": "string",
+    "description": "Commercial"
+   },
+   "compliance": {
+    "type": "string",
+    "description": "Compliance"
+   },
+   "credit": {
+    "type": "string",
+    "description": "Credit"
+   },
+   "fraud": {
+    "type": "string",
+    "description": "Fraud"
+   },
+   "contractExpiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Contract Expiry"
+   },
+   "performance": {
+    "type": "string",
+    "description": "Performance"
+   },
+   "technical": {
+    "type": "string",
+    "description": "Technical"
+   },
+   "managementDecision": {
+    "type": "string",
+    "description": "Management Decision"
+   },
+   "orSelectedRestrictions": {
+    "type": "string",
+    "description": "or selected restrictions"
+   },
+   "stopNewBookings": {
+    "type": "string",
+    "description": "Stop New Bookings"
+   },
+   "stopCreditSales": {
+    "type": "string",
+    "description": "Stop Credit Sales"
+   },
+   "stopApi": {
+    "type": "string",
+    "description": "Stop API"
+   },
+   "stopSpecificVenue": {
+    "type": "string",
+    "description": "Stop Specific Venue"
+   },
+   "stopSpecificMarket": {
+    "type": "string",
+    "description": "Stop Specific Market"
+   },
+   "futureBookings": {
+    "type": "string",
+    "description": "Future bookings"
+   },
+   "activeHolds": {
+    "type": "integer",
+    "description": "Active holds"
+   },
+   "outstandingBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Outstanding balance"
+   },
+   "pendingSettlement": {
+    "type": "integer",
+    "description": "Pending settlement"
+   },
+   "activeUsers": {
+    "type": "integer",
+    "description": "Active users"
+   },
+   "activeIntegrations": {
+    "type": "integer",
+    "description": "Active integrations"
+   },
+   "existingCustomers": {
+    "type": "string",
+    "description": "Existing customers"
+   },
+   "existingTickets": {
+    "type": "string",
+    "description": "Existing tickets"
+   },
+   "currentAllocations": {
+    "type": "string",
+    "description": "Current allocations"
+   },
+   "customers": {
+    "type": "string",
+    "description": "customers"
+   }
+  }
+ },
+ "PartnerBrandVenueBusinessScopeAssignmentInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Partner Brand, Venue & Business Scope Assignment submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "tenant": {
+    "type": "string",
+    "description": "Tenant"
+   },
+   "brand": {
+    "type": "string",
+    "description": "Brand"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "businessUnit": {
+    "type": "string",
+    "description": "Business Unit"
+   },
+   "eventPortfolio": {
+    "type": "string",
+    "description": "Event Portfolio"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "dubaiExperiences": {
+    "type": "string",
+    "description": "Dubai Experiences"
+   },
+   "dubaiArena": {
+    "type": "string",
+    "description": "Dubai Arena"
+   },
+   "cityMuseum": {
+    "type": "string",
+    "description": "City Museum"
+   },
+   "abuDhabiWaterpark": {
+    "type": "string",
+    "description": "Abu Dhabi Waterpark"
+   },
+   "allowControlledExceptions": {
+    "type": "boolean",
+    "description": "Allow controlled exceptions"
+   },
+   "startDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Start Date"
+   },
+   "endDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "End Date"
+   },
+   "temporaryAssignment": {
+    "type": "string",
+    "description": "Temporary Assignment"
+   },
+   "seasonalScope": {
+    "type": "string",
+    "description": "Seasonal Scope"
+   }
+  }
+ },
+ "PartnerBrandVenueBusinessScopeAssignmentView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Partner Brand, Venue & Business Scope Assignment displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "tenant": {
+    "type": "string",
+    "description": "Tenant"
+   },
+   "brand": {
+    "type": "string",
+    "description": "Brand"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "businessUnit": {
+    "type": "string",
+    "description": "Business Unit"
+   },
+   "eventPortfolio": {
+    "type": "string",
+    "description": "Event Portfolio"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "dubaiExperiences": {
+    "type": "string",
+    "description": "Dubai Experiences"
+   },
+   "dubaiArena": {
+    "type": "string",
+    "description": "Dubai Arena"
+   },
+   "cityMuseum": {
+    "type": "string",
+    "description": "City Museum"
+   },
+   "abuDhabiWaterpark": {
+    "type": "string",
+    "description": "Abu Dhabi Waterpark"
+   },
+   "allowControlledExceptions": {
+    "type": "boolean",
+    "description": "Allow controlled exceptions"
+   },
+   "startDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Start Date"
+   },
+   "endDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "End Date"
+   },
+   "temporaryAssignment": {
+    "type": "string",
+    "description": "Temporary Assignment"
+   },
+   "seasonalScope": {
+    "type": "string",
+    "description": "Seasonal Scope"
+   }
+  }
+ },
+ "PartnerContactsUserAdministrationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Partner Contacts & User Administration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "primaryContact": {
+    "type": "string",
+    "description": "Primary Contact"
+   },
+   "commercial": {
+    "type": "string",
+    "description": "Commercial"
+   },
+   "reservations": {
+    "type": "string",
+    "description": "Reservations"
+   },
+   "finance": {
+    "type": "string",
+    "description": "Finance"
+   },
+   "technical": {
+    "type": "string",
+    "description": "Technical"
+   },
+   "operations": {
+    "type": "string",
+    "description": "Operations"
+   },
+   "management": {
+    "type": "string",
+    "description": "Management"
+   },
+   "emergencyContact": {
+    "type": "string",
+    "description": "Emergency Contact"
+   },
+   "name": {
+    "type": "string",
+    "description": "Name"
+   },
+   "position": {
+    "type": "string",
+    "description": "Position"
+   },
+   "department": {
+    "type": "string",
+    "description": "Department"
+   },
+   "email": {
+    "type": "string",
+    "description": "Email"
+   },
+   "mobile": {
+    "type": "string",
+    "description": "Mobile"
+   },
+   "telephone": {
+    "type": "string",
+    "description": "Telephone"
+   },
+   "language": {
+    "type": "string",
+    "description": "Language"
+   },
+   "timeZone": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time Zone"
+   },
+   "contactType": {
+    "type": "string",
+    "description": "Contact Type"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status"
+   },
+   "username": {
+    "type": "string",
+    "description": "Username"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner"
+   },
+   "branch": {
+    "type": "string",
+    "description": "Branch"
+   },
+   "role": {
+    "type": "string",
+    "description": "Role"
+   },
+   "permissions": {
+    "type": "string",
+    "description": "Permissions"
+   },
+   "salesLocation": {
+    "type": "string",
+    "description": "Sales Location"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "mfa": {
+    "type": "string",
+    "description": "MFA"
+   },
+   "passwordPolicy": {
+    "type": "string",
+    "description": "Password policy"
+   },
+   "ssoWhereAvailable": {
+    "type": "string",
+    "description": "SSO where available"
+   },
+   "loginRestrictions": {
+    "type": "string",
+    "description": "Login restrictions"
+   },
+   "accountExpiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Account expiry"
+   },
+   "sessionControls": {
+    "type": "string",
+    "description": "Session controls"
+   },
+   "reassignRole": {
+    "type": "string",
+    "description": "Reassign Role"
+   }
+  }
+ },
+ "PartnerDocumentationComplianceRepositoryView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Partner Documentation & Compliance Repository displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "tradeLicense": {
+    "type": "string",
+    "description": "Trade License"
+   },
+   "taxVatCertificate": {
+    "type": "string",
+    "description": "Tax/VAT Certificate"
+   },
+   "commercialRegistration": {
+    "type": "string",
+    "description": "Commercial Registration"
+   },
+   "bankDetails": {
+    "type": "string",
+    "description": "Bank Details"
+   },
+   "insurance": {
+    "type": "string",
+    "description": "Insurance"
+   },
+   "signedAgreement": {
+    "type": "string",
+    "description": "Signed Agreement"
+   },
+   "nda": {
+    "type": "string",
+    "description": "NDA"
+   },
+   "apiAgreement": {
+    "type": "string",
+    "description": "API Agreement"
+   },
+   "complianceDocuments": {
+    "type": "string",
+    "description": "Compliance Documents"
+   },
+   "identificationOfAuthorizedSignatory": {
+    "type": "string",
+    "description": "Identification of Authorized Signatory"
+   },
+   "otherRequiredDocuments": {
+    "type": "string",
+    "description": "Other required documents"
+   },
+   "documentType": {
+    "type": "string",
+    "description": "Document Type"
+   },
+   "documentNumber": {
+    "type": "string",
+    "description": "Document Number"
+   },
+   "expiryDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry Date"
+   },
+   "issuingAuthority": {
+    "type": "string",
+    "description": "Issuing Authority"
+   },
+   "file": {
+    "type": "string",
+    "description": "File"
+   },
+   "verificationStatus": {
+    "type": "string",
+    "description": "Verification Status"
+   },
+   "verifiedBy": {
+    "type": "string",
+    "description": "Verified By"
+   },
+   "verificationDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Verification Date"
+   },
+   "notes": {
+    "type": "string",
+    "description": "Notes"
+   },
+   "missing": {
+    "type": "string",
+    "description": "Missing"
+   },
+   "uploaded": {
+    "type": "string",
+    "description": "Uploaded"
+   },
+   "underReview": {
+    "type": "string",
+    "description": "Under Review"
+   },
+   "verified": {
+    "type": "string",
+    "description": "Verified"
+   },
+   "rejected": {
+    "type": "integer",
+    "description": "Rejected"
+   },
+   "expiring": {
+    "type": "string",
+    "description": "Expiring"
+   },
+   "expired": {
+    "type": "integer",
+    "description": "Expired"
+   },
+   "warnOnly": {
+    "type": "string",
+    "description": "Warn only"
+   },
+   "requireManualReview": {
+    "type": "boolean",
+    "description": "Require manual review"
+   }
+  }
+ },
+ "PartnerManagementCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Partner Management Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "totalPartners": {
+    "type": "integer",
+    "description": "Total Partners"
+   },
+   "activePartners": {
+    "type": "integer",
+    "description": "Active Partners"
+   },
+   "pendingOnboarding": {
+    "type": "integer",
+    "description": "Pending Onboarding"
+   },
+   "pendingApproval": {
+    "type": "integer",
+    "description": "Pending Approval"
+   },
+   "suspendedPartners": {
+    "type": "integer",
+    "description": "Suspended Partners"
+   },
+   "expiringAgreements": {
+    "type": "integer",
+    "description": "Expiring Agreements"
+   },
+   "documentationIssues": {
+    "type": "integer",
+    "description": "Documentation Issues"
+   },
+   "partnersWithCreditHolds": {
+    "type": "string",
+    "description": "Partners With Credit Holds"
+   },
+   "connectedOtaApiPartners": {
+    "type": "integer",
+    "description": "Connected OTA/API Partners"
+   },
+   "partnerSalesYtd": {
+    "type": "string",
+    "description": "Partner Sales YTD"
+   },
+   "partnerRevenueYtd": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Partner Revenue YTD"
+   },
+   "highRiskPartners": {
+    "type": "integer",
+    "description": "High-Risk Partners"
+   },
+   "partnerId": {
+    "type": "string",
+    "description": "Partner ID"
+   },
+   "tradingName": {
+    "type": "string",
+    "description": "Trading Name"
+   },
+   "legalEntity": {
+    "type": "string",
+    "description": "Legal Entity"
+   },
+   "partnerType": {
+    "type": "string",
+    "description": "Partner Type"
+   },
+   "country": {
+    "type": "string",
+    "description": "Country"
+   },
+   "territory": {
+    "type": "string",
+    "description": "Territory"
+   },
+   "assignedBrand": {
+    "type": "string",
+    "description": "Assigned Brand"
+   },
+   "assignedVenue": {
+    "type": "string",
+    "description": "Assigned Venue"
+   },
+   "commercialOwner": {
+    "type": "string",
+    "description": "Commercial Owner"
+   },
+   "distributionChannel": {
+    "type": "string",
+    "description": "Distribution Channel"
+   },
+   "accountStatus": {
+    "type": "string",
+    "description": "Account Status"
+   },
+   "onboardingStatus": {
+    "type": "string",
+    "description": "Onboarding Status"
+   },
+   "agreementStatus": {
+    "type": "string",
+    "description": "Agreement Status"
+   },
+   "creditStatus": {
+    "type": "string",
+    "description": "Credit Status"
+   },
+   "integrationStatus": {
+    "type": "string",
+    "description": "Integration Status"
+   },
+   "lastActivity": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last Activity"
+   },
+   "suspendedTerminatedArchived": {
+    "type": "string",
+    "description": "Suspended → Terminated → Archived"
+   }
+  }
+ },
+ "PartnerOnboardingApplicationWorkflowView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Partner Onboarding & Application Workflow displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "companyInformation": {
+    "type": "string",
+    "description": "Company information"
+   },
+   "requestedPartnerType": {
+    "type": "string",
+    "description": "Requested partner type"
+   },
+   "markets": {
+    "type": "string",
+    "description": "Markets"
+   },
+   "expectedSalesVolume": {
+    "type": "integer",
+    "description": "Expected sales volume"
+   },
+   "requestedProducts": {
+    "type": "string",
+    "description": "Requested products"
+   },
+   "requestedVenues": {
+    "type": "string",
+    "description": "Requested venues"
+   },
+   "preferredDistributionMethod": {
+    "type": "string",
+    "description": "Preferred distribution method"
+   },
+   "estimatedAnnualBusiness": {
+    "type": "string",
+    "description": "Estimated annual business"
+   },
+   "contactInformation": {
+    "type": "string",
+    "description": "Contact information"
+   },
+   "billingRequirements": {
+    "type": "string",
+    "description": "Billing requirements"
+   },
+   "eachDepartmentReceivesRelevantTasks": {
+    "type": "string",
+    "description": "Each department receives relevant tasks"
+   },
+   "businessCase": {
+    "type": "string",
+    "description": "Business case"
+   },
+   "territory": {
+    "type": "string",
+    "description": "Territory"
+   },
+   "expectedVolume": {
+    "type": "integer",
+    "description": "Expected volume"
+   },
+   "creditRequest": {
+    "type": "string",
+    "description": "Credit request"
+   },
+   "paymentTerms": {
+    "type": "string",
+    "description": "Payment terms"
+   },
+   "taxInformation": {
+    "type": "string",
+    "description": "Tax information"
+   },
+   "productRequirements": {
+    "type": "string",
+    "description": "Product requirements"
+   },
+   "fulfillmentRequirements": {
+    "type": "string",
+    "description": "Fulfillment requirements"
+   },
+   "apiIntegrationRequirements": {
+    "type": "string",
+    "description": "API/integration requirements"
+   },
+   "sequentialApproval": {
+    "type": "string",
+    "description": "Sequential approval"
+   },
+   "parallelApproval": {
+    "type": "string",
+    "description": "Parallel approval"
+   },
+   "mandatoryStage": {
+    "type": "string",
+    "description": "Mandatory stage"
+   },
+   "optionalStage": {
+    "type": "string",
+    "description": "Optional stage"
+   },
+   "sla": {
+    "type": "string",
+    "description": "SLA"
+   },
+   "escalation": {
+    "type": "string",
+    "description": "Escalation"
+   },
+   "reassignment": {
+    "type": "string",
+    "description": "Reassignment"
+   },
+   "rejection": {
+    "type": "string",
+    "description": "Rejection"
+   },
+   "requestMoreInformation": {
+    "type": "string",
+    "description": "Request More Information"
+   }
+  }
+ },
+ "PartnerProfileOrganizationSetupInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is control.developer_account at 3%, so this is not an update to anything the package stores today and no new table has been decided",
+  "description": "**What Partner Profile & Organization Setup submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "typesType": {
+    "type": "string",
+    "enum": [
+     "b2bReseller",
+     "travelAgent",
+     "tourOperator",
+     "ota",
+     "corporateCustomer",
+     "hotelConcierge",
+     "destinationManagementCompany",
+     "affiliate",
+     "wholesaler",
+     "distributor",
+     "governmentPartner",
+     "schoolInstitution",
+     "apiPartner",
+     "internalGroupCompany"
+    ],
+    "description": "Vocabulary listed under Partner Types."
+   },
+   "partnerId": {
+    "type": "string",
+    "description": "Partner ID"
+   },
+   "legalEntityName": {
+    "type": "string",
+    "description": "Legal Entity Name"
+   },
+   "tradingName": {
+    "type": "string",
+    "description": "Trading Name"
+   },
+   "partnerType": {
+    "type": "string",
+    "description": "Partner Type"
+   },
+   "registrationNumber": {
+    "type": "string",
+    "description": "Registration Number"
+   },
+   "taxVatNumber": {
+    "type": "string",
+    "description": "Tax/VAT Number"
+   },
+   "country": {
+    "type": "string",
+    "description": "Country"
+   },
+   "city": {
+    "type": "string",
+    "description": "City"
+   },
+   "registeredAddress": {
+    "type": "string",
+    "description": "Registered Address"
+   },
+   "businessAddress": {
+    "type": "string",
+    "description": "Business Address"
+   },
+   "website": {
+    "type": "string",
+    "description": "Website"
+   },
+   "mainTelephone": {
+    "type": "string",
+    "description": "Main Telephone"
+   },
+   "generalEmail": {
+    "type": "string",
+    "description": "General Email"
+   },
+   "preferredLanguage": {
+    "type": "string",
+    "description": "Preferred Language"
+   },
+   "defaultCurrency": {
+    "type": "string",
+    "description": "Default Currency"
+   },
+   "timeZone": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time Zone"
+   },
+   "accountManager": {
+    "type": "string",
+    "description": "Account Manager"
+   },
+   "commercialManager": {
+    "type": "string",
+    "description": "Commercial Manager"
+   },
+   "financeOwner": {
+    "type": "string",
+    "description": "Finance Owner"
+   },
+   "operationalOwner": {
+    "type": "string",
+    "description": "Operational Owner"
+   },
+   "technicalOwner": {
+    "type": "string",
+    "description": "Technical Owner"
+   },
+   "strategic": {
+    "type": "string",
+    "description": "Strategic"
+   },
+   "keyAccount": {
+    "type": "string",
+    "description": "Key Account"
+   },
+   "standard": {
+    "type": "string",
+    "description": "Standard"
+   },
+   "newPartner": {
+    "type": "integer",
+    "description": "New Partner"
+   },
+   "highVolume": {
+    "type": "integer",
+    "description": "High Volume"
+   },
+   "vip": {
+    "type": "string",
+    "description": "VIP"
+   },
+   "restricted": {
+    "type": "string",
+    "description": "Restricted"
+   }
+  }
+ },
+ "PartnerProfileOrganizationSetupView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Partner Profile & Organization Setup displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "typesType": {
+    "type": "string",
+    "enum": [
+     "b2bReseller",
+     "travelAgent",
+     "tourOperator",
+     "ota",
+     "corporateCustomer",
+     "hotelConcierge",
+     "destinationManagementCompany",
+     "affiliate",
+     "wholesaler",
+     "distributor",
+     "governmentPartner",
+     "schoolInstitution",
+     "apiPartner",
+     "internalGroupCompany"
+    ],
+    "description": "Vocabulary listed under Partner Types."
+   },
+   "partnerId": {
+    "type": "string",
+    "description": "Partner ID"
+   },
+   "legalEntityName": {
+    "type": "string",
+    "description": "Legal Entity Name"
+   },
+   "tradingName": {
+    "type": "string",
+    "description": "Trading Name"
+   },
+   "partnerType": {
+    "type": "string",
+    "description": "Partner Type"
+   },
+   "registrationNumber": {
+    "type": "string",
+    "description": "Registration Number"
+   },
+   "taxVatNumber": {
+    "type": "string",
+    "description": "Tax/VAT Number"
+   },
+   "country": {
+    "type": "string",
+    "description": "Country"
+   },
+   "city": {
+    "type": "string",
+    "description": "City"
+   },
+   "registeredAddress": {
+    "type": "string",
+    "description": "Registered Address"
+   },
+   "businessAddress": {
+    "type": "string",
+    "description": "Business Address"
+   },
+   "website": {
+    "type": "string",
+    "description": "Website"
+   },
+   "mainTelephone": {
+    "type": "string",
+    "description": "Main Telephone"
+   },
+   "generalEmail": {
+    "type": "string",
+    "description": "General Email"
+   },
+   "preferredLanguage": {
+    "type": "string",
+    "description": "Preferred Language"
+   },
+   "defaultCurrency": {
+    "type": "string",
+    "description": "Default Currency"
+   },
+   "timeZone": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time Zone"
+   },
+   "accountManager": {
+    "type": "string",
+    "description": "Account Manager"
+   },
+   "commercialManager": {
+    "type": "string",
+    "description": "Commercial Manager"
+   },
+   "financeOwner": {
+    "type": "string",
+    "description": "Finance Owner"
+   },
+   "operationalOwner": {
+    "type": "string",
+    "description": "Operational Owner"
+   },
+   "technicalOwner": {
+    "type": "string",
+    "description": "Technical Owner"
+   },
+   "strategic": {
+    "type": "string",
+    "description": "Strategic"
+   },
+   "keyAccount": {
+    "type": "string",
+    "description": "Key Account"
+   },
+   "standard": {
+    "type": "string",
+    "description": "Standard"
+   },
+   "newPartner": {
+    "type": "integer",
+    "description": "New Partner"
+   },
+   "highVolume": {
+    "type": "integer",
+    "description": "High Volume"
+   },
+   "vip": {
+    "type": "string",
+    "description": "VIP"
+   },
+   "restricted": {
+    "type": "string",
+    "description": "Restricted"
+   }
+  }
+ },
+ "TerritoryMarketDistributionRightsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Territory, Market & Distribution Rights displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "country": {
+    "type": "string",
+    "description": "Country"
+   },
+   "region": {
+    "type": "string",
+    "description": "Region"
+   },
+   "city": {
+    "type": "string",
+    "description": "City"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "brand": {
+    "type": "string",
+    "description": "Brand"
+   },
+   "b2bPortal": {
+    "type": "string",
+    "description": "B2B Portal"
+   },
+   "api": {
+    "type": "string",
+    "description": "API"
+   },
+   "otaConnection": {
+    "type": "string",
+    "description": "OTA Connection"
+   },
+   "agentPortal": {
+    "type": "string",
+    "description": "Agent Portal"
+   },
+   "affiliateLink": {
+    "type": "string",
+    "description": "Affiliate Link"
+   },
+   "voucherDistribution": {
+    "type": "string",
+    "description": "Voucher Distribution"
+   },
+   "otherAuthorizedChannel": {
+    "type": "string",
+    "description": "Other authorized channel"
+   },
+   "uae": {
+    "type": "string",
+    "description": "UAE"
+   },
+   "dubai": {
+    "type": "string",
+    "description": "Dubai"
+   },
+   "saudiMarket": {
+    "type": "string",
+    "description": "Saudi market"
+   },
+   "directConsumerResale": {
+    "type": "string",
+    "description": "Direct consumer resale"
+   },
+   "subDistribution": {
+    "type": "string",
+    "description": "Sub-distribution"
+   },
+   "nonExclusive": {
+    "type": "string",
+    "description": "Non-exclusive"
+   },
+   "exclusive": {
+    "type": "string",
+    "description": "Exclusive"
+   },
+   "preferred": {
+    "type": "string",
+    "description": "Preferred"
+   },
+   "restricted": {
+    "type": "string",
+    "description": "Restricted"
+   },
+   "subAgentsAllowed": {
+    "type": "boolean",
+    "description": "Sub-agents allowed"
+   },
+   "subAgentsProhibited": {
+    "type": "string",
+    "description": "Sub-agents prohibited"
+   },
+   "approvalRequired": {
+    "type": "boolean",
+    "description": "Approval required"
+   },
+   "maximumHierarchyDepth": {
+    "type": "string",
+    "description": "Maximum hierarchy depth"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "description": "Effective To"
+   }
+  }
+ }
+}

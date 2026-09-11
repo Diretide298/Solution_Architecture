@@ -1,0 +1,1664 @@
+[
+ {
+  "id": "ADM-038",
+  "name": "Communication Service Command Center",
+  "module": "Platform",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Communication & Notification Platform Services_Reference.pdf",
+   "board": "1",
+   "number": "12.1.1",
+   "page": 4
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/communication-service-command-center-adm-038",
+   "component": "apps/ticvai-web/src/routes/platform/CommunicationServiceCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "exitTo": [
+    "ADM-002",
+    "ADM-039",
+    "ADM-040",
+    "ADM-041",
+    "ADM-042",
+    "ADM-043",
+    "ADM-044",
+    "ADM-045",
+    "ADM-046",
+    "ADM-047"
+   ],
+   "inferred": false,
+   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
+   "transitions": [
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-039",
+     "trigger": "Works in Channel & Provider Configuration",
+     "provenance": "flow F133 step 1→2",
+     "operation": "listCommunicationService"
+    },
+    {
+     "to": "ADM-040",
+     "trigger": "Works in Sender Identity, Domain & Brand Configuration",
+     "provenance": "flow F133 step 3→4",
+     "operation": "listCommunicationService"
+    },
+    {
+     "to": "ADM-041",
+     "trigger": "Works in System Transactional Template Registry",
+     "provenance": "flow F133 step 5→6",
+     "operation": "listCommunicationService"
+    },
+    {
+     "to": "ADM-042",
+     "trigger": "Works in Business Event & Notification Trigger Mapping",
+     "provenance": "flow F133 step 7→8",
+     "operation": "listCommunicationService"
+    },
+    {
+     "to": "ADM-043",
+     "trigger": "Works in Routing, Priority, Throttling & Fallback Rules",
+     "provenance": "flow F133 step 9→10",
+     "operation": "listCommunicationService"
+    },
+    {
+     "to": "ADM-044",
+     "trigger": "Works in Consent, Preference & Communication Policy Enforcement",
+     "provenance": "flow F133 step 11→12",
+     "operation": "listCommunicationService"
+    },
+    {
+     "to": "ADM-045",
+     "trigger": "Works in Delivery Queue, Failure & Retry Management",
+     "provenance": "flow F133 step 13→14",
+     "operation": "listCommunicationService"
+    },
+    {
+     "to": "ADM-046",
+     "trigger": "Works in Provider Health, Usage & Cost Monitoring",
+     "provenance": "flow F133 step 15→16",
+     "operation": "listCommunicationService"
+    },
+    {
+     "to": "ADM-047",
+     "trigger": "Works in AI Delivery Optimization & Communication Platform Diagnostics",
+     "provenance": "flow F133 step 17→18",
+     "operation": "listCommunicationService"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Provide administrators and technical/operations teams with a centralized view of the health and activity of TICVAI's communication infrastructure. This is not a marketing dashboard.",
+  "purposeNote": "Platform administrators can understand communication volume, delivery health, provider performance and operational exceptions from one centralized workspace.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every communication service",
+       "columns": [
+        "CommunicationServiceCommandCenterView.messagesProcessedToday",
+        "CommunicationServiceCommandCenterView.emailSent",
+        "CommunicationServiceCommandCenterView.smsSent",
+        "CommunicationServiceCommandCenterView.whatsappSent",
+        "CommunicationServiceCommandCenterView.pushNotifications",
+        "CommunicationServiceCommandCenterView.inAppNotifications",
+        "CommunicationServiceCommandCenterView.delivered",
+        "CommunicationServiceCommandCenterView.failed",
+        "CommunicationServiceCommandCenterView.pending",
+        "CommunicationServiceCommandCenterView.retrying",
+        "CommunicationServiceCommandCenterView.averageDeliveryTime",
+        "CommunicationServiceCommandCenterView.providerAvailability"
+       ],
+       "bindsTo": "CommunicationServiceCommandCenterView",
+       "operation": "listCommunicationService",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 4 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected communication service",
+       "bindsTo": "CommunicationServiceCommandCenterView",
+       "columns": [
+        "CommunicationServiceCommandCenterView.messagesProcessedToday",
+        "CommunicationServiceCommandCenterView.emailSent",
+        "CommunicationServiceCommandCenterView.smsSent",
+        "CommunicationServiceCommandCenterView.whatsappSent",
+        "CommunicationServiceCommandCenterView.pushNotifications",
+        "CommunicationServiceCommandCenterView.inAppNotifications",
+        "CommunicationServiceCommandCenterView.delivered",
+        "CommunicationServiceCommandCenterView.failed",
+        "CommunicationServiceCommandCenterView.pending",
+        "CommunicationServiceCommandCenterView.retrying",
+        "CommunicationServiceCommandCenterView.averageDeliveryTime",
+        "CommunicationServiceCommandCenterView.providerAvailability"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Module Activity”, “Channel Provider Health”, “Health”, “WhatsAp Warni”.",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 4 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The communication service list.",
+   "error": "Could not load. Names which read failed and leaves the communication service untouched.",
+   "emptyFirstRun": "No communication service yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the communication service are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCommunicationService",
+    "contract": "marketing-crm",
+    "purpose": "Communication Service Command Center",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "CommunicationServiceCommandCenterView.messagesProcessedToday",
+    "CommunicationServiceCommandCenterView.emailSent",
+    "CommunicationServiceCommandCenterView.smsSent",
+    "CommunicationServiceCommandCenterView.whatsappSent",
+    "CommunicationServiceCommandCenterView.pushNotifications",
+    "CommunicationServiceCommandCenterView.inAppNotifications"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-038"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 4. 12 of 12 labels bound to a contract property; 12 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-039",
+  "name": "Channel & Provider Configuration",
+  "module": "Platform",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Communication & Notification Platform Services_Reference.pdf",
+   "board": "1",
+   "number": "12.1.2",
+   "page": 6
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/channel-provider-configuration-adm-039",
+   "component": "apps/ticvai-web/src/routes/platform/ChannelProviderConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-038"
+   ],
+   "exitTo": [
+    "ADM-038"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-038, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-038",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F133 step 2→3",
+     "operation": "setChannelProvider"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Configure the external/internal services used by TICVAI to deliver communications.",
+  "purposeNote": "Authorized administrators can configure and test multiple communication providers without requiring individual TICVAI modules to maintain direct provider integrations.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved: Test Connection, Send Test Message, Validate Credentials, Test Webhook, Verify Delivery Receipt. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Communication & Notification Platform Services_Reference.pdf, page 6 §Actions"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Email",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 6 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "SMS",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 6 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "WhatsApp",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 6 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Mobile Push",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 6 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "In-App Notification",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 6 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Future supported channels",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 6 §Configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Test Connection",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 6 §Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Send Test Message",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 6 §Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Validate Credentials",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 6 §Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Test Webhook",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 6 §Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Verify Delivery Receipt",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 6 §Actions"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The channel provider configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the channel provider untouched.",
+   "emptyFirstRun": "No channel provider configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setChannelProvider",
+    "contract": "marketing-crm",
+    "purpose": "Channel & Provider Configuration",
+    "trigger": "onAction",
+    "invalidates": [
+     "setChannelProvider"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-039"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 6. 0 of 0 labels bound to a contract property; 11 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-040",
+  "name": "Sender Identity, Domain & Brand Configuration",
+  "module": "Platform",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Communication & Notification Platform Services_Reference.pdf",
+   "board": "1",
+   "number": "12.1.3",
+   "page": 7
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/sender-identity-domain-brand-configuration-adm-040",
+   "component": "apps/ticvai-web/src/routes/platform/SenderIdentityDomainBrandConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-038"
+   ],
+   "exitTo": [
+    "ADM-038"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-038, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-038",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F133 step 4→5",
+     "operation": "setSenderIdentityDomain"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure; Configure/reference) and no display directory — it is settings, not a population",
+  "purpose": "Manage the identities from which TICVAI communications are sent.",
+  "purposeNote": "Every outbound communication uses a verified and appropriately governed sender identity for the applicable brand, channel and region.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Sending Domain",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "From Name",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "From Address",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Reply-To",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Brand",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Legal Entity",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Region",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Sender ID",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Country",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Approved Use",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Provider",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Status",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Application",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Platform",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Environment",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Business Account",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 7 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Phone Number",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 7 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Verification Status",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 7 §Configure/reference"
+      },
+      {
+       "kind": "selectField",
+       "label": "Approved Templates",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 7 §Configure/reference"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "provenance": "contract operation setSenderIdentityDomain"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The sender identity domain configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the sender identity domain untouched.",
+   "emptyFirstRun": "No sender identity domain configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setSenderIdentityDomain",
+    "contract": "marketing-crm",
+    "purpose": "Sender Identity, Domain & Brand Configuration",
+    "trigger": "onAction",
+    "invalidates": [
+     "setSenderIdentityDomain"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-040"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 19 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-041",
+  "name": "System Transactional Template Registry",
+  "module": "Platform",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Communication & Notification Platform Services_Reference.pdf",
+   "board": "1",
+   "number": "12.1.4",
+   "page": 9
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/system-transactional-template-registry-adm-041",
+   "component": "apps/ticvai-web/src/routes/platform/SystemTransactionalTemplateRegistry.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-038"
+   ],
+   "exitTo": [
+    "ADM-038"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-038, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-038",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F133 step 6→7",
+     "operation": "listSystemTransactionalTemplate"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Maintain centralized system/transactional communication templates used by TICVAI operational modules. This screen must not replace CRM's marketing template builder.",
+  "purposeNote": "Operational modules can use governed reusable communication templates without embedding message content directly in application code.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Template ID",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 9 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Template Name",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 9 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Business Event",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 9 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Source Module",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 9 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Channel",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 9 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Brand",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 9 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Language",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 9 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Version",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 9 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Status",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 9 §Configure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The system transactional template configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the system transactional template untouched.",
+   "emptyFirstRun": "No system transactional template configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listSystemTransactionalTemplate",
+    "contract": "marketing-crm",
+    "purpose": "System Transactional Template Registry",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-041"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 9 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-042",
+  "name": "Business Event & Notification Trigger Mapping",
+  "module": "Platform",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Communication & Notification Platform Services_Reference.pdf",
+   "board": "1",
+   "number": "12.1.5",
+   "page": 11
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/business-event-notification-trigger-mapping-adm-042",
+   "component": "apps/ticvai-web/src/routes/platform/BusinessEventNotificationTriggerMapping.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-038"
+   ],
+   "exitTo": [
+    "ADM-038"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-038, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-038",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F133 step 8→9",
+     "operation": "listBusinessEventNotification"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Map TICVAI business events to the operational communications they should generate. This is the core of the event-driven communication architecture.",
+  "purposeNote": "appropriate operational notification according to centrally configured rules.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Customer, Channel, Membership, Booking Type. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Communication & Notification Platform Services_Reference.pdf, page 11 §Allow conditions based on"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Communication & Notification Platform Services_Reference.pdf, page 11"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Communication & Notification Platform Services_Reference.pdf, page 11"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Customer",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 11 §Allow conditions based on"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Channel",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 11 §Allow conditions based on"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Membership",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 11 §Allow conditions based on"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Booking Type",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 11 §Allow conditions based on"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The business event notification list.",
+   "error": "Could not load. Names which read failed and leaves the business event notification untouched.",
+   "emptyFirstRun": "No business event notification yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the business event notification are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listBusinessEventNotification",
+    "contract": "marketing-crm",
+    "purpose": "Business Event & Notification Trigger Mapping",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "BusinessEventNotificationTriggerMappingView.t30Days",
+    "BusinessEventNotificationTriggerMappingView.t7Days",
+    "BusinessEventNotificationTriggerMappingView.t1Day",
+    "BusinessEventNotificationTriggerMappingView.eventId",
+    "BusinessEventNotificationTriggerMappingView.sourceModule"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-042"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 4 of 36 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-043",
+  "name": "Routing, Priority, Throttling & Fallback Rules",
+  "module": "Platform",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Communication & Notification Platform Services_Reference.pdf",
+   "board": "1",
+   "number": "12.1.6",
+   "page": 13
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/routing-priority-throttling-fallback-rules-adm-043",
+   "component": "apps/ticvai-web/src/routes/platform/RoutingPriorityThrottlingFallbackRules.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-038"
+   ],
+   "exitTo": [
+    "ADM-038"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-038, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-038",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F133 step 10→11",
+     "operation": "listRoutingPriorityThrottling"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure based on; Configure) and no display directory — it is settings, not a population",
+  "purpose": "Determine how TICVAI delivers a message after a communication requirement has been created.",
+  "purposeNote": "Communication requests are dynamically routed according to priority, availability, consent, provider health and configured fallback rules.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Channel",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 13 §Configure based on"
+      },
+      {
+       "kind": "selectField",
+       "label": "Country",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 13 §Configure based on"
+      },
+      {
+       "kind": "selectField",
+       "label": "Brand",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 13 §Configure based on"
+      },
+      {
+       "kind": "selectField",
+       "label": "Provider",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 13 §Configure based on"
+      },
+      {
+       "kind": "selectField",
+       "label": "Message Type",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 13 §Configure based on"
+      },
+      {
+       "kind": "selectField",
+       "label": "Priority",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 13 §Configure based on"
+      },
+      {
+       "kind": "selectField",
+       "label": "Recipient Type",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 13 §Configure based on"
+      },
+      {
+       "kind": "selectField",
+       "label": "Cost",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 13 §Configure based on"
+      },
+      {
+       "kind": "selectField",
+       "label": "Provider Health",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 13 §Configure based on"
+      },
+      {
+       "kind": "selectField",
+       "label": "Messages per second",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 13 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Messages per minute",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 13 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Provider limit",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 13 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Brand limit",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 13 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Event limit",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 13 §Configure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The routing priority throttling configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the routing priority throttling untouched.",
+   "emptyFirstRun": "No routing priority throttling configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listRoutingPriorityThrottling",
+    "contract": "marketing-crm",
+    "purpose": "Routing, Priority, Throttling & Fallback Rules",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-043"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 13. 0 of 0 labels bound to a contract property; 14 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-044",
+  "name": "Consent, Preference & Communication Policy Enforcement",
+  "module": "Platform",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Communication & Notification Platform Services_Reference.pdf",
+   "board": "1",
+   "number": "12.1.7",
+   "page": 14
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/consent-preference-communication-policy-enforcement-adm-044",
+   "component": "apps/ticvai-web/src/routes/platform/ConsentPreferenceCommunicationPolicyEnforcement.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-038"
+   ],
+   "exitTo": [
+    "ADM-038"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-038, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-038",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F133 step 12→13",
+     "operation": "listConsentPreferenceCommunication"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Create a central enforcement layer ensuring communications respect the appropriate communication rules.",
+  "purposeNote": "No communication is delivered without passing the applicable centralized consent, preference and communication-policy evaluation.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Communication & Notification Platform Services_Reference.pdf, page 14"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Communication & Notification Platform Services_Reference.pdf, page 14"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listConsentPreferenceCommunication",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The consent preference communication list.",
+   "error": "Could not load. Names which read failed and leaves the consent preference communication untouched.",
+   "emptyFirstRun": "No consent preference communication yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the consent preference communication are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listConsentPreferenceCommunication",
+    "contract": "marketing-crm",
+    "purpose": "Consent, Preference & Communication Policy Enforcement",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "ConsentPreferenceCommunicationPolicyEnforcementView.marketingConsent",
+    "ConsentPreferenceCommunicationPolicyEnforcementView.emailPreference",
+    "ConsentPreferenceCommunicationPolicyEnforcementView.smsPreference",
+    "ConsentPreferenceCommunicationPolicyEnforcementView.whatsappPreference",
+    "ConsentPreferenceCommunicationPolicyEnforcementView.pushPreference"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-044"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 0 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-045",
+  "name": "Delivery Queue, Failure & Retry Management",
+  "module": "Platform",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Communication & Notification Platform Services_Reference.pdf",
+   "board": "1",
+   "number": "12.1.8",
+   "page": 16
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/delivery-queue-failure-retry-management-adm-045",
+   "component": "apps/ticvai-web/src/routes/platform/DeliveryQueueFailureRetryManagement.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-038"
+   ],
+   "exitTo": [
+    "ADM-038"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-038, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-038",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F133 step 14→15",
+     "operation": "listDeliveryQueueFailure"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Provide technical/operations teams with visibility into communications currently being processed or failing.",
+  "purposeNote": "Failed communications can be identified, diagnosed, retried and resolved without losing the original business-event context.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every delivery queue failure",
+       "columns": [
+        "DeliveryQueueFailureRetryManagementView.pending",
+        "DeliveryQueueFailureRetryManagementView.processing",
+        "DeliveryQueueFailureRetryManagementView.sent",
+        "DeliveryQueueFailureRetryManagementView.delivered",
+        "DeliveryQueueFailureRetryManagementView.failed",
+        "DeliveryQueueFailureRetryManagementView.retrying",
+        "DeliveryQueueFailureRetryManagementView.deadLettered",
+        "DeliveryQueueFailureRetryManagementView.cancelled",
+        "DeliveryQueueFailureRetryManagementView.communicationId",
+        "DeliveryQueueFailureRetryManagementView.sourceModule",
+        "DeliveryQueueFailureRetryManagementView.businessEvent",
+        "DeliveryQueueFailureRetryManagementView.recipient",
+        "DeliveryQueueFailureRetryManagementView.channel",
+        "DeliveryQueueFailureRetryManagementView.template",
+        "DeliveryQueueFailureRetryManagementView.provider",
+        "DeliveryQueueFailureRetryManagementView.priority",
+        "DeliveryQueueFailureRetryManagementView.created",
+        "DeliveryQueueFailureRetryManagementView.status",
+        "DeliveryQueueFailureRetryManagementView.attempts"
+       ],
+       "bindsTo": "DeliveryQueueFailureRetryManagementView",
+       "operation": "listDeliveryQueueFailure",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 16 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected delivery queue failure",
+       "bindsTo": "DeliveryQueueFailureRetryManagementView",
+       "columns": [
+        "DeliveryQueueFailureRetryManagementView.pending",
+        "DeliveryQueueFailureRetryManagementView.processing",
+        "DeliveryQueueFailureRetryManagementView.sent",
+        "DeliveryQueueFailureRetryManagementView.delivered",
+        "DeliveryQueueFailureRetryManagementView.failed",
+        "DeliveryQueueFailureRetryManagementView.retrying",
+        "DeliveryQueueFailureRetryManagementView.deadLettered",
+        "DeliveryQueueFailureRetryManagementView.cancelled",
+        "DeliveryQueueFailureRetryManagementView.communicationId",
+        "DeliveryQueueFailureRetryManagementView.sourceModule",
+        "DeliveryQueueFailureRetryManagementView.businessEvent",
+        "DeliveryQueueFailureRetryManagementView.recipient",
+        "DeliveryQueueFailureRetryManagementView.channel",
+        "DeliveryQueueFailureRetryManagementView.template",
+        "DeliveryQueueFailureRetryManagementView.provider",
+        "DeliveryQueueFailureRetryManagementView.priority",
+        "DeliveryQueueFailureRetryManagementView.created",
+        "DeliveryQueueFailureRetryManagementView.status",
+        "DeliveryQueueFailureRetryManagementView.attempts"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Attempt 1”, “Wait 1 minute”, “Attempt 2”, “Wait 5 minutes”, “Attempt 3”, “Authorized administrators can”.",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 16 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The delivery queue failure list.",
+   "error": "Could not load. Names which read failed and leaves the delivery queue failure untouched.",
+   "emptyFirstRun": "No delivery queue failure yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the delivery queue failure are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listDeliveryQueueFailure",
+    "contract": "marketing-crm",
+    "purpose": "Delivery Queue, Failure & Retry Management",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "DeliveryQueueFailureRetryManagementView.pending",
+    "DeliveryQueueFailureRetryManagementView.processing",
+    "DeliveryQueueFailureRetryManagementView.sent",
+    "DeliveryQueueFailureRetryManagementView.delivered",
+    "DeliveryQueueFailureRetryManagementView.failed",
+    "DeliveryQueueFailureRetryManagementView.retrying"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-045"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 16. 19 of 19 labels bound to a contract property; 19 of 48 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-046",
+  "name": "Provider Health, Usage & Cost Monitoring",
+  "module": "Platform",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Communication & Notification Platform Services_Reference.pdf",
+   "board": "1",
+   "number": "12.1.9",
+   "page": 18
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/provider-health-usage-cost-monitoring-adm-046",
+   "component": "apps/ticvai-web/src/routes/platform/ProviderHealthUsageCostMonitoring.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-038"
+   ],
+   "exitTo": [
+    "ADM-038"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-038, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-038",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F133 step 16→17",
+     "operation": "listProviderHealthUsage"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Monitor the operational and commercial performance of communication providers.",
+  "purposeNote": "Management can understand provider reliability, usage and communication cost across the TICVAI platform.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search provider health usage",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 18 §Analyze by"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "Channel",
+        "Provider",
+        "Brand",
+        "Venue",
+        "Module",
+        "Country",
+        "Message Type"
+       ],
+       "notes": "The pack filters this screen by channel, provider, brand, venue, module, country and 1 more — which are present is a decision the pack already made.",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 18 §Analyze by"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every provider health usage",
+       "columns": [
+        "ProviderHealthUsageCostMonitoringView.volume",
+        "ProviderHealthUsageCostMonitoringView.successRate",
+        "ProviderHealthUsageCostMonitoringView.failureRate",
+        "ProviderHealthUsageCostMonitoringView.deliveryTime",
+        "ProviderHealthUsageCostMonitoringView.apiLatency",
+        "ProviderHealthUsageCostMonitoringView.availability",
+        "ProviderHealthUsageCostMonitoringView.retries",
+        "ProviderHealthUsageCostMonitoringView.fallbackUsage",
+        "ProviderHealthUsageCostMonitoringView.cost",
+        "ProviderHealthUsageCostMonitoringView.costPerMessage"
+       ],
+       "bindsTo": "ProviderHealthUsageCostMonitoringView",
+       "operation": "listProviderHealthUsage",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 18 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected provider health usage",
+       "bindsTo": "ProviderHealthUsageCostMonitoringView",
+       "columns": [
+        "ProviderHealthUsageCostMonitoringView.volume",
+        "ProviderHealthUsageCostMonitoringView.successRate",
+        "ProviderHealthUsageCostMonitoringView.failureRate",
+        "ProviderHealthUsageCostMonitoringView.deliveryTime",
+        "ProviderHealthUsageCostMonitoringView.apiLatency",
+        "ProviderHealthUsageCostMonitoringView.availability",
+        "ProviderHealthUsageCostMonitoringView.retries",
+        "ProviderHealthUsageCostMonitoringView.fallbackUsage",
+        "ProviderHealthUsageCostMonitoringView.cost",
+        "ProviderHealthUsageCostMonitoringView.costPerMessage"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Health”, “Warni”, “Cost Allocation”, “SLA Monitoring”.",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 18 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The provider health usage list.",
+   "error": "Could not load. Names which read failed and leaves the provider health usage untouched.",
+   "emptyFirstRun": "No provider health usage yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the provider health usage are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listProviderHealthUsage",
+    "contract": "marketing-crm",
+    "purpose": "Provider Health, Usage & Cost Monitoring",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "ProviderHealthUsageCostMonitoringView.volume",
+    "ProviderHealthUsageCostMonitoringView.successRate",
+    "ProviderHealthUsageCostMonitoringView.failureRate",
+    "ProviderHealthUsageCostMonitoringView.deliveryTime",
+    "ProviderHealthUsageCostMonitoringView.apiLatency",
+    "ProviderHealthUsageCostMonitoringView.availability"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-046"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 18. 10 of 17 labels bound to a contract property; 17 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-047",
+  "name": "AI Delivery Optimization & Communication Platform Diagnostics",
+  "module": "Platform",
+  "requiresModule": "marketing",
+  "wave": 3,
+  "source": {
+   "pack": "Communication & Notification Platform Services_Reference.pdf",
+   "board": "1",
+   "number": "12.1.10",
+   "page": 19
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/ai-delivery-optimization-communication-platform-diagnost-adm-047",
+   "component": "apps/ticvai-web/src/routes/platform/AiDeliveryOptimizationCommunicationPlatformDiagn.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-038"
+   ],
+   "exitTo": [
+    "ADM-038"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-038, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Analyze) and no metric row",
+  "purpose": "Provide an AI intelligence layer focused specifically on communication infrastructure performance, not CRM marketing strategy.",
+  "purposeNote": "reliability, scalability and cost without interfering with CRM's ownership of customer marketing strategy. Board 1 — Final Screen Register",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every delivery optimization communication",
+       "columns": [
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.businessEvents",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.channels",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.providers",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.queues",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.failures",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.retries",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.latency",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.delivery",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.cost",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.recipientPreferences",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.regionalPerformance",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.historicalPatterns"
+       ],
+       "bindsTo": "AiDeliveryOptimizationCommunicationPlatformDiagnostiView",
+       "operation": "listDeliveryCommunicationPlatform",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 19 §Analyze"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected delivery optimization communication",
+       "bindsTo": "AiDeliveryOptimizationCommunicationPlatformDiagnostiView",
+       "columns": [
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.businessEvents",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.channels",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.providers",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.queues",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.failures",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.retries",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.latency",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.delivery",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.cost",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.recipientPreferences",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.regionalPerformance",
+        "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.historicalPatterns"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Administrators can ask”, “Potential Provider Incident”, “Automation Governance”, “Backend Screen Primary Responsibility”, “Platform communication”, “Marketing & CRM owns”.",
+       "provenance": "pack Communication & Notification Platform Services_Reference.pdf, page 19 §Analyze"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The delivery optimization communication list.",
+   "error": "Could not load. Names which read failed and leaves the delivery optimization communication untouched.",
+   "emptyFirstRun": "No delivery optimization communication yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the delivery optimization communication are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listDeliveryCommunicationPlatform",
+    "contract": "marketing-crm",
+    "purpose": "AI Delivery Optimization & Communication Platform Diagnostics",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.businessEvents",
+    "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.channels",
+    "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.providers",
+    "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.queues",
+    "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.failures",
+    "AiDeliveryOptimizationCommunicationPlatformDiagnostiView.retries"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-047"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Communication & Notification Platform Services_Reference.pdf page 19. 12 of 12 labels bound to a contract property; 12 of 79 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

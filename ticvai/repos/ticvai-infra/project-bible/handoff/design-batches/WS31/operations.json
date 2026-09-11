@@ -1,0 +1,173 @@
+{
+ "createOrderSourceChannel": {
+  "method": "POST",
+  "path": "/order-source-channel",
+  "contract": "orders",
+  "summary": "Order Creation & Source/Channel Configuration",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "OrderCreationSourceChannelConfigurationInput",
+  "responds": "OrderCreationSourceChannelConfigurationView"
+ },
+ "listCapacityReservationInventory": {
+  "method": "GET",
+  "path": "/capacity-reservation-inventory",
+  "contract": "orders",
+  "summary": "Capacity Reservation & Inventory Commitment",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CapacityReservationInventoryCommitmentView"
+ },
+ "listOrderLifecycleTimeline": {
+  "method": "GET",
+  "path": "/order-lifecycle-timeline",
+  "contract": "orders",
+  "summary": "Order Lifecycle Timeline, SLA, Exceptions & AI Operations",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "OrderLifecycleTimelineSlaExceptionsAiOperationsView"
+ },
+ "listOrderLineProduct": {
+  "method": "GET",
+  "path": "/order-line-product",
+  "contract": "orders",
+  "summary": "Order Line, Product & Entitlement Composition",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "OrderLineProductEntitlementCompositionView"
+ },
+ "listOrderReservation": {
+  "method": "GET",
+  "path": "/order-reservation",
+  "contract": "orders",
+  "summary": "Order & Reservation Command Center",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "orderNumber",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "reservationNumber",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ticketNumber",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerName",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "email",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "mobile",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "membershipId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "transactionReference",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "OrderReservationCommandCenterView"
+ },
+ "listReservationConfirmationExpiry": {
+  "method": "GET",
+  "path": "/reservation-confirmation-expiry",
+  "contract": "orders",
+  "summary": "Reservation Confirmation, Expiry & Fulfillment Readiness",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ReservationConfirmationExpiryFulfillmentReadinessView"
+ },
+ "setCustomerGuestAccount": {
+  "method": "PUT",
+  "path": "/customer-guest-account",
+  "contract": "orders",
+  "summary": "Customer, Guest & Account Assignment",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "CustomerGuestAccountAssignmentInput",
+  "responds": "CustomerGuestAccountAssignmentView"
+ },
+ "setOrderDetailTransaction": {
+  "method": "PUT",
+  "path": "/order-detail-transaction",
+  "contract": "orders",
+  "summary": "Order Detail & Transaction Workspace",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "OrderDetailTransactionWorkspaceInput",
+  "responds": "OrderDetailTransactionWorkspaceView"
+ },
+ "setOrderReservationStatus": {
+  "method": "PUT",
+  "path": "/order-reservation-statu",
+  "contract": "orders",
+  "summary": "Order & Reservation Status Lifecycle Configuration",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "OrderReservationStatusLifecycleConfigurationInput",
+  "responds": "OrderReservationStatusLifecycleConfigurationView"
+ },
+ "setReservationHoldPolicy": {
+  "method": "PUT",
+  "path": "/reservation-hold-policy",
+  "contract": "orders",
+  "summary": "Reservation & Hold Policy Configuration",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "ReservationHoldPolicyConfigurationInput",
+  "responds": "ReservationHoldPolicyConfigurationView"
+ }
+}

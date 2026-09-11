@@ -1,5 +1,5 @@
 id: LLD-P08
-title: P08 Venue Management — Back Office — 393 screens
+title: P08 Venue Management — Back Office — 614 screens
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 audience: staff
@@ -21,10 +21,14 @@ why: null
 modulesUsed:
 - module: access
   screens: 156
+- module: resources
+  screens: 105
+- module: games
+  screens: 100
+- module: core
+  screens: 97
 - module: ticketing
   screens: 82
-- module: core
-  screens: 76
 - module: membership
   screens: 20
 - module: fnb
@@ -38,8 +42,6 @@ modulesUsed:
 - module: queue
   screens: 5
 - module: maintenance
-  screens: 5
-- module: resources
   screens: 5
 - module: seating
   screens: 3
@@ -79,9 +81,9 @@ servicesCalled:
 - service: WhiteLabelService
   operationCalls: 1
 coverage:
-  screens: 393
-  inAFlow: 316
-  drawn: 393
+  screens: 614
+  inAFlow: 537
+  drawn: 614
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
@@ -3414,6 +3416,29 @@ screens:
   - BO-364
   - BO-374
   - BO-384
+  - BO-394
+  - BO-404
+  - BO-414
+  - BO-424
+  - BO-434
+  - BO-444
+  - BO-454
+  - BO-464
+  - BO-474
+  - BO-484
+  - BO-494
+  - BO-504
+  - BO-514
+  - BO-524
+  - BO-534
+  - BO-544
+  - BO-554
+  - BO-564
+  - BO-574
+  - BO-584
+  - BO-594
+  - BO-595
+  - BO-605
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-100
   inFlows: null
@@ -10303,3 +10328,4844 @@ screens:
   wireframe: wireframes/P08 Venue Management.dc.html#bo-393
   inFlows:
   - 'F127 Approval Workflows and Governance board 5: Delegation & Escalation Command Center'
+- screen: BO-394
+  name: Game & Ride Operations Dashboard
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-100
+  - BO-395
+  - BO-396
+  - BO-397
+  - BO-398
+  - BO-399
+  - BO-400
+  - BO-401
+  - BO-402
+  - BO-403
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-394
+  inFlows:
+  - 'F187 Game and Ride board 1: Game & Ride Operations Dashboard'
+- screen: BO-395
+  name: Game & Ride Directory
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-394
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-395
+  inFlows:
+  - 'F187 Game and Ride board 1: Game & Ride Operations Dashboard'
+- screen: BO-396
+  name: Attraction Profile
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-394
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-396
+  inFlows:
+  - 'F187 Game and Ride board 1: Game & Ride Operations Dashboard'
+- screen: BO-397
+  name: Attraction Type Configuration
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-394
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-397
+  inFlows:
+  - 'F187 Game and Ride board 1: Game & Ride Operations Dashboard'
+- screen: BO-398
+  name: Game & Ride Operational Configuration
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-394
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-398
+  inFlows:
+  - 'F187 Game and Ride board 1: Game & Ride Operations Dashboard'
+- screen: BO-399
+  name: Wallet & Credit Acceptance Mapping
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-394
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-399
+  inFlows:
+  - 'F187 Game and Ride board 1: Game & Ride Operations Dashboard'
+- screen: BO-400
+  name: Attraction / Reader Mapping
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-394
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-400
+  inFlows:
+  - 'F187 Game and Ride board 1: Game & Ride Operations Dashboard'
+- screen: BO-401
+  name: Game Package & Entitlement Association
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-394
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-401
+  inFlows:
+  - 'F187 Game and Ride board 1: Game & Ride Operations Dashboard'
+- screen: BO-402
+  name: Configuration Health & Validation
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-394
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-402
+  inFlows:
+  - 'F187 Game and Ride board 1: Game & Ride Operations Dashboard'
+- screen: BO-403
+  name: Attraction Audit, Dependencies & Governed Actions
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-394
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-403
+  inFlows:
+  - 'F187 Game and Ride board 1: Game & Ride Operations Dashboard'
+- screen: BO-404
+  name: Reader Management Dashboard
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-100
+  - BO-405
+  - BO-406
+  - BO-407
+  - BO-408
+  - BO-409
+  - BO-410
+  - BO-411
+  - BO-412
+  - BO-413
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-404
+  inFlows:
+  - 'F188 Game and Ride board 2: Reader Management Dashboard'
+- screen: BO-405
+  name: Reader Directory
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-404
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-405
+  inFlows:
+  - 'F188 Game and Ride board 2: Reader Management Dashboard'
+- screen: BO-406
+  name: Reader Profile & Device Setup
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-404
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-406
+  inFlows:
+  - 'F188 Game and Ride board 2: Reader Management Dashboard'
+- screen: BO-407
+  name: Reader Credit & Payment Configuration
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-404
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-407
+  inFlows:
+  - 'F188 Game and Ride board 2: Reader Management Dashboard'
+- screen: BO-408
+  name: Reader / Attraction Assignment
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-404
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-408
+  inFlows:
+  - 'F188 Game and Ride board 2: Reader Management Dashboard'
+- screen: BO-409
+  name: Retap Delay & Transaction Protection
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-404
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-409
+  inFlows:
+  - 'F188 Game and Ride board 2: Reader Management Dashboard'
+- screen: BO-410
+  name: Free Game Glow & Reader Display Rules
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-404
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-410
+  inFlows:
+  - 'F188 Game and Ride board 2: Reader Management Dashboard'
+- screen: BO-411
+  name: Reader Theme & Experience Configuration
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-404
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-411
+  inFlows:
+  - 'F188 Game and Ride board 2: Reader Management Dashboard'
+- screen: BO-412
+  name: Real-Time Tap Validation & Reader Response
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-404
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-412
+  inFlows:
+  - 'F188 Game and Ride board 2: Reader Management Dashboard'
+- screen: BO-413
+  name: Balance Check Reader & Device Test Console
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-404
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-413
+  inFlows:
+  - 'F188 Game and Ride board 2: Reader Management Dashboard'
+- screen: BO-414
+  name: Wallet & Credit Management Dashboard
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-100
+  - BO-415
+  - BO-416
+  - BO-417
+  - BO-418
+  - BO-419
+  - BO-420
+  - BO-421
+  - BO-422
+  - BO-423
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-414
+  inFlows:
+  - 'F189 Game and Ride board 3: Wallet & Credit Management Dashboard'
+- screen: BO-415
+  name: Wallet & Credit Type Configuration
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-414
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-415
+  inFlows:
+  - 'F189 Game and Ride board 3: Wallet & Credit Management Dashboard'
+- screen: BO-416
+  name: Wallet Account & Balance View
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-414
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-416
+  inFlows:
+  - 'F189 Game and Ride board 3: Wallet & Credit Management Dashboard'
+- screen: BO-417
+  name: Top-Up Configuration
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-414
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-417
+  inFlows:
+  - 'F189 Game and Ride board 3: Wallet & Credit Management Dashboard'
+- screen: BO-418
+  name: Top-Up Bonus Rule Configuration
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-414
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-418
+  inFlows:
+  - 'F189 Game and Ride board 3: Wallet & Credit Management Dashboard'
+- screen: BO-419
+  name: Bonus Usage Restrictions
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-414
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-419
+  inFlows:
+  - 'F189 Game and Ride board 3: Wallet & Credit Management Dashboard'
+- screen: BO-420
+  name: Bonus Validity & Expiry Configuration
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-414
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-420
+  inFlows:
+  - 'F189 Game and Ride board 3: Wallet & Credit Management Dashboard'
+- screen: BO-421
+  name: Free Game & Ride Credit Management
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-414
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-421
+  inFlows:
+  - 'F189 Game and Ride board 3: Wallet & Credit Management Dashboard'
+- screen: BO-422
+  name: Refund, Adjustment & Manual Bonus Control
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-414
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-422
+  inFlows:
+  - 'F189 Game and Ride board 3: Wallet & Credit Management Dashboard'
+- screen: BO-423
+  name: Wallet Credit Transaction Ledger & Audit
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-414
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-423
+  inFlows:
+  - 'F189 Game and Ride board 3: Wallet & Credit Management Dashboard'
+- screen: BO-424
+  name: Gameplay Validation Command Center
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-100
+  - BO-425
+  - BO-426
+  - BO-427
+  - BO-428
+  - BO-429
+  - BO-430
+  - BO-431
+  - BO-432
+  - BO-433
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-424
+  inFlows:
+  - 'F190 Game and Ride board 4: Gameplay Validation Command Center'
+- screen: BO-425
+  name: Gameplay Validation Rule Configuration
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-424
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-425
+  inFlows:
+  - 'F190 Game and Ride board 4: Gameplay Validation Command Center'
+- screen: BO-426
+  name: Deduction Priority & Funding Source Rules
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-424
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-426
+  inFlows:
+  - 'F190 Game and Ride board 4: Gameplay Validation Command Center'
+- screen: BO-427
+  name: All Games & Rides Pass Configuration
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-424
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-427
+  inFlows:
+  - 'F190 Game and Ride board 4: Gameplay Validation Command Center'
+- screen: BO-428
+  name: Specific Game/Ride Unlimited Entitlement
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-424
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-428
+  inFlows:
+  - 'F190 Game and Ride board 4: Gameplay Validation Command Center'
+- screen: BO-429
+  name: Specific Game/Ride Limited Entitlement
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-424
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-429
+  inFlows:
+  - 'F190 Game and Ride board 4: Gameplay Validation Command Center'
+- screen: BO-430
+  name: Game Package Builder
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-424
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-430
+  inFlows:
+  - 'F190 Game and Ride board 4: Gameplay Validation Command Center'
+- screen: BO-431
+  name: Entitlement Validity & Activation Rules
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-424
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-431
+  inFlows:
+  - 'F190 Game and Ride board 4: Gameplay Validation Command Center'
+- screen: BO-432
+  name: Real-Time Gameplay Authorization
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-424
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-432
+  inFlows:
+  - 'F190 Game and Ride board 4: Gameplay Validation Command Center'
+- screen: BO-433
+  name: Validation Simulator & Exception Analysis
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-424
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-433
+  inFlows:
+  - 'F190 Game and Ride board 4: Gameplay Validation Command Center'
+- screen: BO-434
+  name: Game & Ride Pricing Command Center
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-100
+  - BO-435
+  - BO-436
+  - BO-437
+  - BO-438
+  - BO-439
+  - BO-440
+  - BO-441
+  - BO-442
+  - BO-443
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-434
+  inFlows:
+  - 'F191 Game and Ride board 5: Game & Ride Pricing Command Center'
+- screen: BO-435
+  name: Standard Game & Ride Price Configuration
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-434
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-435
+  inFlows:
+  - 'F191 Game and Ride board 5: Game & Ride Pricing Command Center'
+- screen: BO-436
+  name: Group Pricing Configuration
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-434
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-436
+  inFlows:
+  - 'F191 Game and Ride board 5: Game & Ride Pricing Command Center'
+- screen: BO-437
+  name: Peak / Non-Peak Dynamic Pricing
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-434
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-437
+  inFlows:
+  - 'F191 Game and Ride board 5: Game & Ride Pricing Command Center'
+- screen: BO-438
+  name: Pricing Calendar & Exception Dates
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-434
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-438
+  inFlows:
+  - 'F191 Game and Ride board 5: Game & Ride Pricing Command Center'
+- screen: BO-439
+  name: Normal & VIP Pricing Configuration
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-434
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-439
+  inFlows:
+  - 'F191 Game and Ride board 5: Game & Ride Pricing Command Center'
+- screen: BO-440
+  name: Retry Price Configuration
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-434
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-440
+  inFlows:
+  - 'F191 Game and Ride board 5: Game & Ride Pricing Command Center'
+- screen: BO-441
+  name: Price Priority & Conflict Rules
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-434
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-441
+  inFlows:
+  - 'F191 Game and Ride board 5: Game & Ride Pricing Command Center'
+- screen: BO-442
+  name: Effective Pricing & Reader Price Preview
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-434
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-442
+  inFlows:
+  - 'F191 Game and Ride board 5: Game & Ride Pricing Command Center'
+- screen: BO-443
+  name: Pricing Audit, Approval & Publication
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-434
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-443
+  inFlows:
+  - 'F191 Game and Ride board 5: Game & Ride Pricing Command Center'
+- screen: BO-444
+  name: Redemption Operations Dashboard
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-100
+  - BO-445
+  - BO-446
+  - BO-447
+  - BO-448
+  - BO-449
+  - BO-450
+  - BO-451
+  - BO-452
+  - BO-453
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-444
+  inFlows:
+  - 'F192 Game and Ride board 6: Redemption Operations Dashboard'
+- screen: BO-445
+  name: Redemption Credit Rule Configuration
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-444
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-445
+  inFlows:
+  - 'F192 Game and Ride board 6: Redemption Operations Dashboard'
+- screen: BO-446
+  name: Ticket-Based Redemption / Ticket-Eater Integration
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-444
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-446
+  inFlows:
+  - 'F192 Game and Ride board 6: Redemption Operations Dashboard'
+- screen: BO-447
+  name: Ticketless Redemption Game Integration
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-444
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-447
+  inFlows:
+  - 'F192 Game and Ride board 6: Redemption Operations Dashboard'
+- screen: BO-448
+  name: Redemption Wallet & Balance View
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-444
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-448
+  inFlows:
+  - 'F192 Game and Ride board 6: Redemption Operations Dashboard'
+- screen: BO-449
+  name: Redemption Counter / Prize Checkout
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-444
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-449
+  inFlows:
+  - 'F192 Game and Ride board 6: Redemption Operations Dashboard'
+- screen: BO-450
+  name: Prize Catalogue & Credit Cost Configuration
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-444
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-450
+  inFlows:
+  - 'F192 Game and Ride board 6: Redemption Operations Dashboard'
+- screen: BO-451
+  name: Prize Inventory Integration
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-444
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-451
+  inFlows:
+  - 'F192 Game and Ride board 6: Redemption Operations Dashboard'
+- screen: BO-452
+  name: Direct-Pay / Crane & Prize Machine Configuration
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-444
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-452
+  inFlows:
+  - 'F192 Game and Ride board 6: Redemption Operations Dashboard'
+- screen: BO-453
+  name: Redemption Transaction Ledger, Reconciliation & Audit
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-444
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-453
+  inFlows:
+  - 'F192 Game and Ride board 6: Redemption Operations Dashboard'
+- screen: BO-454
+  name: Card Lifecycle Command Center
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-100
+  - BO-455
+  - BO-456
+  - BO-457
+  - BO-458
+  - BO-459
+  - BO-460
+  - BO-461
+  - BO-462
+  - BO-463
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-454
+  inFlows:
+  - 'F193 Game and Ride board 7: Card Lifecycle Command Center'
+- screen: BO-455
+  name: Card / Credential Profile
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-454
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-455
+  inFlows:
+  - 'F193 Game and Ride board 7: Card Lifecycle Command Center'
+- screen: BO-456
+  name: Card Expiry Rule Configuration
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-454
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-456
+  inFlows:
+  - 'F193 Game and Ride board 7: Card Lifecycle Command Center'
+- screen: BO-457
+  name: Last Recharge & Last Activity Tracking
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-454
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-457
+  inFlows:
+  - 'F193 Game and Ride board 7: Card Lifecycle Command Center'
+- screen: BO-458
+  name: Expiry Monitoring & Upcoming Expiration
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-454
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-458
+  inFlows:
+  - 'F193 Game and Ride board 7: Card Lifecycle Command Center'
+- screen: BO-459
+  name: Card Expiry Runtime Validation
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-454
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-459
+  inFlows:
+  - 'F193 Game and Ride board 7: Card Lifecycle Command Center'
+- screen: BO-460
+  name: Card Block, Suspend & Reactivation Control
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-454
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-460
+  inFlows:
+  - 'F193 Game and Ride board 7: Card Lifecycle Command Center'
+- screen: BO-461
+  name: Card Replacement & Wallet Relinking
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-454
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-461
+  inFlows:
+  - 'F193 Game and Ride board 7: Card Lifecycle Command Center'
+- screen: BO-462
+  name: Customer Balance & Credential Status View
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-454
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-462
+  inFlows:
+  - 'F193 Game and Ride board 7: Card Lifecycle Command Center'
+- screen: BO-463
+  name: Card Lifecycle Audit & History
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-454
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-463
+  inFlows:
+  - 'F193 Game and Ride board 7: Card Lifecycle Command Center'
+- screen: BO-464
+  name: Game & Ride Operations Control Center
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-100
+  - BO-465
+  - BO-466
+  - BO-467
+  - BO-468
+  - BO-469
+  - BO-470
+  - BO-471
+  - BO-472
+  - BO-473
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-464
+  inFlows:
+  - 'F194 Game and Ride board 8: Game & Ride Operations Control Center'
+- screen: BO-465
+  name: Live Gameplay Transaction Monitor
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-464
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-465
+  inFlows:
+  - 'F194 Game and Ride board 8: Game & Ride Operations Control Center'
+- screen: BO-466
+  name: Reader & Device Health Monitor
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-464
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-466
+  inFlows:
+  - 'F194 Game and Ride board 8: Game & Ride Operations Control Center'
+- screen: BO-467
+  name: Tap Validation & Decision Trace
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-464
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-467
+  inFlows:
+  - 'F194 Game and Ride board 8: Game & Ride Operations Control Center'
+- screen: BO-468
+  name: Rejected Transaction & Reason Analysis
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-464
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-468
+  inFlows:
+  - 'F194 Game and Ride board 8: Game & Ride Operations Control Center'
+- screen: BO-469
+  name: Wallet & Deduction Transaction Monitor
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-464
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-469
+  inFlows:
+  - 'F194 Game and Ride board 8: Game & Ride Operations Control Center'
+- screen: BO-470
+  name: Entitlement & Free-Play Consumption Monitor
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-464
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-470
+  inFlows:
+  - 'F194 Game and Ride board 8: Game & Ride Operations Control Center'
+- screen: BO-471
+  name: Offline, Synchronization & Recovery Monitor
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-464
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-471
+  inFlows:
+  - 'F194 Game and Ride board 8: Game & Ride Operations Control Center'
+- screen: BO-472
+  name: Operational Alerts & Exception Center
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-464
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-472
+  inFlows:
+  - 'F194 Game and Ride board 8: Game & Ride Operations Control Center'
+- screen: BO-473
+  name: Operational Analytics & Reconciliation Dashboard
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-464
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-473
+  inFlows:
+  - 'F194 Game and Ride board 8: Game & Ride Operations Control Center'
+- screen: BO-474
+  name: Reader Integration Command Center
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-100
+  - BO-475
+  - BO-476
+  - BO-477
+  - BO-478
+  - BO-479
+  - BO-480
+  - BO-481
+  - BO-482
+  - BO-483
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-474
+  inFlows:
+  - 'F195 Game and Ride board 9: Reader Integration Command Center'
+- screen: BO-475
+  name: Reader Manufacturer & Model Profile
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-474
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-475
+  inFlows:
+  - 'F195 Game and Ride board 9: Reader Integration Command Center'
+- screen: BO-476
+  name: Communication Protocol Configuration
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-474
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-476
+  inFlows:
+  - 'F195 Game and Ride board 9: Reader Integration Command Center'
+- screen: BO-477
+  name: Reader Command & Event Mapping
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-474
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-477
+  inFlows:
+  - 'F195 Game and Ride board 9: Reader Integration Command Center'
+- screen: BO-478
+  name: Reader Configuration Deployment & Synchronization
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-474
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-478
+  inFlows:
+  - 'F195 Game and Ride board 9: Reader Integration Command Center'
+- screen: BO-479
+  name: Game Trigger & I/O Control Mapping
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-474
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-479
+  inFlows:
+  - 'F195 Game and Ride board 9: Reader Integration Command Center'
+- screen: BO-480
+  name: Reader Screen, LED & Sound Output Mapping
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-474
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-480
+  inFlows:
+  - 'F195 Game and Ride board 9: Reader Integration Command Center'
+- screen: BO-481
+  name: Edge Cache & Offline Rule Package
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-474
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-481
+  inFlows:
+  - 'F195 Game and Ride board 9: Reader Integration Command Center'
+- screen: BO-482
+  name: Device Diagnostics & Integration Logs
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-474
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-482
+  inFlows:
+  - 'F195 Game and Ride board 9: Reader Integration Command Center'
+- screen: BO-483
+  name: Integration Certification & Test Console
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-474
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-483
+  inFlows:
+  - 'F195 Game and Ride board 9: Reader Integration Command Center'
+- screen: BO-484
+  name: Self-Service Experience Command Center
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-100
+  - BO-485
+  - BO-486
+  - BO-487
+  - BO-488
+  - BO-489
+  - BO-490
+  - BO-491
+  - BO-492
+  - BO-493
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-484
+  inFlows:
+  - 'F196 Game and Ride board 10: Self-Service Experience Command Center'
+- screen: BO-485
+  name: Self-Service Kiosk Profile & Channel Configuration
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-484
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-485
+  inFlows:
+  - 'F196 Game and Ride board 10: Self-Service Experience Command Center'
+- screen: BO-486
+  name: Customer Card / Wallet Identification
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-484
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-486
+  inFlows:
+  - 'F196 Game and Ride board 10: Self-Service Experience Command Center'
+- screen: BO-487
+  name: Customer Wallet & Balance Summary
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-484
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-487
+  inFlows:
+  - 'F196 Game and Ride board 10: Self-Service Experience Command Center'
+- screen: BO-488
+  name: Self-Service Wallet Top-Up
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-484
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-488
+  inFlows:
+  - 'F196 Game and Ride board 10: Self-Service Experience Command Center'
+- screen: BO-489
+  name: Bonus, Free Game & Benefit View
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-484
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-489
+  inFlows:
+  - 'F196 Game and Ride board 10: Self-Service Experience Command Center'
+- screen: BO-490
+  name: Game & Ride Eligibility / “What Can I Play?”
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-484
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-490
+  inFlows:
+  - 'F196 Game and Ride board 10: Self-Service Experience Command Center'
+- screen: BO-491
+  name: Redemption Balance & Prize Discovery
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-484
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-491
+  inFlows:
+  - 'F196 Game and Ride board 10: Self-Service Experience Command Center'
+- screen: BO-492
+  name: Customer Game & Wallet Transaction History
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-484
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-492
+  inFlows:
+  - 'F196 Game and Ride board 10: Self-Service Experience Command Center'
+- screen: BO-493
+  name: Self-Service UI Theme, Language & Journey Configuration
+  module: Games & Rides
+  requiresModule: games
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-484
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-493
+  inFlows:
+  - 'F196 Game and Ride board 10: Self-Service Experience Command Center'
+- screen: BO-494
+  name: Rental Product Command Center
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-100
+  - BO-495
+  - BO-496
+  - BO-497
+  - BO-498
+  - BO-499
+  - BO-500
+  - BO-501
+  - BO-502
+  - BO-503
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-494
+  inFlows:
+  - 'F197 Rental Management board 1: Rental Product Command Center'
+- screen: BO-495
+  name: Create Rental Product Wizard
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-494
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-495
+  inFlows:
+  - 'F197 Rental Management board 1: Rental Product Command Center'
+- screen: BO-496
+  name: Rental Product Profile
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-494
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-496
+  inFlows:
+  - 'F197 Rental Management board 1: Rental Product Command Center'
+- screen: BO-497
+  name: Rental Category & Classification Setup
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-494
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-497
+  inFlows:
+  - 'F197 Rental Management board 1: Rental Product Command Center'
+- screen: BO-498
+  name: Inventory Tracking Model
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-494
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-498
+  inFlows:
+  - 'F197 Rental Management board 1: Rental Product Command Center'
+- screen: BO-499
+  name: Rental Location Assignment
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-494
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-499
+  inFlows:
+  - 'F197 Rental Management board 1: Rental Product Command Center'
+- screen: BO-500
+  name: Rental Duration & Turnaround Configuration
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-494
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-500
+  inFlows:
+  - 'F197 Rental Management board 1: Rental Product Command Center'
+- screen: BO-501
+  name: Rental Rules & Operational Policy
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-494
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-501
+  inFlows:
+  - 'F197 Rental Management board 1: Rental Product Command Center'
+- screen: BO-502
+  name: Customer Requirements, Agreement & Waiver
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-494
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-502
+  inFlows:
+  - 'F197 Rental Management board 1: Rental Product Command Center'
+- screen: BO-503
+  name: Product Validation, Approval & Publication
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-494
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-503
+  inFlows:
+  - 'F197 Rental Management board 1: Rental Product Command Center'
+- screen: BO-504
+  name: Rental Inventory Command Center
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-100
+  - BO-505
+  - BO-506
+  - BO-507
+  - BO-508
+  - BO-509
+  - BO-510
+  - BO-511
+  - BO-512
+  - BO-513
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-504
+  inFlows:
+  - 'F198 Rental Management board 2: Rental Inventory Command Center'
+- screen: BO-505
+  name: Serialized Equipment Registry
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-504
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-505
+  inFlows:
+  - 'F198 Rental Management board 2: Rental Inventory Command Center'
+- screen: BO-506
+  name: Equipment / Asset Profile
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-504
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-506
+  inFlows:
+  - 'F198 Rental Management board 2: Rental Inventory Command Center'
+- screen: BO-507
+  name: Pooled Inventory Management
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-504
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-507
+  inFlows:
+  - 'F198 Rental Management board 2: Rental Inventory Command Center'
+- screen: BO-508
+  name: Equipment Status & Condition Management
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-504
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-508
+  inFlows:
+  - 'F198 Rental Management board 2: Rental Inventory Command Center'
+- screen: BO-509
+  name: QR / Barcode Equipment Identification
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-504
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-509
+  inFlows:
+  - 'F198 Rental Management board 2: Rental Inventory Command Center'
+- screen: BO-510
+  name: Inventory Location Allocation
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-504
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-510
+  inFlows:
+  - 'F198 Rental Management board 2: Rental Inventory Command Center'
+- screen: BO-511
+  name: Inventory Transfer Management
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-504
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-511
+  inFlows:
+  - 'F198 Rental Management board 2: Rental Inventory Command Center'
+- screen: BO-512
+  name: Inventory Adjustment & Exception Management
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-504
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-512
+  inFlows:
+  - 'F198 Rental Management board 2: Rental Inventory Command Center'
+- screen: BO-513
+  name: Inventory Intelligence & Rebalancing
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-504
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-513
+  inFlows:
+  - 'F198 Rental Management board 2: Rental Inventory Command Center'
+- screen: BO-514
+  name: Availability Command Center
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-100
+  - BO-515
+  - BO-516
+  - BO-517
+  - BO-518
+  - BO-519
+  - BO-520
+  - BO-521
+  - BO-522
+  - BO-523
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-514
+  inFlows:
+  - 'F199 Rental Management board 3: Availability Command Center'
+- screen: BO-515
+  name: Availability Rule Configuration
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-514
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-515
+  inFlows:
+  - 'F199 Rental Management board 3: Availability Command Center'
+- screen: BO-516
+  name: Operating Hours & Rental Windows
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-514
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-516
+  inFlows:
+  - 'F199 Rental Management board 3: Availability Command Center'
+- screen: BO-517
+  name: Timeslot & Duration Availability Setup
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-514
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-517
+  inFlows:
+  - 'F199 Rental Management board 3: Availability Command Center'
+- screen: BO-518
+  name: Real-Time Availability Calendar
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-514
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-518
+  inFlows:
+  - 'F199 Rental Management board 3: Availability Command Center'
+- screen: BO-519
+  name: Resource / Equipment Calendar
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-514
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-519
+  inFlows:
+  - 'F199 Rental Management board 3: Availability Command Center'
+- screen: BO-520
+  name: Blackout, Closure & Capacity Blocking
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-514
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-520
+  inFlows:
+  - 'F199 Rental Management board 3: Availability Command Center'
+- screen: BO-521
+  name: Overlap & Conflict Engine
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-514
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-521
+  inFlows:
+  - 'F199 Rental Management board 3: Availability Command Center'
+- screen: BO-522
+  name: Inventory Holds, Buffers & Release Rules
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-514
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-522
+  inFlows:
+  - 'F199 Rental Management board 3: Availability Command Center'
+- screen: BO-523
+  name: Availability Intelligence & AI Forecasting
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-514
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-523
+  inFlows:
+  - 'F199 Rental Management board 3: Availability Command Center'
+- screen: BO-524
+  name: Rental Pricing Command Center
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-100
+  - BO-525
+  - BO-526
+  - BO-527
+  - BO-528
+  - BO-529
+  - BO-530
+  - BO-531
+  - BO-532
+  - BO-533
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-524
+  inFlows:
+  - 'F200 Rental Management board 4: Rental Pricing Command Center'
+- screen: BO-525
+  name: Pricing Profile Builder
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-524
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-525
+  inFlows:
+  - 'F200 Rental Management board 4: Rental Pricing Command Center'
+- screen: BO-526
+  name: Duration & Tiered Pricing Configuration
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-524
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-526
+  inFlows:
+  - 'F200 Rental Management board 4: Rental Pricing Command Center'
+- screen: BO-527
+  name: Calendar, Peak & Seasonal Pricing
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-524
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-527
+  inFlows:
+  - 'F200 Rental Management board 4: Rental Pricing Command Center'
+- screen: BO-528
+  name: Dynamic Pricing & AI Recommendation
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-524
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-528
+  inFlows:
+  - 'F200 Rental Management board 4: Rental Pricing Command Center'
+- screen: BO-529
+  name: Deposit & Security Hold Policy
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-524
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-529
+  inFlows:
+  - 'F200 Rental Management board 4: Rental Pricing Command Center'
+- screen: BO-530
+  name: Deposit Lifecycle & Settlement Rules
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-524
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-530
+  inFlows:
+  - 'F200 Rental Management board 4: Rental Pricing Command Center'
+- screen: BO-531
+  name: Late Fee, Grace Period & Extension Pricing
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-524
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-531
+  inFlows:
+  - 'F200 Rental Management board 4: Rental Pricing Command Center'
+- screen: BO-532
+  name: Commercial Exceptions, Waivers & Overrides
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-524
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-532
+  inFlows:
+  - 'F200 Rental Management board 4: Rental Pricing Command Center'
+- screen: BO-533
+  name: Pricing Simulation, Validation & AI Commercial Intelligence
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-524
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-533
+  inFlows:
+  - 'F200 Rental Management board 4: Rental Pricing Command Center'
+- screen: BO-534
+  name: Rental Booking Command Center
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-100
+  - BO-535
+  - BO-536
+  - BO-537
+  - BO-538
+  - BO-539
+  - BO-540
+  - BO-541
+  - BO-542
+  - BO-543
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-534
+  inFlows:
+  - 'F201 Rental Management board 5: Rental Booking Command Center'
+- screen: BO-535
+  name: New Rental Booking Wizard
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-534
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-535
+  inFlows:
+  - 'F201 Rental Management board 5: Rental Booking Command Center'
+- screen: BO-536
+  name: Availability Selection & Alternative Options
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-534
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-536
+  inFlows:
+  - 'F201 Rental Management board 5: Rental Booking Command Center'
+- screen: BO-537
+  name: Customer & Participant Information
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-534
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-537
+  inFlows:
+  - 'F201 Rental Management board 5: Rental Booking Command Center'
+- screen: BO-538
+  name: Group Rental & Participant Management
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-534
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-538
+  inFlows:
+  - 'F201 Rental Management board 5: Rental Booking Command Center'
+- screen: BO-539
+  name: Rental Agreement & Waiver Completion
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-534
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-539
+  inFlows:
+  - 'F201 Rental Management board 5: Rental Booking Command Center'
+- screen: BO-540
+  name: Booking Commercial Summary & Payment
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-534
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-540
+  inFlows:
+  - 'F201 Rental Management board 5: Rental Booking Command Center'
+- screen: BO-541
+  name: Reservation Confirmation & QR Voucher
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-534
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-541
+  inFlows:
+  - 'F201 Rental Management board 5: Rental Booking Command Center'
+- screen: BO-542
+  name: Reservation Modification, Cancellation & No-Show
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-534
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-542
+  inFlows:
+  - 'F201 Rental Management board 5: Rental Booking Command Center'
+- screen: BO-543
+  name: Reservation Detail, Timeline & Readiness
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-534
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-543
+  inFlows:
+  - 'F201 Rental Management board 5: Rental Booking Command Center'
+- screen: BO-544
+  name: Rental Checkout Command Center
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-100
+  - BO-545
+  - BO-546
+  - BO-547
+  - BO-548
+  - BO-549
+  - BO-550
+  - BO-551
+  - BO-552
+  - BO-553
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-544
+  inFlows:
+  - 'F202 Rental Management board 6: Rental Checkout Command Center'
+- screen: BO-545
+  name: Voucher Scan & Reservation Retrieval
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-544
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-545
+  inFlows:
+  - 'F202 Rental Management board 6: Rental Checkout Command Center'
+- screen: BO-546
+  name: Checkout Readiness Validation
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-544
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-546
+  inFlows:
+  - 'F202 Rental Management board 6: Rental Checkout Command Center'
+- screen: BO-547
+  name: Equipment Assignment Workspace
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-544
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-547
+  inFlows:
+  - 'F202 Rental Management board 6: Rental Checkout Command Center'
+- screen: BO-548
+  name: Equipment Scan & Validation
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-544
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-548
+  inFlows:
+  - 'F202 Rental Management board 6: Rental Checkout Command Center'
+- screen: BO-549
+  name: Pre-Rental Condition Inspection
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-544
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-549
+  inFlows:
+  - 'F202 Rental Management board 6: Rental Checkout Command Center'
+- screen: BO-550
+  name: Safety & Handover Checklist
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-544
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-550
+  inFlows:
+  - 'F202 Rental Management board 6: Rental Checkout Command Center'
+- screen: BO-551
+  name: Deposit & Financial Handover Validation
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-544
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-551
+  inFlows:
+  - 'F202 Rental Management board 6: Rental Checkout Command Center'
+- screen: BO-552
+  name: Group & Multi-Item Checkout
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-544
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-552
+  inFlows:
+  - 'F202 Rental Management board 6: Rental Checkout Command Center'
+- screen: BO-553
+  name: Checkout Confirmation & Rental Activation
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-544
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-553
+  inFlows:
+  - 'F202 Rental Management board 6: Rental Checkout Command Center'
+- screen: BO-554
+  name: Active Rental Operations Command Center
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-100
+  - BO-555
+  - BO-556
+  - BO-557
+  - BO-558
+  - BO-559
+  - BO-560
+  - BO-561
+  - BO-562
+  - BO-563
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-554
+  inFlows:
+  - 'F203 Rental Management board 7: Active Rental Operations Command Center'
+- screen: BO-555
+  name: Active Rental Detail & Live Timeline
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-554
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-555
+  inFlows:
+  - 'F203 Rental Management board 7: Active Rental Operations Command Center'
+- screen: BO-556
+  name: Rental Extension Request
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-554
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-556
+  inFlows:
+  - 'F203 Rental Management board 7: Active Rental Operations Command Center'
+- screen: BO-557
+  name: Extension Pricing & Confirmation
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-554
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-557
+  inFlows:
+  - 'F203 Rental Management board 7: Active Rental Operations Command Center'
+- screen: BO-558
+  name: Equipment Swap / Replacement
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-554
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-558
+  inFlows:
+  - 'F203 Rental Management board 7: Active Rental Operations Command Center'
+- screen: BO-559
+  name: Rental Incident & Operational Exception
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-554
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-559
+  inFlows:
+  - 'F203 Rental Management board 7: Active Rental Operations Command Center'
+- screen: BO-560
+  name: Due Soon & Customer Notification Management
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-554
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-560
+  inFlows:
+  - 'F203 Rental Management board 7: Active Rental Operations Command Center'
+- screen: BO-561
+  name: Overdue Rental Management
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-554
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-561
+  inFlows:
+  - 'F203 Rental Management board 7: Active Rental Operations Command Center'
+- screen: BO-562
+  name: Active Group Rental Management
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-554
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-562
+  inFlows:
+  - 'F203 Rental Management board 7: Active Rental Operations Command Center'
+- screen: BO-563
+  name: Active Rental Intelligence & Operational Alerts
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-554
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-563
+  inFlows:
+  - 'F203 Rental Management board 7: Active Rental Operations Command Center'
+- screen: BO-564
+  name: Rental Return Command Center
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-100
+  - BO-565
+  - BO-566
+  - BO-567
+  - BO-568
+  - BO-569
+  - BO-570
+  - BO-571
+  - BO-572
+  - BO-573
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-564
+  inFlows:
+  - 'F204 Rental Management board 8: Rental Return Command Center'
+- screen: BO-565
+  name: Return Scan & Rental Retrieval
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-564
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-565
+  inFlows:
+  - 'F204 Rental Management board 8: Rental Return Command Center'
+- screen: BO-566
+  name: Return Summary & Actual Return Time
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-564
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-566
+  inFlows:
+  - 'F204 Rental Management board 8: Rental Return Command Center'
+- screen: BO-567
+  name: Post-Rental Condition Inspection
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-564
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-567
+  inFlows:
+  - 'F204 Rental Management board 8: Rental Return Command Center'
+- screen: BO-568
+  name: Before vs After Condition Comparison
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-564
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-568
+  inFlows:
+  - 'F204 Rental Management board 8: Rental Return Command Center'
+- screen: BO-569
+  name: Damage Assessment & Charge Workflow
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-564
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-569
+  inFlows:
+  - 'F204 Rental Management board 8: Rental Return Command Center'
+- screen: BO-570
+  name: Partial Return & Missing Equipment
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-564
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-570
+  inFlows:
+  - 'F204 Rental Management board 8: Rental Return Command Center'
+- screen: BO-571
+  name: Late Fees, Damage Fees & Final Settlement
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-564
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-571
+  inFlows:
+  - 'F204 Rental Management board 8: Rental Return Command Center'
+- screen: BO-572
+  name: Deposit Release, Capture & Customer Confirmation
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-564
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-572
+  inFlows:
+  - 'F204 Rental Management board 8: Rental Return Command Center'
+- screen: BO-573
+  name: Return Completion & Equipment Disposition
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-564
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-573
+  inFlows:
+  - 'F204 Rental Management board 8: Rental Return Command Center'
+- screen: BO-574
+  name: Maintenance Command Center
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-100
+  - BO-575
+  - BO-576
+  - BO-577
+  - BO-578
+  - BO-579
+  - BO-580
+  - BO-581
+  - BO-582
+  - BO-583
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-574
+  inFlows:
+  - 'F205 Rental Management board 9: Maintenance Command Center'
+- screen: BO-575
+  name: Maintenance Rule & Service Plan Configuration
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-574
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-575
+  inFlows:
+  - 'F205 Rental Management board 9: Maintenance Command Center'
+- screen: BO-576
+  name: Maintenance Calendar & Scheduling
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-574
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-576
+  inFlows:
+  - 'F205 Rental Management board 9: Maintenance Command Center'
+- screen: BO-577
+  name: Maintenance Work Order
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-574
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-577
+  inFlows:
+  - 'F205 Rental Management board 9: Maintenance Command Center'
+- screen: BO-578
+  name: Technician Repair Workspace
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-574
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-578
+  inFlows:
+  - 'F205 Rental Management board 9: Maintenance Command Center'
+- screen: BO-579
+  name: Parts, Cost & Maintenance Expense Tracking
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-574
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-579
+  inFlows:
+  - 'F205 Rental Management board 9: Maintenance Command Center'
+- screen: BO-580
+  name: Asset Maintenance History & Lifecycle
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-574
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-580
+  inFlows:
+  - 'F205 Rental Management board 9: Maintenance Command Center'
+- screen: BO-581
+  name: Return-to-Service Inspection & Approval
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-574
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-581
+  inFlows:
+  - 'F205 Rental Management board 9: Maintenance Command Center'
+- screen: BO-582
+  name: Asset Retirement, Write-Off & Replacement Recommendation
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-574
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-582
+  inFlows:
+  - 'F205 Rental Management board 9: Maintenance Command Center'
+- screen: BO-583
+  name: Maintenance Intelligence & Predictive AI
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-574
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-583
+  inFlows:
+  - 'F205 Rental Management board 9: Maintenance Command Center'
+- screen: BO-584
+  name: Rental Executive Command Center
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-100
+  - BO-585
+  - BO-586
+  - BO-587
+  - BO-588
+  - BO-589
+  - BO-590
+  - BO-591
+  - BO-592
+  - BO-593
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-584
+  inFlows:
+  - 'F206 Rental Management board 10: Rental Executive Command Center'
+- screen: BO-585
+  name: Rental Revenue & Commercial Analytics
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-584
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-585
+  inFlows:
+  - 'F206 Rental Management board 10: Rental Executive Command Center'
+- screen: BO-586
+  name: Utilization & Capacity Analytics
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-584
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-586
+  inFlows:
+  - 'F206 Rental Management board 10: Rental Executive Command Center'
+- screen: BO-587
+  name: Inventory & Equipment Performance Analytics
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-584
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-587
+  inFlows:
+  - 'F206 Rental Management board 10: Rental Executive Command Center'
+- screen: BO-588
+  name: Rental Duration, Extension & Return Analytics
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-584
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-588
+  inFlows:
+  - 'F206 Rental Management board 10: Rental Executive Command Center'
+- screen: BO-589
+  name: Damage, Loss, Deposit & Exception Analytics
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-584
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-589
+  inFlows:
+  - 'F206 Rental Management board 10: Rental Executive Command Center'
+- screen: BO-590
+  name: Location & Channel Performance
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-584
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-590
+  inFlows:
+  - 'F206 Rental Management board 10: Rental Executive Command Center'
+- screen: BO-591
+  name: Rental Forecasting & Demand Intelligence
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-584
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-591
+  inFlows:
+  - 'F206 Rental Management board 10: Rental Executive Command Center'
+- screen: BO-592
+  name: Audit, Governance & Operational Control
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-584
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-592
+  inFlows:
+  - 'F206 Rental Management board 10: Rental Executive Command Center'
+- screen: BO-593
+  name: AI Rental Management Copilot & Action Center
+  module: Rentals
+  requiresModule: resources
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-584
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-593
+  inFlows:
+  - 'F206 Rental Management board 10: Rental Executive Command Center'
+- screen: BO-594
+  name: Environment Ready & Handoff to AI Setup
+  module: Setup & Go-Live
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-100
+  - BO-595
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-594
+  inFlows:
+  - 'F213 Subscription Licensing AI Self Service board 7: AI Setup Command Center'
+- screen: BO-595
+  name: AI Setup Command Center
+  module: Setup & Go-Live
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-100
+  - BO-596
+  - BO-597
+  - BO-598
+  - BO-599
+  - BO-600
+  - BO-601
+  - BO-602
+  - BO-603
+  - BO-604
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-595
+  inFlows:
+  - 'F213 Subscription Licensing AI Self Service board 7: AI Setup Command Center'
+- screen: BO-596
+  name: Guided Setup Plan
+  module: Setup & Go-Live
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-595
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-596
+  inFlows:
+  - 'F213 Subscription Licensing AI Self Service board 7: AI Setup Command Center'
+- screen: BO-597
+  name: AI Configuration Workspace
+  module: Setup & Go-Live
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-595
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-597
+  inFlows:
+  - 'F213 Subscription Licensing AI Self Service board 7: AI Setup Command Center'
+- screen: BO-598
+  name: AI Draft Review & Approval
+  module: Setup & Go-Live
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-595
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-598
+  inFlows:
+  - 'F213 Subscription Licensing AI Self Service board 7: AI Setup Command Center'
+- screen: BO-599
+  name: Manual Configuration Center
+  module: Setup & Go-Live
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-595
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-599
+  inFlows:
+  - 'F213 Subscription Licensing AI Self Service board 7: AI Setup Command Center'
+- screen: BO-600
+  name: Venue, Calendar & Operational Setup
+  module: Setup & Go-Live
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-595
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-600
+  inFlows:
+  - 'F213 Subscription Licensing AI Self Service board 7: AI Setup Command Center'
+- screen: BO-601
+  name: Product, Pricing & Sales Channel Setup
+  module: Setup & Go-Live
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-595
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-601
+  inFlows:
+  - 'F213 Subscription Licensing AI Self Service board 7: AI Setup Command Center'
+- screen: BO-602
+  name: POS, Payment & Access Setup
+  module: Setup & Go-Live
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-595
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-602
+  inFlows:
+  - 'F213 Subscription Licensing AI Self Service board 7: AI Setup Command Center'
+- screen: BO-603
+  name: Configuration Health & AI Review
+  module: Setup & Go-Live
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-595
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-603
+  inFlows:
+  - 'F213 Subscription Licensing AI Self Service board 7: AI Setup Command Center'
+- screen: BO-604
+  name: Setup Completion & Handoff to Go-Live
+  module: Setup & Go-Live
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-595
+  - BO-605
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-604
+  inFlows:
+  - 'F213 Subscription Licensing AI Self Service board 7: AI Setup Command Center'
+- screen: BO-605
+  name: Go-Live Readiness Command Center
+  module: Setup & Go-Live
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-100
+  - BO-606
+  - BO-607
+  - BO-608
+  - BO-609
+  - BO-610
+  - BO-611
+  - BO-612
+  - BO-613
+  - BO-614
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-605
+  inFlows:
+  - 'F214 Subscription Licensing AI Self Service board 8: Go-Live Readiness Command Center'
+- screen: BO-606
+  name: Automated Validation Plan
+  module: Setup & Go-Live
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-605
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-606
+  inFlows:
+  - 'F214 Subscription Licensing AI Self Service board 8: Go-Live Readiness Command Center'
+- screen: BO-607
+  name: Ticketing & Product Validation
+  module: Setup & Go-Live
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-605
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-607
+  inFlows:
+  - 'F214 Subscription Licensing AI Self Service board 8: Go-Live Readiness Command Center'
+- screen: BO-608
+  name: End-to-End Sales Channel Testing
+  module: Setup & Go-Live
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-605
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-608
+  inFlows:
+  - 'F214 Subscription Licensing AI Self Service board 8: Go-Live Readiness Command Center'
+- screen: BO-609
+  name: Payment & Financial Validation
+  module: Setup & Go-Live
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-605
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-609
+  inFlows:
+  - 'F214 Subscription Licensing AI Self Service board 8: Go-Live Readiness Command Center'
+- screen: BO-610
+  name: Ticket, QR & Access Validation
+  module: Setup & Go-Live
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-605
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-610
+  inFlows:
+  - 'F214 Subscription Licensing AI Self Service board 8: Go-Live Readiness Command Center'
+- screen: BO-611
+  name: User, Security & Integration Validation
+  module: Setup & Go-Live
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-605
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-611
+  inFlows:
+  - 'F214 Subscription Licensing AI Self Service board 8: Go-Live Readiness Command Center'
+- screen: BO-612
+  name: Communication & Customer Journey Validation
+  module: Setup & Go-Live
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-605
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-612
+  inFlows:
+  - 'F214 Subscription Licensing AI Self Service board 8: Go-Live Readiness Command Center'
+- screen: BO-613
+  name: Blocker, Warning & AI Resolution Center
+  module: Setup & Go-Live
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-605
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-613
+  inFlows:
+  - 'F214 Subscription Licensing AI Self Service board 8: Go-Live Readiness Command Center'
+- screen: BO-614
+  name: Final Go-Live Approval & Production Launch
+  module: Setup & Go-Live
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-605
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-614
+  inFlows:
+  - 'F214 Subscription Licensing AI Self Service board 8: Go-Live Readiness Command Center'

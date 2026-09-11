@@ -17,7 +17,7 @@ Every number below is counted from the files in this package, not from memory.
 | **Tables designed** | **388** | 3,911 columns |
 | **Tables written as DDL** | **388** | `backend/*.sql`, 574 foreign keys. Never executed |
 | Relationships | 978 | 362 of 388 tables carry one; the twelve that do not are correct |
-| Screens defined | **1,235** | Across 15 platforms, all linked to a board |
+| Screens defined | **1,629** | Across 16 platforms, all linked to a board |
 | **Screens specified — states written** | **500** | Of 500 |
 | Screens with operations declared | 486 | Of 500 |
 | Operations reaching a screen | 779 | Of 1,032 |

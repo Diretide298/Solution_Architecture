@@ -1,0 +1,200 @@
+[
+ {
+  "id": "WEB-032",
+  "name": "Offers & Promotions",
+  "module": "Promotions",
+  "requiresModule": "ticketing",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/offers-promotions",
+   "component": "apps/guest-web/src/routes/OffersPromotions.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "WEB-001"
+   ],
+   "inferred": false,
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "notes": "**Reached from WEB-001** — a top-level section of the site. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely."
+  },
+  "notes": "Added 17 August for parity with GST-037. **Not on the wireframe board** — needs drawing. CF-93.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listPromotions` reads the population and `getPromotion` reads one of them — list, select, act",
+  "purpose": "What is on, and what applies to you.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every offers promotions",
+       "bindsTo": "Promotion",
+       "columns": [
+        "Promotion.code",
+        "Promotion.name",
+        "Promotion.description",
+        "Promotion.venueId",
+        "Promotion.discount",
+        "Promotion.conditions",
+        "Promotion.stackingMode",
+        "Promotion.stackingGroup",
+        "Promotion.precedence",
+        "Promotion.validFrom",
+        "Promotion.validTo",
+        "Promotion.maxRedemptions"
+       ],
+       "operation": "listPromotions",
+       "provenance": "contract promotions.yaml GET /promotions"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected offers promotions",
+       "bindsTo": "Promotion",
+       "columns": [
+        "Promotion.code",
+        "Promotion.name",
+        "Promotion.description",
+        "Promotion.venueId",
+        "Promotion.discount",
+        "Promotion.conditions",
+        "Promotion.stackingMode",
+        "Promotion.stackingGroup",
+        "Promotion.precedence",
+        "Promotion.validFrom",
+        "Promotion.validTo",
+        "Promotion.maxRedemptions",
+        "Promotion.maxRedemptionsPerGuest",
+        "Promotion.budgetCap",
+        "Promotion.id",
+        "Promotion.status"
+       ],
+       "operation": "getPromotion",
+       "provenance": "contract promotions.yaml GET /promotions/{promotionId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Evaluate",
+       "operation": "evaluatePromotions",
+       "provenance": "contract promotions.yaml POST /promotions/evaluate"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "derived": true,
+       "impliedBy": "getPromotion",
+       "notes": "One record, read-only.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "evaluatePromotions",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The offers promotions list.",
+   "error": "Could not load. Names which read failed and leaves the offers promotions untouched.",
+   "emptyFirstRun": "No offers promotions yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the offers promotions are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listPromotions",
+    "contract": "promotions",
+    "purpose": "List promotions",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getPromotion",
+    "contract": "promotions",
+    "purpose": "Read a promotion",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "evaluatePromotions",
+    "contract": "promotions",
+    "purpose": "Evaluate promotions against a cart",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPromotions"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "promotionId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `promotionId`.",
+   "preloaded": [
+    "Promotion.code",
+    "Promotion.name",
+    "Promotion.description",
+    "Promotion.venueId",
+    "Promotion.discount"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-032"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

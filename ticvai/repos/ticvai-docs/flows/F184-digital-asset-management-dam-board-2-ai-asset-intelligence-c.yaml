@@ -1,0 +1,134 @@
+id: F184
+name: 'Digital Asset Management DAM board 2: AI Asset Intelligence Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P13 Venue CMS
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Digital Asset Management DAM board 2. **This route is read
+    from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: CMS-071
+  entryPoints:
+  - Arrives at AI Asset Intelligence Command Center
+steps:
+- step: 1
+  screen: CMS-071
+  action: Opens AI Asset Intelligence Command Center
+  operations: []
+  outcome: Provide DAM administrators and content teams with an overview of AI processing, version activity,
+    duplicate detection, rendition generation, and asset-quality issues.
+- step: 2
+  screen: CMS-072
+  action: Works in AI Auto-Tagging & Content Understanding
+  operations: []
+  outcome: Automatically analyze uploaded assets and generate useful descriptive metadata.
+- step: 3
+  screen: CMS-071
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: CMS-073
+  action: Works in Semantic & Natural-Language Asset Search
+  operations: []
+  outcome: Allow users to search based on meaning rather than exact filenames or tags. Board 1 provided
+    structured search.
+- step: 5
+  screen: CMS-071
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: CMS-074
+  action: Works in Visual Similarity & Related Asset Discovery
+  operations: []
+  outcome: Allow users to find visually related or similar media.
+- step: 7
+  screen: CMS-071
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: CMS-075
+  action: Works in Duplicate & Near-Duplicate Management
+  operations: []
+  outcome: Prevent the DAM from becoming filled with unnecessary copies of identical or nearly identical
+    content.
+- step: 9
+  screen: CMS-071
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: CMS-076
+  action: Works in Asset Version Control & Revision History
+  operations: []
+  outcome: Maintain controlled versions of the same logical digital asset without creating unrelated master
+    records.
+- step: 11
+  screen: CMS-071
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: CMS-077
+  action: Works in Version Comparison & Replacement Impact
+  operations: []
+  outcome: Allow users to compare versions and understand the consequences of making a new version current.
+- step: 13
+  screen: CMS-071
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: CMS-078
+  action: Works in Transformation & Rendition Management
+  operations: []
+  outcome: Generate channel-appropriate media from a master asset without forcing users to manually upload
+    many independent copies.
+- step: 15
+  screen: CMS-071
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: CMS-079
+  action: Works in Rendition Processing & Delivery Readiness
+  operations: []
+  outcome: Monitor media-processing jobs and ensure required formats are ready before content is distributed.
+- step: 17
+  screen: CMS-071
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: CMS-080
+  action: Works in AI Quality, Intelligence Review & Recommendations
+  operations: []
+  outcome: Provide a governed review workspace for AI results and identify content-quality issues before
+    assets are reused or distributed.
+branches:
+- at: 1
+  condition: Nothing has been set up on AI Asset Intelligence Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Digital Asset Management DAM board 2 visited
+primaryContract: unknown
+contracts:
+- unknown

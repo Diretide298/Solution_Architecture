@@ -1,0 +1,3569 @@
+[
+ {
+  "id": "BO-040",
+  "name": "Variance Approval",
+  "module": "Orders & Money",
+  "requiresModule": "core",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/variance-approval",
+   "component": "apps/venue-management-web/src/routes/venue-operations/VarianceApprovalDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-007",
+    "BO-008",
+    "BO-009",
+    "BO-089"
+   ],
+   "inferred": true,
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "BO-089",
+     "trigger": "Posts the remaining journals",
+     "provenance": "flow F13 step 2→3"
+    },
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-007",
+     "trigger": "Product Directory",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "carries": [
+      "productId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Pricing Rules",
+     "carries": [
+      "priceListId"
+     ],
+     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "density": "compact",
+  "pattern": "approvalInbox",
+  "patternReason": "`approveShiftOpen` decides items that `listShifts` queues — every row is waiting for a person, so the empty state is success",
+  "purpose": "Accept or refuse a till that did not balance.",
+  "gaps": [
+   {
+    "operation": "getShift",
+    "why": "**2 declared operations reach no component on this screen**: getShift, listCashMovements. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "queue",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Waiting for a decision",
+       "bindsTo": "Shift",
+       "columns": [
+        "Shift.id",
+        "Shift.workstationId",
+        "Shift.venueId",
+        "Shift.scopePath",
+        "Shift.principalId",
+        "Shift.principalDisplayName",
+        "Shift.incidents",
+        "Shift.status",
+        "Shift.currency",
+        "Shift.currencyScale",
+        "Shift.depositBoxCode",
+        "Shift.bagNumber"
+       ],
+       "operation": "listShifts",
+       "provenance": "contract shift.yaml GET /shifts"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "item",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected variance approval",
+       "bindsTo": "Shift",
+       "columns": [
+        "Shift.id",
+        "Shift.workstationId",
+        "Shift.venueId",
+        "Shift.scopePath",
+        "Shift.principalId",
+        "Shift.principalDisplayName",
+        "Shift.incidents",
+        "Shift.status",
+        "Shift.currency",
+        "Shift.currencyScale",
+        "Shift.depositBoxCode",
+        "Shift.bagNumber",
+        "Shift.openingFloat",
+        "Shift.salesTotal",
+        "Shift.refundsTotal",
+        "Shift.liftsTotal"
+       ],
+       "operation": "getCurrentShift",
+       "provenance": "contract shift.yaml GET /shifts/current"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "decision",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Accept",
+       "operation": "acceptShiftVariance",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/accept-variance"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Approve",
+       "operation": "approveShiftOpen",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/approve-open"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Close",
+       "operation": "closeShift",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/close"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createCashMovement",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/cash-movements"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Open",
+       "operation": "openShift",
+       "provenance": "contract shift.yaml POST /shifts"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordNoSale",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/no-sale"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reopen",
+       "operation": "reopenShift",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/reopen"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resume",
+       "operation": "resumeShift",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/resume"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Suspend",
+       "operation": "suspendShift",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listShifts",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "acceptShiftVariance",
+       "label": "Accept shift variance",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "acceptShiftVariance",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmCloseShift",
+    "component": "confirmDialog",
+    "trigger": "Close",
+    "body": "**Names what `closeShift` changes and what it leaves alone**, in the consequence rather than the verb. A variance approval this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/close"
+   },
+   {
+    "id": "confirmSuspendShift",
+    "component": "confirmDialog",
+    "trigger": "Suspend",
+    "body": "**Names what `suspendShift` changes and what it leaves alone**, in the consequence rather than the verb. A variance approval this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
+   }
+  ],
+  "states": {
+   "loading": "The variance approval list.",
+   "error": "Could not load. Names which read failed and leaves the variance approval untouched.",
+   "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
+   "emptyNoResults": "The filter narrowed it and the variance approval are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listShifts",
+    "contract": "shift",
+    "purpose": "List shifts",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "acceptShiftVariance",
+    "contract": "shift",
+    "purpose": "Accept an over/short beyond the threshold",
+    "trigger": "onAction",
+    "invalidates": [
+     "listShifts"
+    ]
+   },
+   {
+    "operationId": "approveShiftOpen",
+    "contract": "shift",
+    "purpose": "Approve a shift opening outside tolerance",
+    "trigger": "onAction",
+    "invalidates": [
+     "listShifts"
+    ]
+   },
+   {
+    "operationId": "closeShift",
+    "contract": "shift",
+    "purpose": "Blind close-out",
+    "trigger": "onAction",
+    "invalidates": [
+     "listShifts"
+    ]
+   },
+   {
+    "operationId": "createCashMovement",
+    "contract": "shift",
+    "purpose": "Record a cash lift or add",
+    "trigger": "onAction",
+    "invalidates": [
+     "listShifts"
+    ]
+   },
+   {
+    "operationId": "getCurrentShift",
+    "contract": "shift",
+    "purpose": "The open or suspended shift on the session's workstation",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getShift",
+    "contract": "shift",
+    "purpose": "Read a shift",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listCashMovements",
+    "contract": "shift",
+    "purpose": "Lifts, adds and the opening float",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "openShift",
+    "contract": "shift",
+    "purpose": "Open a shift",
+    "trigger": "onAction",
+    "invalidates": [
+     "listShifts"
+    ]
+   },
+   {
+    "operationId": "recordNoSale",
+    "contract": "shift",
+    "purpose": "Open the drawer without a sale",
+    "trigger": "onAction",
+    "invalidates": [
+     "listShifts"
+    ]
+   },
+   {
+    "operationId": "reopenShift",
+    "contract": "shift",
+    "purpose": "Reopen a shift closed in error",
+    "trigger": "onAction",
+    "invalidates": [
+     "listShifts"
+    ]
+   },
+   {
+    "operationId": "resumeShift",
+    "contract": "shift",
+    "purpose": "Resume a suspended shift",
+    "trigger": "onAction",
+    "invalidates": [
+     "listShifts"
+    ]
+   },
+   {
+    "operationId": "suspendShift",
+    "contract": "shift",
+    "purpose": "Suspend a shift so another user can log in",
+    "trigger": "onAction",
+    "invalidates": [
+     "listShifts"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "shiftId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "Shift.id",
+    "Shift.workstationId",
+    "Shift.venueId",
+    "Shift.scopePath",
+    "Shift.principalId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-040"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-041",
+  "name": "Cash Movements",
+  "module": "Orders & Money",
+  "requiresModule": "core",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/cash-movements",
+   "component": "apps/venue-management-web/src/routes/venue-operations/CashMovementsDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-007",
+    "BO-008",
+    "BO-009"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-007",
+     "trigger": "Product Directory",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "carries": [
+      "productId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Pricing Rules",
+     "carries": [
+      "priceListId"
+     ],
+     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "density": "compact",
+  "pattern": "approvalInbox",
+  "patternReason": "`approveShiftOpen` decides items that `listCashMovements` queues — every row is waiting for a person, so the empty state is success",
+  "purpose": "Track money in and out of a drawer that is not a sale.",
+  "gaps": [
+   {
+    "operation": "getShift",
+    "why": "**2 declared operations reach no component on this screen**: getShift, listShifts. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "queue",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Waiting for a decision",
+       "bindsTo": "CashMovement",
+       "columns": [
+        "CashMovement.id",
+        "CashMovement.kind",
+        "CashMovement.amount",
+        "CashMovement.denominations",
+        "CashMovement.reference",
+        "CashMovement.reason",
+        "CashMovement.recordedAt",
+        "CashMovement.shiftId",
+        "CashMovement.authorisedByPrincipalId",
+        "CashMovement.sequence",
+        "CashMovement.syncedAt"
+       ],
+       "operation": "listCashMovements",
+       "provenance": "contract shift.yaml GET /shifts/{shiftId}/cash-movements"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "item",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected cash movements",
+       "bindsTo": "Shift",
+       "columns": [
+        "Shift.id",
+        "Shift.workstationId",
+        "Shift.venueId",
+        "Shift.scopePath",
+        "Shift.principalId",
+        "Shift.principalDisplayName",
+        "Shift.incidents",
+        "Shift.status",
+        "Shift.currency",
+        "Shift.currencyScale",
+        "Shift.depositBoxCode",
+        "Shift.bagNumber",
+        "Shift.openingFloat",
+        "Shift.salesTotal",
+        "Shift.refundsTotal",
+        "Shift.liftsTotal"
+       ],
+       "operation": "getCurrentShift",
+       "provenance": "contract shift.yaml GET /shifts/current"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "decision",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createCashMovement",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/cash-movements"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Accept",
+       "operation": "acceptShiftVariance",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/accept-variance"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Approve",
+       "operation": "approveShiftOpen",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/approve-open"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Close",
+       "operation": "closeShift",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/close"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Open",
+       "operation": "openShift",
+       "provenance": "contract shift.yaml POST /shifts"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordNoSale",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/no-sale"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reopen",
+       "operation": "reopenShift",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/reopen"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resume",
+       "operation": "resumeShift",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/resume"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Suspend",
+       "operation": "suspendShift",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listCashMovements",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createCashMovement",
+       "label": "Create cash movement",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createCashMovement",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmCloseShift",
+    "component": "confirmDialog",
+    "trigger": "Close",
+    "body": "**Names what `closeShift` changes and what it leaves alone**, in the consequence rather than the verb. A cash movements this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/close"
+   },
+   {
+    "id": "confirmSuspendShift",
+    "component": "confirmDialog",
+    "trigger": "Suspend",
+    "body": "**Names what `suspendShift` changes and what it leaves alone**, in the consequence rather than the verb. A cash movements this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
+   }
+  ],
+  "states": {
+   "loading": "The cash movements list.",
+   "error": "Could not load. Names which read failed and leaves the cash movements untouched.",
+   "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
+   "emptyNoResults": "The filter narrowed it and the cash movements are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCashMovements",
+    "contract": "shift",
+    "purpose": "Lifts, adds and the opening float",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createCashMovement",
+    "contract": "shift",
+    "purpose": "Record a cash lift or add",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCashMovements"
+    ]
+   },
+   {
+    "operationId": "acceptShiftVariance",
+    "contract": "shift",
+    "purpose": "Accept an over/short beyond the threshold",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCashMovements"
+    ]
+   },
+   {
+    "operationId": "approveShiftOpen",
+    "contract": "shift",
+    "purpose": "Approve a shift opening outside tolerance",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCashMovements"
+    ]
+   },
+   {
+    "operationId": "closeShift",
+    "contract": "shift",
+    "purpose": "Blind close-out",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCashMovements"
+    ]
+   },
+   {
+    "operationId": "getCurrentShift",
+    "contract": "shift",
+    "purpose": "The open or suspended shift on the session's workstation",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getShift",
+    "contract": "shift",
+    "purpose": "Read a shift",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listShifts",
+    "contract": "shift",
+    "purpose": "List shifts",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "openShift",
+    "contract": "shift",
+    "purpose": "Open a shift",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCashMovements"
+    ]
+   },
+   {
+    "operationId": "recordNoSale",
+    "contract": "shift",
+    "purpose": "Open the drawer without a sale",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCashMovements"
+    ]
+   },
+   {
+    "operationId": "reopenShift",
+    "contract": "shift",
+    "purpose": "Reopen a shift closed in error",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCashMovements"
+    ]
+   },
+   {
+    "operationId": "resumeShift",
+    "contract": "shift",
+    "purpose": "Resume a suspended shift",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCashMovements"
+    ]
+   },
+   {
+    "operationId": "suspendShift",
+    "contract": "shift",
+    "purpose": "Suspend a shift so another user can log in",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCashMovements"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "shiftId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "Shift.id",
+    "Shift.workstationId",
+    "Shift.venueId",
+    "Shift.scopePath",
+    "Shift.principalId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-041"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-042",
+  "name": "Banking & Safe",
+  "module": "Orders & Money",
+  "requiresModule": "core",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/banking-safe",
+   "component": "apps/venue-management-web/src/routes/venue-operations/BankingSafeDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-007",
+    "BO-008",
+    "BO-009"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-007",
+     "trigger": "Product Directory",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "carries": [
+      "productId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Pricing Rules",
+     "carries": [
+      "priceListId"
+     ],
+     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "density": "compact",
+  "pattern": "approvalInbox",
+  "patternReason": "`approveShiftOpen` decides items that `listCashMovements` queues — every row is waiting for a person, so the empty state is success",
+  "purpose": "Move the day’s cash out of the tills.",
+  "gaps": [
+   {
+    "operation": "getShift",
+    "why": "**2 declared operations reach no component on this screen**: getShift, listShifts. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "queue",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Waiting for a decision",
+       "bindsTo": "CashMovement",
+       "columns": [
+        "CashMovement.id",
+        "CashMovement.kind",
+        "CashMovement.amount",
+        "CashMovement.denominations",
+        "CashMovement.reference",
+        "CashMovement.reason",
+        "CashMovement.recordedAt",
+        "CashMovement.shiftId",
+        "CashMovement.authorisedByPrincipalId",
+        "CashMovement.sequence",
+        "CashMovement.syncedAt"
+       ],
+       "operation": "listCashMovements",
+       "provenance": "contract shift.yaml GET /shifts/{shiftId}/cash-movements"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "item",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected banking safe",
+       "bindsTo": "Shift",
+       "columns": [
+        "Shift.id",
+        "Shift.workstationId",
+        "Shift.venueId",
+        "Shift.scopePath",
+        "Shift.principalId",
+        "Shift.principalDisplayName",
+        "Shift.incidents",
+        "Shift.status",
+        "Shift.currency",
+        "Shift.currencyScale",
+        "Shift.depositBoxCode",
+        "Shift.bagNumber",
+        "Shift.openingFloat",
+        "Shift.salesTotal",
+        "Shift.refundsTotal",
+        "Shift.liftsTotal"
+       ],
+       "operation": "getCurrentShift",
+       "provenance": "contract shift.yaml GET /shifts/current"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "decision",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Accept",
+       "operation": "acceptShiftVariance",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/accept-variance"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Approve",
+       "operation": "approveShiftOpen",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/approve-open"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Close",
+       "operation": "closeShift",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/close"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createCashMovement",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/cash-movements"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Open",
+       "operation": "openShift",
+       "provenance": "contract shift.yaml POST /shifts"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordNoSale",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/no-sale"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reopen",
+       "operation": "reopenShift",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/reopen"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resume",
+       "operation": "resumeShift",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/resume"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Suspend",
+       "operation": "suspendShift",
+       "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listCashMovements",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "acceptShiftVariance",
+       "label": "Accept shift variance",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "acceptShiftVariance",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmCloseShift",
+    "component": "confirmDialog",
+    "trigger": "Close",
+    "body": "**Names what `closeShift` changes and what it leaves alone**, in the consequence rather than the verb. A banking safe this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/close"
+   },
+   {
+    "id": "confirmSuspendShift",
+    "component": "confirmDialog",
+    "trigger": "Suspend",
+    "body": "**Names what `suspendShift` changes and what it leaves alone**, in the consequence rather than the verb. A banking safe this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
+   }
+  ],
+  "states": {
+   "loading": "The banking safe list.",
+   "error": "Could not load. Names which read failed and leaves the banking safe untouched.",
+   "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
+   "emptyNoResults": "The filter narrowed it and the banking safe are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCashMovements",
+    "contract": "shift",
+    "purpose": "Lifts, adds and the opening float",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "acceptShiftVariance",
+    "contract": "shift",
+    "purpose": "Accept an over/short beyond the threshold",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCashMovements"
+    ]
+   },
+   {
+    "operationId": "approveShiftOpen",
+    "contract": "shift",
+    "purpose": "Approve a shift opening outside tolerance",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCashMovements"
+    ]
+   },
+   {
+    "operationId": "closeShift",
+    "contract": "shift",
+    "purpose": "Blind close-out",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCashMovements"
+    ]
+   },
+   {
+    "operationId": "createCashMovement",
+    "contract": "shift",
+    "purpose": "Record a cash lift or add",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCashMovements"
+    ]
+   },
+   {
+    "operationId": "getCurrentShift",
+    "contract": "shift",
+    "purpose": "The open or suspended shift on the session's workstation",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getShift",
+    "contract": "shift",
+    "purpose": "Read a shift",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listShifts",
+    "contract": "shift",
+    "purpose": "List shifts",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "openShift",
+    "contract": "shift",
+    "purpose": "Open a shift",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCashMovements"
+    ]
+   },
+   {
+    "operationId": "recordNoSale",
+    "contract": "shift",
+    "purpose": "Open the drawer without a sale",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCashMovements"
+    ]
+   },
+   {
+    "operationId": "reopenShift",
+    "contract": "shift",
+    "purpose": "Reopen a shift closed in error",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCashMovements"
+    ]
+   },
+   {
+    "operationId": "resumeShift",
+    "contract": "shift",
+    "purpose": "Resume a suspended shift",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCashMovements"
+    ]
+   },
+   {
+    "operationId": "suspendShift",
+    "contract": "shift",
+    "purpose": "Suspend a shift so another user can log in",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCashMovements"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "shiftId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "Shift.id",
+    "Shift.workstationId",
+    "Shift.venueId",
+    "Shift.scopePath",
+    "Shift.principalId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-042"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-043",
+  "name": "Daily Reconciliation",
+  "module": "Orders & Money",
+  "requiresModule": "core",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/daily-reconciliation",
+   "component": "apps/venue-management-web/src/routes/venue-operations/DailyReconciliationDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-007",
+    "BO-008",
+    "BO-009",
+    "BO-074"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "BO-074",
+     "trigger": "Chart of Accounts",
+     "provenance": "flow F98 step 1→2"
+    },
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-007",
+     "trigger": "Product Directory",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "carries": [
+      "productId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Pricing Rules",
+     "carries": [
+      "priceListId"
+     ],
+     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listSettlements` reads the population and `getTrialBalance` reads one of them — list, select, act",
+  "purpose": "Prove the day balances before anyone goes home.",
+  "gaps": [
+   {
+    "operation": "getSettlement",
+    "why": "**3 declared operations reach no component on this screen**: getSettlement, listLedgerEntries, listSettlementExceptions. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every daily reconciliation",
+       "bindsTo": "Settlement",
+       "columns": [
+        "Settlement.id",
+        "Settlement.providerName",
+        "Settlement.periodStart",
+        "Settlement.periodEnd",
+        "Settlement.status",
+        "Settlement.lineCount",
+        "Settlement.matchedCount",
+        "Settlement.exceptionCount",
+        "Settlement.providerGross",
+        "Settlement.providerFees",
+        "Settlement.providerNet",
+        "Settlement.ledgerGross"
+       ],
+       "operation": "listSettlements",
+       "provenance": "contract finance.yaml GET /settlements"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected daily reconciliation",
+       "bindsTo": "TrialBalance",
+       "columns": [
+        "TrialBalance.fiscalPeriodId",
+        "TrialBalance.isBalanced",
+        "TrialBalance.totalDebit",
+        "TrialBalance.totalCredit",
+        "TrialBalance.accounts"
+       ],
+       "operation": "getTrialBalance",
+       "provenance": "contract finance.yaml GET /ledger/trial-balance"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Ingest",
+       "operation": "ingestSettlementFile",
+       "provenance": "contract finance.yaml POST /settlements"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resolve",
+       "operation": "resolveSettlementException",
+       "provenance": "contract finance.yaml POST /settlements/{settlementId}/exceptions"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listSettlements",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "ingestSettlementFile",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The daily reconciliation list.",
+   "error": "Could not load. Names which read failed and leaves the daily reconciliation untouched.",
+   "emptyFirstRun": "No daily reconciliation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the daily reconciliation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getTrialBalance",
+    "contract": "finance",
+    "purpose": "Trial balance for a period",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listSettlements",
+    "contract": "finance",
+    "purpose": "List settlement batches",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getSettlement",
+    "contract": "finance",
+    "purpose": "Settlement detail with match results",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "ingestSettlementFile",
+    "contract": "finance",
+    "purpose": "Ingest a provider settlement file",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSettlements"
+    ]
+   },
+   {
+    "operationId": "listLedgerEntries",
+    "contract": "finance",
+    "purpose": "Query the ledger",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listSettlementExceptions",
+    "contract": "finance",
+    "purpose": "Unmatched or mismatched settlement lines",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "resolveSettlementException",
+    "contract": "finance",
+    "purpose": "Resolve a settlement exception",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSettlements"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "settlementId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `settlementId`.",
+   "preloaded": [
+    "TrialBalance.fiscalPeriodId",
+    "TrialBalance.isBalanced",
+    "TrialBalance.totalDebit",
+    "TrialBalance.totalCredit",
+    "TrialBalance.accounts"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-043"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-047",
+  "name": "Order Corrections & Exceptions",
+  "module": "Orders & Money",
+  "requiresModule": "ticketing",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/f-b-order-management",
+   "component": "apps/venue-management-web/src/routes/venue-operations/FBOrderManagementDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-007",
+    "BO-008",
+    "BO-009"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-007",
+     "trigger": "Product Directory",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "carries": [
+      "productId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Pricing Rules",
+     "carries": [
+      "priceListId"
+     ],
+     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listOrders` reads the population and `getOrder` reads one of them — list, select, act",
+  "purpose": "Fix an order that has gone wrong.",
+  "gaps": [
+   {
+    "operation": "getOrderStatement",
+    "why": "**2 declared operations reach no component on this screen**: getOrderStatement, listOrderRefunds. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every order",
+       "bindsTo": "OrderSummary",
+       "columns": [
+        "OrderSummary.id",
+        "OrderSummary.orderNumber",
+        "OrderSummary.status",
+        "OrderSummary.grossAmount",
+        "OrderSummary.refundedAmount",
+        "OrderSummary.channel",
+        "OrderSummary.lineCount"
+       ],
+       "operation": "listOrders",
+       "provenance": "contract orders.yaml GET /orders"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected order",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount",
+        "Order.totalPriceVariance",
+        "Order.lines",
+        "Order.payments",
+        "Order.principalId"
+       ],
+       "operation": "getOrder",
+       "provenance": "contract orders.yaml GET /orders/{orderId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createOrder",
+       "provenance": "contract orders.yaml POST /orders"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Apply",
+       "operation": "applyManualDiscount",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createRefund",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/refunds"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Exchange",
+       "operation": "exchangeOrderLines",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Hold",
+       "operation": "holdOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Modify",
+       "operation": "modifyOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reprint",
+       "operation": "reprintOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reschedule",
+       "operation": "rescheduleOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resume",
+       "operation": "resumeOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/resume"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Void",
+       "operation": "voidOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listOrders",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createOrder",
+       "label": "Create order",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "destructiveButton",
+       "derived": true,
+       "impliedBy": "voidOrder",
+       "label": "Void order",
+       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createOrder",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmVoidOrder",
+    "component": "confirmDialog",
+    "trigger": "Void",
+    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A order this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
+   }
+  ],
+  "states": {
+   "loading": "The order list.",
+   "error": "Could not load. Names which read failed and leaves the order untouched.",
+   "emptyFirstRun": "No order yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the order are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listOrders",
+    "contract": "orders",
+    "purpose": "List orders",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getOrder",
+    "contract": "orders",
+    "purpose": "Read an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createOrder",
+    "contract": "orders",
+    "purpose": "Create an order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "applyManualDiscount",
+    "contract": "orders",
+    "purpose": "Apply a discount a cashier chose",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "createRefund",
+    "contract": "orders",
+    "purpose": "Refund an order, wholly or in part",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "exchangeOrderLines",
+    "contract": "orders",
+    "purpose": "Exchange lines for different products or dates",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "getOrderStatement",
+    "contract": "orders",
+    "purpose": "Full financial history of an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "holdOrder",
+    "contract": "orders",
+    "purpose": "Park a sale and free the till",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "listOrderRefunds",
+    "contract": "orders",
+    "purpose": "List refunds against an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "modifyOrder",
+    "contract": "orders",
+    "purpose": "Add or remove lines on an existing order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "reprintOrder",
+    "contract": "orders",
+    "purpose": "Reprint or resend tickets",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "rescheduleOrder",
+    "contract": "orders",
+    "purpose": "Move an order to another performance",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "resumeOrder",
+    "contract": "orders",
+    "purpose": "Bring a parked sale back to a till",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "voidOrder",
+    "contract": "orders",
+    "purpose": "Void an order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
+   "preloaded": [
+    "Order.id",
+    "Order.orderNumber",
+    "Order.channel",
+    "Order.venueId",
+    "Order.scopePath"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-047"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "nameNote": "**Renamed 9 September 2026.** It was called *F&B Order Management*, which is BO-020's job and shares not one of this screen's fourteen operations. Its own purpose — fix an order that has gone wrong — is what it is called now.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-048",
+  "name": "Retail Products",
+  "module": "Orders & Money",
+  "requiresModule": "retail",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/retail-products",
+   "component": "apps/venue-management-web/src/routes/venue-operations/RetailProductsDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-007",
+    "BO-008",
+    "BO-009"
+   ],
+   "inferred": true,
+   "fromFlows": true,
+   "transitions": [
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-007",
+     "trigger": "Product Directory",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "carries": [
+      "productId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Pricing Rules",
+     "carries": [
+      "priceListId"
+     ],
+     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-026",
+     "trigger": "Guest tracks it in the app",
+     "provenance": "flow F17 step 3→4",
+     "operation": "listMerchandise",
+     "crossesDevice": true,
+     "back": false
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Cross-platform navigation removed 24 August**: GST-026. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listMerchandise` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Manage what the shop sells.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every retail products",
+       "bindsTo": "MerchandiseItem",
+       "columns": [
+        "MerchandiseItem.id",
+        "MerchandiseItem.sku",
+        "MerchandiseItem.barcode",
+        "MerchandiseItem.name",
+        "MerchandiseItem.outletId",
+        "MerchandiseItem.categoryId",
+        "MerchandiseItem.variantId",
+        "MerchandiseItem.inventoryItemId",
+        "MerchandiseItem.price",
+        "MerchandiseItem.onHand",
+        "MerchandiseItem.isReturnable",
+        "MerchandiseItem.returnWindowDays"
+       ],
+       "operation": "listMerchandise",
+       "provenance": "contract retail.yaml GET /merchandise"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected retail products",
+       "bindsTo": "MerchandiseItem",
+       "columns": [
+        "MerchandiseItem.id",
+        "MerchandiseItem.sku",
+        "MerchandiseItem.barcode",
+        "MerchandiseItem.name",
+        "MerchandiseItem.outletId",
+        "MerchandiseItem.categoryId",
+        "MerchandiseItem.variantId",
+        "MerchandiseItem.inventoryItemId",
+        "MerchandiseItem.price",
+        "MerchandiseItem.onHand",
+        "MerchandiseItem.isReturnable",
+        "MerchandiseItem.returnWindowDays",
+        "MerchandiseItem.requiresSerialNumber",
+        "MerchandiseItem.imageAssetRef",
+        "MerchandiseItem.isActive"
+       ],
+       "operation": "listMerchandise",
+       "provenance": "contract retail.yaml GET /merchandise"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Lookup",
+       "operation": "lookupMerchandise",
+       "provenance": "contract retail.yaml GET /merchandise/lookup"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createMerchandise",
+       "provenance": "contract retail.yaml POST /merchandise"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateMerchandise",
+       "provenance": "contract retail.yaml PATCH /merchandise/{merchandiseId}"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listMerchandise",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "searchField",
+       "derived": true,
+       "impliedBy": "lookupMerchandise",
+       "label": "Search",
+       "notes": "A search that returns nothing must say so differently from a search not yet run.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createMerchandise",
+       "label": "Create merchandise",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createMerchandise",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The retail products list.",
+   "error": "Could not load. Names which read failed and leaves the retail products untouched.",
+   "emptyFirstRun": "No retail products yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the retail products are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listMerchandise",
+    "contract": "retail",
+    "purpose": "List merchandise",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "lookupMerchandise",
+    "contract": "retail",
+    "purpose": "Price and stock check by barcode",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createMerchandise",
+    "contract": "retail",
+    "purpose": "Create a merchandise item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMerchandise"
+    ]
+   },
+   {
+    "operationId": "updateMerchandise",
+    "contract": "retail",
+    "purpose": "Amend a merchandise item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMerchandise"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "merchandiseId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `merchandiseId`.",
+   "preloaded": [
+    "MerchandiseItem.id",
+    "MerchandiseItem.sku",
+    "MerchandiseItem.barcode",
+    "MerchandiseItem.name",
+    "MerchandiseItem.outletId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-048"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-051",
+  "name": "Purchase Orders",
+  "module": "Orders & Money",
+  "requiresModule": "ticketing",
+  "wave": 2,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/purchase-orders",
+   "component": "apps/venue-management-web/src/routes/venue-operations/PurchaseOrdersDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-007",
+    "BO-008",
+    "BO-009"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-007",
+     "trigger": "Product Directory",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "carries": [
+      "productId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Pricing Rules",
+     "carries": [
+      "priceListId"
+     ],
+     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **createRefund removed 18 August** — attached by module resemblance, not by what this screen does. A screen that does not handle money should not be able to move it (CF-87's class).",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listOrders` reads the population and `getOrder` reads one of them — list, select, act",
+  "purpose": "Order more of what is running out.",
+  "gaps": [
+   {
+    "operation": "getOrderStatement",
+    "why": "**2 declared operations reach no component on this screen**: getOrderStatement, listOrderRefunds. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every purchase orders",
+       "bindsTo": "OrderSummary",
+       "columns": [
+        "OrderSummary.id",
+        "OrderSummary.orderNumber",
+        "OrderSummary.status",
+        "OrderSummary.grossAmount",
+        "OrderSummary.refundedAmount",
+        "OrderSummary.channel",
+        "OrderSummary.lineCount"
+       ],
+       "operation": "listOrders",
+       "provenance": "contract orders.yaml GET /orders"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected purchase orders",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount",
+        "Order.totalPriceVariance",
+        "Order.lines",
+        "Order.payments",
+        "Order.principalId"
+       ],
+       "operation": "getOrder",
+       "provenance": "contract orders.yaml GET /orders/{orderId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createOrder",
+       "provenance": "contract orders.yaml POST /orders"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Apply",
+       "operation": "applyManualDiscount",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/discounts"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Exchange",
+       "operation": "exchangeOrderLines",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/exchanges"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Hold",
+       "operation": "holdOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/hold"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Modify",
+       "operation": "modifyOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/modify"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reprint",
+       "operation": "reprintOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reschedule",
+       "operation": "rescheduleOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/reschedule"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resume",
+       "operation": "resumeOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/resume"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Void",
+       "operation": "voidOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listOrders",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createOrder",
+       "label": "Create order",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "destructiveButton",
+       "derived": true,
+       "impliedBy": "voidOrder",
+       "label": "Void order",
+       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createOrder",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmVoidOrder",
+    "component": "confirmDialog",
+    "trigger": "Void",
+    "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A purchase orders this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
+   }
+  ],
+  "states": {
+   "loading": "The purchase orders list.",
+   "error": "Could not load. Names which read failed and leaves the purchase orders untouched.",
+   "emptyFirstRun": "No purchase orders yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the purchase orders are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listOrders",
+    "contract": "orders",
+    "purpose": "List orders",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getOrder",
+    "contract": "orders",
+    "purpose": "Read an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createOrder",
+    "contract": "orders",
+    "purpose": "Create an order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "applyManualDiscount",
+    "contract": "orders",
+    "purpose": "Apply a discount a cashier chose",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "exchangeOrderLines",
+    "contract": "orders",
+    "purpose": "Exchange lines for different products or dates",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "getOrderStatement",
+    "contract": "orders",
+    "purpose": "Full financial history of an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "holdOrder",
+    "contract": "orders",
+    "purpose": "Park a sale and free the till",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "listOrderRefunds",
+    "contract": "orders",
+    "purpose": "List refunds against an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "modifyOrder",
+    "contract": "orders",
+    "purpose": "Add or remove lines on an existing order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "reprintOrder",
+    "contract": "orders",
+    "purpose": "Reprint or resend tickets",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "rescheduleOrder",
+    "contract": "orders",
+    "purpose": "Move an order to another performance",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "resumeOrder",
+    "contract": "orders",
+    "purpose": "Bring a parked sale back to a till",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "voidOrder",
+    "contract": "orders",
+    "purpose": "Void an order",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
+   "preloaded": [
+    "Order.id",
+    "Order.orderNumber",
+    "Order.channel",
+    "Order.venueId",
+    "Order.scopePath"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-051"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-059",
+  "name": "Sales Reports",
+  "module": "Orders & Money",
+  "requiresModule": "analytics",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/sales-reports",
+   "component": "apps/venue-management-web/src/routes/venue-operations/SalesReportsDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-007",
+    "BO-008",
+    "BO-009"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-007",
+     "trigger": "Product Directory",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "carries": [
+      "productId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Pricing Rules",
+     "carries": [
+      "priceListId"
+     ],
+     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listReports` reads the population and `getFinancialReport` reads one of them — list, select, act",
+  "purpose": "See what sold, through which channel.",
+  "gaps": [
+   {
+    "operation": "getReport",
+    "why": "**1 declared operation reach no component on this screen**: getReport. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every sales reports",
+       "bindsTo": "ReportDefinition",
+       "columns": [
+        "ReportDefinition.name",
+        "ReportDefinition.description",
+        "ReportDefinition.category",
+        "ReportDefinition.dataSource",
+        "ReportDefinition.columns",
+        "ReportDefinition.filters",
+        "ReportDefinition.groupBy",
+        "ReportDefinition.parameters",
+        "ReportDefinition.requiredPermission",
+        "ReportDefinition.maxDateRangeDays",
+        "ReportDefinition.id",
+        "ReportDefinition.isSystem"
+       ],
+       "operation": "listReports",
+       "provenance": "contract reporting.yaml GET /reports"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected sales reports",
+       "bindsTo": "FinancialReport",
+       "columns": [
+        "FinancialReport.report",
+        "FinancialReport.fiscalPeriodId",
+        "FinancialReport.legalEntityId",
+        "FinancialReport.currency",
+        "FinancialReport.currencyScale",
+        "FinancialReport.generatedAt",
+        "FinancialReport.sections"
+       ],
+       "operation": "getFinancialReport",
+       "provenance": "contract finance.yaml GET /reports/financial"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createReport",
+       "provenance": "contract reporting.yaml POST /reports"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Ask",
+       "operation": "askReportingQuestion",
+       "provenance": "contract reporting.yaml POST /reports/ask"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Delete",
+       "operation": "deleteReport",
+       "provenance": "contract reporting.yaml DELETE /reports/{reportId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Run",
+       "operation": "runReport",
+       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save",
+       "operation": "saveNaturalLanguageQuery",
+       "provenance": "contract reporting.yaml POST /reports/ask/{conversationId}/save"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateReport",
+       "provenance": "contract reporting.yaml PUT /reports/{reportId}"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listReports",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createReport",
+       "label": "Create report",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "destructiveButton",
+       "derived": true,
+       "impliedBy": "deleteReport",
+       "label": "Delete report",
+       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createReport",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmDeleteReport",
+    "component": "confirmDialog",
+    "trigger": "Delete",
+    "body": "**Names what `deleteReport` changes and what it leaves alone**, in the consequence rather than the verb. A sales reports this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract reporting.yaml DELETE /reports/{reportId}"
+   }
+  ],
+  "states": {
+   "loading": "The sales reports list.",
+   "error": "Could not load. Names which read failed and leaves the sales reports untouched.",
+   "emptyFirstRun": "No sales reports yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the sales reports are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getFinancialReport",
+    "contract": "finance",
+    "purpose": "P&L, balance sheet or cash flow",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listReports",
+    "contract": "reporting",
+    "purpose": "List available report definitions",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createReport",
+    "contract": "reporting",
+    "purpose": "Create a custom report definition",
+    "trigger": "onAction",
+    "invalidates": [
+     "listReports"
+    ]
+   },
+   {
+    "operationId": "askReportingQuestion",
+    "contract": "reporting",
+    "purpose": "Natural-language reporting query",
+    "trigger": "onAction",
+    "invalidates": [
+     "listReports"
+    ]
+   },
+   {
+    "operationId": "deleteReport",
+    "contract": "reporting",
+    "purpose": "Retire a report definition",
+    "trigger": "onAction",
+    "invalidates": [
+     "listReports"
+    ]
+   },
+   {
+    "operationId": "getReport",
+    "contract": "reporting",
+    "purpose": "Read a report definition",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "runReport",
+    "contract": "reporting",
+    "purpose": "Run a report",
+    "trigger": "onAction",
+    "invalidates": [
+     "listReports"
+    ]
+   },
+   {
+    "operationId": "saveNaturalLanguageQuery",
+    "contract": "reporting",
+    "purpose": "Save a natural-language answer as a report definition",
+    "trigger": "onAction",
+    "invalidates": [
+     "listReports"
+    ]
+   },
+   {
+    "operationId": "updateReport",
+    "contract": "reporting",
+    "purpose": "Publish a new version of a definition",
+    "trigger": "onAction",
+    "invalidates": [
+     "listReports"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "conversationId",
+     "from": "deepLink"
+    },
+    {
+     "name": "reportId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom.",
+   "preloaded": [
+    "FinancialReport.report",
+    "FinancialReport.fiscalPeriodId",
+    "FinancialReport.legalEntityId",
+    "FinancialReport.currency",
+    "FinancialReport.currencyScale"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-059"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-061",
+  "name": "Scheduled Reports",
+  "module": "Orders & Money",
+  "requiresModule": "analytics",
+  "wave": 3,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/scheduled-reports",
+   "component": "apps/venue-management-web/src/routes/venue-operations/ScheduledReportsDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-007",
+    "BO-008",
+    "BO-009",
+    "BO-060"
+   ],
+   "inferred": true,
+   "entryFrom": [
+    "BO-058"
+   ],
+   "transitions": [
+    {
+     "to": "BO-060",
+     "trigger": "Attendance & Footfall",
+     "provenance": "flow F107 step 2→3",
+     "operation": "updateReport"
+    },
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-007",
+     "trigger": "Product Directory",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "carries": [
+      "productId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Pricing Rules",
+     "carries": [
+      "priceListId"
+     ],
+     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listReports` reads the population and `getFinancialReport` reads one of them — list, select, act",
+  "purpose": "Send a report to somebody without them asking.",
+  "gaps": [
+   {
+    "operation": "getReport",
+    "why": "**1 declared operation reach no component on this screen**: getReport. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every scheduled reports",
+       "bindsTo": "ReportDefinition",
+       "columns": [
+        "ReportDefinition.name",
+        "ReportDefinition.description",
+        "ReportDefinition.category",
+        "ReportDefinition.dataSource",
+        "ReportDefinition.columns",
+        "ReportDefinition.filters",
+        "ReportDefinition.groupBy",
+        "ReportDefinition.parameters",
+        "ReportDefinition.requiredPermission",
+        "ReportDefinition.maxDateRangeDays",
+        "ReportDefinition.id",
+        "ReportDefinition.isSystem"
+       ],
+       "operation": "listReports",
+       "provenance": "contract reporting.yaml GET /reports"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected scheduled reports",
+       "bindsTo": "FinancialReport",
+       "columns": [
+        "FinancialReport.report",
+        "FinancialReport.fiscalPeriodId",
+        "FinancialReport.legalEntityId",
+        "FinancialReport.currency",
+        "FinancialReport.currencyScale",
+        "FinancialReport.generatedAt",
+        "FinancialReport.sections"
+       ],
+       "operation": "getFinancialReport",
+       "provenance": "contract finance.yaml GET /reports/financial"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createReport",
+       "provenance": "contract reporting.yaml POST /reports"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Ask",
+       "operation": "askReportingQuestion",
+       "provenance": "contract reporting.yaml POST /reports/ask"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Delete",
+       "operation": "deleteReport",
+       "provenance": "contract reporting.yaml DELETE /reports/{reportId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Run",
+       "operation": "runReport",
+       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save",
+       "operation": "saveNaturalLanguageQuery",
+       "provenance": "contract reporting.yaml POST /reports/ask/{conversationId}/save"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateReport",
+       "provenance": "contract reporting.yaml PUT /reports/{reportId}"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listReports",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "createReport",
+       "label": "Create report",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "destructiveButton",
+       "derived": true,
+       "impliedBy": "deleteReport",
+       "label": "Delete report",
+       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createReport",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "confirmDialog",
+       "derived": true,
+       "label": "Confirm",
+       "notes": "**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a dialog somebody dismisses.\n\n**Added 31 August.** `confirmDialog` and `modal` were both in the component library and used **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry reads *always requires confirmation*.",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmDeleteReport",
+    "component": "confirmDialog",
+    "trigger": "Delete",
+    "body": "**Names what `deleteReport` changes and what it leaves alone**, in the consequence rather than the verb. A scheduled reports this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract reporting.yaml DELETE /reports/{reportId}"
+   }
+  ],
+  "states": {
+   "loading": "The scheduled reports list.",
+   "error": "Could not load. Names which read failed and leaves the scheduled reports untouched.",
+   "emptyFirstRun": "No scheduled reports yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the scheduled reports are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getFinancialReport",
+    "contract": "finance",
+    "purpose": "P&L, balance sheet or cash flow",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listReports",
+    "contract": "reporting",
+    "purpose": "List available report definitions",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createReport",
+    "contract": "reporting",
+    "purpose": "Create a custom report definition",
+    "trigger": "onAction",
+    "invalidates": [
+     "listReports"
+    ]
+   },
+   {
+    "operationId": "askReportingQuestion",
+    "contract": "reporting",
+    "purpose": "Natural-language reporting query",
+    "trigger": "onAction",
+    "invalidates": [
+     "listReports"
+    ]
+   },
+   {
+    "operationId": "deleteReport",
+    "contract": "reporting",
+    "purpose": "Retire a report definition",
+    "trigger": "onAction",
+    "invalidates": [
+     "listReports"
+    ]
+   },
+   {
+    "operationId": "getReport",
+    "contract": "reporting",
+    "purpose": "Read a report definition",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "runReport",
+    "contract": "reporting",
+    "purpose": "Run a report",
+    "trigger": "onAction",
+    "invalidates": [
+     "listReports"
+    ]
+   },
+   {
+    "operationId": "saveNaturalLanguageQuery",
+    "contract": "reporting",
+    "purpose": "Save a natural-language answer as a report definition",
+    "trigger": "onAction",
+    "invalidates": [
+     "listReports"
+    ]
+   },
+   {
+    "operationId": "updateReport",
+    "contract": "reporting",
+    "purpose": "Publish a new version of a definition",
+    "trigger": "onAction",
+    "invalidates": [
+     "listReports"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "conversationId",
+     "from": "deepLink"
+    },
+    {
+     "name": "reportId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom.",
+   "preloaded": [
+    "FinancialReport.report",
+    "FinancialReport.fiscalPeriodId",
+    "FinancialReport.legalEntityId",
+    "FinancialReport.currency",
+    "FinancialReport.currencyScale"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-061"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-062",
+  "name": "Venue Profile",
+  "module": "Orders & Money",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/venue-operations/venue-profile",
+   "component": "apps/venue-management-web/src/routes/venue-operations/VenueProfileDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-007",
+    "BO-008",
+    "BO-009"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-007",
+     "trigger": "Product Directory",
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — BO-007 declares entryState.params productId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-008",
+     "trigger": "Product Detail & Variants",
+     "carries": [
+      "productId",
+      "venueId"
+     ],
+     "provenance": "derived — BO-008 declares entryState.params productId, venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-009",
+     "trigger": "Pricing Rules",
+     "carries": [
+      "priceListId"
+     ],
+     "provenance": "derived — BO-009 declares entryState.params priceListId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listDiningOutlets` reads the population and `getRefundPolicy` reads one of them — list, select, act",
+  "purpose": "The facts every other surface reads.",
+  "gaps": [
+   {
+    "operation": "listDeliveryLocations",
+    "why": "**1 declared operation reach no component on this screen**: listDeliveryLocations. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every venue profile",
+       "bindsTo": "DiningOutlet",
+       "columns": [
+        "DiningOutlet.outletId",
+        "DiningOutlet.name",
+        "DiningOutlet.kind",
+        "DiningOutlet.zone",
+        "DiningOutlet.cuisine",
+        "DiningOutlet.isOpenNow",
+        "DiningOutlet.opensAt",
+        "DiningOutlet.closesAt",
+        "DiningOutlet.orderingMethod",
+        "DiningOutlet.estimatedWaitMinutes",
+        "DiningOutlet.imageAssetRef",
+        "DiningOutlet.menuId"
+       ],
+       "operation": "listDiningOutlets",
+       "provenance": "contract fnb.yaml GET /venues/{venueId}/dining"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected venue profile",
+       "bindsTo": "RefundPolicy",
+       "columns": [
+        "RefundPolicy.id",
+        "RefundPolicy.venueId",
+        "RefundPolicy.selfAuthoriseLimit",
+        "RefundPolicy.requiresSecondUserAbove",
+        "RefundPolicy.requiresApprovalAbove",
+        "RefundPolicy.timeBands",
+        "RefundPolicy.allowPartial",
+        "RefundPolicy.refundWindowDays",
+        "RefundPolicy.varianceThreshold"
+       ],
+       "operation": "getRefundPolicy",
+       "provenance": "contract orders.yaml GET /venues/{venueId}/refund-policy"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "setRefundPolicy",
+       "provenance": "contract orders.yaml PUT /venues/{venueId}/refund-policy"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "notes": "Structure from the wireframe board. Components not yet enumerated.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listDiningOutlets",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "setRefundPolicy",
+       "label": "Save refund policy",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "setRefundPolicy",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The venue profile list.",
+   "error": "Could not load. Names which read failed and leaves the venue profile untouched.",
+   "emptyFirstRun": "No venue profile yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the venue profile are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getRefundPolicy",
+    "contract": "orders",
+    "purpose": "Read a venue's refund policy",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listDiningOutlets",
+    "contract": "fnb",
+    "purpose": "Where a guest can eat, right now",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setRefundPolicy",
+    "contract": "orders",
+    "purpose": "Set a venue's refund policy",
+    "trigger": "onAction",
+    "invalidates": [
+     "listDiningOutlets"
+    ]
+   },
+   {
+    "operationId": "listDeliveryLocations",
+    "contract": "fnb",
+    "purpose": "Where an order can be delivered",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "RefundPolicy.id",
+    "RefundPolicy.venueId",
+    "RefundPolicy.selfAuthoriseLimit",
+    "RefundPolicy.requiresSecondUserAbove",
+    "RefundPolicy.requiresApprovalAbove"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-062"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

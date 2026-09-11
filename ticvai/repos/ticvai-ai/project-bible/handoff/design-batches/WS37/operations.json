@@ -1,0 +1,214 @@
+{
+ "approvePricingWorkflowAuthority": {
+  "method": "PUT",
+  "path": "/pricing-workflow-authority",
+  "contract": "catalogue",
+  "summary": "Pricing Approval Workflow & Authority Matrix",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "PricingApprovalWorkflowAuthorityMatrixInput",
+  "responds": "PricingApprovalWorkflowAuthorityMatrixView"
+ },
+ "listBulkPricingUpdate": {
+  "method": "GET",
+  "path": "/bulk-pricing-update",
+  "contract": "catalogue",
+  "summary": "Bulk Pricing Update, Import & Mass Maintenance",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BulkPricingUpdateImportMassMaintenanceView"
+ },
+ "listPricingChangeImpact": {
+  "method": "GET",
+  "path": "/pricing-change-impact",
+  "contract": "catalogue",
+  "summary": "Pricing Change Impact Analysis",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PricingChangeImpactAnalysisView"
+ },
+ "listPricingCompliance": {
+  "method": "GET",
+  "path": "/pricing-compliance",
+  "contract": "catalogue",
+  "summary": "Pricing History, Audit & Compliance Explorer",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "priceList",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "rate",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "user",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "changeRequest",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "version",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "market",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "PricingHistoryAuditComplianceExplorerView"
+ },
+ "listPricingDistributionSynchronization": {
+  "method": "GET",
+  "path": "/pricing-distribution-synchronization",
+  "contract": "catalogue",
+  "summary": "Pricing Distribution, Synchronization & Publication Monitor",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PricingDistributionSynchronizationPublicationMonitorView"
+ },
+ "listPricingGovernance": {
+  "method": "GET",
+  "path": "/pricing-governance",
+  "contract": "catalogue",
+  "summary": "Pricing Governance Command Center",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "priceList",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "market",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "legalEntity",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "changeType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "owner",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "PricingGovernanceCommandCenterView"
+ },
+ "listPricingRollbackEmergency": {
+  "method": "GET",
+  "path": "/pricing-rollback-emergency",
+  "contract": "catalogue",
+  "summary": "Pricing Rollback & Emergency Control Center",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PricingRollbackEmergencyControlCenterView"
+ },
+ "listPricingVersionBaseline": {
+  "method": "GET",
+  "path": "/pricing-version-baseline",
+  "contract": "catalogue",
+  "summary": "Pricing Version & Baseline Management",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PricingVersionBaselineManagementView"
+ },
+ "publishPricingEffectiveDate": {
+  "method": "PUT",
+  "path": "/pricing-effective-date",
+  "contract": "catalogue",
+  "summary": "Pricing Publication & Effective-Date Scheduler",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "PricingPublicationEffectiveDateSchedulerInput",
+  "responds": "PricingPublicationEffectiveDateSchedulerView"
+ },
+ "setPricingChangeRequest": {
+  "method": "PUT",
+  "path": "/pricing-change-request",
+  "contract": "catalogue",
+  "summary": "Pricing Change Request & Workspace",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "PricingChangeRequestWorkspaceInput",
+  "responds": "PricingChangeRequestWorkspaceView"
+ }
+}

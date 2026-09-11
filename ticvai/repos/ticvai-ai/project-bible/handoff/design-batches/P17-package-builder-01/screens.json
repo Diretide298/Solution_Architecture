@@ -1,0 +1,811 @@
+[
+ {
+  "id": "SGN-011",
+  "name": "Recommended Package Overview",
+  "module": "Package Builder",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "sameAs": "ADM-399",
+   "book": "Subscription_Licensing_AI_Self_Service.pdf",
+   "board": "4",
+   "number": "1",
+   "page": 44
+  },
+  "implementation": {
+   "app": "signup-web",
+   "route": "/package-builder/recommended-package-overview-sgn-011",
+   "component": "apps/signup-web/src/routes/package-builder/RecommendedPackageOverview.tsx",
+   "status": "notStarted"
+  },
+  "density": "compact",
+  "notes": "The self-service form of `ADM-399`, for a prospect with no account. Decided 11 September 2026; P09 keeps its screen for the operator-led path (BL-165). `tools/applied/apply-subscription-placement.py` keeps the two in step.",
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P17 TICVAI Sign-up.dc.html#sgn-011"
+  },
+  "purpose": "Present the AI-generated recommended package based on: Board 2 Customer Assessment VSI Operational requirements Commercial model Technical licensing profile Required modules Expected ticket/transaction volume Contract requirements",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "layout": {
+   "template": "split",
+   "regions": []
+  },
+  "states": {
+   "loading": "The recommended package overview list.",
+   "error": "Could not load. Names which read failed and leaves the recommended package overview untouched.",
+   "emptyFirstRun": "No recommended package overview yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the recommended package overview are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it."
+  },
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 44"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 44"
+   }
+  ],
+  "apis": [],
+  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 44. 0 of 0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "navigation": {
+   "entryFrom": [
+    "SGN-010",
+    "SGN-012",
+    "SGN-013",
+    "SGN-014",
+    "SGN-015",
+    "SGN-016",
+    "SGN-017",
+    "SGN-018"
+   ],
+   "exitTo": [
+    "SGN-010",
+    "SGN-012",
+    "SGN-013",
+    "SGN-014",
+    "SGN-015",
+    "SGN-016",
+    "SGN-017",
+    "SGN-018"
+   ],
+   "transitions": [
+    {
+     "to": "SGN-010",
+     "trigger": "Back to AI Assessment Summary & Handoff",
+     "provenance": "structural — the book's own journey, 2.1 \"Journey Preview\", 11 September 2026",
+     "back": true
+    },
+    {
+     "to": "SGN-012",
+     "trigger": "Commercial Model & Tier Selection",
+     "provenance": "structural — the book's own journey, 2.1 \"Journey Preview\", 11 September 2026"
+    },
+    {
+     "to": "SGN-013",
+     "trigger": "Module Marketplace",
+     "provenance": "structural — the book's own journey, 2.1 \"Journey Preview\", 11 September 2026"
+    },
+    {
+     "to": "SGN-014",
+     "trigger": "AI Module & Package Recommendations",
+     "provenance": "structural — the book's own journey, 2.1 \"Journey Preview\", 11 September 2026"
+    },
+    {
+     "to": "SGN-015",
+     "trigger": "Module Detail & Commercial Treatment",
+     "provenance": "structural — the book's own journey, 2.1 \"Journey Preview\", 11 September 2026"
+    },
+    {
+     "to": "SGN-016",
+     "trigger": "Module Dependency & Compatibility Manager",
+     "provenance": "structural — the book's own journey, 2.1 \"Journey Preview\", 11 September 2026"
+    },
+    {
+     "to": "SGN-017",
+     "trigger": "Add-Ons, Capacity & Commercial Options",
+     "provenance": "structural — the book's own journey, 2.1 \"Journey Preview\", 11 September 2026"
+    },
+    {
+     "to": "SGN-018",
+     "trigger": "Purchase / Trial Journey Selection",
+     "provenance": "structural — the book's own journey, 2.1 \"Journey Preview\", 11 September 2026"
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P17",
+   "audience": "public",
+   "formFactor": "web",
+   "shortName": "TICVAI Sign-up",
+   "name": "TICVAI Sign-up — Onboarding & Purchase",
+   "offlineCapable": false,
+   "app": "signup-web",
+   "operator": "public",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P09",
+     "P10",
+     "P11",
+     "P14"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "SGN-012",
+  "name": "Commercial Model & Tier Selection",
+  "module": "Package Builder",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "sameAs": "ADM-400",
+   "book": "Subscription_Licensing_AI_Self_Service.pdf",
+   "board": "4",
+   "number": "2",
+   "page": 45
+  },
+  "implementation": {
+   "app": "signup-web",
+   "route": "/package-builder/commercial-model-tier-selection-sgn-012",
+   "component": "apps/signup-web/src/routes/package-builder/CommercialModelTierSelection.tsx",
+   "status": "notStarted"
+  },
+  "density": "compact",
+  "notes": "The self-service form of `ADM-400`, for a prospect with no account. Decided 11 September 2026; P09 keeps its screen for the operator-led path (BL-165). `tools/applied/apply-subscription-placement.py` keeps the two in step.",
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P17 TICVAI Sign-up.dc.html#sgn-012"
+  },
+  "purpose": "Allow TICVAI commercial users — or authorized self-service customers where applicable — to select the appropriate commercial charging model. This replaces the previous assumption that this screen is only a tier comparison.",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "layout": {
+   "template": "split",
+   "regions": []
+  },
+  "states": {
+   "loading": "The commercial model tier list.",
+   "error": "Could not load. Names which read failed and leaves the commercial model tier untouched.",
+   "emptyFirstRun": "No commercial model tier yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the commercial model tier are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it."
+  },
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 45"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 45"
+   }
+  ],
+  "apis": [],
+  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 45. 0 of 0 labels bound to a contract property; 0 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "navigation": {
+   "entryFrom": [
+    "SGN-011"
+   ],
+   "exitTo": [
+    "SGN-011"
+   ],
+   "transitions": [
+    {
+     "to": "SGN-011",
+     "trigger": "Back to Recommended Package Overview",
+     "provenance": "structural — the book's own journey, 2.1 \"Journey Preview\", 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P17",
+   "audience": "public",
+   "formFactor": "web",
+   "shortName": "TICVAI Sign-up",
+   "name": "TICVAI Sign-up — Onboarding & Purchase",
+   "offlineCapable": false,
+   "app": "signup-web",
+   "operator": "public",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P09",
+     "P10",
+     "P11",
+     "P14"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "SGN-013",
+  "name": "Module Marketplace",
+  "module": "Package Builder",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "sameAs": "ADM-401",
+   "book": "Subscription_Licensing_AI_Self_Service.pdf",
+   "board": "4",
+   "number": "3",
+   "page": 46
+  },
+  "implementation": {
+   "app": "signup-web",
+   "route": "/package-builder/module-marketplace-sgn-013",
+   "component": "apps/signup-web/src/routes/package-builder/ModuleMarketplace.tsx",
+   "status": "notStarted"
+  },
+  "density": "compact",
+  "notes": "The self-service form of `ADM-401`, for a prospect with no account. Decided 11 September 2026; P09 keeps its screen for the operator-led path (BL-165). `tools/applied/apply-subscription-placement.py` keeps the two in step.",
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P17 TICVAI Sign-up.dc.html#sgn-013"
+  },
+  "purpose": "Allow the customer or TICVAI commercial team to select optional TICVAI modules.",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Each module displays) and no metric row",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every module marketplace",
+       "columns": [
+        "Module Name",
+        "Description",
+        "Key Features",
+        "Commercial Status",
+        "Included / Optional",
+        "Price or Contract Treatment",
+        "Dependencies",
+        "Recommended / Required",
+        "Trial Availability"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 46 §Each module displays"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected module marketplace",
+       "bindsTo": null,
+       "columns": [
+        "Module Name",
+        "Description",
+        "Key Features",
+        "Commercial Status",
+        "Included / Optional",
+        "Price or Contract Treatment",
+        "Dependencies",
+        "Recommended / Required",
+        "Trial Availability"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Sales”, “Venue Operations”, “Customer”, “Commercial”, “Important”.",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 46 §Each module displays"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The module marketplace list.",
+   "error": "Could not load. Names which read failed and leaves the module marketplace untouched.",
+   "emptyFirstRun": "No module marketplace yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the module marketplace are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it."
+  },
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 46 §Each module displays"
+   }
+  ],
+  "apis": [],
+  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 46. 0 of 9 labels bound to a contract property; 9 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "preloaded": [
+    "Module Name",
+    "Description",
+    "Key Features",
+    "Commercial Status",
+    "Included / Optional",
+    "Price or Contract Treatment"
+   ]
+  },
+  "navigation": {
+   "entryFrom": [
+    "SGN-011"
+   ],
+   "exitTo": [
+    "SGN-011"
+   ],
+   "transitions": [
+    {
+     "to": "SGN-011",
+     "trigger": "Back to Recommended Package Overview",
+     "provenance": "structural — the book's own journey, 2.1 \"Journey Preview\", 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P17",
+   "audience": "public",
+   "formFactor": "web",
+   "shortName": "TICVAI Sign-up",
+   "name": "TICVAI Sign-up — Onboarding & Purchase",
+   "offlineCapable": false,
+   "app": "signup-web",
+   "operator": "public",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P09",
+     "P10",
+     "P11",
+     "P14"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "SGN-014",
+  "name": "AI Module & Package Recommendations",
+  "module": "Package Builder",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "sameAs": "ADM-402",
+   "book": "Subscription_Licensing_AI_Self_Service.pdf",
+   "board": "4",
+   "number": "4",
+   "page": 48
+  },
+  "implementation": {
+   "app": "signup-web",
+   "route": "/package-builder/ai-module-package-recommendations-sgn-014",
+   "component": "apps/signup-web/src/routes/package-builder/AiModulePackageRecommendations.tsx",
+   "status": "notStarted"
+  },
+  "density": "compact",
+  "notes": "The self-service form of `ADM-402`, for a prospect with no account. Decided 11 September 2026; P09 keeps its screen for the operator-led path (BL-165). `tools/applied/apply-subscription-placement.py` keeps the two in step.",
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P17 TICVAI Sign-up.dc.html#sgn-014"
+  },
+  "purpose": "Use AI to recommend the appropriate modules and package configuration based on the customer's business.",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Each recommendation shows) and no metric row",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every module package recommendations",
+       "columns": [
+        "Additional Monthly Cost",
+        "Annual Cost",
+        "Per-Ticket Impact",
+        "Included in Contract",
+        "Revenue/Operational Benefit",
+        "Confidence",
+        "Reason"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 48 §Each recommendation shows"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected module package recommendations",
+       "bindsTo": null,
+       "columns": [
+        "Additional Monthly Cost",
+        "Annual Cost",
+        "Per-Ticket Impact",
+        "Included in Contract",
+        "Revenue/Operational Benefit",
+        "Confidence",
+        "Reason"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Add Virtual Queue”, “Seat Management”.",
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 48 §Each recommendation shows"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The module package recommendations list.",
+   "error": "Could not load. Names which read failed and leaves the module package recommendations untouched.",
+   "emptyFirstRun": "No module package recommendations yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the module package recommendations are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it."
+  },
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 48 §Each recommendation shows"
+   }
+  ],
+  "apis": [],
+  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 48. 0 of 7 labels bound to a contract property; 7 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "preloaded": [
+    "Additional Monthly Cost",
+    "Annual Cost",
+    "Per-Ticket Impact",
+    "Included in Contract",
+    "Revenue/Operational Benefit",
+    "Confidence"
+   ]
+  },
+  "navigation": {
+   "entryFrom": [
+    "SGN-011"
+   ],
+   "exitTo": [
+    "SGN-011"
+   ],
+   "transitions": [
+    {
+     "to": "SGN-011",
+     "trigger": "Back to Recommended Package Overview",
+     "provenance": "structural — the book's own journey, 2.1 \"Journey Preview\", 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P17",
+   "audience": "public",
+   "formFactor": "web",
+   "shortName": "TICVAI Sign-up",
+   "name": "TICVAI Sign-up — Onboarding & Purchase",
+   "offlineCapable": false,
+   "app": "signup-web",
+   "operator": "public",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P09",
+     "P10",
+     "P11",
+     "P14"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "SGN-015",
+  "name": "Module Detail & Commercial Treatment",
+  "module": "Package Builder",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "sameAs": "ADM-403",
+   "book": "Subscription_Licensing_AI_Self_Service.pdf",
+   "board": "4",
+   "number": "5",
+   "page": 49
+  },
+  "implementation": {
+   "app": "signup-web",
+   "route": "/package-builder/module-detail-commercial-treatment-sgn-015",
+   "component": "apps/signup-web/src/routes/package-builder/ModuleDetailCommercialTreatment.tsx",
+   "status": "notStarted"
+  },
+  "density": "compact",
+  "notes": "The self-service form of `ADM-403`, for a prospect with no account. Decided 11 September 2026; P09 keeps its screen for the operator-led path (BL-165). `tools/applied/apply-subscription-placement.py` keeps the two in step.",
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P17 TICVAI Sign-up.dc.html#sgn-015"
+  },
+  "purpose": "Provide detailed information about an individual module before adding it to the package.",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "layout": {
+   "template": "split",
+   "regions": []
+  },
+  "states": {
+   "loading": "The module detail commercial list.",
+   "error": "Could not load. Names which read failed and leaves the module detail commercial untouched.",
+   "emptyFirstRun": "No module detail commercial yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the module detail commercial are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it."
+  },
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 49"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 49"
+   }
+  ],
+  "apis": [],
+  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 49. 0 of 0 labels bound to a contract property; 0 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "navigation": {
+   "entryFrom": [
+    "SGN-011"
+   ],
+   "exitTo": [
+    "SGN-011"
+   ],
+   "transitions": [
+    {
+     "to": "SGN-011",
+     "trigger": "Back to Recommended Package Overview",
+     "provenance": "structural — the book's own journey, 2.1 \"Journey Preview\", 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P17",
+   "audience": "public",
+   "formFactor": "web",
+   "shortName": "TICVAI Sign-up",
+   "name": "TICVAI Sign-up — Onboarding & Purchase",
+   "offlineCapable": false,
+   "app": "signup-web",
+   "operator": "public",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P09",
+     "P10",
+     "P11",
+     "P14"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "SGN-016",
+  "name": "Module Dependency & Compatibility Manager",
+  "module": "Package Builder",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "sameAs": "ADM-404",
+   "book": "Subscription_Licensing_AI_Self_Service.pdf",
+   "board": "4",
+   "number": "6",
+   "page": 49
+  },
+  "implementation": {
+   "app": "signup-web",
+   "route": "/package-builder/module-dependency-compatibility-manager-sgn-016",
+   "component": "apps/signup-web/src/routes/package-builder/ModuleDependencyCompatibilityManager.tsx",
+   "status": "notStarted"
+  },
+  "density": "compact",
+  "notes": "The self-service form of `ADM-404`, for a prospect with no account. Decided 11 September 2026; P09 keeps its screen for the operator-led path (BL-165). `tools/applied/apply-subscription-placement.py` keeps the two in step.",
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P17 TICVAI Sign-up.dc.html#sgn-016"
+  },
+  "purpose": "Ensure that the package is technically valid before commercial approval.",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "layout": {
+   "template": "split",
+   "regions": []
+  },
+  "states": {
+   "loading": "The module dependency compatibility list.",
+   "error": "Could not load. Names which read failed and leaves the module dependency compatibility untouched.",
+   "emptyFirstRun": "No module dependency compatibility yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the module dependency compatibility are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it."
+  },
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**Module Dependency & Compatibility Manager declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 49"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 49"
+   }
+  ],
+  "apis": [],
+  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 49. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "navigation": {
+   "entryFrom": [
+    "SGN-011"
+   ],
+   "exitTo": [
+    "SGN-011"
+   ],
+   "transitions": [
+    {
+     "to": "SGN-011",
+     "trigger": "Back to Recommended Package Overview",
+     "provenance": "structural — the book's own journey, 2.1 \"Journey Preview\", 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P17",
+   "audience": "public",
+   "formFactor": "web",
+   "shortName": "TICVAI Sign-up",
+   "name": "TICVAI Sign-up — Onboarding & Purchase",
+   "offlineCapable": false,
+   "app": "signup-web",
+   "operator": "public",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P09",
+     "P10",
+     "P11",
+     "P14"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "SGN-017",
+  "name": "Add-Ons, Capacity & Commercial Options",
+  "module": "Package Builder",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "sameAs": "ADM-405",
+   "book": "Subscription_Licensing_AI_Self_Service.pdf",
+   "board": "4",
+   "number": "7",
+   "page": 50
+  },
+  "implementation": {
+   "app": "signup-web",
+   "route": "/package-builder/add-ons-capacity-commercial-options-sgn-017",
+   "component": "apps/signup-web/src/routes/package-builder/AddOnsCapacityCommercialOptions.tsx",
+   "status": "notStarted"
+  },
+  "density": "compact",
+  "notes": "The self-service form of `ADM-405`, for a prospect with no account. Decided 11 September 2026; P09 keeps its screen for the operator-led path (BL-165). `tools/applied/apply-subscription-placement.py` keeps the two in step.",
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P17 TICVAI Sign-up.dc.html#sgn-017"
+  },
+  "purpose": "Allow additional resources to be added without unnecessarily moving the customer to another tier. This remains a very important TICVAI commercial principle.",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "layout": {
+   "template": "split",
+   "regions": []
+  },
+  "states": {
+   "loading": "The add-ons capacity commercial list.",
+   "error": "Could not load. Names which read failed and leaves the add-ons capacity commercial untouched.",
+   "emptyFirstRun": "No add-ons capacity commercial yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the add-ons capacity commercial are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it."
+  },
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 50"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Subscription_Licensing_AI_Self_Service.pdf, page 50"
+   }
+  ],
+  "apis": [],
+  "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 50. 0 of 0 labels bound to a contract property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "navigation": {
+   "entryFrom": [
+    "SGN-011"
+   ],
+   "exitTo": [
+    "SGN-011"
+   ],
+   "transitions": [
+    {
+     "to": "SGN-011",
+     "trigger": "Back to Recommended Package Overview",
+     "provenance": "structural — the book's own journey, 2.1 \"Journey Preview\", 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P17",
+   "audience": "public",
+   "formFactor": "web",
+   "shortName": "TICVAI Sign-up",
+   "name": "TICVAI Sign-up — Onboarding & Purchase",
+   "offlineCapable": false,
+   "app": "signup-web",
+   "operator": "public",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P09",
+     "P10",
+     "P11",
+     "P14"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

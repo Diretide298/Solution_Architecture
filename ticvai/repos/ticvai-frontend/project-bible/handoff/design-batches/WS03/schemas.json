@@ -1,0 +1,907 @@
+{
+ "BleBeaconGeofenceConfigurationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What BLE Beacon & Geofence Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "andDraws": {
+    "type": "string",
+    "description": "and draws"
+   },
+   "beaconName": {
+    "type": "string",
+    "description": "Beacon Name"
+   },
+   "beaconId": {
+    "type": "string",
+    "description": "Beacon ID"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "zone": {
+    "type": "string",
+    "description": "Zone"
+   },
+   "gate": {
+    "type": "string",
+    "description": "Gate"
+   },
+   "proximityThreshold": {
+    "type": "integer",
+    "description": "Proximity threshold"
+   },
+   "activeInactive": {
+    "type": "integer",
+    "description": "Active/Inactive"
+   },
+   "health": {
+    "type": "string",
+    "description": "Health"
+   },
+   "lastDetected": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last detected"
+   },
+   "park": {
+    "type": "string",
+    "description": "Park"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   }
+  }
+ },
+ "BleBeaconGeofenceConfigurationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What BLE Beacon & Geofence Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "andDraws": {
+    "type": "string",
+    "description": "and draws"
+   },
+   "beaconName": {
+    "type": "string",
+    "description": "Beacon Name"
+   },
+   "beaconId": {
+    "type": "string",
+    "description": "Beacon ID"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "zone": {
+    "type": "string",
+    "description": "Zone"
+   },
+   "gate": {
+    "type": "string",
+    "description": "Gate"
+   },
+   "proximityThreshold": {
+    "type": "integer",
+    "description": "Proximity threshold"
+   },
+   "activeInactive": {
+    "type": "integer",
+    "description": "Active/Inactive"
+   },
+   "health": {
+    "type": "string",
+    "description": "Health"
+   },
+   "lastDetected": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last detected"
+   },
+   "park": {
+    "type": "string",
+    "description": "Park"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   }
+  }
+ },
+ "CredentialActivationDisplayRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Credential Activation & Display Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "hideQr": {
+    "type": "string",
+    "description": "Hide QR"
+   },
+   "blurQr": {
+    "type": "string",
+    "description": "Blur QR"
+   },
+   "showCountdown": {
+    "type": "string",
+    "description": "Show countdown"
+   },
+   "showAvailableAtVenue": {
+    "type": "string",
+    "description": "Show \"Available at Venue\""
+   },
+   "showVenueDirections": {
+    "type": "string",
+    "description": "Show venue directions"
+   },
+   "displayDynamicQr": {
+    "type": "string",
+    "description": "Display dynamic QR"
+   },
+   "displayActivationTimer": {
+    "type": "string",
+    "description": "Display activation timer"
+   },
+   "displayCredentialStatus": {
+    "type": "string",
+    "description": "Display credential status"
+   },
+   "displayRemainingEntitlements": {
+    "type": "string",
+    "description": "Display remaining entitlements"
+   }
+  }
+ },
+ "CredentialRevocationLifecycleEventsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Credential Revocation & Lifecycle Events displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "cancellation": {
+    "type": "string",
+    "description": "Cancellation"
+   },
+   "exchange": {
+    "type": "string",
+    "description": "Exchange"
+   },
+   "ticketExpiration": {
+    "type": "string",
+    "description": "Ticket expiration"
+   },
+   "manualInvalidation": {
+    "type": "string",
+    "description": "Manual invalidation"
+   },
+   "fraudLock": {
+    "type": "string",
+    "description": "Fraud lock"
+   },
+   "accountSuspension": {
+    "type": "string",
+    "description": "Account suspension"
+   },
+   "centralPlatform": {
+    "type": "string",
+    "description": "Central Platform ✓"
+   },
+   "mobileApp": {
+    "type": "string",
+    "description": "Mobile App ✓"
+   },
+   "gateNetwork": {
+    "type": "string",
+    "description": "Gate Network ✓"
+   },
+   "offlineRevocationPackage": {
+    "type": "integer",
+    "description": "Offline Revocation Package ✓"
+   },
+   "walletCredentialService": {
+    "type": "string",
+    "description": "Wallet/Credential Service ✓"
+   }
+  }
+ },
+ "CredentialSecuritySimulationAuditPublicationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Credential Security Simulation, Audit & Publication displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "signatureValid": {
+    "type": "string",
+    "description": "✓ Signature valid"
+   },
+   "deviceValid": {
+    "type": "string",
+    "description": "✓ Device valid"
+   },
+   "venueValid": {
+    "type": "string",
+    "description": "✓ Venue valid"
+   },
+   "entitlementValid": {
+    "type": "string",
+    "description": "✓ Entitlement valid"
+   },
+   "qrFreshnessFailed": {
+    "type": "integer",
+    "description": "✕ QR freshness failed"
+   },
+   "credential": {
+    "type": "string",
+    "description": "Credential"
+   },
+   "ticket": {
+    "type": "string",
+    "description": "Ticket"
+   },
+   "guestAccountReference": {
+    "type": "string",
+    "description": "Guest/account reference"
+   },
+   "device": {
+    "type": "string",
+    "description": "Device"
+   },
+   "gate": {
+    "type": "string",
+    "description": "Gate"
+   },
+   "location": {
+    "type": "string",
+    "description": "Location"
+   },
+   "timestamp": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Timestamp"
+   },
+   "operator": {
+    "type": "string",
+    "description": "Operator"
+   },
+   "activation": {
+    "type": "string",
+    "description": "Activation"
+   },
+   "refresh": {
+    "type": "string",
+    "description": "Refresh"
+   },
+   "validation": {
+    "type": "string",
+    "description": "Validation"
+   },
+   "revocation": {
+    "type": "string",
+    "description": "revocation"
+   },
+   "resultReasonCode": {
+    "type": "string",
+    "description": "result/reason code"
+   },
+   "securityApprovePublish": {
+    "type": "string",
+    "description": "Security → Approve & Publish"
+   },
+   "dynamicDigitalCredentials": {
+    "type": "string",
+    "description": "dynamic digital credentials"
+   }
+  }
+ },
+ "CredentialTransferRebindingView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Credential Transfer & Rebinding displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "numberOfTransfers": {
+    "type": "integer",
+    "description": "Number of transfers"
+   },
+   "beforeFirstValidationOnly": {
+    "type": "string",
+    "description": "Before first validation only"
+   },
+   "requireRecipientAccount": {
+    "type": "boolean",
+    "description": "Require recipient account"
+   },
+   "requireOtp": {
+    "type": "boolean",
+    "description": "Require OTP"
+   },
+   "requireAcceptance": {
+    "type": "boolean",
+    "description": "Require acceptance"
+   },
+   "returnToSender": {
+    "type": "string",
+    "description": "Return to sender"
+   },
+   "oldCredentialInvalid": {
+    "type": "string",
+    "description": "Old Credential → INVALID"
+   },
+   "oldDeviceBindingRemoved": {
+    "type": "string",
+    "description": "Old Device Binding → REMOVED"
+   },
+   "recipientCredentialActiveEligible": {
+    "type": "string",
+    "description": "Recipient Credential → ACTIVE/ELIGIBLE"
+   }
+  }
+ },
+ "DeviceBindingSessionSecurityView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Device Binding & Session Security displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "maximumActiveDevices": {
+    "type": "integer",
+    "description": "Maximum Active Devices (the pack shows 1)"
+   },
+   "concurrentSessions": {
+    "type": "integer",
+    "description": "Concurrent Sessions (the pack shows 1)"
+   },
+   "notAllowed": {
+    "type": "boolean",
+    "description": "Not allowed"
+   },
+   "allowedBeforeFirstUse": {
+    "type": "string",
+    "description": "Allowed before first use"
+   },
+   "otpVerificationRequired": {
+    "type": "boolean",
+    "description": "OTP verification required"
+   },
+   "operatorApprovalRequired": {
+    "type": "boolean",
+    "description": "Operator approval required"
+   },
+   "supervisorApprovalRequired": {
+    "type": "boolean",
+    "description": "Supervisor approval required"
+   },
+   "user": {
+    "type": "string",
+    "description": "User"
+   },
+   "credential": {
+    "type": "string",
+    "description": "Credential"
+   },
+   "deviceId": {
+    "type": "string",
+    "description": "Device ID"
+   },
+   "deviceReference": {
+    "type": "string",
+    "description": "Device reference"
+   },
+   "appInstallation": {
+    "type": "string",
+    "description": "App installation"
+   },
+   "os": {
+    "type": "integer",
+    "description": "OS"
+   },
+   "registrationDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Registration date"
+   },
+   "lastActivation": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last activation"
+   },
+   "lastKnownVenue": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last known venue"
+   },
+   "securityStatus": {
+    "type": "integer",
+    "description": "Security status"
+   },
+   "andSimultaneously": {
+    "type": "string",
+    "description": "and simultaneously"
+   }
+  }
+ },
+ "DigitalCredentialSecurityCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Digital Credential Security Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "dynamicQrTickets": {
+    "type": "integer",
+    "description": "Dynamic QR Tickets"
+   },
+   "membershipCredentials": {
+    "type": "integer",
+    "description": "Membership Credentials"
+   },
+   "annualPasses": {
+    "type": "integer",
+    "description": "Annual Passes"
+   },
+   "mobileWalletCredentials": {
+    "type": "integer",
+    "description": "Mobile Wallet Credentials"
+   },
+   "loyaltyCredentials": {
+    "type": "integer",
+    "description": "Loyalty Credentials"
+   },
+   "digitalPasses": {
+    "type": "integer",
+    "description": "Digital Passes"
+   },
+   "eventCredentials": {
+    "type": "integer",
+    "description": "Event Credentials"
+   },
+   "activeDigitalCredentials": {
+    "type": "integer",
+    "description": "Active Digital Credentials"
+   },
+   "dynamicQrEnabled": {
+    "type": "boolean",
+    "description": "Dynamic QR Enabled"
+   },
+   "deviceBoundCredentials": {
+    "type": "integer",
+    "description": "Device-Bound Credentials"
+   },
+   "locationProtectedCredentials": {
+    "type": "integer",
+    "description": "Location-Protected Credentials"
+   },
+   "offlineReadyCredentials": {
+    "type": "integer",
+    "description": "Offline-Ready Credentials"
+   },
+   "credentialsRevokedToday": {
+    "type": "string",
+    "description": "Credentials Revoked Today"
+   },
+   "securityAlerts": {
+    "type": "integer",
+    "description": "Security Alerts"
+   },
+   "suspiciousSessions": {
+    "type": "integer",
+    "description": "Suspicious Sessions"
+   }
+  }
+ },
+ "DynamicQrSecurityProfileBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is access.scan_event at 7%, so this is not an update to anything the package stores today and no new table has been decided",
+  "description": "**What Dynamic QR Security Profile Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "static": {
+    "type": "string",
+    "description": "Static"
+   },
+   "dynamic": {
+    "type": "string",
+    "description": "Dynamic"
+   },
+   "dynamicDeviceBound": {
+    "type": "string",
+    "description": "Dynamic + Device Bound"
+   },
+   "dynamicLocationBound": {
+    "type": "string",
+    "description": "Dynamic + Location Bound"
+   },
+   "refreshEvery30Seconds": {
+    "type": "string",
+    "description": "Refresh Every: 30 seconds"
+   },
+   "custom": {
+    "type": "string",
+    "description": "Custom"
+   },
+   "credentialId": {
+    "type": "string",
+    "description": "Credential ID"
+   },
+   "ticketId": {
+    "type": "string",
+    "description": "Ticket ID"
+   },
+   "timestamp": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Timestamp"
+   },
+   "nonceOtp": {
+    "type": "string",
+    "description": "Nonce / OTP"
+   },
+   "deviceBindingReference": {
+    "type": "string",
+    "description": "Device binding reference"
+   },
+   "venueContext": {
+    "type": "string",
+    "description": "Venue context"
+   },
+   "entitlementPayload": {
+    "type": "string",
+    "description": "Entitlement payload"
+   },
+   "cryptographicSignatureKeyReference": {
+    "type": "string",
+    "description": "cryptographic signature/key reference"
+   },
+   "screens": {
+    "type": "string",
+    "description": "screens"
+   }
+  }
+ },
+ "DynamicQrSecurityProfileBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Dynamic QR Security Profile Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "static": {
+    "type": "string",
+    "description": "Static"
+   },
+   "dynamic": {
+    "type": "string",
+    "description": "Dynamic"
+   },
+   "dynamicDeviceBound": {
+    "type": "string",
+    "description": "Dynamic + Device Bound"
+   },
+   "dynamicLocationBound": {
+    "type": "string",
+    "description": "Dynamic + Location Bound"
+   },
+   "refreshEvery30Seconds": {
+    "type": "string",
+    "description": "Refresh Every: 30 seconds"
+   },
+   "custom": {
+    "type": "string",
+    "description": "Custom"
+   },
+   "credentialId": {
+    "type": "string",
+    "description": "Credential ID"
+   },
+   "ticketId": {
+    "type": "string",
+    "description": "Ticket ID"
+   },
+   "timestamp": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Timestamp"
+   },
+   "nonceOtp": {
+    "type": "string",
+    "description": "Nonce / OTP"
+   },
+   "deviceBindingReference": {
+    "type": "string",
+    "description": "Device binding reference"
+   },
+   "venueContext": {
+    "type": "string",
+    "description": "Venue context"
+   },
+   "entitlementPayload": {
+    "type": "string",
+    "description": "Entitlement payload"
+   },
+   "cryptographicSignatureKeyReference": {
+    "type": "string",
+    "description": "cryptographic signature/key reference"
+   },
+   "screens": {
+    "type": "string",
+    "description": "screens"
+   }
+  }
+ },
+ "EmbeddedEntitlementPayloadDesignerInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Embedded Entitlement Payload Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "credentialId": {
+    "type": "string",
+    "description": "Credential ID"
+   },
+   "ticketType": {
+    "type": "string",
+    "description": "Ticket type"
+   },
+   "guestCategory": {
+    "type": "string",
+    "description": "Guest category"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "park": {
+    "type": "string",
+    "description": "Park"
+   },
+   "zone": {
+    "type": "string",
+    "description": "Zone"
+   },
+   "attractionPermissions": {
+    "type": "string",
+    "description": "Attraction permissions"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "time": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time"
+   },
+   "timeslot": {
+    "type": "string",
+    "description": "Timeslot"
+   },
+   "expiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "expiry"
+   },
+   "admission": {
+    "type": "string",
+    "description": "Admission"
+   },
+   "fastPass": {
+    "type": "string",
+    "description": "Fast Pass"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "reservation": {
+    "type": "string",
+    "description": "Reservation"
+   },
+   "locker": {
+    "type": "string",
+    "description": "Locker"
+   },
+   "seat": {
+    "type": "string",
+    "description": "Seat"
+   },
+   "otherPermittedOperationalClaims": {
+    "type": "string",
+    "description": "other permitted operational claims"
+   },
+   "ai": {
+    "type": "string",
+    "description": "AI"
+   }
+  }
+ },
+ "EmbeddedEntitlementPayloadDesignerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Embedded Entitlement Payload Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "credentialId": {
+    "type": "string",
+    "description": "Credential ID"
+   },
+   "ticketType": {
+    "type": "string",
+    "description": "Ticket type"
+   },
+   "guestCategory": {
+    "type": "string",
+    "description": "Guest category"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "park": {
+    "type": "string",
+    "description": "Park"
+   },
+   "zone": {
+    "type": "string",
+    "description": "Zone"
+   },
+   "attractionPermissions": {
+    "type": "string",
+    "description": "Attraction permissions"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "time": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time"
+   },
+   "timeslot": {
+    "type": "string",
+    "description": "Timeslot"
+   },
+   "expiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "expiry"
+   },
+   "admission": {
+    "type": "string",
+    "description": "Admission"
+   },
+   "fastPass": {
+    "type": "string",
+    "description": "Fast Pass"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "reservation": {
+    "type": "string",
+    "description": "Reservation"
+   },
+   "locker": {
+    "type": "string",
+    "description": "Locker"
+   },
+   "seat": {
+    "type": "string",
+    "description": "Seat"
+   },
+   "otherPermittedOperationalClaims": {
+    "type": "string",
+    "description": "other permitted operational claims"
+   },
+   "ai": {
+    "type": "string",
+    "description": "AI"
+   }
+  }
+ },
+ "OfflineCryptographicValidationProfileView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Offline Cryptographic Validation Profile displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "credentialAuthenticity": {
+    "type": "string",
+    "description": "Credential authenticity"
+   },
+   "digitalSignature": {
+    "type": "string",
+    "description": "Digital signature"
+   },
+   "ticketId": {
+    "type": "string",
+    "description": "Ticket ID"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "park": {
+    "type": "string",
+    "description": "Park"
+   },
+   "zone": {
+    "type": "string",
+    "description": "Zone"
+   },
+   "visitDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Visit date"
+   },
+   "timeWindow": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time window"
+   },
+   "credentialStatusSnapshot": {
+    "type": "string",
+    "description": "Credential status snapshot"
+   },
+   "ticketType": {
+    "type": "string",
+    "description": "Ticket type"
+   },
+   "guestCategory": {
+    "type": "string",
+    "description": "Guest category"
+   },
+   "seat": {
+    "type": "string",
+    "description": "Seat"
+   },
+   "timeslot": {
+    "type": "string",
+    "description": "Timeslot"
+   },
+   "reservation": {
+    "type": "string",
+    "description": "Reservation"
+   },
+   "entitlements": {
+    "type": "string",
+    "description": "Entitlements"
+   },
+   "reEntryPermissions": {
+    "type": "string",
+    "description": "Re-entry permissions"
+   },
+   "validityPeriod": {
+    "type": "string",
+    "format": "date-time",
+    "description": "validity period"
+   },
+   "continueRestrictedValidation": {
+    "type": "string",
+    "description": "Continue restricted validation"
+   },
+   "operatorWarning": {
+    "type": "string",
+    "description": "Operator warning"
+   },
+   "supervisorMode": {
+    "type": "string",
+    "description": "Supervisor mode"
+   },
+   "failClosed": {
+    "type": "integer",
+    "description": "Fail closed"
+   },
+   "configurableFallback": {
+    "type": "string",
+    "description": "configurable fallback"
+   }
+  }
+ }
+}

@@ -1,0 +1,606 @@
+{
+ "acknowledgeAnnouncement": {
+  "method": "POST",
+  "path": "/announcements/{announcementId}/acknowledge",
+  "contract": "workforce",
+  "summary": "Confirm you have read it",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "amendAttendance": {
+  "method": "POST",
+  "path": "/attendance/{recordId}/amend",
+  "contract": "workforce",
+  "summary": "A supervisor corrects a record",
+  "permission": "WORKFORCE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AttendanceRecord"
+ },
+ "createApprovalDelegation": {
+  "method": "POST",
+  "path": "/delegations",
+  "contract": "approvals",
+  "summary": "Delegate approval authority",
+  "permission": "APPROVAL_DECIDE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApprovalDelegation",
+  "responds": "ApprovalDelegation"
+ },
+ "createPrincipal": {
+  "method": "POST",
+  "path": "/principals",
+  "contract": "identity",
+  "summary": "Create a principal",
+  "permission": "USER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreatePrincipalRequest",
+  "responds": "Principal"
+ },
+ "createRole": {
+  "method": "POST",
+  "path": "/roles",
+  "contract": "identity",
+  "summary": "Create a role",
+  "permission": "ROLE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Role"
+ },
+ "createRotaAssignment": {
+  "method": "POST",
+  "path": "/rota-assignments",
+  "contract": "workforce",
+  "summary": "Put someone on the rota",
+  "permission": "WORKFORCE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RotaAssignment",
+  "responds": "RotaAssignment"
+ },
+ "decideApprovalRequest": {
+  "method": "POST",
+  "path": "/approval-requests/{requestId}/decide",
+  "contract": "approvals",
+  "summary": "Approve or reject",
+  "permission": "APPROVAL_DECIDE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalRequest"
+ },
+ "escalateApprovalRequest": {
+  "method": "POST",
+  "path": "/approval-requests/{requestId}/escalate",
+  "contract": "approvals",
+  "summary": "Move it up a level",
+  "permission": "APPROVAL_REQUEST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalRequest"
+ },
+ "evaluateApprovalRequirement": {
+  "method": "POST",
+  "path": "/approval-requests/evaluate",
+  "contract": "approvals",
+  "summary": "Does this need approval, and from whom",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalRequirement"
+ },
+ "getAnnouncementReach": {
+  "method": "GET",
+  "path": "/announcements/{announcementId}/reach",
+  "contract": "workforce",
+  "summary": "Who has acknowledged, and who has not",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AnnouncementReach"
+ },
+ "getPrincipal": {
+  "method": "GET",
+  "path": "/principals/{principalId}",
+  "contract": "identity",
+  "summary": "Read a principal",
+  "permission": "USER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Principal"
+ },
+ "listAnnouncements": {
+  "method": "GET",
+  "path": "/announcements",
+  "contract": "workforce",
+  "summary": "What staff have been told",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "unacknowledgedOnly",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Announcement"
+ },
+ "listApprovalDelegations": {
+  "method": "GET",
+  "path": "/delegations",
+  "contract": "approvals",
+  "summary": "Who is standing in for whom",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ApprovalDelegation"
+ },
+ "listApprovalMatrices": {
+  "method": "GET",
+  "path": "/approval-matrices",
+  "contract": "approvals",
+  "summary": "What requires approval here",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "effective",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalMatrix"
+ },
+ "listApprovalRequests": {
+  "method": "GET",
+  "path": "/approval-requests",
+  "contract": "approvals",
+  "summary": "Requests awaiting a decision, or already decided",
+  "permission": "APPROVAL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "assignedToMe",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "raisedByMe",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "breachingWithinMinutes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listAttendance": {
+  "method": "GET",
+  "path": "/attendance",
+  "contract": "workforce",
+  "summary": "Who was here",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "date",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "exceptionsOnly",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AttendanceRecord"
+ },
+ "listPrincipals": {
+  "method": "GET",
+  "path": "/principals",
+  "contract": "identity",
+  "summary": "List principals",
+  "permission": "USER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "isActive",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listRoles": {
+  "method": "GET",
+  "path": "/roles",
+  "contract": "identity",
+  "summary": "List roles",
+  "permission": "ROLE_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listRotaAssignments": {
+  "method": "GET",
+  "path": "/rota-assignments",
+  "contract": "workforce",
+  "summary": "The rota",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "to",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "departmentId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "RotaAssignment"
+ },
+ "publishAnnouncement": {
+  "method": "POST",
+  "path": "/announcements",
+  "contract": "workforce",
+  "summary": "Tell staff something",
+  "permission": "ANNOUNCEMENT_PUBLISH",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Announcement",
+  "responds": "Announcement"
+ },
+ "recordAttendance": {
+  "method": "POST",
+  "path": "/attendance/clock",
+  "contract": "workforce",
+  "summary": "Clock in, clock out, or take a break",
+  "permission": "ATTENDANCE_RECORD",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AttendanceRecord"
+ },
+ "requestShiftSwap": {
+  "method": "POST",
+  "path": "/rota-assignments/{assignmentId}/swap",
+  "contract": "workforce",
+  "summary": "Ask someone to take your shift",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "resubmitApprovalRequest": {
+  "method": "POST",
+  "path": "/approval-requests/{requestId}/resubmit",
+  "contract": "approvals",
+  "summary": "Amend a rejected request and try again",
+  "permission": "APPROVAL_REQUEST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalRequest"
+ },
+ "revokeApprovalDelegation": {
+  "method": "DELETE",
+  "path": "/delegations/{delegationId}",
+  "contract": "approvals",
+  "summary": "End a delegation early",
+  "permission": "APPROVAL_DECIDE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setApprovalMatrix": {
+  "method": "PUT",
+  "path": "/approval-matrices",
+  "contract": "approvals",
+  "summary": "Configure what requires approval",
+  "permission": "APPROVAL_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ApprovalMatrix",
+  "responds": "ApprovalMatrix"
+ },
+ "updatePrincipal": {
+  "method": "PATCH",
+  "path": "/principals/{principalId}",
+  "contract": "identity",
+  "summary": "Update or deactivate a principal",
+  "permission": "USER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Principal"
+ },
+ "updateRotaAssignment": {
+  "method": "PATCH",
+  "path": "/rota-assignments/{assignmentId}",
+  "contract": "workforce",
+  "summary": "Move or cancel an assignment",
+  "permission": "WORKFORCE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RotaAssignment",
+  "responds": "RotaAssignment"
+ },
+ "withdrawApprovalRequest": {
+  "method": "POST",
+  "path": "/approval-requests/{requestId}/withdraw",
+  "contract": "approvals",
+  "summary": "The requester takes it back",
+  "permission": "APPROVAL_REQUEST",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ApprovalRequest"
+ }
+}

@@ -1,0 +1,278 @@
+{
+ "createPrincipal": {
+  "method": "POST",
+  "path": "/principals",
+  "contract": "identity",
+  "summary": "Create a principal",
+  "permission": "USER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreatePrincipalRequest",
+  "responds": "Principal"
+ },
+ "createRole": {
+  "method": "POST",
+  "path": "/roles",
+  "contract": "identity",
+  "summary": "Create a role",
+  "permission": "ROLE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Role"
+ },
+ "forceLogout": {
+  "method": "POST",
+  "path": "/auth/sessions/{sessionId}/force-logout",
+  "contract": "identity",
+  "summary": "Supervisor termination of an abandoned session",
+  "permission": "SESSION_FORCE_LOGOUT",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": "sessionId",
+    "in": "path",
+    "required": true
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getCurrentSession": {
+  "method": "GET",
+  "path": "/auth/session",
+  "contract": "identity",
+  "summary": "Current session and effective permissions",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Session"
+ },
+ "getGuestSession": {
+  "method": "GET",
+  "path": "/auth/guest/session",
+  "contract": "identity",
+  "summary": "Read the current guest session",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestSession"
+ },
+ "getPrincipal": {
+  "method": "GET",
+  "path": "/principals/{principalId}",
+  "contract": "identity",
+  "summary": "Read a principal",
+  "permission": "USER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Principal"
+ },
+ "listActiveSessions": {
+  "method": "GET",
+  "path": "/auth/sessions",
+  "contract": "identity",
+  "summary": "List active sessions",
+  "permission": "SESSION_FORCE_LOGOUT",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "principalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMfaMethods": {
+  "method": "GET",
+  "path": "/auth/mfa/methods",
+  "contract": "identity",
+  "summary": "Enrolled MFA methods",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MfaMethod"
+ },
+ "listPrincipals": {
+  "method": "GET",
+  "path": "/principals",
+  "contract": "identity",
+  "summary": "List principals",
+  "permission": "USER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "scopePath",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "isActive",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listRoles": {
+  "method": "GET",
+  "path": "/roles",
+  "contract": "identity",
+  "summary": "List roles",
+  "permission": "ROLE_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listSsoProviders": {
+  "method": "GET",
+  "path": "/auth/sso/providers",
+  "contract": "identity",
+  "summary": "Identity providers configured for this tenant",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SsoProvider"
+ },
+ "login": {
+  "method": "POST",
+  "path": "/auth/login",
+  "contract": "identity",
+  "summary": "Authenticate and open a session",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "LoginRequest",
+  "responds": "LoginResponse"
+ },
+ "revokeAllSessions": {
+  "method": "POST",
+  "path": "/auth/sessions/revoke-all",
+  "contract": "identity",
+  "summary": "Revoke every session in scope",
+  "permission": "SESSION_FORCE_LOGOUT",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "updatePrincipal": {
+  "method": "PATCH",
+  "path": "/principals/{principalId}",
+  "contract": "identity",
+  "summary": "Update or deactivate a principal",
+  "permission": "USER_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Principal"
+ }
+}

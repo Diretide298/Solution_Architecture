@@ -1,0 +1,2029 @@
+[
+ {
+  "id": "BO-114",
+  "name": "Variants, Attributes, Barcode & RFID Management",
+  "module": "Sell",
+  "requiresModule": "inventory",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/variants-attributes-barcode-rfid-management",
+   "component": "apps/venue-management-web/src/routes/sell/VariantsAttributesBarcodeRfidManagemenList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-102"
+   ],
+   "exitTo": [
+    "BO-102"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-102",
+     "trigger": "Sell",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not.",
+  "density": "compact",
+  "boardFrames": [
+   "Retail Board 4.dc.html#ret-4j"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listSerialisedItems` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Variants, Attributes, Barcode & RFID Management — from the client design board, 20 August.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every variants attributes barcode",
+       "bindsTo": "SerialisedItem",
+       "columns": [
+        "SerialisedItem.id",
+        "SerialisedItem.itemId",
+        "SerialisedItem.batchId",
+        "SerialisedItem.serial",
+        "SerialisedItem.locationId",
+        "SerialisedItem.status",
+        "SerialisedItem.soldOnOrderLineId",
+        "SerialisedItem.warrantyUntil",
+        "SerialisedItem.receivedAt"
+       ],
+       "operation": "listSerialisedItems",
+       "provenance": "contract inventory.yaml GET /serialised-items"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected variants attributes barcode",
+       "bindsTo": "SerialisedItem",
+       "columns": [
+        "SerialisedItem.id",
+        "SerialisedItem.itemId",
+        "SerialisedItem.batchId",
+        "SerialisedItem.serial",
+        "SerialisedItem.locationId",
+        "SerialisedItem.status",
+        "SerialisedItem.soldOnOrderLineId",
+        "SerialisedItem.warrantyUntil",
+        "SerialisedItem.receivedAt"
+       ],
+       "operation": "listSerialisedItems",
+       "provenance": "contract inventory.yaml GET /serialised-items"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Lookup",
+       "operation": "lookupMerchandise",
+       "provenance": "contract retail.yaml GET /merchandise/lookup"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search variants, attributes, barcode",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The variants attributes barcode list.",
+   "error": "Could not load. Names which read failed and leaves the variants attributes barcode untouched.",
+   "emptyFirstRun": "No variants attributes barcode yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the variants attributes barcode are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listSerialisedItems",
+    "contract": "inventory",
+    "purpose": "listSerialisedItems",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "lookupMerchandise",
+    "contract": "retail",
+    "purpose": "Price and stock check by barcode",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders.",
+   "preloaded": [
+    "SerialisedItem.id",
+    "SerialisedItem.itemId",
+    "SerialisedItem.batchId",
+    "SerialisedItem.serial",
+    "SerialisedItem.locationId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-114",
+   "source": "Claude Design Retail pack, 24 August",
+   "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-115",
+  "name": "Category, Brand & Merchandise Hierarchy",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/category-brand-merchandise-hierarchy",
+   "component": "apps/venue-management-web/src/routes/sell/CategoryBrandMerchandiseHierarchyList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-102"
+   ],
+   "exitTo": [
+    "BO-102",
+    "BO-116"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-116",
+     "trigger": "Merchandising & Product Presentation",
+     "provenance": "flow F86 step 1→2"
+    },
+    {
+     "to": "BO-102",
+     "trigger": "Sell",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not. **Owns POS board frame(s) POS-4A** (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse off than one who has none.",
+  "density": "compact",
+  "boardFrames": [
+   "POS Board 4.dc.html#pos-4a"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listProductCategories` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Category, Brand & Merchandise Hierarchy — from the client design board, 20 August.",
+  "gaps": [
+   {
+    "operation": "listSaleBoards",
+    "why": "**1 declared operation reach no component on this screen**: listSaleBoards. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every category brand merchandise",
+       "bindsTo": "ProductCategory",
+       "columns": [
+        "ProductCategory.id",
+        "ProductCategory.name",
+        "ProductCategory.nameLocalised",
+        "ProductCategory.kind",
+        "ProductCategory.parentId",
+        "ProductCategory.scopePath",
+        "ProductCategory.displayOrder",
+        "ProductCategory.imageAssetId",
+        "ProductCategory.isActive"
+       ],
+       "operation": "listProductCategories",
+       "provenance": "contract catalogue.yaml GET /product-categories"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected category brand merchandise",
+       "bindsTo": "ProductCategory",
+       "columns": [
+        "ProductCategory.id",
+        "ProductCategory.name",
+        "ProductCategory.nameLocalised",
+        "ProductCategory.kind",
+        "ProductCategory.parentId",
+        "ProductCategory.scopePath",
+        "ProductCategory.displayOrder",
+        "ProductCategory.imageAssetId",
+        "ProductCategory.isActive"
+       ],
+       "operation": "listProductCategories",
+       "provenance": "contract catalogue.yaml GET /product-categories"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "setProductCategories",
+       "provenance": "contract catalogue.yaml PUT /product-categories"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request",
+       "operation": "requestSuggestion",
+       "provenance": "contract ai.yaml POST /ai/suggestions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Run",
+       "operation": "runReport",
+       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search category, brand",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The category brand merchandise list.",
+   "error": "Could not load. Names which read failed and leaves the category brand merchandise untouched.",
+   "emptyFirstRun": "No category brand merchandise yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the category brand merchandise are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listProductCategories",
+    "contract": "catalogue",
+    "purpose": "listProductCategories",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setProductCategories",
+    "contract": "catalogue",
+    "purpose": "setProductCategories",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProductCategories"
+    ]
+   },
+   {
+    "operationId": "listSaleBoards",
+    "contract": "tenancy",
+    "purpose": "List sale boards",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "requestSuggestion",
+    "contract": "ai",
+    "purpose": "requestSuggestion",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProductCategories"
+    ]
+   },
+   {
+    "operationId": "runReport",
+    "contract": "reporting",
+    "purpose": "Run a report",
+    "trigger": "onAction",
+    "invalidates": [
+     "listProductCategories"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "reportId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders.",
+   "preloaded": [
+    "ProductCategory.id",
+    "ProductCategory.name",
+    "ProductCategory.nameLocalised",
+    "ProductCategory.kind",
+    "ProductCategory.parentId"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-115",
+   "source": "Claude Design POS pack, 24 August",
+   "note": "**Drawn by Claude Design on `POS Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-116",
+  "name": "Merchandising & Product Presentation",
+  "module": "Sell",
+  "requiresModule": "retail",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/merchandising-product-presentation",
+   "component": "apps/venue-management-web/src/routes/sell/MerchandisingProductPresentationList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-102",
+    "BO-115"
+   ],
+   "exitTo": [
+    "BO-102",
+    "BO-117"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-117",
+     "trigger": "Product Import, Governance & AI Configuration Assistant",
+     "provenance": "flow F86 step 2→3"
+    },
+    {
+     "to": "BO-102",
+     "trigger": "Sell",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not. **Owns POS board frame(s) POS-4B** (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse off than one who has none.",
+  "density": "compact",
+  "boardFrames": [
+   "POS Board 4.dc.html#pos-4b"
+  ],
+  "pattern": "commandCentre",
+  "patternReason": "3 independent reads and no read of one record — the screen watches a population rather than working one",
+  "purpose": "Merchandising & Product Presentation — from the client design board, 20 August.",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Merchandise",
+       "bindsTo": "MerchandiseItem",
+       "operation": "listMerchandise",
+       "provenance": "contract retail.yaml GET /merchandise"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Sale boards",
+       "bindsTo": "SaleBoard",
+       "operation": "listSaleBoards",
+       "provenance": "contract tenancy.yaml GET /sale-boards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Workstations",
+       "bindsTo": "Workstation",
+       "operation": "listWorkstations",
+       "provenance": "contract tenancy.yaml GET /workstations"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every merchandising product presentation",
+       "bindsTo": "MerchandiseItem",
+       "columns": [
+        "MerchandiseItem.id",
+        "MerchandiseItem.sku",
+        "MerchandiseItem.barcode",
+        "MerchandiseItem.name",
+        "MerchandiseItem.outletId",
+        "MerchandiseItem.categoryId",
+        "MerchandiseItem.variantId",
+        "MerchandiseItem.inventoryItemId",
+        "MerchandiseItem.price",
+        "MerchandiseItem.onHand",
+        "MerchandiseItem.isReturnable",
+        "MerchandiseItem.returnWindowDays"
+       ],
+       "operation": "listMerchandise",
+       "provenance": "contract retail.yaml GET /merchandise"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "updateMerchandise",
+       "provenance": "contract retail.yaml PATCH /merchandise/{merchandiseId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setRolePermissions",
+       "provenance": "contract tenancy.yaml PUT /roles/{roleId}/permissions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "setVenueSettings",
+       "provenance": "contract tenancy.yaml PUT /venues/{venueId}/settings"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateSaleBoard",
+       "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search merchandising",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The merchandising product presentation list.",
+   "error": "Could not load. Names which read failed and leaves the merchandising product presentation untouched.",
+   "emptyFirstRun": "No merchandising product presentation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the merchandising product presentation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listMerchandise",
+    "contract": "retail",
+    "purpose": "List merchandise",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateMerchandise",
+    "contract": "retail",
+    "purpose": "Amend a merchandise item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMerchandise"
+    ]
+   },
+   {
+    "operationId": "listSaleBoards",
+    "contract": "tenancy",
+    "purpose": "List sale boards",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listWorkstations",
+    "contract": "tenancy",
+    "purpose": "List workstations",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "setRolePermissions",
+    "contract": "tenancy",
+    "purpose": "What this role may do",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMerchandise"
+    ]
+   },
+   {
+    "operationId": "setVenueSettings",
+    "contract": "tenancy",
+    "purpose": "Set support hours, quiet hours, segregated access and alerti",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMerchandise"
+    ]
+   },
+   {
+    "operationId": "updateSaleBoard",
+    "contract": "tenancy",
+    "purpose": "Update a sale board",
+    "trigger": "onAction",
+    "invalidates": [
+     "listMerchandise"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "merchandiseId",
+     "from": "deepLink"
+    },
+    {
+     "name": "roleId",
+     "from": "deepLink"
+    },
+    {
+     "name": "saleBoardId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders. A role opened from the directory."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-116",
+   "source": "Claude Design POS pack, 24 August",
+   "note": "**Drawn by Claude Design on `POS Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-117",
+  "name": "Product Import, Governance & AI Configuration Assistant",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/product-import-governance-ai-configuration-assistant",
+   "component": "apps/venue-management-web/src/routes/sell/ProductImportGovernanceAiConfigurationList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-102",
+    "BO-116"
+   ],
+   "exitTo": [
+    "BO-102",
+    "BO-118"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-118",
+     "trigger": "Campaign & Audience Management",
+     "provenance": "flow F86 step 3→4"
+    },
+    {
+     "to": "BO-102",
+     "trigger": "Sell",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not. **Owns POS board frame(s) POS-4C** (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse off than one who has none.",
+  "density": "compact",
+  "boardFrames": [
+   "POS Board 4.dc.html#pos-4c"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listSaleBoards` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Product Import, Governance & AI Configuration Assistant — from the client design board, 20 August.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every product import governance",
+       "bindsTo": "SaleBoard",
+       "columns": [
+        "SaleBoard.id",
+        "SaleBoard.code",
+        "SaleBoard.name",
+        "SaleBoard.venueId",
+        "SaleBoard.kind",
+        "SaleBoard.pages",
+        "SaleBoard.isActive"
+       ],
+       "operation": "listSaleBoards",
+       "provenance": "contract tenancy.yaml GET /sale-boards"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected product import governance",
+       "bindsTo": "SaleBoard",
+       "columns": [
+        "SaleBoard.id",
+        "SaleBoard.code",
+        "SaleBoard.name",
+        "SaleBoard.venueId",
+        "SaleBoard.kind",
+        "SaleBoard.pages",
+        "SaleBoard.isActive"
+       ],
+       "operation": "listSaleBoards",
+       "provenance": "contract tenancy.yaml GET /sale-boards"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Import",
+       "operation": "importProductCatalogue",
+       "provenance": "contract catalogue.yaml POST /products/import"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Generate",
+       "operation": "generateConfiguration",
+       "provenance": "contract ai.yaml POST /generate/configuration"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Request",
+       "operation": "requestSuggestion",
+       "provenance": "contract ai.yaml POST /ai/suggestions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateSaleBoard",
+       "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search product import, governance",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The product import governance list.",
+   "error": "Could not load. Names which read failed and leaves the product import governance untouched.",
+   "emptyFirstRun": "No product import governance yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the product import governance are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "importProductCatalogue",
+    "contract": "catalogue",
+    "purpose": "Parse a catalogue file into a preview",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSaleBoards"
+    ]
+   },
+   {
+    "operationId": "generateConfiguration",
+    "contract": "ai",
+    "purpose": "Draft a configuration from a description",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSaleBoards"
+    ]
+   },
+   {
+    "operationId": "listSaleBoards",
+    "contract": "tenancy",
+    "purpose": "List sale boards",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "requestSuggestion",
+    "contract": "ai",
+    "purpose": "requestSuggestion",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSaleBoards"
+    ]
+   },
+   {
+    "operationId": "updateSaleBoard",
+    "contract": "tenancy",
+    "purpose": "Update a sale board",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSaleBoards"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "saleBoardId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders.",
+   "preloaded": [
+    "SaleBoard.id",
+    "SaleBoard.code",
+    "SaleBoard.name",
+    "SaleBoard.venueId",
+    "SaleBoard.kind"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-117",
+   "source": "Claude Design POS pack, 24 August",
+   "note": "**Drawn by Claude Design on `POS Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-118",
+  "name": "Campaign & Audience Management",
+  "module": "Sell",
+  "requiresModule": "marketing",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/campaign-audience-management",
+   "component": "apps/venue-management-web/src/routes/sell/CampaignAudienceManagementList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-102",
+    "BO-117"
+   ],
+   "exitTo": [
+    "BO-102",
+    "BO-126"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-126",
+     "trigger": "Deployment, Preview & Audit",
+     "provenance": "flow F86 step 4→5",
+     "operation": "createCampaign"
+    },
+    {
+     "to": "BO-102",
+     "trigger": "Sell",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Owns POS board frame(s) POS-4D** (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse off than one who has none.",
+  "density": "compact",
+  "boardFrames": [
+   "POS Board 4.dc.html#pos-4d"
+  ],
+  "pattern": "commandCentre",
+  "patternReason": "3 independent reads and no read of one record — the screen watches a population rather than working one",
+  "purpose": "Campaign & Audience Management — from the client design board, 20 August.",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Campaigns",
+       "bindsTo": "Campaign",
+       "operation": "listCampaigns",
+       "provenance": "contract marketing-crm.yaml GET /campaigns"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Segments",
+       "bindsTo": "Segment",
+       "operation": "listSegments",
+       "provenance": "contract marketing-crm.yaml GET /segments"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Sale boards",
+       "bindsTo": "SaleBoard",
+       "operation": "listSaleBoards",
+       "provenance": "contract tenancy.yaml GET /sale-boards"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every campaign audience",
+       "bindsTo": "Campaign",
+       "columns": [
+        "Campaign.name",
+        "Campaign.kind",
+        "Campaign.channel",
+        "Campaign.venueId",
+        "Campaign.segmentId",
+        "Campaign.content",
+        "Campaign.trigger",
+        "Campaign.scheduledFor",
+        "Campaign.consentPurpose",
+        "Campaign.sendWindow",
+        "Campaign.id",
+        "Campaign.budgetCap"
+       ],
+       "operation": "listCampaigns",
+       "provenance": "contract marketing-crm.yaml GET /campaigns"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createCampaign",
+       "provenance": "contract marketing-crm.yaml POST /campaigns"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Run",
+       "operation": "runReport",
+       "provenance": "contract reporting.yaml POST /reports/{reportId}/run"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateSaleBoard",
+       "provenance": "contract tenancy.yaml PUT /sale-boards/{saleBoardId}"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search campaign",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The campaign audience list.",
+   "error": "Could not load. Names which read failed and leaves the campaign audience untouched.",
+   "emptyFirstRun": "No campaign audience yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the campaign audience are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCampaigns",
+    "contract": "marketing-crm",
+    "purpose": "List campaigns",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createCampaign",
+    "contract": "marketing-crm",
+    "purpose": "Create a campaign",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCampaigns"
+    ]
+   },
+   {
+    "operationId": "listSegments",
+    "contract": "marketing-crm",
+    "purpose": "List segments",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listSaleBoards",
+    "contract": "tenancy",
+    "purpose": "List sale boards",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "runReport",
+    "contract": "reporting",
+    "purpose": "Run a report",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCampaigns"
+    ]
+   },
+   {
+    "operationId": "updateSaleBoard",
+    "contract": "tenancy",
+    "purpose": "Update a sale board",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCampaigns"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    },
+    {
+     "name": "reportId",
+     "from": "deepLink"
+    },
+    {
+     "name": "saleBoardId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-118",
+   "source": "Claude Design POS pack, 24 August",
+   "note": "**Drawn by Claude Design on `POS Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-119",
+  "name": "Cross-Sell, Upsell & Recommendation Rules",
+  "module": "Sell",
+  "requiresModule": "ticketing",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/cross-sell-upsell-recommendation-rules",
+   "component": "apps/venue-management-web/src/routes/sell/CrossSellUpsellRecommendationRulesList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-102"
+   ],
+   "exitTo": [
+    "BO-010",
+    "BO-102"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-010",
+     "trigger": "Promotions & Coupons",
+     "provenance": "flow F90 step 1→2"
+    },
+    {
+     "to": "BO-102",
+     "trigger": "Sell",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not.",
+  "density": "compact",
+  "boardFrames": [
+   "Retail Board 5.dc.html#ret-5d"
+  ],
+  "pattern": "statusTracker",
+  "patternReason": "`getRecommendations` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Cross-Sell, Upsell & Recommendation Rules — from the client design board, 20 August.",
+  "gaps": [
+   {
+    "operation": "getRecommendations",
+    "why": "**2 declared operations reach no component on this screen**: getRecommendations, getUpsellSuggestions. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search cross-sell, upsell",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "getRecommendations",
+       "notes": "The act the screen exists for."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "getRecommendations"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The cross-sell upsell recommendation list.",
+   "error": "Could not load. Names which read failed and leaves the cross-sell upsell recommendation untouched.",
+   "emptyFirstRun": "No cross-sell upsell recommendation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the cross-sell upsell recommendation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getRecommendations",
+    "contract": "promotions",
+    "purpose": "What else this guest might want",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getUpsellSuggestions",
+    "contract": "promotions",
+    "purpose": "Suggestions for a cart",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-119",
+   "source": "Claude Design Retail pack, 24 August",
+   "note": "**Drawn by Claude Design on `Retail Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-120",
+  "name": "Omnichannel Commerce & Journey Configuration",
+  "module": "Sell",
+  "requiresModule": "marketing",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/omnichannel-commerce-journey-configuration",
+   "component": "apps/venue-management-web/src/routes/sell/OmnichannelCommerceJourneyConfiguratioList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-102"
+   ],
+   "exitTo": [
+    "BO-102"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-102",
+     "trigger": "Sell",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not. **Drawn 31 August** — `Retail Board 5.dc.html` frame `ret-5g`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Omnichannel Commerce &amp; Journey Configuration* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.",
+  "density": "compact",
+  "boardFrames": [
+   "Retail Board 5.dc.html#ret-5g"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listJourneys` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Omnichannel Commerce & Journey Configuration — from the client design board, 20 August.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every omnichannel commerce journey",
+       "bindsTo": "Journey",
+       "columns": [
+        "Journey.id",
+        "Journey.name",
+        "Journey.templateKind",
+        "Journey.entryEvent",
+        "Journey.entryConditions",
+        "Journey.steps",
+        "Journey.status",
+        "Journey.maxDurationDays",
+        "Journey.reentryPolicy",
+        "Journey.scopePath"
+       ],
+       "operation": "listJourneys",
+       "provenance": "contract marketing-crm.yaml GET /journeys"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected omnichannel commerce journey",
+       "bindsTo": "Journey",
+       "columns": [
+        "Journey.id",
+        "Journey.name",
+        "Journey.templateKind",
+        "Journey.entryEvent",
+        "Journey.entryConditions",
+        "Journey.steps",
+        "Journey.status",
+        "Journey.maxDurationDays",
+        "Journey.reentryPolicy",
+        "Journey.scopePath"
+       ],
+       "operation": "listJourneys",
+       "provenance": "contract marketing-crm.yaml GET /journeys"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createJourney",
+       "provenance": "contract marketing-crm.yaml POST /journeys"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search omnichannel commerce",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The omnichannel commerce journey list.",
+   "error": "Could not load. Names which read failed and leaves the omnichannel commerce journey untouched.",
+   "emptyFirstRun": "No omnichannel commerce journey yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the omnichannel commerce journey are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listJourneys",
+    "contract": "marketing-crm",
+    "purpose": "Automated journeys",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createJourney",
+    "contract": "marketing-crm",
+    "purpose": "Define an automated journey",
+    "trigger": "onAction",
+    "invalidates": [
+     "listJourneys"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders.",
+   "preloaded": [
+    "Journey.id",
+    "Journey.name",
+    "Journey.templateKind",
+    "Journey.entryEvent",
+    "Journey.entryConditions"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-120",
+   "note": "**Drawn by Claude Design on `Retail Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-121",
+  "name": "Personalized Offers & Guest Engagement",
+  "module": "Sell",
+  "requiresModule": "marketing",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/personalized-offers-guest-engagement",
+   "component": "apps/venue-management-web/src/routes/sell/PersonalizedOffersGuestEngagementList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-102"
+   ],
+   "exitTo": [
+    "BO-102"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-102",
+     "trigger": "Sell",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them.",
+  "density": "compact",
+  "boardFrames": [
+   "Retail Board 5.dc.html#ret-5f"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listSegments` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Personalized Offers & Guest Engagement — from the client design board, 20 August.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every personalized offers guest",
+       "bindsTo": "Segment",
+       "columns": [
+        "Segment.name",
+        "Segment.description",
+        "Segment.venueId",
+        "Segment.match",
+        "Segment.criteria",
+        "Segment.excludeSegmentIds",
+        "Segment.id",
+        "Segment.lastEvaluatedSize",
+        "Segment.lastEvaluatedAt"
+       ],
+       "operation": "listSegments",
+       "provenance": "contract marketing-crm.yaml GET /segments"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected personalized offers guest",
+       "bindsTo": "Segment",
+       "columns": [
+        "Segment.name",
+        "Segment.description",
+        "Segment.venueId",
+        "Segment.match",
+        "Segment.criteria",
+        "Segment.excludeSegmentIds",
+        "Segment.id",
+        "Segment.lastEvaluatedSize",
+        "Segment.lastEvaluatedAt"
+       ],
+       "operation": "listSegments",
+       "provenance": "contract marketing-crm.yaml GET /segments"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createCampaign",
+       "provenance": "contract marketing-crm.yaml POST /campaigns"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search personalized offers",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The personalized offers guest list.",
+   "error": "Could not load. Names which read failed and leaves the personalized offers guest untouched.",
+   "emptyFirstRun": "No personalized offers guest yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the personalized offers guest are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listSegments",
+    "contract": "marketing-crm",
+    "purpose": "List segments",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createCampaign",
+    "contract": "marketing-crm",
+    "purpose": "Create a campaign",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSegments"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders.",
+   "preloaded": [
+    "Segment.name",
+    "Segment.description",
+    "Segment.venueId",
+    "Segment.match",
+    "Segment.criteria"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-121",
+   "source": "Claude Design Retail pack, 24 August",
+   "note": "**Drawn by Claude Design on `Retail Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-122",
+  "name": "POS Experience Dashboard",
+  "module": "Sell",
+  "requiresModule": "core",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/pos-experience-dashboard",
+   "component": "apps/venue-management-web/src/routes/sell/PosExperienceDashboardList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-102"
+   ],
+   "exitTo": [
+    "BO-102"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-102",
+     "trigger": "Sell",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not.",
+  "density": "compact",
+  "boardFrames": [
+   "Retail Board 5.dc.html#ret-5j"
+  ],
+  "pattern": "listDetail",
+  "patternReason": "`listSaleBoards` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "POS Experience Dashboard — from the client design board, 20 August.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every pos experience",
+       "bindsTo": "SaleBoard",
+       "columns": [
+        "SaleBoard.id",
+        "SaleBoard.code",
+        "SaleBoard.name",
+        "SaleBoard.venueId",
+        "SaleBoard.kind",
+        "SaleBoard.pages",
+        "SaleBoard.isActive"
+       ],
+       "operation": "listSaleBoards",
+       "provenance": "contract tenancy.yaml GET /sale-boards"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected pos experience",
+       "bindsTo": "SaleBoard",
+       "columns": [
+        "SaleBoard.id",
+        "SaleBoard.code",
+        "SaleBoard.name",
+        "SaleBoard.venueId",
+        "SaleBoard.kind",
+        "SaleBoard.pages",
+        "SaleBoard.isActive"
+       ],
+       "operation": "listSaleBoards",
+       "provenance": "contract tenancy.yaml GET /sale-boards"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search pos experience dashboard",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The pos experience list.",
+   "error": "Could not load. Names which read failed and leaves the pos experience untouched.",
+   "emptyFirstRun": "No pos experience yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the pos experience are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listSaleBoards",
+    "contract": "tenancy",
+    "purpose": "List sale boards",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders.",
+   "preloaded": [
+    "SaleBoard.id",
+    "SaleBoard.code",
+    "SaleBoard.name",
+    "SaleBoard.venueId",
+    "SaleBoard.kind"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-122",
+   "source": "Claude Design Retail pack, 24 August",
+   "note": "**Drawn by Claude Design on `Retail Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-123",
+  "name": "POS Profile Management",
+  "module": "Sell",
+  "requiresModule": "core",
+  "wave": 2,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/sell/pos-profile-management",
+   "component": "apps/venue-management-web/src/routes/sell/PosProfileManagementList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-102"
+   ],
+   "exitTo": [
+    "BO-102"
+   ],
+   "inferred": false,
+   "notes": "**Returns to BO-102.** Stated on 4 September: this screen declared where it is reached from and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.",
+   "transitions": [
+    {
+     "to": "BO-102",
+     "trigger": "Sell",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-102 declares entryState.params venueId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listSaleBoards` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "POS Profile Management — from the client design board, 20 August.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every pos profile",
+       "bindsTo": "SaleBoard",
+       "columns": [
+        "SaleBoard.id",
+        "SaleBoard.code",
+        "SaleBoard.name",
+        "SaleBoard.venueId",
+        "SaleBoard.kind",
+        "SaleBoard.pages",
+        "SaleBoard.isActive"
+       ],
+       "operation": "listSaleBoards",
+       "provenance": "contract tenancy.yaml GET /sale-boards"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected pos profile",
+       "bindsTo": "SaleBoard",
+       "columns": [
+        "SaleBoard.id",
+        "SaleBoard.code",
+        "SaleBoard.name",
+        "SaleBoard.venueId",
+        "SaleBoard.kind",
+        "SaleBoard.pages",
+        "SaleBoard.isActive"
+       ],
+       "operation": "listSaleBoards",
+       "provenance": "contract tenancy.yaml GET /sale-boards"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "operation": "setConfigurationProfile",
+       "provenance": "contract tenancy.yaml PUT /configuration-profiles"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search pos profile management",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The pos profile list.",
+   "error": "Could not load. Names which read failed and leaves the pos profile untouched.",
+   "emptyFirstRun": "No pos profile yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the pos profile are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setConfigurationProfile",
+    "contract": "tenancy",
+    "purpose": "setConfigurationProfile",
+    "trigger": "onAction",
+    "invalidates": [
+     "listSaleBoards"
+    ]
+   },
+   {
+    "operationId": "listSaleBoards",
+    "contract": "tenancy",
+    "purpose": "List sale boards",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders.",
+   "preloaded": [
+    "SaleBoard.id",
+    "SaleBoard.code",
+    "SaleBoard.name",
+    "SaleBoard.venueId",
+    "SaleBoard.kind"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-123"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

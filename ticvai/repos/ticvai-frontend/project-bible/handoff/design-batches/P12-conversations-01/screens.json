@@ -1,0 +1,662 @@
+[
+ {
+  "id": "SUP-004",
+  "name": "Conversation Queue",
+  "module": "Conversations",
+  "requiresModule": "marketing",
+  "wave": 2,
+  "capability": "C32",
+  "implementation": {
+   "app": "venue-support-web",
+   "route": "/general/conversation-queue",
+   "component": "apps/venue-support-web/src/routes/general/ConversationQueueList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "SUP-001"
+   ],
+   "exitTo": [
+    "SUP-001",
+    "SUP-002",
+    "SUP-003",
+    "SUP-005"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "SUP-005",
+     "trigger": "Reads the history and replies",
+     "provenance": "flow F05 step 1→2, F24 step 3→4"
+    },
+    {
+     "to": "SUP-001",
+     "trigger": "Agent Login",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "SUP-002",
+     "trigger": "Agent Dashboard",
+     "carries": [
+      "caseId"
+     ],
+     "provenance": "derived — SUP-002 declares entryState.params caseId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101). **The guest concierge is Phase 1 and a handover needs somewhere to land** — the queue and the workspace move; the rest of the console stays Wave 3.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listCases` reads the population and `getCase` reads one of them — list, select, act",
+  "purpose": "Find the right one quickly, and act on it without opening it.",
+  "gaps": [
+   {
+    "operation": "listConversations",
+    "why": "**1 declared operation reach no component on this screen**: listConversations. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every conversation queue",
+       "bindsTo": "Case",
+       "columns": [
+        "Case.id",
+        "Case.caseNumber",
+        "Case.subjectId",
+        "Case.guestName",
+        "Case.subject",
+        "Case.categoryId",
+        "Case.status",
+        "Case.priority",
+        "Case.assignedToPrincipalId",
+        "Case.venueId",
+        "Case.relatedOrderId",
+        "Case.slaDueAt"
+       ],
+       "operation": "listCases",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected conversation queue",
+       "bindsTo": "CaseDetail",
+       "columns": [
+        "CaseDetail.id",
+        "CaseDetail.caseNumber",
+        "CaseDetail.subjectId",
+        "CaseDetail.guestName",
+        "CaseDetail.subject",
+        "CaseDetail.categoryId",
+        "CaseDetail.status",
+        "CaseDetail.priority",
+        "CaseDetail.assignedToPrincipalId",
+        "CaseDetail.venueId",
+        "CaseDetail.relatedOrderId",
+        "CaseDetail.slaDueAt",
+        "CaseDetail.isSlaBreached",
+        "CaseDetail.slaPausedSeconds",
+        "CaseDetail.escalationCount",
+        "CaseDetail.resolvedAt"
+       ],
+       "operation": "getCase",
+       "provenance": "contract marketing-crm.yaml GET /cases/{caseId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add",
+       "operation": "addCaseMessage",
+       "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/messages"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createCase",
+       "provenance": "contract marketing-crm.yaml POST /cases"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Escalate",
+       "operation": "escalateCase",
+       "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/escalate"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reopen",
+       "operation": "reopenCase",
+       "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/reopen"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateCase",
+       "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Claim",
+       "operation": "claimConversation",
+       "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/claim"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Transfer",
+       "operation": "transferConversation",
+       "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/transfer"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The conversation queue list.",
+   "error": "Could not load. Names which read failed and leaves the conversation queue untouched.",
+   "emptyFirstRun": "No conversation queue yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the conversation queue are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCases",
+    "contract": "marketing-crm",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "addCaseMessage",
+    "contract": "marketing-crm",
+    "purpose": "Add a message or internal note",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCases"
+    ]
+   },
+   {
+    "operationId": "createCase",
+    "contract": "marketing-crm",
+    "purpose": "Raise a service case",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCases"
+    ]
+   },
+   {
+    "operationId": "escalateCase",
+    "contract": "marketing-crm",
+    "purpose": "Escalate a case",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCases"
+    ]
+   },
+   {
+    "operationId": "getCase",
+    "contract": "marketing-crm",
+    "purpose": "Read a case with its thread",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "reopenCase",
+    "contract": "marketing-crm",
+    "purpose": "Reopen a resolved case",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCases"
+    ]
+   },
+   {
+    "operationId": "updateCase",
+    "contract": "marketing-crm",
+    "purpose": "Assign, reprioritise or resolve a case",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCases"
+    ]
+   },
+   {
+    "operationId": "listConversations",
+    "contract": "marketing-crm",
+    "purpose": "The omnichannel inbox",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "claimConversation",
+    "contract": "marketing-crm",
+    "purpose": "An agent takes it",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCases"
+    ]
+   },
+   {
+    "operationId": "transferConversation",
+    "contract": "marketing-crm",
+    "purpose": "Pass it to another agent or queue",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCases"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "caseId",
+     "from": "deepLink"
+    },
+    {
+     "name": "conversationId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom.",
+   "preloaded": [
+    "CaseDetail.id",
+    "CaseDetail.caseNumber",
+    "CaseDetail.subjectId",
+    "CaseDetail.guestName",
+    "CaseDetail.subject"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P12 Venue Support.dc.html#sup-004"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P12",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Support",
+   "name": "Venue Support — Agent Console",
+   "offlineCapable": false,
+   "app": "venue-support-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "SUP-005",
+  "name": "Live Chat Workspace",
+  "module": "Conversations",
+  "requiresModule": "marketing",
+  "wave": 2,
+  "capability": "C32",
+  "implementation": {
+   "app": "venue-support-web",
+   "route": "/general/live-chat-workspace",
+   "component": "apps/venue-support-web/src/routes/general/LiveChatWorkspaceDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "SUP-001",
+    "SUP-004",
+    "SUP-005"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "SUP-001",
+    "SUP-002",
+    "SUP-003"
+   ],
+   "flowDerived": true,
+   "transitions": [
+    {
+     "to": "SUP-001",
+     "trigger": "Agent Login",
+     "carries": [
+      "sessionId"
+     ],
+     "provenance": "derived — SUP-001 declares entryState.params sessionId, so an edge into it must carry them"
+    },
+    {
+     "to": "SUP-002",
+     "trigger": "Agent Dashboard",
+     "carries": [
+      "caseId"
+     ],
+     "provenance": "derived — SUP-002 declares entryState.params caseId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101) with SUP-004. An agent needs a queue and a place to answer from; canned responses and SLA reporting can wait.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listCases` reads the population and `getCase` reads one of them — list, select, act",
+  "purpose": "Work with live chat workspace for this venue.",
+  "gaps": [
+   {
+    "operation": "getConversation",
+    "why": "**1 declared operation reach no component on this screen**: getConversation. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every live chat",
+       "bindsTo": "Case",
+       "columns": [
+        "Case.id",
+        "Case.caseNumber",
+        "Case.subjectId",
+        "Case.guestName",
+        "Case.subject",
+        "Case.categoryId",
+        "Case.status",
+        "Case.priority",
+        "Case.assignedToPrincipalId",
+        "Case.venueId",
+        "Case.relatedOrderId",
+        "Case.slaDueAt"
+       ],
+       "operation": "listCases",
+       "provenance": "contract marketing-crm.yaml GET /cases"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected live chat",
+       "bindsTo": "CaseDetail",
+       "columns": [
+        "CaseDetail.id",
+        "CaseDetail.caseNumber",
+        "CaseDetail.subjectId",
+        "CaseDetail.guestName",
+        "CaseDetail.subject",
+        "CaseDetail.categoryId",
+        "CaseDetail.status",
+        "CaseDetail.priority",
+        "CaseDetail.assignedToPrincipalId",
+        "CaseDetail.venueId",
+        "CaseDetail.relatedOrderId",
+        "CaseDetail.slaDueAt",
+        "CaseDetail.isSlaBreached",
+        "CaseDetail.slaPausedSeconds",
+        "CaseDetail.escalationCount",
+        "CaseDetail.resolvedAt"
+       ],
+       "operation": "getCase",
+       "provenance": "contract marketing-crm.yaml GET /cases/{caseId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add",
+       "operation": "addCaseMessage",
+       "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/messages"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateCase",
+       "provenance": "contract marketing-crm.yaml PATCH /cases/{caseId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Escalate",
+       "operation": "escalateCase",
+       "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/escalate"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createCase",
+       "provenance": "contract marketing-crm.yaml POST /cases"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reopen",
+       "operation": "reopenCase",
+       "provenance": "contract marketing-crm.yaml POST /cases/{caseId}/reopen"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Send",
+       "operation": "sendConversationMessage",
+       "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/messages"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Close",
+       "operation": "closeConversation",
+       "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/close"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Transfer",
+       "operation": "transferConversation",
+       "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/transfer"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "derived": true,
+       "impliedBy": "addCaseMessage",
+       "label": "Add case message",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listCases",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "addCaseMessage",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmCloseConversation",
+    "component": "confirmDialog",
+    "trigger": "Close",
+    "body": "**Names what `closeConversation` changes and what it leaves alone**, in the consequence rather than the verb. A live chat this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/close"
+   }
+  ],
+  "states": {
+   "loading": "The live chat list.",
+   "error": "Could not load. Names which read failed and leaves the live chat untouched.",
+   "emptyFirstRun": "No live chat yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the live chat are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "addCaseMessage",
+    "contract": "marketing-crm",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getCase",
+    "contract": "marketing-crm",
+    "purpose": "Case with its thread",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateCase",
+    "contract": "marketing-crm",
+    "purpose": "Assign, reprioritise, resolve",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "escalateCase",
+    "contract": "marketing-crm",
+    "purpose": "Escalate with a reason",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "createCase",
+    "contract": "marketing-crm",
+    "purpose": "Raise a service case",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCases"
+    ]
+   },
+   {
+    "operationId": "listCases",
+    "contract": "marketing-crm",
+    "purpose": "List service cases",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "reopenCase",
+    "contract": "marketing-crm",
+    "purpose": "Reopen a resolved case",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCases"
+    ]
+   },
+   {
+    "operationId": "getConversation",
+    "contract": "marketing-crm",
+    "purpose": "One conversation and everything before it",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "sendConversationMessage",
+    "contract": "marketing-crm",
+    "purpose": "Say something, as a guest or an agent",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCases"
+    ]
+   },
+   {
+    "operationId": "closeConversation",
+    "contract": "marketing-crm",
+    "purpose": "End it",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCases"
+    ]
+   },
+   {
+    "operationId": "transferConversation",
+    "contract": "marketing-crm",
+    "purpose": "Pass it to another agent or queue",
+    "trigger": "onAction",
+    "invalidates": [
+     "listCases"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "caseId",
+     "from": "SUP-004"
+    },
+    {
+     "name": "conversationId",
+     "from": "SUP-004"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "CaseDetail.id",
+    "CaseDetail.caseNumber",
+    "CaseDetail.subjectId",
+    "CaseDetail.guestName",
+    "CaseDetail.subject"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P12 Venue Support.dc.html#sup-005"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P12",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Support",
+   "name": "Venue Support — Agent Console",
+   "offlineCapable": false,
+   "app": "venue-support-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

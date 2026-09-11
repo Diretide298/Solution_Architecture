@@ -1,0 +1,1915 @@
+[
+ {
+  "id": "CMS-021",
+  "name": "Privacy & Consent Configuration Command Center",
+  "module": "Policy",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
+   "board": "1",
+   "number": "17.1.1",
+   "page": 4
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/policy/privacy-consent-configuration-command-center-cms-021",
+   "component": "apps/venue-management-web/src/routes/policy/PrivacyConsentConfigurationCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "CMS-001"
+   ],
+   "exitTo": [
+    "CMS-001",
+    "CMS-022",
+    "CMS-023",
+    "CMS-024",
+    "CMS-025",
+    "CMS-026",
+    "CMS-027",
+    "CMS-028",
+    "CMS-029",
+    "CMS-030"
+   ],
+   "inferred": false,
+   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
+   "transitions": [
+    {
+     "to": "CMS-001",
+     "trigger": "Tenant Workspace",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — CMS-001 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "CMS-022",
+     "trigger": "Works in Data Processing Purpose & Lawful Basis Registry",
+     "provenance": "flow F150 step 1→2",
+     "operation": "listPrivacyConsent"
+    },
+    {
+     "to": "CMS-023",
+     "trigger": "Works in Consent Purpose & Consent Type Builder",
+     "provenance": "flow F150 step 3→4",
+     "operation": "listPrivacyConsent"
+    },
+    {
+     "to": "CMS-024",
+     "trigger": "Works in Communication Preference & Marketing Permission Configuration",
+     "provenance": "flow F150 step 5→6",
+     "operation": "listPrivacyConsent"
+    },
+    {
+     "to": "CMS-025",
+     "trigger": "Works in Cookie, Tracking & Digital Technology Registry",
+     "provenance": "flow F150 step 7→8",
+     "operation": "listPrivacyConsent"
+    },
+    {
+     "to": "CMS-026",
+     "trigger": "Works in Cookie Banner & Preference Center Designer",
+     "provenance": "flow F150 step 9→10",
+     "operation": "listPrivacyConsent"
+    },
+    {
+     "to": "CMS-027",
+     "trigger": "Works in Consent Capture Point & Customer Journey Configuration",
+     "provenance": "flow F150 step 11→12",
+     "operation": "listPrivacyConsent"
+    },
+    {
+     "to": "CMS-028",
+     "trigger": "Works in Privacy Notice, Policy & Terms Version Management",
+     "provenance": "flow F150 step 13→14",
+     "operation": "listPrivacyConsent"
+    },
+    {
+     "to": "CMS-029",
+     "trigger": "Works in Minor, Guardian & Age-Based Privacy Configuration",
+     "provenance": "flow F150 step 15→16",
+     "operation": "listPrivacyConsent"
+    },
+    {
+     "to": "CMS-030",
+     "trigger": "Works in Privacy Configuration Testing, Approval & Publication",
+     "provenance": "flow F150 step 17→18",
+     "operation": "listPrivacyConsent"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Display configuration indicators such as; Configuration Type Scope Status) and no display directory — it is settings, not a population",
+  "purpose": "Provide administrators with one central dashboard for configuring and governing TICVAI's privacy framework across tenants, brands, venues and customer channels.",
+  "purposeNote": "An authorized administrator can centrally understand and manage TICVAI's privacy, consent and preference configuration without navigating individual sales or customer modules.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 7 actions on this screen and the screen declares 1 operation.** Unserved: Create Consent Purpose, Create Policy, Configure Preferences, Configure Cookies, Configure Capture Point, Test Configuration, Submit for Approval. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 4 §Quick Actions"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search privacy consent",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 4 §Filter by"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "Tenant",
+        "Brand",
+        "Country",
+        "Venue",
+        "Channel",
+        "Consent Type",
+        "Policy",
+        "Language",
+        "Status",
+        "Effective Date"
+       ],
+       "notes": "The pack filters this screen by tenant, brand, country, venue, channel, consent type and 4 more — which are present is a decision the pack already made.",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 4 §Filter by"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Active Consent Purposes",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 4 §Display configuration indicators such as"
+      },
+      {
+       "kind": "selectField",
+       "label": "Active Privacy Policies",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 4 §Display configuration indicators such as"
+      },
+      {
+       "kind": "selectField",
+       "label": "Communication Preference Types",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 4 §Display configuration indicators such as"
+      },
+      {
+       "kind": "selectField",
+       "label": "Cookie Categories",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 4 §Display configuration indicators such as"
+      },
+      {
+       "kind": "textField",
+       "label": "Active Consent Capture Points",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 4 §Display configuration indicators such as"
+      },
+      {
+       "kind": "selectField",
+       "label": "Supported Languages",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 4 §Display configuration indicators such as"
+      },
+      {
+       "kind": "selectField",
+       "label": "Pending Policy Approvals",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 4 §Display configuration indicators such as"
+      },
+      {
+       "kind": "selectField",
+       "label": "Scheduled Policy Changes",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 4 §Display configuration indicators such as"
+      },
+      {
+       "kind": "selectField",
+       "label": "Configuration Warnings",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 4 §Display configuration indicators such as"
+      },
+      {
+       "kind": "textField",
+       "label": "Consent Configurations Requiring Review",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 4 §Display configuration indicators such as"
+      },
+      {
+       "kind": "selectField",
+       "label": "n From",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 4 §Configuration Type Scope Status"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create Consent Purpose",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 4 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create Policy",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 4 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Configure Preferences",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 4 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Configure Cookies",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 4 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Configure Capture Point",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 4 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Test Configuration",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 4 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Submit for Approval",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 4 §Quick Actions"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The privacy consent configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the privacy consent untouched.",
+   "emptyFirstRun": "No privacy consent configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoResults": "The filter narrowed it and the privacy consent are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listPrivacyConsent",
+    "contract": "marketing-crm",
+    "purpose": "Privacy & Consent Configuration Command Center",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-021"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 4. 0 of 10 labels bound to a contract property; 28 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P13",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue CMS",
+   "name": "Venue CMS — White Label",
+   "app": "venue-management-web",
+   "offlineCapable": false,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "CMS-022",
+  "name": "Data Processing Purpose & Lawful Basis Registry",
+  "module": "Policy",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
+   "board": "1",
+   "number": "17.1.2",
+   "page": 5
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/policy/data-processing-purpose-lawful-basis-registry-cms-022",
+   "component": "apps/venue-management-web/src/routes/policy/DataProcessingPurposeLawfulBasisRegistry.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "CMS-021"
+   ],
+   "exitTo": [
+    "CMS-021"
+   ],
+   "inferred": false,
+   "notes": "**Reached from CMS-021, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "CMS-021",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F150 step 2→3",
+     "operation": "listDataProcessingPurpose"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Create a central registry explaining why customer data is being collected or processed. This becomes the foundation used by consent forms, policies, customer journeys and downstream systems. Ticket Purchase & Fulfillment Customer Account Management Membership Administration Customer Support Transactional Communication Marketing Communication Personalization Analytics Fraud Prevention Security Biometric Processing Location-Based Services Loyalty Customer Research",
+  "purposeNote": "Every governed processing purpose can be centrally documented, classified, versioned and associated with the appropriate TICVAI processes.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 5"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 5"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listDataProcessingPurpose",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The data processing purpose list.",
+   "error": "Could not load. Names which read failed and leaves the data processing purpose untouched.",
+   "emptyFirstRun": "No data processing purpose yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the data processing purpose are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listDataProcessingPurpose",
+    "contract": "marketing-crm",
+    "purpose": "Data Processing Purpose & Lawful Basis Registry",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "DataProcessingPurposeLawfulBasisRegistryView.purposeId",
+    "DataProcessingPurposeLawfulBasisRegistryView.purposeName",
+    "DataProcessingPurposeLawfulBasisRegistryView.description",
+    "DataProcessingPurposeLawfulBasisRegistryView.businessOwner",
+    "DataProcessingPurposeLawfulBasisRegistryView.dataControllerApplicableOrganization"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-022"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 5. 0 of 0 labels bound to a contract property; 0 of 54 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P13",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue CMS",
+   "name": "Venue CMS — White Label",
+   "app": "venue-management-web",
+   "offlineCapable": false,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "CMS-023",
+  "name": "Consent Purpose & Consent Type Builder",
+  "module": "Policy",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
+   "board": "1",
+   "number": "17.1.3",
+   "page": 7
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/policy/consent-purpose-consent-type-builder-cms-023",
+   "component": "apps/venue-management-web/src/routes/policy/ConsentPurposeConsentTypeBuilder.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "CMS-021"
+   ],
+   "exitTo": [
+    "CMS-021"
+   ],
+   "inferred": false,
+   "notes": "**Reached from CMS-021, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "CMS-021",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F150 step 4→5",
+     "operation": "setConsentPurposes"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Configure the actual consent objects that TICVAI may request from customers.",
+  "purposeNote": "Administrators can create reusable, granular and version-controlled consent definitions without development effort.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Consent ID",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Name",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Processing Purpose",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Description",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Consent Text",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Mandatory / Optional",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "textField",
+       "label": "Explicit / Other configured consent method",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Default state",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Withdrawal permitted",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Renewal required",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Expiry",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Reconfirmation interval",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Age restrictions",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Guardian requirement",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Channel applicability",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Country applicability",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Brand applicability",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "provenance": "contract operation setConsentPurposes"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The consent purpose consent configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the consent purpose consent untouched.",
+   "emptyFirstRun": "No consent purpose consent configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "Configure consent purposes",
+    "trigger": "onAction",
+    "invalidates": [
+     "setConsentPurposes"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-023"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 7. 0 of 0 labels bound to a contract property; 17 of 46 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P13",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue CMS",
+   "name": "Venue CMS — White Label",
+   "app": "venue-management-web",
+   "offlineCapable": false,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "CMS-024",
+  "name": "Communication Preference & Marketing Permission Configuration",
+  "module": "Policy",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
+   "board": "1",
+   "number": "17.1.4",
+   "page": 8
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/policy/communication-preference-marketing-permission-configurat-cms-024",
+   "component": "apps/venue-management-web/src/routes/policy/CommunicationPreferenceMarketingPermissionConfig.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "CMS-021"
+   ],
+   "exitTo": [
+    "CMS-021"
+   ],
+   "inferred": false,
+   "notes": "**Reached from CMS-021, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "CMS-021",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F150 step 6→7",
+     "operation": "setCommunicationPreferenceMarketing"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure; Administrators define) and no display directory — it is settings, not a population",
+  "purpose": "Define how customers control the communications they wish to receive. This screen should integrate strongly with CRM and Marketing but remain governed by the central Privacy Engine.",
+  "purposeNote": "downstream communication systems can consistently enforce.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Channel + Purpose + Brand. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 8 §Support"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Email",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "SMS",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "WhatsApp",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Push Notification",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Phone",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Direct Mail",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Other future channels",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Preference category",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 8 §Administrators define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Communication type",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 8 §Administrators define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Marketing/transactional classification",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 8 §Administrators define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Applicable brands",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 8 §Administrators define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Applicable countries",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 8 §Administrators define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Available channels",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 8 §Administrators define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer-editable status",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 8 §Administrators define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Default behavior",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 8 §Administrators define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Consent dependency",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 8 §Administrators define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Expiry/reconfirmation if applicable",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 8 §Administrators define"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Channel + Purpose + Brand",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 8 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The communication preference marketing configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the communication preference marketing untouched.",
+   "emptyFirstRun": "No communication preference marketing configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setCommunicationPreferenceMarketing",
+    "contract": "marketing-crm",
+    "purpose": "Communication Preference & Marketing Permission Configuration",
+    "trigger": "onAction",
+    "invalidates": [
+     "setCommunicationPreferenceMarketing"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-024"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 18 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P13",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue CMS",
+   "name": "Venue CMS — White Label",
+   "app": "venue-management-web",
+   "offlineCapable": false,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "CMS-025",
+  "name": "Cookie, Tracking & Digital Technology Registry",
+  "module": "Policy",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
+   "board": "1",
+   "number": "17.1.5",
+   "page": 10
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/policy/cookie-tracking-digital-technology-registry-cms-025",
+   "component": "apps/venue-management-web/src/routes/policy/CookieTrackingDigitalTechnologyRegistry.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "CMS-021"
+   ],
+   "exitTo": [
+    "CMS-021"
+   ],
+   "inferred": false,
+   "notes": "**Reached from CMS-021, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "CMS-021",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F150 step 8→9",
+     "operation": "listCookieTrackingDigital"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Maintain a centralized registry of cookies, SDKs, pixels and other governed tracking technologies used by TICVAI digital channels. This should cover more than traditional browser cookies.",
+  "purposeNote": "Administrators maintain an auditable inventory of governed cookies and tracking technologies, their purposes and applicable consent requirements.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Other tracking technology. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 10 §Support"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 10"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 10"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Other tracking technology",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 10 §Support"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listCookieTrackingDigital",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The cookie tracking digital list.",
+   "error": "Could not load. Names which read failed and leaves the cookie tracking digital untouched.",
+   "emptyFirstRun": "No cookie tracking digital yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the cookie tracking digital are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCookieTrackingDigital",
+    "contract": "marketing-crm",
+    "purpose": "Cookie, Tracking & Digital Technology Registry",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "CookieTrackingDigitalTechnologyRegistryView.firstPartyCookie",
+    "CookieTrackingDigitalTechnologyRegistryView.thirdPartyCookie",
+    "CookieTrackingDigitalTechnologyRegistryView.mobileSdk",
+    "CookieTrackingDigitalTechnologyRegistryView.analyticsTracker",
+    "CookieTrackingDigitalTechnologyRegistryView.advertisingPixel"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-025"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 10. 0 of 0 labels bound to a contract property; 1 of 45 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P13",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue CMS",
+   "name": "Venue CMS — White Label",
+   "app": "venue-management-web",
+   "offlineCapable": false,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "CMS-026",
+  "name": "Cookie Banner & Preference Center Designer",
+  "module": "Policy",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
+   "board": "1",
+   "number": "17.1.6",
+   "page": 11
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/policy/cookie-banner-preference-center-designer-cms-026",
+   "component": "apps/venue-management-web/src/routes/policy/CookieBannerPreferenceCenterDesigner.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "CMS-021"
+   ],
+   "exitTo": [
+    "CMS-021"
+   ],
+   "inferred": false,
+   "notes": "**Reached from CMS-021, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "CMS-021",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F150 step 10→11",
+     "operation": "listCookieBannerPreference"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Provide a no-code designer for privacy/cookie interfaces displayed on digital channels.",
+  "purposeNote": "Authorized users can design and publish branded cookie/privacy preference experiences without requiring source-code changes for ordinary configuration changes.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Additional configured languages. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 11 §Support"
+   },
+   {
+    "operation": null,
+    "why": "**Cookie Banner & Preference Center Designer declares no operation that writes anything** — its only declared call is `listCookieBannerPreference`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Logo",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 11 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Title",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 11 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Description",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 11 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Buttons",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 11 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Position",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 11 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Theme",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 11 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Branding",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 11 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Language",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 11 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Links",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 11 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Category descriptions",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 11 §Configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Additional configured languages",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 11 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The cookie banner preference configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the cookie banner preference untouched.",
+   "emptyFirstRun": "No cookie banner preference configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCookieBannerPreference",
+    "contract": "marketing-crm",
+    "purpose": "Cookie Banner & Preference Center Designer",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-026"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 11. 0 of 0 labels bound to a contract property; 11 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P13",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue CMS",
+   "name": "Venue CMS — White Label",
+   "app": "venue-management-web",
+   "offlineCapable": false,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "CMS-027",
+  "name": "Consent Capture Point & Customer Journey Configuration",
+  "module": "Policy",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
+   "board": "1",
+   "number": "17.1.7",
+   "page": 12
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/policy/consent-capture-point-customer-journey-configuration-cms-027",
+   "component": "apps/venue-management-web/src/routes/policy/ConsentCapturePointCustomerJourneyConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "CMS-021"
+   ],
+   "exitTo": [
+    "CMS-021"
+   ],
+   "inferred": false,
+   "notes": "**Reached from CMS-021, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "CMS-021",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F150 step 12→13",
+     "operation": "setConsentCapturePoint"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Potential capture points include; For each capture point define) and no display directory — it is settings, not a population",
+  "purpose": "Define where, when and under what circumstances privacy notices and consent requests appear. This prevents each channel from implementing consent independently.",
+  "purposeNote": "without duplicating configuration inside each frontend channel.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Account Registration",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 12 §Potential capture points include"
+      },
+      {
+       "kind": "selectField",
+       "label": "Guest Checkout",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 12 §Potential capture points include"
+      },
+      {
+       "kind": "selectField",
+       "label": "Ticket Purchase",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 12 §Potential capture points include"
+      },
+      {
+       "kind": "selectField",
+       "label": "Membership Enrollment",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 12 §Potential capture points include"
+      },
+      {
+       "kind": "selectField",
+       "label": "Annual Pass Enrollment",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 12 §Potential capture points include"
+      },
+      {
+       "kind": "selectField",
+       "label": "Mobile App Registration",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 12 §Potential capture points include"
+      },
+      {
+       "kind": "selectField",
+       "label": "POS Customer Creation",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 12 §Potential capture points include"
+      },
+      {
+       "kind": "selectField",
+       "label": "Kiosk",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 12 §Potential capture points include"
+      },
+      {
+       "kind": "selectField",
+       "label": "CRM Customer Creation",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 12 §Potential capture points include"
+      },
+      {
+       "kind": "selectField",
+       "label": "Wallet Enrollment",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 12 §Potential capture points include"
+      },
+      {
+       "kind": "selectField",
+       "label": "Face Enrollment",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 12 §Potential capture points include"
+      },
+      {
+       "kind": "selectField",
+       "label": "Newsletter Signup",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 12 §Potential capture points include"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer Portal",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 12 §Potential capture points include"
+      },
+      {
+       "kind": "selectField",
+       "label": "Competition/Promotion",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 12 §Potential capture points include"
+      },
+      {
+       "kind": "selectField",
+       "label": "API/Partner Journey",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 12 §Potential capture points include"
+      },
+      {
+       "kind": "selectField",
+       "label": "Channel",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 12 §For each capture point define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Brand",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 12 §For each capture point define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Country",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 12 §For each capture point define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer type",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 12 §For each capture point define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Processing purpose",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 12 §For each capture point define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Required notice",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 12 §For each capture point define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Required consent",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 12 §For each capture point define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Optional preferences",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 12 §For each capture point define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Consent wording",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 12 §For each capture point define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Policy version",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 12 §For each capture point define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Language",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 12 §For each capture point define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Display order",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 12 §For each capture point define"
+      },
+      {
+       "kind": "selectField",
+       "label": "Mandatory/optional behavior",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 12 §For each capture point define"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "provenance": "contract operation setConsentCapturePoint"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The consent capture point configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the consent capture point untouched.",
+   "emptyFirstRun": "No consent capture point configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setConsentCapturePoint",
+    "contract": "marketing-crm",
+    "purpose": "Consent Capture Point & Customer Journey Configuration",
+    "trigger": "onAction",
+    "invalidates": [
+     "setConsentCapturePoint"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-027"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 12. 0 of 0 labels bound to a contract property; 28 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P13",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue CMS",
+   "name": "Venue CMS — White Label",
+   "app": "venue-management-web",
+   "offlineCapable": false,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "CMS-028",
+  "name": "Privacy Notice, Policy & Terms Version Management",
+  "module": "Policy",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
+   "board": "1",
+   "number": "17.1.8",
+   "page": 14
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/policy/privacy-notice-policy-terms-version-management-cms-028",
+   "component": "apps/venue-management-web/src/routes/policy/PrivacyNoticePolicyTermsVersionManagement.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "CMS-021"
+   ],
+   "exitTo": [
+    "CMS-021"
+   ],
+   "inferred": false,
+   "notes": "**Reached from CMS-021, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "CMS-021",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F150 step 14→15",
+     "operation": "listPrivacyNoticePolicy"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Manage customer-facing privacy notices and related governed documents with complete version control.",
+  "purposeNote": "which version was presented to a customer.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 14"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 14"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Privacy Policy",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 14 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "No Customer Action",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 14 §Allow changes to be marked"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The privacy notice policy list.",
+   "error": "Could not load. Names which read failed and leaves the privacy notice policy untouched.",
+   "emptyFirstRun": "No privacy notice policy yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the privacy notice policy are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listPrivacyNoticePolicy",
+    "contract": "marketing-crm",
+    "purpose": "Privacy Notice, Policy & Terms Version Management",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "PrivacyNoticePolicyTermsVersionManagementView.privacyPolicy",
+    "PrivacyNoticePolicyTermsVersionManagementView.privacyNotice",
+    "PrivacyNoticePolicyTermsVersionManagementView.cookieNotice",
+    "PrivacyNoticePolicyTermsVersionManagementView.marketingNotice",
+    "PrivacyNoticePolicyTermsVersionManagementView.biometricPrivacyNotice"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-028"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 2 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P13",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue CMS",
+   "name": "Venue CMS — White Label",
+   "app": "venue-management-web",
+   "offlineCapable": false,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "CMS-029",
+  "name": "Minor, Guardian & Age-Based Privacy Configuration",
+  "module": "Policy",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
+   "board": "1",
+   "number": "17.1.9",
+   "page": 15
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/policy/minor-guardian-age-based-privacy-configuration-cms-029",
+   "component": "apps/venue-management-web/src/routes/policy/MinorGuardianAgeBasedPrivacyConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "CMS-021"
+   ],
+   "exitTo": [
+    "CMS-021"
+   ],
+   "inferred": false,
+   "notes": "**Reached from CMS-021, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "CMS-021",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F150 step 16→17",
+     "operation": "setMinorGuardianAge"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Where required/configured) and no display directory — it is settings, not a population",
+  "purpose": "Provide specialized privacy configuration for journeys involving children and guardians. This is especially important for TICVAI customers operating: Theme parks Attractions Camps Academies Family entertainment Children's events",
+  "purposeNote": "separation between privacy consent and operational waivers.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Guardian name",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 15 §Where required/configured"
+      },
+      {
+       "kind": "selectField",
+       "label": "Relationship",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 15 §Where required/configured"
+      },
+      {
+       "kind": "selectField",
+       "label": "Email",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 15 §Where required/configured"
+      },
+      {
+       "kind": "selectField",
+       "label": "Mobile",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 15 §Where required/configured"
+      },
+      {
+       "kind": "selectField",
+       "label": "Verification status",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 15 §Where required/configured"
+      },
+      {
+       "kind": "selectField",
+       "label": "Consent status",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 15 §Where required/configured"
+      },
+      {
+       "kind": "selectField",
+       "label": "Consent version",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 15 §Where required/configured"
+      },
+      {
+       "kind": "selectField",
+       "label": "Date/time",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 15 §Where required/configured"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "provenance": "contract operation setMinorGuardianAge"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The minor guardian age-based configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the minor guardian age-based untouched.",
+   "emptyFirstRun": "No minor guardian age-based configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setMinorGuardianAge",
+    "contract": "marketing-crm",
+    "purpose": "Minor, Guardian & Age-Based Privacy Configuration",
+    "trigger": "onAction",
+    "invalidates": [
+     "setMinorGuardianAge"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-029"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 8 of 40 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P13",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue CMS",
+   "name": "Venue CMS — White Label",
+   "app": "venue-management-web",
+   "offlineCapable": false,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "CMS-030",
+  "name": "Privacy Configuration Testing, Approval & Publication",
+  "module": "Policy",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
+   "board": "1",
+   "number": "17.1.10",
+   "page": 16
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/policy/privacy-configuration-testing-approval-publication-cms-030",
+   "component": "apps/venue-management-web/src/routes/policy/PrivacyConfigurationTestingApprovalPublication.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "CMS-021"
+   ],
+   "exitTo": [
+    "CMS-021"
+   ],
+   "inferred": false,
+   "notes": "**Reached from CMS-021, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure; Detect configuration problems such as; Central configuration) and no display directory — it is settings, not a population",
+  "purpose": "Act as the final governance gate before privacy configurations are deployed into production. No major privacy configuration should move directly from editing to production without validation. Board 1 defines what TICVAI's privacy rules are. Board 2 manages what happens after those rules are live and customers begin interacting with them.",
+  "purposeNote": "live customer journeys. Board 1 — Final Screen Register # Backend Screen Core Responsibility 17.1. Privacy & Consent Configuration Command",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Publish Now, Schedule Publication, Selected Channel. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Support"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Country",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Brand",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Channel",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer age",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer status",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Product",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Membership",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Existing consents",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Existing policy acceptance",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Language",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Requested processing",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Missing policy",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
+      },
+      {
+       "kind": "selectField",
+       "label": "Missing consent mapping",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
+      },
+      {
+       "kind": "selectField",
+       "label": "Missing language",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
+      },
+      {
+       "kind": "selectField",
+       "label": "Conflicting consent rules",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
+      },
+      {
+       "kind": "selectField",
+       "label": "Missing processing purpose",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
+      },
+      {
+       "kind": "selectField",
+       "label": "Invalid effective dates",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
+      },
+      {
+       "kind": "selectField",
+       "label": "Unmapped tracking technology",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
+      },
+      {
+       "kind": "selectField",
+       "label": "Missing guardian rule",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
+      },
+      {
+       "kind": "selectField",
+       "label": "Unpublished dependency",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
+      },
+      {
+       "kind": "selectField",
+       "label": "Circular configuration dependency",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
+      },
+      {
+       "kind": "selectField",
+       "label": "1 Center",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "2 Registry processed",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration"
+      },
+      {
+       "kind": "textField",
+       "label": "# Backend Screen Core Responsibility",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "3",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration"
+      },
+      {
+       "kind": "textField",
+       "label": "17.1. Communication Preference & Marketing Marketing/channel",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration"
+      },
+      {
+       "kind": "textField",
+       "label": "4 Permission Configuration permissions",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "17.1. Cookie/SDK/tracker",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration"
+      },
+      {
+       "kind": "textField",
+       "label": "Cookie, Tracking & Digital Technology Registry",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "5 inventory",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Publish Now",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Schedule Publication",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Selected Channel",
+       "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The privacy testing approval configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the privacy testing approval untouched.",
+   "emptyFirstRun": "No privacy testing approval configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "approvePrivacyTesting",
+    "contract": "marketing-crm",
+    "purpose": "Privacy Configuration Testing, Approval & Publication",
+    "trigger": "onAction",
+    "invalidates": [
+     "approvePrivacyTesting"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P13 Venue CMS.dc.html#cms-030"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Privacy__Consent___Preference_Management_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 37 of 118 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P13",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue CMS",
+   "name": "Venue CMS — White Label",
+   "app": "venue-management-web",
+   "offlineCapable": false,
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P08",
+     "P12",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

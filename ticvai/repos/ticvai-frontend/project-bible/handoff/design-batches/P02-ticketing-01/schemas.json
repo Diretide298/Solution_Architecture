@@ -1,0 +1,274 @@
+{
+ "CreateOrderLine": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "variantId",
+   "quantity",
+   "quotedUnitPrice"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "variantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "inventoryHoldId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Lease the units were drawn from. Absent for uncontended products."
+   },
+   "seatIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Seated products only. Not available offline."
+   },
+   "quantity": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "quotedUnitPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "What the client charged, from its local bundle."
+   },
+   "holderName": {
+    "type": "string",
+    "nullable": true
+   },
+   "dataMaskValues": {
+    "type": "object",
+    "additionalProperties": true
+   }
+  }
+ },
+ "FxRate": {
+  "type": "object",
+  "x-ticvai-persistence": "ledger.fx_rate",
+  "required": [
+   "fromCurrency",
+   "toCurrency",
+   "rate",
+   "purpose",
+   "effectiveFrom"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "fromCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "toCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "rate": {
+    "type": "number",
+    "description": "Units of `toCurrency` per one `fromCurrency`. Six decimal places — a two-place rate on a three-place currency loses money on every transaction, quietly.\n"
+   },
+   "purpose": {
+    "$ref": "#/components/schemas/FxRatePurpose"
+   },
+   "source": {
+    "$ref": "#/components/schemas/FxRateSource"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "A rate change is a new row. The old one is never edited — a transaction posted last Tuesday must still reconcile at last Tuesday's rate.\n"
+   },
+   "setByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "providerReference": {
+    "type": "string",
+    "nullable": true,
+    "description": "The provider's own identifier for this quote. **What makes a rate reproducible** — an auditor asking why a payment converted at 3.6725 gets an answer that is checkable against the source rather than a number somebody typed."
+   },
+   "fetchedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When the rate was pulled. **Distinct from `effectiveFrom`**, which is when it applies — a rate fetched at 06:00 for a business day starting at 00:00 has two different times and conflating them makes a late feed look like a backdated rate."
+   }
+  }
+ },
+ "FxRatePurpose": {
+  "type": "string",
+  "description": "A venue does not accept dollars at the rate it books an intercompany balance at. Separating them is what stops a spread on the counter appearing as a loss in the accounts.\n",
+  "enum": [
+   "tender",
+   "interEntity",
+   "reporting",
+   "revaluation"
+  ]
+ },
+ "FxRateSource": {
+  "type": "string",
+  "description": "**Where the rate came from, and which provider specifically.** `source: provider` said a feed set it and not which one — two tenants on different feeds were indistinguishable in the ledger, and a rate cannot be defended in an audit without naming its origin.\n\n**`uaeCentralBank` is the default for AED pairs.** The UAE Central Bank publishes an official daily rate and it is what a UAE auditor expects to see — a commercial feed is defensible for tender and awkward for statutory reporting.\n\n**`openExchangeRates` and `ecb` are the commercial and reference options.** ECB publishes daily reference rates free and is the usual fallback for non-AED pairs; Open Exchange Rates is the common commercial feed with intraday granularity. **The choice is per purpose, not per platform** — a tender rate wants intraday, a reporting rate wants the official daily close.",
+  "enum": [
+   "manual",
+   "uaeCentralBank",
+   "ecb",
+   "openExchangeRates",
+   "cardScheme",
+   "provider"
+  ]
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "Reservation": {
+  "x-ticvai-persistence": "orders.reservation",
+  "type": "object",
+  "required": [
+   "id",
+   "venueId",
+   "status",
+   "expiresAt",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "held",
+     "converted",
+     "expired",
+     "cancelled"
+    ]
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/CreateOrderLine"
+    }
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "convertedOrderId": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "TicketTransfer": {
+  "x-ticvai-persistence": "orders.ticket_transfer",
+  "type": "object",
+  "required": [
+   "id",
+   "orderId",
+   "ticketIds",
+   "status",
+   "offeredAt",
+   "expiresAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "orderId": {
+    "type": "string"
+   },
+   "ticketIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "fromSubjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "toSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Set only on claim. Ownership moves then, not at offer."
+   },
+   "recipientAddressMasked": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "offered",
+     "claimed",
+     "expired",
+     "cancelled"
+    ]
+   },
+   "claimUrl": {
+    "type": "string",
+    "nullable": true
+   },
+   "offeredAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "claimedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "An unclaimed transfer expires and the tickets return. A transfer to a mistyped address must not strand a ticket somewhere nobody can reach.\n"
+   }
+  }
+ }
+}

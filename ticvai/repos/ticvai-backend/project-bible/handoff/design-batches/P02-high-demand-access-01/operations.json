@@ -1,0 +1,58 @@
+{
+ "getWaitTimes": {
+  "method": "GET",
+  "path": "/queues/wait-times",
+  "contract": "queue",
+  "summary": "Wait times across a venue",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "category",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WaitTime"
+ },
+ "getWaitingGuest": {
+  "method": "GET",
+  "path": "/waiting-guests/{entryId}",
+  "contract": "queue",
+  "summary": "Read a queue entry",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WaitingGuest"
+ },
+ "joinQueue": {
+  "method": "POST",
+  "path": "/waiting-guests",
+  "contract": "queue",
+  "summary": "Join a virtual queue",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "JoinQueueRequest",
+  "responds": "WaitingGuest"
+ }
+}

@@ -1,0 +1,173 @@
+{
+ "approveListingModeration": {
+  "method": "PUT",
+  "path": "/listing-moderation",
+  "contract": "orders",
+  "summary": "Listing Approval & Moderation",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "ListingApprovalModerationInput",
+  "responds": "ListingApprovalModerationView"
+ },
+ "createListingSeller": {
+  "method": "POST",
+  "path": "/listing-seller",
+  "contract": "orders",
+  "summary": "Listing Creation & Seller Configuration",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "ListingCreationSellerConfigurationInput",
+  "responds": "ListingCreationSellerConfigurationView"
+ },
+ "listListingLifecycleExpiry": {
+  "method": "GET",
+  "path": "/listing-lifecycle-expiry",
+  "contract": "orders",
+  "summary": "Listing Lifecycle, Expiry & Cancellation",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ListingLifecycleExpiryCancellationView"
+ },
+ "listResaleFeeCommission": {
+  "method": "GET",
+  "path": "/resale-fee-commission",
+  "contract": "orders",
+  "summary": "Resale Fees, Commission & Seller Proceeds",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResaleFeesCommissionSellerProceedsView"
+ },
+ "listResaleInventoryAvailability": {
+  "method": "GET",
+  "path": "/resale-inventory-availability",
+  "contract": "orders",
+  "summary": "Resale Inventory & Availability Management",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResaleInventoryAvailabilityManagementView"
+ },
+ "listResaleMarketplace": {
+  "method": "GET",
+  "path": "/resale-marketplace",
+  "contract": "orders",
+  "summary": "Resale Marketplace Command Center",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "date",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "listingStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "priceRange",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "resaleChannel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "riskLevel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "approvalStatus",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "ResaleMarketplaceCommandCenterView"
+ },
+ "listResalePolicyMarketplace": {
+  "method": "GET",
+  "path": "/resale-policy-marketplace",
+  "contract": "orders",
+  "summary": "Resale Policy & Marketplace Settings",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResalePolicyMarketplaceSettingsView"
+ },
+ "listResalePricingPrice": {
+  "method": "GET",
+  "path": "/resale-pricing-price",
+  "contract": "orders",
+  "summary": "Resale Pricing & Price Guardrails",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ResalePricingPriceGuardrailsView"
+ },
+ "setResaleEligibilityRule": {
+  "method": "PUT",
+  "path": "/resale-eligibility-rule",
+  "contract": "orders",
+  "summary": "Resale Eligibility Rule Configuration",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "ResaleEligibilityRuleConfigurationInput",
+  "responds": "ResaleEligibilityRuleConfigurationView"
+ },
+ "setResaleMarketplaceRecommendation": {
+  "method": "PUT",
+  "path": "/resale-marketplace-recommendation",
+  "contract": "orders",
+  "summary": "AI Resale Configuration & Marketplace Recommendations",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "AiResaleConfigurationMarketplaceRecommendationsInput",
+  "responds": "AiResaleConfigurationMarketplaceRecommendationsView"
+ }
+}

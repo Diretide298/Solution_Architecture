@@ -1,0 +1,214 @@
+{
+ "listChannel": {
+  "method": "GET",
+  "path": "/channel",
+  "contract": "catalogue",
+  "summary": "Channel Operations Command Center",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ChannelOperationsCommandCenterView"
+ },
+ "listChannel2": {
+  "method": "GET",
+  "path": "/channel-2",
+  "contract": "catalogue",
+  "summary": "AI Channel Optimization & Intelligence Center",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiChannelOptimizationIntelligenceCenterView"
+ },
+ "listChannelAllocationRebalancing": {
+  "method": "GET",
+  "path": "/channel-allocation-rebalancing",
+  "contract": "catalogue",
+  "summary": "Channel Allocation & Rebalancing Operations",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ChannelAllocationRebalancingOperationsView"
+ },
+ "listChannelConnectionIntegration": {
+  "method": "GET",
+  "path": "/channel-connection-integration",
+  "contract": "catalogue",
+  "summary": "Channel Connection & Integration Manager",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ChannelConnectionIntegrationManagerView"
+ },
+ "listChannelExceptionIncident": {
+  "method": "GET",
+  "path": "/channel-exception-incident",
+  "contract": "catalogue",
+  "summary": "Channel Exceptions, Incidents & Recovery",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ChannelExceptionsIncidentsRecoveryView"
+ },
+ "listChannelGovernanceSla": {
+  "method": "GET",
+  "path": "/channel-governance-sla",
+  "contract": "catalogue",
+  "summary": "Channel Governance, SLA & Partner Control",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ChannelGovernanceSlaPartnerControlView"
+ },
+ "listChannelLogTransaction": {
+  "method": "GET",
+  "path": "/channel-log-transaction",
+  "contract": "catalogue",
+  "summary": "Channel Audit, Logs & Transaction Traceability",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "orderId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "transactionId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ticket",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partnerReference",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customer",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "correlationId",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "ChannelAuditLogsTransactionTraceabilityView"
+ },
+ "listChannelPerformanceCommercial": {
+  "method": "GET",
+  "path": "/channel-performance-commercial",
+  "contract": "catalogue",
+  "summary": "Channel Performance & Commercial Analytics",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "country",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerSegment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "date",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "ChannelPerformanceCommercialAnalyticsView"
+ },
+ "listProductPriceAvailability": {
+  "method": "GET",
+  "path": "/product-price-availability",
+  "contract": "catalogue",
+  "summary": "Product, Price & Availability Synchronization",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ProductPriceAvailabilitySynchronizationView"
+ },
+ "listRealTimeChannel": {
+  "method": "GET",
+  "path": "/real-time-channel",
+  "contract": "catalogue",
+  "summary": "Real-Time Channel Availability & Inventory Monitor",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "RealTimeChannelAvailabilityInventoryMonitorView"
+ }
+}

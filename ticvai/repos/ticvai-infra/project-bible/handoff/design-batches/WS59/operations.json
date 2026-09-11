@@ -1,0 +1,173 @@
+{
+ "listCredentialIdentityToken": {
+  "method": "GET",
+  "path": "/credential-identity-token",
+  "contract": "access",
+  "summary": "Credential Identity, Token & Reference Mapping",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CredentialIdentityTokenReferenceMappingView"
+ },
+ "listEntitlementCrossMedia": {
+  "method": "GET",
+  "path": "/entitlement-cross-media",
+  "contract": "access",
+  "summary": "Entitlement & Cross-Media Synchronization Rules",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "EntitlementCrossMediaSynchronizationRulesView"
+ },
+ "listMediaActivationPriority": {
+  "method": "GET",
+  "path": "/media-activation-priority",
+  "contract": "access",
+  "summary": "Media Activation, Priority & Fallback Rules",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MediaActivationPriorityFallbackRulesView"
+ },
+ "listMediaReplacementRevocation": {
+  "method": "GET",
+  "path": "/media-replacement-revocation",
+  "contract": "access",
+  "summary": "Media Replacement, Revocation & Rebinding Rules",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MediaReplacementRevocationRebindingRulesView"
+ },
+ "listMediaTypeCredential": {
+  "method": "GET",
+  "path": "/media-type-credential",
+  "contract": "access",
+  "summary": "Media Type & Credential Technology Registry",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MediaTypeCredentialTechnologyRegistryView"
+ },
+ "listMultiMediaBinding": {
+  "method": "GET",
+  "path": "/multi-media-binding",
+  "contract": "access",
+  "summary": "Multi-Media Binding & Association Rules",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MultiMediaBindingAssociationRulesView"
+ },
+ "listVirtualTicket": {
+  "method": "GET",
+  "path": "/virtual-ticket",
+  "contract": "access",
+  "summary": "Virtual Ticket Command Center",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "brand",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "performance",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customer",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "virtualTicketStatus",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "mediaType",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "VirtualTicketCommandCenterView"
+ },
+ "listVirtualTicketArchitecture": {
+  "method": "GET",
+  "path": "/virtual-ticket-architecture",
+  "contract": "access",
+  "summary": "Virtual Ticket Architecture Testing, Governance & Audit",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VirtualTicketArchitectureTestingGovernanceAuditView"
+ },
+ "listVirtualTicketStatus": {
+  "method": "GET",
+  "path": "/virtual-ticket-statu",
+  "contract": "access",
+  "summary": "Virtual Ticket Status & Lifecycle Model",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VirtualTicketStatusLifecycleModelView"
+ },
+ "setVirtualTicketIdentity": {
+  "method": "PUT",
+  "path": "/virtual-ticket-identity",
+  "contract": "access",
+  "summary": "Virtual Ticket Identity & Master Record Configuration",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "VirtualTicketIdentityMasterRecordConfigurationInput",
+  "responds": "VirtualTicketIdentityMasterRecordConfigurationView"
+ }
+}

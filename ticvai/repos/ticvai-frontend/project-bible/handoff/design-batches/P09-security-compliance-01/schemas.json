@@ -1,0 +1,629 @@
+{
+ "Cell": {
+  "x-ticvai-persistence": "control.cell",
+  "x-ticvai-retired-columns": [
+   "tenant_id"
+  ],
+  "type": "object",
+  "required": [
+   "id",
+   "name",
+   "regionId",
+   "countryCode",
+   "tier",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/CellKind"
+   },
+   "clusterId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "isReachable": {
+    "type": "boolean",
+    "default": true,
+    "description": "False for `onPremise`. The Control Plane holds the record for licensing and support and **cannot reach the installation** — it may sit behind a firewall with no inbound route. Every operation assuming reachability must handle absence rather than timing out, and a cell that has not called home for a month is not necessarily broken.\n"
+   },
+   "lastContactAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When the site last called out. The only liveness signal for an unreachable cell, and the number a support engineer asks for first.\n"
+   },
+   "licenceExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "On-premise only. Licensing cannot be enforced by a Control Plane the site cannot reach, so a signed licence file is verified locally. **An expired licence degrades rather than stops** — a venue whose gates refuse entry because a licence lapsed over a weekend is worse than one running unlicensed until Monday.\n"
+   },
+   "participatesInCrossCell": {
+    "type": "boolean",
+    "default": true,
+    "description": "False by default for `onPremise`. Redeeming a pass issued elsewhere requires reaching the issuing cell at that moment, and an on-premise site may not be able to. Exclusion is the honest default; local-then-reconcile carries a double-redemption risk that needs a decision rather than an assumption.\n"
+   },
+   "regionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "regionName": {
+    "type": "string"
+   },
+   "countryCode": {
+    "type": "string"
+   },
+   "tier": {
+    "$ref": "#/components/schemas/CellTier"
+   },
+   "status": {
+    "$ref": "#/components/schemas/CellStatus"
+   },
+   "cloudProvider": {
+    "type": "string",
+    "nullable": true
+   },
+   "cloudRegion": {
+    "type": "string",
+    "nullable": true
+   },
+   "apiEndpoint": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueCount": {
+    "type": "integer"
+   },
+   "provisionedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "deploymentRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "**A pointer to where this cell runs, not a description of it.** A Kubernetes namespace, an ECS cluster ARN, a stack name — whatever the orchestrator calls the thing.\n\n**The platform does not model instances, nodes or shards** (31 August). Kubernetes already holds instance counts and they change by the second; a table copying them drifts within minutes and the copy would win.\n\n**The line is: routing decisions belong to the platform, provisioning facts belong to the orchestrator.** Qdrant is the proof — ADR-0021 makes the tenant *the* shard key, so nine operations route without a lookup and **a stored shard assignment would be a second copy of something derivable.**\n\n**CF-161 needed a table after all, and this said it did not.** The claim here was that one database per cell or one per service is a build-time decision and the DDL is identical either way. **ADR-0038 answered it per tenant**, which drops `Cell.tenantId`, adds `CellTenant`, `RolloutTenant` and a per-tenant migration row, and takes `control` out of the tenant template. `tools/derive-ddl.py` carried the same claim in its docstring.\n\n**A claim that a question cannot affect your artefact is the one most likely to be left standing after it does**, which is why the correction is recorded here rather than the sentence simply deleted."
+   }
+  }
+ },
+ "CellCapacity": {
+  "type": "object",
+  "x-ticvai-persistence": "none — measured, not stored",
+  "required": [
+   "cellId",
+   "isConstrained",
+   "dimensions",
+   "measuredAt"
+  ],
+  "properties": {
+   "cellId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/CellKind"
+   },
+   "tenantCount": {
+    "type": "integer",
+    "description": "Reported, and **deliberately not the sizing signal.** Forty quiet tenants may load a cell less than three busy ones.\n"
+   },
+   "isConstrained": {
+    "type": "boolean"
+   },
+   "constrainedDimension": {
+    "type": "string",
+    "nullable": true
+   },
+   "dimensions": {
+    "type": "array",
+    "description": "Per dimension, because the response differs. Short of connections and long on storage is a different problem from short of both.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "dimension",
+      "used",
+      "headroom"
+     ],
+     "properties": {
+      "dimension": {
+       "type": "string",
+       "enum": [
+        "concurrentUsers",
+        "transactionsPerSecond",
+        "scansPerSecond",
+        "databaseConnections",
+        "storageGb",
+        "replicationLag",
+        "cpu"
+       ]
+      },
+      "used": {
+       "type": "number"
+      },
+      "limit": {
+       "type": "number"
+      },
+      "headroom": {
+       "type": "number",
+       "description": "Fraction remaining. Negative means already over."
+      },
+      "peakAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "forecastBreachAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When the constrained dimension is projected to run out at the current trend. Null where there is no trend to project — an honest null beats an invented date.\n"
+   },
+   "measuredAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "CellDetail": {
+  "x-ticvai-persistence": "control.cell",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/Cell"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "health": {
+      "$ref": "#/components/schemas/CellHealth"
+     },
+     "activeJobs": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/CellJob"
+      }
+     }
+    }
+   }
+  ]
+ },
+ "CellHealth": {
+  "x-ticvai-persistence": "none — polled, not stored",
+  "type": "object",
+  "required": [
+   "cellId",
+   "isHealthy",
+   "schemaVersion",
+   "checkedAt"
+  ],
+  "properties": {
+   "cellId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "isHealthy": {
+    "type": "boolean"
+   },
+   "schemaVersion": {
+    "type": "string",
+    "description": "From the cell's version register. Skew across a tenant's cells is expected during rollout; unexplained skew is a defect.\n"
+   },
+   "isSchemaBehind": {
+    "type": "boolean"
+   },
+   "databaseStatus": {
+    "type": "string"
+   },
+   "replicationLagSeconds": {
+    "type": "number",
+    "nullable": true
+   },
+   "lastBackupAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "lastRestoreDrillAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "checkedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "CellJob": {
+  "x-ticvai-persistence": "control.cell_job",
+  "type": "object",
+  "required": [
+   "id",
+   "cellId",
+   "kind",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "cellId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "provision",
+     "tierMigration",
+     "schemaMigration",
+     "backup",
+     "restore",
+     "decommission"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "queued",
+     "running",
+     "completed",
+     "failed",
+     "rolledBack"
+    ]
+   },
+   "progressPercent": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100
+   },
+   "message": {
+    "type": "string",
+    "nullable": true
+   },
+   "error": {
+    "type": "string",
+    "nullable": true
+   },
+   "scheduledFor": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "CellKind": {
+  "type": "string",
+  "description": "Four deployment models (ADR-0017). `shared` is the default; the others exist because a client asked or a law requires it.\n\n\n**`burst` added 31 August.** An environment stood up for one on-sale and torn down after (CF-162 scenario c). **It is not a jurisdiction and it is not permanent** — it holds a catalogue snapshot, three services of sixteen, and 17 tables of 380.\n\n**The other four are places data lives. This one is a place data passes through**, which is why it has its own lifecycle and a reconciliation obligation the others do not.",
+  "enum": [
+   "shared",
+   "dedicated",
+   "onPremise",
+   "controlPlane",
+   "burst"
+  ]
+ },
+ "CreateDashboardRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "name",
+   "tiles"
+  ],
+  "properties": {
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 1000
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "isShared": {
+    "type": "boolean",
+    "default": false
+   },
+   "tiles": {
+    "type": "array",
+    "minItems": 1,
+    "maxItems": 24,
+    "items": {
+     "$ref": "#/components/schemas/DashboardTile"
+    }
+   }
+  }
+ },
+ "Dashboard": {
+  "x-ticvai-persistence": "reporting.dashboard + reporting.dashboard_tile",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateDashboardRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "ownerPrincipalId",
+     "aggregateCost",
+     "createdAt"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "ownerPrincipalId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "aggregateCost": {
+      "type": "string",
+      "enum": [
+       "low",
+       "medium",
+       "high"
+      ],
+      "description": "Combined refresh load of every tile."
+     },
+     "createdAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  ]
+ },
+ "DashboardData": {
+  "x-ticvai-persistence": "none — computed",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/Dashboard"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "tileData": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "tileId": {
+         "type": "string",
+         "format": "uuid"
+        },
+        "result": {
+         "$ref": "#/components/schemas/ReportResult"
+        },
+        "isCached": {
+         "type": "boolean"
+        },
+        "error": {
+         "type": "string",
+         "nullable": true
+        }
+       }
+      }
+     }
+    }
+   }
+  ]
+ },
+ "DashboardTile": {
+  "x-ticvai-persistence": "reporting.dashboard_tile",
+  "type": "object",
+  "required": [
+   "id",
+   "reportId",
+   "visualisation",
+   "position"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "title": {
+    "type": "string"
+   },
+   "reportId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "visualisation": {
+    "type": "string",
+    "enum": [
+     "number",
+     "line",
+     "bar",
+     "stackedBar",
+     "pie",
+     "table",
+     "gauge",
+     "heatmap"
+    ]
+   },
+   "parameters": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "refreshSeconds": {
+    "type": "integer",
+    "minimum": 30,
+    "description": "Minimum thirty seconds. A tile refreshing every second is a load problem wearing a convenience costume.\n"
+   },
+   "position": {
+    "type": "object",
+    "required": [
+     "row",
+     "column",
+     "width",
+     "height"
+    ],
+    "properties": {
+     "row": {
+      "type": "integer"
+     },
+     "column": {
+      "type": "integer"
+     },
+     "width": {
+      "type": "integer"
+     },
+     "height": {
+      "type": "integer"
+     }
+    }
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "ReportResult": {
+  "x-ticvai-persistence": "none — result set, cached in object storage",
+  "type": "object",
+  "required": [
+   "executionId",
+   "columns",
+   "rows"
+  ],
+  "properties": {
+   "executionId": {
+    "type": "string"
+   },
+   "columns": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "key": {
+       "type": "string"
+      },
+      "label": {
+       "type": "string"
+      },
+      "type": {
+       "$ref": "#/components/schemas/FieldType"
+      }
+     }
+    }
+   },
+   "rows": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "additionalProperties": true
+    }
+   },
+   "totals": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "rowCount": {
+    "type": "integer"
+   },
+   "nextCursor": {
+    "type": "string",
+    "nullable": true
+   },
+   "generatedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "dataAsOf": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it prevents an argument about a figure that moved.\n"
+   }
+  }
+ },
+ "WafRule": {
+  "type": "object",
+  "x-ticvai-persistence": "control.waf_rule",
+  "description": "**Drafted 4 September.** One firewall rule, and the reason it is a row rather than a config file is that somebody has to be able to say who changed it and when.",
+  "required": [
+   "id"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "cellId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "action": {
+    "type": "string",
+    "enum": [
+     "allow",
+     "block",
+     "rateLimit",
+     "challenge"
+    ]
+   },
+   "matchOn": {
+    "type": "string",
+    "description": "What the rule inspects - a path, a header, a source range."
+   },
+   "pattern": {
+    "type": "string"
+   },
+   "enabled": {
+    "type": "boolean"
+   },
+   "hitCount24h": {
+    "type": "integer",
+    "description": "**A rule with no hits is either protecting nothing or blocking everything silently**, and both want looking at."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ }
+}

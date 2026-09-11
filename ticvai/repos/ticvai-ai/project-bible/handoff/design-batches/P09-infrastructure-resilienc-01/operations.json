@@ -1,0 +1,180 @@
+{
+ "cancelDecommission": {
+  "method": "POST",
+  "path": "/cells/{cellId}/cancel-decommission",
+  "contract": "subscription",
+  "summary": "Halt a decommission",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "decommissionCell": {
+  "method": "POST",
+  "path": "/cells/{cellId}/decommission",
+  "contract": "subscription",
+  "summary": "Begin decommissioning a cell",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getCell": {
+  "method": "GET",
+  "path": "/cells/{cellId}",
+  "contract": "subscription",
+  "summary": "Read a cell",
+  "permission": "PLATFORM_CELL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CellDetail"
+ },
+ "getCellCapacity": {
+  "method": "GET",
+  "path": "/cells/{cellId}/capacity",
+  "contract": "subscription",
+  "summary": "Load against headroom",
+  "permission": "PLATFORM_CELL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "window",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CellCapacity"
+ },
+ "getCellHealth": {
+  "method": "GET",
+  "path": "/cells/{cellId}/health",
+  "contract": "subscription",
+  "summary": "Cell health and schema version",
+  "permission": "PLATFORM_CELL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CellHealth"
+ },
+ "getScalingPolicy": {
+  "method": "GET",
+  "path": "/scaling-policies",
+  "contract": "platform-ops",
+  "summary": "The floors, ceilings and target utilisation a cell scales on",
+  "permission": "PLATFORM_CELL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ScalingPolicy"
+ },
+ "listArchivalJobs": {
+  "method": "GET",
+  "path": "/archival-jobs",
+  "contract": "platform-ops",
+  "summary": "Archival and retention jobs",
+  "permission": "PLATFORM_CELL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ArchivalJob"
+ },
+ "listBackupRuns": {
+  "method": "GET",
+  "path": "/backup-runs",
+  "contract": "platform-ops",
+  "summary": "Backups taken and what they cover",
+  "permission": "PLATFORM_CELL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "BackupRun"
+ },
+ "listCellJobs": {
+  "method": "GET",
+  "path": "/cells/{cellId}/jobs",
+  "contract": "subscription",
+  "summary": "Provisioning, migration and maintenance jobs",
+  "permission": "PLATFORM_CELL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "setScalingPolicy": {
+  "method": "PUT",
+  "path": "/scaling-policies",
+  "contract": "platform-ops",
+  "summary": "Change the scaling policy",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [],
+  "requestBody": "ScalingPolicy",
+  "responds": "ScalingPolicy"
+ },
+ "updateCellTier": {
+  "method": "PATCH",
+  "path": "/cells/{cellId}",
+  "contract": "subscription",
+  "summary": "Change a cell's tier",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ }
+}

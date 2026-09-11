@@ -127,14 +127,16 @@ CREATE TABLE IF NOT EXISTS approvals.rule (
     matrix_id                         uuid NOT NULL
 );
 
+-- Holds 8 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it; 1 tables reference it
 CREATE TABLE IF NOT EXISTS approvals.step_up_policy (
-    id                                uuid PRIMARY KEY NOT NULL,
     operation_id                      text NOT NULL,
     required                          text NOT NULL,
     contract_floor                    text,
     scope_level                       text,
     reason                            text,
     set_by                            uuid,
-    set_at                            timestamptz
+    set_at                            timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL
 );
 

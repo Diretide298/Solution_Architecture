@@ -1,0 +1,725 @@
+[
+ {
+  "id": "GST-014",
+  "name": "Ticket Transfer",
+  "module": "Ticketing",
+  "requiresModule": "ticketing",
+  "wave": 2,
+  "capability": "C02",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/general/ticket-transfer",
+   "component": "apps/guest-app/src/routes/general/TicketTransferDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "GST-001",
+    "GST-002",
+    "GST-003"
+   ],
+   "transitions": [
+    {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-003",
+     "trigger": "Event & Attraction Listing",
+     "carries": [
+      "eventId"
+     ],
+     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Cross-surface parity, 31 August**: added listOrders. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.",
+  "openQuestions": [
+   "Inventory cites `POST /tickets/{id}/transfer` — no matching operation. Written before the contracts existed."
+  ],
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listOrders` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Work with ticket transfer for this venue.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every ticket transfer",
+       "bindsTo": "OrderSummary",
+       "columns": [
+        "OrderSummary.id",
+        "OrderSummary.orderNumber",
+        "OrderSummary.status",
+        "OrderSummary.grossAmount",
+        "OrderSummary.refundedAmount",
+        "OrderSummary.channel",
+        "OrderSummary.lineCount"
+       ],
+       "operation": "listOrders",
+       "provenance": "contract orders.yaml GET /orders"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected ticket transfer",
+       "bindsTo": "OrderSummary",
+       "columns": [
+        "OrderSummary.id",
+        "OrderSummary.orderNumber",
+        "OrderSummary.status",
+        "OrderSummary.grossAmount",
+        "OrderSummary.refundedAmount",
+        "OrderSummary.channel",
+        "OrderSummary.lineCount"
+       ],
+       "operation": "listOrders",
+       "provenance": "contract orders.yaml GET /orders"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Claim",
+       "operation": "claimTicketTransfer",
+       "provenance": "contract orders.yaml POST /ticket-transfers/{transferId}/claim"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Availability is live, never cached",
+   "error": "Availability unavailable. **Selection is blocked** — overselling is worse than waiting",
+   "emptyFirstRun": "**Sold out is a real answer.** Offers the next available rather than a dead end",
+   "emptyNoResults": "The filter narrowed it and the ticket transfer are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+  },
+  "apis": [
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "claimTicketTransfer",
+    "contract": "orders",
+    "purpose": "Claim transferred tickets",
+    "trigger": "onAction",
+    "invalidates": [
+     "listOrders"
+    ]
+   },
+   {
+    "operationId": "listOrders",
+    "contract": "orders",
+    "purpose": "List orders",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    },
+    {
+     "name": "transferId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
+   "preloaded": [
+    "OrderSummary.id",
+    "OrderSummary.orderNumber",
+    "OrderSummary.status",
+    "OrderSummary.grossAmount",
+    "OrderSummary.refundedAmount"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-014"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-016",
+  "name": "My Reservations",
+  "module": "Ticketing",
+  "requiresModule": "ticketing",
+  "wave": 2,
+  "capability": "C02",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/general/my-reservations",
+   "component": "apps/guest-app/src/routes/general/MyReservationsDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-001",
+    "GST-050"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "GST-001",
+    "GST-002",
+    "GST-003",
+    "GST-017"
+   ],
+   "transitions": [
+    {
+     "to": "GST-017",
+     "trigger": "On the day, they arrive",
+     "provenance": "flow F52 step 3→4"
+    },
+    {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-003",
+     "trigger": "Event & Attraction Listing",
+     "carries": [
+      "eventId"
+     ],
+     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listReservations` reads the population and `getReservation` reads one of them — list, select, act",
+  "purpose": "Find my reservations for this venue.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every reservations",
+       "bindsTo": "Reservation",
+       "columns": [
+        "Reservation.id",
+        "Reservation.venueId",
+        "Reservation.status",
+        "Reservation.lines",
+        "Reservation.expiresAt",
+        "Reservation.convertedOrderId"
+       ],
+       "operation": "listReservations",
+       "provenance": "contract orders.yaml GET /reservations"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected reservations",
+       "bindsTo": "Reservation",
+       "columns": [
+        "Reservation.id",
+        "Reservation.venueId",
+        "Reservation.status",
+        "Reservation.lines",
+        "Reservation.expiresAt",
+        "Reservation.convertedOrderId"
+       ],
+       "operation": "getReservation",
+       "provenance": "contract orders.yaml GET /reservations/{reservationId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "destructiveButton",
+       "label": "Cancel",
+       "operation": "cancelReservation",
+       "provenance": "contract orders.yaml DELETE /reservations/{reservationId}"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmCancelReservation",
+    "component": "confirmDialog",
+    "trigger": "Cancel",
+    "body": "**Names what `cancelReservation` changes and what it leaves alone**, in the consequence rather than the verb. A reservations this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract orders.yaml DELETE /reservations/{reservationId}"
+   }
+  ],
+  "states": {
+   "loading": "The reservations list.",
+   "error": "Could not load. Names which read failed and leaves the reservations untouched.",
+   "emptyFirstRun": "No reservations yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the reservations are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+  },
+  "apis": [
+   {
+    "operationId": "listReservations",
+    "contract": "orders",
+    "purpose": "List reservations",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getReservation",
+    "contract": "orders",
+    "purpose": "Read a reservation",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "cancelReservation",
+    "contract": "orders",
+    "purpose": "Cancel a reservation",
+    "trigger": "onAction",
+    "invalidates": [
+     "listReservations"
+    ]
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "reservationId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `reservationId`.",
+   "preloaded": [
+    "Reservation.id",
+    "Reservation.venueId",
+    "Reservation.status",
+    "Reservation.lines",
+    "Reservation.expiresAt"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-016"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-017",
+  "name": "Reservation Details",
+  "module": "Ticketing",
+  "requiresModule": "ticketing",
+  "wave": 2,
+  "capability": "C02",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/general/reservation-details",
+   "component": "apps/guest-app/src/routes/general/ReservationDetailsDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-001",
+    "GST-016"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "GST-001",
+    "GST-002",
+    "GST-003"
+   ],
+   "transitions": [
+    {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-003",
+     "trigger": "Event & Attraction Listing",
+     "carries": [
+      "eventId"
+     ],
+     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "density": "comfortable",
+  "pattern": "statusTracker",
+  "patternReason": "`getReservation` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "See reservation details for this venue.",
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected reservation",
+       "bindsTo": "Reservation",
+       "columns": [
+        "Reservation.id",
+        "Reservation.venueId",
+        "Reservation.status",
+        "Reservation.lines",
+        "Reservation.expiresAt",
+        "Reservation.convertedOrderId"
+       ],
+       "operation": "getReservation",
+       "provenance": "contract orders.yaml GET /reservations/{reservationId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "destructiveButton",
+       "label": "Cancel",
+       "operation": "cancelReservation",
+       "provenance": "contract orders.yaml DELETE /reservations/{reservationId}"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmCancelReservation",
+    "component": "confirmDialog",
+    "trigger": "Cancel",
+    "body": "**Names what `cancelReservation` changes and what it leaves alone**, in the consequence rather than the verb. A reservation this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract orders.yaml DELETE /reservations/{reservationId}"
+   }
+  ],
+  "states": {
+   "loading": "The reservation list.",
+   "error": "Could not load. Names which read failed and leaves the reservation untouched.",
+   "emptyFirstRun": "No reservation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the reservation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+  },
+  "apis": [
+   {
+    "operationId": "getReservation",
+    "contract": "orders",
+    "purpose": "Read a reservation",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "cancelReservation",
+    "contract": "orders",
+    "purpose": "Cancel a reservation",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "reservationId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `reservationId`."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-017"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-044",
+  "name": "Multi-Currency & Pricing",
+  "module": "Ticketing",
+  "requiresModule": "ticketing",
+  "wave": 2,
+  "capability": "C107",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/general/multi-currency-and-pricing",
+   "component": "apps/guest-app/src/routes/general/MultiCurrencyAndPricingDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "GST-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "GST-001",
+    "GST-002",
+    "GST-003"
+   ],
+   "transitions": [
+    {
+     "to": "GST-001",
+     "trigger": "Home – Default",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-001 declares entryState.params subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "GST-003",
+     "trigger": "Event & Attraction Listing",
+     "carries": [
+      "eventId"
+     ],
+     "provenance": "derived — GST-003 declares entryState.params eventId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Drawn in guest storyboard board 7 panel 4 — a selector across AED, USD, EUR, GBP and SAR with *\"payment will be processed in AED\"* — and board 8 carries an AED selector in its header. **Confirmed for both surfaces on 18 August (CF-111).** The matrix names the website (2.6.33, 2.9.1) and the storyboard draws the app; both are client documents and the answer is both, which is what CF-93 concluded for every other guest capability. **Display only — the sale settles in base currency** (CF-37), and that is stated on the screen rather than in a footnote. **`getRegionSettings` deliberately not called** — a guest does not need the venue's scope configuration to pick a currency. `listFxRates` is the currency list: a rate exists only for a currency the venue enabled, so the two questions have one answer.",
+  "openQuestions": [
+   "Inventory cites `GET /currencies` — no matching operation. Written before the contracts existed."
+  ],
+  "density": "comfortable",
+  "pattern": "listDetail",
+  "patternReason": "`listFxRates` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "See prices in your own currency, in the app, before and during the visit.",
+  "gaps": [
+   {
+    "operation": "listProducts",
+    "why": "**1 declared operation reach no component on this screen**: listProducts. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every multi-currency pricing",
+       "bindsTo": "FxRate",
+       "columns": [
+        "FxRate.id",
+        "FxRate.fromCurrency",
+        "FxRate.toCurrency",
+        "FxRate.rate",
+        "FxRate.purpose",
+        "FxRate.source",
+        "FxRate.effectiveFrom",
+        "FxRate.effectiveTo",
+        "FxRate.setByPrincipalId",
+        "FxRate.providerReference",
+        "FxRate.fetchedAt"
+       ],
+       "operation": "listFxRates",
+       "provenance": "contract finance.yaml GET /fx-rates"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected multi-currency pricing",
+       "bindsTo": "FxRate",
+       "columns": [
+        "FxRate.id",
+        "FxRate.fromCurrency",
+        "FxRate.toCurrency",
+        "FxRate.rate",
+        "FxRate.purpose",
+        "FxRate.source",
+        "FxRate.effectiveFrom",
+        "FxRate.effectiveTo",
+        "FxRate.setByPrincipalId",
+        "FxRate.providerReference",
+        "FxRate.fetchedAt"
+       ],
+       "operation": "listFxRates",
+       "provenance": "contract finance.yaml GET /fx-rates"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The multi-currency pricing list.",
+   "error": "Could not load. Names which read failed and leaves the multi-currency pricing untouched.",
+   "emptyFirstRun": "No multi-currency pricing yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the multi-currency pricing are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Last known rates, with their age shown.** A rate is a number a guest may act on, and an undated one they cannot judge"
+  },
+  "apis": [
+   {
+    "operationId": "listFxRates",
+    "contract": "finance",
+    "purpose": "The rates in force",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listProducts",
+    "contract": "catalogue",
+    "purpose": "List products",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "FxRate.id",
+    "FxRate.fromCurrency",
+    "FxRate.toCurrency",
+    "FxRate.rate",
+    "FxRate.purpose"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-044"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

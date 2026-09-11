@@ -1,0 +1,656 @@
+{
+ "addToWishlist": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/wishlist",
+  "contract": "marketing-crm",
+  "summary": "Save an item",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Wishlist"
+ },
+ "createReferral": {
+  "method": "POST",
+  "path": "/referrals",
+  "contract": "marketing-crm",
+  "summary": "Issue a referral code",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Referral",
+  "responds": "Referral"
+ },
+ "deleteGuestAccount": {
+  "method": "DELETE",
+  "path": "/auth/guest/account",
+  "contract": "identity",
+  "summary": "Self-service account deletion",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "evaluatePromotions": {
+  "method": "POST",
+  "path": "/promotions/evaluate",
+  "contract": "promotions",
+  "summary": "Evaluate promotions against a cart",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "EvaluatePromotionsRequest",
+  "responds": "PromotionEvaluation"
+ },
+ "exportSubjectData": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/data-export",
+  "contract": "identity",
+  "summary": "Everything the platform holds about one guest",
+  "permission": "GUEST_VIEW_PII",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getFacePassEnrolment": {
+  "method": "GET",
+  "path": "/face-pass/enrolments/{enrolmentId}",
+  "contract": "access",
+  "summary": "Whether a pass has a face registered, and when",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "FacePassEnrolment"
+ },
+ "getGameCard": {
+  "method": "GET",
+  "path": "/game-cards/{cardCode}",
+  "contract": "games",
+  "summary": "Read a card's balances",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GameCard"
+ },
+ "getGiftCard": {
+  "method": "GET",
+  "path": "/gift-cards/{cardCode}",
+  "contract": "retail",
+  "summary": "Check a gift card balance",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GiftCard"
+ },
+ "getGuestConsents": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/consents",
+  "contract": "marketing-crm",
+  "summary": "Read a guest's consent state",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ConsentState"
+ },
+ "getLoyaltyPosition": {
+  "method": "GET",
+  "path": "/loyalty/position",
+  "contract": "marketing-crm",
+  "summary": "A guest's points, tier and what is within reach",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
+ "getMyMemberships": {
+  "method": "GET",
+  "path": "/guests/me/memberships",
+  "contract": "catalogue",
+  "summary": "A guest's own memberships, benefits and history",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "includeLapsed",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestMembership"
+ },
+ "getProduct": {
+  "method": "GET",
+  "path": "/products/{productId}",
+  "contract": "catalogue",
+  "summary": "Read a product",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Product"
+ },
+ "getWaiverStatus": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/waiver-status",
+  "contract": "marketing-crm",
+  "summary": "Whether this guest may be issued a ticket that requires a waiver",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "productId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "getWallet": {
+  "method": "GET",
+  "path": "/wallets/{subjectId}",
+  "contract": "retail",
+  "summary": "Read a guest wallet",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Wallet"
+ },
+ "getWishlist": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/wishlist",
+  "contract": "marketing-crm",
+  "summary": "Read a guest's saved items",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Wishlist"
+ },
+ "grantDelegation": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/delegations",
+  "contract": "identity",
+  "summary": "Let one guest act for another",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DelegatedAccess"
+ },
+ "listDelegations": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/delegations",
+  "contract": "identity",
+  "summary": "Who may act for this guest, and for whom they may act",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "listGuestDevices": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/devices",
+  "contract": "marketing-crm",
+  "summary": "A guest's registered devices",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestDevice"
+ },
+ "listGuestMemberships": {
+  "method": "GET",
+  "path": "/guest/memberships",
+  "contract": "catalogue",
+  "summary": "A guest's memberships, benefits and history",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "includeLapsed",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestMembership"
+ },
+ "listLoyaltyProgrammes": {
+  "method": "GET",
+  "path": "/loyalty/programmes",
+  "contract": "marketing-crm",
+  "summary": "List loyalty programmes",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "LoyaltyProgramme"
+ },
+ "listPaymentTokens": {
+  "method": "GET",
+  "path": "/payment-tokens",
+  "contract": "orders",
+  "summary": "A guest's saved payment methods",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PaymentToken"
+ },
+ "listProducts": {
+  "method": "GET",
+  "path": "/products",
+  "contract": "catalogue",
+  "summary": "List products",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "isSellable",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listPromotions": {
+  "method": "GET",
+  "path": "/promotions",
+  "contract": "promotions",
+  "summary": "List promotions",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "activeAt",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listWalletTransactions": {
+  "method": "GET",
+  "path": "/wallets/{subjectId}/transactions",
+  "contract": "retail",
+  "summary": "Wallet transaction history",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "recordConsent": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/consents",
+  "contract": "marketing-crm",
+  "summary": "Record a consent decision",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RecordConsentRequest",
+  "responds": "ConsentState"
+ },
+ "redeemLoyaltyPoints": {
+  "method": "POST",
+  "path": "/loyalty/redemptions",
+  "contract": "marketing-crm",
+  "summary": "Spend points",
+  "permission": "LOYALTY_REDEEM",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "LoyaltyPosition"
+ },
+ "registerGuestDevice": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/devices",
+  "contract": "marketing-crm",
+  "summary": "Register a device for push",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestDevice"
+ },
+ "removeFromWishlist": {
+  "method": "DELETE",
+  "path": "/guests/{subjectId}/wishlist/{itemId}",
+  "contract": "marketing-crm",
+  "summary": "Remove a saved item",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "revokeFacePass": {
+  "method": "DELETE",
+  "path": "/face-pass/enrolments/{enrolmentId}",
+  "contract": "access",
+  "summary": "Remove a facial profile",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "revokeGuestDevice": {
+  "method": "DELETE",
+  "path": "/guests/{subjectId}/devices/{deviceId}",
+  "contract": "marketing-crm",
+  "summary": "Revoke a device registration",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "storePaymentToken": {
+  "method": "POST",
+  "path": "/payment-tokens",
+  "contract": "orders",
+  "summary": "Save a payment method for future use",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PaymentToken"
+ },
+ "transferOrderTickets": {
+  "method": "POST",
+  "path": "/orders/{orderId}/transfer",
+  "contract": "orders",
+  "summary": "Transfer tickets to another guest",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "transferWalletBalance": {
+  "method": "POST",
+  "path": "/wallets/{walletId}/transfer",
+  "contract": "retail",
+  "summary": "Send balance to another guest",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ }
+}

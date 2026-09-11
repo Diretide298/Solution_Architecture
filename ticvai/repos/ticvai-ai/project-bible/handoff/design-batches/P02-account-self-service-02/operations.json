@@ -1,0 +1,304 @@
+{
+ "createMfaChallenge": {
+  "method": "POST",
+  "path": "/auth/mfa/challenge",
+  "contract": "identity",
+  "summary": "Step-up authentication for a sensitive action",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "createRefundRequest": {
+  "method": "POST",
+  "path": "/refund-requests",
+  "contract": "orders",
+  "summary": "Guest-initiated refund request",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "createResaleListing": {
+  "method": "POST",
+  "path": "/resale-listings",
+  "contract": "orders",
+  "summary": "List an entitlement for resale",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ResaleListing",
+  "responds": "ResaleListing"
+ },
+ "enrolFacePass": {
+  "method": "POST",
+  "path": "/face-pass/enrolments",
+  "contract": "access",
+  "summary": "Register a facial profile against an entitlement",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "FacePassEnrolment"
+ },
+ "getFacePassEnrolment": {
+  "method": "GET",
+  "path": "/face-pass/enrolments/{enrolmentId}",
+  "contract": "access",
+  "summary": "Whether a pass has a face registered, and when",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "FacePassEnrolment"
+ },
+ "getGiftCard": {
+  "method": "GET",
+  "path": "/gift-cards/{cardCode}",
+  "contract": "retail",
+  "summary": "Check a gift card balance",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GiftCard"
+ },
+ "getWaiverStatus": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/waiver-status",
+  "contract": "marketing-crm",
+  "summary": "Whether this guest may be issued a ticket that requires a waiver",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "productId",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "listGuestDevices": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/devices",
+  "contract": "marketing-crm",
+  "summary": "A guest's registered devices",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestDevice"
+ },
+ "listPaymentTokens": {
+  "method": "GET",
+  "path": "/payment-tokens",
+  "contract": "orders",
+  "summary": "A guest's saved payment methods",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PaymentToken"
+ },
+ "redeemLoyaltyPoints": {
+  "method": "POST",
+  "path": "/loyalty/redemptions",
+  "contract": "marketing-crm",
+  "summary": "Spend points",
+  "permission": "LOYALTY_REDEEM",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "LoyaltyPosition"
+ },
+ "registerGuestDevice": {
+  "method": "POST",
+  "path": "/guests/{subjectId}/devices",
+  "contract": "marketing-crm",
+  "summary": "Register a device for push",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestDevice"
+ },
+ "revokeFacePass": {
+  "method": "DELETE",
+  "path": "/face-pass/enrolments/{enrolmentId}",
+  "contract": "access",
+  "summary": "Remove a facial profile",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "revokeGuestDevice": {
+  "method": "DELETE",
+  "path": "/guests/{subjectId}/devices/{deviceId}",
+  "contract": "marketing-crm",
+  "summary": "Revoke a device registration",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "storePaymentToken": {
+  "method": "POST",
+  "path": "/payment-tokens",
+  "contract": "orders",
+  "summary": "Save a payment method for future use",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PaymentToken"
+ },
+ "transferWalletBalance": {
+  "method": "POST",
+  "path": "/wallets/{walletId}/transfer",
+  "contract": "retail",
+  "summary": "Send balance to another guest",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "verifyGuestEmail": {
+  "method": "POST",
+  "path": "/auth/guest/verify-email",
+  "contract": "identity",
+  "summary": "Send a verification link, or consume one",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ }
+}

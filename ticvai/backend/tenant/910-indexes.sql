@@ -179,6 +179,8 @@ CREATE INDEX IF NOT EXISTS ix_invitation_issued_by_principal_id ON marketing.inv
 CREATE INDEX IF NOT EXISTS ix_invitation_offered_by_principal_id ON marketing.invitation (offered_by_principal_id);
 -- convention, not declared: marketing.journey_entrant.journey_id -> marketing.journey
 CREATE INDEX IF NOT EXISTS ix_journey_entrant_journey_id ON marketing.journey_entrant (journey_id);
+-- convention, not declared: marketing.journey_entrant.step_id -> approvals.step_up_policy
+CREATE INDEX IF NOT EXISTS ix_journey_entrant_step_id ON marketing.journey_entrant (step_id);
 -- convention, not declared: marketing.journey_entrant.subject_id -> pii.subject
 CREATE INDEX IF NOT EXISTS ix_journey_entrant_subject_id ON marketing.journey_entrant (subject_id);
 -- convention, not declared: marketing.lost_item.last_seen_point_id -> venuemap.point

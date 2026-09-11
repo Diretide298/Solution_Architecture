@@ -1,0 +1,132 @@
+id: F214
+name: 'Subscription Licensing AI Self Service board 8: Go-Live Readiness Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Subscription Licensing AI Self Service board 8. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-605
+  entryPoints:
+  - Arrives at Go-Live Readiness Command Center
+steps:
+- step: 1
+  screen: BO-605
+  action: Opens Go-Live Readiness Command Center
+  operations: []
+  outcome: Provide one central dashboard showing whether the customer is ready for production.
+- step: 2
+  screen: BO-606
+  action: Works in Automated Validation Plan
+  operations: []
+  outcome: 'Automatically create the correct testing plan based on what the customer has actually purchased
+    and configured. For example, if the customer purchased: Ticketing POS B2C B2B Access Control the system
+    automatically creates the relevant valid'
+- step: 3
+  screen: BO-605
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-607
+  action: Works in Ticketing & Product Validation
+  operations: []
+  outcome: Validate that configured products can actually operate correctly.
+- step: 5
+  screen: BO-605
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-608
+  action: Works in End-to-End Sales Channel Testing
+  operations: []
+  outcome: Test the real customer transaction journey across each activated sales channel.
+- step: 7
+  screen: BO-605
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-609
+  action: Works in Payment & Financial Validation
+  operations: []
+  outcome: Confirm that payment, taxation, refunds, and financial configuration work before accepting
+    real customer money.
+- step: 9
+  screen: BO-605
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-610
+  action: Works in Ticket, QR & Access Validation
+  operations: []
+  outcome: Validate the complete journey from ticket creation to physical admission.
+- step: 11
+  screen: BO-605
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-611
+  action: Works in User, Security & Integration Validation
+  operations: []
+  outcome: Verify that the environment is technically and operationally secure before launch.
+- step: 13
+  screen: BO-605
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-612
+  action: Works in Communication & Customer Journey Validation
+  operations: []
+  outcome: Ensure that the customer receives the correct information throughout the booking journey.
+- step: 15
+  screen: BO-605
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-613
+  action: Works in Blocker, Warning & AI Resolution Center
+  operations: []
+  outcome: Bring all readiness problems into one actionable screen instead of forcing the customer to
+    search through the system.
+- step: 17
+  screen: BO-605
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-614
+  action: Works in Final Go-Live Approval & Production Launch
+  operations: []
+  outcome: Provide the final controlled decision to activate production operation.
+branches:
+- at: 1
+  condition: Nothing has been set up on Go-Live Readiness Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Subscription Licensing AI Self Service board 8 visited
+primaryContract: unknown
+contracts:
+- unknown

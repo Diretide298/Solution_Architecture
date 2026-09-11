@@ -1,0 +1,486 @@
+{
+ "claimLocationSession": {
+  "method": "POST",
+  "path": "/location-sessions",
+  "contract": "fnb",
+  "summary": "Tell the platform where the guest is",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "LocationSession"
+ },
+ "claimTableSession": {
+  "method": "POST",
+  "path": "/table-sessions",
+  "contract": "fnb",
+  "summary": "Identify which table a guest is sitting at",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "TableSession"
+ },
+ "createGuestFnbOrder": {
+  "method": "POST",
+  "path": "/guest-orders",
+  "contract": "fnb",
+  "summary": "A guest orders food",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateGuestOrderRequest",
+  "responds": "GuestOrderResult"
+ },
+ "createParkingEntitlement": {
+  "method": "POST",
+  "path": "/parking-entitlements",
+  "contract": "access",
+  "summary": "A guest bought parking",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ParkingEntitlement",
+  "responds": "ParkingEntitlement"
+ },
+ "createTableReservation": {
+  "method": "POST",
+  "path": "/table-reservations",
+  "contract": "fnb",
+  "summary": "Book a table in advance",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "TableReservation",
+  "responds": "TableReservation"
+ },
+ "getGuestBill": {
+  "method": "GET",
+  "path": "/table-sessions/{sessionId}/bill",
+  "contract": "fnb",
+  "summary": "The bill for the guest's table",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Bill"
+ },
+ "getGuestMenu": {
+  "method": "GET",
+  "path": "/outlets/{outletId}/guest-menu",
+  "contract": "fnb",
+  "summary": "The menu a guest sees",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "at",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "language",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestMenu"
+ },
+ "getGuestOrderStatus": {
+  "method": "GET",
+  "path": "/guest-orders/{orderId}",
+  "contract": "fnb",
+  "summary": "Track an order",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GuestOrderStatus"
+ },
+ "getVenueMap": {
+  "method": "GET",
+  "path": "/venue-maps/{mapId}",
+  "contract": "venue-map",
+  "summary": "A map with its points and paths",
+  "permission": "VENUE_MAP_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "version",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "VenueMapDetail"
+ },
+ "getVenueMapGraph": {
+  "method": "GET",
+  "path": "/venue-maps/{mapId}/graph",
+  "contract": "venue-map",
+  "summary": "The navigation graph, ready to route over",
+  "permission": "VENUE_MAP_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "stepFreeOnly",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "VenueMapGraph"
+ },
+ "getWaitTimes": {
+  "method": "GET",
+  "path": "/queues/wait-times",
+  "contract": "queue",
+  "summary": "Wait times across a venue",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": true
+   },
+   {
+    "name": "category",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "WaitTime"
+ },
+ "getWaitingGuest": {
+  "method": "GET",
+  "path": "/waiting-guests/{entryId}",
+  "contract": "queue",
+  "summary": "Read a queue entry",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "WaitingGuest"
+ },
+ "joinQueue": {
+  "method": "POST",
+  "path": "/waiting-guests",
+  "contract": "queue",
+  "summary": "Join a virtual queue",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "JoinQueueRequest",
+  "responds": "WaitingGuest"
+ },
+ "joinRestaurantWaitlist": {
+  "method": "POST",
+  "path": "/waitlist",
+  "contract": "fnb",
+  "summary": "Add a party to an outlet's waitlist",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RestaurantWaitlist",
+  "responds": "RestaurantWaitlist"
+ },
+ "joinWaitlist": {
+  "method": "POST",
+  "path": "/waitlist-entries",
+  "contract": "catalogue",
+  "summary": "Ask to be told if capacity frees up",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "WaitlistEntry",
+  "responds": "WaitlistEntry"
+ },
+ "leaveQueue": {
+  "method": "DELETE",
+  "path": "/waiting-guests/{entryId}",
+  "contract": "queue",
+  "summary": "Leave a queue",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "leaveWaitlist": {
+  "method": "DELETE",
+  "path": "/waitlist-entries/{entryId}",
+  "contract": "catalogue",
+  "summary": "Stop waiting",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "listDeliveryLocations": {
+  "method": "GET",
+  "path": "/venues/{venueId}/delivery-locations",
+  "contract": "fnb",
+  "summary": "Where an order can be delivered",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "servingOutletId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DeliveryLocation"
+ },
+ "listDiningOutlets": {
+  "method": "GET",
+  "path": "/venues/{venueId}/dining",
+  "contract": "fnb",
+  "summary": "Where a guest can eat, right now",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "openNow",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "orderingMethod",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DiningOutlet"
+ },
+ "listModifierGroups": {
+  "method": "GET",
+  "path": "/modifier-groups",
+  "contract": "fnb",
+  "summary": "List modifier groups",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ModifierGroup"
+ },
+ "listParkingFacilities": {
+  "method": "GET",
+  "path": "/parking-facilities",
+  "contract": "access",
+  "summary": "Car parks at a venue, and how each integrates",
+  "permission": "ACCESS_POINT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ParkingFacility"
+ },
+ "listQueues": {
+  "method": "GET",
+  "path": "/queues",
+  "contract": "queue",
+  "summary": "List queues",
+  "permission": "QUEUE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "openOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "updateParkingEntitlement": {
+  "method": "PATCH",
+  "path": "/parking-entitlements/{entitlementId}",
+  "contract": "access",
+  "summary": "Change the plate, or revoke",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ParkingEntitlement",
+  "responds": "ParkingEntitlement"
+ }
+}

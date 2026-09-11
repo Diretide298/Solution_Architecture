@@ -1,0 +1,277 @@
+{
+ "addCaseMessage": {
+  "method": "POST",
+  "path": "/cases/{caseId}/messages",
+  "contract": "marketing-crm",
+  "summary": "Add a message or internal note",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CaseMessage"
+ },
+ "claimConversation": {
+  "method": "POST",
+  "path": "/conversations/{conversationId}/claim",
+  "contract": "marketing-crm",
+  "summary": "An agent takes it",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Conversation"
+ },
+ "closeConversation": {
+  "method": "POST",
+  "path": "/conversations/{conversationId}/close",
+  "contract": "marketing-crm",
+  "summary": "End it",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Conversation"
+ },
+ "createCase": {
+  "method": "POST",
+  "path": "/cases",
+  "contract": "marketing-crm",
+  "summary": "Raise a service case",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateCaseRequest",
+  "responds": "Case"
+ },
+ "escalateCase": {
+  "method": "POST",
+  "path": "/cases/{caseId}/escalate",
+  "contract": "marketing-crm",
+  "summary": "Escalate a case",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Case"
+ },
+ "getCase": {
+  "method": "GET",
+  "path": "/cases/{caseId}",
+  "contract": "marketing-crm",
+  "summary": "Read a case with its thread",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CaseDetail"
+ },
+ "getConversation": {
+  "method": "GET",
+  "path": "/conversations/{conversationId}",
+  "contract": "marketing-crm",
+  "summary": "One conversation and everything before it",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Conversation"
+ },
+ "listCases": {
+  "method": "GET",
+  "path": "/cases",
+  "contract": "marketing-crm",
+  "summary": "List service cases",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "assignedToPrincipalId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "breachedSla",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "priority",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listConversations": {
+  "method": "GET",
+  "path": "/conversations",
+  "contract": "marketing-crm",
+  "summary": "The omnichannel inbox",
+  "permission": "CASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "state",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "assignedToMe",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Conversation"
+ },
+ "reopenCase": {
+  "method": "POST",
+  "path": "/cases/{caseId}/reopen",
+  "contract": "marketing-crm",
+  "summary": "Reopen a resolved case",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "sendConversationMessage": {
+  "method": "POST",
+  "path": "/conversations/{conversationId}/messages",
+  "contract": "marketing-crm",
+  "summary": "Say something, as a guest or an agent",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ConversationMessage"
+ },
+ "transferConversation": {
+  "method": "POST",
+  "path": "/conversations/{conversationId}/transfer",
+  "contract": "marketing-crm",
+  "summary": "Pass it to another agent or queue",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Conversation"
+ },
+ "updateCase": {
+  "method": "PATCH",
+  "path": "/cases/{caseId}",
+  "contract": "marketing-crm",
+  "summary": "Assign, reprioritise or resolve a case",
+  "permission": "CASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Case"
+ }
+}

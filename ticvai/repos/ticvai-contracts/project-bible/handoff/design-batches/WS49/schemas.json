@@ -1,0 +1,1340 @@
+{
+ "BundleAvailabilityCapacityValidationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Bundle Availability, Capacity & Validation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "available": {
+    "type": "string",
+    "description": "Available"
+   },
+   "lowAvailability": {
+    "type": "string",
+    "description": "Low availability"
+   },
+   "soldOut": {
+    "type": "string",
+    "description": "Sold out"
+   },
+   "suspended": {
+    "type": "string",
+    "description": "Suspended"
+   },
+   "unpublished": {
+    "type": "string",
+    "description": "Unpublished"
+   },
+   "invalidDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Invalid date"
+   },
+   "capacityUnavailable": {
+    "type": "integer",
+    "description": "Capacity unavailable"
+   },
+   "independentCapacity": {
+    "type": "integer",
+    "description": "independent capacity"
+   }
+  }
+ },
+ "BundleComboCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Bundle & Combo Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "activeBundles": {
+    "type": "integer",
+    "description": "Active Bundles"
+   },
+   "draftBundles": {
+    "type": "integer",
+    "description": "Draft Bundles"
+   },
+   "scheduledBundles": {
+    "type": "integer",
+    "description": "Scheduled Bundles"
+   },
+   "dynamicBundles": {
+    "type": "integer",
+    "description": "Dynamic Bundles"
+   },
+   "fixedBundles": {
+    "type": "integer",
+    "description": "Fixed Bundles"
+   },
+   "guestChoiceBundles": {
+    "type": "integer",
+    "description": "Guest-Choice Bundles"
+   },
+   "partnerBundles": {
+    "type": "integer",
+    "description": "Partner Bundles"
+   },
+   "bundleSales": {
+    "type": "integer",
+    "description": "Bundle Sales"
+   },
+   "bundleRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Bundle Revenue"
+   },
+   "averageBundleValue": {
+    "type": "number",
+    "description": "Average Bundle Value"
+   },
+   "bundleConversionRate": {
+    "type": "number",
+    "description": "Bundle Conversion Rate"
+   },
+   "redemptionRate": {
+    "type": "number",
+    "description": "Redemption Rate"
+   },
+   "aovUplift": {
+    "type": "number",
+    "description": "AOV Uplift"
+   },
+   "bundleMargin": {
+    "type": "number",
+    "description": "Bundle Margin"
+   },
+   "draft": {
+    "type": "string",
+    "description": "Draft"
+   },
+   "incomplete": {
+    "type": "string",
+    "description": "Incomplete"
+   },
+   "pendingValidation": {
+    "type": "integer",
+    "description": "Pending Validation"
+   },
+   "pendingApproval": {
+    "type": "integer",
+    "description": "Pending Approval"
+   },
+   "scheduled": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Scheduled"
+   },
+   "active": {
+    "type": "integer",
+    "description": "Active"
+   },
+   "paused": {
+    "type": "string",
+    "description": "Paused"
+   },
+   "suspended": {
+    "type": "string",
+    "description": "Suspended"
+   },
+   "expired": {
+    "type": "integer",
+    "description": "Expired"
+   },
+   "archived": {
+    "type": "string",
+    "description": "Archived"
+   }
+  }
+ },
+ "BundleComponentBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Bundle Component Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "admissionTicket": {
+    "type": "string",
+    "description": "Admission ticket"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "timeslot": {
+    "type": "string",
+    "description": "Timeslot"
+   },
+   "experience": {
+    "type": "string",
+    "description": "Experience"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "annualPass": {
+    "type": "string",
+    "description": "Annual pass"
+   },
+   "fBProduct": {
+    "type": "string",
+    "description": "F&B product"
+   },
+   "fBMealPackage": {
+    "type": "string",
+    "description": "F&B meal package"
+   },
+   "retailProduct": {
+    "type": "string",
+    "description": "Retail product"
+   },
+   "parking": {
+    "type": "string",
+    "description": "Parking"
+   },
+   "locker": {
+    "type": "string",
+    "description": "Locker"
+   },
+   "photo": {
+    "type": "string",
+    "description": "Photo"
+   },
+   "rental": {
+    "type": "string",
+    "description": "Rental"
+   },
+   "voucher": {
+    "type": "string",
+    "description": "Voucher"
+   },
+   "giftCard": {
+    "type": "string",
+    "description": "Gift card"
+   },
+   "service": {
+    "type": "string",
+    "description": "Service"
+   },
+   "externalProduct": {
+    "type": "string",
+    "description": "External product"
+   },
+   "ntYEntTreatment": {
+    "type": "string",
+    "description": "nt y ent Treatment"
+   },
+   "photo1OptionalAed30": {
+    "type": "string",
+    "description": "Photo 1 Optional +AED 30"
+   },
+   "typesType": {
+    "type": "string",
+    "enum": [
+     "mandatory",
+     "optional",
+     "choice",
+     "conditional",
+     "recommended"
+    ],
+    "description": "Vocabulary listed under Component Types."
+   },
+   "fixedQuantity": {
+    "type": "integer",
+    "description": "Fixed quantity"
+   },
+   "minimum": {
+    "type": "string",
+    "description": "Minimum"
+   },
+   "maximum": {
+    "type": "string",
+    "description": "Maximum"
+   },
+   "quantityBasedOnGuestCount": {
+    "type": "integer",
+    "description": "Quantity based on guest count"
+   },
+   "quantityBasedOnTicketCount": {
+    "type": "integer",
+    "description": "Quantity based on ticket count"
+   }
+  }
+ },
+ "BundleComponentBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Bundle Component Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "admissionTicket": {
+    "type": "string",
+    "description": "Admission ticket"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "timeslot": {
+    "type": "string",
+    "description": "Timeslot"
+   },
+   "experience": {
+    "type": "string",
+    "description": "Experience"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "annualPass": {
+    "type": "string",
+    "description": "Annual pass"
+   },
+   "fBProduct": {
+    "type": "string",
+    "description": "F&B product"
+   },
+   "fBMealPackage": {
+    "type": "string",
+    "description": "F&B meal package"
+   },
+   "retailProduct": {
+    "type": "string",
+    "description": "Retail product"
+   },
+   "parking": {
+    "type": "string",
+    "description": "Parking"
+   },
+   "locker": {
+    "type": "string",
+    "description": "Locker"
+   },
+   "photo": {
+    "type": "string",
+    "description": "Photo"
+   },
+   "rental": {
+    "type": "string",
+    "description": "Rental"
+   },
+   "voucher": {
+    "type": "string",
+    "description": "Voucher"
+   },
+   "giftCard": {
+    "type": "string",
+    "description": "Gift card"
+   },
+   "service": {
+    "type": "string",
+    "description": "Service"
+   },
+   "externalProduct": {
+    "type": "string",
+    "description": "External product"
+   },
+   "ntYEntTreatment": {
+    "type": "string",
+    "description": "nt y ent Treatment"
+   },
+   "photo1OptionalAed30": {
+    "type": "string",
+    "description": "Photo 1 Optional +AED 30"
+   },
+   "typesType": {
+    "type": "string",
+    "enum": [
+     "mandatory",
+     "optional",
+     "choice",
+     "conditional",
+     "recommended"
+    ],
+    "description": "Vocabulary listed under Component Types."
+   },
+   "fixedQuantity": {
+    "type": "integer",
+    "description": "Fixed quantity"
+   },
+   "minimum": {
+    "type": "string",
+    "description": "Minimum"
+   },
+   "maximum": {
+    "type": "string",
+    "description": "Maximum"
+   },
+   "quantityBasedOnGuestCount": {
+    "type": "integer",
+    "description": "Quantity based on guest count"
+   },
+   "quantityBasedOnTicketCount": {
+    "type": "integer",
+    "description": "Quantity based on ticket count"
+   }
+  }
+ },
+ "BundleDefinitionSetupInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is promotions.allocation_split at 5%, so this is not an update to anything the package stores today and no new table has been decided",
+  "description": "**What Bundle Definition & Setup submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "bundleName": {
+    "type": "string",
+    "description": "Bundle name"
+   },
+   "bundleId": {
+    "type": "string",
+    "description": "Bundle ID"
+   },
+   "internalDescription": {
+    "type": "string",
+    "description": "Internal description"
+   },
+   "guestFacingDescription": {
+    "type": "string",
+    "description": "Guest-facing description"
+   },
+   "businessEntity": {
+    "type": "string",
+    "description": "Business entity"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "bundleCategory": {
+    "type": "string",
+    "description": "Bundle category"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "campaign": {
+    "type": "string",
+    "description": "Campaign"
+   },
+   "effectiveDates": {
+    "type": "string",
+    "description": "Effective dates"
+   },
+   "salesStatus": {
+    "type": "string",
+    "description": "Sales status"
+   },
+   "allComponentsPredefined": {
+    "type": "string",
+    "description": "All components predefined"
+   },
+   "requiredComponentsPlusOptionalChoices": {
+    "type": "string",
+    "description": "Required components plus optional choices"
+   },
+   "customerSelectsFromPermittedCategories": {
+    "type": "string",
+    "description": "Customer selects from permitted categories"
+   },
+   "chooseAny3Attractions": {
+    "type": "string",
+    "description": "Choose any 3 attractions"
+   },
+   "containsInternalAndExternalProducts": {
+    "type": "string",
+    "description": "Contains internal and external products"
+   },
+   "appearsAsStandaloneProduct": {
+    "type": "string",
+    "description": "Appears as standalone product"
+   },
+   "isRecommendedDuringCheckout": {
+    "type": "boolean",
+    "description": "Is recommended during checkout"
+   },
+   "requiresAnotherProduct": {
+    "type": "string",
+    "description": "Requires another product"
+   }
+  }
+ },
+ "BundleDefinitionSetupView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Bundle Definition & Setup displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "bundleName": {
+    "type": "string",
+    "description": "Bundle name"
+   },
+   "bundleId": {
+    "type": "string",
+    "description": "Bundle ID"
+   },
+   "internalDescription": {
+    "type": "string",
+    "description": "Internal description"
+   },
+   "guestFacingDescription": {
+    "type": "string",
+    "description": "Guest-facing description"
+   },
+   "businessEntity": {
+    "type": "string",
+    "description": "Business entity"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "bundleCategory": {
+    "type": "string",
+    "description": "Bundle category"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "campaign": {
+    "type": "string",
+    "description": "Campaign"
+   },
+   "effectiveDates": {
+    "type": "string",
+    "description": "Effective dates"
+   },
+   "salesStatus": {
+    "type": "string",
+    "description": "Sales status"
+   },
+   "allComponentsPredefined": {
+    "type": "string",
+    "description": "All components predefined"
+   },
+   "requiredComponentsPlusOptionalChoices": {
+    "type": "string",
+    "description": "Required components plus optional choices"
+   },
+   "customerSelectsFromPermittedCategories": {
+    "type": "string",
+    "description": "Customer selects from permitted categories"
+   },
+   "chooseAny3Attractions": {
+    "type": "string",
+    "description": "Choose any 3 attractions"
+   },
+   "containsInternalAndExternalProducts": {
+    "type": "string",
+    "description": "Contains internal and external products"
+   },
+   "appearsAsStandaloneProduct": {
+    "type": "string",
+    "description": "Appears as standalone product"
+   },
+   "isRecommendedDuringCheckout": {
+    "type": "boolean",
+    "description": "Is recommended during checkout"
+   },
+   "requiresAnotherProduct": {
+    "type": "string",
+    "description": "Requires another product"
+   }
+  }
+ },
+ "BundlePreviewSimulationAiRecommendationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is promotions.bundle_component at 3%, so this is not an update to anything the package stores today and no new table has been decided",
+  "description": "**What Bundle Preview, Simulation & AI Recommendation submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "guest": {
+    "type": "string",
+    "description": "Guest"
+   },
+   "segment": {
+    "type": "string",
+    "description": "Segment"
+   },
+   "products": {
+    "type": "string",
+    "description": "Products"
+   },
+   "quantity": {
+    "type": "integer",
+    "description": "Quantity"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "loyalty": {
+    "type": "string",
+    "description": "Loyalty"
+   },
+   "paymentType": {
+    "type": "string",
+    "description": "Payment type"
+   },
+   "promoCode": {
+    "type": "string",
+    "description": "Promo code"
+   },
+   "familySegment": {
+    "type": "string",
+    "description": "Family segment ✓"
+   },
+   "b2c": {
+    "type": "string",
+    "description": "B2C ✓"
+   },
+   "validDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Valid date ✓"
+   },
+   "marketingAdministrator": {
+    "type": "string",
+    "description": "Marketing Administrator"
+   },
+   "campaignManager": {
+    "type": "string",
+    "description": "Campaign Manager"
+   },
+   "commercialManager": {
+    "type": "string",
+    "description": "Commercial Manager"
+   },
+   "revenueManager": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue Manager"
+   },
+   "finance": {
+    "type": "string",
+    "description": "Finance"
+   },
+   "b2bManager": {
+    "type": "string",
+    "description": "B2B Manager"
+   },
+   "venueManager": {
+    "type": "string",
+    "description": "Venue Manager"
+   },
+   "systemAdministrator": {
+    "type": "string",
+    "description": "System Administrator"
+   },
+   "approver": {
+    "type": "string",
+    "description": "Approver"
+   },
+   "auditor": {
+    "type": "string",
+    "description": "Auditor"
+   },
+   "changeDiscount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Change discount"
+   },
+   "changeThresholds": {
+    "type": "string",
+    "description": "Change thresholds"
+   },
+   "changeSegments": {
+    "type": "string",
+    "description": "Change segments"
+   },
+   "changeDates": {
+    "type": "string",
+    "description": "Change dates"
+   },
+   "currentPriceAndPricingFloors": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Current price and pricing floors"
+   },
+   "guestCustomerSegments": {
+    "type": "string",
+    "description": "Guest/customer segments"
+   },
+   "membershipAndTierEligibility": {
+    "type": "string",
+    "description": "Membership and tier eligibility"
+   },
+   "companySegmentsAndPartnerPricing": {
+    "type": "string",
+    "description": "Company segments and partner pricing"
+   },
+   "paymentMethodAndBankEligibility": {
+    "type": "string",
+    "description": "Payment-method and bank eligibility"
+   },
+   "productsEligibleForPromotionalRules": {
+    "type": "string",
+    "description": "Products eligible for promotional rules"
+   },
+   "revenueMarginAndDiscountExposure": {
+    "type": "number",
+    "description": "Revenue, margin and discount exposure"
+   }
+  }
+ },
+ "BundlePreviewSimulationAiRecommendationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Bundle Preview, Simulation & AI Recommendation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "guest": {
+    "type": "string",
+    "description": "Guest"
+   },
+   "segment": {
+    "type": "string",
+    "description": "Segment"
+   },
+   "products": {
+    "type": "string",
+    "description": "Products"
+   },
+   "quantity": {
+    "type": "integer",
+    "description": "Quantity"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "loyalty": {
+    "type": "string",
+    "description": "Loyalty"
+   },
+   "paymentType": {
+    "type": "string",
+    "description": "Payment type"
+   },
+   "promoCode": {
+    "type": "string",
+    "description": "Promo code"
+   },
+   "discount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount (the pack shows 15% / AED 90)"
+   },
+   "familySegment": {
+    "type": "string",
+    "description": "Family segment ✓"
+   },
+   "b2c": {
+    "type": "string",
+    "description": "B2C ✓"
+   },
+   "validDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Valid date ✓"
+   },
+   "rule421Qualified": {
+    "type": "string",
+    "description": "Rule 421 qualified"
+   },
+   "marketingAdministrator": {
+    "type": "string",
+    "description": "Marketing Administrator"
+   },
+   "campaignManager": {
+    "type": "string",
+    "description": "Campaign Manager"
+   },
+   "commercialManager": {
+    "type": "string",
+    "description": "Commercial Manager"
+   },
+   "revenueManager": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue Manager"
+   },
+   "finance": {
+    "type": "string",
+    "description": "Finance"
+   },
+   "b2bManager": {
+    "type": "string",
+    "description": "B2B Manager"
+   },
+   "venueManager": {
+    "type": "string",
+    "description": "Venue Manager"
+   },
+   "systemAdministrator": {
+    "type": "string",
+    "description": "System Administrator"
+   },
+   "approver": {
+    "type": "string",
+    "description": "Approver"
+   },
+   "auditor": {
+    "type": "string",
+    "description": "Auditor"
+   },
+   "changeDiscount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Change discount"
+   },
+   "changeThresholds": {
+    "type": "string",
+    "description": "Change thresholds"
+   },
+   "changeSegments": {
+    "type": "string",
+    "description": "Change segments"
+   },
+   "changeDates": {
+    "type": "string",
+    "description": "Change dates"
+   },
+   "currentPriceAndPricingFloors": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Current price and pricing floors"
+   },
+   "guestCustomerSegments": {
+    "type": "string",
+    "description": "Guest/customer segments"
+   },
+   "membershipAndTierEligibility": {
+    "type": "string",
+    "description": "Membership and tier eligibility"
+   },
+   "companySegmentsAndPartnerPricing": {
+    "type": "string",
+    "description": "Company segments and partner pricing"
+   },
+   "paymentMethodAndBankEligibility": {
+    "type": "string",
+    "description": "Payment-method and bank eligibility"
+   },
+   "productsEligibleForPromotionalRules": {
+    "type": "string",
+    "description": "Products eligible for promotional rules"
+   },
+   "revenueMarginAndDiscountExposure": {
+    "type": "number",
+    "description": "Revenue, margin and discount exposure"
+   }
+  }
+ },
+ "BundlePricingCommercialModelView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Bundle Pricing & Commercial Model displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "bundleDiscount15": {
+    "type": "number",
+    "description": "Bundle discount 15%"
+   },
+   "eachComponentRetainsConfiguredPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Each component retains configured price"
+   },
+   "calculatedThroughTicvaiSPricingEngine": {
+    "type": "string",
+    "description": "Calculated through TICVAI's pricing engine"
+   },
+   "basePrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Base price"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "discount": {
+    "type": "number",
+    "description": "Discount %"
+   },
+   "discountAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount amount"
+   },
+   "minimumPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Minimum price"
+   },
+   "maximumPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Maximum price"
+   },
+   "priceFloor": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price floor"
+   },
+   "marginFloor": {
+    "type": "number",
+    "description": "Margin floor"
+   },
+   "guestSpecificPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Guest-specific price"
+   },
+   "channelSpecificPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Channel-specific price"
+   },
+   "aed30": {
+    "type": "string",
+    "description": "+AED 30"
+   }
+  }
+ },
+ "BundleValiditySchedulingRedemptionRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Bundle Validity, Scheduling & Redemption Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "valid1June31August": {
+    "type": "string",
+    "description": "Valid 1 June–31 August"
+   },
+   "allComponentsTogether": {
+    "type": "string",
+    "description": "All components together"
+   },
+   "independentRedemption": {
+    "type": "string",
+    "description": "Independent redemption"
+   },
+   "sequentialRedemption": {
+    "type": "string",
+    "description": "Sequential redemption"
+   },
+   "firstUseActivation": {
+    "type": "string",
+    "description": "First-use activation"
+   },
+   "scheduledRedemption": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Scheduled redemption"
+   },
+   "timeslotReservationRequired": {
+    "type": "boolean",
+    "description": "Timeslot reservation required"
+   },
+   "ownValidity": {
+    "type": "string",
+    "description": "Own validity"
+   },
+   "ownCapacity": {
+    "type": "integer",
+    "description": "Own capacity"
+   },
+   "ownTimeslot": {
+    "type": "string",
+    "description": "Own timeslot"
+   },
+   "ownRedemptionCount": {
+    "type": "integer",
+    "description": "Own redemption count"
+   },
+   "ownEntitlement": {
+    "type": "string",
+    "description": "Own entitlement"
+   },
+   "ownAccessRule": {
+    "type": "string",
+    "description": "Own access rule"
+   }
+  }
+ },
+ "GuestChoiceBuildYourOwnBundleDesignerInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Guest Choice & Build-Your-Own Bundle Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.\n\n**The pack defines this as a record**, under *For each group* - one of only 13 drafted writes that does. That is the client writing a row rather than a screen, and it is where the table conversation should start.",
+  "properties": {
+   "waterPark": {
+    "type": "string",
+    "description": "Water Park"
+   },
+   "aquarium": {
+    "type": "string",
+    "description": "Aquarium"
+   },
+   "observationDeck": {
+    "type": "string",
+    "description": "Observation Deck"
+   },
+   "museum": {
+    "type": "string",
+    "description": "Museum"
+   },
+   "adventurePark": {
+    "type": "string",
+    "description": "Adventure Park"
+   },
+   "mealA": {
+    "type": "string",
+    "description": "Meal A"
+   },
+   "mealB": {
+    "type": "string",
+    "description": "Meal B"
+   },
+   "mealC": {
+    "type": "string",
+    "description": "Meal C"
+   },
+   "photo": {
+    "type": "string",
+    "description": "Photo"
+   },
+   "locker": {
+    "type": "string",
+    "description": "Locker"
+   },
+   "parking": {
+    "type": "string",
+    "description": "Parking"
+   },
+   "groupName": {
+    "type": "string",
+    "description": "Group name"
+   },
+   "category": {
+    "type": "string",
+    "description": "Category"
+   },
+   "minimumSelections": {
+    "type": "string",
+    "description": "Minimum selections"
+   },
+   "maximumSelections": {
+    "type": "string",
+    "description": "Maximum selections"
+   },
+   "requiredOptional": {
+    "type": "string",
+    "description": "Required/optional"
+   },
+   "eligibleProducts": {
+    "type": "string",
+    "description": "Eligible products"
+   },
+   "additionalCharge": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Additional charge"
+   },
+   "selectionOrder": {
+    "type": "string",
+    "description": "Selection order"
+   }
+  },
+  "x-ticvai-record-definition": "For each group"
+ },
+ "GuestChoiceBuildYourOwnBundleDesignerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Guest Choice & Build-Your-Own Bundle Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "waterPark": {
+    "type": "string",
+    "description": "Water Park"
+   },
+   "aquarium": {
+    "type": "string",
+    "description": "Aquarium"
+   },
+   "observationDeck": {
+    "type": "string",
+    "description": "Observation Deck"
+   },
+   "museum": {
+    "type": "string",
+    "description": "Museum"
+   },
+   "adventurePark": {
+    "type": "string",
+    "description": "Adventure Park"
+   },
+   "mealA": {
+    "type": "string",
+    "description": "Meal A"
+   },
+   "mealB": {
+    "type": "string",
+    "description": "Meal B"
+   },
+   "mealC": {
+    "type": "string",
+    "description": "Meal C"
+   },
+   "photo": {
+    "type": "string",
+    "description": "Photo"
+   },
+   "locker": {
+    "type": "string",
+    "description": "Locker"
+   },
+   "parking": {
+    "type": "string",
+    "description": "Parking"
+   },
+   "groupName": {
+    "type": "string",
+    "description": "Group name"
+   },
+   "category": {
+    "type": "string",
+    "description": "Category"
+   },
+   "minimumSelections": {
+    "type": "string",
+    "description": "Minimum selections"
+   },
+   "maximumSelections": {
+    "type": "string",
+    "description": "Maximum selections"
+   },
+   "requiredOptional": {
+    "type": "string",
+    "description": "Required/optional"
+   },
+   "eligibleProducts": {
+    "type": "string",
+    "description": "Eligible products"
+   },
+   "additionalCharge": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Additional charge"
+   },
+   "selectionOrder": {
+    "type": "string",
+    "description": "Selection order"
+   }
+  }
+ },
+ "PartnerExternalProductBundleManagerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Partner & External Product Bundle Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "partner": {
+    "type": "string",
+    "description": "Partner"
+   },
+   "externalProductId": {
+    "type": "string",
+    "description": "External product ID"
+   },
+   "productName": {
+    "type": "string",
+    "description": "Product name"
+   },
+   "apiSource": {
+    "type": "string",
+    "description": "API source"
+   },
+   "availabilitySource": {
+    "type": "string",
+    "description": "Availability source"
+   },
+   "externalPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "External price"
+   },
+   "ticvaiSellingPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "TICVAI selling price"
+   },
+   "commission": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Commission"
+   },
+   "settlementRule": {
+    "type": "string",
+    "description": "Settlement rule"
+   },
+   "cancellationRule": {
+    "type": "string",
+    "description": "Cancellation rule"
+   },
+   "redemptionMethod": {
+    "type": "string",
+    "description": "Redemption method"
+   },
+   "connected": {
+    "type": "string",
+    "description": "Connected"
+   },
+   "available": {
+    "type": "string",
+    "description": "Available"
+   },
+   "degraded": {
+    "type": "string",
+    "description": "Degraded"
+   },
+   "apiError": {
+    "type": "string",
+    "description": "API Error"
+   },
+   "productUnavailable": {
+    "type": "string",
+    "description": "Product unavailable"
+   },
+   "mappingError": {
+    "type": "string",
+    "description": "Mapping error"
+   },
+   "ticvaiWaterPark": {
+    "type": "string",
+    "description": "TICVAI Water Park"
+   },
+   "externalHotelNight": {
+    "type": "string",
+    "description": "External Hotel Night"
+   },
+   "externalDesertSafari": {
+    "type": "string",
+    "description": "External Desert Safari"
+   },
+   "ticvaiMealVoucher": {
+    "type": "string",
+    "description": "TICVAI Meal Voucher"
+   },
+   "soldAsOneCommercialPackage": {
+    "type": "string",
+    "description": "sold as one commercial package"
+   }
+  }
+ },
+ "RevenueAllocationCostSettlementRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over promotions state, assembled at read time from tables that already exist",
+  "description": "**What Revenue Allocation, Cost & Settlement Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "on": {
+    "type": "string",
+    "description": "on"
+   },
+   "fixedAmount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fixed amount"
+   },
+   "percentage": {
+    "type": "number",
+    "description": "Percentage"
+   },
+   "proportionalListPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Proportional list price"
+   },
+   "weightedAllocation": {
+    "type": "string",
+    "description": "Weighted allocation"
+   },
+   "costPlus": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Cost-plus"
+   },
+   "contractualPartnerAllocation": {
+    "type": "string",
+    "description": "Contractual partner allocation"
+   },
+   "redemptionBasedAllocation": {
+    "type": "string",
+    "description": "Redemption-based allocation"
+   },
+   "revenueAccount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue account"
+   },
+   "department": {
+    "type": "string",
+    "description": "Department"
+   },
+   "costCenter": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Cost center"
+   },
+   "legalEntity": {
+    "type": "string",
+    "description": "Legal entity"
+   },
+   "taxTreatment": {
+    "type": "string",
+    "description": "Tax treatment"
+   },
+   "partnerPayable": {
+    "type": "string",
+    "description": "Partner payable"
+   },
+   "commission": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Commission"
+   },
+   "settlementCycle": {
+    "type": "string",
+    "description": "Settlement cycle"
+   },
+   "fullRefund": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Full refund"
+   },
+   "partialRefund": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Partial refund"
+   },
+   "componentRefund": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Component refund"
+   },
+   "unredeemedComponentRefund": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Unredeemed component refund"
+   }
+  }
+ }
+}

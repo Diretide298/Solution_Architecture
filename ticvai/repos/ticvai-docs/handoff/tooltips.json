@@ -1954,7 +1954,18 @@
     },
     "P14": "The developer portal (CF-135). **The surface public-api needed and did not have** — 21 of its 22 operations reached no screen. Renders artefacts that already exist: ADR-0024 makes the contract the deliverable and the 28 OpenAPI files are the schema documentation.",
     "P15": "The kitchen display (client F&B board 3, 20 August). **Its own platform because a kitchen display is used standing, must survive the network going down, and nobody logs into it** — it is on when the kitchen is open and resolves its station from the device assignment. Dark theme only: a white screen at head height in a service window is a light source.",
-    "P16": "Cross-domain analytics (board 6 of every client set, 20 August). **26 board screens collapsed to nine with a domain selector** — six were duplicated across F&B and Retail, two word for word. **A domain is a filter on an analytics screen, not a copy of it.**"
+    "P16": "Cross-domain analytics (board 6 of every client set, 20 August). **26 board screens collapsed to nine with a domain selector** — six were duplicated across F&B and Retail, two word for word. **A domain is a filter on an analytics screen, not a copy of it.**",
+    "P17": {
+      "name": "TICVAI Sign-up — Onboarding & Purchase",
+      "short": "TICVAI Sign-up",
+      "operator": "public",
+      "audience": "public",
+      "formFactor": "web",
+      "app": "signup-web",
+      "screens": 24,
+      "offline": false,
+      "tip": "TICVAI Sign-up — Onboarding & Purchase. Operated by public, public on web, app `signup-web`. A business buying TICVAI before it is a tenant; served from the Control Plane."
+    }
   },
   "adrs": {
     "0001": {

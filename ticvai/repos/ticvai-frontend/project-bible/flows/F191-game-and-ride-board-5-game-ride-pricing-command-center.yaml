@@ -1,0 +1,139 @@
+id: F191
+name: 'Game and Ride board 5: Game & Ride Pricing Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Game and Ride board 5. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-434
+  entryPoints:
+  - Arrives at Game & Ride Pricing Command Center
+steps:
+- step: 1
+  screen: BO-434
+  action: Opens Game & Ride Pricing Command Center
+  operations: []
+  outcome: Provide a central view of all game and ride pricing configurations, active pricing rules, upcoming
+    changes, and pricing issues.
+- step: 2
+  screen: BO-435
+  action: Works in Standard Game & Ride Price Configuration
+  operations: []
+  outcome: Define the normal base price charged to play a specific game or ride. The source requires that
+    prices be defined for each game.
+- step: 3
+  screen: BO-434
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-436
+  action: Works in Group Pricing Configuration
+  operations: []
+  outcome: Allow multiple games or rides to share a common pricing rule instead of configuring each attraction
+    individually.
+- step: 5
+  screen: BO-434
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-437
+  action: Works in Peak / Non-Peak Dynamic Pricing
+  operations: []
+  outcome: Configure different game/ride prices based on date and time. The source explicitly requires
+    peak/non-peak pricing for games/rides based on specific date/time.
+- step: 7
+  screen: BO-434
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-438
+  action: Works in Pricing Calendar & Exception Dates
+  operations: []
+  outcome: Provide a visual calendar for understanding and overriding time-based pricing.
+- step: 9
+  screen: BO-434
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-439
+  action: Works in Normal & VIP Pricing Configuration
+  operations: []
+  outcome: Configure different prices for Normal and VIP guests for the same game/ride and reader. The
+    source explicitly requires one reader to show both Normal Price and VIP Price for a specific game,
+    with VIP eligibility obtained through purchase of
+- step: 11
+  screen: BO-434
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-440
+  action: Works in Retry Price Configuration
+  operations: []
+  outcome: 'Configure a discounted repeat-play price for applicable skill games. Requirement 10.2.16 describes
+    a skill game where, before the game ends, the guest is offered: “Do you want to continue?” A subsequent
+    RFID tap should deduct a lower amount'
+- step: 13
+  screen: BO-434
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-441
+  action: Works in Price Priority & Conflict Rules
+  operations: []
+  outcome: Define which pricing rule wins when several valid prices apply simultaneously. This is required
+    to make the source pricing models operational because Standard, Group, Peak, VIP and Retry prices
+    can overlap.
+- step: 15
+  screen: BO-434
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-442
+  action: Works in Effective Pricing & Reader Price Preview
+  operations: []
+  outcome: Allow an administrator to preview what price will actually be presented/applied for a selected
+    game before publishing configuration.
+- step: 17
+  screen: BO-434
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-443
+  action: Works in Pricing Audit, Approval & Publication
+  operations: []
+  outcome: Govern pricing changes and maintain a full historical record.
+branches:
+- at: 1
+  condition: Nothing has been set up on Game & Ride Pricing Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Game and Ride board 5 visited
+primaryContract: unknown
+contracts:
+- unknown

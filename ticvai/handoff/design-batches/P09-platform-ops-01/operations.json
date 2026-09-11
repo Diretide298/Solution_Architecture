@@ -1,0 +1,50 @@
+{
+ "listDeadLetters": {
+  "method": "GET",
+  "path": "/dead-letters",
+  "contract": "platform-ops",
+  "summary": "Undeliverable events",
+  "permission": "PLATFORM_CELL_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": "consumer",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "since",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DeadLetter"
+ },
+ "replayDeadLetter": {
+  "method": "POST",
+  "path": "/dead-letters/{deadLetterId}/replay",
+  "contract": "platform-ops",
+  "summary": "Re-enter the delivery path",
+  "permission": "PLATFORM_CELL_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": "deadLetterId",
+    "in": "path",
+    "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "DeadLetter"
+ }
+}

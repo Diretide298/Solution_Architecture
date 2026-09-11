@@ -1,0 +1,1405 @@
+{
+ "Channel": {
+  "type": "string",
+  "enum": [
+   "pos",
+   "kiosk",
+   "web",
+   "mobile",
+   "b2b",
+   "ota",
+   "callCentre"
+  ]
+ },
+ "ConsentDecision": {
+  "type": "string",
+  "enum": [
+   "granted",
+   "withdrawn",
+   "notAsked"
+  ]
+ },
+ "ConsentPurpose": {
+  "type": "string",
+  "enum": [
+   "marketing",
+   "personalisation",
+   "profiling",
+   "thirdPartySharing",
+   "aiProcessing",
+   "transactional"
+  ]
+ },
+ "ConsentSource": {
+  "type": "string",
+  "enum": [
+   "guestApp",
+   "website",
+   "kiosk",
+   "pos",
+   "callCentre",
+   "import",
+   "agentRecorded"
+  ]
+ },
+ "ConsentState": {
+  "x-ticvai-persistence": "none — projection over consent_record",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "purposes"
+  ],
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "purposes": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "purpose",
+      "decision",
+      "requiresRenewal"
+     ],
+     "properties": {
+      "purpose": {
+       "$ref": "#/components/schemas/ConsentPurpose"
+      },
+      "decision": {
+       "$ref": "#/components/schemas/ConsentDecision"
+      },
+      "channels": {
+       "type": "array",
+       "items": {
+        "$ref": "#/components/schemas/MessageChannel"
+       }
+      },
+      "noticeVersion": {
+       "type": "string",
+       "nullable": true
+      },
+      "requiresRenewal": {
+       "type": "boolean",
+       "description": "True where the notice has been superseded since consent was given."
+      },
+      "decidedAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "DelegatedAccess": {
+  "x-ticvai-persistence": "identity.delegated_access",
+  "type": "object",
+  "required": [
+   "id",
+   "permission",
+   "scopePath",
+   "effect"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "roleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "permission": {
+    "type": "string",
+    "description": "From the permission enum. `*` permitted on DENY only."
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "CF-132, CL-05. **A grant held by a guest rather than a staff principal.**\nSection 5.5 asks for portfolios — a primary holder assigning entitlements, transfer between linked accounts, shared wallets with individual tracking — and it appears ten times across ten sections. **Every one of those reduces to the same question: who may act on whose behalf, over what, and until when.**\n**That is a grant, not a household table.** A primary holder assigning an entitlement is a grant. A group leader holding tickets for twelve is a grant. A corporate account enrolling members is a grant with a quota. **A shared wallet with individual tracking is a grant over a balance, and the transaction log already records who spent.**\n**A household table would answer one of those four.**\n"
+   },
+   "overSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Whose behalf. **Null for a staff grant, which is the existing behaviour** — every grant written before 18 August means exactly what it meant before.\n"
+   },
+   "overObjectRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "**Where the authority is over a thing rather than a scope** — a wallet, an entitlement, a booking. `scopePath` answers *where*; this answers *what*, and a guest's authority is almost always over a specific object rather than a branch of the tree.\n"
+   },
+   "delegationKind": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "primaryHolder",
+     "familyMember",
+     "groupLeader",
+     "attendee",
+     "corporateAdmin",
+     "corporateMember",
+     "carer"
+    ],
+    "description": "**What kind of relationship this expresses**, for display and for reporting. The mechanism does not branch on it — a family member and a group attendee are the same grant with different words around them, which is the point.\n"
+   },
+   "quota": {
+    "type": "integer",
+    "nullable": true,
+    "description": "2.14.15 and 4.3.11. **How many the holder may assign.** A corporate account with fifty allocations and a family with four are the same structure with different numbers.\n"
+   },
+   "isRevocableBySubject": {
+    "type": "boolean",
+    "default": true,
+    "description": "**Whether the person it is over can end it.** A guest who linked a family member should be able to unlink them; a corporate member should not be able to revoke their employer's oversight — and **a delegation nobody can end is a delegation somebody will regret.**\n"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "effect": {
+    "type": "string",
+    "enum": [
+     "ALLOW",
+     "DENY"
+    ]
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "createdByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "EvaluatePromotionsRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "venueId",
+   "channel",
+   "lines"
+  ],
+  "properties": {
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "channel": {
+    "type": "string"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "membershipTierId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "couponCodes": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "evaluateAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "For back-office testing of a rule before publishing."
+   },
+   "lines": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "lineId",
+      "variantId",
+      "quantity",
+      "unitPrice"
+     ],
+     "properties": {
+      "lineId": {
+       "type": "string"
+      },
+      "variantId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "performanceId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "quantity": {
+       "type": "integer",
+       "minimum": 1
+      },
+      "unitPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   }
+  }
+ },
+ "FacePassEnrolment": {
+  "type": "object",
+  "x-ticvai-persistence": "pii.subject_biometric",
+  "description": "3.2.43. **Metadata about a facial profile. Never the profile.**\n",
+  "required": [
+   "id",
+   "subjectId",
+   "entitlementId",
+   "source",
+   "capturedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "entitlementId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "source": {
+    "type": "string",
+    "enum": [
+     "guestApp",
+     "ticketCounter",
+     "annualPassCounter"
+    ]
+   },
+   "capturedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "consentPurposeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "consentGivenAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "guardianSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where the subject is a minor (3.2.12)."
+   },
+   "isActive": {
+    "type": "boolean",
+    "readOnly": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**Bounded by the entitlement it belongs to.** A face outliving the pass it was enrolled for is a biometric held for no stated purpose, which CF-64 has to settle.\n"
+   }
+  }
+ },
+ "GameCard": {
+  "x-ticvai-persistence": "games.card",
+  "type": "object",
+  "required": [
+   "cardCode",
+   "venueId",
+   "credits",
+   "bonusCredits",
+   "points",
+   "status",
+   "issuedAt"
+  ],
+  "properties": {
+   "cardCode": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "credits": {
+    "type": "integer",
+    "description": "Bought with money. Buys plays."
+   },
+   "bonusCredits": {
+    "type": "integer",
+    "description": "From a promotion. Typically non-refundable and spent before paid credits.\n"
+   },
+   "points": {
+    "type": "integer",
+    "description": "Won by playing. Buys prizes. **Not interchangeable with credits** — a guest who wins should not simply be able to play more.\n"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "blocked",
+     "expired",
+     "transferred"
+    ]
+   },
+   "blockedReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "transferredToCardCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "lastPlayedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "issuedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "GiftCard": {
+  "x-ticvai-persistence": "retail.gift_card",
+  "type": "object",
+  "required": [
+   "cardCode",
+   "faceValue",
+   "balance",
+   "status",
+   "issuedAt"
+  ],
+  "properties": {
+   "cardCode": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string"
+   },
+   "faceValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "balance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "issued",
+     "active",
+     "partiallyRedeemed",
+     "redeemed",
+     "expired",
+     "blocked"
+    ]
+   },
+   "blockedReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "issuedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "activatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "GuestDevice": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.guest_device",
+  "required": [
+   "id",
+   "subjectId",
+   "platform",
+   "status",
+   "registeredAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "platform": {
+    "type": "string",
+    "enum": [
+     "ios",
+     "android",
+     "web"
+    ]
+   },
+   "tokenFingerprint": {
+    "type": "string",
+    "description": "Hash of the token, not the token. The token itself is write-only — returning it would put a push credential in every response a support agent can read.\n"
+   },
+   "appVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "osVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "deviceModel": {
+    "type": "string",
+    "nullable": true
+   },
+   "locale": {
+    "type": "string",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "revoked",
+     "failed"
+    ]
+   },
+   "failureCount": {
+    "type": "integer",
+    "description": "Consecutive delivery failures. Past the threshold the device is marked failed and stops being targeted — a dead token retried forever is wasted quota and a misleading delivery rate.\n"
+   },
+   "registeredAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "lastSeenAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "revokedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "GuestMembership": {
+  "type": "object",
+  "description": "19.2.26 to 19.2.28. **A view, not a table** — assembled from the entitlement, the product that granted it and the order that bought it.\n",
+  "required": [
+   "entitlementId",
+   "productId",
+   "name",
+   "status"
+  ],
+  "properties": {
+   "entitlementId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "tier": {
+    "type": "string",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "frozen",
+     "suspended",
+     "expired",
+     "cancelled"
+    ],
+    "description": "**Derived from the entitlement, not held here.** This schema is a view assembled from the entitlement, the product that granted it and the order that bought it — the lifecycle lives in `states/entitlement-status.yaml` and `frozen` is what `freezeEntitlement` sets.\nNo state model of its own, deliberately: **two models over one lifecycle drift.**\n"
+   },
+   "validFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date"
+   },
+   "frozenDays": {
+    "type": "integer",
+    "description": "Days lost to a freeze and added back to `validTo`. **Shown because a guest who paused a pass will check the maths**, and a validity date that moved without explanation is a support call.\n"
+   },
+   "benefits": {
+    "type": "array",
+    "description": "5.4.31. From the product's entitlement template. **Traceable to what grants them**, so a gate can honour what the app promised.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "code": {
+       "type": "string"
+      },
+      "name": {
+       "type": "string"
+      },
+      "value": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "renewsOn": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "previousTerms": {
+    "type": "array",
+    "description": "Prior terms, including lapsed ones.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "validFrom": {
+       "type": "string",
+       "format": "date"
+      },
+      "validTo": {
+       "type": "string",
+       "format": "date"
+      },
+      "endedBecause": {
+       "type": "string",
+       "enum": [
+        "expired",
+        "renewed",
+        "cancelled",
+        "upgraded"
+       ]
+      }
+     }
+    }
+   }
+  }
+ },
+ "LoyaltyPosition": {
+  "x-ticvai-persistence": "marketing.loyalty_position",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "programmeId",
+   "pointsBalance",
+   "tierCode"
+  ],
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "programmeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "pointsBalance": {
+    "type": "integer"
+   },
+   "lifetimePoints": {
+    "type": "integer"
+   },
+   "tierCode": {
+    "type": "string"
+   },
+   "tierName": {
+    "type": "string"
+   },
+   "pointsToNextTier": {
+    "type": "integer",
+    "nullable": true
+   },
+   "nextExpiryPoints": {
+    "type": "integer",
+    "nullable": true
+   },
+   "nextExpiryAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "LoyaltyProgramme": {
+  "x-ticvai-persistence": "marketing.loyalty_programme + marketing.loyalty_tier",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "earnRules",
+   "tiers"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "pointsLiabilityAccountId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Points post here on accrual. They are a liability from the moment they are earned, not from the moment they are spent.\n"
+   },
+   "earnRules": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "trigger",
+      "points"
+     ],
+     "properties": {
+      "trigger": {
+       "type": "string",
+       "enum": [
+        "perCurrencyUnit",
+        "perVisit",
+        "perProduct",
+        "onSignup",
+        "onBirthday",
+        "onReview"
+       ]
+      },
+      "points": {
+       "type": "number"
+      },
+      "productKinds": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "multiplier": {
+       "type": "number"
+      }
+     }
+    }
+   },
+   "tiers": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "code",
+      "name",
+      "thresholdPoints"
+     ],
+     "properties": {
+      "code": {
+       "type": "string"
+      },
+      "name": {
+       "type": "string"
+      },
+      "thresholdPoints": {
+       "type": "integer"
+      },
+      "benefits": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "earnMultiplier": {
+       "type": "number"
+      }
+     }
+    }
+   },
+   "pointsExpireAfterMonths": {
+    "type": "integer",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "MessageChannel": {
+  "type": "string",
+  "enum": [
+   "email",
+   "sms",
+   "whatsapp",
+   "push",
+   "inApp",
+   "post"
+  ]
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PaymentToken": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.payment_token",
+  "description": "BL-116. **A stored credential, held by the provider and referenced here.** The platform never sees a card number, which is what keeps PCI scope where it belongs.\n**A token is provider-scoped.** A card tokenised with one gateway does not work with another, so a routing change does not silently move a guest's saved card — it means asking them again, and the model should make that visible rather than surprising.\n",
+  "required": [
+   "id",
+   "subjectId",
+   "providerId",
+   "token",
+   "isDefault"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "providerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "token": {
+    "type": "string",
+    "format": "password",
+    "description": "**Write-only, never returned.** The provider's reference to a credential it holds.\n"
+   },
+   "method": {
+    "type": "string"
+   },
+   "maskedIdentifier": {
+    "type": "string",
+    "description": "What a guest sees — the last four digits, the card brand. **Enough to choose between two saved cards and not enough to use one.**\n"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "isDefault": {
+    "type": "boolean"
+   },
+   "consentPurposeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Storing a card for future use is a purpose a guest consents to**, separate from the payment they are making now. A token taken without it is a card kept on a guest's behalf that they never agreed to.\n"
+   }
+  }
+ },
+ "Product": {
+  "x-ticvai-persistence": "catalogue.product",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "kind",
+   "venueId",
+   "scopePath",
+   "isSellable",
+   "hasVariants"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/ProductKind"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "createdByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "1.4.18. **The approval gate refuses an approver who is the author, and nothing recorded either.** `SeatBlock`, `DelegatedAccess` and `ManualDiscountRequest` all carry this and the product passing through approval did not.\n"
+   },
+   "approvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "responsibleDepartmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Who owns this product commercially. A scope node at `department` level."
+   },
+   "onSaleFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "1.4.8. **A seasonal product should not need somebody awake at midnight.** Archiving already runs on a timer in this contract, so the machinery exists; `effectiveFrom` appears on tax codes, FX rates and white-label policies and not here.\n"
+   },
+   "onSaleTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Retires the product automatically. **Retirement is not deletion** — the product stops selling and every order that referenced it still resolves.\n"
+   },
+   "lifecycleState": {
+    "$ref": "#/components/schemas/ProductLifecycleState"
+   },
+   "isSellable": {
+    "type": "boolean",
+    "description": "True only when live **and** carried by a published bundle. Approval and publication are different acts.\n"
+   },
+   "hasVariants": {
+    "type": "boolean"
+   },
+   "variantCount": {
+    "type": "integer"
+   },
+   "segmentTags": {
+    "type": "array",
+    "description": "7.3.5. **A channel and a segment tag are mandatory and nothing required either.** A catalogue that cannot be filtered by segment is a catalogue nobody can report on.\n**Hierarchical, not flat** — `family/with-toddlers` narrows `family` without duplicating it, which is how the promotions engine already treats scope.\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "codeSchema": {
+    "type": "string",
+    "readOnly": true,
+    "description": "7.3.4 specifies `[ParkCode]-[ProductType]-[Variant]`. **`Product.code` existed and nothing required a format**, so a venue with three thousand products had three thousand conventions.\nThe tenant sets the pattern and the platform generates against it. **Validation is the point, not the string** — a code typed by hand is a code that will not sort.\n"
+   },
+   "channels": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/Channel"
+    }
+   },
+   "entitlementTemplateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "What the buyer receives. Null for products that grant nothing — F&B and retail. Identity and entitlement are separate concerns.\n"
+   },
+   "blockedOffline": {
+    "type": "boolean",
+    "description": "True for seated and retail. Seated because a seat map is not a count; retail because stock depletes in real time.\n"
+   },
+   "dataMaskValues": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Custom fields. JSONB-backed, defined by the venue's data mask."
+   }
+  }
+ },
+ "ProductKind": {
+  "type": "string",
+  "description": "**`openDated` added 24 August** from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: **valid on any date within an eligible range, rather than for a named performance or a fixed date.**\nThe mechanism already existed — `access.entitlement` carries `valid_from`, `valid_to`, `entries_allowed` and `frozen_days`, which is exactly an open-dated pass. **What was missing was the product saying it is one**, so a catalogue could not offer it and a report could not count it.\n**`datedAdmission` is a different thing and the two were being conflated**: dated is *this Tuesday*, open-dated is *any Tuesday between March and June*. A guest buying the second and being sold the first has bought the wrong ticket.\n",
+  "enum": [
+   "admission",
+   "timedAdmission",
+   "datedAdmission",
+   "openDated",
+   "seated",
+   "membership",
+   "bundle",
+   "fnb",
+   "retail",
+   "rental",
+   "addOn",
+   "giftCard"
+  ]
+ },
+ "ProductLifecycleState": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "inReview",
+   "approved",
+   "live",
+   "withdrawn",
+   "archived"
+  ]
+ },
+ "PromotionEvaluation": {
+  "x-ticvai-persistence": "none — computed",
+  "parameters": [
+   {
+    "$ref": "../shared/common.yaml#/components/parameters/IdempotencyKey"
+   }
+  ],
+  "type": "object",
+  "required": [
+   "totalDiscount",
+   "lines",
+   "applied",
+   "rejected"
+  ],
+  "properties": {
+   "totalDiscount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "lineId",
+      "originalPrice",
+      "discountedPrice",
+      "discount"
+     ],
+     "properties": {
+      "lineId": {
+       "type": "string"
+      },
+      "originalPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "discountedPrice": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "discount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "appliedPromotionIds": {
+       "type": "array",
+       "items": {
+        "type": "string",
+        "format": "uuid"
+       }
+      }
+     }
+    }
+   },
+   "applied": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "promotionId",
+      "promotionCode",
+      "discount"
+     ],
+     "properties": {
+      "promotionId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "promotionCode": {
+       "type": "string"
+      },
+      "promotionName": {
+       "type": "string"
+      },
+      "discount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "couponCode": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "rejected": {
+    "type": "array",
+    "description": "Promotions that matched the products but did not apply, with the reason. This is what a cashier reads to a guest who expected a discount.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "promotionCode",
+      "reason"
+     ],
+     "properties": {
+      "promotionCode": {
+       "type": "string"
+      },
+      "promotionName": {
+       "type": "string"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "conditionsNotMet",
+        "supersededByBetterOffer",
+        "exclusivePromotionApplied",
+        "redemptionLimitReached",
+        "budgetExhausted",
+        "outsideValidPeriod",
+        "wrongChannel",
+        "membershipRequired",
+        "couponRequired"
+       ]
+      },
+      "detail": {
+       "type": "string"
+      }
+     }
+    }
+   }
+  }
+ },
+ "RecordConsentRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "purpose",
+   "decision",
+   "noticeVersion",
+   "source",
+   "recordedAt"
+  ],
+  "properties": {
+   "purpose": {
+    "$ref": "#/components/schemas/ConsentPurpose"
+   },
+   "decision": {
+    "$ref": "#/components/schemas/ConsentDecision"
+   },
+   "channels": {
+    "type": "array",
+    "description": "Omit to apply to every channel the purpose covers.",
+    "items": {
+     "$ref": "#/components/schemas/MessageChannel"
+    }
+   },
+   "noticeVersion": {
+    "type": "string"
+   },
+   "source": {
+    "$ref": "#/components/schemas/ConsentSource"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "Referral": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.referral",
+  "description": "BL-034. **No referrer, no reward, nothing anywhere.**\n**The reward fires on the referee's qualifying act, not on the sign-up**, because a referral that pays on registration pays for accounts rather than for guests.\n",
+  "required": [
+   "id",
+   "referrerSubjectId",
+   "code",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "referrerSubjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "refereeSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "code": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "issued",
+     "registered",
+     "qualified",
+     "rewarded",
+     "expired",
+     "void"
+    ]
+   },
+   "qualifyingAction": {
+    "type": "string",
+    "enum": [
+     "firstPurchase",
+     "firstVisit",
+     "membershipPurchase"
+    ]
+   },
+   "referrerRewardId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "refereeRewardId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "Wallet": {
+  "x-ticvai-persistence": "retail.wallet",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "balance",
+   "currency",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "balance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "credits": {
+    "type": "array",
+    "description": "4.3.5 and 4.3.19. **One balance and one bonus balance with one expiry could not express what the requirement asks for** — cash, bonus and redemption credit, each with its own expiry.\n**The expiries are the reason this is a list.** Cash a guest paid for should outlive a promotional credit they were given, and a single `expiresAt` either expires the money they paid or never expires the promotion.\n**Consumed first-expiry-first-out across all three** (4.3.19), which is also the order that is fairest to the guest — spend what is about to die before what is not.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "kind",
+      "amount"
+     ],
+     "properties": {
+      "kind": {
+       "type": "string",
+       "enum": [
+        "cash",
+        "bonus",
+        "redemption",
+        "refund",
+        "goodwill"
+       ],
+       "description": "**`cash` is money the guest paid and the others are not.** That distinction decides what is refundable, what expires, and what shows as a liability.\n"
+      },
+      "amount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "expiresAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "sourceRef": {
+       "type": "string",
+       "nullable": true
+      },
+      "isRefundable": {
+       "type": "boolean",
+       "default": false,
+       "description": "**True only for `cash`.** A guest cannot cash out a promotional credit, and a wallet that lets them has given away the promotion twice.\n"
+      }
+     }
+    }
+   },
+   "bonusBalance": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "Promotional value. Typically non-refundable and spent first."
+   },
+   "currency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "suspended",
+     "closed"
+    ]
+   },
+   "homeCellName": {
+    "type": "string",
+    "nullable": true,
+    "description": "Where the authoritative balance lives. Present when the guest is linked across cells.\n"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "lastActivityAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "Wishlist": {
+  "type": "object",
+  "required": [
+   "subjectId",
+   "items"
+  ],
+  "x-ticvai-persistence": "none — wrapper. The items are the table, keyed by subject",
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "items": {
+    "type": "array",
+    "x-ticvai-persistence": "marketing.wishlist_item",
+    "items": {
+     "type": "object",
+     "required": [
+      "id",
+      "variantId",
+      "addedAt",
+      "isAvailable"
+     ],
+     "properties": {
+      "id": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "variantId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "productName": {
+       "type": "string"
+      },
+      "performanceId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true
+      },
+      "performanceStartsAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      },
+      "price": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "imageAssetRef": {
+       "type": "string",
+       "nullable": true
+      },
+      "isAvailable": {
+       "type": "boolean",
+       "description": "False where the product has been withdrawn or the performance has passed. Returned rather than dropped — a guest who saved something and finds it silently gone assumes the feature is broken.\n"
+      },
+      "unavailableReason": {
+       "type": "string",
+       "nullable": true
+      },
+      "note": {
+       "type": "string",
+       "nullable": true
+      },
+      "addedAt": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
+   }
+  }
+ }
+}

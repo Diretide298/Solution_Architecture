@@ -1,0 +1,1116 @@
+{
+ "AiChannelOptimizationIntelligenceCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What AI Channel Optimization & Intelligence Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "salesVelocity": {
+    "type": "string",
+    "description": "Sales velocity"
+   },
+   "conversion": {
+    "type": "number",
+    "description": "Conversion"
+   },
+   "capacity": {
+    "type": "integer",
+    "description": "Capacity"
+   },
+   "allocation": {
+    "type": "string",
+    "description": "Allocation"
+   },
+   "revenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue"
+   },
+   "netRevenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Net revenue"
+   },
+   "pricing": {
+    "type": "string",
+    "description": "Pricing"
+   },
+   "channelFees": {
+    "type": "string",
+    "description": "Channel fees"
+   },
+   "commission": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Commission"
+   },
+   "customerDemand": {
+    "type": "string",
+    "description": "Customer demand"
+   },
+   "timeToEvent": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time to event"
+   },
+   "historicalPerformance": {
+    "type": "string",
+    "description": "Historical performance"
+   },
+   "failures": {
+    "type": "string",
+    "description": "Failures"
+   },
+   "availability": {
+    "type": "string",
+    "description": "Availability"
+   },
+   "expectedUnitsSold": {
+    "type": "string",
+    "description": "Expected units sold"
+   },
+   "revenueImpact": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue impact"
+   },
+   "channelUtilization": {
+    "type": "number",
+    "description": "Channel utilization"
+   },
+   "risk": {
+    "type": "string",
+    "description": "Risk"
+   },
+   "contractualConstraints": {
+    "type": "string",
+    "description": "Contractual constraints"
+   },
+   "recommendation": {
+    "type": "string",
+    "description": "Recommendation"
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason"
+   },
+   "expectedImpact": {
+    "type": "string",
+    "description": "Expected Impact"
+   },
+   "confidence": {
+    "type": "string",
+    "description": "Confidence"
+   },
+   "constraints": {
+    "type": "string",
+    "description": "Constraints"
+   },
+   "requiredApproval": {
+    "type": "string",
+    "description": "Required Approval"
+   },
+   "realTimeChannelAvailabilityInventory": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Real-Time Channel Availability & Inventory"
+   },
+   "paymentFulfillmentValidatePublish": {
+    "type": "string",
+    "description": "Payment/Fulfillment → Validate → Publish"
+   }
+  }
+ },
+ "ChannelAllocationRebalancingOperationsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Channel Allocation & Rebalancing Operations displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "initialAllocation": {
+    "type": "string",
+    "description": "Initial Allocation"
+   },
+   "sold": {
+    "type": "string",
+    "description": "Sold"
+   },
+   "held": {
+    "type": "string",
+    "description": "Held"
+   },
+   "remaining": {
+    "type": "string",
+    "description": "Remaining"
+   },
+   "utilization": {
+    "type": "number",
+    "description": "Utilization"
+   },
+   "salesVelocity": {
+    "type": "string",
+    "description": "Sales Velocity"
+   },
+   "forecast": {
+    "type": "string",
+    "description": "Forecast"
+   },
+   "recommendedAllocation": {
+    "type": "string",
+    "description": "Recommended Allocation"
+   },
+   "increaseAllocation": {
+    "type": "string",
+    "description": "Increase allocation"
+   },
+   "reduceAllocation": {
+    "type": "string",
+    "description": "Reduce allocation"
+   },
+   "returnInventory": {
+    "type": "string",
+    "description": "Return inventory"
+   },
+   "allocated1000": {
+    "type": "string",
+    "description": "Allocated: 1,000"
+   },
+   "sold280": {
+    "type": "string",
+    "description": "Sold: 280"
+   },
+   "remaining720": {
+    "type": "string",
+    "description": "Remaining: 720"
+   },
+   "allocated6000": {
+    "type": "string",
+    "description": "Allocated: 6,000"
+   },
+   "sold5880": {
+    "type": "string",
+    "description": "Sold: 5,880"
+   },
+   "remaining120": {
+    "type": "string",
+    "description": "Remaining: 120"
+   },
+   "contractualAllocation": {
+    "type": "string",
+    "description": "Contractual allocation"
+   },
+   "minimumGuaranteedInventory": {
+    "type": "string",
+    "description": "Minimum guaranteed inventory"
+   },
+   "capacity": {
+    "type": "integer",
+    "description": "Capacity"
+   },
+   "existingHolds": {
+    "type": "string",
+    "description": "Existing holds"
+   },
+   "confirmedTransactions": {
+    "type": "string",
+    "description": "Confirmed transactions"
+   },
+   "approvalThresholds": {
+    "type": "string",
+    "description": "Approval thresholds"
+   }
+  }
+ },
+ "ChannelAuditLogsTransactionTraceabilityView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Channel Audit, Logs & Transaction Traceability displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "configurationChange": {
+    "type": "string",
+    "description": "Configuration Change"
+   },
+   "activation": {
+    "type": "string",
+    "description": "Activation"
+   },
+   "suspension": {
+    "type": "string",
+    "description": "Suspension"
+   },
+   "allocationChange": {
+    "type": "string",
+    "description": "Allocation Change"
+   },
+   "priceAssignment": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price Assignment"
+   },
+   "order": {
+    "type": "string",
+    "description": "Order"
+   },
+   "cancellation": {
+    "type": "string",
+    "description": "Cancellation"
+   },
+   "error": {
+    "type": "string",
+    "description": "Error"
+   },
+   "manualIntervention": {
+    "type": "string",
+    "description": "Manual Intervention"
+   },
+   "integrationChange": {
+    "type": "string",
+    "description": "Integration Change"
+   },
+   "timestamp": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Timestamp"
+   },
+   "userSystem": {
+    "type": "string",
+    "description": "User/System"
+   },
+   "action": {
+    "type": "string",
+    "description": "Action"
+   },
+   "previousValue": {
+    "type": "string",
+    "description": "Previous Value"
+   },
+   "newValue": {
+    "type": "integer",
+    "description": "New Value"
+   },
+   "reference": {
+    "type": "string",
+    "description": "Reference"
+   },
+   "result": {
+    "type": "string",
+    "description": "Result"
+   },
+   "environment": {
+    "type": "string",
+    "description": "Environment"
+   },
+   "finance": {
+    "type": "string",
+    "description": "Finance"
+   },
+   "partnerDisputes": {
+    "type": "string",
+    "description": "Partner disputes"
+   },
+   "compliance": {
+    "type": "string",
+    "description": "Compliance"
+   },
+   "technicalInvestigation": {
+    "type": "string",
+    "description": "Technical investigation"
+   }
+  }
+ },
+ "ChannelConnectionIntegrationManagerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Channel Connection & Integration Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "ticvaiNative": {
+    "type": "string",
+    "description": "TICVAI Native"
+   },
+   "restApi": {
+    "type": "string",
+    "description": "REST API"
+   },
+   "webhook": {
+    "type": "string",
+    "description": "Webhook"
+   },
+   "otaAdapter": {
+    "type": "string",
+    "description": "OTA Adapter"
+   },
+   "resellerApi": {
+    "type": "string",
+    "description": "Reseller API"
+   },
+   "partnerApi": {
+    "type": "string",
+    "description": "Partner API"
+   },
+   "middleware": {
+    "type": "string",
+    "description": "Middleware"
+   },
+   "fileSftpWhereRequired": {
+    "type": "boolean",
+    "description": "File/SFTP where required"
+   },
+   "customConnector": {
+    "type": "string",
+    "description": "Custom Connector"
+   },
+   "connectorName": {
+    "type": "string",
+    "description": "Connector Name"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner"
+   },
+   "environment": {
+    "type": "string",
+    "description": "Environment"
+   },
+   "endpoint": {
+    "type": "string",
+    "description": "Endpoint"
+   },
+   "apiVersion": {
+    "type": "string",
+    "description": "API Version"
+   },
+   "authenticationType": {
+    "type": "string",
+    "description": "Authentication Type"
+   },
+   "credentialsReference": {
+    "type": "string",
+    "description": "Credentials reference"
+   },
+   "certificate": {
+    "type": "string",
+    "description": "Certificate"
+   },
+   "timeout": {
+    "type": "string",
+    "description": "Timeout"
+   },
+   "rateLimit": {
+    "type": "integer",
+    "description": "Rate Limit"
+   },
+   "ipRestrictions": {
+    "type": "string",
+    "description": "IP Restrictions"
+   },
+   "connectionStatus": {
+    "type": "string",
+    "description": "Connection Status"
+   },
+   "oauth": {
+    "type": "string",
+    "description": "OAuth"
+   },
+   "apiKey": {
+    "type": "string",
+    "description": "API Key"
+   },
+   "clientCredentials": {
+    "type": "string",
+    "description": "Client Credentials"
+   },
+   "certificates": {
+    "type": "string",
+    "description": "Certificates"
+   },
+   "signedRequests": {
+    "type": "string",
+    "description": "Signed Requests"
+   },
+   "testAuthentication": {
+    "type": "string",
+    "description": "Test Authentication"
+   },
+   "testConnectivity": {
+    "type": "string",
+    "description": "Test Connectivity"
+   },
+   "testProduct": {
+    "type": "string",
+    "description": "Test Product"
+   },
+   "testPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Test Price"
+   },
+   "testAvailability": {
+    "type": "string",
+    "description": "Test Availability"
+   },
+   "testOrder": {
+    "type": "string",
+    "description": "Test Order"
+   },
+   "testCancellationWhereSupported": {
+    "type": "string",
+    "description": "Test Cancellation where supported"
+   },
+   "thisScreenManagesChannelConnectivity": {
+    "type": "string",
+    "description": "This screen manages channel connectivity"
+   }
+  }
+ },
+ "ChannelExceptionsIncidentsRecoveryView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Channel Exceptions, Incidents & Recovery displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "connectionFailure": {
+    "type": "string",
+    "description": "Connection Failure"
+   },
+   "authenticationFailure": {
+    "type": "string",
+    "description": "Authentication Failure"
+   },
+   "productSyncFailure": {
+    "type": "string",
+    "description": "Product Sync Failure"
+   },
+   "pricingMismatch": {
+    "type": "string",
+    "description": "Pricing Mismatch"
+   },
+   "inventoryMismatch": {
+    "type": "string",
+    "description": "Inventory Mismatch"
+   },
+   "orderFailure": {
+    "type": "string",
+    "description": "Order Failure"
+   },
+   "paymentError": {
+    "type": "string",
+    "description": "Payment Error"
+   },
+   "timeout": {
+    "type": "string",
+    "description": "Timeout"
+   },
+   "cancellationFailure": {
+    "type": "string",
+    "description": "Cancellation Failure"
+   },
+   "fulfillmentFailure": {
+    "type": "string",
+    "description": "Fulfillment Failure"
+   },
+   "rateLimit": {
+    "type": "integer",
+    "description": "Rate Limit"
+   },
+   "partnerError": {
+    "type": "string",
+    "description": "Partner Error"
+   },
+   "incidentId": {
+    "type": "string",
+    "description": "Incident ID"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "partner": {
+    "type": "string",
+    "description": "Partner"
+   },
+   "severity": {
+    "type": "string",
+    "description": "Severity"
+   },
+   "errorType": {
+    "type": "string",
+    "description": "Error Type"
+   },
+   "affectedProduct": {
+    "type": "string",
+    "description": "Affected Product"
+   },
+   "affectedEvent": {
+    "type": "string",
+    "description": "Affected Event"
+   },
+   "transactionsAffected": {
+    "type": "string",
+    "description": "Transactions Affected"
+   },
+   "businessImpact": {
+    "type": "string",
+    "description": "Business Impact"
+   },
+   "firstDetected": {
+    "type": "string",
+    "description": "First Detected"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "sla": {
+    "type": "string",
+    "description": "SLA"
+   },
+   "currentStatus": {
+    "type": "string",
+    "description": "Current Status"
+   },
+   "reSync": {
+    "type": "string",
+    "description": "Re-sync"
+   },
+   "reprocess": {
+    "type": "string",
+    "description": "Reprocess"
+   },
+   "switchToManual": {
+    "type": "string",
+    "description": "Switch to Manual"
+   },
+   "errorCode": {
+    "type": "string",
+    "description": "Error Code"
+   },
+   "apiRequestReference": {
+    "type": "string",
+    "description": "API Request Reference"
+   },
+   "response": {
+    "type": "string",
+    "description": "Response"
+   },
+   "correlationId": {
+    "type": "string",
+    "description": "Correlation ID"
+   },
+   "timestamp": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Timestamp"
+   }
+  }
+ },
+ "ChannelGovernanceSlaPartnerControlView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Channel Governance, SLA & Partner Control displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "channelOwner": {
+    "type": "string",
+    "description": "Channel Owner"
+   },
+   "partnerOwner": {
+    "type": "string",
+    "description": "Partner Owner"
+   },
+   "commercialAgreementReference": {
+    "type": "string",
+    "description": "Commercial Agreement Reference"
+   },
+   "sla": {
+    "type": "string",
+    "description": "SLA"
+   },
+   "transactionLimits": {
+    "type": "string",
+    "description": "Transaction Limits"
+   },
+   "rateLimits": {
+    "type": "number",
+    "description": "Rate Limits"
+   },
+   "contractDates": {
+    "type": "string",
+    "description": "Contract Dates"
+   },
+   "renewalDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Renewal Date"
+   },
+   "supportContacts": {
+    "type": "string",
+    "description": "Support Contacts"
+   },
+   "escalationContacts": {
+    "type": "string",
+    "description": "Escalation Contacts"
+   },
+   "availability": {
+    "type": "number",
+    "description": "Availability %"
+   },
+   "apiResponseTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "API Response Time"
+   },
+   "transactionSuccess": {
+    "type": "number",
+    "description": "Transaction Success %"
+   },
+   "errorRate": {
+    "type": "number",
+    "description": "Error Rate"
+   },
+   "incidentResolutionTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Incident Resolution Time"
+   },
+   "availability999": {
+    "type": "number",
+    "description": "Availability: 99.9%"
+   },
+   "actual9972": {
+    "type": "number",
+    "description": "Actual: 99.72%"
+   },
+   "statusSlaBreach": {
+    "type": "string",
+    "description": "Status: SLA Breach"
+   },
+   "expiredAgreement": {
+    "type": "integer",
+    "description": "Expired agreement"
+   },
+   "expiredCertificate": {
+    "type": "integer",
+    "description": "Expired certificate"
+   },
+   "expiringApiCredentials": {
+    "type": "string",
+    "description": "Expiring API credentials"
+   },
+   "missingOwner": {
+    "type": "string",
+    "description": "Missing owner"
+   },
+   "unapprovedProductionIntegration": {
+    "type": "string",
+    "description": "Unapproved production integration"
+   },
+   "slaBreach": {
+    "type": "string",
+    "description": "SLA breach"
+   },
+   "excessiveTransactionFailures": {
+    "type": "string",
+    "description": "Excessive transaction failures"
+   },
+   "placeUnderReview": {
+    "type": "string",
+    "description": "Place Under Review"
+   },
+   "restrict": {
+    "type": "string",
+    "description": "Restrict"
+   },
+   "reactivate": {
+    "type": "string",
+    "description": "Reactivate"
+   },
+   "resellerOtaDistributionArea": {
+    "type": "string",
+    "description": "Reseller / OTA Distribution area"
+   }
+  }
+ },
+ "ChannelOperationsCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Channel Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "activeChannels": {
+    "type": "integer",
+    "description": "Active Channels"
+   },
+   "connectedChannels": {
+    "type": "integer",
+    "description": "Connected Channels"
+   },
+   "degradedChannels": {
+    "type": "integer",
+    "description": "Degraded Channels"
+   },
+   "offlineChannels": {
+    "type": "integer",
+    "description": "Offline Channels"
+   },
+   "transactionsToday": {
+    "type": "string",
+    "description": "Transactions Today"
+   },
+   "grossSales": {
+    "type": "integer",
+    "description": "Gross Sales"
+   },
+   "productsAvailable": {
+    "type": "string",
+    "description": "Products Available"
+   },
+   "synchronizationErrors": {
+    "type": "integer",
+    "description": "Synchronization Errors"
+   },
+   "capacityAlerts": {
+    "type": "integer",
+    "description": "Capacity Alerts"
+   },
+   "pricingErrors": {
+    "type": "integer",
+    "description": "Pricing Errors"
+   },
+   "failedTransactions": {
+    "type": "integer",
+    "description": "Failed Transactions"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "type": {
+    "type": "string",
+    "description": "Type"
+   },
+   "venueScope": {
+    "type": "string",
+    "description": "Venue/Scope"
+   },
+   "connectionStatus": {
+    "type": "string",
+    "description": "Connection Status"
+   },
+   "lastSync": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last Sync"
+   },
+   "products": {
+    "type": "string",
+    "description": "Products"
+   },
+   "transactions": {
+    "type": "string",
+    "description": "Transactions"
+   },
+   "salesValue": {
+    "type": "string",
+    "description": "Sales Value"
+   },
+   "inventoryStatus": {
+    "type": "string",
+    "description": "Inventory Status"
+   },
+   "pricingStatus": {
+    "type": "string",
+    "description": "Pricing Status"
+   },
+   "errorCount": {
+    "type": "integer",
+    "description": "Error Count"
+   },
+   "healthScore": {
+    "type": "number",
+    "description": "Health Score"
+   },
+   "otaTiqtripInventorySynchronized1041": {
+    "type": "string",
+    "description": "OTA-TiqTrip inventory synchronized — 10:41"
+   },
+   "forceSync": {
+    "type": "string",
+    "description": "Force Sync"
+   }
+  }
+ },
+ "ChannelPerformanceCommercialAnalyticsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Channel Performance & Commercial Analytics displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "grossSales": {
+    "type": "integer",
+    "description": "Gross Sales"
+   },
+   "netSales": {
+    "type": "integer",
+    "description": "Net Sales"
+   },
+   "transactions": {
+    "type": "integer",
+    "description": "Transactions"
+   },
+   "ticketsSold": {
+    "type": "string",
+    "description": "Tickets Sold"
+   },
+   "averageOrderValue": {
+    "type": "number",
+    "description": "Average Order Value"
+   },
+   "conversionRate": {
+    "type": "number",
+    "description": "Conversion Rate"
+   },
+   "cancellationRate": {
+    "type": "number",
+    "description": "Cancellation Rate"
+   },
+   "capacityUtilization": {
+    "type": "integer",
+    "description": "Capacity Utilization"
+   },
+   "revenuePerAvailableUnit": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue per Available Unit"
+   },
+   "fees": {
+    "type": "integer",
+    "description": "Fees"
+   },
+   "commission": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Commission"
+   },
+   "costOfSaleWhereAvailable": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Cost of Sale where available"
+   },
+   "allocation": {
+    "type": "string",
+    "description": "Allocation"
+   },
+   "sold": {
+    "type": "string",
+    "description": "Sold"
+   },
+   "utilization": {
+    "type": "number",
+    "description": "Utilization"
+   },
+   "revenue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Revenue"
+   },
+   "cancellation": {
+    "type": "string",
+    "description": "Cancellation"
+   },
+   "settlement": {
+    "type": "string",
+    "description": "Settlement"
+   },
+   "growth": {
+    "type": "string",
+    "description": "Growth"
+   }
+  }
+ },
+ "ProductPriceAvailabilitySynchronizationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Product, Price & Availability Synchronization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "productDescription": {
+    "type": "string",
+    "description": "Product Description"
+   },
+   "availability": {
+    "type": "string",
+    "description": "Availability"
+   },
+   "capacity": {
+    "type": "integer",
+    "description": "Capacity"
+   },
+   "price": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price"
+   },
+   "tax": {
+    "type": "string",
+    "description": "Tax"
+   },
+   "fees": {
+    "type": "string",
+    "description": "Fees"
+   },
+   "media": {
+    "type": "string",
+    "description": "Media"
+   },
+   "restrictions": {
+    "type": "string",
+    "description": "Restrictions"
+   },
+   "salesStatus": {
+    "type": "string",
+    "description": "Sales Status"
+   },
+   "channelTicvai": {
+    "type": "string",
+    "description": "Channel → TICVAI"
+   },
+   "realTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Real Time"
+   },
+   "nearRealTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Near Real Time"
+   },
+   "scheduled": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Scheduled"
+   },
+   "manual": {
+    "type": "string",
+    "description": "Manual"
+   },
+   "eventTriggered": {
+    "type": "string",
+    "description": "Event Triggered"
+   },
+   "lastSuccessfulSync": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last Successful Sync"
+   },
+   "nextSync": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Next Sync"
+   },
+   "recordsProcessed": {
+    "type": "string",
+    "description": "Records Processed"
+   },
+   "successful": {
+    "type": "string",
+    "description": "Successful"
+   },
+   "failed": {
+    "type": "integer",
+    "description": "Failed"
+   },
+   "pending": {
+    "type": "integer",
+    "description": "Pending"
+   },
+   "warning": {
+    "type": "string",
+    "description": "Warning"
+   },
+   "duration": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Duration"
+   },
+   "reprocess": {
+    "type": "string",
+    "description": "Reprocess"
+   }
+  }
+ },
+ "RealTimeChannelAvailabilityInventoryMonitorView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Real-Time Channel Availability & Inventory Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "ctBA": {
+    "type": "string",
+    "description": "ct B A"
+   },
+   "dD": {
+    "type": "string",
+    "description": "d d"
+   },
+   "available": {
+    "type": "string",
+    "description": "Available"
+   },
+   "lowAvailability": {
+    "type": "string",
+    "description": "Low Availability"
+   },
+   "soldOut": {
+    "type": "string",
+    "description": "Sold Out"
+   },
+   "closed": {
+    "type": "integer",
+    "description": "Closed"
+   },
+   "suspended": {
+    "type": "string",
+    "description": "Suspended"
+   },
+   "notAssigned": {
+    "type": "string",
+    "description": "Not Assigned"
+   },
+   "allocated": {
+    "type": "string",
+    "description": "Allocated"
+   },
+   "sold": {
+    "type": "string",
+    "description": "Sold"
+   },
+   "held": {
+    "type": "string",
+    "description": "Held"
+   },
+   "remaining": {
+    "type": "string",
+    "description": "Remaining"
+   },
+   "utilization": {
+    "type": "number",
+    "description": "Utilization %"
+   },
+   "salesVelocity": {
+    "type": "string",
+    "description": "Sales Velocity"
+   },
+   "forecastedSellOut": {
+    "type": "string",
+    "description": "Forecasted Sell-Out"
+   },
+   "againstTheSeatMapCapacityPool": {
+    "type": "integer",
+    "description": "against the seat map/capacity pool"
+   }
+  }
+ }
+}

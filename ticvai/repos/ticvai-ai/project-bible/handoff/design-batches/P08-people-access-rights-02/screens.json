@@ -1,0 +1,392 @@
+[
+ {
+  "id": "BO-088",
+  "name": "Approval Analytics",
+  "module": "People & Access Rights",
+  "requiresModule": "core",
+  "wave": 3,
+  "capability": "C00",
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/approvals/approval-analytics",
+   "component": "apps/venue-management-web/src/routes/approvals/ApprovalAnalytics.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "BO-001",
+    "BO-084",
+    "BO-085",
+    "BO-086"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "BO-001",
+     "trigger": "Queue Directory",
+     "carries": [
+      "eventId",
+      "feedId",
+      "queueId"
+     ],
+     "provenance": "derived — BO-001 declares entryState.params eventId, feedId, queueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-084",
+     "trigger": "Approval Inbox",
+     "carries": [
+      "requestId"
+     ],
+     "provenance": "derived — BO-084 declares entryState.params requestId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-085",
+     "trigger": "Approval Request",
+     "carries": [
+      "requestId"
+     ],
+     "provenance": "derived — BO-085 declares entryState.params requestId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. **Retail board operations wired 24 August.**",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listIndexJobs` reads the population and `getApprovalAnalytics` reads one of them — list, select, act",
+  "purpose": "Volumes, decision times and where requests get stuck.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every approval analytics",
+       "bindsTo": "IndexJob",
+       "columns": [
+        "IndexJob.id",
+        "IndexJob.sourceId",
+        "IndexJob.kind",
+        "IndexJob.reason",
+        "IndexJob.status",
+        "IndexJob.recordsTotal",
+        "IndexJob.recordsEmbedded",
+        "IndexJob.recordsFailed",
+        "IndexJob.failureSample",
+        "IndexJob.shadowCollection",
+        "IndexJob.shardKey",
+        "IndexJob.embeddingModel"
+       ],
+       "operation": "listIndexJobs",
+       "provenance": "contract ai.yaml GET /index-jobs"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected approval analytics",
+       "bindsTo": "ApprovalAnalytics",
+       "columns": [
+        "ApprovalAnalytics.from",
+        "ApprovalAnalytics.to",
+        "ApprovalAnalytics.groupBy",
+        "ApprovalAnalytics.rows"
+       ],
+       "operation": "getApprovalAnalytics",
+       "provenance": "contract approvals.yaml GET /approval-analytics"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The approval analytics list.",
+   "error": "Could not load. Names which read failed and leaves the approval analytics untouched.",
+   "emptyFirstRun": "No approval analytics yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the approval analytics are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getApprovalAnalytics",
+    "contract": "approvals",
+    "purpose": "Volumes, times, rejections and bottlenecks",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listIndexJobs",
+    "contract": "ai",
+    "purpose": "Indexing in flight and recently finished",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "ApprovalAnalytics.from",
+    "ApprovalAnalytics.to",
+    "ApprovalAnalytics.groupBy",
+    "ApprovalAnalytics.rows"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-088"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-106",
+  "name": "People & Access Rights",
+  "module": "People & Access Rights",
+  "requiresModule": "core",
+  "wave": 1,
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/people-access-rights",
+   "component": "apps/venue-management-web/src/routes/home/PeopleAccessRightsList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-053",
+    "BO-054",
+    "BO-055",
+    "BO-056",
+    "BO-057",
+    "BO-066",
+    "BO-084",
+    "BO-085",
+    "BO-086",
+    "BO-087",
+    "BO-088"
+   ],
+   "transitions": [
+    {
+     "to": "BO-053",
+     "trigger": "Staff Directory",
+     "carries": [
+      "principalId"
+     ],
+     "provenance": "derived — BO-053 declares entryState.params principalId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-055",
+     "trigger": "Rota & Scheduling",
+     "carries": [
+      "assignmentId"
+     ],
+     "provenance": "derived — BO-055 declares entryState.params assignmentId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-056",
+     "trigger": "Time & Attendance",
+     "carries": [
+      "recordId"
+     ],
+     "provenance": "derived — BO-056 declares entryState.params recordId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-066",
+     "trigger": "Notification Settings",
+     "carries": [
+      "announcementId"
+     ],
+     "provenance": "derived — BO-066 declares entryState.params announcementId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-084",
+     "trigger": "Approval Inbox",
+     "carries": [
+      "requestId"
+     ],
+     "provenance": "derived — BO-084 declares entryState.params requestId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-085",
+     "trigger": "Approval Request",
+     "carries": [
+      "requestId"
+     ],
+     "provenance": "derived — BO-085 declares entryState.params requestId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-087",
+     "trigger": "Approval Delegations",
+     "carries": [
+      "delegationId"
+     ],
+     "provenance": "derived — BO-087 declares entryState.params delegationId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Section landing. **11 screens reach the entry point through here** — before 20 August they reached it through nothing.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listRoles` reads the population and `getVenueSettings` reads one of them — list, select, act",
+  "purpose": "Everything in people & access rights, and what in it needs attention.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every people access rights",
+       "bindsTo": "Role",
+       "columns": [
+        "Role.id",
+        "Role.code",
+        "Role.name",
+        "Role.description",
+        "Role.permissions",
+        "Role.inheritsFromRoleId",
+        "Role.isSystem",
+        "Role.principalCount",
+        "Role.grantCount"
+       ],
+       "operation": "listRoles",
+       "provenance": "contract identity.yaml GET /roles"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected people access rights",
+       "bindsTo": "VenueSettings",
+       "columns": [
+        "VenueSettings.id",
+        "VenueSettings.venueId",
+        "VenueSettings.supportHours",
+        "VenueSettings.quietHours",
+        "VenueSettings.segregatedAccess",
+        "VenueSettings.alerting"
+       ],
+       "operation": "getVenueSettings",
+       "provenance": "contract tenancy.yaml GET /venues/{venueId}/settings"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "cardList",
+       "bindsTo": "screens",
+       "notes": "11 screens, each with what needs attention.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "searchField",
+       "label": "Search people & access rights",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The list, with counts.",
+   "error": "Could not load. Venue Home is still reachable.",
+   "emptyFirstRun": "**Nothing configured in people & access rights yet.** The action is the first thing to set up, not a blank list.",
+   "emptyNoResults": "Nothing matches the filter.",
+   "emptyNoAccess": "You do not have permission for people & access rights. **Said plainly** — an empty section reads as broken."
+  },
+  "apis": [
+   {
+    "operationId": "getVenueSettings",
+    "contract": "tenancy",
+    "purpose": "What is enabled here",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listRoles",
+    "contract": "identity",
+    "purpose": "Roles and who holds them",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "venueId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "**Resolves from the session, so a cold arrival is the ordinary case** — a manager bookmarks the back office and opens it every morning. A principal with more than one venue is asked which before the page renders, rather than shown the first one.",
+   "preloaded": [
+    "VenueSettings.id",
+    "VenueSettings.venueId",
+    "VenueSettings.supportHours",
+    "VenueSettings.quietHours",
+    "VenueSettings.segregatedAccess"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-106"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

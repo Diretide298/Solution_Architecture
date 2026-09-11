@@ -1,0 +1,179 @@
+{
+ "approvePrivacyTesting": {
+  "method": "PUT",
+  "path": "/privacy-testing",
+  "contract": "marketing-crm",
+  "summary": "Privacy Configuration Testing, Approval & Publication",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "PrivacyConfigurationTestingApprovalPublicationInput",
+  "responds": "PrivacyConfigurationTestingApprovalPublicationView"
+ },
+ "listCookieBannerPreference": {
+  "method": "GET",
+  "path": "/cookie-banner-preference",
+  "contract": "marketing-crm",
+  "summary": "Cookie Banner & Preference Center Designer",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CookieBannerPreferenceCenterDesignerView"
+ },
+ "listCookieTrackingDigital": {
+  "method": "GET",
+  "path": "/cookie-tracking-digital",
+  "contract": "marketing-crm",
+  "summary": "Cookie, Tracking & Digital Technology Registry",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CookieTrackingDigitalTechnologyRegistryView"
+ },
+ "listDataProcessingPurpose": {
+  "method": "GET",
+  "path": "/data-processing-purpose",
+  "contract": "marketing-crm",
+  "summary": "Data Processing Purpose & Lawful Basis Registry",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "DataProcessingPurposeLawfulBasisRegistryView"
+ },
+ "listPrivacyConsent": {
+  "method": "GET",
+  "path": "/privacy-consent",
+  "contract": "marketing-crm",
+  "summary": "Privacy & Consent Configuration Command Center",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "tenant",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "brand",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "country",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "consentType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "policy",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "language",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "PrivacyConsentConfigurationCommandCenterView"
+ },
+ "listPrivacyNoticePolicy": {
+  "method": "GET",
+  "path": "/privacy-notice-policy",
+  "contract": "marketing-crm",
+  "summary": "Privacy Notice, Policy & Terms Version Management",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PrivacyNoticePolicyTermsVersionManagementView"
+ },
+ "setCommunicationPreferenceMarketing": {
+  "method": "PUT",
+  "path": "/communication-preference-marketing",
+  "contract": "marketing-crm",
+  "summary": "Communication Preference & Marketing Permission Configuration",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "CommunicationPreferenceMarketingPermissionConfiguratInput",
+  "responds": "CommunicationPreferenceMarketingPermissionConfiguratView"
+ },
+ "setConsentCapturePoint": {
+  "method": "PUT",
+  "path": "/consent-capture-point",
+  "contract": "marketing-crm",
+  "summary": "Consent Capture Point & Customer Journey Configuration",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "ConsentCapturePointCustomerJourneyConfigurationInput",
+  "responds": "ConsentCapturePointCustomerJourneyConfigurationView"
+ },
+ "setConsentPurposes": {
+  "method": "PUT",
+  "path": "/consent-purposes",
+  "contract": "marketing-crm",
+  "summary": "Configure consent purposes",
+  "permission": "GUEST_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ConsentPurposeConfig"
+ },
+ "setMinorGuardianAge": {
+  "method": "PUT",
+  "path": "/minor-guardian-age",
+  "contract": "marketing-crm",
+  "summary": "Minor, Guardian & Age-Based Privacy Configuration",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "MinorGuardianAgeBasedPrivacyConfigurationInput",
+  "responds": "MinorGuardianAgeBasedPrivacyConfigurationView"
+ }
+}

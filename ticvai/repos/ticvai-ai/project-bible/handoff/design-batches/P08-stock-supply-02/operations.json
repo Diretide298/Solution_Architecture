@@ -1,0 +1,253 @@
+{
+ "acknowledgeAlert": {
+  "method": "POST",
+  "path": "/alerts/{alertId}/acknowledge",
+  "contract": "reporting",
+  "summary": "Mark it seen",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Alert"
+ },
+ "completeProductionRun": {
+  "method": "POST",
+  "path": "/production-runs/{runId}/complete",
+  "contract": "fnb",
+  "summary": "Record what was actually made",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProductionRun"
+ },
+ "createRequisition": {
+  "method": "POST",
+  "path": "/requisitions",
+  "contract": "inventory",
+  "summary": "Raise a requisition",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreateRequisitionRequest",
+  "responds": "Requisition"
+ },
+ "getCountVariance": {
+  "method": "GET",
+  "path": "/stock-counts/{countId}/variance",
+  "contract": "inventory",
+  "summary": "Variance between counted and expected",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CountVariance"
+ },
+ "getProductionRun": {
+  "method": "GET",
+  "path": "/production-runs/{runId}",
+  "contract": "fnb",
+  "summary": "One run — its plan, its output, and the gap",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ProductionRun"
+ },
+ "listAlerts": {
+  "method": "GET",
+  "path": "/alerts",
+  "contract": "reporting",
+  "summary": "What is currently wrong",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Alert"
+ },
+ "listExpiringBatches": {
+  "method": "GET",
+  "path": "/stock-batches/expiring",
+  "contract": "inventory",
+  "summary": "What is about to go out of date",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "withinDays",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "StockBatch"
+ },
+ "listProductionRuns": {
+  "method": "GET",
+  "path": "/production-runs",
+  "contract": "fnb",
+  "summary": "What is being made, and what was",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "locationKind",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "from",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "ProductionRun"
+ },
+ "listRecipes": {
+  "method": "GET",
+  "path": "/recipes",
+  "contract": "fnb",
+  "summary": "List recipes",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "planProductionRun": {
+  "method": "POST",
+  "path": "/production-runs",
+  "contract": "fnb",
+  "summary": "Plan a batch, for one outlet or several",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "ProductionRun",
+  "responds": "ProductionRun"
+ },
+ "recordWaste": {
+  "method": "POST",
+  "path": "/outlets/{outletId}/waste",
+  "contract": "fnb",
+  "summary": "Record waste",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "setItemAvailability": {
+  "method": "PUT",
+  "path": "/menu-items/{itemId}/availability",
+  "contract": "fnb",
+  "summary": "Mark an item available or eighty-sixed",
+  "permission": "PRODUCT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MenuItem"
+ }
+}

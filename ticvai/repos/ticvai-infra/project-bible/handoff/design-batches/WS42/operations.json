@@ -1,0 +1,214 @@
+{
+ "listConsentEvidenceWithdrawal": {
+  "method": "GET",
+  "path": "/consent-evidence-withdrawal",
+  "contract": "marketing-crm",
+  "summary": "Consent Evidence, History & Withdrawal Management",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ConsentEvidenceHistoryWithdrawalManagementView"
+ },
+ "listCustomerPrivacyConsent": {
+  "method": "GET",
+  "path": "/customer-privacy-consent",
+  "contract": "marketing-crm",
+  "summary": "Customer Privacy, Consent & Preference 360°",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CustomerPrivacyConsentPreference360View"
+ },
+ "listDataRetentionExpiry": {
+  "method": "GET",
+  "path": "/data-retention-expiry",
+  "contract": "marketing-crm",
+  "summary": "Data Retention, Expiry & Legal Hold Operations",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "DataRetentionExpiryLegalHoldOperationsView"
+ },
+ "listDataSubjectCustomer": {
+  "method": "GET",
+  "path": "/data-subject-customer",
+  "contract": "marketing-crm",
+  "summary": "Data Subject / Customer Privacy Request Management",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "DataSubjectCustomerPrivacyRequestManagementView"
+ },
+ "listDeletionAnonymizationRestriction": {
+  "method": "GET",
+  "path": "/deletion-anonymization-restriction",
+  "contract": "marketing-crm",
+  "summary": "Deletion, Anonymization & Restriction Operations",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "DeletionAnonymizationRestrictionOperationsView"
+ },
+ "listPrivacy": {
+  "method": "GET",
+  "path": "/privacy",
+  "contract": "marketing-crm",
+  "summary": "Privacy Operations Command Center",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "tenant",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "brand",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "country",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customer",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "requestType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "consentPurpose",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "PrivacyOperationsCommandCenterView"
+ },
+ "listPrivacyCompliance": {
+  "method": "GET",
+  "path": "/privacy-compliance",
+  "contract": "marketing-crm",
+  "summary": "Privacy Analytics & AI Compliance Intelligence",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "tenant",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "brand",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "country",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "consentPurpose",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerSegment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "PrivacyAnalyticsAiComplianceIntelligenceView"
+ },
+ "listPrivacyEvidenceCompliance": {
+  "method": "GET",
+  "path": "/privacy-evidence-compliance",
+  "contract": "marketing-crm",
+  "summary": "Privacy Audit, Evidence & Compliance Reporting",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PrivacyAuditEvidenceComplianceReportingView"
+ },
+ "setDataDiscoveryAccess": {
+  "method": "PUT",
+  "path": "/data-discovery-access",
+  "contract": "marketing-crm",
+  "summary": "Data Discovery, Access, Export & Correction Workspace",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "DataDiscoveryAccessExportCorrectionWorkspaceInput",
+  "responds": "DataDiscoveryAccessExportCorrectionWorkspaceView"
+ },
+ "setPrivacyComplianceException": {
+  "method": "PUT",
+  "path": "/privacy-compliance-exception",
+  "contract": "marketing-crm",
+  "summary": "Privacy Compliance, Exception & Investigation Workspace",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "PrivacyComplianceExceptionInvestigationWorkspaceInput",
+  "responds": "PrivacyComplianceExceptionInvestigationWorkspaceView"
+ }
+}

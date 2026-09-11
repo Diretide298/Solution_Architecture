@@ -1,0 +1,1168 @@
+[
+ {
+  "id": "BO-484",
+  "name": "Self-Service Experience Command Center",
+  "module": "Games & Rides",
+  "requiresModule": "games",
+  "wave": 3,
+  "source": {
+   "pack": "Game_and_Ride_Module.pdf",
+   "board": "10",
+   "number": "1",
+   "page": 96
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/games-rides/self-service-experience-command-center-bo-484",
+   "component": "apps/venue-management-web/src/routes/games-rides/SelfServiceExperienceCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-485",
+    "BO-486",
+    "BO-487",
+    "BO-488",
+    "BO-489",
+    "BO-490",
+    "BO-491",
+    "BO-492",
+    "BO-493"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 10 wiring, 11 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-485",
+     "trigger": "Self-Service Kiosk Profile & Channel Configuration",
+     "provenance": "structural — pack board 10 wiring, 11 September 2026"
+    },
+    {
+     "to": "BO-486",
+     "trigger": "Customer Card / Wallet Identification",
+     "provenance": "structural — pack board 10 wiring, 11 September 2026"
+    },
+    {
+     "to": "BO-487",
+     "trigger": "Customer Wallet & Balance Summary",
+     "provenance": "structural — pack board 10 wiring, 11 September 2026"
+    },
+    {
+     "to": "BO-488",
+     "trigger": "Self-Service Wallet Top-Up",
+     "provenance": "structural — pack board 10 wiring, 11 September 2026"
+    },
+    {
+     "to": "BO-489",
+     "trigger": "Bonus, Free Game & Benefit View",
+     "provenance": "structural — pack board 10 wiring, 11 September 2026"
+    },
+    {
+     "to": "BO-490",
+     "trigger": "Game & Ride Eligibility / “What Can I Play?”",
+     "provenance": "structural — pack board 10 wiring, 11 September 2026"
+    },
+    {
+     "to": "BO-491",
+     "trigger": "Redemption Balance & Prize Discovery",
+     "provenance": "structural — pack board 10 wiring, 11 September 2026"
+    },
+    {
+     "to": "BO-492",
+     "trigger": "Customer Game & Wallet Transaction History",
+     "provenance": "structural — pack board 10 wiring, 11 September 2026"
+    },
+    {
+     "to": "BO-493",
+     "trigger": "Self-Service UI Theme, Language & Journey Configuration",
+     "provenance": "structural — pack board 10 wiring, 11 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "purposeNote": "Administrators can monitor the status and usage of all self-service game-wallet channels centrally.",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
+  "purpose": "Provide administrators with a centralized view of all customer-facing game wallet kiosks, balance stations, and enabled self-service channels.",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search self-service experience",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 96 §Filters"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "Client",
+        "Venue",
+        "Zone",
+        "Device Type",
+        "Status"
+       ],
+       "notes": "The pack filters this screen by client, venue, zone, device type, status — which are present is a decision the pack already made.",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 96 §Filters"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Total Self-Service Devices",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 96 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Online Devices",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 96 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Offline Devices",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 96 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Customer Sessions Today",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 96 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Balance Checks",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 96 §KPI Cards"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The self-service experience list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the self-service experience untouched.",
+   "emptyFirstRun": "No self-service experience yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the self-service experience are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "entryState": {
+   "preloaded": [
+    "Total Self-Service Devices",
+    "Online Devices",
+    "Offline Devices",
+    "Customer Sessions Today",
+    "Balance Checks"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-484"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 96. 0 of 5 labels bound to a contract property; 10 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-485",
+  "name": "Self-Service Kiosk Profile & Channel Configuration",
+  "module": "Games & Rides",
+  "requiresModule": "games",
+  "wave": 3,
+  "source": {
+   "pack": "Game_and_Ride_Module.pdf",
+   "board": "10",
+   "number": "2",
+   "page": 97
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/games-rides/self-service-kiosk-profile-channel-configuration-bo-485",
+   "component": "apps/venue-management-web/src/routes/games-rides/SelfServiceKioskProfileChannelConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-484"
+   ],
+   "exitTo": [
+    "BO-484"
+   ],
+   "transitions": [
+    {
+     "to": "BO-484",
+     "trigger": "Back to Self-Service Experience Command Center",
+     "provenance": "structural — pack board 10 wiring, 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "purposeNote": "Administrators can determine which self-service functions are available on each kiosk/device.",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Define the business role of each kiosk or customer-facing station.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Game_and_Ride_Module.pdf, page 97"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Game_and_Ride_Module.pdf, page 97"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": []
+  },
+  "states": {
+   "loading": "The self-service kiosk profile list.",
+   "error": "Could not load. Names which read failed and leaves the self-service kiosk profile untouched.",
+   "emptyFirstRun": "No self-service kiosk profile yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the self-service kiosk profile are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-485"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 97. 0 of 0 labels bound to a contract property; 0 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-486",
+  "name": "Customer Card / Wallet Identification",
+  "module": "Games & Rides",
+  "requiresModule": "games",
+  "wave": 3,
+  "source": {
+   "pack": "Game_and_Ride_Module.pdf",
+   "board": "10",
+   "number": "3",
+   "page": 98
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/games-rides/customer-card-wallet-identification-bo-486",
+   "component": "apps/venue-management-web/src/routes/games-rides/CustomerCardWalletIdentification.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-484"
+   ],
+   "exitTo": [
+    "BO-484"
+   ],
+   "transitions": [
+    {
+     "to": "BO-484",
+     "trigger": "Back to Self-Service Experience Command Center",
+     "provenance": "structural — pack board 10 wiring, 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "purposeNote": "A self-service session opens only after TICVAI successfully identifies and validates the customer's credential.",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Validate Card Status; Card recognized) and no metric row",
+  "purpose": "Configure the first customer step: identifying the customer's game card or digital wallet securely.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Game_and_Ride_Module.pdf, page 98 §Validate Card Status"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every customer card wallet",
+       "columns": [
+        "↓",
+        "4321"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Game_and_Ride_Module.pdf, page 98 §Validate Card Status"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected customer card wallet",
+       "bindsTo": null,
+       "columns": [
+        "↓",
+        "4321"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “WELCOME”, “Identification Methods”, “Customer Tap”, “Invalid Results”.",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 98 §Validate Card Status"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The customer card wallet list.",
+   "error": "Could not load. Names which read failed and leaves the customer card wallet untouched.",
+   "emptyFirstRun": "No customer card wallet yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the customer card wallet are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "entryState": {
+   "preloaded": [
+    "↓",
+    "4321"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-486"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 98. 0 of 2 labels bound to a contract property; 3 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-487",
+  "name": "Customer Wallet & Balance Summary",
+  "module": "Games & Rides",
+  "requiresModule": "games",
+  "wave": 3,
+  "source": {
+   "pack": "Game_and_Ride_Module.pdf",
+   "board": "10",
+   "number": "4",
+   "page": 99
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/games-rides/customer-wallet-balance-summary-bo-487",
+   "component": "apps/venue-management-web/src/routes/games-rides/CustomerWalletBalanceSummary.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-484"
+   ],
+   "exitTo": [
+    "BO-484"
+   ],
+   "transitions": [
+    {
+     "to": "BO-484",
+     "trigger": "Back to Self-Service Experience Command Center",
+     "provenance": "structural — pack board 10 wiring, 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "purposeNote": "Customers can distinguish paid credit, bonus, redemption credits, free games, and entitlements in a single view.",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Card Information) and no metric row",
+  "purpose": "Present all relevant wallet balances clearly to the customer. The source specifically requires customers' stored credits to be viewable through self-service kiosks.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
+    "source": "pack Game_and_Ride_Module.pdf, page 99 §Card Information"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every customer wallet balance",
+       "columns": [
+        "Card Status",
+        "Card Expiry",
+        "Last Recharge"
+       ],
+       "bindsTo": null,
+       "operation": null,
+       "provenance": "pack Game_and_Ride_Module.pdf, page 99 §Card Information"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected customer wallet balance",
+       "bindsTo": null,
+       "columns": [
+        "Card Status",
+        "Card Expiry",
+        "Last Recharge"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “AED 25”, “Redemption Credits”, “Free Games”, “Active Entitlements”.",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 99 §Card Information"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The customer wallet balance list.",
+   "error": "Could not load. Names which read failed and leaves the customer wallet balance untouched.",
+   "emptyFirstRun": "No customer wallet balance yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the customer wallet balance are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "entryState": {
+   "preloaded": [
+    "Card Status",
+    "Card Expiry",
+    "Last Recharge"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-487"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 99. 0 of 3 labels bound to a contract property; 3 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-488",
+  "name": "Self-Service Wallet Top-Up",
+  "module": "Games & Rides",
+  "requiresModule": "games",
+  "wave": 3,
+  "source": {
+   "pack": "Game_and_Ride_Module.pdf",
+   "board": "10",
+   "number": "5",
+   "page": 99
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/games-rides/self-service-wallet-top-up-bo-488",
+   "component": "apps/venue-management-web/src/routes/games-rides/SelfServiceWalletTopUp.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-484"
+   ],
+   "exitTo": [
+    "BO-484"
+   ],
+   "transitions": [
+    {
+     "to": "BO-484",
+     "trigger": "Back to Self-Service Experience Command Center",
+     "provenance": "structural — pack board 10 wiring, 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "purposeNote": "The self-service channel retrieves the active TICVAI top-up rules and applies the resulting wallet and bonus values correctly.",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Allow customers to add value to their game wallet through an enabled kiosk/channel.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Game_and_Ride_Module.pdf, page 99"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Game_and_Ride_Module.pdf, page 99"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": []
+  },
+  "states": {
+   "loading": "The self-service wallet top-up list.",
+   "error": "Could not load. Names which read failed and leaves the self-service wallet top-up untouched.",
+   "emptyFirstRun": "No self-service wallet top-up yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the self-service wallet top-up are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-488"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 99. 0 of 0 labels bound to a contract property; 0 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-489",
+  "name": "Bonus, Free Game & Benefit View",
+  "module": "Games & Rides",
+  "requiresModule": "games",
+  "wave": 3,
+  "source": {
+   "pack": "Game_and_Ride_Module.pdf",
+   "board": "10",
+   "number": "6",
+   "page": 100
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/games-rides/bonus-free-game-benefit-view-bo-489",
+   "component": "apps/venue-management-web/src/routes/games-rides/BonusFreeGameBenefitView.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-484"
+   ],
+   "exitTo": [
+    "BO-484"
+   ],
+   "transitions": [
+    {
+     "to": "BO-484",
+     "trigger": "Back to Self-Service Experience Command Center",
+     "provenance": "structural — pack board 10 wiring, 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "purposeNote": "Customers can understand what promotional/free value they hold, where it can be used, and its remaining validity.",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Help customers understand promotional value and benefits available in their wallet.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Game_and_Ride_Module.pdf, page 100"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Game_and_Ride_Module.pdf, page 100"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": []
+  },
+  "states": {
+   "loading": "The bonus free game list.",
+   "error": "Could not load. Names which read failed and leaves the bonus free game untouched.",
+   "emptyFirstRun": "No bonus free game yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the bonus free game are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-489"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 100. 0 of 0 labels bound to a contract property; 0 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-490",
+  "name": "Game & Ride Eligibility / “What Can I Play?”",
+  "module": "Games & Rides",
+  "requiresModule": "games",
+  "wave": 3,
+  "source": {
+   "pack": "Game_and_Ride_Module.pdf",
+   "board": "10",
+   "number": "7",
+   "page": 101
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/games-rides/game-ride-eligibility-what-can-i-play-bo-490",
+   "component": "apps/venue-management-web/src/routes/games-rides/GameRideEligibilityWhatCanIPlay.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-484"
+   ],
+   "exitTo": [
+    "BO-484"
+   ],
+   "transitions": [
+    {
+     "to": "BO-484",
+     "trigger": "Back to Self-Service Experience Command Center",
+     "provenance": "structural — pack board 10 wiring, 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "purposeNote": "Customers can identify available gameplay options using the real-time rules configured in TICVAI.",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Allow guests to see which games and rides they can currently access based on their wallet, packages, free plays and entitlements.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Game_and_Ride_Module.pdf, page 101"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search game ride eligibility",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 101 §Filters"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "Rides",
+        "Video Games",
+        "Skill Games",
+        "Free for Me",
+        "Included in My Package"
+       ],
+       "notes": "The pack filters this screen by rides, video games, skill games, free for me, included in my package — which are present is a decision the pack already made.",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 101 §Filters"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The game ride eligibility list.",
+   "error": "Could not load. Names which read failed and leaves the game ride eligibility untouched.",
+   "emptyFirstRun": "No game ride eligibility yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the game ride eligibility are still there. The pack's own statuses are Included — the state names which is selected.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-490"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 101. 0 of 5 labels bound to a contract property; 9 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-491",
+  "name": "Redemption Balance & Prize Discovery",
+  "module": "Games & Rides",
+  "requiresModule": "games",
+  "wave": 3,
+  "source": {
+   "pack": "Game_and_Ride_Module.pdf",
+   "board": "10",
+   "number": "8",
+   "page": 102
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/games-rides/redemption-balance-prize-discovery-bo-491",
+   "component": "apps/venue-management-web/src/routes/games-rides/RedemptionBalancePrizeDiscovery.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-484"
+   ],
+   "exitTo": [
+    "BO-484"
+   ],
+   "transitions": [
+    {
+     "to": "BO-484",
+     "trigger": "Back to Self-Service Experience Command Center",
+     "provenance": "structural — pack board 10 wiring, 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "purposeNote": "Customers can see their redemption balance and identify prizes that are currently available within that balance.",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Allow customers to check redemption credits and browse prizes they can afford before visiting the redemption counter.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Game_and_Ride_Module.pdf, page 102"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search redemption balance prize",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 102 §Filters"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "Available Now",
+        "Prize Category",
+        "Credit Range",
+        "Venue"
+       ],
+       "notes": "The pack filters this screen by available now, prize category, credit range, venue — which are present is a decision the pack already made.",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 102 §Filters"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The redemption balance prize list.",
+   "error": "Could not load. Names which read failed and leaves the redemption balance prize untouched.",
+   "emptyFirstRun": "No redemption balance prize yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the redemption balance prize are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-491"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 102. 0 of 4 labels bound to a contract property; 4 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-492",
+  "name": "Customer Game & Wallet Transaction History",
+  "module": "Games & Rides",
+  "requiresModule": "games",
+  "wave": 3,
+  "source": {
+   "pack": "Game_and_Ride_Module.pdf",
+   "board": "10",
+   "number": "9",
+   "page": 102
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/games-rides/customer-game-wallet-transaction-history-bo-492",
+   "component": "apps/venue-management-web/src/routes/games-rides/CustomerGameWalletTransactionHistory.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-484"
+   ],
+   "exitTo": [
+    "BO-484"
+   ],
+   "transitions": [
+    {
+     "to": "BO-484",
+     "trigger": "Back to Self-Service Experience Command Center",
+     "provenance": "structural — pack board 10 wiring, 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "purposeNote": "Customers can review recent wallet/game activity without requiring back-office access.",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Allow the customer to review recent activity associated with the card/wallet.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Game_and_Ride_Module.pdf, page 102"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search customer game wallet",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 102 §Filters"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "Games/Rides",
+        "Top-Ups",
+        "Bonus",
+        "Redemption",
+        "Free Play"
+       ],
+       "notes": "The pack filters this screen by games/rides, top-ups, bonus, redemption, free play — which are present is a decision the pack already made.",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 102 §Filters"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The customer game wallet list.",
+   "error": "Could not load. Names which read failed and leaves the customer game wallet untouched.",
+   "emptyFirstRun": "No customer game wallet yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the customer game wallet are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-492"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 102. 0 of 5 labels bound to a contract property; 5 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-493",
+  "name": "Self-Service UI Theme, Language & Journey Configuration",
+  "module": "Games & Rides",
+  "requiresModule": "games",
+  "wave": 3,
+  "source": {
+   "pack": "Game_and_Ride_Module.pdf",
+   "board": "10",
+   "number": "10",
+   "page": 103
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/games-rides/self-service-ui-theme-language-journey-configuration-bo-493",
+   "component": "apps/venue-management-web/src/routes/games-rides/SelfServiceUiThemeLanguageJourneyConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-484"
+   ],
+   "exitTo": [
+    "BO-484"
+   ],
+   "transitions": [
+    {
+     "to": "BO-484",
+     "trigger": "Back to Self-Service Experience Command Center",
+     "provenance": "structural — pack board 10 wiring, 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "purposeNote": "The customer-facing experience can be branded and configured centrally while continuing to consume the same TICVAI backend wallet and gameplay services. Board 10 — Exact Screen Mapping # Screen 1 Self-Service Experience Command Center 2 Self-Service Kiosk Profile & Channel Configuration 3 Customer Card / Wallet Identification 4 Customer Wallet & Balance Summary 5 Self-Service Wallet Top-Up 6 Bonus, Free Game & Benefit View 7 Game & Ride Eligibility / “What Can I Play?” 8 Redemption Balance & Prize Discovery",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Session Configuration) and no display directory — it is settings, not a population",
+  "purpose": "Allow TICVAI administrators to configure the customer-facing kiosk experience without changing business logic.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Session Timeout",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 103 §Session Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Auto Logout",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 103 §Session Configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Confirmation Timeout",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 103 §Session Configuration"
+      },
+      {
+       "kind": "textField",
+       "label": "Privacy Reset After Session",
+       "provenance": "pack Game_and_Ride_Module.pdf, page 103 §Session Configuration"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The self-service theme language configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the self-service theme language untouched.",
+   "emptyFirstRun": "No self-service theme language configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-493"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 103. 0 of 0 labels bound to a contract property; 4 of 59 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

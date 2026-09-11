@@ -4,13 +4,13 @@
 
 | | |
 |---|---|
-| Screens | 393 |
+| Screens | 614 |
 | Operations | 666 |
 | Contracts | 27 |
-| Modules | 8 |
+| Modules | 11 |
 | Undrawn | 0 |
 | Operations with no screen | 229 |
-| Waves | wave1 60 · wave2 79 · wave3 254 |
+| Waves | wave1 60 · wave2 79 · wave3 475 |
 
 ## Gaps
 
@@ -80,9 +80,12 @@
 | Module | Screens | Waves |
 |---|---|---|
 | Access & Venue | 175 | 1, 2, 3 |
+| Games & Rides | 100 | 3 |
+| Rentals | 100 | 3 |
 | Sell | 75 | 1, 2, 3 |
 | Orders & Money | 59 | 1, 2, 3 |
 | Venue Operations | 45 | 1, 2, 3 |
+| Setup & Go-Live | 21 | 3 |
 | Stock & Supply | 15 | 1, 2 |
 | People & Access Rights | 12 | 1, 2, 3 |
 | Food & Beverage | 8 | 1, 2 |
@@ -485,4 +488,225 @@
 | `BO-391` | Live Escalation Operations Center | Venue Operations | 3 | 0 | yes |
 | `BO-392` | SLA & Escalation Performance Analytics | Venue Operations | 3 | 0 | yes |
 | `BO-393` | AI SLA & Escalation Advisor | Venue Operations | 3 | 0 | yes |
+| `BO-394` | Game & Ride Operations Dashboard | Games & Rides | 3 | 0 | yes |
+| `BO-395` | Game & Ride Directory | Games & Rides | 3 | 0 | yes |
+| `BO-396` | Attraction Profile | Games & Rides | 3 | 0 | yes |
+| `BO-397` | Attraction Type Configuration | Games & Rides | 3 | 0 | yes |
+| `BO-398` | Game & Ride Operational Configuration | Games & Rides | 3 | 0 | yes |
+| `BO-399` | Wallet & Credit Acceptance Mapping | Games & Rides | 3 | 0 | yes |
+| `BO-400` | Attraction / Reader Mapping | Games & Rides | 3 | 0 | yes |
+| `BO-401` | Game Package & Entitlement Association | Games & Rides | 3 | 0 | yes |
+| `BO-402` | Configuration Health & Validation | Games & Rides | 3 | 0 | yes |
+| `BO-403` | Attraction Audit, Dependencies & Governed Actions | Games & Rides | 3 | 0 | yes |
+| `BO-404` | Reader Management Dashboard | Games & Rides | 3 | 0 | yes |
+| `BO-405` | Reader Directory | Games & Rides | 3 | 0 | yes |
+| `BO-406` | Reader Profile & Device Setup | Games & Rides | 3 | 0 | yes |
+| `BO-407` | Reader Credit & Payment Configuration | Games & Rides | 3 | 0 | yes |
+| `BO-408` | Reader / Attraction Assignment | Games & Rides | 3 | 0 | yes |
+| `BO-409` | Retap Delay & Transaction Protection | Games & Rides | 3 | 0 | yes |
+| `BO-410` | Free Game Glow & Reader Display Rules | Games & Rides | 3 | 0 | yes |
+| `BO-411` | Reader Theme & Experience Configuration | Games & Rides | 3 | 0 | yes |
+| `BO-412` | Real-Time Tap Validation & Reader Response | Games & Rides | 3 | 0 | yes |
+| `BO-413` | Balance Check Reader & Device Test Console | Games & Rides | 3 | 0 | yes |
+| `BO-414` | Wallet & Credit Management Dashboard | Games & Rides | 3 | 0 | yes |
+| `BO-415` | Wallet & Credit Type Configuration | Games & Rides | 3 | 0 | yes |
+| `BO-416` | Wallet Account & Balance View | Games & Rides | 3 | 0 | yes |
+| `BO-417` | Top-Up Configuration | Games & Rides | 3 | 0 | yes |
+| `BO-418` | Top-Up Bonus Rule Configuration | Games & Rides | 3 | 0 | yes |
+| `BO-419` | Bonus Usage Restrictions | Games & Rides | 3 | 0 | yes |
+| `BO-420` | Bonus Validity & Expiry Configuration | Games & Rides | 3 | 0 | yes |
+| `BO-421` | Free Game & Ride Credit Management | Games & Rides | 3 | 0 | yes |
+| `BO-422` | Refund, Adjustment & Manual Bonus Control | Games & Rides | 3 | 0 | yes |
+| `BO-423` | Wallet Credit Transaction Ledger & Audit | Games & Rides | 3 | 0 | yes |
+| `BO-424` | Gameplay Validation Command Center | Games & Rides | 3 | 0 | yes |
+| `BO-425` | Gameplay Validation Rule Configuration | Games & Rides | 3 | 0 | yes |
+| `BO-426` | Deduction Priority & Funding Source Rules | Games & Rides | 3 | 0 | yes |
+| `BO-427` | All Games & Rides Pass Configuration | Games & Rides | 3 | 0 | yes |
+| `BO-428` | Specific Game/Ride Unlimited Entitlement | Games & Rides | 3 | 0 | yes |
+| `BO-429` | Specific Game/Ride Limited Entitlement | Games & Rides | 3 | 0 | yes |
+| `BO-430` | Game Package Builder | Games & Rides | 3 | 0 | yes |
+| `BO-431` | Entitlement Validity & Activation Rules | Games & Rides | 3 | 0 | yes |
+| `BO-432` | Real-Time Gameplay Authorization | Games & Rides | 3 | 0 | yes |
+| `BO-433` | Validation Simulator & Exception Analysis | Games & Rides | 3 | 0 | yes |
+| `BO-434` | Game & Ride Pricing Command Center | Games & Rides | 3 | 0 | yes |
+| `BO-435` | Standard Game & Ride Price Configuration | Games & Rides | 3 | 0 | yes |
+| `BO-436` | Group Pricing Configuration | Games & Rides | 3 | 0 | yes |
+| `BO-437` | Peak / Non-Peak Dynamic Pricing | Games & Rides | 3 | 0 | yes |
+| `BO-438` | Pricing Calendar & Exception Dates | Games & Rides | 3 | 0 | yes |
+| `BO-439` | Normal & VIP Pricing Configuration | Games & Rides | 3 | 0 | yes |
+| `BO-440` | Retry Price Configuration | Games & Rides | 3 | 0 | yes |
+| `BO-441` | Price Priority & Conflict Rules | Games & Rides | 3 | 0 | yes |
+| `BO-442` | Effective Pricing & Reader Price Preview | Games & Rides | 3 | 0 | yes |
+| `BO-443` | Pricing Audit, Approval & Publication | Games & Rides | 3 | 0 | yes |
+| `BO-444` | Redemption Operations Dashboard | Games & Rides | 3 | 0 | yes |
+| `BO-445` | Redemption Credit Rule Configuration | Games & Rides | 3 | 0 | yes |
+| `BO-446` | Ticket-Based Redemption / Ticket-Eater Integration | Games & Rides | 3 | 0 | yes |
+| `BO-447` | Ticketless Redemption Game Integration | Games & Rides | 3 | 0 | yes |
+| `BO-448` | Redemption Wallet & Balance View | Games & Rides | 3 | 0 | yes |
+| `BO-449` | Redemption Counter / Prize Checkout | Games & Rides | 3 | 0 | yes |
+| `BO-450` | Prize Catalogue & Credit Cost Configuration | Games & Rides | 3 | 0 | yes |
+| `BO-451` | Prize Inventory Integration | Games & Rides | 3 | 0 | yes |
+| `BO-452` | Direct-Pay / Crane & Prize Machine Configuration | Games & Rides | 3 | 0 | yes |
+| `BO-453` | Redemption Transaction Ledger, Reconciliation & Audit | Games & Rides | 3 | 0 | yes |
+| `BO-454` | Card Lifecycle Command Center | Games & Rides | 3 | 0 | yes |
+| `BO-455` | Card / Credential Profile | Games & Rides | 3 | 0 | yes |
+| `BO-456` | Card Expiry Rule Configuration | Games & Rides | 3 | 0 | yes |
+| `BO-457` | Last Recharge & Last Activity Tracking | Games & Rides | 3 | 0 | yes |
+| `BO-458` | Expiry Monitoring & Upcoming Expiration | Games & Rides | 3 | 0 | yes |
+| `BO-459` | Card Expiry Runtime Validation | Games & Rides | 3 | 0 | yes |
+| `BO-460` | Card Block, Suspend & Reactivation Control | Games & Rides | 3 | 0 | yes |
+| `BO-461` | Card Replacement & Wallet Relinking | Games & Rides | 3 | 0 | yes |
+| `BO-462` | Customer Balance & Credential Status View | Games & Rides | 3 | 0 | yes |
+| `BO-463` | Card Lifecycle Audit & History | Games & Rides | 3 | 0 | yes |
+| `BO-464` | Game & Ride Operations Control Center | Games & Rides | 3 | 0 | yes |
+| `BO-465` | Live Gameplay Transaction Monitor | Games & Rides | 3 | 0 | yes |
+| `BO-466` | Reader & Device Health Monitor | Games & Rides | 3 | 0 | yes |
+| `BO-467` | Tap Validation & Decision Trace | Games & Rides | 3 | 0 | yes |
+| `BO-468` | Rejected Transaction & Reason Analysis | Games & Rides | 3 | 0 | yes |
+| `BO-469` | Wallet & Deduction Transaction Monitor | Games & Rides | 3 | 0 | yes |
+| `BO-470` | Entitlement & Free-Play Consumption Monitor | Games & Rides | 3 | 0 | yes |
+| `BO-471` | Offline, Synchronization & Recovery Monitor | Games & Rides | 3 | 0 | yes |
+| `BO-472` | Operational Alerts & Exception Center | Games & Rides | 3 | 0 | yes |
+| `BO-473` | Operational Analytics & Reconciliation Dashboard | Games & Rides | 3 | 0 | yes |
+| `BO-474` | Reader Integration Command Center | Games & Rides | 3 | 0 | yes |
+| `BO-475` | Reader Manufacturer & Model Profile | Games & Rides | 3 | 0 | yes |
+| `BO-476` | Communication Protocol Configuration | Games & Rides | 3 | 0 | yes |
+| `BO-477` | Reader Command & Event Mapping | Games & Rides | 3 | 0 | yes |
+| `BO-478` | Reader Configuration Deployment & Synchronization | Games & Rides | 3 | 0 | yes |
+| `BO-479` | Game Trigger & I/O Control Mapping | Games & Rides | 3 | 0 | yes |
+| `BO-480` | Reader Screen, LED & Sound Output Mapping | Games & Rides | 3 | 0 | yes |
+| `BO-481` | Edge Cache & Offline Rule Package | Games & Rides | 3 | 0 | yes |
+| `BO-482` | Device Diagnostics & Integration Logs | Games & Rides | 3 | 0 | yes |
+| `BO-483` | Integration Certification & Test Console | Games & Rides | 3 | 0 | yes |
+| `BO-484` | Self-Service Experience Command Center | Games & Rides | 3 | 0 | yes |
+| `BO-485` | Self-Service Kiosk Profile & Channel Configuration | Games & Rides | 3 | 0 | yes |
+| `BO-486` | Customer Card / Wallet Identification | Games & Rides | 3 | 0 | yes |
+| `BO-487` | Customer Wallet & Balance Summary | Games & Rides | 3 | 0 | yes |
+| `BO-488` | Self-Service Wallet Top-Up | Games & Rides | 3 | 0 | yes |
+| `BO-489` | Bonus, Free Game & Benefit View | Games & Rides | 3 | 0 | yes |
+| `BO-490` | Game & Ride Eligibility / “What Can I Play?” | Games & Rides | 3 | 0 | yes |
+| `BO-491` | Redemption Balance & Prize Discovery | Games & Rides | 3 | 0 | yes |
+| `BO-492` | Customer Game & Wallet Transaction History | Games & Rides | 3 | 0 | yes |
+| `BO-493` | Self-Service UI Theme, Language & Journey Configuration | Games & Rides | 3 | 0 | yes |
+| `BO-494` | Rental Product Command Center | Rentals | 3 | 0 | yes |
+| `BO-495` | Create Rental Product Wizard | Rentals | 3 | 0 | yes |
+| `BO-496` | Rental Product Profile | Rentals | 3 | 0 | yes |
+| `BO-497` | Rental Category & Classification Setup | Rentals | 3 | 0 | yes |
+| `BO-498` | Inventory Tracking Model | Rentals | 3 | 0 | yes |
+| `BO-499` | Rental Location Assignment | Rentals | 3 | 0 | yes |
+| `BO-500` | Rental Duration & Turnaround Configuration | Rentals | 3 | 0 | yes |
+| `BO-501` | Rental Rules & Operational Policy | Rentals | 3 | 0 | yes |
+| `BO-502` | Customer Requirements, Agreement & Waiver | Rentals | 3 | 0 | yes |
+| `BO-503` | Product Validation, Approval & Publication | Rentals | 3 | 0 | yes |
+| `BO-504` | Rental Inventory Command Center | Rentals | 3 | 0 | yes |
+| `BO-505` | Serialized Equipment Registry | Rentals | 3 | 0 | yes |
+| `BO-506` | Equipment / Asset Profile | Rentals | 3 | 0 | yes |
+| `BO-507` | Pooled Inventory Management | Rentals | 3 | 0 | yes |
+| `BO-508` | Equipment Status & Condition Management | Rentals | 3 | 0 | yes |
+| `BO-509` | QR / Barcode Equipment Identification | Rentals | 3 | 0 | yes |
+| `BO-510` | Inventory Location Allocation | Rentals | 3 | 0 | yes |
+| `BO-511` | Inventory Transfer Management | Rentals | 3 | 0 | yes |
+| `BO-512` | Inventory Adjustment & Exception Management | Rentals | 3 | 0 | yes |
+| `BO-513` | Inventory Intelligence & Rebalancing | Rentals | 3 | 0 | yes |
+| `BO-514` | Availability Command Center | Rentals | 3 | 0 | yes |
+| `BO-515` | Availability Rule Configuration | Rentals | 3 | 0 | yes |
+| `BO-516` | Operating Hours & Rental Windows | Rentals | 3 | 0 | yes |
+| `BO-517` | Timeslot & Duration Availability Setup | Rentals | 3 | 0 | yes |
+| `BO-518` | Real-Time Availability Calendar | Rentals | 3 | 0 | yes |
+| `BO-519` | Resource / Equipment Calendar | Rentals | 3 | 0 | yes |
+| `BO-520` | Blackout, Closure & Capacity Blocking | Rentals | 3 | 0 | yes |
+| `BO-521` | Overlap & Conflict Engine | Rentals | 3 | 0 | yes |
+| `BO-522` | Inventory Holds, Buffers & Release Rules | Rentals | 3 | 0 | yes |
+| `BO-523` | Availability Intelligence & AI Forecasting | Rentals | 3 | 0 | yes |
+| `BO-524` | Rental Pricing Command Center | Rentals | 3 | 0 | yes |
+| `BO-525` | Pricing Profile Builder | Rentals | 3 | 0 | yes |
+| `BO-526` | Duration & Tiered Pricing Configuration | Rentals | 3 | 0 | yes |
+| `BO-527` | Calendar, Peak & Seasonal Pricing | Rentals | 3 | 0 | yes |
+| `BO-528` | Dynamic Pricing & AI Recommendation | Rentals | 3 | 0 | yes |
+| `BO-529` | Deposit & Security Hold Policy | Rentals | 3 | 0 | yes |
+| `BO-530` | Deposit Lifecycle & Settlement Rules | Rentals | 3 | 0 | yes |
+| `BO-531` | Late Fee, Grace Period & Extension Pricing | Rentals | 3 | 0 | yes |
+| `BO-532` | Commercial Exceptions, Waivers & Overrides | Rentals | 3 | 0 | yes |
+| `BO-533` | Pricing Simulation, Validation & AI Commercial Intelligence | Rentals | 3 | 0 | yes |
+| `BO-534` | Rental Booking Command Center | Rentals | 3 | 0 | yes |
+| `BO-535` | New Rental Booking Wizard | Rentals | 3 | 0 | yes |
+| `BO-536` | Availability Selection & Alternative Options | Rentals | 3 | 0 | yes |
+| `BO-537` | Customer & Participant Information | Rentals | 3 | 0 | yes |
+| `BO-538` | Group Rental & Participant Management | Rentals | 3 | 0 | yes |
+| `BO-539` | Rental Agreement & Waiver Completion | Rentals | 3 | 0 | yes |
+| `BO-540` | Booking Commercial Summary & Payment | Rentals | 3 | 0 | yes |
+| `BO-541` | Reservation Confirmation & QR Voucher | Rentals | 3 | 0 | yes |
+| `BO-542` | Reservation Modification, Cancellation & No-Show | Rentals | 3 | 0 | yes |
+| `BO-543` | Reservation Detail, Timeline & Readiness | Rentals | 3 | 0 | yes |
+| `BO-544` | Rental Checkout Command Center | Rentals | 3 | 0 | yes |
+| `BO-545` | Voucher Scan & Reservation Retrieval | Rentals | 3 | 0 | yes |
+| `BO-546` | Checkout Readiness Validation | Rentals | 3 | 0 | yes |
+| `BO-547` | Equipment Assignment Workspace | Rentals | 3 | 0 | yes |
+| `BO-548` | Equipment Scan & Validation | Rentals | 3 | 0 | yes |
+| `BO-549` | Pre-Rental Condition Inspection | Rentals | 3 | 0 | yes |
+| `BO-550` | Safety & Handover Checklist | Rentals | 3 | 0 | yes |
+| `BO-551` | Deposit & Financial Handover Validation | Rentals | 3 | 0 | yes |
+| `BO-552` | Group & Multi-Item Checkout | Rentals | 3 | 0 | yes |
+| `BO-553` | Checkout Confirmation & Rental Activation | Rentals | 3 | 0 | yes |
+| `BO-554` | Active Rental Operations Command Center | Rentals | 3 | 0 | yes |
+| `BO-555` | Active Rental Detail & Live Timeline | Rentals | 3 | 0 | yes |
+| `BO-556` | Rental Extension Request | Rentals | 3 | 0 | yes |
+| `BO-557` | Extension Pricing & Confirmation | Rentals | 3 | 0 | yes |
+| `BO-558` | Equipment Swap / Replacement | Rentals | 3 | 0 | yes |
+| `BO-559` | Rental Incident & Operational Exception | Rentals | 3 | 0 | yes |
+| `BO-560` | Due Soon & Customer Notification Management | Rentals | 3 | 0 | yes |
+| `BO-561` | Overdue Rental Management | Rentals | 3 | 0 | yes |
+| `BO-562` | Active Group Rental Management | Rentals | 3 | 0 | yes |
+| `BO-563` | Active Rental Intelligence & Operational Alerts | Rentals | 3 | 0 | yes |
+| `BO-564` | Rental Return Command Center | Rentals | 3 | 0 | yes |
+| `BO-565` | Return Scan & Rental Retrieval | Rentals | 3 | 0 | yes |
+| `BO-566` | Return Summary & Actual Return Time | Rentals | 3 | 0 | yes |
+| `BO-567` | Post-Rental Condition Inspection | Rentals | 3 | 0 | yes |
+| `BO-568` | Before vs After Condition Comparison | Rentals | 3 | 0 | yes |
+| `BO-569` | Damage Assessment & Charge Workflow | Rentals | 3 | 0 | yes |
+| `BO-570` | Partial Return & Missing Equipment | Rentals | 3 | 0 | yes |
+| `BO-571` | Late Fees, Damage Fees & Final Settlement | Rentals | 3 | 0 | yes |
+| `BO-572` | Deposit Release, Capture & Customer Confirmation | Rentals | 3 | 0 | yes |
+| `BO-573` | Return Completion & Equipment Disposition | Rentals | 3 | 0 | yes |
+| `BO-574` | Maintenance Command Center | Rentals | 3 | 0 | yes |
+| `BO-575` | Maintenance Rule & Service Plan Configuration | Rentals | 3 | 0 | yes |
+| `BO-576` | Maintenance Calendar & Scheduling | Rentals | 3 | 0 | yes |
+| `BO-577` | Maintenance Work Order | Rentals | 3 | 0 | yes |
+| `BO-578` | Technician Repair Workspace | Rentals | 3 | 0 | yes |
+| `BO-579` | Parts, Cost & Maintenance Expense Tracking | Rentals | 3 | 0 | yes |
+| `BO-580` | Asset Maintenance History & Lifecycle | Rentals | 3 | 0 | yes |
+| `BO-581` | Return-to-Service Inspection & Approval | Rentals | 3 | 0 | yes |
+| `BO-582` | Asset Retirement, Write-Off & Replacement Recommendation | Rentals | 3 | 0 | yes |
+| `BO-583` | Maintenance Intelligence & Predictive AI | Rentals | 3 | 0 | yes |
+| `BO-584` | Rental Executive Command Center | Rentals | 3 | 0 | yes |
+| `BO-585` | Rental Revenue & Commercial Analytics | Rentals | 3 | 0 | yes |
+| `BO-586` | Utilization & Capacity Analytics | Rentals | 3 | 0 | yes |
+| `BO-587` | Inventory & Equipment Performance Analytics | Rentals | 3 | 0 | yes |
+| `BO-588` | Rental Duration, Extension & Return Analytics | Rentals | 3 | 0 | yes |
+| `BO-589` | Damage, Loss, Deposit & Exception Analytics | Rentals | 3 | 0 | yes |
+| `BO-590` | Location & Channel Performance | Rentals | 3 | 0 | yes |
+| `BO-591` | Rental Forecasting & Demand Intelligence | Rentals | 3 | 0 | yes |
+| `BO-592` | Audit, Governance & Operational Control | Rentals | 3 | 0 | yes |
+| `BO-593` | AI Rental Management Copilot & Action Center | Rentals | 3 | 0 | yes |
+| `BO-594` | Environment Ready & Handoff to AI Setup | Setup & Go-Live | 3 | 0 | yes |
+| `BO-595` | AI Setup Command Center | Setup & Go-Live | 3 | 0 | yes |
+| `BO-596` | Guided Setup Plan | Setup & Go-Live | 3 | 0 | yes |
+| `BO-597` | AI Configuration Workspace | Setup & Go-Live | 3 | 0 | yes |
+| `BO-598` | AI Draft Review & Approval | Setup & Go-Live | 3 | 0 | yes |
+| `BO-599` | Manual Configuration Center | Setup & Go-Live | 3 | 0 | yes |
+| `BO-600` | Venue, Calendar & Operational Setup | Setup & Go-Live | 3 | 0 | yes |
+| `BO-601` | Product, Pricing & Sales Channel Setup | Setup & Go-Live | 3 | 0 | yes |
+| `BO-602` | POS, Payment & Access Setup | Setup & Go-Live | 3 | 0 | yes |
+| `BO-603` | Configuration Health & AI Review | Setup & Go-Live | 3 | 0 | yes |
+| `BO-604` | Setup Completion & Handoff to Go-Live | Setup & Go-Live | 3 | 0 | yes |
+| `BO-605` | Go-Live Readiness Command Center | Setup & Go-Live | 3 | 0 | yes |
+| `BO-606` | Automated Validation Plan | Setup & Go-Live | 3 | 0 | yes |
+| `BO-607` | Ticketing & Product Validation | Setup & Go-Live | 3 | 0 | yes |
+| `BO-608` | End-to-End Sales Channel Testing | Setup & Go-Live | 3 | 0 | yes |
+| `BO-609` | Payment & Financial Validation | Setup & Go-Live | 3 | 0 | yes |
+| `BO-610` | Ticket, QR & Access Validation | Setup & Go-Live | 3 | 0 | yes |
+| `BO-611` | User, Security & Integration Validation | Setup & Go-Live | 3 | 0 | yes |
+| `BO-612` | Communication & Customer Journey Validation | Setup & Go-Live | 3 | 0 | yes |
+| `BO-613` | Blocker, Warning & AI Resolution Center | Setup & Go-Live | 3 | 0 | yes |
+| `BO-614` | Final Go-Live Approval & Production Launch | Setup & Go-Live | 3 | 0 | yes |
 

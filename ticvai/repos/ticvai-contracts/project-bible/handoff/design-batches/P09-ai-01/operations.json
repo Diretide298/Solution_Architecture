@@ -1,0 +1,72 @@
+{
+ "listAiProviders": {
+  "method": "GET",
+  "path": "/providers",
+  "contract": "ai",
+  "summary": "Configured providers and their order",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AiProvider"
+ },
+ "setAiCredential": {
+  "method": "PUT",
+  "path": "/ai-providers/{providerId}/credential",
+  "contract": "ai",
+  "summary": "Store or rotate a provider key",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "AiProvider"
+ },
+ "setAiProvider": {
+  "method": "PUT",
+  "path": "/providers",
+  "contract": "ai",
+  "summary": "Configure a provider",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AiProvider",
+  "responds": "AiProvider"
+ },
+ "testAiProvider": {
+  "method": "POST",
+  "path": "/ai-providers/{providerId}/test",
+  "contract": "ai",
+  "summary": "Check the key works before anyone relies on it",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ }
+}

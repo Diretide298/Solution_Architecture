@@ -1,0 +1,104 @@
+[
+ {
+  "id": "WEB-029",
+  "name": "Error / Sold Out / Maintenance",
+  "module": "System States",
+  "requiresModule": "core",
+  "wave": 1,
+  "capability": "C57",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/system-states/error-sold-out-maintenance",
+   "component": "apps/guest-web/src/routes/system-states/ErrorSoldOutMaintenanceDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "inferred": true,
+   "exitTo": [
+    "WEB-001"
+   ]
+  },
+  "notes": "Tenant-branded. An unbranded error page inside a tenant's storefront reads as the tenant's failure, not ours. Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "density": "compact",
+  "pattern": "statusTracker",
+  "patternReason": "`getTenantAppStatus` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Say what is wrong in a way that tells the person whether to wait or leave.",
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected error sold out",
+       "bindsTo": "TenantAppStatus",
+       "columns": [
+        "TenantAppStatus.isPublished",
+        "TenantAppStatus.publishedVersion",
+        "TenantAppStatus.publishedAt",
+        "TenantAppStatus.draftVersion",
+        "TenantAppStatus.hasUnpublishedChanges",
+        "TenantAppStatus.activeModuleCount",
+        "TenantAppStatus.licensedModuleCount",
+        "TenantAppStatus.activePageCount",
+        "TenantAppStatus.isInMaintenance",
+        "TenantAppStatus.maintenanceMessage",
+        "TenantAppStatus.expectedBackAt",
+        "TenantAppStatus.recentChanges"
+       ],
+       "operation": "getTenantAppStatus",
+       "provenance": "contract white-label.yaml GET /tenant-config/status"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "—",
+   "error": "**This screen is the error state.** It distinguishes sold out, closed, and platform unavailable — three different things a guest must not confuse, because only one means come back later",
+   "emptyFirstRun": "—",
+   "emptyNoResults": "The filter narrowed it and the error sold out are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getTenantAppStatus",
+    "contract": "white-label",
+    "purpose": "from page inventory",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-029"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

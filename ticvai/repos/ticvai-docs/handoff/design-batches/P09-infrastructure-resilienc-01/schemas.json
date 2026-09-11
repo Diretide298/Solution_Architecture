@@ -1,0 +1,482 @@
+{
+ "ArchivalJob": {
+  "type": "object",
+  "x-ticvai-persistence": "control.archival_job",
+  "description": "**Drafted 4 September.** One archival or retention run. Retention is a legal obligation, so a stalled job is a compliance failure rather than a housekeeping one.",
+  "required": [
+   "id"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "cellId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "policyName": {
+    "type": "string"
+   },
+   "targetTable": {
+    "type": "string"
+   },
+   "rowsArchived": {
+    "type": "integer"
+   },
+   "rowsPurged": {
+    "type": "integer"
+   },
+   "state": {
+    "type": "string",
+    "enum": [
+     "scheduled",
+     "running",
+     "succeeded",
+     "failed"
+    ]
+   },
+   "runAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "error": {
+    "type": "string"
+   }
+  }
+ },
+ "BackupRun": {
+  "type": "object",
+  "x-ticvai-persistence": "control.backup_run",
+  "description": "**Drafted 4 September.** One backup run. The question this answers is not *did it run* but *how old is the newest restorable copy* - a job that succeeds nightly against an empty database succeeds forever.",
+  "required": [
+   "id"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "cellId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scope": {
+    "type": "string",
+    "enum": [
+     "cell",
+     "tenant"
+    ]
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "state": {
+    "type": "string",
+    "enum": [
+     "running",
+     "succeeded",
+     "failed"
+    ]
+   },
+   "sizeBytes": {
+    "type": "integer"
+   },
+   "restoreTestedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "**A backup nobody has restored is a hypothesis.**"
+   },
+   "error": {
+    "type": "string"
+   }
+  }
+ },
+ "Cell": {
+  "x-ticvai-persistence": "control.cell",
+  "x-ticvai-retired-columns": [
+   "tenant_id"
+  ],
+  "type": "object",
+  "required": [
+   "id",
+   "name",
+   "regionId",
+   "countryCode",
+   "tier",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/CellKind"
+   },
+   "clusterId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "isReachable": {
+    "type": "boolean",
+    "default": true,
+    "description": "False for `onPremise`. The Control Plane holds the record for licensing and support and **cannot reach the installation** — it may sit behind a firewall with no inbound route. Every operation assuming reachability must handle absence rather than timing out, and a cell that has not called home for a month is not necessarily broken.\n"
+   },
+   "lastContactAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When the site last called out. The only liveness signal for an unreachable cell, and the number a support engineer asks for first.\n"
+   },
+   "licenceExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "On-premise only. Licensing cannot be enforced by a Control Plane the site cannot reach, so a signed licence file is verified locally. **An expired licence degrades rather than stops** — a venue whose gates refuse entry because a licence lapsed over a weekend is worse than one running unlicensed until Monday.\n"
+   },
+   "participatesInCrossCell": {
+    "type": "boolean",
+    "default": true,
+    "description": "False by default for `onPremise`. Redeeming a pass issued elsewhere requires reaching the issuing cell at that moment, and an on-premise site may not be able to. Exclusion is the honest default; local-then-reconcile carries a double-redemption risk that needs a decision rather than an assumption.\n"
+   },
+   "regionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "regionName": {
+    "type": "string"
+   },
+   "countryCode": {
+    "type": "string"
+   },
+   "tier": {
+    "$ref": "#/components/schemas/CellTier"
+   },
+   "status": {
+    "$ref": "#/components/schemas/CellStatus"
+   },
+   "cloudProvider": {
+    "type": "string",
+    "nullable": true
+   },
+   "cloudRegion": {
+    "type": "string",
+    "nullable": true
+   },
+   "apiEndpoint": {
+    "type": "string",
+    "nullable": true
+   },
+   "venueCount": {
+    "type": "integer"
+   },
+   "provisionedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "deploymentRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "**A pointer to where this cell runs, not a description of it.** A Kubernetes namespace, an ECS cluster ARN, a stack name — whatever the orchestrator calls the thing.\n\n**The platform does not model instances, nodes or shards** (31 August). Kubernetes already holds instance counts and they change by the second; a table copying them drifts within minutes and the copy would win.\n\n**The line is: routing decisions belong to the platform, provisioning facts belong to the orchestrator.** Qdrant is the proof — ADR-0021 makes the tenant *the* shard key, so nine operations route without a lookup and **a stored shard assignment would be a second copy of something derivable.**\n\n**CF-161 needed a table after all, and this said it did not.** The claim here was that one database per cell or one per service is a build-time decision and the DDL is identical either way. **ADR-0038 answered it per tenant**, which drops `Cell.tenantId`, adds `CellTenant`, `RolloutTenant` and a per-tenant migration row, and takes `control` out of the tenant template. `tools/derive-ddl.py` carried the same claim in its docstring.\n\n**A claim that a question cannot affect your artefact is the one most likely to be left standing after it does**, which is why the correction is recorded here rather than the sentence simply deleted."
+   }
+  }
+ },
+ "CellCapacity": {
+  "type": "object",
+  "x-ticvai-persistence": "none — measured, not stored",
+  "required": [
+   "cellId",
+   "isConstrained",
+   "dimensions",
+   "measuredAt"
+  ],
+  "properties": {
+   "cellId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/CellKind"
+   },
+   "tenantCount": {
+    "type": "integer",
+    "description": "Reported, and **deliberately not the sizing signal.** Forty quiet tenants may load a cell less than three busy ones.\n"
+   },
+   "isConstrained": {
+    "type": "boolean"
+   },
+   "constrainedDimension": {
+    "type": "string",
+    "nullable": true
+   },
+   "dimensions": {
+    "type": "array",
+    "description": "Per dimension, because the response differs. Short of connections and long on storage is a different problem from short of both.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "dimension",
+      "used",
+      "headroom"
+     ],
+     "properties": {
+      "dimension": {
+       "type": "string",
+       "enum": [
+        "concurrentUsers",
+        "transactionsPerSecond",
+        "scansPerSecond",
+        "databaseConnections",
+        "storageGb",
+        "replicationLag",
+        "cpu"
+       ]
+      },
+      "used": {
+       "type": "number"
+      },
+      "limit": {
+       "type": "number"
+      },
+      "headroom": {
+       "type": "number",
+       "description": "Fraction remaining. Negative means already over."
+      },
+      "peakAt": {
+       "type": "string",
+       "format": "date-time",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "forecastBreachAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When the constrained dimension is projected to run out at the current trend. Null where there is no trend to project — an honest null beats an invented date.\n"
+   },
+   "measuredAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "CellDetail": {
+  "x-ticvai-persistence": "control.cell",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/Cell"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "health": {
+      "$ref": "#/components/schemas/CellHealth"
+     },
+     "activeJobs": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/CellJob"
+      }
+     }
+    }
+   }
+  ]
+ },
+ "CellHealth": {
+  "x-ticvai-persistence": "none — polled, not stored",
+  "type": "object",
+  "required": [
+   "cellId",
+   "isHealthy",
+   "schemaVersion",
+   "checkedAt"
+  ],
+  "properties": {
+   "cellId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "isHealthy": {
+    "type": "boolean"
+   },
+   "schemaVersion": {
+    "type": "string",
+    "description": "From the cell's version register. Skew across a tenant's cells is expected during rollout; unexplained skew is a defect.\n"
+   },
+   "isSchemaBehind": {
+    "type": "boolean"
+   },
+   "databaseStatus": {
+    "type": "string"
+   },
+   "replicationLagSeconds": {
+    "type": "number",
+    "nullable": true
+   },
+   "lastBackupAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "lastRestoreDrillAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "checkedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "CellJob": {
+  "x-ticvai-persistence": "control.cell_job",
+  "type": "object",
+  "required": [
+   "id",
+   "cellId",
+   "kind",
+   "status",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "cellId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "provision",
+     "tierMigration",
+     "schemaMigration",
+     "backup",
+     "restore",
+     "decommission"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "queued",
+     "running",
+     "completed",
+     "failed",
+     "rolledBack"
+    ]
+   },
+   "progressPercent": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 100
+   },
+   "message": {
+    "type": "string",
+    "nullable": true
+   },
+   "error": {
+    "type": "string",
+    "nullable": true
+   },
+   "scheduledFor": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "CellKind": {
+  "type": "string",
+  "description": "Four deployment models (ADR-0017). `shared` is the default; the others exist because a client asked or a law requires it.\n\n\n**`burst` added 31 August.** An environment stood up for one on-sale and torn down after (CF-162 scenario c). **It is not a jurisdiction and it is not permanent** — it holds a catalogue snapshot, three services of sixteen, and 17 tables of 380.\n\n**The other four are places data lives. This one is a place data passes through**, which is why it has its own lifecycle and a reconciliation obligation the others do not.",
+  "enum": [
+   "shared",
+   "dedicated",
+   "onPremise",
+   "controlPlane",
+   "burst"
+  ]
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "ScalingPolicy": {
+  "type": "object",
+  "x-ticvai-persistence": "control.scaling_policy",
+  "description": "**Drafted 4 September.** What a cell scales on. **A floor and a ceiling are not symmetric** - the floor is the size the environment is stood up at before traffic arrives, and the ceiling is a cap on absorbing a peak nobody predicted (ADR-0035).",
+  "required": [
+   "id"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "cellId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "service": {
+    "type": "string"
+   },
+   "replicaFloor": {
+    "type": "integer"
+   },
+   "replicaCeiling": {
+    "type": "integer",
+    "description": "Null means no maximum, which is the correct setting for a burst cell."
+   },
+   "targetUtilisationPct": {
+    "type": "integer"
+   },
+   "scaleStepPct": {
+    "type": "integer"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ }
+}

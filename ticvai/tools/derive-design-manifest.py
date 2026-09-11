@@ -40,6 +40,9 @@ from pathlib import Path
 
 import yaml
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import workshop_boards  # noqa: E402  -- WS codes are issued once, not enumerated
+
 ROOT = Path(__file__).resolve().parents[1]
 SCREENS = ROOT / "screens"
 FRAMES = ROOT / "wireframes" / "frames"
@@ -106,11 +109,26 @@ def collect() -> tuple[list, dict]:
             else:
                 modules.setdefault((code, s.get("module") or "Screens"), []).append(s["id"])
 
+    # **A workshop board is drawn on one platform.** One brief carries one form factor, so a board
+    # whose screens were placed on two platforms keeps its code for the majority and sends the rest
+    # to their own platform's module batches. Found 11 September: Subscription 6.10 moved to P08
+    # while 6.1–6.9 stayed on P09, and sorting by id would have drawn a P08 screen in a P09 batch.
+    home = workshop_boards.home_platforms(
+        (key, screens[i][0], (screens[i][1].get("source") or {}).get("number"))
+        for key, ids in workshop.items() for i in ids)
+    for key in list(workshop):
+        strays = [i for i in workshop[key] if screens[i][0] != home[key]]
+        workshop[key] = [i for i in workshop[key] if screens[i][0] == home[key]]
+        for i in strays:
+            code, s = screens[i]
+            modules.setdefault((code, s.get("module") or "Screens"), []).append(i)
+
     batches = []
-    for i, key in enumerate(sorted(workshop), 1):
+    ws = workshop_boards.codes(workshop, write=True)
+    for key in sorted(workshop, key=lambda k: int(ws[k][2:])):
         ids = sorted(workshop[key])
         batches.append({
-            "id": "WS%02d" % i,
+            "id": ws[key],
             "kind": "workshop",
             "label": "%s board %d" % key,
             "platform": screens[ids[0]][0],
@@ -161,7 +179,9 @@ def main() -> int:
     # so those wait for specification rather than for design time. Within a tier, `id` order —
     # a stable order means two people picking "the next batch" pick the same one.
     order = {"pending": 0, "partial": 0, "drawn": 1, "locked": 2}
-    batches.sort(key=lambda b: (order[b["status"]], b["thin"] > 0, b["thin"], b["id"]))
+    # Natural order on the id: as text, `WS100`–`WS107` sorted ahead of `WS11`.
+    batches.sort(key=lambda b: (order[b["status"]], b["thin"] > 0, b["thin"],
+                                [int(t) if t.isdigit() else t for t in re.split(r"(\d+)", b["id"])]))
 
     doc = {
         "generatedBy": "tools/derive-design-manifest.py",

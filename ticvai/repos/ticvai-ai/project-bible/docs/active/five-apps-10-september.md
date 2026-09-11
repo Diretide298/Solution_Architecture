@@ -26,9 +26,11 @@ Absorbs P08, P12, P13, P16.
 
 ## TICVAI Control (`ticvai-control`)
 
-Absorbs P09, P10, P11, P14.
+Absorbs P09, P10, P11, P14, and P17 since 11 September.
 
-**TICVAI operates all four**, whoever signs in. The partner portal, the accreditation intake and the developer portal are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line.
+**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line.
+
+**P17 TICVAI Sign-up was added on 11 September, and the app count did not change.** The Subscription book's boards 2, 4 and 5 are a business buying TICVAI before it is a tenant. Nothing served from a cell can reach somebody with no cell, and ADR-0043 already puts the onboarding application in the control plane — so the door is a fifth face of this app, not a sixth app. **Its users are the least trusted of the five**: anonymous, on an unmanaged device, on the public internet, before any identity exists. Every onboarding operation in `subscription.yaml` is authenticated today, which is the gap P17 exposes rather than closes.
 
 ## The turnstile
 

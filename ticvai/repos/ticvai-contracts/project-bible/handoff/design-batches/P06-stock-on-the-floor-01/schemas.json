@@ -1,0 +1,1423 @@
+{
+ "Alert": {
+  "type": "object",
+  "x-ticvai-persistence": "reporting.alert",
+  "description": "A raised alert. **Acknowledged rather than dismissed** — CF-134 asked for it markable, and the difference is that an acknowledgement records who saw it.\n",
+  "required": [
+   "id",
+   "ruleId",
+   "raisedAt",
+   "severity",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "ruleId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "raisedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "info",
+     "warning",
+     "critical"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "raised",
+     "acknowledged",
+     "resolved",
+     "expired"
+    ]
+   },
+   "observedValue": {
+    "type": "number"
+   },
+   "threshold": {
+    "type": "number"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "acknowledgedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "acknowledgedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**Set when the metric returns to range, automatically.** An alert that only a person can close is an alert list that only grows.\n"
+   },
+   "escalatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Where `VenueSettings.alerting.escalateAfterMinutes` passed with no acknowledgement. **A critical alert nobody acknowledged is the case escalation exists for.**\n"
+   }
+  }
+ },
+ "ColdChainEvent": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.cold_chain_event",
+  "description": "Board 5G. **A delivery arriving warm is a rejection decision made at the door**, and the package had `createGoodsReceipt` with nowhere to record the temperature it arrived at.\n**The reading is taken before the receipt is posted**, not after — once stock is received it has entered the kitchen, and a claim against a supplier needs the reading that refused it.\n",
+  "required": [
+   "id",
+   "recordedAt",
+   "valueCelsius",
+   "decision"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "goodsReceiptId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "transferId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "valueCelsius": {
+    "type": "number"
+   },
+   "thresholdCelsius": {
+    "type": "number"
+   },
+   "decision": {
+    "type": "string",
+    "enum": [
+     "accepted",
+     "acceptedWithNote",
+     "partiallyRejected",
+     "rejected"
+    ]
+   },
+   "correctiveActionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "supplierClaimRaised": {
+    "type": "boolean",
+    "default": false
+   }
+  }
+ },
+ "CorrectiveAction": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.corrective_action",
+  "description": "What was done about a finding, and who signed it. **Opened automatically by an out-of-range reading or a cold-chain breach**, because an action that depends on somebody remembering to raise it is an action that is not raised.\n**Signed by a named principal, and the signature is the record.** *Discarded and reset* with nobody against it is not a corrective action.\n",
+  "required": [
+   "id",
+   "raisedAt",
+   "source",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "raisedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "source": {
+    "type": "string",
+    "enum": [
+     "temperatureExcursion",
+     "coldChainBreach",
+     "expiredStock",
+     "contamination",
+     "pestSighting",
+     "equipmentFailure",
+     "manual"
+    ]
+   },
+   "sourceRef": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "observation",
+     "minor",
+     "major",
+     "critical"
+    ]
+   },
+   "actionTaken": {
+    "type": "string",
+    "nullable": true
+   },
+   "disposal": {
+    "type": "string",
+    "enum": [
+     "none",
+     "discarded",
+     "reworked",
+     "quarantined",
+     "returned"
+    ],
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "open",
+     "actioned",
+     "signed",
+     "escalated",
+     "closed"
+    ]
+   },
+   "signedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "signedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "escalatedToPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**A critical finding a shift cannot close.** Escalation exists so a supervisor signs what a cook should not.\n"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "CountStatus": {
+  "type": "string",
+  "enum": [
+   "open",
+   "counting",
+   "closed",
+   "variancePending",
+   "posted",
+   "cancelled"
+  ]
+ },
+ "CountVariance": {
+  "x-ticvai-persistence": "none — computed at close",
+  "type": "object",
+  "required": [
+   "countId",
+   "totalVarianceValue",
+   "lines"
+  ],
+  "properties": {
+   "countId": {
+    "type": "string"
+   },
+   "totalVarianceValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "exceptionCount": {
+    "type": "integer",
+    "description": "Lines beyond tolerance, requiring review before posting."
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "itemId",
+      "expectedQuantity",
+      "countedQuantity",
+      "variance",
+      "isException"
+     ],
+     "properties": {
+      "itemId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "itemName": {
+       "type": "string"
+      },
+      "sku": {
+       "type": "string"
+      },
+      "expectedQuantity": {
+       "type": "number"
+      },
+      "countedQuantity": {
+       "type": "number"
+      },
+      "variance": {
+       "type": "number"
+      },
+      "variancePercentage": {
+       "type": "number"
+      },
+      "varianceValue": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "isException": {
+       "type": "boolean"
+      },
+      "recountCount": {
+       "type": "integer",
+       "description": "A line counted several times is itself a finding."
+      },
+      "note": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "CreateGoodsReceiptRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "purchaseOrderId",
+   "locationId",
+   "lines",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "purchaseOrderId": {
+    "type": "string"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "deliveryNoteReference": {
+    "type": "string",
+    "maxLength": 128
+   },
+   "lines": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "itemId",
+      "receivedQuantity"
+     ],
+     "properties": {
+      "itemId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "receivedQuantity": {
+       "type": "number",
+       "minimum": 0
+      },
+      "unit": {
+       "type": "string"
+      },
+      "batchNumber": {
+       "type": "string",
+       "maxLength": 64
+      },
+      "expiryDate": {
+       "type": "string",
+       "format": "date",
+       "description": "Required for perishable items."
+      },
+      "note": {
+       "type": "string",
+       "maxLength": 200
+      }
+     }
+    }
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "CreateRequisitionRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "venueId",
+   "lines",
+   "requiredBy"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "departmentId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "costCenterId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "lines": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "itemId",
+      "quantity"
+     ],
+     "properties": {
+      "itemId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "quantity": {
+       "type": "number",
+       "minimum": 0
+      },
+      "unit": {
+       "type": "string"
+      },
+      "note": {
+       "type": "string",
+       "maxLength": 200
+      }
+     }
+    }
+   },
+   "requiredBy": {
+    "type": "string",
+    "format": "date"
+   },
+   "justification": {
+    "type": "string",
+    "maxLength": 1000
+   }
+  }
+ },
+ "CreateStockMovementRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "itemId",
+   "locationId",
+   "kind",
+   "quantity",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "itemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/MovementKind"
+   },
+   "quantity": {
+    "type": "number",
+    "description": "Positive increases stock, negative decreases it."
+   },
+   "unit": {
+    "type": "string"
+   },
+   "reason": {
+    "type": "string",
+    "maxLength": 500,
+    "description": "Required for adjustments, which are reported separately."
+   },
+   "costCenterId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "CreateStockTransferRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "fromLocationId",
+   "toLocationId",
+   "lines",
+   "recordedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "fromLocationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "toLocationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "lines": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "itemId",
+      "quantity"
+     ],
+     "properties": {
+      "itemId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "quantity": {
+       "type": "number",
+       "minimum": 0
+      },
+      "unit": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 500
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "GoodsReceipt": {
+  "x-ticvai-persistence": "inventory.goods_receipt + inventory.goods_receipt_line",
+  "type": "object",
+  "required": [
+   "id",
+   "receiptNumber",
+   "purchaseOrderId",
+   "locationId",
+   "lines",
+   "receivedByPrincipalId",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "receiptNumber": {
+    "type": "string"
+   },
+   "purchaseOrderId": {
+    "type": "string"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "deliveryNoteReference": {
+    "type": "string",
+    "nullable": true
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "itemId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "itemName": {
+       "type": "string"
+      },
+      "orderedQuantity": {
+       "type": "number"
+      },
+      "receivedQuantity": {
+       "type": "number"
+      },
+      "rejectedQuantity": {
+       "type": "number"
+      },
+      "batchNumber": {
+       "type": "string",
+       "nullable": true
+      },
+      "expiryDate": {
+       "type": "string",
+       "format": "date",
+       "nullable": true
+      },
+      "unitCost": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "totalValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "receivedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "journalEntryId": {
+    "type": "string",
+    "nullable": true,
+    "description": "The accrual the supplier invoice will later match against."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "LocationKind": {
+  "type": "string",
+  "enum": [
+   "mainStore",
+   "subStore",
+   "kitchen",
+   "bar",
+   "retailFloor",
+   "cellar",
+   "transit"
+  ]
+ },
+ "MenuItem": {
+  "x-ticvai-persistence": "fnb.menu_item",
+  "type": "object",
+  "required": [
+   "id",
+   "productVariantId",
+   "name",
+   "price",
+   "isAvailable"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "productVariantId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The catalogue variant this item sells. Pricing and tax come from there — a menu is a presentation of the catalogue, not a second catalogue.\n"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "price": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "sortOrder": {
+    "type": "integer"
+   },
+   "modifierGroupIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "stationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "isStockTracked": {
+    "type": "boolean",
+    "description": "True where a recipe exists. Stock-tracked items cannot be sold offline."
+   },
+   "isAvailable": {
+    "type": "boolean"
+   },
+   "unavailableReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "preparationMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "allergens": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   }
+  }
+ },
+ "MerchandiseReservation": {
+  "x-ticvai-persistence": "retail.reservation + retail.reservation_line",
+  "type": "object",
+  "required": [
+   "id",
+   "outletId",
+   "lines",
+   "status",
+   "expiresAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "reservationNumber": {
+    "type": "string"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "merchandiseId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "quantity": {
+       "type": "integer"
+      }
+     }
+    }
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "reserved",
+     "collected",
+     "expired",
+     "cancelled"
+    ]
+   },
+   "collectionNote": {
+    "type": "string",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "collectedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "MovementKind": {
+  "type": "string",
+  "enum": [
+   "receipt",
+   "issue",
+   "saleDepletion",
+   "waste",
+   "adjustment",
+   "transferOut",
+   "transferIn",
+   "countAdjustment",
+   "supplierReturn",
+   "production"
+  ]
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PriceCheck": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "merchandiseId",
+   "name",
+   "listPrice",
+   "effectivePrice",
+   "onHand"
+  ],
+  "properties": {
+   "merchandiseId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sku": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "listPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "effectivePrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "After any live promotion."
+   },
+   "appliedPromotionCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "onHand": {
+    "type": "number"
+   },
+   "isAvailable": {
+    "type": "boolean"
+   },
+   "siblingOutlets": {
+    "type": "array",
+    "description": "Stock elsewhere in the venue, so a colleague can be sent.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "outletId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "outletName": {
+       "type": "string"
+      },
+      "onHand": {
+       "type": "number"
+      }
+     }
+    }
+   }
+  }
+ },
+ "Requisition": {
+  "x-ticvai-persistence": "inventory.requisition + inventory.requisition_line",
+  "type": "object",
+  "required": [
+   "id",
+   "requisitionNumber",
+   "venueId",
+   "status",
+   "lines",
+   "raisedByPrincipalId",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "requisitionNumber": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "departmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "status": {
+    "$ref": "#/components/schemas/RequisitionStatus"
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "lineId": {
+       "type": "string"
+      },
+      "itemId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "itemName": {
+       "type": "string"
+      },
+      "requestedQuantity": {
+       "type": "number"
+      },
+      "approvedQuantity": {
+       "type": "number",
+       "nullable": true
+      },
+      "orderedQuantity": {
+       "type": "number",
+       "nullable": true
+      },
+      "unit": {
+       "type": "string"
+      },
+      "estimatedCost": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "estimatedTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "raisedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "approvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "approvalNote": {
+    "type": "string",
+    "nullable": true
+   },
+   "requiredBy": {
+    "type": "string",
+    "format": "date"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "approvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "RequisitionStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "pendingApproval",
+   "approved",
+   "rejected",
+   "returnedForInfo",
+   "ordered",
+   "closed",
+   "cancelled"
+  ]
+ },
+ "SerialisedItem": {
+  "type": "object",
+  "x-ticvai-persistence": "inventory.serialised_item",
+  "description": "Retail Board 4 of the client's design set, 20 August. **`StockBatch` was added on 18 August with a lot number, and serialisation to the individual item is a step beyond it.**\nA lot answers *which delivery did this come from*. A serial answers *where is this exact one* — which is what a jewellery counter, a phone, a ticketed collectible or anything with a warranty needs.\n**Most stock is not serialised and should not be.** Turning it on for a 2 AED keyring creates a row per keyring, so it is a per-item decision rather than a policy.\n",
+  "required": [
+   "id",
+   "itemId",
+   "serial",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "itemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "batchId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The batch it arrived in, where the item is both lotted and serialised."
+   },
+   "serial": {
+    "type": "string",
+    "description": "**Unique within the item, not globally.** Two manufacturers reuse serial numbers and a global constraint would refuse the second one.\n"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "inStock",
+     "reserved",
+     "sold",
+     "returned",
+     "damaged",
+     "lost",
+     "inTransit",
+     "warranty"
+    ]
+   },
+   "soldOnOrderLineId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The link that makes serialisation worth having.** A warranty claim, a recall and a proof of purchase all start with *which sale was this exact item*.\n"
+   },
+   "warrantyUntil": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "receivedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "StartStockCountRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "locationId",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "full",
+     "cycle",
+     "spot"
+    ]
+   },
+   "categoryIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "For cycle counts — restrict to these categories."
+   },
+   "isBlind": {
+    "type": "boolean",
+    "default": true,
+    "description": "Expected quantities withheld from the counting device. Defaults true because a counter who can see the figure reconciles to it rather than to the shelf.\n"
+   }
+  }
+ },
+ "StockCount": {
+  "x-ticvai-persistence": "inventory.count + inventory.count_line",
+  "type": "object",
+  "required": [
+   "id",
+   "locationId",
+   "kind",
+   "status",
+   "isBlind",
+   "lineCount",
+   "countedCount",
+   "startedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "locationName": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string"
+   },
+   "status": {
+    "$ref": "#/components/schemas/CountStatus"
+   },
+   "isBlind": {
+    "type": "boolean"
+   },
+   "lineCount": {
+    "type": "integer"
+   },
+   "countedCount": {
+    "type": "integer"
+   },
+   "varianceLineCount": {
+    "type": "integer"
+   },
+   "varianceValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "startedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "postedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "journalEntryId": {
+    "type": "string",
+    "nullable": true
+   },
+   "startedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "closedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "postedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "StockLocation": {
+  "x-ticvai-persistence": "inventory.location",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "venueId",
+   "kind"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/LocationKind"
+   },
+   "parentLocationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
+ "StockMovement": {
+  "x-ticvai-persistence": "inventory.movement",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateStockMovementRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "balanceAfter",
+     "principalId",
+     "createdAt"
+    ],
+    "properties": {
+     "balanceAfter": {
+      "type": "number"
+     },
+     "unitCost": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "totalCost": {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     },
+     "principalId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "sourceType": {
+      "type": "string",
+      "nullable": true,
+      "description": "What generated it — an order, a count, a transfer."
+     },
+     "sourceId": {
+      "type": "string",
+      "nullable": true
+     },
+     "journalEntryId": {
+      "type": "string",
+      "nullable": true
+     },
+     "createdAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  ]
+ },
+ "StockTransfer": {
+  "x-ticvai-persistence": "inventory.transfer + inventory.transfer_line",
+  "type": "object",
+  "required": [
+   "id",
+   "fromLocationId",
+   "toLocationId",
+   "status",
+   "lines",
+   "dispatchedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "transferNumber": {
+    "type": "string"
+   },
+   "fromLocationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "toLocationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "status": {
+    "$ref": "#/components/schemas/TransferStatus"
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "itemId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "itemName": {
+       "type": "string"
+      },
+      "dispatchedQuantity": {
+       "type": "number"
+      },
+      "receivedQuantity": {
+       "type": "number",
+       "nullable": true
+      },
+      "discrepancy": {
+       "type": "number",
+       "nullable": true
+      },
+      "discrepancyReason": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   },
+   "dispatchedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "receivedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "dispatchedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "receivedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). `fromLocationId` and `toLocationId` give the endpoints; **this gives the owner.** A transfer between two venues belongs to the tenant above both, and without it the row is addressable from neither end."
+   }
+  }
+ },
+ "TemperatureLog": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.temperature_log",
+  "description": "Board 5J of the client F&B pack, 20 August. **HACCP records are a UAE regulatory obligation, they are inspected, and nothing in 947 operations touched them** — a venue that cannot produce a temperature log has a compliance failure rather than a missing screen.\n**A reading out of range is not an error, it is a finding.** The log records it, opens a corrective action, and keeps the reading — **deleting a bad reading is the one thing an inspector looks for.**\n**Offline-capable and it must be.** A walk-in freezer is where the signal is worst and the readings matter most.\n",
+  "required": [
+   "id",
+   "checkPointId",
+   "recordedAt",
+   "valueCelsius",
+   "outcome"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "checkPointId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The unit, station or delivery being read."
+   },
+   "checkPointKind": {
+    "type": "string",
+    "enum": [
+     "fridge",
+     "freezer",
+     "holdingCabinet",
+     "blastChiller",
+     "coreProbe",
+     "delivery",
+     "displayCounter",
+     "ambient"
+    ]
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "recordedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "valueCelsius": {
+    "type": "number"
+   },
+   "minCelsius": {
+    "type": "number",
+    "nullable": true
+   },
+   "maxCelsius": {
+    "type": "number",
+    "nullable": true
+   },
+   "outcome": {
+    "type": "string",
+    "enum": [
+     "inRange",
+     "outOfRange",
+     "notTaken"
+    ],
+    "description": "**`notTaken` is a record, not an absence.** A check that did not happen is itself a finding, and a log with a gap cannot be told apart from a log nobody kept.\n"
+   },
+   "deviceReported": {
+    "type": "boolean",
+    "default": false,
+    "description": "**A probe reading and a person's reading are different evidence.** An inspector treats them differently and so should the record.\n"
+   },
+   "correctiveActionId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   }
+  }
+ },
+ "TransferStatus": {
+  "type": "string",
+  "enum": [
+   "dispatched",
+   "inTransit",
+   "received",
+   "partiallyReceived",
+   "cancelled"
+  ]
+ }
+}

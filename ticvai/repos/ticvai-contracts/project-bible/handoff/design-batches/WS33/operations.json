@@ -1,0 +1,199 @@
+{
+ "listDepositPartialPayment": {
+  "method": "GET",
+  "path": "/deposit-partial-payment",
+  "contract": "orders",
+  "summary": "Deposit, Partial Payment & Outstanding Balance Management",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "DepositPartialPaymentOutstandingBalanceManagementView"
+ },
+ "listExternalPaymentPartner": {
+  "method": "GET",
+  "path": "/external-payment-partner",
+  "contract": "orders",
+  "summary": "External Payment, Partner & Settlement Reference Mapping",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ExternalPaymentPartnerSettlementReferenceMappingView"
+ },
+ "listFinancialTraceability": {
+  "method": "GET",
+  "path": "/financial-traceability",
+  "contract": "orders",
+  "summary": "Financial Traceability, Control & Audit Explorer",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "FinancialTraceabilityControlAuditExplorerView"
+ },
+ "listOrderFinancialReconciliation": {
+  "method": "GET",
+  "path": "/order-financial-reconciliation",
+  "contract": "orders",
+  "summary": "Order Financial Analytics & AI Reconciliation Intelligence",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "paymentMethod",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "gateway",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerSegment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "b2bPartner",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "OrderFinancialAnalyticsAiReconciliationIntelligenceView"
+ },
+ "listOrderPaymentDetail": {
+  "method": "GET",
+  "path": "/order-payment-detail",
+  "contract": "orders",
+  "summary": "Order Payment Detail & Transaction Ledger",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "OrderPaymentDetailTransactionLedgerView"
+ },
+ "listOrderSplitMerge": {
+  "method": "GET",
+  "path": "/order-split-merge",
+  "contract": "orders",
+  "summary": "Order Split, Merge & Transaction Relationship Management",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "OrderSplitMergeTransactionRelationshipManagementView"
+ },
+ "listPaymentOrderFinancial": {
+  "method": "GET",
+  "path": "/payment-order-financial",
+  "contract": "orders",
+  "summary": "Payment & Order Financial Command Center",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PaymentOrderFinancialCommandCenterView"
+ },
+ "listPaymentReconciliationException": {
+  "method": "GET",
+  "path": "/payment-reconciliation-exception",
+  "contract": "orders",
+  "summary": "Payment Reconciliation & Exception Management",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "PaymentReconciliationExceptionManagementView"
+ },
+ "listRelatedOrderTransaction": {
+  "method": "GET",
+  "path": "/related-order-transaction",
+  "contract": "orders",
+  "summary": "Related Order & Transaction Relationship Explorer",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "order",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "ticket",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customer",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "externalReference",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "partnerBooking",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "RelatedOrderTransactionRelationshipExplorerView"
+ },
+ "setMultiPaymentSplit": {
+  "method": "PUT",
+  "path": "/multi-payment-split",
+  "contract": "orders",
+  "summary": "Multi-Payment, Split Tender & Payment Allocation Configuration",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "MultiPaymentSplitTenderPaymentAllocationConfiguratioInput",
+  "responds": "MultiPaymentSplitTenderPaymentAllocationConfiguratioView"
+ }
+}

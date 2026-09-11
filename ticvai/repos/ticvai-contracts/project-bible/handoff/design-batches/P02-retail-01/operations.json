@@ -1,0 +1,107 @@
+{
+ "getGameCard": {
+  "method": "GET",
+  "path": "/game-cards/{cardCode}",
+  "contract": "games",
+  "summary": "Read a card's balances",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GameCard"
+ },
+ "listMerchandise": {
+  "method": "GET",
+  "path": "/merchandise",
+  "contract": "retail",
+  "summary": "List merchandise",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "outletId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "categoryId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "inStockOnly",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "lookupMerchandise": {
+  "method": "GET",
+  "path": "/merchandise/lookup",
+  "contract": "retail",
+  "summary": "Price and stock check by barcode",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "barcode",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "sku",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "includeSiblingOutlets",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "PriceCheck"
+ },
+ "reserveMerchandise": {
+  "method": "POST",
+  "path": "/outlets/{outletId}/reserve",
+  "contract": "retail",
+  "summary": "Reserve an item for collection",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "MerchandiseReservation"
+ }
+}

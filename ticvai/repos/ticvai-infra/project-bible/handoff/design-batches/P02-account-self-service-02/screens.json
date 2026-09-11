@@ -1,0 +1,691 @@
+[
+ {
+  "id": "GST-067",
+  "name": "Refunds & Resale",
+  "module": "Account & Self-Service",
+  "requiresModule": "core",
+  "wave": 2,
+  "capability": "read-write",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/account/refunds-resale",
+   "component": "apps/guest-app/src/routes/account/RefundsResale.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "GST-039"
+   ],
+   "entryFrom": [
+    "GST-008"
+   ],
+   "inferred": false,
+   "notes": "**Reached from GST-008** — a refund starts from the ticket being refunded. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "GST-039",
+     "trigger": "Profile",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-039 declares entryState.params subjectId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**A guest could buy a ticket and not ask for their money back.** `createRefundRequest` and `createResaleListing` were back-office only, so every refund began as a phone call.\n\n**The refund policy decides what is offered, not this screen.** `orders.refund_policy` is scoped, so a venue may be stricter than its tenant — the screen shows the answer rather than arguing with it.",
+  "density": "comfortable",
+  "offline": false,
+  "pattern": "statusTracker",
+  "patternReason": "`getWaiverStatus` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "**A guest could buy a ticket and not ask for their money back.** `createRefundRequest` and `createResaleListing` were back-office only, so every refund began as a phone call.",
+  "gaps": [
+   {
+    "operation": "getWaiverStatus",
+    "why": "**1 declared operation reach no component on this screen**: getWaiverStatus. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createRefundRequest",
+       "provenance": "contract orders.yaml POST /refund-requests"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createResaleListing",
+       "provenance": "contract orders.yaml POST /resale-listings"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "Content loads.",
+   "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
+   "emptyFirstRun": "**No refunds or listings yet.** The venue's policy is shown regardless, so a guest knows the answer before they need it.",
+   "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Refunds and listings need the server. **A queued refund request is a promise nobody made.**"
+  },
+  "apis": [
+   {
+    "operationId": "createRefundRequest",
+    "contract": "orders",
+    "purpose": "Guest-initiated refund request",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "createResaleListing",
+    "contract": "orders",
+    "purpose": "List an entitlement for resale",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getWaiverStatus",
+    "contract": "marketing-crm",
+    "purpose": "Whether this guest may be issued a ticket that requires a wa",
+    "trigger": "onLoad",
+    "offline": false
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "**Resolves from the session.** A guest arriving cold is asked to sign in and returned here afterwards — never a 404, and never a screen that silently shows somebody else's data (ADR-0030)."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-067"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-069",
+  "name": "Face Pass",
+  "module": "Account & Self-Service",
+  "requiresModule": "core",
+  "wave": 2,
+  "capability": "read-write",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/account/face-pass",
+   "component": "apps/guest-app/src/routes/account/FacePass.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "GST-039"
+   ],
+   "entryFrom": [
+    "GST-039"
+   ],
+   "inferred": false,
+   "notes": "**Reached from GST-039** — enrolment is a setting on the profile. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "GST-039",
+     "trigger": "Profile",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-039 declares entryState.params subjectId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "🔴 **Biometric enrolment had no guest-facing consent step.** `enrolFacePass` was callable by a guest and reachable from nowhere, which means enrolment was happening at a desk with somebody else operating the screen.\n\n**`pii.subject_biometric` is separate from contact and document precisely so consent and erasure differ per kind.** Revocation sits beside enrolment for the same reason — a face a guest cannot withdraw is a face they did not really consent to.",
+  "density": "comfortable",
+  "offline": false,
+  "pattern": "statusTracker",
+  "patternReason": "`getFacePassEnrolment` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "🔴 **Biometric enrolment had no guest-facing consent step.** `enrolFacePass` was callable by a guest and reachable from nowhere, which means enrolment was happening at a desk with somebody else operat",
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected face pass",
+       "bindsTo": "FacePassEnrolment",
+       "columns": [
+        "FacePassEnrolment.id",
+        "FacePassEnrolment.subjectId",
+        "FacePassEnrolment.entitlementId",
+        "FacePassEnrolment.source",
+        "FacePassEnrolment.capturedAt",
+        "FacePassEnrolment.consentPurposeId",
+        "FacePassEnrolment.consentGivenAt",
+        "FacePassEnrolment.guardianSubjectId",
+        "FacePassEnrolment.isActive",
+        "FacePassEnrolment.expiresAt"
+       ],
+       "operation": "getFacePassEnrolment",
+       "provenance": "contract access.yaml GET /face-pass/enrolments/{enrolmentId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Enrol",
+       "operation": "enrolFacePass",
+       "provenance": "contract access.yaml POST /face-pass/enrolments"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Revoke",
+       "operation": "revokeFacePass",
+       "provenance": "contract access.yaml DELETE /face-pass/enrolments/{enrolmentId}"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmRevokeFacePass",
+    "component": "confirmDialog",
+    "trigger": "Revoke",
+    "body": "**Names what `revokeFacePass` changes and what it leaves alone**, in the consequence rather than the verb. A face pass this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract access.yaml DELETE /face-pass/enrolments/{enrolmentId}"
+   }
+  ],
+  "states": {
+   "loading": "Content loads.",
+   "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
+   "emptyFirstRun": "**Not enrolled.** What a face pass is for, where it works, and what withdrawing it does — **before** the camera opens.",
+   "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Biometric enrolment never works offline. **A face captured and queued is a face the guest cannot withdraw until it uploads.**"
+  },
+  "apis": [
+   {
+    "operationId": "enrolFacePass",
+    "contract": "access",
+    "purpose": "Register a facial profile against an entitlement",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getFacePassEnrolment",
+    "contract": "access",
+    "purpose": "Whether a pass has a face registered, and when",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "revokeFacePass",
+    "contract": "access",
+    "purpose": "Remove a facial profile",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "enrolmentId",
+     "from": "deepLink"
+    },
+    {
+     "name": "subjectId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "**Resolves from the session.** A guest arriving cold is asked to sign in and returned here afterwards — never a 404, and never a screen that silently shows somebody else's data (ADR-0030)."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-069"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-071",
+  "name": "Payment Methods",
+  "module": "Account & Self-Service",
+  "requiresModule": "core",
+  "wave": 2,
+  "capability": "read-write",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/account/payment-methods",
+   "component": "apps/guest-app/src/routes/account/PaymentMethods.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "GST-039"
+   ],
+   "entryFrom": [
+    "GST-039"
+   ],
+   "inferred": false,
+   "notes": "**Reached from GST-039** — a payment method is a setting on the profile. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "GST-039",
+     "trigger": "Profile",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-039 declares entryState.params subjectId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**A stored card a guest cannot see is a stored card they cannot remove.** `listPaymentTokens` and `storePaymentToken` were guest-callable with no guest screen.\n\n**Wallet transfer and loyalty redemption sit here** because to a guest they are all *how I pay*, whatever the contracts call them.",
+  "density": "comfortable",
+  "offline": false,
+  "pattern": "listDetail",
+  "patternReason": "`listPaymentTokens` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "**A stored card a guest cannot see is a stored card they cannot remove.** `listPaymentTokens` and `storePaymentToken` were guest-callable with no guest screen.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every payment methods",
+       "bindsTo": "PaymentToken",
+       "columns": [
+        "PaymentToken.id",
+        "PaymentToken.subjectId",
+        "PaymentToken.providerId",
+        "PaymentToken.token",
+        "PaymentToken.method",
+        "PaymentToken.maskedIdentifier",
+        "PaymentToken.expiresAt",
+        "PaymentToken.isDefault",
+        "PaymentToken.consentPurposeId"
+       ],
+       "operation": "listPaymentTokens",
+       "provenance": "contract orders.yaml GET /payment-tokens"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected payment methods",
+       "bindsTo": "PaymentToken",
+       "columns": [
+        "PaymentToken.id",
+        "PaymentToken.subjectId",
+        "PaymentToken.providerId",
+        "PaymentToken.token",
+        "PaymentToken.method",
+        "PaymentToken.maskedIdentifier",
+        "PaymentToken.expiresAt",
+        "PaymentToken.isDefault",
+        "PaymentToken.consentPurposeId"
+       ],
+       "operation": "listPaymentTokens",
+       "provenance": "contract orders.yaml GET /payment-tokens"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Store",
+       "operation": "storePaymentToken",
+       "provenance": "contract orders.yaml POST /payment-tokens"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Transfer",
+       "operation": "transferWalletBalance",
+       "provenance": "contract retail.yaml POST /wallets/{walletId}/transfer"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Redeem",
+       "operation": "redeemLoyaltyPoints",
+       "provenance": "contract marketing-crm.yaml POST /loyalty/redemptions"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Content loads.",
+   "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
+   "emptyFirstRun": "**No stored cards.** A guest arrives here after a first purchase, so the empty state is the common one.",
+   "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Stored cards are shown from cache, masked. **Storing and transferring need the server.**"
+  },
+  "apis": [
+   {
+    "operationId": "listPaymentTokens",
+    "contract": "orders",
+    "purpose": "A guest's saved payment methods",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "storePaymentToken",
+    "contract": "orders",
+    "purpose": "Save a payment method for future use",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPaymentTokens"
+    ]
+   },
+   {
+    "operationId": "transferWalletBalance",
+    "contract": "retail",
+    "purpose": "Send balance to another guest",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPaymentTokens"
+    ]
+   },
+   {
+    "operationId": "redeemLoyaltyPoints",
+    "contract": "marketing-crm",
+    "purpose": "Spend points",
+    "trigger": "onAction",
+    "invalidates": [
+     "listPaymentTokens"
+    ]
+   },
+   {
+    "operationId": "getGiftCard",
+    "contract": "retail",
+    "purpose": "Balance on a gift card",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
+    {
+     "name": "walletId",
+     "from": "deepLink"
+    },
+    {
+     "name": "cardCode",
+     "from": "navigation"
+    }
+   ],
+   "coldEntry": "**Resolves from the session.** A guest arriving cold is asked to sign in and returned here afterwards — never a 404, and never a screen that silently shows somebody else's data (ADR-0030).",
+   "preloaded": [
+    "PaymentToken.id",
+    "PaymentToken.subjectId",
+    "PaymentToken.providerId",
+    "PaymentToken.token",
+    "PaymentToken.method"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-071"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "GST-073",
+  "name": "Security & Sign-in",
+  "module": "Account & Self-Service",
+  "requiresModule": "core",
+  "wave": 2,
+  "capability": "read-write",
+  "implementation": {
+   "app": "guest-app",
+   "route": "/account/security-sign-in",
+   "component": "apps/guest-app/src/routes/account/SecuritySignIn.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "GST-039"
+   ],
+   "entryFrom": [
+    "GST-039"
+   ],
+   "inferred": false,
+   "notes": "**Reached from GST-039** — sign-in security is a setting on the profile. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "GST-039",
+     "trigger": "Profile",
+     "carries": [
+      "subjectId"
+     ],
+     "provenance": "derived — GST-039 declares entryState.params subjectId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**A guest could enrol a second factor and not manage it.** Small screen, and it is the one a guest reaches after losing a phone.",
+  "density": "comfortable",
+  "offline": false,
+  "pattern": "configEditor",
+  "patternReason": "the screen declares only writes (`createMfaChallenge`) and no read of a population — it is settings, not a list",
+  "purpose": "**A guest could enrol a second factor and not manage it.** Small screen, and it is the one a guest reaches after losing a phone.",
+  "gaps": [
+   {
+    "operation": "createMfaChallenge",
+    "why": "**`createMfaChallenge` declares no request body shape**, so nothing says what this editor edits. The fields cannot be derived and the screen needs the contract before it needs a designer.",
+    "source": "contract identity.yaml POST /auth/mfa/challenge"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create",
+       "operation": "createMfaChallenge",
+       "provenance": "contract identity.yaml POST /auth/mfa/challenge"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listGuestDevices",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      },
+      {
+       "kind": "destructiveButton",
+       "derived": true,
+       "impliedBy": "revokeGuestDevice",
+       "label": "Revoke guest device",
+       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not."
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Cancel",
+       "notes": "**A screen that can submit must be leaveable without submitting.**",
+       "derived": true,
+       "impliedBy": "createMfaChallenge"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "Content loads.",
+   "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
+   "emptyFirstRun": "**No second factor enrolled.** Explains what one protects before asking for a phone number.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "Enrolment needs the server. **A second factor is not a second factor if it was set up offline.**"
+  },
+  "apis": [
+   {
+    "operationId": "createMfaChallenge",
+    "contract": "identity",
+    "purpose": "Step-up authentication for a sensitive action",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "listGuestDevices",
+    "contract": "marketing-crm",
+    "purpose": "Which devices hold this guest's credentials",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "registerGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Trust this device",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "revokeGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Sign a lost device out",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "verifyGuestEmail",
+    "contract": "identity",
+    "purpose": "Confirm the address before it can recover an account",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "subjectId",
+     "from": "session"
+    },
+    {
+     "name": "deviceId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "**Resolves from the session.** A guest arriving cold is asked to sign in and returned here afterwards — never a 404, and never a screen that silently shows somebody else's data (ADR-0030)."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P02 Guest App.dc.html#gst-073"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P02",
+   "audience": "guest",
+   "formFactor": "mobileApp",
+   "shortName": "Guest App",
+   "name": "Guest App — Mobile",
+   "offlineCapable": true,
+   "app": "guest-app",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "mobile",
+    "siblings": [
+     "P01",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

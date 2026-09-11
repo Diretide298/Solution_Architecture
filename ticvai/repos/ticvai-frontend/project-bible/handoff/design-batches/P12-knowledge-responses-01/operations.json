@@ -1,0 +1,76 @@
+{
+ "createMessageTemplate": {
+  "method": "POST",
+  "path": "/message-templates",
+  "contract": "marketing-crm",
+  "summary": "Create a message template",
+  "permission": "MARKETING_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "MessageTemplate",
+  "responds": "MessageTemplate"
+ },
+ "listFaqs": {
+  "method": "GET",
+  "path": "/tenant-config/faqs",
+  "contract": "white-label",
+  "summary": "List FAQs",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "FaqCategory"
+ },
+ "listKnowledgeCollections": {
+  "method": "GET",
+  "path": "/collections",
+  "contract": "ai",
+  "summary": "Collections available to this tenant",
+  "permission": "AI_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "KnowledgeCollection"
+ },
+ "listMessageTemplates": {
+  "method": "GET",
+  "path": "/message-templates",
+  "contract": "marketing-crm",
+  "summary": "List message templates",
+  "permission": "MARKETING_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "channel",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ }
+}

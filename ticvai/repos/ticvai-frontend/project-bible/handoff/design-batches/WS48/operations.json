@@ -1,0 +1,173 @@
+{
+ "listAdvancedOffer": {
+  "method": "GET",
+  "path": "/advanced-offer",
+  "contract": "promotions",
+  "summary": "Advanced Offer Command Center",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "buyXGetX",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "buyXGetY",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "buyNGetX",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "buyNGetMultiple",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "cheapestItemFree",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "percentageOffAnotherProduct",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "amountOffAnotherProduct",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "fixedBundlePrice",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "AdvancedOfferCommandCenterView"
+ },
+ "listAdvancedOfferGuardrail": {
+  "method": "GET",
+  "path": "/advanced-offer-guardrail",
+  "contract": "promotions",
+  "summary": "Advanced Offer Guardrails & Conflict Controls",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AdvancedOfferGuardrailsConflictControlsView"
+ },
+ "listCheapestLowestValue": {
+  "method": "GET",
+  "path": "/cheapest-lowest-value",
+  "contract": "promotions",
+  "summary": "Cheapest / Lowest-Value Item Promotion",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CheapestLowestValueItemPromotionView"
+ },
+ "listMultiBuyQuantity": {
+  "method": "GET",
+  "path": "/multi-buy-quantity",
+  "contract": "promotions",
+  "summary": "Multi-Buy & Quantity Offer Configurator",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "MultiBuyQuantityOfferConfiguratorView"
+ },
+ "listOfferBasketTrace": {
+  "method": "GET",
+  "path": "/offer-basket-trace",
+  "contract": "promotions",
+  "summary": "Offer Simulation, Basket Trace & AI Optimization",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "OfferSimulationBasketTraceAiOptimizationView"
+ },
+ "listRewardSelectionSubstitution": {
+  "method": "GET",
+  "path": "/reward-selection-substitution",
+  "contract": "promotions",
+  "summary": "Reward Selection, Substitution & Customer Choice",
+  "permission": "PRICE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "RewardSelectionSubstitutionCustomerChoiceView"
+ },
+ "setBuyGetBogo": {
+  "method": "PUT",
+  "path": "/buy-get-bogo",
+  "contract": "promotions",
+  "summary": "Buy X Get Y / BOGO Rule Builder",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "BuyXGetYBogoRuleBuilderInput",
+  "responds": "BuyXGetYBogoRuleBuilderView"
+ },
+ "setCrossCategoryPromotion": {
+  "method": "PUT",
+  "path": "/cross-category-promotion",
+  "contract": "promotions",
+  "summary": "Cross-Category Promotion Builder",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "CrossCategoryPromotionBuilderInput",
+  "responds": "CrossCategoryPromotionBuilderView"
+ },
+ "setFixedPriceOffer": {
+  "method": "PUT",
+  "path": "/fixed-price-offer",
+  "contract": "promotions",
+  "summary": "Fixed-Price & “N for X” Offer Builder",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "FixedPriceNForXOfferBuilderInput",
+  "responds": "FixedPriceNForXOfferBuilderView"
+ },
+ "setGiftFreeProduct": {
+  "method": "PUT",
+  "path": "/gift-free-product",
+  "contract": "promotions",
+  "summary": "Gift, Free Product & Added-Value Offer Builder",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "GiftFreeProductAddedValueOfferBuilderInput",
+  "responds": "GiftFreeProductAddedValueOfferBuilderView"
+ }
+}

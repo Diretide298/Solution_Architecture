@@ -1,0 +1,134 @@
+id: F185
+name: 'Digital Asset Management DAM board 3: DAM Governance & Rights Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P13 Venue CMS
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Digital Asset Management DAM board 3. **This route is read
+    from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: CMS-081
+  entryPoints:
+  - Arrives at DAM Governance & Rights Command Center
+steps:
+- step: 1
+  screen: CMS-081
+  action: Opens DAM Governance & Rights Command Center
+  operations: []
+  outcome: Provide DAM administrators, brand managers, legal/compliance teams, and content managers with
+    one overview of asset governance.
+- step: 2
+  screen: CMS-082
+  action: Works in Asset Ownership & Responsibility Management
+  operations: []
+  outcome: Define who owns and is responsible for each digital asset from a business and operational perspective.
+    This should be separate from the person who simply uploaded the file.
+- step: 3
+  screen: CMS-081
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: CMS-083
+  action: Works in Rights, License & Usage Policy Management
+  operations: []
+  outcome: Define exactly how an asset is legally and commercially allowed to be used.
+- step: 5
+  screen: CMS-081
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: CMS-084
+  action: Works in Asset Approval Workflow Management
+  operations: []
+  outcome: Provide configurable governance before an asset becomes approved for operational or public
+    use.
+- step: 7
+  screen: CMS-081
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: CMS-085
+  action: Works in Publication Eligibility & Governance Validation
+  operations: []
+  outcome: Determine whether an asset is actually eligible to be used or distributed. This screen is particularly
+    important. An asset being technically available in DAM does not mean it should be publishable.
+- step: 9
+  screen: CMS-081
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: CMS-086
+  action: Works in Role-Based Asset Access & Permission Management
+  operations: []
+  outcome: Control who can discover, view, edit, download, share, approve, or manage assets.
+- step: 11
+  screen: CMS-081
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: CMS-087
+  action: Works in Secure Internal & External Sharing
+  operations: []
+  outcome: Allow controlled sharing without users manually downloading assets and sending uncontrolled
+    copies.
+- step: 13
+  screen: CMS-081
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: CMS-088
+  action: Works in Rights Expiry, Renewal & Usage Impact
+  operations: []
+  outcome: Prevent expired assets from continuing to be used across TICVAI channels.
+- step: 15
+  screen: CMS-081
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: CMS-089
+  action: Works in Governance Audit Trail & Compliance Evidence
+  operations: []
+  outcome: Provide complete traceability for asset governance.
+- step: 17
+  screen: CMS-081
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: CMS-090
+  action: Works in Governance Risk, Compliance & AI Recommendations
+  operations: []
+  outcome: Provide a consolidated view of governance risks and use AI to help identify problems requiring
+    human attention.
+branches:
+- at: 1
+  condition: Nothing has been set up on DAM Governance & Rights Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Digital Asset Management DAM board 3 visited
+primaryContract: unknown
+contracts:
+- unknown

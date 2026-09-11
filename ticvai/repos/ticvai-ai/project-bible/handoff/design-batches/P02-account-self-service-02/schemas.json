@@ -1,0 +1,363 @@
+{
+ "FacePassEnrolment": {
+  "type": "object",
+  "x-ticvai-persistence": "pii.subject_biometric",
+  "description": "3.2.43. **Metadata about a facial profile. Never the profile.**\n",
+  "required": [
+   "id",
+   "subjectId",
+   "entitlementId",
+   "source",
+   "capturedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "entitlementId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "source": {
+    "type": "string",
+    "enum": [
+     "guestApp",
+     "ticketCounter",
+     "annualPassCounter"
+    ]
+   },
+   "capturedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "consentPurposeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "consentGivenAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "guardianSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where the subject is a minor (3.2.12)."
+   },
+   "isActive": {
+    "type": "boolean",
+    "readOnly": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**Bounded by the entitlement it belongs to.** A face outliving the pass it was enrolled for is a biometric held for no stated purpose, which CF-64 has to settle.\n"
+   }
+  }
+ },
+ "GiftCard": {
+  "x-ticvai-persistence": "retail.gift_card",
+  "type": "object",
+  "required": [
+   "cardCode",
+   "faceValue",
+   "balance",
+   "status",
+   "issuedAt"
+  ],
+  "properties": {
+   "cardCode": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string"
+   },
+   "faceValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "balance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "issued",
+     "active",
+     "partiallyRedeemed",
+     "redeemed",
+     "expired",
+     "blocked"
+    ]
+   },
+   "blockedReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "issuedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "activatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "GuestDevice": {
+  "type": "object",
+  "x-ticvai-persistence": "marketing.guest_device",
+  "required": [
+   "id",
+   "subjectId",
+   "platform",
+   "status",
+   "registeredAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "platform": {
+    "type": "string",
+    "enum": [
+     "ios",
+     "android",
+     "web"
+    ]
+   },
+   "tokenFingerprint": {
+    "type": "string",
+    "description": "Hash of the token, not the token. The token itself is write-only — returning it would put a push credential in every response a support agent can read.\n"
+   },
+   "appVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "osVersion": {
+    "type": "string",
+    "nullable": true
+   },
+   "deviceModel": {
+    "type": "string",
+    "nullable": true
+   },
+   "locale": {
+    "type": "string",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "active",
+     "revoked",
+     "failed"
+    ]
+   },
+   "failureCount": {
+    "type": "integer",
+    "description": "Consecutive delivery failures. Past the threshold the device is marked failed and stops being targeted — a dead token retried forever is wasted quota and a misleading delivery rate.\n"
+   },
+   "registeredAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "lastSeenAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "revokedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "LoyaltyPosition": {
+  "x-ticvai-persistence": "marketing.loyalty_position",
+  "type": "object",
+  "required": [
+   "subjectId",
+   "programmeId",
+   "pointsBalance",
+   "tierCode"
+  ],
+  "properties": {
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "programmeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "pointsBalance": {
+    "type": "integer"
+   },
+   "lifetimePoints": {
+    "type": "integer"
+   },
+   "tierCode": {
+    "type": "string"
+   },
+   "tierName": {
+    "type": "string"
+   },
+   "pointsToNextTier": {
+    "type": "integer",
+    "nullable": true
+   },
+   "nextExpiryPoints": {
+    "type": "integer",
+    "nullable": true
+   },
+   "nextExpiryAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "PaymentToken": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.payment_token",
+  "description": "BL-116. **A stored credential, held by the provider and referenced here.** The platform never sees a card number, which is what keeps PCI scope where it belongs.\n**A token is provider-scoped.** A card tokenised with one gateway does not work with another, so a routing change does not silently move a guest's saved card — it means asking them again, and the model should make that visible rather than surprising.\n",
+  "required": [
+   "id",
+   "subjectId",
+   "providerId",
+   "token",
+   "isDefault"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "providerId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "token": {
+    "type": "string",
+    "format": "password",
+    "description": "**Write-only, never returned.** The provider's reference to a credential it holds.\n"
+   },
+   "method": {
+    "type": "string"
+   },
+   "maskedIdentifier": {
+    "type": "string",
+    "description": "What a guest sees — the last four digits, the card brand. **Enough to choose between two saved cards and not enough to use one.**\n"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "isDefault": {
+    "type": "boolean"
+   },
+   "consentPurposeId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**Storing a card for future use is a purpose a guest consents to**, separate from the payment they are making now. A token taken without it is a card kept on a guest's behalf that they never agreed to.\n"
+   }
+  }
+ },
+ "ResaleListing": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.resale_listing",
+  "description": "BL-060. **Smaller than it first looked** — most of the machinery exists. An entitlement can already be transferred, an order can already be created, and payment already routes. What was missing is the listing itself and a cart line that can point at one.\n**A resale is a transfer with money attached**, and the venue is in the middle: the seller's entitlement is voided and a new one issued to the buyer, so **the ticket that admits is always one the venue issued.** That is what stops a screenshot at the gate.\n",
+  "required": [
+   "id",
+   "entitlementId",
+   "sellerSubjectId",
+   "askPrice",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "entitlementId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sellerSubjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "askPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "priceCapPercent": {
+    "type": "number",
+    "nullable": true,
+    "description": "**A ceiling as a percentage of face value**, because uncapped resale is a venue watching its own tickets sold at four times the price with its name on them. Null means uncapped, which is a venue decision rather than a default.\n"
+   },
+   "sellerFeePercent": {
+    "type": "number"
+   },
+   "buyerFeePercent": {
+    "type": "number"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "listed",
+     "reserved",
+     "sold",
+     "withdrawn",
+     "expired"
+    ]
+   },
+   "listedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "soldToSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "payoutStatus": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "held",
+     "paid",
+     "failed"
+    ],
+    "description": "**The seller is paid after the buyer is admitted, not after they pay.** A resale refunded at the gate for a void ticket cannot be clawed back from a seller who has already been paid.\n"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ }
+}

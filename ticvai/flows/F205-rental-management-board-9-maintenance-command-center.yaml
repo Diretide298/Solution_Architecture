@@ -1,0 +1,135 @@
+id: F205
+name: 'Rental Management board 9: Maintenance Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Rental Management board 9. **This route is read from the
+    screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-574
+  entryPoints:
+  - Arrives at Maintenance Command Center
+steps:
+- step: 1
+  screen: BO-574
+  action: Opens Maintenance Command Center
+  operations: []
+  outcome: Provide maintenance teams and rental management with a real-time view of rental asset health
+    and maintenance workload.
+- step: 2
+  screen: BO-575
+  action: Works in Maintenance Rule & Service Plan Configuration
+  operations: []
+  outcome: Define when different rental products/assets require preventive maintenance. This is important
+    because maintenance should not depend only on staff manually noticing a problem.
+- step: 3
+  screen: BO-574
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-576
+  action: Works in Maintenance Calendar & Scheduling
+  operations: []
+  outcome: Plan preventive and corrective maintenance while understanding its effect on rental capacity.
+    The original requirement specifically calls for scheduled maintenance periods.
+- step: 5
+  screen: BO-574
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-577
+  action: Works in Maintenance Work Order
+  operations: []
+  outcome: Create and manage the actual repair/service job.
+- step: 7
+  screen: BO-574
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-578
+  action: Works in Technician Repair Workspace
+  operations: []
+  outcome: Provide the technician with a focused operational screen for executing maintenance.
+- step: 9
+  screen: BO-574
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-579
+  action: Works in Parts, Cost & Maintenance Expense Tracking
+  operations: []
+  outcome: Capture the operational cost associated with maintaining rental equipment. This should integrate
+    with the broader Inventory/Procurement and Finance modules rather than recreate them.
+- step: 11
+  screen: BO-574
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-580
+  action: Works in Asset Maintenance History & Lifecycle
+  operations: []
+  outcome: Provide the complete maintenance history of an individual serialized rental asset. The original
+    requirement specifically requires maintenance history tracking.
+- step: 13
+  screen: BO-574
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-581
+  action: Works in Return-to-Service Inspection & Approval
+  operations: []
+  outcome: Ensure repaired equipment does not automatically become rentable when a technician clicks “Repair
+    Complete.” This is one of the most important controls in Board 9.
+- step: 15
+  screen: BO-574
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-582
+  action: Works in Asset Retirement, Write-Off & Replacement Recommendation
+  operations: []
+  outcome: Manage assets that should no longer remain in the active rental fleet.
+- step: 17
+  screen: BO-574
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-583
+  action: Works in Maintenance Intelligence & Predictive AI
+  operations: []
+  outcome: Use AI to move TICVAI from reactive maintenance toward predictive maintenance. This is where
+    I recommend making the module significantly stronger than the original matrix.
+branches:
+- at: 1
+  condition: Nothing has been set up on Maintenance Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Rental Management board 9 visited
+primaryContract: unknown
+contracts:
+- unknown

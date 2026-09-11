@@ -1,0 +1,1089 @@
+{
+ "DeviceGateCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Device & Gate Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "totalDevices": {
+    "type": "integer",
+    "description": "Total Devices"
+   },
+   "online": {
+    "type": "integer",
+    "description": "Online"
+   },
+   "offline": {
+    "type": "integer",
+    "description": "Offline"
+   },
+   "degraded": {
+    "type": "string",
+    "description": "Degraded"
+   },
+   "turnstiles": {
+    "type": "integer",
+    "description": "Turnstiles"
+   },
+   "handhelds": {
+    "type": "integer",
+    "description": "Handhelds"
+   },
+   "biometricReaders": {
+    "type": "integer",
+    "description": "Biometric Readers"
+   },
+   "rfidNfcReaders": {
+    "type": "integer",
+    "description": "RFID/NFC Readers"
+   },
+   "gatesOpen": {
+    "type": "integer",
+    "description": "Gates Open"
+   },
+   "gatesClosed": {
+    "type": "integer",
+    "description": "Gates Closed"
+   },
+   "devicesRequiringSync": {
+    "type": "string",
+    "description": "Devices Requiring Sync"
+   },
+   "firmwareSoftwareExceptions": {
+    "type": "integer",
+    "description": "Firmware/Software Exceptions"
+   },
+   "hardwareAlerts": {
+    "type": "integer",
+    "description": "Hardware Alerts"
+   },
+   "connectivity": {
+    "type": "string",
+    "description": "connectivity"
+   },
+   "lastHeartbeat": {
+    "type": "string",
+    "format": "date-time",
+    "description": "last heartbeat"
+   },
+   "configurationVersion": {
+    "type": "string",
+    "description": "configuration version"
+   },
+   "localRuleVersion": {
+    "type": "string",
+    "description": "local rule version"
+   },
+   "credentialSecurityPackageVersion": {
+    "type": "string",
+    "description": "credential/security package version"
+   },
+   "scannerHealth": {
+    "type": "string",
+    "description": "scanner health"
+   },
+   "controllerHealth": {
+    "type": "string",
+    "description": "controller health"
+   },
+   "cameraHealthWhereApplicable": {
+    "type": "string",
+    "description": "camera health where applicable"
+   },
+   "ai": {
+    "type": "string",
+    "description": "AI"
+   }
+  }
+ },
+ "DeviceSoftwareContentRemoteConfigurationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Device Software, Content & Remote Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "deviceSettings": {
+    "type": "string",
+    "description": "Device settings"
+   },
+   "gateMode": {
+    "type": "string",
+    "description": "Gate mode"
+   },
+   "readerSettings": {
+    "type": "string",
+    "description": "Reader settings"
+   },
+   "mediaProfiles": {
+    "type": "string",
+    "description": "Media profiles"
+   },
+   "outcomeProfiles": {
+    "type": "string",
+    "description": "Outcome profiles"
+   },
+   "language": {
+    "type": "string",
+    "description": "Language"
+   },
+   "uiContent": {
+    "type": "string",
+    "description": "UI content"
+   },
+   "localRules": {
+    "type": "string",
+    "description": "Local rules"
+   },
+   "offlineSecurityConfiguration": {
+    "type": "integer",
+    "description": "Offline security configuration"
+   },
+   "welcomePage": {
+    "type": "string",
+    "description": "Welcome page"
+   },
+   "instructions": {
+    "type": "string",
+    "description": "Instructions"
+   },
+   "ticketStatus": {
+    "type": "string",
+    "description": "Ticket status"
+   },
+   "reasonMessage": {
+    "type": "string",
+    "description": "Reason message"
+   },
+   "promotionalInformation": {
+    "type": "string",
+    "description": "Promotional information"
+   },
+   "externalApprovedWebpage": {
+    "type": "string",
+    "description": "External approved webpage"
+   },
+   "emergencyInformation": {
+    "type": "string",
+    "description": "Emergency information"
+   }
+  }
+ },
+ "DeviceSoftwareContentRemoteConfigurationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Device Software, Content & Remote Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "deviceSettings": {
+    "type": "string",
+    "description": "Device settings"
+   },
+   "gateMode": {
+    "type": "string",
+    "description": "Gate mode"
+   },
+   "readerSettings": {
+    "type": "string",
+    "description": "Reader settings"
+   },
+   "mediaProfiles": {
+    "type": "string",
+    "description": "Media profiles"
+   },
+   "outcomeProfiles": {
+    "type": "string",
+    "description": "Outcome profiles"
+   },
+   "language": {
+    "type": "string",
+    "description": "Language"
+   },
+   "uiContent": {
+    "type": "string",
+    "description": "UI content"
+   },
+   "localRules": {
+    "type": "string",
+    "description": "Local rules"
+   },
+   "offlineSecurityConfiguration": {
+    "type": "integer",
+    "description": "Offline security configuration"
+   },
+   "welcomePage": {
+    "type": "string",
+    "description": "Welcome page"
+   },
+   "instructions": {
+    "type": "string",
+    "description": "Instructions"
+   },
+   "ticketStatus": {
+    "type": "string",
+    "description": "Ticket status"
+   },
+   "reasonMessage": {
+    "type": "string",
+    "description": "Reason message"
+   },
+   "promotionalInformation": {
+    "type": "string",
+    "description": "Promotional information"
+   },
+   "externalApprovedWebpage": {
+    "type": "string",
+    "description": "External approved webpage"
+   },
+   "emergencyInformation": {
+    "type": "string",
+    "description": "Emergency information"
+   }
+  }
+ },
+ "DeviceTypeHardwareLibraryView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Device Type & Hardware Library displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "standard": {
+    "type": "string",
+    "description": "Standard"
+   },
+   "fullHeight": {
+    "type": "string",
+    "description": "Full Height"
+   },
+   "tripod": {
+    "type": "string",
+    "description": "Tripod"
+   },
+   "speedGate": {
+    "type": "string",
+    "description": "Speed Gate"
+   },
+   "wideLane": {
+    "type": "string",
+    "description": "Wide Lane"
+   },
+   "accessiblePodGate": {
+    "type": "string",
+    "description": "Accessible/POD Gate"
+   },
+   "buggyGate": {
+    "type": "string",
+    "description": "Buggy Gate"
+   },
+   "vipGate": {
+    "type": "string",
+    "description": "VIP Gate"
+   },
+   "staffGate": {
+    "type": "string",
+    "description": "Staff Gate"
+   },
+   "androidHandheld": {
+    "type": "string",
+    "description": "Android Handheld"
+   },
+   "iosDevice": {
+    "type": "string",
+    "description": "iOS Device"
+   },
+   "tablet": {
+    "type": "string",
+    "description": "Tablet"
+   },
+   "qrBarcode": {
+    "type": "string",
+    "description": "QR/Barcode"
+   },
+   "rfid": {
+    "type": "string",
+    "description": "RFID"
+   },
+   "nfc": {
+    "type": "string",
+    "description": "NFC"
+   },
+   "multiTechnology": {
+    "type": "string",
+    "description": "Multi-technology"
+   },
+   "biometric": {
+    "type": "string",
+    "description": "Biometric"
+   },
+   "podium": {
+    "type": "string",
+    "description": "Podium"
+   },
+   "counter": {
+    "type": "string",
+    "description": "Counter"
+   },
+   "beacon": {
+    "type": "string",
+    "description": "Beacon"
+   },
+   "cameraController": {
+    "type": "string",
+    "description": "camera/controller"
+   },
+   "supportedExternalAccessDevice": {
+    "type": "string",
+    "description": "supported external access device"
+   },
+   "standardTurnstiles": {
+    "type": "string",
+    "description": "standard turnstiles"
+   },
+   "manufacturer": {
+    "type": "string",
+    "description": "Manufacturer"
+   },
+   "model": {
+    "type": "string",
+    "description": "Model"
+   },
+   "deviceCategory": {
+    "type": "string",
+    "description": "Device Category"
+   },
+   "supportedTechnologies": {
+    "type": "string",
+    "description": "Supported technologies"
+   },
+   "connectivity": {
+    "type": "string",
+    "description": "Connectivity"
+   },
+   "offlineCapability": {
+    "type": "integer",
+    "description": "Offline capability"
+   },
+   "screenCapability": {
+    "type": "string",
+    "description": "Screen capability"
+   },
+   "soundCapability": {
+    "type": "string",
+    "description": "Sound capability"
+   },
+   "lightCapability": {
+    "type": "string",
+    "description": "Light capability"
+   },
+   "relayControllerSupport": {
+    "type": "boolean",
+    "description": "Relay/controller support"
+   },
+   "paymentCapabilityWhereAvailable": {
+    "type": "string",
+    "description": "payment capability where available"
+   },
+   "firmwareSoftwareInformation": {
+    "type": "string",
+    "description": "firmware/software information"
+   }
+  }
+ },
+ "GateModesFreeSpinEmergencyControlsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Gate Modes, Free Spin & Emergency Controls displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "entry": {
+    "type": "string",
+    "description": "Entry"
+   },
+   "exit": {
+    "type": "string",
+    "description": "Exit"
+   },
+   "reEntry": {
+    "type": "string",
+    "description": "Re-entry"
+   },
+   "crossover": {
+    "type": "string",
+    "description": "Crossover"
+   },
+   "closed": {
+    "type": "integer",
+    "description": "Closed"
+   },
+   "credentialReadingOff": {
+    "type": "string",
+    "description": "Credential Reading: OFF"
+   },
+   "turnstileRotationCountOn": {
+    "type": "integer",
+    "description": "Turnstile Rotation Count: ON"
+   },
+   "whoCanActivate": {
+    "type": "string",
+    "description": "Who can activate"
+   },
+   "venueScope": {
+    "type": "string",
+    "description": "Venue scope"
+   },
+   "gateGroup": {
+    "type": "string",
+    "description": "Gate group"
+   },
+   "reason": {
+    "type": "string",
+    "description": "reason"
+   },
+   "emergencyCode": {
+    "type": "string",
+    "description": "emergency code"
+   },
+   "automaticNotification": {
+    "type": "string",
+    "description": "automatic notification"
+   },
+   "incidentRecord": {
+    "type": "string",
+    "description": "incident record"
+   }
+  }
+ },
+ "HandheldMobileAccessDeviceConfigurationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Handheld & Mobile Access Device Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "deviceType": {
+    "type": "string",
+    "description": "Device type"
+   },
+   "androidIos": {
+    "type": "string",
+    "description": "Android/iOS"
+   },
+   "assignedVenue": {
+    "type": "string",
+    "description": "assigned venue"
+   },
+   "assignedZone": {
+    "type": "string",
+    "description": "assigned zone"
+   },
+   "assignedOperatorGroup": {
+    "type": "string",
+    "description": "assigned operator group"
+   },
+   "permittedOperatingModes": {
+    "type": "string",
+    "description": "permitted operating modes"
+   },
+   "offlineCapability": {
+    "type": "integer",
+    "description": "offline capability"
+   },
+   "scannerSource": {
+    "type": "string",
+    "description": "scanner source"
+   },
+   "biometricCapabilityWhereSupported": {
+    "type": "string",
+    "description": "biometric capability where supported"
+   },
+   "scanTicket": {
+    "type": "string",
+    "description": "Scan Ticket"
+   },
+   "entry": {
+    "type": "string",
+    "description": "Entry"
+   },
+   "exit": {
+    "type": "string",
+    "description": "Exit"
+   },
+   "reEntry": {
+    "type": "string",
+    "description": "Re-entry"
+   },
+   "crossover": {
+    "type": "string",
+    "description": "Crossover"
+   },
+   "groupAdmission": {
+    "type": "string",
+    "description": "Group Admission"
+   },
+   "manualAttendance": {
+    "type": "integer",
+    "description": "Manual Attendance"
+   },
+   "changeDeviceMode": {
+    "type": "string",
+    "description": "Change Device Mode"
+   },
+   "scanGroupAdmission": {
+    "type": "string",
+    "description": "Scan + Group Admission"
+   },
+   "preventsFurtherTrustedAccessTransactions": {
+    "type": "string",
+    "description": "prevents further trusted access transactions"
+   }
+  }
+ },
+ "HandheldMobileAccessDeviceConfigurationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Handheld & Mobile Access Device Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "deviceType": {
+    "type": "string",
+    "description": "Device type"
+   },
+   "androidIos": {
+    "type": "string",
+    "description": "Android/iOS"
+   },
+   "assignedVenue": {
+    "type": "string",
+    "description": "assigned venue"
+   },
+   "assignedZone": {
+    "type": "string",
+    "description": "assigned zone"
+   },
+   "assignedOperatorGroup": {
+    "type": "string",
+    "description": "assigned operator group"
+   },
+   "permittedOperatingModes": {
+    "type": "string",
+    "description": "permitted operating modes"
+   },
+   "offlineCapability": {
+    "type": "integer",
+    "description": "offline capability"
+   },
+   "scannerSource": {
+    "type": "string",
+    "description": "scanner source"
+   },
+   "biometricCapabilityWhereSupported": {
+    "type": "string",
+    "description": "biometric capability where supported"
+   },
+   "scanTicket": {
+    "type": "string",
+    "description": "Scan Ticket"
+   },
+   "entry": {
+    "type": "string",
+    "description": "Entry"
+   },
+   "exit": {
+    "type": "string",
+    "description": "Exit"
+   },
+   "reEntry": {
+    "type": "string",
+    "description": "Re-entry"
+   },
+   "crossover": {
+    "type": "string",
+    "description": "Crossover"
+   },
+   "groupAdmission": {
+    "type": "string",
+    "description": "Group Admission"
+   },
+   "manualAttendance": {
+    "type": "integer",
+    "description": "Manual Attendance"
+   },
+   "changeDeviceMode": {
+    "type": "string",
+    "description": "Change Device Mode"
+   },
+   "scanGroupAdmission": {
+    "type": "string",
+    "description": "Scan + Group Admission"
+   },
+   "preventsFurtherTrustedAccessTransactions": {
+    "type": "string",
+    "description": "prevents further trusted access transactions"
+   }
+  }
+ },
+ "HardwareCompatibilityHealthTestingDeploymentView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Hardware Compatibility, Health, Testing & Deployment displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "rfid": {
+    "type": "string",
+    "description": "RFID ✓ ✓ ✓ ✓"
+   },
+   "nfc": {
+    "type": "string",
+    "description": "NFC ✓ — ✓ ✓"
+   },
+   "offline": {
+    "type": "integer",
+    "description": "Offline ✓ ✓ ✓ ✓"
+   },
+   "pilotDeployment": {
+    "type": "string",
+    "description": "Pilot deployment"
+   },
+   "selectedGates": {
+    "type": "string",
+    "description": "Selected gates"
+   },
+   "deviceGroup": {
+    "type": "string",
+    "description": "device group"
+   },
+   "venue": {
+    "type": "string",
+    "description": "venue"
+   },
+   "scheduledRollout": {
+    "type": "string",
+    "format": "date-time",
+    "description": "scheduled rollout"
+   },
+   "rollback": {
+    "type": "string",
+    "description": "rollback"
+   },
+   "sounds": {
+    "type": "string",
+    "description": "sounds"
+   },
+   "board2AccessRules": {
+    "type": "string",
+    "description": "Board 2 — Access Rules"
+   },
+   "board6PhysicalExecution": {
+    "type": "string",
+    "description": "BOARD 6 — PHYSICAL EXECUTION"
+   },
+   "issues": {
+    "type": "string",
+    "description": "issues"
+   },
+   "disappears": {
+    "type": "string",
+    "description": "disappears?"
+   },
+   "distribute": {
+    "type": "string",
+    "description": "↓ Distribute"
+   },
+   "localValidation": {
+    "type": "string",
+    "description": "↓ Local validation"
+   },
+   "synchronize": {
+    "type": "string",
+    "description": "↑ Synchronize"
+   }
+  }
+ },
+ "PhysicalDeviceRegistrationProvisioningView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Physical Device Registration & Provisioning displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "deviceId": {
+    "type": "string",
+    "description": "Device ID"
+   },
+   "serialNumber": {
+    "type": "string",
+    "description": "Serial Number"
+   },
+   "hardwareModel": {
+    "type": "string",
+    "description": "Hardware Model"
+   },
+   "manufacturer": {
+    "type": "string",
+    "description": "Manufacturer"
+   },
+   "tenant": {
+    "type": "string",
+    "description": "Tenant"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "park": {
+    "type": "string",
+    "description": "Park"
+   },
+   "zone": {
+    "type": "string",
+    "description": "Zone"
+   },
+   "accessPoint": {
+    "type": "string",
+    "description": "Access Point"
+   },
+   "gateLane": {
+    "type": "string",
+    "description": "Gate/Lane"
+   },
+   "ipNetworkReference": {
+    "type": "string",
+    "description": "IP/network reference"
+   },
+   "controllerReference": {
+    "type": "string",
+    "description": "controller reference"
+   },
+   "installationDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "installation date"
+   },
+   "useControlledDeviceCredentials": {
+    "type": "string",
+    "description": "Use controlled device credentials"
+   },
+   "useControlledDeviceCertificates": {
+    "type": "string",
+    "description": "Use controlled device certificates"
+   },
+   "whilePreserving": {
+    "type": "string",
+    "description": "while preserving"
+   },
+   "gateAssignment": {
+    "type": "string",
+    "description": "Gate assignment"
+   },
+   "configuration": {
+    "type": "string",
+    "description": "Configuration"
+   },
+   "accessRules": {
+    "type": "string",
+    "description": "Access rules"
+   },
+   "mediaProfiles": {
+    "type": "string",
+    "description": "Media profiles"
+   },
+   "operatingMode": {
+    "type": "string",
+    "description": "operating mode"
+   }
+  }
+ },
+ "ReaderScannerPeripheralConfigurationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Reader, Scanner & Peripheral Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "whereSupported": {
+    "type": "string",
+    "description": "where supported"
+   },
+   "yellowOperatorVerification": {
+    "type": "string",
+    "description": "Yellow → Operator Verification"
+   }
+  }
+ },
+ "ReaderScannerPeripheralConfigurationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Reader, Scanner & Peripheral Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "whereSupported": {
+    "type": "string",
+    "description": "where supported"
+   },
+   "yellowOperatorVerification": {
+    "type": "string",
+    "description": "Yellow → Operator Verification"
+   }
+  }
+ },
+ "TurnstileLaneBehaviorConfigurationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Turnstile & Lane Behavior Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "entry": {
+    "type": "string",
+    "description": "Entry"
+   },
+   "exit": {
+    "type": "string",
+    "description": "Exit"
+   },
+   "entryExit": {
+    "type": "string",
+    "description": "Entry/Exit"
+   },
+   "reEntry": {
+    "type": "string",
+    "description": "Re-entry"
+   },
+   "crossover": {
+    "type": "string",
+    "description": "Crossover"
+   },
+   "fastPass": {
+    "type": "string",
+    "description": "Fast Pass"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "group": {
+    "type": "string",
+    "description": "Group"
+   },
+   "countOnly": {
+    "type": "integer",
+    "description": "Count Only"
+   },
+   "freeSpin": {
+    "type": "string",
+    "description": "Free Spin"
+   },
+   "closed": {
+    "type": "integer",
+    "description": "Closed"
+   },
+   "emergency": {
+    "type": "string",
+    "description": "Emergency"
+   },
+   "passThroughTimeout": {
+    "type": "string",
+    "description": "pass-through timeout"
+   },
+   "relockBehavior": {
+    "type": "string",
+    "description": "relock behavior"
+   },
+   "incompletePassageBehavior": {
+    "type": "string",
+    "description": "incomplete passage behavior"
+   }
+  }
+ },
+ "TurnstileLaneBehaviorConfigurationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Turnstile & Lane Behavior Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "entry": {
+    "type": "string",
+    "description": "Entry"
+   },
+   "exit": {
+    "type": "string",
+    "description": "Exit"
+   },
+   "entryExit": {
+    "type": "string",
+    "description": "Entry/Exit"
+   },
+   "reEntry": {
+    "type": "string",
+    "description": "Re-entry"
+   },
+   "crossover": {
+    "type": "string",
+    "description": "Crossover"
+   },
+   "fastPass": {
+    "type": "string",
+    "description": "Fast Pass"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "group": {
+    "type": "string",
+    "description": "Group"
+   },
+   "countOnly": {
+    "type": "integer",
+    "description": "Count Only"
+   },
+   "freeSpin": {
+    "type": "string",
+    "description": "Free Spin"
+   },
+   "closed": {
+    "type": "integer",
+    "description": "Closed"
+   },
+   "emergency": {
+    "type": "string",
+    "description": "Emergency"
+   },
+   "passThroughTimeout": {
+    "type": "string",
+    "description": "pass-through timeout"
+   },
+   "relockBehavior": {
+    "type": "string",
+    "description": "relock behavior"
+   },
+   "incompletePassageBehavior": {
+    "type": "string",
+    "description": "incomplete passage behavior"
+   }
+  }
+ },
+ "ValidationOutcomeGuestFeedbackDesignerInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Validation Outcome & Guest Feedback Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "greenLight": {
+    "type": "string",
+    "description": "Green light"
+   },
+   "gateOpen": {
+    "type": "integer",
+    "description": "Gate open"
+   },
+   "successTone": {
+    "type": "string",
+    "description": "Success tone"
+   },
+   "pictogram": {
+    "type": "string",
+    "description": "✓ pictogram"
+   },
+   "customMessage": {
+    "type": "string",
+    "description": "Custom message"
+   },
+   "yellowLight": {
+    "type": "string",
+    "description": "Yellow light"
+   },
+   "alertSound": {
+    "type": "string",
+    "description": "Alert sound"
+   },
+   "gateRemainsControlled": {
+    "type": "string",
+    "description": "Gate remains controlled"
+   },
+   "operatorPrompt": {
+    "type": "string",
+    "description": "operator prompt"
+   },
+   "redLight": {
+    "type": "string",
+    "description": "Red light"
+   },
+   "denialSound": {
+    "type": "string",
+    "description": "Denial sound"
+   },
+   "gateRemainsLocked": {
+    "type": "string",
+    "description": "Gate remains locked"
+   },
+   "reasonCode": {
+    "type": "string",
+    "description": "reason code"
+   },
+   "redAccessDenied": {
+    "type": "string",
+    "description": "RED — ACCESS DENIED"
+   }
+  }
+ },
+ "ValidationOutcomeGuestFeedbackDesignerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Validation Outcome & Guest Feedback Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "greenLight": {
+    "type": "string",
+    "description": "Green light"
+   },
+   "gateOpen": {
+    "type": "integer",
+    "description": "Gate open"
+   },
+   "successTone": {
+    "type": "string",
+    "description": "Success tone"
+   },
+   "pictogram": {
+    "type": "string",
+    "description": "✓ pictogram"
+   },
+   "customMessage": {
+    "type": "string",
+    "description": "Custom message"
+   },
+   "yellowLight": {
+    "type": "string",
+    "description": "Yellow light"
+   },
+   "alertSound": {
+    "type": "string",
+    "description": "Alert sound"
+   },
+   "gateRemainsControlled": {
+    "type": "string",
+    "description": "Gate remains controlled"
+   },
+   "operatorPrompt": {
+    "type": "string",
+    "description": "operator prompt"
+   },
+   "redLight": {
+    "type": "string",
+    "description": "Red light"
+   },
+   "denialSound": {
+    "type": "string",
+    "description": "Denial sound"
+   },
+   "gateRemainsLocked": {
+    "type": "string",
+    "description": "Gate remains locked"
+   },
+   "reasonCode": {
+    "type": "string",
+    "description": "reason code"
+   },
+   "redAccessDenied": {
+    "type": "string",
+    "description": "RED — ACCESS DENIED"
+   }
+  }
+ }
+}

@@ -1,0 +1,55 @@
+{
+ "DeadLetter": {
+  "type": "object",
+  "x-ticvai-persistence": "platform.dead_letter",
+  "description": "ADR-0033. **An outbox row whose delivery failed after its retry budget.**\n\n**A financial posting is never dead-lettered** — `ledger.journal_entry` is append-only and a failed posting is an incident. **Nor is a DSAR**: `platform.dsar_request` carries a legal clock, and a dead-lettered erasure nobody works is a regulatory failure with a timestamp on it. Both halt and alert.",
+  "required": [
+   "id"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "outboxId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The row that would not deliver."
+   },
+   "eventName": {
+    "type": "string"
+   },
+   "consumer": {
+    "type": "string",
+    "description": "Which consumer failed. **A dead letter you cannot attribute is a log entry with a table’s overhead.**"
+   },
+   "payload": {
+    "type": "object",
+    "description": "The event as it was written. **Replay needs the payload, not a reference to a row that may have moved on.**"
+   },
+   "attempts": {
+    "type": "integer",
+    "description": "**Five, exponential from one second, jittered** (ADR-0033). Jitter because a thousand failures at the same instant retry at the same instant."
+   },
+   "lastError": {
+    "type": "string"
+   },
+   "lastAttemptAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "replayCount": {
+    "type": "integer",
+    "default": 0,
+    "description": "**A replay is a new attempt, not a reset.** An operator retrying the same poison message forty times should be able to see that they did."
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ }
+}

@@ -1,0 +1,173 @@
+{
+ "listGroupAmendmentCancellation": {
+  "method": "GET",
+  "path": "/group-amendment-cancellation",
+  "contract": "orders",
+  "summary": "Group Amendments, Cancellation & Refund Operations",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GroupAmendmentsCancellationRefundOperationsView"
+ },
+ "listGroupArrivalCheck": {
+  "method": "GET",
+  "path": "/group-arrival-check",
+  "contract": "orders",
+  "summary": "Group Arrival, Check-In & Admission Operations",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GroupArrivalCheckInAdmissionOperationsView"
+ },
+ "listGroupBooking": {
+  "method": "GET",
+  "path": "/group-booking",
+  "contract": "orders",
+  "summary": "Group Booking Operations Command Center",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GroupBookingOperationsCommandCenterView"
+ },
+ "listGroupBookingReconciliation": {
+  "method": "GET",
+  "path": "/group-booking-reconciliation",
+  "contract": "orders",
+  "summary": "Group Booking Reconciliation, Closure & Performance",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GroupBookingReconciliationClosurePerformanceView"
+ },
+ "listGroupPaymentDeposit": {
+  "method": "GET",
+  "path": "/group-payment-deposit",
+  "contract": "orders",
+  "summary": "Group Payment, Deposit & Balance Management",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GroupPaymentDepositBalanceManagementView"
+ },
+ "listGroupSale2": {
+  "method": "GET",
+  "path": "/group-sale-2",
+  "contract": "orders",
+  "summary": "Group Sales Analytics & AI Intelligence Center",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "customerType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "organization",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "salesOwner",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "groupType",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "date",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "GroupSalesAnalyticsAiIntelligenceCenterView"
+ },
+ "listGroupTicketFulfillment": {
+  "method": "GET",
+  "path": "/group-ticket-fulfillment",
+  "contract": "orders",
+  "summary": "Group Ticket Fulfillment & Distribution",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GroupTicketFulfillmentDistributionView"
+ },
+ "listGroupTicketSeat": {
+  "method": "GET",
+  "path": "/group-ticket-seat",
+  "contract": "orders",
+  "summary": "Group Ticket, Seat & Entitlement Allocation",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "GroupTicketSeatEntitlementAllocationView"
+ },
+ "listParticipantGuestList": {
+  "method": "GET",
+  "path": "/participant-guest-list",
+  "contract": "orders",
+  "summary": "Participants, Guest Lists & Group Structure",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ParticipantsGuestListsGroupStructureView"
+ },
+ "setGroupOperationalPlanning": {
+  "method": "PUT",
+  "path": "/group-operational-planning",
+  "contract": "orders",
+  "summary": "Group Operational Planning & Task Workspace",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "GroupOperationalPlanningTaskWorkspaceInput",
+  "responds": "GroupOperationalPlanningTaskWorkspaceView"
+ }
+}

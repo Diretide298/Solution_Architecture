@@ -1,0 +1,2456 @@
+{
+ "AppleWalletPassDesignerInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Apple Wallet Pass Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "passIdentity": {
+    "type": "string",
+    "description": "Pass identity"
+   },
+   "organization": {
+    "type": "string",
+    "description": "Organization"
+   },
+   "description": {
+    "type": "string",
+    "description": "Description"
+   },
+   "logo": {
+    "type": "string",
+    "description": "Logo"
+   },
+   "icon": {
+    "type": "string",
+    "description": "Icon"
+   },
+   "imagesWhereSupported": {
+    "type": "string",
+    "description": "Images where supported"
+   },
+   "backgroundAppearance": {
+    "type": "string",
+    "description": "Background appearance"
+   },
+   "foregroundAppearance": {
+    "type": "string",
+    "description": "Foreground appearance"
+   },
+   "labelAppearance": {
+    "type": "string",
+    "description": "Label appearance"
+   },
+   "primaryFields": {
+    "type": "string",
+    "description": "Primary fields"
+   },
+   "secondaryFields": {
+    "type": "string",
+    "description": "Secondary fields"
+   },
+   "auxiliaryFields": {
+    "type": "string",
+    "description": "Auxiliary fields"
+   },
+   "headerFields": {
+    "type": "string",
+    "description": "Header fields"
+   },
+   "backFields": {
+    "type": "string",
+    "description": "Back fields"
+   },
+   "qr": {
+    "type": "string",
+    "description": "QR"
+   },
+   "barcode": {
+    "type": "string",
+    "description": "Barcode"
+   },
+   "tokenReference": {
+    "type": "string",
+    "description": "Token/reference"
+   },
+   "accordingToTheCredentialProfile": {
+    "type": "string",
+    "description": "according to the credential profile"
+   },
+   "dynamicUpdates": {
+    "type": "string",
+    "description": "Dynamic updates"
+   },
+   "eventChanges": {
+    "type": "string",
+    "description": "Event changes"
+   },
+   "seatChanges": {
+    "type": "string",
+    "description": "Seat changes"
+   },
+   "ticketStatusChanges": {
+    "type": "string",
+    "description": "Ticket status changes"
+   },
+   "relevantNotificationUpdateBehavior": {
+    "type": "string",
+    "description": "Relevant notification/update behavior"
+   },
+   "expiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry"
+   },
+   "revocationInvalidationBehaviorWhereSupported": {
+    "type": "string",
+    "description": "Revocation/invalidation behavior where supported"
+   }
+  }
+ },
+ "AppleWalletPassDesignerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Apple Wallet Pass Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "passIdentity": {
+    "type": "string",
+    "description": "Pass identity"
+   },
+   "organization": {
+    "type": "string",
+    "description": "Organization"
+   },
+   "description": {
+    "type": "string",
+    "description": "Description"
+   },
+   "logo": {
+    "type": "string",
+    "description": "Logo"
+   },
+   "icon": {
+    "type": "string",
+    "description": "Icon"
+   },
+   "imagesWhereSupported": {
+    "type": "string",
+    "description": "Images where supported"
+   },
+   "backgroundAppearance": {
+    "type": "string",
+    "description": "Background appearance"
+   },
+   "foregroundAppearance": {
+    "type": "string",
+    "description": "Foreground appearance"
+   },
+   "labelAppearance": {
+    "type": "string",
+    "description": "Label appearance"
+   },
+   "primaryFields": {
+    "type": "string",
+    "description": "Primary fields"
+   },
+   "secondaryFields": {
+    "type": "string",
+    "description": "Secondary fields"
+   },
+   "auxiliaryFields": {
+    "type": "string",
+    "description": "Auxiliary fields"
+   },
+   "headerFields": {
+    "type": "string",
+    "description": "Header fields"
+   },
+   "backFields": {
+    "type": "string",
+    "description": "Back fields"
+   },
+   "qr": {
+    "type": "string",
+    "description": "QR"
+   },
+   "barcode": {
+    "type": "string",
+    "description": "Barcode"
+   },
+   "tokenReference": {
+    "type": "string",
+    "description": "Token/reference"
+   },
+   "accordingToTheCredentialProfile": {
+    "type": "string",
+    "description": "according to the credential profile"
+   },
+   "dynamicUpdates": {
+    "type": "string",
+    "description": "Dynamic updates"
+   },
+   "eventChanges": {
+    "type": "string",
+    "description": "Event changes"
+   },
+   "seatChanges": {
+    "type": "string",
+    "description": "Seat changes"
+   },
+   "ticketStatusChanges": {
+    "type": "string",
+    "description": "Ticket status changes"
+   },
+   "relevantNotificationUpdateBehavior": {
+    "type": "string",
+    "description": "Relevant notification/update behavior"
+   },
+   "expiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry"
+   },
+   "revocationInvalidationBehaviorWhereSupported": {
+    "type": "string",
+    "description": "Revocation/invalidation behavior where supported"
+   }
+  }
+ },
+ "BrandingLocalizationTemplateInheritanceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Branding, Localization & Template Inheritance displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "logo": {
+    "type": "string",
+    "description": "Logo"
+   },
+   "colors": {
+    "type": "string",
+    "description": "Colors"
+   },
+   "typography": {
+    "type": "string",
+    "description": "Typography"
+   },
+   "backgrounds": {
+    "type": "string",
+    "description": "Backgrounds"
+   },
+   "headerFooter": {
+    "type": "string",
+    "description": "Header/footer"
+   },
+   "legalFooter": {
+    "type": "string",
+    "description": "Legal footer"
+   },
+   "supportInformation": {
+    "type": "string",
+    "description": "Support information"
+   },
+   "sponsorPlacement": {
+    "type": "string",
+    "description": "Sponsor placement"
+   },
+   "images": {
+    "type": "string",
+    "description": "Images"
+   },
+   "english": {
+    "type": "string",
+    "description": "English"
+   },
+   "arabic": {
+    "type": "string",
+    "description": "Arabic"
+   },
+   "additionalConfiguredLanguages": {
+    "type": "string",
+    "description": "Additional configured languages"
+   },
+   "sourceLanguage": {
+    "type": "string",
+    "description": "Source language"
+   },
+   "translation": {
+    "type": "string",
+    "description": "Translation"
+   },
+   "translationStatus": {
+    "type": "integer",
+    "description": "Translation status"
+   },
+   "reviewer": {
+    "type": "string",
+    "description": "Reviewer"
+   },
+   "approval": {
+    "type": "string",
+    "description": "Approval"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version"
+   }
+  }
+ },
+ "DigitalCardMembershipWearableDesignerInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Digital Card, Membership & Wearable Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "brand": {
+    "type": "string",
+    "description": "Brand"
+   },
+   "cardArtwork": {
+    "type": "string",
+    "description": "Card artwork"
+   },
+   "memberPhotograph": {
+    "type": "string",
+    "description": "Member photograph"
+   },
+   "memberName": {
+    "type": "string",
+    "description": "Member name"
+   },
+   "membershipNumber": {
+    "type": "string",
+    "description": "Membership number"
+   },
+   "tier": {
+    "type": "string",
+    "description": "Tier"
+   },
+   "validity": {
+    "type": "string",
+    "description": "Validity"
+   },
+   "qrBarcode": {
+    "type": "string",
+    "description": "QR/barcode"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status"
+   },
+   "benefitsSummary": {
+    "type": "string",
+    "description": "Benefits summary"
+   },
+   "dynamicMessaging": {
+    "type": "string",
+    "description": "Dynamic messaging"
+   },
+   "tierDesigns": {
+    "type": "string",
+    "description": "Tier designs"
+   },
+   "membershipTypes": {
+    "type": "string",
+    "description": "Membership types"
+   },
+   "brands": {
+    "type": "string",
+    "description": "Brands"
+   },
+   "venues": {
+    "type": "string",
+    "description": "Venues"
+   },
+   "ageCategories": {
+    "type": "string",
+    "description": "Age categories"
+   },
+   "membershipRenewal": {
+    "type": "string",
+    "description": "Membership renewal"
+   },
+   "tierChange": {
+    "type": "string",
+    "description": "Tier change"
+   },
+   "expiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry"
+   },
+   "suspension": {
+    "type": "string",
+    "description": "Suspension"
+   },
+   "benefitStatus": {
+    "type": "string",
+    "description": "Benefit status"
+   }
+  }
+ },
+ "DigitalCardMembershipWearableDesignerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Digital Card, Membership & Wearable Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "brand": {
+    "type": "string",
+    "description": "Brand"
+   },
+   "cardArtwork": {
+    "type": "string",
+    "description": "Card artwork"
+   },
+   "memberPhotograph": {
+    "type": "string",
+    "description": "Member photograph"
+   },
+   "memberName": {
+    "type": "string",
+    "description": "Member name"
+   },
+   "membershipNumber": {
+    "type": "string",
+    "description": "Membership number"
+   },
+   "tier": {
+    "type": "string",
+    "description": "Tier"
+   },
+   "validity": {
+    "type": "string",
+    "description": "Validity"
+   },
+   "qrBarcode": {
+    "type": "string",
+    "description": "QR/barcode"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status"
+   },
+   "benefitsSummary": {
+    "type": "string",
+    "description": "Benefits summary"
+   },
+   "dynamicMessaging": {
+    "type": "string",
+    "description": "Dynamic messaging"
+   },
+   "tierDesigns": {
+    "type": "string",
+    "description": "Tier designs"
+   },
+   "membershipTypes": {
+    "type": "string",
+    "description": "Membership types"
+   },
+   "brands": {
+    "type": "string",
+    "description": "Brands"
+   },
+   "venues": {
+    "type": "string",
+    "description": "Venues"
+   },
+   "ageCategories": {
+    "type": "string",
+    "description": "Age categories"
+   },
+   "membershipRenewal": {
+    "type": "string",
+    "description": "Membership renewal"
+   },
+   "tierChange": {
+    "type": "string",
+    "description": "Tier change"
+   },
+   "expiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry"
+   },
+   "suspension": {
+    "type": "string",
+    "description": "Suspension"
+   },
+   "benefitStatus": {
+    "type": "string",
+    "description": "Benefit status"
+   }
+  }
+ },
+ "DigitalQrBarcodeTicketDesignerInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Digital QR & Barcode Ticket Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "logo": {
+    "type": "string",
+    "description": "Logo"
+   },
+   "eventImage": {
+    "type": "string",
+    "description": "Event Image"
+   },
+   "eventName": {
+    "type": "string",
+    "description": "Event Name"
+   },
+   "ticketType": {
+    "type": "string",
+    "description": "Ticket Type"
+   },
+   "customerName": {
+    "type": "string",
+    "description": "Customer Name"
+   },
+   "participantName": {
+    "type": "string",
+    "description": "Participant Name"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "time": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "entrance": {
+    "type": "string",
+    "description": "Entrance"
+   },
+   "section": {
+    "type": "string",
+    "description": "Section"
+   },
+   "row": {
+    "type": "string",
+    "description": "Row"
+   },
+   "seat": {
+    "type": "string",
+    "description": "Seat"
+   },
+   "price": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price"
+   },
+   "orderReference": {
+    "type": "string",
+    "description": "Order Reference"
+   },
+   "virtualTicketId": {
+    "type": "string",
+    "description": "Virtual Ticket ID"
+   },
+   "qr": {
+    "type": "string",
+    "description": "QR"
+   },
+   "barcode": {
+    "type": "string",
+    "description": "Barcode"
+   },
+   "terms": {
+    "type": "string",
+    "description": "Terms"
+   },
+   "instructions": {
+    "type": "string",
+    "description": "Instructions"
+   },
+   "waiverLinkStatus": {
+    "type": "string",
+    "description": "Waiver Link / Status"
+   },
+   "sponsor": {
+    "type": "string",
+    "description": "Sponsor"
+   },
+   "customFields": {
+    "type": "string",
+    "description": "Custom Fields"
+   },
+   "staticQr": {
+    "type": "string",
+    "description": "Static QR"
+   },
+   "dynamicQr": {
+    "type": "string",
+    "description": "Dynamic QR"
+   },
+   "signedQr": {
+    "type": "string",
+    "description": "Signed QR"
+   },
+   "tokenizedQr": {
+    "type": "string",
+    "description": "Tokenized QR"
+   },
+   "rotationBehaviorWhereSupported": {
+    "type": "string",
+    "description": "Rotation behavior where supported"
+   },
+   "size": {
+    "type": "string",
+    "description": "Size"
+   },
+   "position": {
+    "type": "string",
+    "description": "Position"
+   },
+   "quietZone": {
+    "type": "string",
+    "description": "Quiet zone"
+   },
+   "errorCorrection": {
+    "type": "string",
+    "description": "Error correction"
+   },
+   "expiration": {
+    "type": "string",
+    "description": "Expiration"
+   },
+   "refreshBehavior": {
+    "type": "string",
+    "description": "Refresh behavior"
+   },
+   "barcodeType": {
+    "type": "string",
+    "description": "Barcode type"
+   },
+   "orientation": {
+    "type": "string",
+    "description": "Orientation"
+   },
+   "humanReadableValue": {
+    "type": "string",
+    "description": "Human-readable value"
+   },
+   "hideShowEncodedReference": {
+    "type": "string",
+    "description": "Hide/show encoded reference"
+   },
+   "showPriceOnOff": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Show Price: ON / OFF"
+   },
+   "mobileTabletDesktop": {
+    "type": "string",
+    "description": "Mobile | Tablet | Desktop"
+   }
+  }
+ },
+ "DigitalQrBarcodeTicketDesignerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Digital QR & Barcode Ticket Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "logo": {
+    "type": "string",
+    "description": "Logo"
+   },
+   "eventImage": {
+    "type": "string",
+    "description": "Event Image"
+   },
+   "eventName": {
+    "type": "string",
+    "description": "Event Name"
+   },
+   "ticketType": {
+    "type": "string",
+    "description": "Ticket Type"
+   },
+   "customerName": {
+    "type": "string",
+    "description": "Customer Name"
+   },
+   "participantName": {
+    "type": "string",
+    "description": "Participant Name"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "time": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "entrance": {
+    "type": "string",
+    "description": "Entrance"
+   },
+   "section": {
+    "type": "string",
+    "description": "Section"
+   },
+   "row": {
+    "type": "string",
+    "description": "Row"
+   },
+   "seat": {
+    "type": "string",
+    "description": "Seat"
+   },
+   "price": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price"
+   },
+   "orderReference": {
+    "type": "string",
+    "description": "Order Reference"
+   },
+   "virtualTicketId": {
+    "type": "string",
+    "description": "Virtual Ticket ID"
+   },
+   "qr": {
+    "type": "string",
+    "description": "QR"
+   },
+   "barcode": {
+    "type": "string",
+    "description": "Barcode"
+   },
+   "terms": {
+    "type": "string",
+    "description": "Terms"
+   },
+   "instructions": {
+    "type": "string",
+    "description": "Instructions"
+   },
+   "waiverLinkStatus": {
+    "type": "string",
+    "description": "Waiver Link / Status"
+   },
+   "sponsor": {
+    "type": "string",
+    "description": "Sponsor"
+   },
+   "customFields": {
+    "type": "string",
+    "description": "Custom Fields"
+   },
+   "staticQr": {
+    "type": "string",
+    "description": "Static QR"
+   },
+   "dynamicQr": {
+    "type": "string",
+    "description": "Dynamic QR"
+   },
+   "signedQr": {
+    "type": "string",
+    "description": "Signed QR"
+   },
+   "tokenizedQr": {
+    "type": "string",
+    "description": "Tokenized QR"
+   },
+   "rotationBehaviorWhereSupported": {
+    "type": "string",
+    "description": "Rotation behavior where supported"
+   },
+   "size": {
+    "type": "string",
+    "description": "Size"
+   },
+   "position": {
+    "type": "string",
+    "description": "Position"
+   },
+   "quietZone": {
+    "type": "string",
+    "description": "Quiet zone"
+   },
+   "errorCorrection": {
+    "type": "string",
+    "description": "Error correction"
+   },
+   "expiration": {
+    "type": "string",
+    "description": "Expiration"
+   },
+   "refreshBehavior": {
+    "type": "string",
+    "description": "Refresh behavior"
+   },
+   "barcodeType": {
+    "type": "string",
+    "description": "Barcode type"
+   },
+   "orientation": {
+    "type": "string",
+    "description": "Orientation"
+   },
+   "humanReadableValue": {
+    "type": "string",
+    "description": "Human-readable value"
+   },
+   "hideShowEncodedReference": {
+    "type": "string",
+    "description": "Hide/show encoded reference"
+   },
+   "showPriceOnOff": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Show Price: ON / OFF"
+   },
+   "mobileTabletDesktop": {
+    "type": "string",
+    "description": "Mobile | Tablet | Desktop"
+   }
+  }
+ },
+ "DynamicFieldsDataMappingContentBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is access.entitlement at 3%, so this is not an update to anything the package stores today and no new table has been decided",
+  "description": "**What Dynamic Fields, Data Mapping & Content Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "customerName": {
+    "type": "string",
+    "description": "Customer Name"
+   },
+   "customerId": {
+    "type": "string",
+    "description": "Customer ID"
+   },
+   "mobile": {
+    "type": "string",
+    "description": "Mobile"
+   },
+   "email": {
+    "type": "string",
+    "description": "Email"
+   },
+   "photo": {
+    "type": "string",
+    "description": "Photo"
+   },
+   "participantName": {
+    "type": "string",
+    "description": "Participant Name"
+   },
+   "dobAgeCategory": {
+    "type": "string",
+    "description": "DOB/Age category"
+   },
+   "participantId": {
+    "type": "string",
+    "description": "Participant ID"
+   },
+   "orderId": {
+    "type": "string",
+    "description": "Order ID"
+   },
+   "bookingReference": {
+    "type": "string",
+    "description": "Booking Reference"
+   },
+   "purchaseDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Purchase Date"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "virtualTicketId": {
+    "type": "string",
+    "description": "Virtual Ticket ID"
+   },
+   "ticketType": {
+    "type": "string",
+    "description": "Ticket Type"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status"
+   },
+   "validity": {
+    "type": "string",
+    "description": "Validity"
+   },
+   "usageStatus": {
+    "type": "string",
+    "description": "Usage Status"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "performance": {
+    "type": "string",
+    "description": "Performance"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "time": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "entrance": {
+    "type": "string",
+    "description": "Entrance"
+   },
+   "section": {
+    "type": "string",
+    "description": "Section"
+   },
+   "row": {
+    "type": "string",
+    "description": "Row"
+   },
+   "seat": {
+    "type": "string",
+    "description": "Seat"
+   },
+   "faceValue": {
+    "type": "string",
+    "description": "Face Value"
+   },
+   "paidPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Paid Price"
+   },
+   "discount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "membershipId": {
+    "type": "string",
+    "description": "Membership ID"
+   },
+   "tier": {
+    "type": "string",
+    "description": "Tier"
+   },
+   "expiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry"
+   },
+   "waiverStatus": {
+    "type": "string",
+    "description": "Waiver Status"
+   },
+   "waiverLinkWherePermitted": {
+    "type": "string",
+    "description": "Waiver Link where permitted"
+   },
+   "qr": {
+    "type": "string",
+    "description": "QR"
+   },
+   "barcode": {
+    "type": "string",
+    "description": "Barcode"
+   },
+   "credentialReference": {
+    "type": "string",
+    "description": "Credential Reference"
+   },
+   "dateFormats": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date formats"
+   }
+  }
+ },
+ "DynamicFieldsDataMappingContentBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Dynamic Fields, Data Mapping & Content Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "customerName": {
+    "type": "string",
+    "description": "Customer Name"
+   },
+   "customerId": {
+    "type": "string",
+    "description": "Customer ID"
+   },
+   "mobile": {
+    "type": "string",
+    "description": "Mobile"
+   },
+   "email": {
+    "type": "string",
+    "description": "Email"
+   },
+   "photo": {
+    "type": "string",
+    "description": "Photo"
+   },
+   "participantName": {
+    "type": "string",
+    "description": "Participant Name"
+   },
+   "dobAgeCategory": {
+    "type": "string",
+    "description": "DOB/Age category"
+   },
+   "participantId": {
+    "type": "string",
+    "description": "Participant ID"
+   },
+   "orderId": {
+    "type": "string",
+    "description": "Order ID"
+   },
+   "bookingReference": {
+    "type": "string",
+    "description": "Booking Reference"
+   },
+   "purchaseDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Purchase Date"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "virtualTicketId": {
+    "type": "string",
+    "description": "Virtual Ticket ID"
+   },
+   "ticketType": {
+    "type": "string",
+    "description": "Ticket Type"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status"
+   },
+   "validity": {
+    "type": "string",
+    "description": "Validity"
+   },
+   "usageStatus": {
+    "type": "string",
+    "description": "Usage Status"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "performance": {
+    "type": "string",
+    "description": "Performance"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "time": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "entrance": {
+    "type": "string",
+    "description": "Entrance"
+   },
+   "section": {
+    "type": "string",
+    "description": "Section"
+   },
+   "row": {
+    "type": "string",
+    "description": "Row"
+   },
+   "seat": {
+    "type": "string",
+    "description": "Seat"
+   },
+   "faceValue": {
+    "type": "string",
+    "description": "Face Value"
+   },
+   "paidPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Paid Price"
+   },
+   "discount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Discount"
+   },
+   "currency": {
+    "type": "string",
+    "description": "Currency"
+   },
+   "membershipId": {
+    "type": "string",
+    "description": "Membership ID"
+   },
+   "tier": {
+    "type": "string",
+    "description": "Tier"
+   },
+   "expiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry"
+   },
+   "waiverStatus": {
+    "type": "string",
+    "description": "Waiver Status"
+   },
+   "waiverLinkWherePermitted": {
+    "type": "string",
+    "description": "Waiver Link where permitted"
+   },
+   "qr": {
+    "type": "string",
+    "description": "QR"
+   },
+   "barcode": {
+    "type": "string",
+    "description": "Barcode"
+   },
+   "credentialReference": {
+    "type": "string",
+    "description": "Credential Reference"
+   },
+   "dateFormats": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date formats"
+   }
+  }
+ },
+ "GoogleWalletPassDesignerInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Google Wallet Pass Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "passClass": {
+    "type": "string",
+    "description": "Pass class"
+   },
+   "passTemplate": {
+    "type": "string",
+    "description": "Pass template"
+   },
+   "issuer": {
+    "type": "string",
+    "description": "Issuer"
+   },
+   "title": {
+    "type": "string",
+    "description": "Title"
+   },
+   "logo": {
+    "type": "string",
+    "description": "Logo"
+   },
+   "heroImageAssetsWhereApplicable": {
+    "type": "string",
+    "description": "Hero/image assets where applicable"
+   },
+   "eventInformation": {
+    "type": "string",
+    "description": "Event information"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "dateTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date/time"
+   },
+   "ticketHolder": {
+    "type": "string",
+    "description": "Ticket holder"
+   },
+   "seat": {
+    "type": "string",
+    "description": "Seat"
+   },
+   "ticketType": {
+    "type": "string",
+    "description": "Ticket type"
+   },
+   "customFields": {
+    "type": "string",
+    "description": "Custom fields"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status"
+   },
+   "links": {
+    "type": "string",
+    "description": "Links"
+   },
+   "additionalInformation": {
+    "type": "string",
+    "description": "Additional information"
+   },
+   "qr": {
+    "type": "string",
+    "description": "QR"
+   },
+   "barcode": {
+    "type": "string",
+    "description": "Barcode"
+   },
+   "credentialTokenReference": {
+    "type": "string",
+    "description": "Credential/token reference"
+   },
+   "accordingToSupportedWalletFunctionality": {
+    "type": "string",
+    "description": "according to supported wallet functionality"
+   },
+   "eventTimeChange": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Event time change"
+   },
+   "venueChange": {
+    "type": "string",
+    "description": "Venue change"
+   },
+   "seatReassignment": {
+    "type": "string",
+    "description": "Seat reassignment"
+   },
+   "ticketStatusChange": {
+    "type": "string",
+    "description": "Ticket status change"
+   },
+   "relevantTicketInformationChanges": {
+    "type": "string",
+    "description": "Relevant ticket information changes"
+   },
+   "provideDeviceOrientedPreviewBeforePublication": {
+    "type": "string",
+    "description": "Provide device-oriented preview before publication"
+   },
+   "mapping": {
+    "type": "string",
+    "description": "mapping"
+   }
+  }
+ },
+ "GoogleWalletPassDesignerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Google Wallet Pass Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "passClass": {
+    "type": "string",
+    "description": "Pass class"
+   },
+   "passTemplate": {
+    "type": "string",
+    "description": "Pass template"
+   },
+   "issuer": {
+    "type": "string",
+    "description": "Issuer"
+   },
+   "title": {
+    "type": "string",
+    "description": "Title"
+   },
+   "logo": {
+    "type": "string",
+    "description": "Logo"
+   },
+   "heroImageAssetsWhereApplicable": {
+    "type": "string",
+    "description": "Hero/image assets where applicable"
+   },
+   "eventInformation": {
+    "type": "string",
+    "description": "Event information"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "dateTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date/time"
+   },
+   "ticketHolder": {
+    "type": "string",
+    "description": "Ticket holder"
+   },
+   "seat": {
+    "type": "string",
+    "description": "Seat"
+   },
+   "ticketType": {
+    "type": "string",
+    "description": "Ticket type"
+   },
+   "customFields": {
+    "type": "string",
+    "description": "Custom fields"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status"
+   },
+   "links": {
+    "type": "string",
+    "description": "Links"
+   },
+   "additionalInformation": {
+    "type": "string",
+    "description": "Additional information"
+   },
+   "qr": {
+    "type": "string",
+    "description": "QR"
+   },
+   "barcode": {
+    "type": "string",
+    "description": "Barcode"
+   },
+   "credentialTokenReference": {
+    "type": "string",
+    "description": "Credential/token reference"
+   },
+   "accordingToSupportedWalletFunctionality": {
+    "type": "string",
+    "description": "according to supported wallet functionality"
+   },
+   "eventTimeChange": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Event time change"
+   },
+   "venueChange": {
+    "type": "string",
+    "description": "Venue change"
+   },
+   "seatReassignment": {
+    "type": "string",
+    "description": "Seat reassignment"
+   },
+   "ticketStatusChange": {
+    "type": "string",
+    "description": "Ticket status change"
+   },
+   "relevantTicketInformationChanges": {
+    "type": "string",
+    "description": "Relevant ticket information changes"
+   },
+   "provideDeviceOrientedPreviewBeforePublication": {
+    "type": "string",
+    "description": "Provide device-oriented preview before publication"
+   },
+   "mapping": {
+    "type": "string",
+    "description": "mapping"
+   }
+  }
+ },
+ "MediaDesignStudioCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Media Design Studio Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "totalMediaTemplates": {
+    "type": "integer",
+    "description": "Total Media Templates"
+   },
+   "published": {
+    "type": "string",
+    "description": "Published"
+   },
+   "draft": {
+    "type": "string",
+    "description": "Draft"
+   },
+   "pendingApproval": {
+    "type": "integer",
+    "description": "Pending Approval"
+   },
+   "scheduled": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Scheduled"
+   },
+   "archived": {
+    "type": "string",
+    "description": "Archived"
+   },
+   "qrDigitalTemplates": {
+    "type": "string",
+    "description": "QR / Digital Templates"
+   },
+   "pdfPrintTemplates": {
+    "type": "string",
+    "description": "PDF / Print Templates"
+   },
+   "appleWalletTemplates": {
+    "type": "integer",
+    "description": "Apple Wallet Templates"
+   },
+   "googleWalletTemplates": {
+    "type": "integer",
+    "description": "Google Wallet Templates"
+   },
+   "rfidNfcTemplates": {
+    "type": "string",
+    "description": "RFID / NFC Templates"
+   },
+   "cardWristbandTemplates": {
+    "type": "string",
+    "description": "Card / Wristband Templates"
+   },
+   "templatesRequiringReview": {
+    "type": "string",
+    "description": "Templates Requiring Review"
+   },
+   "templatesWithValidationErrors": {
+    "type": "integer",
+    "description": "Templates with Validation Errors"
+   },
+   "templateId": {
+    "type": "string",
+    "description": "Template ID"
+   },
+   "templateName": {
+    "type": "string",
+    "description": "Template Name"
+   },
+   "mediaType": {
+    "type": "string",
+    "description": "Media Type"
+   },
+   "brand": {
+    "type": "string",
+    "description": "Brand"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "productEventAssociation": {
+    "type": "string",
+    "description": "Product / Event association"
+   },
+   "language": {
+    "type": "string",
+    "description": "Language"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "description": "Effective To"
+   },
+   "status": {
+    "type": "integer",
+    "description": "Status"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "lastModified": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last Modified"
+   },
+   "createMediaTemplate": {
+    "type": "string",
+    "description": "+ Create Media Template"
+   },
+   "qrTicket": {
+    "type": "string",
+    "description": "QR Ticket"
+   },
+   "dynamicQrTicket": {
+    "type": "string",
+    "description": "Dynamic QR Ticket"
+   },
+   "barcodeTicket": {
+    "type": "string",
+    "description": "Barcode Ticket"
+   },
+   "mobileTicket": {
+    "type": "string",
+    "description": "Mobile Ticket"
+   },
+   "pdf": {
+    "type": "string",
+    "description": "PDF"
+   },
+   "a4A5": {
+    "type": "string",
+    "description": "A4 / A5"
+   },
+   "thermal": {
+    "type": "string",
+    "description": "Thermal"
+   },
+   "pos": {
+    "type": "string",
+    "description": "POS"
+   },
+   "customPrint": {
+    "type": "string",
+    "description": "Custom Print"
+   },
+   "appleWallet": {
+    "type": "string",
+    "description": "Apple Wallet"
+   },
+   "googleWallet": {
+    "type": "string",
+    "description": "Google Wallet"
+   },
+   "rfidCard": {
+    "type": "string",
+    "description": "RFID Card"
+   }
+  }
+ },
+ "MultiMediaPreviewTestingApprovalPublicationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Multi-Media Preview, Testing, Approval & Publication submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "sideBySideWherePractical": {
+    "type": "string",
+    "description": "side by side where practical"
+   },
+   "virtualTicketVt2026009821": {
+    "type": "string",
+    "description": "Virtual Ticket: VT-2026-009821"
+   },
+   "productVipConcert": {
+    "type": "string",
+    "description": "Product: VIP Concert"
+   },
+   "date15Sep2026": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date: 15 Sep 2026"
+   },
+   "time1930": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time: 19:30"
+   },
+   "venueArena": {
+    "type": "string",
+    "description": "Venue: Arena"
+   },
+   "sectionA": {
+    "type": "string",
+    "description": "Section: A"
+   },
+   "row3": {
+    "type": "string",
+    "description": "Row: 3"
+   },
+   "seat18": {
+    "type": "string",
+    "description": "Seat: 18"
+   },
+   "dynamicFields": {
+    "type": "string",
+    "description": "Dynamic fields"
+   },
+   "missingFields": {
+    "type": "string",
+    "description": "Missing fields"
+   },
+   "qrReadability": {
+    "type": "string",
+    "description": "QR readability"
+   },
+   "barcodeReadability": {
+    "type": "string",
+    "description": "Barcode readability"
+   },
+   "walletConfiguration": {
+    "type": "string",
+    "description": "Wallet configuration"
+   },
+   "localization": {
+    "type": "string",
+    "description": "Localization"
+   },
+   "rtl": {
+    "type": "string",
+    "description": "RTL"
+   },
+   "branding": {
+    "type": "string",
+    "description": "Branding"
+   },
+   "imageResolution": {
+    "type": "string",
+    "description": "Image resolution"
+   },
+   "credentialPayload": {
+    "type": "string",
+    "description": "Credential payload"
+   },
+   "virtualTicketResolution": {
+    "type": "string",
+    "description": "Virtual Ticket resolution"
+   },
+   "providerConfiguration": {
+    "type": "string",
+    "description": "Provider configuration"
+   },
+   "desktop": {
+    "type": "string",
+    "description": "Desktop"
+   },
+   "mobile": {
+    "type": "string",
+    "description": "Mobile"
+   },
+   "tablet": {
+    "type": "string",
+    "description": "Tablet"
+   },
+   "printer": {
+    "type": "string",
+    "description": "Printer"
+   },
+   "pos": {
+    "type": "string",
+    "description": "POS"
+   },
+   "wallet": {
+    "type": "string",
+    "description": "Wallet"
+   },
+   "encoder": {
+    "type": "string",
+    "description": "Encoder"
+   },
+   "missingMandatoryField": {
+    "type": "string",
+    "description": "Missing mandatory field"
+   },
+   "qrOverlapsCustomerName": {
+    "type": "string",
+    "description": "QR overlaps customer name"
+   },
+   "arabicLayoutExceedsPrintableArea": {
+    "type": "string",
+    "description": "Arabic layout exceeds printable area"
+   },
+   "selectedBrands": {
+    "type": "string",
+    "description": "Selected Brands"
+   },
+   "selectedVenues": {
+    "type": "string",
+    "description": "Selected Venues"
+   },
+   "selectedProducts": {
+    "type": "string",
+    "description": "Selected Products"
+   },
+   "selectedChannels": {
+    "type": "string",
+    "description": "Selected Channels"
+   },
+   "controlledRollout": {
+    "type": "string",
+    "description": "Controlled rollout"
+   },
+   "aTemplateChanges": {
+    "type": "string",
+    "description": "a template changes"
+   },
+   "eachTemplate": {
+    "type": "string",
+    "description": "each template"
+   },
+   "redesigningTheVirtualTicketCore": {
+    "type": "string",
+    "description": "redesigning the Virtual Ticket core"
+   },
+   "approvalPublishedMediaTemplate": {
+    "type": "string",
+    "description": "Approval → Published Media Template"
+   }
+  }
+ },
+ "MultiMediaPreviewTestingApprovalPublicationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Multi-Media Preview, Testing, Approval & Publication displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "sideBySideWherePractical": {
+    "type": "string",
+    "description": "side by side where practical"
+   },
+   "virtualTicketVt2026009821": {
+    "type": "string",
+    "description": "Virtual Ticket: VT-2026-009821"
+   },
+   "productVipConcert": {
+    "type": "string",
+    "description": "Product: VIP Concert"
+   },
+   "date15Sep2026": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date: 15 Sep 2026"
+   },
+   "time1930": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time: 19:30"
+   },
+   "venueArena": {
+    "type": "string",
+    "description": "Venue: Arena"
+   },
+   "sectionA": {
+    "type": "string",
+    "description": "Section: A"
+   },
+   "row3": {
+    "type": "string",
+    "description": "Row: 3"
+   },
+   "seat18": {
+    "type": "string",
+    "description": "Seat: 18"
+   },
+   "dynamicFields": {
+    "type": "string",
+    "description": "Dynamic fields"
+   },
+   "missingFields": {
+    "type": "string",
+    "description": "Missing fields"
+   },
+   "qrReadability": {
+    "type": "string",
+    "description": "QR readability"
+   },
+   "barcodeReadability": {
+    "type": "string",
+    "description": "Barcode readability"
+   },
+   "walletConfiguration": {
+    "type": "string",
+    "description": "Wallet configuration"
+   },
+   "localization": {
+    "type": "string",
+    "description": "Localization"
+   },
+   "rtl": {
+    "type": "string",
+    "description": "RTL"
+   },
+   "branding": {
+    "type": "string",
+    "description": "Branding"
+   },
+   "imageResolution": {
+    "type": "string",
+    "description": "Image resolution"
+   },
+   "credentialPayload": {
+    "type": "string",
+    "description": "Credential payload"
+   },
+   "virtualTicketResolution": {
+    "type": "string",
+    "description": "Virtual Ticket resolution"
+   },
+   "providerConfiguration": {
+    "type": "string",
+    "description": "Provider configuration"
+   },
+   "desktop": {
+    "type": "string",
+    "description": "Desktop"
+   },
+   "mobile": {
+    "type": "string",
+    "description": "Mobile"
+   },
+   "tablet": {
+    "type": "string",
+    "description": "Tablet"
+   },
+   "printer": {
+    "type": "string",
+    "description": "Printer"
+   },
+   "pos": {
+    "type": "string",
+    "description": "POS"
+   },
+   "wallet": {
+    "type": "string",
+    "description": "Wallet"
+   },
+   "encoder": {
+    "type": "string",
+    "description": "Encoder"
+   },
+   "missingMandatoryField": {
+    "type": "string",
+    "description": "Missing mandatory field"
+   },
+   "qrOverlapsCustomerName": {
+    "type": "string",
+    "description": "QR overlaps customer name"
+   },
+   "arabicLayoutExceedsPrintableArea": {
+    "type": "string",
+    "description": "Arabic layout exceeds printable area"
+   },
+   "selectedBrands": {
+    "type": "string",
+    "description": "Selected Brands"
+   },
+   "selectedVenues": {
+    "type": "string",
+    "description": "Selected Venues"
+   },
+   "selectedProducts": {
+    "type": "string",
+    "description": "Selected Products"
+   },
+   "selectedChannels": {
+    "type": "string",
+    "description": "Selected Channels"
+   },
+   "controlledRollout": {
+    "type": "string",
+    "description": "Controlled rollout"
+   },
+   "aTemplateChanges": {
+    "type": "string",
+    "description": "a template changes"
+   },
+   "eachTemplate": {
+    "type": "string",
+    "description": "each template"
+   },
+   "redesigningTheVirtualTicketCore": {
+    "type": "string",
+    "description": "redesigning the Virtual Ticket core"
+   },
+   "approvalPublishedMediaTemplate": {
+    "type": "string",
+    "description": "Approval → Published Media Template"
+   }
+  }
+ },
+ "PdfPrintablePosTicketDesignerInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What PDF, Printable & POS Ticket Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "pdf": {
+    "type": "string",
+    "description": "PDF"
+   },
+   "a4": {
+    "type": "string",
+    "description": "A4"
+   },
+   "a5": {
+    "type": "string",
+    "description": "A5"
+   },
+   "customDimensions": {
+    "type": "string",
+    "description": "Custom dimensions"
+   },
+   "posReceipt": {
+    "type": "string",
+    "description": "POS receipt"
+   },
+   "thermalTicket": {
+    "type": "string",
+    "description": "Thermal ticket"
+   },
+   "boxOfficeStock": {
+    "type": "string",
+    "description": "Box-office stock"
+   },
+   "prePrintedStockWhereRequired": {
+    "type": "boolean",
+    "description": "Pre-printed stock where required"
+   },
+   "pageSize": {
+    "type": "string",
+    "description": "Page size"
+   },
+   "orientation": {
+    "type": "string",
+    "description": "Orientation"
+   },
+   "margins": {
+    "type": "string",
+    "description": "Margins"
+   },
+   "header": {
+    "type": "string",
+    "description": "Header"
+   },
+   "footer": {
+    "type": "string",
+    "description": "Footer"
+   },
+   "background": {
+    "type": "string",
+    "description": "Background"
+   },
+   "logo": {
+    "type": "string",
+    "description": "Logo"
+   },
+   "images": {
+    "type": "string",
+    "description": "Images"
+   },
+   "text": {
+    "type": "string",
+    "description": "Text"
+   },
+   "dynamicFields": {
+    "type": "string",
+    "description": "Dynamic fields"
+   },
+   "qrBarcode": {
+    "type": "string",
+    "description": "QR/barcode"
+   },
+   "terms": {
+    "type": "string",
+    "description": "Terms"
+   },
+   "perforationIndicatorsWhereApplicable": {
+    "type": "string",
+    "description": "Perforation indicators where applicable"
+   },
+   "printSafeZones": {
+    "type": "string",
+    "description": "Print-safe zones"
+   },
+   "printerProfile": {
+    "type": "string",
+    "description": "Printer profile"
+   },
+   "dpi": {
+    "type": "string",
+    "description": "DPI"
+   },
+   "paperStockType": {
+    "type": "string",
+    "description": "Paper/stock type"
+   },
+   "thermalLayout": {
+    "type": "string",
+    "description": "Thermal layout"
+   },
+   "cutBehavior": {
+    "type": "string",
+    "description": "Cut behavior"
+   },
+   "supportedPrinterIntegration": {
+    "type": "string",
+    "description": "Supported printer integration"
+   }
+  }
+ },
+ "PdfPrintablePosTicketDesignerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What PDF, Printable & POS Ticket Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "pdf": {
+    "type": "string",
+    "description": "PDF"
+   },
+   "a4": {
+    "type": "string",
+    "description": "A4"
+   },
+   "a5": {
+    "type": "string",
+    "description": "A5"
+   },
+   "customDimensions": {
+    "type": "string",
+    "description": "Custom dimensions"
+   },
+   "posReceipt": {
+    "type": "string",
+    "description": "POS receipt"
+   },
+   "thermalTicket": {
+    "type": "string",
+    "description": "Thermal ticket"
+   },
+   "boxOfficeStock": {
+    "type": "string",
+    "description": "Box-office stock"
+   },
+   "prePrintedStockWhereRequired": {
+    "type": "boolean",
+    "description": "Pre-printed stock where required"
+   },
+   "pageSize": {
+    "type": "string",
+    "description": "Page size"
+   },
+   "orientation": {
+    "type": "string",
+    "description": "Orientation"
+   },
+   "margins": {
+    "type": "string",
+    "description": "Margins"
+   },
+   "header": {
+    "type": "string",
+    "description": "Header"
+   },
+   "footer": {
+    "type": "string",
+    "description": "Footer"
+   },
+   "background": {
+    "type": "string",
+    "description": "Background"
+   },
+   "logo": {
+    "type": "string",
+    "description": "Logo"
+   },
+   "images": {
+    "type": "string",
+    "description": "Images"
+   },
+   "text": {
+    "type": "string",
+    "description": "Text"
+   },
+   "dynamicFields": {
+    "type": "string",
+    "description": "Dynamic fields"
+   },
+   "qrBarcode": {
+    "type": "string",
+    "description": "QR/barcode"
+   },
+   "terms": {
+    "type": "string",
+    "description": "Terms"
+   },
+   "perforationIndicatorsWhereApplicable": {
+    "type": "string",
+    "description": "Perforation indicators where applicable"
+   },
+   "printSafeZones": {
+    "type": "string",
+    "description": "Print-safe zones"
+   },
+   "printerProfile": {
+    "type": "string",
+    "description": "Printer profile"
+   },
+   "dpi": {
+    "type": "string",
+    "description": "DPI"
+   },
+   "paperStockType": {
+    "type": "string",
+    "description": "Paper/stock type"
+   },
+   "thermalLayout": {
+    "type": "string",
+    "description": "Thermal layout"
+   },
+   "cutBehavior": {
+    "type": "string",
+    "description": "Cut behavior"
+   },
+   "supportedPrinterIntegration": {
+    "type": "string",
+    "description": "Supported printer integration"
+   }
+  }
+ },
+ "RfidNfcCardWristbandMediaDesignerInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What RFID, NFC, Card & Wristband Media Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "rfidCard": {
+    "type": "string",
+    "description": "RFID Card"
+   },
+   "rfidWristband": {
+    "type": "string",
+    "description": "RFID Wristband"
+   },
+   "nfcCard": {
+    "type": "string",
+    "description": "NFC Card"
+   },
+   "nfcWristband": {
+    "type": "string",
+    "description": "NFC Wristband"
+   },
+   "membershipCard": {
+    "type": "string",
+    "description": "Membership Card"
+   },
+   "staffGuestCardWhereApplicable": {
+    "type": "string",
+    "description": "Staff/guest card where applicable"
+   },
+   "customWearable": {
+    "type": "string",
+    "description": "Custom Wearable"
+   },
+   "disposable": {
+    "type": "string",
+    "description": "Disposable"
+   },
+   "reusable": {
+    "type": "string",
+    "description": "Reusable"
+   },
+   "printed": {
+    "type": "string",
+    "description": "Printed"
+   },
+   "encoded": {
+    "type": "string",
+    "description": "Encoded"
+   },
+   "colorCategory": {
+    "type": "string",
+    "description": "Color/category"
+   },
+   "sizeWhereApplicable": {
+    "type": "string",
+    "description": "Size where applicable"
+   },
+   "activationAtCollection": {
+    "type": "string",
+    "description": "Activation at collection"
+   },
+   "depositReferenceWhereApplicable": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Deposit/reference where applicable"
+   },
+   "mediaDimensions": {
+    "type": "string",
+    "description": "Media dimensions"
+   },
+   "front": {
+    "type": "string",
+    "description": "Front"
+   },
+   "back": {
+    "type": "string",
+    "description": "Back"
+   },
+   "printableArea": {
+    "type": "string",
+    "description": "Printable area"
+   },
+   "logo": {
+    "type": "string",
+    "description": "Logo"
+   },
+   "customerName": {
+    "type": "string",
+    "description": "Customer name"
+   },
+   "photo": {
+    "type": "string",
+    "description": "Photo"
+   },
+   "membershipTier": {
+    "type": "string",
+    "description": "Membership tier"
+   },
+   "expiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry"
+   },
+   "serialNumber": {
+    "type": "string",
+    "description": "Serial number"
+   },
+   "customArtwork": {
+    "type": "string",
+    "description": "Custom artwork"
+   },
+   "sponsorVenueBranding": {
+    "type": "string",
+    "description": "Sponsor/venue branding"
+   },
+   "rfidNfcTechnology": {
+    "type": "string",
+    "description": "RFID/NFC technology"
+   },
+   "chipProfile": {
+    "type": "string",
+    "description": "Chip/profile"
+   },
+   "uidReferenceHandling": {
+    "type": "string",
+    "description": "UID/reference handling"
+   },
+   "encodingProfile": {
+    "type": "string",
+    "description": "Encoding profile"
+   },
+   "provider": {
+    "type": "string",
+    "description": "Provider"
+   },
+   "readerCompatibility": {
+    "type": "string",
+    "description": "Reader compatibility"
+   },
+   "printerEncoderIntegration": {
+    "type": "string",
+    "description": "Printer/encoder integration"
+   },
+   "credentialBindingVirtualTicket": {
+    "type": "string",
+    "description": "Credential Binding → Virtual Ticket"
+   }
+  }
+ },
+ "RfidNfcCardWristbandMediaDesignerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What RFID, NFC, Card & Wristband Media Designer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "rfidCard": {
+    "type": "string",
+    "description": "RFID Card"
+   },
+   "rfidWristband": {
+    "type": "string",
+    "description": "RFID Wristband"
+   },
+   "nfcCard": {
+    "type": "string",
+    "description": "NFC Card"
+   },
+   "nfcWristband": {
+    "type": "string",
+    "description": "NFC Wristband"
+   },
+   "membershipCard": {
+    "type": "string",
+    "description": "Membership Card"
+   },
+   "staffGuestCardWhereApplicable": {
+    "type": "string",
+    "description": "Staff/guest card where applicable"
+   },
+   "customWearable": {
+    "type": "string",
+    "description": "Custom Wearable"
+   },
+   "disposable": {
+    "type": "string",
+    "description": "Disposable"
+   },
+   "reusable": {
+    "type": "string",
+    "description": "Reusable"
+   },
+   "printed": {
+    "type": "string",
+    "description": "Printed"
+   },
+   "encoded": {
+    "type": "string",
+    "description": "Encoded"
+   },
+   "colorCategory": {
+    "type": "string",
+    "description": "Color/category"
+   },
+   "sizeWhereApplicable": {
+    "type": "string",
+    "description": "Size where applicable"
+   },
+   "activationAtCollection": {
+    "type": "string",
+    "description": "Activation at collection"
+   },
+   "depositReferenceWhereApplicable": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Deposit/reference where applicable"
+   },
+   "mediaDimensions": {
+    "type": "string",
+    "description": "Media dimensions"
+   },
+   "front": {
+    "type": "string",
+    "description": "Front"
+   },
+   "back": {
+    "type": "string",
+    "description": "Back"
+   },
+   "printableArea": {
+    "type": "string",
+    "description": "Printable area"
+   },
+   "logo": {
+    "type": "string",
+    "description": "Logo"
+   },
+   "customerName": {
+    "type": "string",
+    "description": "Customer name"
+   },
+   "photo": {
+    "type": "string",
+    "description": "Photo"
+   },
+   "membershipTier": {
+    "type": "string",
+    "description": "Membership tier"
+   },
+   "expiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry"
+   },
+   "serialNumber": {
+    "type": "string",
+    "description": "Serial number"
+   },
+   "customArtwork": {
+    "type": "string",
+    "description": "Custom artwork"
+   },
+   "sponsorVenueBranding": {
+    "type": "string",
+    "description": "Sponsor/venue branding"
+   },
+   "rfidNfcTechnology": {
+    "type": "string",
+    "description": "RFID/NFC technology"
+   },
+   "chipProfile": {
+    "type": "string",
+    "description": "Chip/profile"
+   },
+   "uidReferenceHandling": {
+    "type": "string",
+    "description": "UID/reference handling"
+   },
+   "encodingProfile": {
+    "type": "string",
+    "description": "Encoding profile"
+   },
+   "provider": {
+    "type": "string",
+    "description": "Provider"
+   },
+   "readerCompatibility": {
+    "type": "string",
+    "description": "Reader compatibility"
+   },
+   "printerEncoderIntegration": {
+    "type": "string",
+    "description": "Printer/encoder integration"
+   },
+   "credentialBindingVirtualTicket": {
+    "type": "string",
+    "description": "Credential Binding → Virtual Ticket"
+   }
+  }
+ }
+}

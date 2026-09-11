@@ -1,0 +1,210 @@
+{
+ "approveExceptionServiceRecovery": {
+  "method": "PUT",
+  "path": "/exception-service-recovery",
+  "contract": "orders",
+  "summary": "Approval, Exception & Service Recovery Management",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "ApprovalExceptionServiceRecoveryManagementInput",
+  "responds": "ApprovalExceptionServiceRecoveryManagementView"
+ },
+ "listAmendmentAfterSale": {
+  "method": "GET",
+  "path": "/amendment-after-sale",
+  "contract": "orders",
+  "summary": "Amendment & After-Sales Command Center",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "agent",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "approval",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "date",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "AmendmentAfterSalesCommandCenterView"
+ },
+ "listAmendmentAfterSale2": {
+  "method": "GET",
+  "path": "/amendment-after-sale-2",
+  "contract": "orders",
+  "summary": "Amendment History, Audit & After-Sales Analytics",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venue",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "product",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "event",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "agent",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "customerSegment",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "reason",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "period",
+    "in": "query",
+    "required": false
+   }
+  ],
+  "requestBody": null,
+  "responds": "AmendmentHistoryAuditAfterSalesAnalyticsView"
+ },
+ "listTicketReissueFulfillment": {
+  "method": "GET",
+  "path": "/ticket-reissue-fulfillment",
+  "contract": "orders",
+  "summary": "Ticket Reissue & Fulfillment Regeneration",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "TicketReissueFulfillmentRegenerationView"
+ },
+ "listVoidReversalSame": {
+  "method": "GET",
+  "path": "/void-reversal-same",
+  "contract": "orders",
+  "summary": "Void, Reversal & Same-Day Correction Management",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "VoidReversalSameDayCorrectionManagementView"
+ },
+ "setAfterSaleFinancial": {
+  "method": "PUT",
+  "path": "/after-sale-financial",
+  "contract": "orders",
+  "summary": "After-Sales Financial Settlement & Adjustment Workspace",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "AfterSalesFinancialSettlementAdjustmentWorkspaceInput",
+  "responds": "AfterSalesFinancialSettlementAdjustmentWorkspaceView"
+ },
+ "setAmendmentEligibilityPolicy": {
+  "method": "PUT",
+  "path": "/amendment-eligibility-policy",
+  "contract": "orders",
+  "summary": "Amendment Eligibility & Policy Rule Builder",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "AmendmentEligibilityPolicyRuleBuilderInput",
+  "responds": "AmendmentEligibilityPolicyRuleBuilderView"
+ },
+ "setCancellationPartialPolicy": {
+  "method": "PUT",
+  "path": "/cancellation-partial-policy",
+  "contract": "orders",
+  "summary": "Cancellation & Partial Cancellation Policy Configuration",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "CancellationPartialCancellationPolicyConfigurationInput",
+  "responds": "CancellationPartialCancellationPolicyConfigurationView"
+ },
+ "setOrderAmendment": {
+  "method": "PUT",
+  "path": "/order-amendment",
+  "contract": "orders",
+  "summary": "Order Amendment Workspace",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": "OrderAmendmentWorkspaceInput",
+  "responds": "OrderAmendmentWorkspaceView"
+ },
+ "setRefundPolicy": {
+  "method": "PUT",
+  "path": "/venues/{venueId}/refund-policy",
+  "contract": "orders",
+  "summary": "Set a venue's refund policy",
+  "permission": "REGION_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "RefundPolicy",
+  "responds": "RefundPolicy"
+ }
+}

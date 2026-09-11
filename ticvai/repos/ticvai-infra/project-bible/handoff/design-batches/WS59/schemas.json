@@ -1,0 +1,1381 @@
+{
+ "CredentialIdentityTokenReferenceMappingView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Credential Identity, Token & Reference Mapping displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "qrToken": {
+    "type": "string",
+    "description": "QR Token →"
+   },
+   "rfidUid": {
+    "type": "string",
+    "description": "RFID UID →"
+   },
+   "walletObject": {
+    "type": "string",
+    "description": "Wallet Object →"
+   },
+   "nfcToken": {
+    "type": "string",
+    "description": "NFC Token →"
+   },
+   "faceReference": {
+    "type": "string",
+    "description": "Face Reference →"
+   },
+   "andTheResolverReturns": {
+    "type": "string",
+    "description": "and the resolver returns"
+   },
+   "credentialBindingId": {
+    "type": "string",
+    "description": "Credential Binding ID"
+   },
+   "virtualTicketId": {
+    "type": "string",
+    "description": "Virtual Ticket ID"
+   },
+   "mediaType": {
+    "type": "string",
+    "description": "Media Type"
+   },
+   "credentialReference": {
+    "type": "string",
+    "description": "Credential Reference"
+   },
+   "tokenIdentifier": {
+    "type": "string",
+    "description": "Token / Identifier"
+   },
+   "providerReference": {
+    "type": "string",
+    "description": "Provider Reference"
+   },
+   "issuedDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Issued Date"
+   },
+   "activationDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Activation Date"
+   },
+   "expiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status"
+   },
+   "version": {
+    "type": "string",
+    "description": "Version"
+   },
+   "securityProfile": {
+    "type": "string",
+    "description": "Security profile"
+   },
+   "tokenization": {
+    "type": "string",
+    "description": "Tokenization"
+   },
+   "hashing": {
+    "type": "string",
+    "description": "Hashing"
+   },
+   "encryption": {
+    "type": "string",
+    "description": "Encryption"
+   },
+   "signedPayloads": {
+    "type": "string",
+    "description": "Signed payloads"
+   },
+   "keyReferences": {
+    "type": "string",
+    "description": "Key references"
+   },
+   "masking": {
+    "type": "string",
+    "description": "Masking"
+   },
+   "dependingOnCredentialTechnology": {
+    "type": "string",
+    "description": "depending on credential technology"
+   }
+  }
+ },
+ "EntitlementCrossMediaSynchronizationRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Entitlement & Cross-Media Synchronization Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "entry": {
+    "type": "string",
+    "description": "Entry"
+   },
+   "exit": {
+    "type": "string",
+    "description": "Exit"
+   },
+   "redemption": {
+    "type": "string",
+    "description": "Redemption"
+   },
+   "partialConsumption": {
+    "type": "string",
+    "description": "Partial consumption"
+   },
+   "cancellation": {
+    "type": "string",
+    "description": "Cancellation"
+   },
+   "suspension": {
+    "type": "string",
+    "description": "Suspension"
+   },
+   "reactivation": {
+    "type": "string",
+    "description": "Reactivation"
+   },
+   "expiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry"
+   },
+   "replacement": {
+    "type": "string",
+    "description": "Replacement"
+   },
+   "mainAdmission": {
+    "type": "string",
+    "description": "Main admission"
+   },
+   "delayedUpdates": {
+    "type": "string",
+    "description": "Delayed updates"
+   },
+   "conflictingStates": {
+    "type": "string",
+    "description": "Conflicting states"
+   },
+   "offlineTransactionsPendingSynchronization": {
+    "type": "integer",
+    "description": "Offline transactions pending synchronization"
+   },
+   "providerUpdateFailures": {
+    "type": "string",
+    "description": "Provider update failures"
+   },
+   "staleWalletCredentials": {
+    "type": "string",
+    "description": "Stale wallet credentials"
+   }
+  }
+ },
+ "MediaActivationPriorityFallbackRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Media Activation, Priority & Fallback Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "immediateOnIssuance": {
+    "type": "string",
+    "description": "Immediate on issuance"
+   },
+   "onTicketActivation": {
+    "type": "string",
+    "description": "On ticket activation"
+   },
+   "onDownload": {
+    "type": "string",
+    "description": "On download"
+   },
+   "onWalletInstallation": {
+    "type": "string",
+    "description": "On wallet installation"
+   },
+   "onRfidAssignment": {
+    "type": "string",
+    "description": "On RFID assignment"
+   },
+   "onFaceEnrollment": {
+    "type": "string",
+    "description": "On face enrollment"
+   },
+   "onFirstUse": {
+    "type": "string",
+    "description": "On first use"
+   },
+   "onEventDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "On event date"
+   },
+   "manualActivation": {
+    "type": "string",
+    "description": "Manual activation"
+   },
+   "scheduledActivation": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Scheduled activation"
+   },
+   "temporaryMedia": {
+    "type": "string",
+    "description": "Temporary media"
+   },
+   "validityDuration": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Validity duration"
+   },
+   "oneTimeUse": {
+    "type": "string",
+    "format": "date-time",
+    "description": "One-time use"
+   },
+   "automaticExpiration": {
+    "type": "string",
+    "description": "Automatic expiration"
+   },
+   "replacementBehavior": {
+    "type": "string",
+    "description": "Replacement behavior"
+   },
+   "originalMediaImpact": {
+    "type": "string",
+    "description": "Original-media impact"
+   },
+   "ticket": {
+    "type": "string",
+    "description": "Ticket"
+   }
+  }
+ },
+ "MediaReplacementRevocationRebindingRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Media Replacement, Revocation & Rebinding Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "lostRfidCard": {
+    "type": "string",
+    "description": "Lost RFID card"
+   },
+   "damagedWristband": {
+    "type": "string",
+    "description": "Damaged wristband"
+   },
+   "compromisedQr": {
+    "type": "string",
+    "description": "Compromised QR"
+   },
+   "newMobileDevice": {
+    "type": "integer",
+    "description": "New mobile device"
+   },
+   "walletCredentialReplacement": {
+    "type": "string",
+    "description": "Wallet credential replacement"
+   },
+   "faceReEnrollment": {
+    "type": "string",
+    "description": "Face re-enrollment"
+   },
+   "printedTicketReplacement": {
+    "type": "string",
+    "description": "Printed ticket replacement"
+   },
+   "incorrectCredentialAssignment": {
+    "type": "string",
+    "description": "Incorrect credential assignment"
+   },
+   "rfid88721Revoked": {
+    "type": "string",
+    "description": "RFID-88721 — REVOKED"
+   },
+   "rfid99211Active": {
+    "type": "integer",
+    "description": "RFID-99211 — ACTIVE"
+   },
+   "vt009821Active": {
+    "type": "integer",
+    "description": "VT-009821 — ACTIVE"
+   },
+   "numberOfReplacements": {
+    "type": "integer",
+    "description": "Number of replacements"
+   },
+   "replacementFeeReference": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Replacement fee reference"
+   },
+   "approvalRequired": {
+    "type": "boolean",
+    "description": "Approval required"
+   },
+   "identityVerification": {
+    "type": "string",
+    "description": "Identity verification"
+   },
+   "oldMediaAutomaticallyRevoked": {
+    "type": "string",
+    "description": "Old media automatically revoked"
+   },
+   "gracePeriod": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Grace period"
+   },
+   "simultaneousMediaPolicy": {
+    "type": "string",
+    "description": "Simultaneous media policy"
+   },
+   "reasonMandatory": {
+    "type": "string",
+    "description": "Reason mandatory"
+   },
+   "supervisorApproval": {
+    "type": "string",
+    "description": "Supervisor approval"
+   },
+   "oldBinding": {
+    "type": "string",
+    "description": "Old binding"
+   },
+   "newBinding": {
+    "type": "integer",
+    "description": "New binding"
+   },
+   "user": {
+    "type": "string",
+    "description": "User"
+   },
+   "dateTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date/time"
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason"
+   },
+   "approval": {
+    "type": "string",
+    "description": "Approval"
+   },
+   "relatedTransaction": {
+    "type": "string",
+    "description": "Related transaction"
+   }
+  }
+ },
+ "MediaTypeCredentialTechnologyRegistryView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Media Type & Credential Technology Registry displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "qr": {
+    "type": "string",
+    "description": "QR"
+   },
+   "dynamicQr": {
+    "type": "string",
+    "description": "Dynamic QR"
+   },
+   "barcode": {
+    "type": "string",
+    "description": "Barcode"
+   },
+   "mobileTicket": {
+    "type": "string",
+    "description": "Mobile Ticket"
+   },
+   "pdf": {
+    "type": "string",
+    "description": "PDF"
+   },
+   "appleWallet": {
+    "type": "string",
+    "description": "Apple Wallet"
+   },
+   "googleWallet": {
+    "type": "string",
+    "description": "Google Wallet"
+   },
+   "rfidCard": {
+    "type": "string",
+    "description": "RFID Card"
+   },
+   "rfidWristband": {
+    "type": "string",
+    "description": "RFID Wristband"
+   },
+   "nfcCard": {
+    "type": "string",
+    "description": "NFC Card"
+   },
+   "nfcWristband": {
+    "type": "string",
+    "description": "NFC Wristband"
+   },
+   "printedTicket": {
+    "type": "string",
+    "description": "Printed Ticket"
+   },
+   "thermalTicket": {
+    "type": "string",
+    "description": "Thermal Ticket"
+   },
+   "membershipCard": {
+    "type": "string",
+    "description": "Membership Card"
+   },
+   "customWearable": {
+    "type": "string",
+    "description": "Custom Wearable"
+   },
+   "faceRecognitionReference": {
+    "type": "string",
+    "description": "Face Recognition Reference"
+   },
+   "tenantDefinedIntegrationBasedCredentialTechnology": {
+    "type": "string",
+    "description": "Tenant-defined / integration-based credential technology"
+   },
+   "mediaTypeId": {
+    "type": "string",
+    "description": "Media Type ID"
+   },
+   "name": {
+    "type": "string",
+    "description": "Name"
+   },
+   "category": {
+    "type": "string",
+    "description": "Category"
+   },
+   "provider": {
+    "type": "string",
+    "description": "Provider"
+   },
+   "technology": {
+    "type": "string",
+    "description": "Technology"
+   },
+   "tokenFormat": {
+    "type": "string",
+    "description": "Token format"
+   },
+   "generationMethod": {
+    "type": "string",
+    "description": "Generation method"
+   },
+   "validationMechanism": {
+    "type": "string",
+    "description": "Validation mechanism"
+   },
+   "supportsVisualDesign": {
+    "type": "string",
+    "description": "Supports visual design"
+   },
+   "supportsDynamicUpdate": {
+    "type": "string",
+    "description": "Supports dynamic update"
+   },
+   "supportsRevocation": {
+    "type": "string",
+    "description": "Supports revocation"
+   },
+   "supportsExpiration": {
+    "type": "string",
+    "description": "Supports expiration"
+   },
+   "supportsOfflineReference": {
+    "type": "string",
+    "description": "Supports offline reference"
+   },
+   "supportsReplacement": {
+    "type": "string",
+    "description": "Supports replacement"
+   },
+   "supportsEncryption": {
+    "type": "string",
+    "description": "Supports encryption"
+   },
+   "supportsSigning": {
+    "type": "string",
+    "description": "Supports signing"
+   },
+   "supportedChannels": {
+    "type": "string",
+    "description": "Supported channels"
+   },
+   "supportedDevices": {
+    "type": "string",
+    "description": "Supported devices"
+   },
+   "integrationAdapter": {
+    "type": "string",
+    "description": "Integration adapter"
+   },
+   "rfidIsTheTechnologyMediaType": {
+    "type": "string",
+    "description": "RFID is the technology/media type"
+   }
+  }
+ },
+ "MultiMediaBindingAssociationRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Multi-Media Binding & Association Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "allowedMedia": {
+    "type": "string",
+    "description": "Allowed media"
+   },
+   "mandatoryMedia": {
+    "type": "string",
+    "description": "Mandatory media"
+   },
+   "optionalMedia": {
+    "type": "string",
+    "description": "Optional media"
+   },
+   "maximumActiveMedia": {
+    "type": "string",
+    "description": "Maximum active media"
+   },
+   "minimumMediaRequired": {
+    "type": "boolean",
+    "description": "Minimum media required"
+   },
+   "primaryMedia": {
+    "type": "string",
+    "description": "Primary media"
+   },
+   "secondaryMedia": {
+    "type": "string",
+    "description": "Secondary media"
+   },
+   "backupMedia": {
+    "type": "string",
+    "description": "Backup media"
+   },
+   "temporaryMedia": {
+    "type": "string",
+    "description": "Temporary media"
+   },
+   "mediaCombination": {
+    "type": "string",
+    "description": "Media combination"
+   },
+   "simultaneousActivation": {
+    "type": "string",
+    "description": "Simultaneous activation"
+   },
+   "exclusiveActivation": {
+    "type": "string",
+    "description": "Exclusive activation"
+   },
+   "face": {
+    "type": "string",
+    "description": "Face"
+   },
+   "rfidWristband": {
+    "type": "string",
+    "description": "RFID Wristband"
+   },
+   "mobileQr": {
+    "type": "string",
+    "description": "Mobile QR"
+   },
+   "rfidCard": {
+    "type": "string",
+    "description": "RFID Card"
+   },
+   "mobileQrBeforeWristbandCollection": {
+    "type": "string",
+    "description": "Mobile QR before wristband collection"
+   },
+   "appleWallet": {
+    "type": "string",
+    "description": "Apple Wallet"
+   },
+   "googleWallet": {
+    "type": "string",
+    "description": "Google Wallet"
+   },
+   "dynamicQr": {
+    "type": "string",
+    "description": "Dynamic QR"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "ticketType": {
+    "type": "string",
+    "description": "Ticket Type"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "customerType": {
+    "type": "string",
+    "description": "Customer Type"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "age": {
+    "type": "string",
+    "description": "Age"
+   },
+   "country": {
+    "type": "string",
+    "description": "Country"
+   },
+   "accessEnvironment": {
+    "type": "string",
+    "description": "Access environment"
+   }
+  }
+ },
+ "VirtualTicketArchitectureTestingGovernanceAuditView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Virtual Ticket Architecture Testing, Governance & Audit displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "sameAuthoritativeEntitlementEvaluated": {
+    "type": "string",
+    "description": "Same authoritative entitlement evaluated"
+   },
+   "lostRfid": {
+    "type": "string",
+    "description": "Lost RFID"
+   },
+   "revokedQr": {
+    "type": "string",
+    "description": "Revoked QR"
+   },
+   "expiredWalletToken": {
+    "type": "integer",
+    "description": "Expired wallet token"
+   },
+   "faceUnavailable": {
+    "type": "string",
+    "description": "Face unavailable"
+   },
+   "offlineDevice": {
+    "type": "integer",
+    "description": "Offline device"
+   },
+   "synchronizationFailure": {
+    "type": "string",
+    "description": "Synchronization failure"
+   },
+   "providerOutage": {
+    "type": "string",
+    "description": "Provider outage"
+   },
+   "credentialBindingConflict": {
+    "type": "string",
+    "description": "Credential binding conflict"
+   },
+   "invalidMediaCombinations": {
+    "type": "string",
+    "description": "Invalid media combinations"
+   },
+   "missingSecurityProfile": {
+    "type": "string",
+    "description": "Missing security profile"
+   },
+   "missingFallback": {
+    "type": "string",
+    "description": "Missing fallback"
+   },
+   "conflictingActivationRules": {
+    "type": "string",
+    "description": "Conflicting activation rules"
+   },
+   "excessiveActiveCredentials": {
+    "type": "string",
+    "description": "Excessive active credentials"
+   },
+   "brokenProviderIntegration": {
+    "type": "string",
+    "description": "Broken provider integration"
+   },
+   "invalidLifecycleDependencies": {
+    "type": "string",
+    "description": "Invalid lifecycle dependencies"
+   },
+   "configurationChanges": {
+    "type": "string",
+    "description": "Configuration changes"
+   },
+   "mediaBindings": {
+    "type": "string",
+    "description": "Media bindings"
+   },
+   "rebindings": {
+    "type": "string",
+    "description": "Rebindings"
+   },
+   "activation": {
+    "type": "string",
+    "description": "Activation"
+   },
+   "suspension": {
+    "type": "string",
+    "description": "Suspension"
+   },
+   "revocation": {
+    "type": "string",
+    "description": "Revocation"
+   },
+   "replacement": {
+    "type": "string",
+    "description": "Replacement"
+   },
+   "resolverChanges": {
+    "type": "string",
+    "description": "Resolver changes"
+   },
+   "ruleChanges": {
+    "type": "string",
+    "description": "Rule changes"
+   },
+   "approvals": {
+    "type": "string",
+    "description": "Approvals"
+   },
+   "actor": {
+    "type": "string",
+    "description": "Actor"
+   },
+   "timestamp": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Timestamp"
+   },
+   "beforeAfter": {
+    "type": "string",
+    "description": "Before/After"
+   },
+   "replacementRebindingTestGovern": {
+    "type": "string",
+    "description": "Replacement/Rebinding → Test & Govern"
+   },
+   "coreVirtualTicketArchitecture": {
+    "type": "string",
+    "description": "core Virtual Ticket architecture"
+   }
+  }
+ },
+ "VirtualTicketCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Virtual Ticket Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "totalVirtualTickets": {
+    "type": "integer",
+    "description": "Total Virtual Tickets"
+   },
+   "active": {
+    "type": "integer",
+    "description": "Active"
+   },
+   "pendingActivation": {
+    "type": "integer",
+    "description": "Pending Activation"
+   },
+   "suspended": {
+    "type": "string",
+    "description": "Suspended"
+   },
+   "usedConsumed": {
+    "type": "string",
+    "description": "Used / Consumed"
+   },
+   "partiallyConsumed": {
+    "type": "string",
+    "description": "Partially Consumed"
+   },
+   "expired": {
+    "type": "integer",
+    "description": "Expired"
+   },
+   "cancelled": {
+    "type": "integer",
+    "description": "Cancelled"
+   },
+   "revoked": {
+    "type": "string",
+    "description": "Revoked"
+   },
+   "virtualTicketsWithMultipleMedia": {
+    "type": "string",
+    "description": "Virtual Tickets with Multiple Media"
+   },
+   "mediaBindingExceptions": {
+    "type": "integer",
+    "description": "Media Binding Exceptions"
+   },
+   "credentialSynchronizationIssues": {
+    "type": "integer",
+    "description": "Credential Synchronization Issues"
+   },
+   "virtualTicketId": {
+    "type": "string",
+    "description": "Virtual Ticket ID"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "eventPerformance": {
+    "type": "string",
+    "description": "Event / Performance"
+   },
+   "ticketHolder": {
+    "type": "string",
+    "description": "Ticket Holder"
+   },
+   "orderReference": {
+    "type": "string",
+    "description": "Order Reference"
+   },
+   "ticketType": {
+    "type": "string",
+    "description": "Ticket Type"
+   },
+   "seatResourceWhereApplicable": {
+    "type": "string",
+    "description": "Seat / Resource where applicable"
+   },
+   "validFromTo": {
+    "type": "string",
+    "description": "Valid From / To"
+   },
+   "ticketStatus": {
+    "type": "integer",
+    "description": "Ticket Status"
+   },
+   "usageStatus": {
+    "type": "integer",
+    "description": "Usage Status"
+   },
+   "numberOfLinkedMedia": {
+    "type": "integer",
+    "description": "Number of Linked Media"
+   },
+   "primaryMedia": {
+    "type": "string",
+    "description": "Primary Media"
+   },
+   "lastCredentialActivity": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last Credential Activity"
+   },
+   "lastModified": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Last Modified"
+   },
+   "productVipConcert": {
+    "type": "string",
+    "description": "Product: VIP Concert"
+   },
+   "customerAhmedHassan": {
+    "type": "string",
+    "description": "Customer: Ahmed Hassan"
+   },
+   "seatA18": {
+    "type": "string",
+    "description": "Seat: A-18"
+   },
+   "statusActive": {
+    "type": "integer",
+    "description": "Status: Active"
+   },
+   "media4": {
+    "type": "string",
+    "description": "Media: 4"
+   },
+   "bindMedia": {
+    "type": "string",
+    "description": "Bind Media"
+   },
+   "reactivate": {
+    "type": "string",
+    "description": "Reactivate"
+   },
+   "diagnoseCredential": {
+    "type": "string",
+    "description": "Diagnose Credential"
+   }
+  }
+ },
+ "VirtualTicketIdentityMasterRecordConfigurationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Virtual Ticket Identity & Master Record Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "mediaReplacement": {
+    "type": "string",
+    "description": "Media replacement"
+   },
+   "qrRegeneration": {
+    "type": "string",
+    "description": "QR regeneration"
+   },
+   "rfidReplacement": {
+    "type": "string",
+    "description": "RFID replacement"
+   },
+   "walletUpdates": {
+    "type": "string",
+    "description": "Wallet updates"
+   },
+   "deviceChanges": {
+    "type": "string",
+    "description": "Device changes"
+   },
+   "faceEnrollmentChanges": {
+    "type": "string",
+    "description": "Face enrollment changes"
+   },
+   "ticketReprint": {
+    "type": "string",
+    "description": "Ticket reprint"
+   },
+   "order": {
+    "type": "string",
+    "description": "Order"
+   },
+   "orderLine": {
+    "type": "string",
+    "description": "Order Line"
+   },
+   "reservation": {
+    "type": "string",
+    "description": "Reservation"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "productVersion": {
+    "type": "string",
+    "description": "Product Version"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "performanceTimeslot": {
+    "type": "string",
+    "description": "Performance / Timeslot"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "ticketHolder": {
+    "type": "string",
+    "description": "Ticket Holder"
+   },
+   "participant": {
+    "type": "string",
+    "description": "Participant"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "seat": {
+    "type": "string",
+    "description": "Seat"
+   },
+   "resource": {
+    "type": "string",
+    "description": "Resource"
+   },
+   "priceSnapshot": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price Snapshot"
+   },
+   "entitlements": {
+    "type": "string",
+    "description": "Entitlements"
+   },
+   "validity": {
+    "type": "string",
+    "description": "Validity"
+   },
+   "accessEntitlement": {
+    "type": "string",
+    "description": "Access entitlement"
+   },
+   "fulfillmentStatus": {
+    "type": "string",
+    "description": "Fulfillment status"
+   },
+   "idGenerationPattern": {
+    "type": "string",
+    "description": "ID generation pattern"
+   },
+   "ticketClassification": {
+    "type": "string",
+    "description": "Ticket classification"
+   },
+   "ticketOwnershipModel": {
+    "type": "string",
+    "description": "Ticket ownership model"
+   },
+   "holderAssignmentRequirements": {
+    "type": "string",
+    "description": "Holder assignment requirements"
+   },
+   "transferabilityReference": {
+    "type": "string",
+    "description": "Transferability reference"
+   },
+   "validityModel": {
+    "type": "string",
+    "description": "Validity model"
+   },
+   "consumptionModel": {
+    "type": "string",
+    "description": "Consumption model"
+   },
+   "entitlementModel": {
+    "type": "string",
+    "description": "Entitlement model"
+   },
+   "mediaRequirements": {
+    "type": "string",
+    "description": "Media requirements"
+   },
+   "rfid77812Vt009821": {
+    "type": "string",
+    "description": "RFID-77812 → VT-009821"
+   },
+   "rfid99142Vt009821": {
+    "type": "string",
+    "description": "RFID-99142 → VT-009821"
+   },
+   "theVirtualTicketRemainsUnchanged": {
+    "type": "string",
+    "description": "The Virtual Ticket remains unchanged"
+   },
+   "valid": {
+    "type": "string",
+    "description": "Valid"
+   },
+   "suspended": {
+    "type": "string",
+    "description": "Suspended"
+   }
+  }
+ },
+ "VirtualTicketIdentityMasterRecordConfigurationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Virtual Ticket Identity & Master Record Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "mediaReplacement": {
+    "type": "string",
+    "description": "Media replacement"
+   },
+   "qrRegeneration": {
+    "type": "string",
+    "description": "QR regeneration"
+   },
+   "rfidReplacement": {
+    "type": "string",
+    "description": "RFID replacement"
+   },
+   "walletUpdates": {
+    "type": "string",
+    "description": "Wallet updates"
+   },
+   "deviceChanges": {
+    "type": "string",
+    "description": "Device changes"
+   },
+   "faceEnrollmentChanges": {
+    "type": "string",
+    "description": "Face enrollment changes"
+   },
+   "ticketReprint": {
+    "type": "string",
+    "description": "Ticket reprint"
+   },
+   "order": {
+    "type": "string",
+    "description": "Order"
+   },
+   "orderLine": {
+    "type": "string",
+    "description": "Order Line"
+   },
+   "reservation": {
+    "type": "string",
+    "description": "Reservation"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "productVersion": {
+    "type": "string",
+    "description": "Product Version"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "performanceTimeslot": {
+    "type": "string",
+    "description": "Performance / Timeslot"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "ticketHolder": {
+    "type": "string",
+    "description": "Ticket Holder"
+   },
+   "participant": {
+    "type": "string",
+    "description": "Participant"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "seat": {
+    "type": "string",
+    "description": "Seat"
+   },
+   "resource": {
+    "type": "string",
+    "description": "Resource"
+   },
+   "priceSnapshot": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Price Snapshot"
+   },
+   "entitlements": {
+    "type": "string",
+    "description": "Entitlements"
+   },
+   "validity": {
+    "type": "string",
+    "description": "Validity"
+   },
+   "accessEntitlement": {
+    "type": "string",
+    "description": "Access entitlement"
+   },
+   "fulfillmentStatus": {
+    "type": "string",
+    "description": "Fulfillment status"
+   },
+   "idGenerationPattern": {
+    "type": "string",
+    "description": "ID generation pattern"
+   },
+   "ticketClassification": {
+    "type": "string",
+    "description": "Ticket classification"
+   },
+   "ticketOwnershipModel": {
+    "type": "string",
+    "description": "Ticket ownership model"
+   },
+   "holderAssignmentRequirements": {
+    "type": "string",
+    "description": "Holder assignment requirements"
+   },
+   "transferabilityReference": {
+    "type": "string",
+    "description": "Transferability reference"
+   },
+   "validityModel": {
+    "type": "string",
+    "description": "Validity model"
+   },
+   "consumptionModel": {
+    "type": "string",
+    "description": "Consumption model"
+   },
+   "entitlementModel": {
+    "type": "string",
+    "description": "Entitlement model"
+   },
+   "mediaRequirements": {
+    "type": "string",
+    "description": "Media requirements"
+   },
+   "rfid77812Vt009821": {
+    "type": "string",
+    "description": "RFID-77812 → VT-009821"
+   },
+   "rfid99142Vt009821": {
+    "type": "string",
+    "description": "RFID-99142 → VT-009821"
+   },
+   "theVirtualTicketRemainsUnchanged": {
+    "type": "string",
+    "description": "The Virtual Ticket remains unchanged"
+   },
+   "valid": {
+    "type": "string",
+    "description": "Valid"
+   },
+   "suspended": {
+    "type": "string",
+    "description": "Suspended"
+   }
+  }
+ },
+ "VirtualTicketStatusLifecycleModelView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over access state, assembled at read time from tables that already exist",
+  "description": "**What Virtual Ticket Status & Lifecycle Model displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "withGovernedAlternativeStates": {
+    "type": "string",
+    "description": "with governed alternative states"
+   },
+   "suspended": {
+    "type": "string",
+    "description": "Suspended"
+   },
+   "cancelled": {
+    "type": "integer",
+    "description": "Cancelled"
+   },
+   "voided": {
+    "type": "string",
+    "description": "Voided"
+   },
+   "reissuedSuperseded": {
+    "type": "string",
+    "description": "Reissued / Superseded"
+   },
+   "refunded": {
+    "type": "string",
+    "description": "Refunded"
+   },
+   "transferred": {
+    "type": "string",
+    "description": "Transferred"
+   },
+   "blocked": {
+    "type": "string",
+    "description": "Blocked"
+   },
+   "from": {
+    "type": "string",
+    "description": "from"
+   },
+   "qrActive": {
+    "type": "integer",
+    "description": "QR — Active"
+   },
+   "rfidLostRevoked": {
+    "type": "string",
+    "description": "RFID — Lost / Revoked"
+   },
+   "appleWalletActive": {
+    "type": "integer",
+    "description": "Apple Wallet — Active"
+   },
+   "faceActive": {
+    "type": "integer",
+    "description": "Face — Active"
+   },
+   "theTicketItselfRemainsValid": {
+    "type": "string",
+    "description": "The ticket itself remains valid"
+   },
+   "orderManagement": {
+    "type": "string",
+    "description": "Order Management"
+   },
+   "cancellation": {
+    "type": "string",
+    "description": "Cancellation"
+   },
+   "ticketTransfer": {
+    "type": "string",
+    "description": "Ticket Transfer"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "expiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry"
+   },
+   "accessUsage": {
+    "type": "string",
+    "description": "Access usage"
+   },
+   "authorizedOperator": {
+    "type": "string",
+    "description": "Authorized operator"
+   },
+   "api": {
+    "type": "string",
+    "description": "API"
+   },
+   "scheduledProcess": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Scheduled process"
+   }
+  }
+ }
+}

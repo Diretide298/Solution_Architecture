@@ -1,0 +1,513 @@
+{
+ "AddCartLineRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only",
+  "required": [
+   "variantId",
+   "quantity"
+  ],
+  "properties": {
+   "variantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "quantity": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "seatIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "parentLineId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For an add-on attaching to a ticket already in the cart. **Removing the parent removes the child** — a locker with no admission is not a sale.\n"
+   },
+   "attributes": {
+    "type": "object",
+    "additionalProperties": true
+   }
+  }
+ },
+ "Cart": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.cart",
+  "required": [
+   "id",
+   "venueId",
+   "channel",
+   "status",
+   "lines"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "token": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "channel": {
+    "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Null while anonymous. Set by `claimCart`."
+   },
+   "status": {
+    "$ref": "#/components/schemas/CartStatus"
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/CartLine"
+    }
+   },
+   "conflicts": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/CartConflict"
+    }
+   },
+   "subtotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "discountTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "taxTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "total": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "appliedPromotionIds": {
+    "type": "array",
+    "description": "**Re-evaluated on every read.** A promotion that expired while the cart sat must not still be applied at checkout, and a promotion that became applicable should be.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "The earliest lease expiry in the cart, or the cart's own window where it holds none."
+   },
+   "extensionsUsed": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "maxExtensions": {
+    "type": "integer",
+    "readOnly": true
+   },
+   "locale": {
+    "type": "string"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "CartConflict": {
+  "type": "object",
+  "x-ticvai-persistence": "none — computed on read",
+  "description": "2.9.5. Golf at 13:00 and karting at 13:00 for the same guest. **A prompt, not a refusal** — a party of four may legitimately split, and refusing would be wrong more often than right.\n",
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "overlappingTime",
+     "sameSessionDifferentVenue",
+     "exceedsPartySize",
+     "requiresPrerequisite"
+    ]
+   },
+   "lineIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "message": {
+    "type": "string"
+   },
+   "isBlocking": {
+    "type": "boolean",
+    "description": "Most are not. `requiresPrerequisite` is — an add-on with no ticket to attach to cannot be sold.\n"
+   }
+  }
+ },
+ "CartLine": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.cart_line",
+  "required": [
+   "id",
+   "variantId",
+   "quantity"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "variantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "productName": {
+    "type": "string",
+    "readOnly": true
+   },
+   "quantity": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "seatIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "overridePrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "overrideReason": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "priceMatch",
+     "serviceRecovery",
+     "negotiated",
+     "damagedGoods",
+     "staffSale",
+     "error"
+    ],
+    "description": "BL-085. **An operator could apply an approved discount and not enter a price.** A price match against a competitor and a service-recovery gesture are not discounts off a list — they are a number somebody decided.\n**Escalated above a configured threshold, and the reason is a closed set**: a free-text override reason is an override nobody can report on, and this is the field an auditor reads first.\n"
+   },
+   "feeKind": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "booking",
+     "transaction",
+     "service",
+     "delivery",
+     "convenience",
+     "cancellation"
+    ],
+    "description": "**A fee is a line, not an adjustment.** `orders` already separates a service charge from a tip for the reason that applies here: **a guest is entitled to see what they are being charged for**, and a fee folded into the ticket price is a fee nobody can question.\nItemised at checkout, taxed on its own code, and refundable separately — **a cancellation fee is usually the one thing not refunded**, which only works if it is its own line.\n"
+   },
+   "unitPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "lineTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "inventoryHoldId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The capacity held for this line. **Null for a product with no capacity** — a t-shirt needs stock, not a lease.\n"
+   },
+   "leaseExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Shown to the guest. *\"Your seats are held for 6 minutes\"* is better than discovering it at checkout.\n"
+   },
+   "isAvailable": {
+    "type": "boolean",
+    "readOnly": true,
+    "description": "Re-checked on every read. **A line can become unavailable while the cart sits** — a lease expiring is not the same as the product selling out, and both land here.\n"
+   }
+  }
+ },
+ "CartStatus": {
+  "type": "string",
+  "enum": [
+   "active",
+   "expiring",
+   "expired",
+   "abandoned",
+   "checkedOut"
+  ]
+ },
+ "MerchandiseReservation": {
+  "x-ticvai-persistence": "retail.reservation + retail.reservation_line",
+  "type": "object",
+  "required": [
+   "id",
+   "outletId",
+   "lines",
+   "status",
+   "expiresAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "reservationNumber": {
+    "type": "string"
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "merchandiseId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "quantity": {
+       "type": "integer"
+      }
+     }
+    }
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "reserved",
+     "collected",
+     "expired",
+     "cancelled"
+    ]
+   },
+   "collectionNote": {
+    "type": "string",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "collectedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "PriceCheck": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "merchandiseId",
+   "name",
+   "listPrice",
+   "effectivePrice",
+   "onHand"
+  ],
+  "properties": {
+   "merchandiseId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sku": {
+    "type": "string"
+   },
+   "name": {
+    "type": "string"
+   },
+   "listPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "effectivePrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "After any live promotion."
+   },
+   "appliedPromotionCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "onHand": {
+    "type": "number"
+   },
+   "isAvailable": {
+    "type": "boolean"
+   },
+   "siblingOutlets": {
+    "type": "array",
+    "description": "Stock elsewhere in the venue, so a colleague can be sent.",
+    "items": {
+     "type": "object",
+     "properties": {
+      "outletId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "outletName": {
+       "type": "string"
+      },
+      "onHand": {
+       "type": "number"
+      }
+     }
+    }
+   }
+  }
+ },
+ "ShopAndDrop": {
+  "type": "object",
+  "x-ticvai-persistence": "retail.shop_and_drop + retail.shop_and_drop_line",
+  "required": [
+   "id",
+   "dropReference",
+   "saleId",
+   "collectionPointId",
+   "status",
+   "collectBy"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "dropReference": {
+    "type": "string",
+    "description": "Short and readable. Printed on the slip a guest may or may not keep."
+   },
+   "saleId": {
+    "type": "string"
+   },
+   "entitlementId": {
+    "type": "string",
+    "nullable": true,
+    "description": "The ticket that claims these goods. The point of 4.4.7 — a guest does not have to keep a receipt safe for eight hours in a water park.\n"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "collectionPointId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "collectionPointName": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "awaitingCollection",
+     "partiallyCollected",
+     "collected",
+     "uncollected",
+     "disposed"
+    ]
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "lineId": {
+       "type": "string"
+      },
+      "merchandiseId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "name": {
+       "type": "string"
+      },
+      "quantity": {
+       "type": "integer"
+      },
+      "collectedQuantity": {
+       "type": "integer"
+      }
+     }
+    }
+   },
+   "droppedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "collectBy": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "collectedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "collectedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "verifiedBy": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ }
+}

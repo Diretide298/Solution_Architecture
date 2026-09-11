@@ -1,0 +1,136 @@
+id: F210
+name: 'Subscription Licensing AI Self Service board 4: Recommended Package Overview'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Subscription Licensing AI Self Service board 4. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-399
+  entryPoints:
+  - Arrives at Recommended Package Overview
+steps:
+- step: 1
+  screen: ADM-399
+  action: Opens Recommended Package Overview
+  operations: []
+  outcome: 'Present the AI-generated recommended package based on: Board 2 Customer Assessment VSI Operational
+    requirements Commercial model Technical licensing profile Required modules Expected ticket/transaction
+    volume Contract requirements'
+- step: 2
+  screen: ADM-400
+  action: Works in Commercial Model & Tier Selection
+  operations: []
+  outcome: Allow TICVAI commercial users — or authorized self-service customers where applicable — to
+    select the appropriate commercial charging model. This replaces the previous assumption that this
+    screen is only a tier comparison.
+- step: 3
+  screen: ADM-399
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-401
+  action: Works in Module Marketplace
+  operations: []
+  outcome: Allow the customer or TICVAI commercial team to select optional TICVAI modules.
+- step: 5
+  screen: ADM-399
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-402
+  action: Works in AI Module & Package Recommendations
+  operations: []
+  outcome: Use AI to recommend the appropriate modules and package configuration based on the customer's
+    business.
+- step: 7
+  screen: ADM-399
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-403
+  action: Works in Module Detail & Commercial Treatment
+  operations: []
+  outcome: Provide detailed information about an individual module before adding it to the package.
+- step: 9
+  screen: ADM-399
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-404
+  action: Works in Module Dependency & Compatibility Manager
+  operations: []
+  outcome: Ensure that the package is technically valid before commercial approval.
+- step: 11
+  screen: ADM-399
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-405
+  action: Works in Add-Ons, Capacity & Commercial Options
+  operations: []
+  outcome: Allow additional resources to be added without unnecessarily moving the customer to another
+    tier. This remains a very important TICVAI commercial principle.
+- step: 13
+  screen: ADM-399
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-406
+  action: Works in Commercial Package Simulator
+  operations: []
+  outcome: Compare different ways of commercially packaging the same customer. This screen must consume
+    the commercial models configured in Board 3.
+- step: 15
+  screen: ADM-399
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-407
+  action: Works in Package Review & Commercial Summary
+  operations: []
+  outcome: Provide the complete package before customer acceptance or internal approval.
+- step: 17
+  screen: ADM-399
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-408
+  action: Works in Final Package Approval & Handoff
+  operations: []
+  outcome: Govern final approval of the commercial package and send the approved configuration into purchase/contract
+    activation.
+branches:
+- at: 1
+  condition: Nothing has been set up on Recommended Package Overview yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Subscription Licensing AI Self Service board 4 visited
+primaryContract: unknown
+contracts:
+- unknown

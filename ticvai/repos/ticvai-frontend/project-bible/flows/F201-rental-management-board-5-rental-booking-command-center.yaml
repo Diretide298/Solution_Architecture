@@ -1,0 +1,134 @@
+id: F201
+name: 'Rental Management board 5: Rental Booking Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Rental Management board 5. **This route is read from the
+    screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-534
+  entryPoints:
+  - Arrives at Rental Booking Command Center
+steps:
+- step: 1
+  screen: BO-534
+  action: Opens Rental Booking Command Center
+  operations: []
+  outcome: Provide a single operational view of all rental reservations across venues and locations.
+- step: 2
+  screen: BO-535
+  action: Works in New Rental Booking Wizard
+  operations: []
+  outcome: Allow POS/rental operators to create a reservation through a guided workflow.
+- step: 3
+  screen: BO-534
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-536
+  action: Works in Availability Selection & Alternative Options
+  operations: []
+  outcome: Give the operator/customer a clear booking choice based on Board 3 availability.
+- step: 5
+  screen: BO-534
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-537
+  action: Works in Customer & Participant Information
+  operations: []
+  outcome: Capture the configurable customer information required by the rental product. The original
+    requirements specifically support configurable mandatory fields such as name, mobile, email, nationality,
+    ID number and date of birth.
+- step: 7
+  screen: BO-534
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-538
+  action: Works in Group Rental & Participant Management
+  operations: []
+  outcome: Handle reservations involving multiple participants. The source explicitly requires group reservations,
+    participant demographics and configurable participant forms.
+- step: 9
+  screen: BO-534
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-539
+  action: Works in Rental Agreement & Waiver Completion
+  operations: []
+  outcome: Complete all mandatory customer acknowledgments before confirmation or checkout. This implements
+    the digital rental agreement/waiver capability recommended in the source.
+- step: 11
+  screen: BO-534
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-540
+  action: Works in Booking Commercial Summary & Payment
+  operations: []
+  outcome: Show the complete financial commitment before confirming the reservation.
+- step: 13
+  screen: BO-534
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-541
+  action: Works in Reservation Confirmation & QR Voucher
+  operations: []
+  outcome: Create the confirmed rental reservation and customer credential. The original voucher flow
+    specifically requires the system to generate a voucher/ticket that is later redeemed at the rental
+    counter.
+- step: 15
+  screen: BO-534
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-542
+  action: Works in Reservation Modification, Cancellation & No-Show
+  operations: []
+  outcome: Manage the reservation after confirmation but before/during fulfillment.
+- step: 17
+  screen: BO-534
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-543
+  action: Works in Reservation Detail, Timeline & Readiness
+  operations: []
+  outcome: Provide the complete operational record before handing the reservation to Board 6 for checkout.
+branches:
+- at: 1
+  condition: Nothing has been set up on Rental Booking Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Rental Management board 5 visited
+primaryContract: unknown
+contracts:
+- unknown

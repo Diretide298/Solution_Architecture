@@ -1,0 +1,343 @@
+{
+ "acknowledgeAnnouncement": {
+  "method": "POST",
+  "path": "/announcements/{announcementId}/acknowledge",
+  "contract": "workforce",
+  "summary": "Confirm you have read it",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "createInspectionTemplate": {
+  "method": "POST",
+  "path": "/inspection-templates",
+  "contract": "maintenance",
+  "summary": "Create an inspection template",
+  "permission": "INSPECTION_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "InspectionTemplate",
+  "responds": "InspectionTemplate"
+ },
+ "getAnnouncementReach": {
+  "method": "GET",
+  "path": "/announcements/{announcementId}/reach",
+  "contract": "workforce",
+  "summary": "Who has acknowledged, and who has not",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AnnouncementReach"
+ },
+ "getIncident": {
+  "method": "GET",
+  "path": "/incidents/{incidentId}",
+  "contract": "maintenance",
+  "summary": "Read an incident",
+  "permission": "INCIDENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "IncidentDetail"
+ },
+ "listAnnouncements": {
+  "method": "GET",
+  "path": "/announcements",
+  "contract": "workforce",
+  "summary": "What staff have been told",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "unacknowledgedOnly",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Announcement"
+ },
+ "listIncidents": {
+  "method": "GET",
+  "path": "/incidents",
+  "contract": "maintenance",
+  "summary": "List incidents",
+  "permission": "INCIDENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "severity",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "isReportable",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listInspectionTemplates": {
+  "method": "GET",
+  "path": "/inspection-templates",
+  "contract": "maintenance",
+  "summary": "List inspection templates",
+  "permission": "INSPECTION_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "InspectionTemplate"
+ },
+ "listInspections": {
+  "method": "GET",
+  "path": "/inspections",
+  "contract": "maintenance",
+  "summary": "List completed inspections",
+  "permission": "INSPECTION_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "templateId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "assetId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "outcome",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "performedFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "performedTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listScans": {
+  "method": "GET",
+  "path": "/access/scans",
+  "contract": "access",
+  "summary": "List scan events",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "accessPointId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "ticketId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "outcome",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "recordedFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "recordedTo",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "logout": {
+  "method": "POST",
+  "path": "/auth/logout",
+  "contract": "identity",
+  "summary": "Close the current session",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
+ },
+ "publishAnnouncement": {
+  "method": "POST",
+  "path": "/announcements",
+  "contract": "workforce",
+  "summary": "Tell staff something",
+  "permission": "ANNOUNCEMENT_PUBLISH",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Announcement",
+  "responds": "Announcement"
+ },
+ "recordAuthorityNotification": {
+  "method": "POST",
+  "path": "/incidents/{incidentId}/notify-authority",
+  "contract": "maintenance",
+  "summary": "Record notification to an external authority",
+  "permission": "INCIDENT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Incident"
+ },
+ "submitInspection": {
+  "method": "POST",
+  "path": "/inspections",
+  "contract": "maintenance",
+  "summary": "Submit a completed inspection",
+  "permission": "INSPECTION_SUBMIT",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SubmitInspectionRequest",
+  "responds": "InspectionResult"
+ },
+ "syncScans": {
+  "method": "POST",
+  "path": "/access/scans",
+  "contract": "access",
+  "summary": "Replay scans recorded offline",
+  "permission": "ACCESS_VALIDATE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ScanSyncResult"
+ },
+ "updateIncident": {
+  "method": "PATCH",
+  "path": "/incidents/{incidentId}",
+  "contract": "maintenance",
+  "summary": "Investigate, escalate or close an incident",
+  "permission": "INCIDENT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Incident"
+ }
+}

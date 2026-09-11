@@ -1,0 +1,1513 @@
+[
+ {
+  "id": "BO-254",
+  "name": "Access Monitoring & Analytics Command Center",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Access Control Module_Reference.pdf",
+   "board": "12",
+   "number": "12.1",
+   "page": 168
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/access-monitoring-analytics-command-center-bo-254",
+   "component": "apps/venue-management-web/src/routes/access-venue/AccessMonitoringAnalyticsCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-255",
+    "BO-256",
+    "BO-257",
+    "BO-258",
+    "BO-259",
+    "BO-260",
+    "BO-261",
+    "BO-262",
+    "BO-263"
+   ],
+   "inferred": false,
+   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Venue Home",
+     "carries": [
+      "venueId"
+     ],
+     "provenance": "derived — BO-100 declares entryState.params venueId, so an edge into it must carry them"
+    },
+    {
+     "to": "BO-255",
+     "trigger": "Works in Live Venue Occupancy & People Counting",
+     "provenance": "flow F122 step 1→2",
+     "operation": "listAccessMonitoring"
+    },
+    {
+     "to": "BO-256",
+     "trigger": "Works in Graphical Access Map & Live Gate Performance",
+     "provenance": "flow F122 step 3→4",
+     "operation": "listAccessMonitoring"
+    },
+    {
+     "to": "BO-257",
+     "trigger": "Works in Attendance & Admission Analytics",
+     "provenance": "flow F122 step 5→6",
+     "operation": "listAccessMonitoring"
+    },
+    {
+     "to": "BO-258",
+     "trigger": "Works in Entry, Exit, Re-entry & Crossover Analytics",
+     "provenance": "flow F122 step 7→8",
+     "operation": "listAccessMonitoring"
+    },
+    {
+     "to": "BO-259",
+     "trigger": "Works in Throughput, Queue & Validation Performance Analytics",
+     "provenance": "flow F122 step 9→10",
+     "operation": "listAccessMonitoring"
+    },
+    {
+     "to": "BO-260",
+     "trigger": "Works in Validation Outcome & Rejection Analytics",
+     "provenance": "flow F122 step 11→12",
+     "operation": "listAccessMonitoring"
+    },
+    {
+     "to": "BO-261",
+     "trigger": "Works in Guest Dwell Time, Length of Stay & Attraction Flow",
+     "provenance": "flow F122 step 13→14",
+     "operation": "listAccessMonitoring"
+    },
+    {
+     "to": "BO-262",
+     "trigger": "Works in Access Reports, Scheduled Reporting & Data Export",
+     "provenance": "flow F122 step 15→16",
+     "operation": "listAccessMonitoring"
+    },
+    {
+     "to": "BO-263",
+     "trigger": "Works in AI Access Intelligence, Forecasting & Executive Insights",
+     "provenance": "flow F122 step 17→18",
+     "operation": "listAccessMonitoring"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
+  "purpose": "Provide a single executive and operational overview of access performance across all TICVAI-controlled venues.",
+  "purposeNote": "Management can understand the overall access operation from one screen.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every access monitoring analytics",
+       "columns": [
+        "AccessMonitoringAnalyticsCommandCenterView.totalAdmissionsToday",
+        "AccessMonitoringAnalyticsCommandCenterView.entries",
+        "AccessMonitoringAnalyticsCommandCenterView.exits",
+        "AccessMonitoringAnalyticsCommandCenterView.currentlyInVenue",
+        "AccessMonitoringAnalyticsCommandCenterView.reEntries",
+        "AccessMonitoringAnalyticsCommandCenterView.crossovers",
+        "AccessMonitoringAnalyticsCommandCenterView.groupAdmissions",
+        "AccessMonitoringAnalyticsCommandCenterView.fastPassUses",
+        "AccessMonitoringAnalyticsCommandCenterView.validScans",
+        "AccessMonitoringAnalyticsCommandCenterView.rejectedScans",
+        "AccessMonitoringAnalyticsCommandCenterView.interventionRate",
+        "AccessMonitoringAnalyticsCommandCenterView.averageValidationTime",
+        "AccessMonitoringAnalyticsCommandCenterView.activeGates",
+        "AccessMonitoringAnalyticsCommandCenterView.offlineDevices"
+       ],
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterView",
+       "operation": "listAccessMonitoring",
+       "provenance": "pack Access Control Module_Reference.pdf, page 168 §Show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected access monitoring analytics",
+       "bindsTo": "AccessMonitoringAnalyticsCommandCenterView",
+       "columns": [
+        "AccessMonitoringAnalyticsCommandCenterView.totalAdmissionsToday",
+        "AccessMonitoringAnalyticsCommandCenterView.entries",
+        "AccessMonitoringAnalyticsCommandCenterView.exits",
+        "AccessMonitoringAnalyticsCommandCenterView.currentlyInVenue",
+        "AccessMonitoringAnalyticsCommandCenterView.reEntries",
+        "AccessMonitoringAnalyticsCommandCenterView.crossovers",
+        "AccessMonitoringAnalyticsCommandCenterView.groupAdmissions",
+        "AccessMonitoringAnalyticsCommandCenterView.fastPassUses",
+        "AccessMonitoringAnalyticsCommandCenterView.validScans",
+        "AccessMonitoringAnalyticsCommandCenterView.rejectedScans",
+        "AccessMonitoringAnalyticsCommandCenterView.interventionRate",
+        "AccessMonitoringAnalyticsCommandCenterView.averageValidationTime",
+        "AccessMonitoringAnalyticsCommandCenterView.activeGates",
+        "AccessMonitoringAnalyticsCommandCenterView.offlineDevices"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “TOTAL ADMISSIONS”, “CURRENTLY IN VENUE”, “Venue Comparison”.",
+       "provenance": "pack Access Control Module_Reference.pdf, page 168 §Show"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The access monitoring analytics list.",
+   "error": "Could not load. Names which read failed and leaves the access monitoring analytics untouched.",
+   "emptyFirstRun": "No access monitoring analytics yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the access monitoring analytics are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listAccessMonitoring",
+    "contract": "access",
+    "purpose": "Access Monitoring & Analytics Command Center",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "AccessMonitoringAnalyticsCommandCenterView.totalAdmissionsToday",
+    "AccessMonitoringAnalyticsCommandCenterView.entries",
+    "AccessMonitoringAnalyticsCommandCenterView.exits",
+    "AccessMonitoringAnalyticsCommandCenterView.currentlyInVenue",
+    "AccessMonitoringAnalyticsCommandCenterView.reEntries",
+    "AccessMonitoringAnalyticsCommandCenterView.crossovers"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-254"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 168. 14 of 14 labels bound to a contract property; 14 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-255",
+  "name": "Live Venue Occupancy & People Counting",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Access Control Module_Reference.pdf",
+   "board": "12",
+   "number": "12.2",
+   "page": 170
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/live-venue-occupancy-people-counting-bo-255",
+   "component": "apps/venue-management-web/src/routes/access-venue/LiveVenueOccupancyPeopleCounting.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-254"
+   ],
+   "exitTo": [
+    "BO-254"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-254, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-254",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F122 step 2→3",
+     "operation": "listLiveVenueOccupancy"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide real-time people counting and occupancy using entry and exit events.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Access Control Module_Reference.pdf, page 170"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Access Control Module_Reference.pdf, page 170"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listLiveVenueOccupancy",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The live venue occupancy list.",
+   "error": "Could not load. Names which read failed and leaves the live venue occupancy untouched.",
+   "emptyFirstRun": "No live venue occupancy yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the live venue occupancy are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listLiveVenueOccupancy",
+    "contract": "access",
+    "purpose": "Live Venue Occupancy & People Counting",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "LiveVenueOccupancyPeopleCountingView.exits",
+    "LiveVenueOccupancyPeopleCountingView.operationalAdjustments",
+    "LiveVenueOccupancyPeopleCountingView.current",
+    "LiveVenueOccupancyPeopleCountingView.capacity",
+    "LiveVenueOccupancyPeopleCountingView.occupancy"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-255"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 170. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-256",
+  "name": "Graphical Access Map & Live Gate Performance",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Access Control Module_Reference.pdf",
+   "board": "12",
+   "number": "12.3",
+   "page": 171
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/graphical-access-map-live-gate-performance-bo-256",
+   "component": "apps/venue-management-web/src/routes/access-venue/GraphicalAccessMapLiveGatePerformance.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-254"
+   ],
+   "exitTo": [
+    "BO-254"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-254, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-254",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F122 step 4→5",
+     "operation": "listGraphicalAccessMap"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Turn the graphical access topology created in Board 1 into a live operational analytics map.",
+  "purposeNote": "Operations can visually identify where access bottlenecks or abnormal conditions are occurring.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every graphical access map",
+       "columns": [
+        "GraphicalAccessMapLiveGatePerformanceView.gates",
+        "GraphicalAccessMapLiveGatePerformanceView.turnstiles",
+        "GraphicalAccessMapLiveGatePerformanceView.entryPoints",
+        "GraphicalAccessMapLiveGatePerformanceView.exitPoints",
+        "GraphicalAccessMapLiveGatePerformanceView.reEntryGates",
+        "GraphicalAccessMapLiveGatePerformanceView.groupGates",
+        "GraphicalAccessMapLiveGatePerformanceView.vipGates",
+        "GraphicalAccessMapLiveGatePerformanceView.attractionAccess"
+       ],
+       "bindsTo": "GraphicalAccessMapLiveGatePerformanceView",
+       "operation": "listGraphicalAccessMap",
+       "provenance": "pack Access Control Module_Reference.pdf, page 171 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected graphical access map",
+       "bindsTo": "GraphicalAccessMapLiveGatePerformanceView",
+       "columns": [
+        "GraphicalAccessMapLiveGatePerformanceView.gates",
+        "GraphicalAccessMapLiveGatePerformanceView.turnstiles",
+        "GraphicalAccessMapLiveGatePerformanceView.entryPoints",
+        "GraphicalAccessMapLiveGatePerformanceView.exitPoints",
+        "GraphicalAccessMapLiveGatePerformanceView.reEntryGates",
+        "GraphicalAccessMapLiveGatePerformanceView.groupGates",
+        "GraphicalAccessMapLiveGatePerformanceView.vipGates",
+        "GraphicalAccessMapLiveGatePerformanceView.attractionAccess"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Guests”, “Throughput”, “Success”, “Reject”, “Yellow”.",
+       "provenance": "pack Access Control Module_Reference.pdf, page 171 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The graphical access map list.",
+   "error": "Could not load. Names which read failed and leaves the graphical access map untouched.",
+   "emptyFirstRun": "No graphical access map yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the graphical access map are still there. The pack's own statuses are 🟢 Healthy — the state names which is selected.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listGraphicalAccessMap",
+    "contract": "access",
+    "purpose": "Graphical Access Map & Live Gate Performance",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "GraphicalAccessMapLiveGatePerformanceView.gates",
+    "GraphicalAccessMapLiveGatePerformanceView.turnstiles",
+    "GraphicalAccessMapLiveGatePerformanceView.entryPoints",
+    "GraphicalAccessMapLiveGatePerformanceView.exitPoints",
+    "GraphicalAccessMapLiveGatePerformanceView.reEntryGates",
+    "GraphicalAccessMapLiveGatePerformanceView.groupGates"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-256"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 171. 8 of 8 labels bound to a contract property; 12 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-257",
+  "name": "Attendance & Admission Analytics",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Access Control Module_Reference.pdf",
+   "board": "12",
+   "number": "12.4",
+   "page": 172
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/attendance-admission-analytics-bo-257",
+   "component": "apps/venue-management-web/src/routes/access-venue/AttendanceAdmissionAnalytics.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-254"
+   ],
+   "exitTo": [
+    "BO-254"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-254, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-254",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F122 step 6→7",
+     "operation": "listAttendanceAdmission"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
+  "purpose": "Provide detailed reporting of who actually attended compared with tickets sold/reserved. This is particularly important because group admission may differ from purchased quantity.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search attendance admission analytics",
+       "provenance": "pack Access Control Module_Reference.pdf, page 172 §Analyze by"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "AttendanceAdmissionAnalyticsView.ticketType",
+        "Product",
+        "AttendanceAdmissionAnalyticsView.event",
+        "Timeslot",
+        "Membership",
+        "AttendanceAdmissionAnalyticsView.channel",
+        "B2B Partner",
+        "Reseller",
+        "AttendanceAdmissionAnalyticsView.customerSegment",
+        "Guest Category"
+       ],
+       "notes": "The pack filters this screen by ticket type, product, event, timeslot, membership, channel and 4 more — which are present is a decision the pack already made.",
+       "provenance": "pack Access Control Module_Reference.pdf, page 172 §Analyze by"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every attendance admission analytics",
+       "columns": [
+        "AttendanceAdmissionAnalyticsView.ticketsSold",
+        "AttendanceAdmissionAnalyticsView.ticketsEligibleToday",
+        "AttendanceAdmissionAnalyticsView.ticketsScanned",
+        "AttendanceAdmissionAnalyticsView.uniqueGuests",
+        "AttendanceAdmissionAnalyticsView.noShows",
+        "AttendanceAdmissionAnalyticsView.groupAttendance",
+        "AttendanceAdmissionAnalyticsView.membershipAttendance",
+        "AttendanceAdmissionAnalyticsView.repeatEntry",
+        "AttendanceAdmissionAnalyticsView.noShowRate",
+        "AttendanceAdmissionAnalyticsView.ticketType",
+        "AttendanceAdmissionAnalyticsView.channel",
+        "AttendanceAdmissionAnalyticsView.event",
+        "AttendanceAdmissionAnalyticsView.dateTime"
+       ],
+       "bindsTo": "AttendanceAdmissionAnalyticsView",
+       "operation": "listAttendanceAdmission",
+       "provenance": "pack Access Control Module_Reference.pdf, page 172 §Show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected attendance admission analytics",
+       "bindsTo": "AttendanceAdmissionAnalyticsView",
+       "columns": [
+        "AttendanceAdmissionAnalyticsView.ticketsSold",
+        "AttendanceAdmissionAnalyticsView.ticketsEligibleToday",
+        "AttendanceAdmissionAnalyticsView.ticketsScanned",
+        "AttendanceAdmissionAnalyticsView.uniqueGuests",
+        "AttendanceAdmissionAnalyticsView.noShows",
+        "AttendanceAdmissionAnalyticsView.groupAttendance",
+        "AttendanceAdmissionAnalyticsView.membershipAttendance",
+        "AttendanceAdmissionAnalyticsView.repeatEntry",
+        "AttendanceAdmissionAnalyticsView.noShowRate",
+        "AttendanceAdmissionAnalyticsView.ticketType",
+        "AttendanceAdmissionAnalyticsView.channel",
+        "AttendanceAdmissionAnalyticsView.event",
+        "AttendanceAdmissionAnalyticsView.dateTime"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Sold”, “Eligible”, “Attended”, “ATTENDANCE RATE”, “Purchased”, “Actual Attendance”.",
+       "provenance": "pack Access Control Module_Reference.pdf, page 172 §Show"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The attendance admission analytics list.",
+   "error": "Could not load. Names which read failed and leaves the attendance admission analytics untouched.",
+   "emptyFirstRun": "No attendance admission analytics yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the attendance admission analytics are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listAttendanceAdmission",
+    "contract": "access",
+    "purpose": "Attendance & Admission Analytics",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "AttendanceAdmissionAnalyticsView.ticketsSold",
+    "AttendanceAdmissionAnalyticsView.ticketsEligibleToday",
+    "AttendanceAdmissionAnalyticsView.ticketsScanned",
+    "AttendanceAdmissionAnalyticsView.uniqueGuests",
+    "AttendanceAdmissionAnalyticsView.noShows",
+    "AttendanceAdmissionAnalyticsView.groupAttendance"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-257"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 172. 17 of 23 labels bound to a contract property; 23 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-258",
+  "name": "Entry, Exit, Re-entry & Crossover Analytics",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Access Control Module_Reference.pdf",
+   "board": "12",
+   "number": "12.5",
+   "page": 174
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/entry-exit-re-entry-crossover-analytics-bo-258",
+   "component": "apps/venue-management-web/src/routes/access-venue/EntryExitReEntryCrossoverAnalytics.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-254"
+   ],
+   "exitTo": [
+    "BO-254"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-254, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-254",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F122 step 8→9",
+     "operation": "listEntryExitCrossover"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Measure) and no metric row",
+  "purpose": "Analyze complete guest movement across the access journey.",
+  "purposeNote": "Management can understand actual movement patterns rather than only total admission counts.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every entry exit re-entry",
+       "columns": [
+        "EntryExitReEntryCrossoverAnalyticsView.reEntryRate",
+        "EntryExitReEntryCrossoverAnalyticsView.averageTimeOutside",
+        "EntryExitReEntryCrossoverAnalyticsView.mostUsedReEntryGates",
+        "EntryExitReEntryCrossoverAnalyticsView.rejectedReEntry",
+        "EntryExitReEntryCrossoverAnalyticsView.parkAParkB",
+        "EntryExitReEntryCrossoverAnalyticsView.parkBParkA",
+        "EntryExitReEntryCrossoverAnalyticsView.crossoverTime",
+        "EntryExitReEntryCrossoverAnalyticsView.crossoverProduct"
+       ],
+       "bindsTo": "EntryExitReEntryCrossoverAnalyticsView",
+       "operation": "listEntryExitCrossover",
+       "provenance": "pack Access Control Module_Reference.pdf, page 174 §Measure"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected entry exit re-entry",
+       "bindsTo": "EntryExitReEntryCrossoverAnalyticsView",
+       "columns": [
+        "EntryExitReEntryCrossoverAnalyticsView.reEntryRate",
+        "EntryExitReEntryCrossoverAnalyticsView.averageTimeOutside",
+        "EntryExitReEntryCrossoverAnalyticsView.mostUsedReEntryGates",
+        "EntryExitReEntryCrossoverAnalyticsView.rejectedReEntry",
+        "EntryExitReEntryCrossoverAnalyticsView.parkAParkB",
+        "EntryExitReEntryCrossoverAnalyticsView.parkBParkA",
+        "EntryExitReEntryCrossoverAnalyticsView.crossoverTime",
+        "EntryExitReEntryCrossoverAnalyticsView.crossoverProduct"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Adventure Park”, “Water Park”.",
+       "provenance": "pack Access Control Module_Reference.pdf, page 174 §Measure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The entry exit re-entry list.",
+   "error": "Could not load. Names which read failed and leaves the entry exit re-entry untouched.",
+   "emptyFirstRun": "No entry exit re-entry yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the entry exit re-entry are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listEntryExitCrossover",
+    "contract": "access",
+    "purpose": "Entry, Exit, Re-entry & Crossover Analytics",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "EntryExitReEntryCrossoverAnalyticsView.reEntryRate",
+    "EntryExitReEntryCrossoverAnalyticsView.averageTimeOutside",
+    "EntryExitReEntryCrossoverAnalyticsView.mostUsedReEntryGates",
+    "EntryExitReEntryCrossoverAnalyticsView.rejectedReEntry",
+    "EntryExitReEntryCrossoverAnalyticsView.parkAParkB",
+    "EntryExitReEntryCrossoverAnalyticsView.parkBParkA"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-258"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 174. 8 of 8 labels bound to a contract property; 8 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-259",
+  "name": "Throughput, Queue & Validation Performance Analytics",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Access Control Module_Reference.pdf",
+   "board": "12",
+   "number": "12.6",
+   "page": 175
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/throughput-queue-validation-performance-analytics-bo-259",
+   "component": "apps/venue-management-web/src/routes/access-venue/ThroughputQueueValidationPerformanceAnalytics.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-254"
+   ],
+   "exitTo": [
+    "BO-254"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-254, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-254",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F122 step 10→11",
+     "operation": "listThroughputQueueValidation"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen a metric directory (§Show) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
+  "purpose": "Measure the operational efficiency of gates and validation devices.",
+  "purposeNote": "Management can identify why specific gates or lanes are underperforming.",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Guests per Minute",
+       "provenance": "pack Access Control Module_Reference.pdf, page 175 §Show",
+       "bindsTo": "ThroughputQueueValidationPerformanceAnalyticsView.guestsPerMinute"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Guests per Hour",
+       "provenance": "pack Access Control Module_Reference.pdf, page 175 §Show",
+       "bindsTo": "ThroughputQueueValidationPerformanceAnalyticsView.guestsPerHour"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Average Scan Time",
+       "provenance": "pack Access Control Module_Reference.pdf, page 175 §Show",
+       "bindsTo": "ThroughputQueueValidationPerformanceAnalyticsView.averageScanTime"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Average Gate Cycle",
+       "provenance": "pack Access Control Module_Reference.pdf, page 175 §Show",
+       "bindsTo": "ThroughputQueueValidationPerformanceAnalyticsView.averageGateCycle"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Success Rate",
+       "provenance": "pack Access Control Module_Reference.pdf, page 175 §Show",
+       "bindsTo": "ThroughputQueueValidationPerformanceAnalyticsView.successRate"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Yellow Rate",
+       "provenance": "pack Access Control Module_Reference.pdf, page 175 §Show",
+       "bindsTo": "ThroughputQueueValidationPerformanceAnalyticsView.yellowRate"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Reject Rate",
+       "provenance": "pack Access Control Module_Reference.pdf, page 175 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Manual Intervention Rate",
+       "provenance": "pack Access Control Module_Reference.pdf, page 175 §Show",
+       "bindsTo": "ThroughputQueueValidationPerformanceAnalyticsView.manualInterventionRate"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The throughput queue validation list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the throughput queue validation untouched.",
+   "emptyFirstRun": "No throughput queue validation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the throughput queue validation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listThroughputQueueValidation",
+    "contract": "access",
+    "purpose": "Throughput, Queue & Validation Performance Analytics",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "ThroughputQueueValidationPerformanceAnalyticsView.guestsPerMinute",
+    "ThroughputQueueValidationPerformanceAnalyticsView.guestsPerHour",
+    "ThroughputQueueValidationPerformanceAnalyticsView.averageScanTime",
+    "ThroughputQueueValidationPerformanceAnalyticsView.averageGateCycle",
+    "ThroughputQueueValidationPerformanceAnalyticsView.successRate",
+    "ThroughputQueueValidationPerformanceAnalyticsView.yellowRate"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-259"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 175. 7 of 7 labels bound to a contract property; 8 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-260",
+  "name": "Validation Outcome & Rejection Analytics",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Access Control Module_Reference.pdf",
+   "board": "12",
+   "number": "12.7",
+   "page": 176
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/validation-outcome-rejection-analytics-bo-260",
+   "component": "apps/venue-management-web/src/routes/access-venue/ValidationOutcomeRejectionAnalytics.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-254"
+   ],
+   "exitTo": [
+    "BO-254"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-254, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-254",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F122 step 12→13",
+     "operation": "listValidationOutcomeRejection"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Analyze why guests are denied or require manual intervention.",
+  "purposeNote": "Management can identify the operational root cause behind access failures.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Access Control Module_Reference.pdf, page 176"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search validation outcome rejection",
+       "provenance": "pack Access Control Module_Reference.pdf, page 176 §Analyze By"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "Venue",
+        "Gate",
+        "Product",
+        "Ticket Type",
+        "Channel",
+        "Reseller",
+        "Operator",
+        "Device",
+        "Credential Type"
+       ],
+       "notes": "The pack filters this screen by venue, gate, product, ticket type, channel, reseller and 3 more — which are present is a decision the pack already made.",
+       "provenance": "pack Access Control Module_Reference.pdf, page 176 §Analyze By"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The validation outcome rejection list.",
+   "error": "Could not load. Names which read failed and leaves the validation outcome rejection untouched.",
+   "emptyFirstRun": "No validation outcome rejection yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the validation outcome rejection are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listValidationOutcomeRejection",
+    "contract": "access",
+    "purpose": "Validation Outcome & Rejection Analytics",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-260"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 176. 0 of 9 labels bound to a contract property; 9 of 33 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-261",
+  "name": "Guest Dwell Time, Length of Stay & Attraction Flow",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Access Control Module_Reference.pdf",
+   "board": "12",
+   "number": "12.8",
+   "page": 177
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/guest-dwell-time-length-of-stay-attraction-flow-bo-261",
+   "component": "apps/venue-management-web/src/routes/access-venue/GuestDwellTimeLengthOfStayAttractionFlow.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-254"
+   ],
+   "exitTo": [
+    "BO-254"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-254, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-254",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F122 step 14→15",
+     "operation": "listGuestDwellTime"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen a metric directory (§Show) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
+  "purpose": "Use access events to understand how guests move through and use the venue.",
+  "purposeNote": "systems.",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Average Length of Stay",
+       "provenance": "pack Access Control Module_Reference.pdf, page 177 §Show",
+       "bindsTo": "GuestDwellTimeLengthOfStayAttractionFlowView.averageLengthOfStay"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Median Stay",
+       "provenance": "pack Access Control Module_Reference.pdf, page 177 §Show",
+       "bindsTo": "GuestDwellTimeLengthOfStayAttractionFlowView.medianStay"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Peak Arrival",
+       "provenance": "pack Access Control Module_Reference.pdf, page 177 §Show",
+       "bindsTo": "GuestDwellTimeLengthOfStayAttractionFlowView.peakArrival"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Peak Departure",
+       "provenance": "pack Access Control Module_Reference.pdf, page 177 §Show",
+       "bindsTo": "GuestDwellTimeLengthOfStayAttractionFlowView.peakDeparture"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Zone Dwell Time",
+       "provenance": "pack Access Control Module_Reference.pdf, page 177 §Show",
+       "bindsTo": "GuestDwellTimeLengthOfStayAttractionFlowView.zoneDwellTime"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Attraction Visits",
+       "provenance": "pack Access Control Module_Reference.pdf, page 177 §Show",
+       "bindsTo": "GuestDwellTimeLengthOfStayAttractionFlowView.attractionVisits"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Fast Pass Usage",
+       "provenance": "pack Access Control Module_Reference.pdf, page 177 §Show",
+       "bindsTo": "GuestDwellTimeLengthOfStayAttractionFlowView.fastPassUsage"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The guest dwell time list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the guest dwell time untouched.",
+   "emptyFirstRun": "No guest dwell time yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the guest dwell time are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listGuestDwellTime",
+    "contract": "access",
+    "purpose": "Guest Dwell Time, Length of Stay & Attraction Flow",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "GuestDwellTimeLengthOfStayAttractionFlowView.averageLengthOfStay",
+    "GuestDwellTimeLengthOfStayAttractionFlowView.medianStay",
+    "GuestDwellTimeLengthOfStayAttractionFlowView.peakArrival",
+    "GuestDwellTimeLengthOfStayAttractionFlowView.peakDeparture",
+    "GuestDwellTimeLengthOfStayAttractionFlowView.zoneDwellTime",
+    "GuestDwellTimeLengthOfStayAttractionFlowView.attractionVisits"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-261"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 177. 7 of 7 labels bound to a contract property; 7 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-262",
+  "name": "Access Reports, Scheduled Reporting & Data Export",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Access Control Module_Reference.pdf",
+   "board": "12",
+   "number": "12.9",
+   "page": 179
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/access-reports-scheduled-reporting-data-export-bo-262",
+   "component": "apps/venue-management-web/src/routes/access-venue/AccessReportsScheduledReportingDataExport.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-254"
+   ],
+   "exitTo": [
+    "BO-254"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-254, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-254",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F122 step 16→17",
+     "operation": "listAccessReportScheduled"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide configurable operational and management reports.",
+  "purposeNote": "Authorized users can create, schedule and export access-control reports without development support.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Access Control Module_Reference.pdf, page 179"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search access reports scheduled",
+       "provenance": "pack Access Control Module_Reference.pdf, page 179 §Filters"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "AccessReportsScheduledReportingDataExportView.tenant",
+        "AccessReportsScheduledReportingDataExportView.venue",
+        "AccessReportsScheduledReportingDataExportView.park",
+        "AccessReportsScheduledReportingDataExportView.zone",
+        "AccessReportsScheduledReportingDataExportView.event",
+        "AccessReportsScheduledReportingDataExportView.date",
+        "AccessReportsScheduledReportingDataExportView.ticketType",
+        "AccessReportsScheduledReportingDataExportView.product",
+        "AccessReportsScheduledReportingDataExportView.gate",
+        "AccessReportsScheduledReportingDataExportView.device",
+        "AccessReportsScheduledReportingDataExportView.channel"
+       ],
+       "notes": "The pack filters this screen by tenant, venue, park, zone, event, date and 5 more — which are present is a decision the pack already made.",
+       "provenance": "pack Access Control Module_Reference.pdf, page 179 §Filters"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The access reports scheduled list.",
+   "error": "Could not load. Names which read failed and leaves the access reports scheduled untouched.",
+   "emptyFirstRun": "No access reports scheduled yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the access reports scheduled are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listAccessReportScheduled",
+    "contract": "access",
+    "purpose": "Access Reports, Scheduled Reporting & Data Export",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-262"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 179. 11 of 11 labels bound to a contract property; 11 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-263",
+  "name": "AI Access Intelligence, Forecasting & Executive Insights",
+  "module": "Access & Venue",
+  "requiresModule": "access",
+  "wave": 3,
+  "source": {
+   "pack": "Access Control Module_Reference.pdf",
+   "board": "12",
+   "number": "12.10",
+   "page": 180
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/access-venue/ai-access-intelligence-forecasting-executive-insights-bo-263",
+   "component": "apps/venue-management-web/src/routes/access-venue/AiAccessIntelligenceForecastingExecutiveInsights.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-254"
+   ],
+   "exitTo": [
+    "BO-254"
+   ],
+   "inferred": false,
+   "notes": "**Reached from BO-254, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Forecast) and no metric row",
+  "purpose": "Turn access-control data into proactive operational intelligence. This should be the final intelligence screen of the entire Access Control module.",
+  "purposeNote": "dashboards alone. Board 12 — Final 10-Screen Structure # Backend Screen Main Responsibility 12.1 Access Monitoring & Analytics Command Center Executive access overview 12.2 Live Venue Occupancy & People Counting Real-time occupancy 12.3 Graphical Access Map & Live Gate Performance Visual venue/gate monitoring 12.4 Attendance & Admission Analytics Actual attendance and no-shows 12.5 Entry, Exit, Re-entry & Crossover Analytics Complete guest movement 12.6 Throughput, Queue & Validation Performance Analytics Gate operational efficiency 12.7 Validation Outcome & Rejection Analytics Failure and int",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every access intelligence forecasting",
+       "columns": [
+        "AiAccessIntelligenceForecastingExecutiveInsightsView.tomorrowSAttendance",
+        "AiAccessIntelligenceForecastingExecutiveInsightsView.peakArrivalTime",
+        "AiAccessIntelligenceForecastingExecutiveInsightsView.peakExitTime",
+        "AiAccessIntelligenceForecastingExecutiveInsightsView.venueOccupancy",
+        "AiAccessIntelligenceForecastingExecutiveInsightsView.zoneOccupancy",
+        "AiAccessIntelligenceForecastingExecutiveInsightsView.gateDemand",
+        "AiAccessIntelligenceForecastingExecutiveInsightsView.groupArrivalPressure",
+        "AiAccessIntelligenceForecastingExecutiveInsightsView.reEntryDemand"
+       ],
+       "bindsTo": "AiAccessIntelligenceForecastingExecutiveInsightsView",
+       "operation": "listAccessExecutiveInsight",
+       "provenance": "pack Access Control Module_Reference.pdf, page 180 §Forecast"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected access intelligence forecasting",
+       "bindsTo": "AiAccessIntelligenceForecastingExecutiveInsightsView",
+       "columns": [
+        "AiAccessIntelligenceForecastingExecutiveInsightsView.tomorrowSAttendance",
+        "AiAccessIntelligenceForecastingExecutiveInsightsView.peakArrivalTime",
+        "AiAccessIntelligenceForecastingExecutiveInsightsView.peakExitTime",
+        "AiAccessIntelligenceForecastingExecutiveInsightsView.venueOccupancy",
+        "AiAccessIntelligenceForecastingExecutiveInsightsView.zoneOccupancy",
+        "AiAccessIntelligenceForecastingExecutiveInsightsView.gateDemand",
+        "AiAccessIntelligenceForecastingExecutiveInsightsView.groupArrivalPressure",
+        "AiAccessIntelligenceForecastingExecutiveInsightsView.reEntryDemand"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Expected Attendance”, “Peak Arrival”, “Current Planned”, “Board 12 Key Workflow”, “Final Access Control Architecture”, “Board Area”.",
+       "provenance": "pack Access Control Module_Reference.pdf, page 180 §Forecast"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The access intelligence forecasting list.",
+   "error": "Could not load. Names which read failed and leaves the access intelligence forecasting untouched.",
+   "emptyFirstRun": "No access intelligence forecasting yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the access intelligence forecasting are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listAccessExecutiveInsight",
+    "contract": "access",
+    "purpose": "AI Access Intelligence, Forecasting & Executive Insights",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "AiAccessIntelligenceForecastingExecutiveInsightsView.tomorrowSAttendance",
+    "AiAccessIntelligenceForecastingExecutiveInsightsView.peakArrivalTime",
+    "AiAccessIntelligenceForecastingExecutiveInsightsView.peakExitTime",
+    "AiAccessIntelligenceForecastingExecutiveInsightsView.venueOccupancy",
+    "AiAccessIntelligenceForecastingExecutiveInsightsView.zoneOccupancy",
+    "AiAccessIntelligenceForecastingExecutiveInsightsView.gateDemand"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-263"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 180. 8 of 8 labels bound to a contract property; 8 of 62 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

@@ -102,7 +102,6 @@ Two different things live here, and they do not carry the same weight.
 | `Ticvai_Design_Vision_Book_v1_1.pdf` | Design vision and direction |
 | `TICVAI_White_Label_Guest_App_UI_Reference_1.pdf` | Guest B2C app UI reference |
 | `TICVAI_Employee_App_UI_Reference_1.pdf` | Employee app UI reference |
-| `Park_POS_dc.html`, `Park_POS_v1_dc.html` | Early POS explorations |
 
 Design references are a **starting point, not a specification** (03 Aug §2). Where a design
 reference conflicts with a MoM decision, the MoM wins.
@@ -115,9 +114,15 @@ PDFs above for anything about structure.
 | File | Covers | Standing |
 |---|---|---|
 | `TICVAI_POS_Terminal_client_approved.html` | P04, 30 screens | **Client-approved.** The fidelity reference every other build is measured against |
-| `booking-skeletons/` | The guest booking spine | The design system of record for the booking flow |
+| `ticvai-booking-archetypes.md` | The guest booking spine | The design system of record for the booking flow |
 
-`booking-skeletons/` is a white-label booking engine, not a mockup. One fixed step spine —
+**Removed 11 September, on purpose:** `booking-skeletons/` and the two early explorations
+`Park_POS_dc.html` / `Park_POS_v1_dc.html`. The skeletons pack shipped five clients' configurations
+— invented venues, prices and logo-sampled palettes — and `ticvai-booking-archetypes.md` keeps the
+part that is TICVAI's. The zip it came from is still at `adam/Venue ticketing platform design.zip`.
+What follows describes the engine that file records.
+
+The skeletons pack was a white-label booking engine, not a mockup. One fixed step spine —
 Select, Seats, Extras, Details, Payment, Confirmed — composed from **16 module factories** (chips,
 date, note, counters, cards, form, timeline, event, benefits, heights, toggle, spec, sessions,
 menu, matrix, expand) and covering **34 flows across five verticals**: theme park, water park, stadium, theatre and
@@ -143,13 +148,7 @@ in use — the count above is read off the code, which is the one that renders.
 So work against this pack means **adding an entry to `flows: []`**, not authoring HTML that
 resembles the output. Anything hand-drawn in its style is a fork of the engine on day one.
 
-Open `TICVAI_Booking_Skeletons.dc.html` directly; `support.js` and `logos/` sit beside it and every
-path in it is relative, so it renders from disk with nothing installed.
-`TICVAI_White_Label_Booking.earlier.dc.html` is the previous iteration, kept because it shows which
-decisions were reversed.
-
-**The POS build is a bundle; the Skeletons pack is source.** That difference decides how each one
-can be extended. `TICVAI_POS_Terminal_client_approved.html` is 5.67 MB of which only 20 KB is
+**The POS build is a bundle.** That decides how it can be extended. `TICVAI_POS_Terminal_client_approved.html` is 5.67 MB of which only 20 KB is
 reachable text: the build itself is a JSON-escaped string on one line inside
 `<script type="__bundler/template">`, with 4.67 MB of base64 assets on another. It cannot be
 edited, diffed or read in that form. `tools/extract-design-document.py` unpacks it --
@@ -163,8 +162,8 @@ not mirrored**, because it is derived from a file already in the package and cop
 six bibles buys nothing. It is not committed as the source of truth; the bundle is.
 
 **The palette trick does not survive being copied out.** It reads logo pixels through a canvas,
-which needs a same-origin image. A frame that points at `logos/` works here and comes out blank on
-a board. Frames drawn from this pack must leave logo and photo slots empty, naming the source file.
+which needs a same-origin image. Frames drawn from the booking engine must leave logo and photo
+slots empty, naming the source file.
 
 **What was left in the zip.** 16MB of pasted conversation screenshots, a rendered export of the
 earlier build, and a copy of the POS terminal that is byte-identical to the one above
@@ -319,3 +318,20 @@ hours**, which the package does not yet model. Access-control vendor narrowed to
 
 **20 August.** Duplicate detection, identity resolution and merge rules are covered by `mergeGuests`
 and CF-160. **Consent retention and archival policy is not**, and it was discussed.
+
+---
+
+## Added 11 September — four module books into `workshop/`
+
+`Latest Docs.zip`: **Digital Asset Management** (81pp, 4 boards), **Game & Ride** (105pp, 10),
+**Rental Management** (138pp, 10) and **Subscription Licensing & AI Self-Service** (137pp, 10) —
+340 screens, none of them previously in any folder here. Same kind as the seventeen of 3 September:
+client reference books, rank 3, a board-and-screen specification rather than scope. They take the
+pack to 23 books, 111 boards and 1,110 screens.
+
+**What they supply that the package lacked.** `assets.yaml`, `games.yaml` and `resources.yaml` have
+10, 14 and 9 operations; these books specify 40, 100 and 100 screens against them, and
+`subscription.yaml` has 112 operations and no screen that calls its onboarding. **What they
+settle: nothing yet.** No MoM has adopted them, so a conflict with a settled position is a CF item,
+not a correction. The run and its six defects are in
+[workshop-pack-log](../docs/active/workshop-pack-log.md).

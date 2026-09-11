@@ -1,0 +1,1390 @@
+{
+ "ConsentEvidenceHistoryWithdrawalManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Consent Evidence, History & Withdrawal Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "evidenceId": {
+    "type": "string",
+    "description": "Evidence ID"
+   },
+   "customerParticipant": {
+    "type": "string",
+    "description": "Customer / Participant"
+   },
+   "consentPurpose": {
+    "type": "string",
+    "description": "Consent Purpose"
+   },
+   "consentVersion": {
+    "type": "string",
+    "description": "Consent Version"
+   },
+   "exactApplicableWordingVersionReference": {
+    "type": "string",
+    "description": "Exact applicable wording/version reference"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status"
+   },
+   "action": {
+    "type": "string",
+    "description": "Action"
+   },
+   "dateTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date/time"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "brand": {
+    "type": "string",
+    "description": "Brand"
+   },
+   "country": {
+    "type": "string",
+    "description": "Country"
+   },
+   "journeyCapturePoint": {
+    "type": "string",
+    "description": "Journey/Capture Point"
+   },
+   "userCustomerActor": {
+    "type": "string",
+    "description": "User/Customer Actor"
+   },
+   "sourceSystem": {
+    "type": "string",
+    "description": "Source System"
+   },
+   "deviceSessionReferenceWherePermitted": {
+    "type": "string",
+    "description": "Device/session reference where permitted"
+   },
+   "guardianReferenceWhereApplicable": {
+    "type": "string",
+    "description": "Guardian reference where applicable"
+   },
+   "yesterdaySHistoricalConsentEvidenceRemains": {
+    "type": "string",
+    "description": "Yesterday's historical consent evidence remains"
+   },
+   "customerPortal": {
+    "type": "string",
+    "description": "Customer Portal"
+   },
+   "mobileApp": {
+    "type": "string",
+    "description": "Mobile App"
+   },
+   "preferenceCenter": {
+    "type": "string",
+    "description": "Preference Center"
+   },
+   "customerService": {
+    "type": "string",
+    "description": "Customer Service"
+   },
+   "authorizedStaff": {
+    "type": "string",
+    "description": "Authorized Staff"
+   },
+   "api": {
+    "type": "string",
+    "description": "API"
+   },
+   "requested": {
+    "type": "string",
+    "description": "Requested"
+   },
+   "processed": {
+    "type": "string",
+    "description": "Processed"
+   },
+   "propagated": {
+    "type": "string",
+    "description": "Propagated"
+   },
+   "acknowledged": {
+    "type": "string",
+    "description": "Acknowledged"
+   },
+   "failed": {
+    "type": "integer",
+    "description": "Failed"
+   }
+  }
+ },
+ "CustomerPrivacyConsentPreference360View": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Customer Privacy, Consent & Preference 360° displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "customerId": {
+    "type": "string",
+    "description": "Customer ID"
+   },
+   "name": {
+    "type": "string",
+    "description": "Name"
+   },
+   "account": {
+    "type": "string",
+    "description": "Account"
+   },
+   "country": {
+    "type": "string",
+    "description": "Country"
+   },
+   "preferredLanguage": {
+    "type": "string",
+    "description": "Preferred Language"
+   },
+   "ageCategory": {
+    "type": "string",
+    "description": "Age Category"
+   },
+   "guardianRelationshipWhereApplicable": {
+    "type": "string",
+    "description": "Guardian Relationship where applicable"
+   },
+   "accountStatus": {
+    "type": "integer",
+    "description": "Account Status"
+   },
+   "privacyRiskExceptionIndicator": {
+    "type": "string",
+    "description": "Privacy Risk/Exception indicator"
+   },
+   "v3212AugB2c": {
+    "type": "string",
+    "description": "v3.2 12 Aug B2C"
+   },
+   "v2820AugPortal": {
+    "type": "string",
+    "description": "v2.8 20 Aug Portal"
+   },
+   "whatsappV2112AugApp": {
+    "type": "string",
+    "description": "WhatsApp v2.1 12 Aug App"
+   },
+   "biometricsV4015AugApp": {
+    "type": "string",
+    "description": "Biometrics v4.0 15 Aug App"
+   },
+   "declinedV1412AugB2c": {
+    "type": "string",
+    "description": "Declined v1.4 12 Aug B2C"
+   },
+   "emailPreference": {
+    "type": "string",
+    "description": "Email preference"
+   },
+   "smsPreference": {
+    "type": "string",
+    "description": "SMS preference"
+   },
+   "whatsappPreference": {
+    "type": "string",
+    "description": "WhatsApp preference"
+   },
+   "pushPreference": {
+    "type": "string",
+    "description": "Push preference"
+   },
+   "brandPreferences": {
+    "type": "integer",
+    "description": "Brand preferences"
+   },
+   "marketingCategories": {
+    "type": "integer",
+    "description": "Marketing categories"
+   },
+   "personalizationPreferences": {
+    "type": "integer",
+    "description": "Personalization preferences"
+   },
+   "privacyPolicyVersion": {
+    "type": "string",
+    "description": "Privacy Policy Version"
+   },
+   "cookieNoticeVersion": {
+    "type": "string",
+    "description": "Cookie Notice Version"
+   },
+   "biometricNotice": {
+    "type": "string",
+    "description": "Biometric Notice"
+   },
+   "childrenSPrivacyNotice": {
+    "type": "string",
+    "description": "Children's Privacy Notice"
+   },
+   "otherApplicablePrivacyDocuments": {
+    "type": "string",
+    "description": "Other applicable privacy documents"
+   },
+   "choices": {
+    "type": "string",
+    "description": "choices"
+   },
+   "access": {
+    "type": "string",
+    "description": "Access"
+   },
+   "correction": {
+    "type": "string",
+    "description": "Correction"
+   },
+   "deletion": {
+    "type": "string",
+    "description": "Deletion"
+   },
+   "restriction": {
+    "type": "string",
+    "description": "Restriction"
+   },
+   "objection": {
+    "type": "string",
+    "description": "Objection"
+   },
+   "otherConfiguredRequests": {
+    "type": "integer",
+    "description": "Other configured requests"
+   },
+   "informationExists": {
+    "type": "string",
+    "description": "information exists"
+   }
+  }
+ },
+ "DataDiscoveryAccessExportCorrectionWorkspaceInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is marketing.guest_profile at 4%, so this is not an update to anything the package stores today and no new table has been decided",
+  "description": "**What Data Discovery, Access, Export & Correction Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "customerProfile": {
+    "type": "string",
+    "description": "Customer Profile"
+   },
+   "orders": {
+    "type": "string",
+    "description": "Orders"
+   },
+   "tickets": {
+    "type": "string",
+    "description": "Tickets"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "loyalty": {
+    "type": "string",
+    "description": "Loyalty"
+   },
+   "wallet": {
+    "type": "string",
+    "description": "Wallet"
+   },
+   "crm": {
+    "type": "string",
+    "description": "CRM"
+   },
+   "marketing": {
+    "type": "string",
+    "description": "Marketing"
+   },
+   "paymentsReferences": {
+    "type": "string",
+    "description": "Payments references"
+   },
+   "waiverRecords": {
+    "type": "string",
+    "description": "Waiver records"
+   },
+   "resourceBookings": {
+    "type": "string",
+    "description": "Resource bookings"
+   },
+   "eventRegistrations": {
+    "type": "string",
+    "description": "Event registrations"
+   },
+   "consentRecords": {
+    "type": "string",
+    "description": "Consent records"
+   },
+   "credentialReferences": {
+    "type": "string",
+    "description": "Credential references"
+   },
+   "connectedApplications": {
+    "type": "string",
+    "description": "Connected applications"
+   },
+   "includedSystems": {
+    "type": "string",
+    "description": "Included systems"
+   },
+   "includedCategories": {
+    "type": "string",
+    "description": "Included categories"
+   },
+   "exclusions": {
+    "type": "string",
+    "description": "Exclusions"
+   },
+   "sensitiveFieldHandling": {
+    "type": "string",
+    "description": "Sensitive-field handling"
+   },
+   "format": {
+    "type": "string",
+    "description": "Format"
+   },
+   "language": {
+    "type": "string",
+    "description": "Language"
+   },
+   "encryptionSecurity": {
+    "type": "string",
+    "description": "Encryption/security"
+   },
+   "expiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry"
+   }
+  }
+ },
+ "DataDiscoveryAccessExportCorrectionWorkspaceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Data Discovery, Access, Export & Correction Workspace displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "customerProfile": {
+    "type": "string",
+    "description": "Customer Profile"
+   },
+   "orders": {
+    "type": "string",
+    "description": "Orders"
+   },
+   "tickets": {
+    "type": "string",
+    "description": "Tickets"
+   },
+   "membership": {
+    "type": "string",
+    "description": "Membership"
+   },
+   "loyalty": {
+    "type": "string",
+    "description": "Loyalty"
+   },
+   "wallet": {
+    "type": "string",
+    "description": "Wallet"
+   },
+   "crm": {
+    "type": "string",
+    "description": "CRM"
+   },
+   "marketing": {
+    "type": "string",
+    "description": "Marketing"
+   },
+   "paymentsReferences": {
+    "type": "string",
+    "description": "Payments references"
+   },
+   "waiverRecords": {
+    "type": "string",
+    "description": "Waiver records"
+   },
+   "resourceBookings": {
+    "type": "string",
+    "description": "Resource bookings"
+   },
+   "eventRegistrations": {
+    "type": "string",
+    "description": "Event registrations"
+   },
+   "consentRecords": {
+    "type": "string",
+    "description": "Consent records"
+   },
+   "credentialReferences": {
+    "type": "string",
+    "description": "Credential references"
+   },
+   "connectedApplications": {
+    "type": "string",
+    "description": "Connected applications"
+   },
+   "ticketing82Records": {
+    "type": "string",
+    "description": "Ticketing — 82 records"
+   },
+   "orders26Records": {
+    "type": "string",
+    "description": "Orders — 26 records"
+   },
+   "membership1Record": {
+    "type": "string",
+    "description": "Membership — 1 record"
+   },
+   "crm14Records": {
+    "type": "string",
+    "description": "CRM — 14 records"
+   },
+   "consent17Records": {
+    "type": "string",
+    "description": "Consent — 17 records"
+   },
+   "includedSystems": {
+    "type": "string",
+    "description": "Included systems"
+   },
+   "includedCategories": {
+    "type": "string",
+    "description": "Included categories"
+   },
+   "exclusions": {
+    "type": "string",
+    "description": "Exclusions"
+   },
+   "sensitiveFieldHandling": {
+    "type": "string",
+    "description": "Sensitive-field handling"
+   },
+   "format": {
+    "type": "string",
+    "description": "Format"
+   },
+   "language": {
+    "type": "string",
+    "description": "Language"
+   },
+   "encryptionSecurity": {
+    "type": "string",
+    "description": "Encryption/security"
+   },
+   "expiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Expiry"
+   }
+  }
+ },
+ "DataRetentionExpiryLegalHoldOperationsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Data Retention, Expiry & Legal Hold Operations displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "recordsApproachingExpiry": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Records Approaching Expiry"
+   },
+   "eligibleForDeletion": {
+    "type": "string",
+    "description": "Eligible for Deletion"
+   },
+   "eligibleForAnonymization": {
+    "type": "string",
+    "description": "Eligible for Anonymization"
+   },
+   "underLegalHold": {
+    "type": "string",
+    "description": "Under Legal Hold"
+   },
+   "processingFailures": {
+    "type": "integer",
+    "description": "Processing Failures"
+   },
+   "retentionExceptions": {
+    "type": "integer",
+    "description": "Retention Exceptions"
+   },
+   "anonymize": {
+    "type": "string",
+    "description": "Anonymize"
+   },
+   "placeHold": {
+    "type": "string",
+    "description": "Place Hold"
+   },
+   "holdId": {
+    "type": "string",
+    "description": "Hold ID"
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason"
+   },
+   "scope": {
+    "type": "string",
+    "description": "Scope"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "start": {
+    "type": "string",
+    "description": "Start"
+   },
+   "approval": {
+    "type": "string",
+    "description": "Approval"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status"
+   },
+   "daily": {
+    "type": "string",
+    "description": "Daily"
+   },
+   "weekly": {
+    "type": "string",
+    "description": "Weekly"
+   },
+   "monthly": {
+    "type": "string",
+    "description": "Monthly"
+   },
+   "onConfiguredSchedules": {
+    "type": "string",
+    "description": "On configured schedules"
+   }
+  }
+ },
+ "DataSubjectCustomerPrivacyRequestManagementView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Data Subject / Customer Privacy Request Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "access": {
+    "type": "string",
+    "description": "Access"
+   },
+   "dataCopyExport": {
+    "type": "string",
+    "description": "Data Copy / Export"
+   },
+   "correction": {
+    "type": "string",
+    "description": "Correction"
+   },
+   "deletion": {
+    "type": "string",
+    "description": "Deletion"
+   },
+   "anonymization": {
+    "type": "string",
+    "description": "Anonymization"
+   },
+   "restriction": {
+    "type": "string",
+    "description": "Restriction"
+   },
+   "objection": {
+    "type": "string",
+    "description": "Objection"
+   },
+   "consentWithdrawal": {
+    "type": "string",
+    "description": "Consent Withdrawal"
+   },
+   "marketingOptOut": {
+    "type": "string",
+    "description": "Marketing Opt-out"
+   },
+   "otherOrganizationDefinedPrivacyRequests": {
+    "type": "string",
+    "description": "Other organization-defined privacy requests"
+   },
+   "customerPortal": {
+    "type": "string",
+    "description": "Customer Portal"
+   },
+   "b2c": {
+    "type": "string",
+    "description": "B2C"
+   },
+   "mobileApp": {
+    "type": "string",
+    "description": "Mobile App"
+   },
+   "emailManualEntry": {
+    "type": "string",
+    "description": "Email/manual entry"
+   },
+   "customerService": {
+    "type": "string",
+    "description": "Customer Service"
+   },
+   "pos": {
+    "type": "string",
+    "description": "POS"
+   },
+   "api": {
+    "type": "string",
+    "description": "API"
+   },
+   "guardian": {
+    "type": "string",
+    "description": "Guardian"
+   },
+   "authorizedRepresentative": {
+    "type": "string",
+    "description": "Authorized Representative"
+   },
+   "requestId": {
+    "type": "string",
+    "description": "Request ID"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "requestType": {
+    "type": "string",
+    "description": "Request Type"
+   },
+   "submittedAt": {
+    "type": "string",
+    "description": "Submitted At"
+   },
+   "source": {
+    "type": "string",
+    "description": "Source"
+   },
+   "jurisdiction": {
+    "type": "string",
+    "description": "Jurisdiction"
+   },
+   "dueDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Due Date"
+   },
+   "sla": {
+    "type": "string",
+    "description": "SLA"
+   },
+   "priority": {
+    "type": "string",
+    "description": "Priority"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "verificationStatus": {
+    "type": "string",
+    "description": "Verification Status"
+   },
+   "status": {
+    "type": "string",
+    "description": "Status"
+   },
+   "notes": {
+    "type": "string",
+    "description": "Notes"
+   },
+   "accountLogin": {
+    "type": "string",
+    "description": "Account Login"
+   },
+   "otp": {
+    "type": "string",
+    "description": "OTP"
+   },
+   "emailVerification": {
+    "type": "string",
+    "description": "Email Verification"
+   },
+   "mobileVerification": {
+    "type": "string",
+    "description": "Mobile Verification"
+   },
+   "idReviewWherePermitted": {
+    "type": "string",
+    "description": "ID Review where permitted"
+   },
+   "manualVerification": {
+    "type": "string",
+    "description": "Manual Verification"
+   },
+   "daysRemaining": {
+    "type": "string",
+    "description": "Days remaining"
+   },
+   "atRisk": {
+    "type": "string",
+    "description": "At risk"
+   }
+  }
+ },
+ "DeletionAnonymizationRestrictionOperationsView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Deletion, Anonymization & Restriction Operations displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "anonymize": {
+    "type": "string",
+    "description": "Anonymize"
+   },
+   "pseudonymizeWhereConfigured": {
+    "type": "string",
+    "description": "Pseudonymize where configured"
+   },
+   "restrictProcessing": {
+    "type": "string",
+    "description": "Restrict Processing"
+   },
+   "suppressMarketing": {
+    "type": "string",
+    "description": "Suppress Marketing"
+   },
+   "disconnectThirdPartyProfile": {
+    "type": "string",
+    "description": "Disconnect Third-party Profile"
+   },
+   "otherConfiguredAction": {
+    "type": "string",
+    "description": "Other configured action"
+   },
+   "marketingProfileDelete": {
+    "type": "string",
+    "description": "Marketing Profile — Delete"
+   },
+   "biometricReferenceDelete": {
+    "type": "string",
+    "description": "Biometric Reference — Delete"
+   },
+   "fraudInvestigationHold": {
+    "type": "string",
+    "description": "Fraud Investigation — Hold"
+   },
+   "retentionRequirements": {
+    "type": "string",
+    "description": "Retention requirements"
+   },
+   "legalHolds": {
+    "type": "string",
+    "description": "Legal holds"
+   },
+   "financialRecords": {
+    "type": "string",
+    "description": "Financial records"
+   },
+   "activeTransactions": {
+    "type": "integer",
+    "description": "Active transactions"
+   },
+   "securityFraudRequirements": {
+    "type": "string",
+    "description": "Security/fraud requirements"
+   },
+   "contractualObligations": {
+    "type": "string",
+    "description": "Contractual obligations"
+   },
+   "configuredJurisdictionRules": {
+    "type": "string",
+    "description": "Configured jurisdiction rules"
+   },
+   "pending": {
+    "type": "integer",
+    "description": "Pending"
+   },
+   "processing": {
+    "type": "string",
+    "description": "Processing"
+   },
+   "completed": {
+    "type": "string",
+    "description": "Completed"
+   },
+   "retainedWithReason": {
+    "type": "string",
+    "description": "Retained with Reason"
+   },
+   "failed": {
+    "type": "integer",
+    "description": "Failed"
+   },
+   "manualActionRequired": {
+    "type": "boolean",
+    "description": "Manual Action Required"
+   }
+  }
+ },
+ "PrivacyAnalyticsAiComplianceIntelligenceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Privacy Analytics & AI Compliance Intelligence displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "consentRate": {
+    "type": "number",
+    "description": "Consent Rate"
+   },
+   "withdrawalRate": {
+    "type": "number",
+    "description": "Withdrawal Rate"
+   },
+   "marketingOptInRate": {
+    "type": "number",
+    "description": "Marketing Opt-in Rate"
+   },
+   "cookieAcceptanceByCategory": {
+    "type": "string",
+    "description": "Cookie Acceptance by Category"
+   },
+   "privacyRequests": {
+    "type": "string",
+    "description": "Privacy Requests"
+   },
+   "averageResolutionTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Average Resolution Time"
+   },
+   "slaCompliance": {
+    "type": "string",
+    "description": "SLA Compliance"
+   },
+   "deletionCompletionRate": {
+    "type": "number",
+    "description": "Deletion Completion Rate"
+   },
+   "retentionCompliance": {
+    "type": "string",
+    "description": "Retention Compliance"
+   },
+   "policyAcceptance": {
+    "type": "string",
+    "description": "Policy Acceptance"
+   },
+   "guardianConsentCompletion": {
+    "type": "string",
+    "description": "Guardian Consent Completion"
+   },
+   "privacyExceptions": {
+    "type": "string",
+    "description": "Privacy Exceptions"
+   },
+   "consentPropagationFailures": {
+    "type": "string",
+    "description": "Consent Propagation Failures"
+   },
+   "showOverdueDeletionRequests": {
+    "type": "string",
+    "description": "“Show overdue deletion requests.”"
+   },
+   "backendScreenCoreResponsibility": {
+    "type": "string",
+    "description": "# Backend Screen Core Responsibility"
+   },
+   "board1Configure": {
+    "type": "string",
+    "description": "Board 1 — CONFIGURE"
+   },
+   "board2Operate": {
+    "type": "string",
+    "description": "Board 2 — OPERATE"
+   },
+   "consentStates": {
+    "type": "string",
+    "description": "consent states"
+   }
+  }
+ },
+ "PrivacyAuditEvidenceComplianceReportingView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Privacy Audit, Evidence & Compliance Reporting displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "consentGranted": {
+    "type": "string",
+    "description": "Consent Granted"
+   },
+   "consentWithdrawn": {
+    "type": "string",
+    "description": "Consent Withdrawn"
+   },
+   "preferenceChanged": {
+    "type": "string",
+    "description": "Preference Changed"
+   },
+   "policyAccepted": {
+    "type": "string",
+    "description": "Policy Accepted"
+   },
+   "privacyRequestCreated": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Privacy Request Created"
+   },
+   "identityVerified": {
+    "type": "string",
+    "description": "Identity Verified"
+   },
+   "dataExportGenerated": {
+    "type": "string",
+    "description": "Data Export Generated"
+   },
+   "correctionRequested": {
+    "type": "string",
+    "description": "Correction Requested"
+   },
+   "deletionApproved": {
+    "type": "string",
+    "description": "Deletion Approved"
+   },
+   "anonymizationExecuted": {
+    "type": "string",
+    "description": "Anonymization Executed"
+   },
+   "retentionAction": {
+    "type": "string",
+    "description": "Retention Action"
+   },
+   "legalHold": {
+    "type": "string",
+    "description": "Legal Hold"
+   },
+   "administrativeOverride": {
+    "type": "string",
+    "description": "Administrative Override"
+   },
+   "configurationChange": {
+    "type": "string",
+    "description": "Configuration Change"
+   },
+   "eventId": {
+    "type": "string",
+    "description": "Event ID"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "action": {
+    "type": "string",
+    "description": "Action"
+   },
+   "actor": {
+    "type": "string",
+    "description": "Actor"
+   },
+   "role": {
+    "type": "string",
+    "description": "Role"
+   },
+   "source": {
+    "type": "string",
+    "description": "Source"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "dateTime": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date/time"
+   },
+   "before": {
+    "type": "string",
+    "description": "Before"
+   },
+   "after": {
+    "type": "string",
+    "description": "After"
+   },
+   "reason": {
+    "type": "string",
+    "description": "Reason"
+   },
+   "approval": {
+    "type": "string",
+    "description": "Approval"
+   },
+   "relatedCase": {
+    "type": "string",
+    "description": "Related Case"
+   },
+   "evidenceReference": {
+    "type": "string",
+    "description": "Evidence reference"
+   },
+   "consentStatusReport": {
+    "type": "string",
+    "description": "Consent Status Report"
+   },
+   "consentWithdrawalReport": {
+    "type": "string",
+    "description": "Consent Withdrawal Report"
+   },
+   "marketingPermissionReport": {
+    "type": "string",
+    "description": "Marketing Permission Report"
+   },
+   "privacyRequestSlaReport": {
+    "type": "string",
+    "description": "Privacy Request SLA Report"
+   },
+   "deletionAnonymizationReport": {
+    "type": "string",
+    "description": "Deletion/Anonymization Report"
+   },
+   "retentionReport": {
+    "type": "string",
+    "description": "Retention Report"
+   },
+   "policyAcceptanceReport": {
+    "type": "string",
+    "description": "Policy Acceptance Report"
+   },
+   "minorGuardianPrivacyReport": {
+    "type": "string",
+    "description": "Minor/Guardian Privacy Report"
+   },
+   "cookieTrackingComplianceReport": {
+    "type": "string",
+    "description": "Cookie/Tracking Compliance Report"
+   },
+   "biometricPrivacyReport": {
+    "type": "string",
+    "description": "Biometric Privacy Report"
+   },
+   "exceptionReport": {
+    "type": "string",
+    "description": "Exception Report"
+   },
+   "selected": {
+    "type": "string",
+    "description": "selected"
+   }
+  }
+ },
+ "PrivacyComplianceExceptionInvestigationWorkspaceInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Privacy Compliance, Exception & Investigation Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "exceptionSummary": {
+    "type": "string",
+    "description": "Exception summary"
+   },
+   "customerPrivacyProfile": {
+    "type": "string",
+    "description": "Customer privacy profile"
+   },
+   "relatedEvidence": {
+    "type": "string",
+    "description": "Related evidence"
+   },
+   "policyConfiguration": {
+    "type": "string",
+    "description": "Policy/configuration"
+   },
+   "systemEvents": {
+    "type": "string",
+    "description": "System events"
+   },
+   "timeline": {
+    "type": "string",
+    "description": "Timeline"
+   },
+   "rootCause": {
+    "type": "string",
+    "description": "Root cause"
+   },
+   "correctiveAction": {
+    "type": "string",
+    "description": "Corrective action"
+   },
+   "notes": {
+    "type": "string",
+    "description": "Notes"
+   },
+   "attachmentsReferenceEvidence": {
+    "type": "string",
+    "description": "Attachments/reference evidence"
+   },
+   "privacy": {
+    "type": "string",
+    "description": "Privacy"
+   },
+   "legal": {
+    "type": "string",
+    "description": "Legal"
+   },
+   "security": {
+    "type": "string",
+    "description": "Security"
+   },
+   "it": {
+    "type": "string",
+    "description": "IT"
+   },
+   "marketing": {
+    "type": "string",
+    "description": "Marketing"
+   },
+   "operations": {
+    "type": "string",
+    "description": "Operations"
+   },
+   "dataOwner": {
+    "type": "string",
+    "description": "Data Owner"
+   },
+   "fullEnterpriseCybersecurityIncidentManagementPlatform": {
+    "type": "string",
+    "description": "full enterprise cybersecurity incident-management platform"
+   }
+  }
+ },
+ "PrivacyComplianceExceptionInvestigationWorkspaceView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Privacy Compliance, Exception & Investigation Workspace displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "severity": {
+    "type": "string",
+    "description": "Severity"
+   },
+   "exception": {
+    "type": "string",
+    "description": "Exception"
+   },
+   "customer": {
+    "type": "string",
+    "description": "Customer"
+   },
+   "system": {
+    "type": "string",
+    "description": "System"
+   },
+   "brand": {
+    "type": "string",
+    "description": "Brand"
+   },
+   "country": {
+    "type": "string",
+    "description": "Country"
+   },
+   "detectedAt": {
+    "type": "string",
+    "description": "Detected At"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "sla": {
+    "type": "string",
+    "description": "SLA"
+   },
+   "status": {
+    "type": "integer",
+    "description": "Status"
+   },
+   "exceptionSummary": {
+    "type": "string",
+    "description": "Exception summary"
+   },
+   "customerPrivacyProfile": {
+    "type": "string",
+    "description": "Customer privacy profile"
+   },
+   "relatedEvidence": {
+    "type": "string",
+    "description": "Related evidence"
+   },
+   "policyConfiguration": {
+    "type": "string",
+    "description": "Policy/configuration"
+   },
+   "systemEvents": {
+    "type": "string",
+    "description": "System events"
+   },
+   "timeline": {
+    "type": "string",
+    "description": "Timeline"
+   },
+   "rootCause": {
+    "type": "string",
+    "description": "Root cause"
+   },
+   "correctiveAction": {
+    "type": "string",
+    "description": "Corrective action"
+   },
+   "notes": {
+    "type": "string",
+    "description": "Notes"
+   },
+   "attachmentsReferenceEvidence": {
+    "type": "string",
+    "description": "Attachments/reference evidence"
+   },
+   "privacy": {
+    "type": "string",
+    "description": "Privacy"
+   },
+   "legal": {
+    "type": "string",
+    "description": "Legal"
+   },
+   "security": {
+    "type": "string",
+    "description": "Security"
+   },
+   "it": {
+    "type": "string",
+    "description": "IT"
+   },
+   "marketing": {
+    "type": "string",
+    "description": "Marketing"
+   },
+   "operations": {
+    "type": "string",
+    "description": "Operations"
+   },
+   "dataOwner": {
+    "type": "string",
+    "description": "Data Owner"
+   },
+   "fullEnterpriseCybersecurityIncidentManagementPlatform": {
+    "type": "string",
+    "description": "full enterprise cybersecurity incident-management platform"
+   }
+  }
+ },
+ "PrivacyOperationsCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over marketing-crm state, assembled at read time from tables that already exist",
+  "description": "**What Privacy Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "totalCustomerPrivacyProfiles": {
+    "type": "integer",
+    "description": "Total Customer Privacy Profiles"
+   },
+   "activeConsentRecords": {
+    "type": "integer",
+    "description": "Active Consent Records"
+   },
+   "withdrawnConsents": {
+    "type": "integer",
+    "description": "Withdrawn Consents"
+   },
+   "marketingOptIns": {
+    "type": "integer",
+    "description": "Marketing Opt-ins"
+   },
+   "marketingOptOuts": {
+    "type": "integer",
+    "description": "Marketing Opt-outs"
+   },
+   "pendingDataRightsRequests": {
+    "type": "integer",
+    "description": "Pending Data Rights Requests"
+   },
+   "overdueRequests": {
+    "type": "integer",
+    "description": "Overdue Requests"
+   },
+   "pendingDeletionActions": {
+    "type": "integer",
+    "description": "Pending Deletion Actions"
+   },
+   "pendingAnonymization": {
+    "type": "integer",
+    "description": "Pending Anonymization"
+   },
+   "retentionActionsDue": {
+    "type": "string",
+    "description": "Retention Actions Due"
+   },
+   "consentEvidenceExceptions": {
+    "type": "integer",
+    "description": "Consent Evidence Exceptions"
+   },
+   "privacyIncidentsExceptions": {
+    "type": "string",
+    "description": "Privacy Incidents / Exceptions"
+   },
+   "policyReAcceptancePending": {
+    "type": "integer",
+    "description": "Policy Re-Acceptance Pending"
+   },
+   "emailMarketing": {
+    "type": "string",
+    "description": "Email Marketing"
+   },
+   "smsMarketing": {
+    "type": "string",
+    "description": "SMS Marketing"
+   },
+   "whatsappMarketing": {
+    "type": "string",
+    "description": "WhatsApp Marketing"
+   },
+   "push": {
+    "type": "string",
+    "description": "Push"
+   },
+   "personalization": {
+    "type": "string",
+    "description": "Personalization"
+   },
+   "analytics": {
+    "type": "integer",
+    "description": "Analytics"
+   },
+   "location": {
+    "type": "string",
+    "description": "Location"
+   },
+   "biometrics": {
+    "type": "integer",
+    "description": "Biometrics"
+   },
+   "otherConfiguredPurposes": {
+    "type": "integer",
+    "description": "Other configured purposes"
+   },
+   "investigateEvidence": {
+    "type": "string",
+    "description": "Investigate Evidence"
+   }
+  }
+ }
+}

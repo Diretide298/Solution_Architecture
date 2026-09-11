@@ -1,0 +1,530 @@
+{
+ "Alert": {
+  "type": "object",
+  "x-ticvai-persistence": "reporting.alert",
+  "description": "A raised alert. **Acknowledged rather than dismissed** — CF-134 asked for it markable, and the difference is that an acknowledgement records who saw it.\n",
+  "required": [
+   "id",
+   "ruleId",
+   "raisedAt",
+   "severity",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "ruleId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "raisedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "info",
+     "warning",
+     "critical"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "raised",
+     "acknowledged",
+     "resolved",
+     "expired"
+    ]
+   },
+   "observedValue": {
+    "type": "number"
+   },
+   "threshold": {
+    "type": "number"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "acknowledgedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "acknowledgedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**Set when the metric returns to range, automatically.** An alert that only a person can close is an alert list that only grows.\n"
+   },
+   "escalatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Where `VenueSettings.alerting.escalateAfterMinutes` passed with no acknowledgement. **A critical alert nobody acknowledged is the case escalation exists for.**\n"
+   }
+  }
+ },
+ "CountVariance": {
+  "x-ticvai-persistence": "none — computed at close",
+  "type": "object",
+  "required": [
+   "countId",
+   "totalVarianceValue",
+   "lines"
+  ],
+  "properties": {
+   "countId": {
+    "type": "string"
+   },
+   "totalVarianceValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "exceptionCount": {
+    "type": "integer",
+    "description": "Lines beyond tolerance, requiring review before posting."
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "itemId",
+      "expectedQuantity",
+      "countedQuantity",
+      "variance",
+      "isException"
+     ],
+     "properties": {
+      "itemId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "itemName": {
+       "type": "string"
+      },
+      "sku": {
+       "type": "string"
+      },
+      "expectedQuantity": {
+       "type": "number"
+      },
+      "countedQuantity": {
+       "type": "number"
+      },
+      "variance": {
+       "type": "number"
+      },
+      "variancePercentage": {
+       "type": "number"
+      },
+      "varianceValue": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "isException": {
+       "type": "boolean"
+      },
+      "recountCount": {
+       "type": "integer",
+       "description": "A line counted several times is itself a finding."
+      },
+      "note": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "CreateRequisitionRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "venueId",
+   "lines",
+   "requiredBy"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "departmentId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "costCenterId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "lines": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "itemId",
+      "quantity"
+     ],
+     "properties": {
+      "itemId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "quantity": {
+       "type": "number",
+       "minimum": 0
+      },
+      "unit": {
+       "type": "string"
+      },
+      "note": {
+       "type": "string",
+       "maxLength": 200
+      }
+     }
+    }
+   },
+   "requiredBy": {
+    "type": "string",
+    "format": "date"
+   },
+   "justification": {
+    "type": "string",
+    "maxLength": 1000
+   }
+  }
+ },
+ "MenuItem": {
+  "x-ticvai-persistence": "fnb.menu_item",
+  "type": "object",
+  "required": [
+   "id",
+   "productVariantId",
+   "name",
+   "price",
+   "isAvailable"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "productVariantId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The catalogue variant this item sells. Pricing and tax come from there — a menu is a presentation of the catalogue, not a second catalogue.\n"
+   },
+   "name": {
+    "type": "string"
+   },
+   "description": {
+    "type": "string",
+    "nullable": true
+   },
+   "price": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "sortOrder": {
+    "type": "integer"
+   },
+   "modifierGroupIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "stationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "isStockTracked": {
+    "type": "boolean",
+    "description": "True where a recipe exists. Stock-tracked items cannot be sold offline."
+   },
+   "isAvailable": {
+    "type": "boolean"
+   },
+   "unavailableReason": {
+    "type": "string",
+    "nullable": true
+   },
+   "preparationMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "allergens": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "ProductionRun": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.production_run",
+  "description": "BL-129. **A central kitchen makes 400 portions at 6am for four outlets**, and nothing modelled that — orders consume stock and no operation produced any.\n**Production converts ingredients into a sellable item**, which is a stock movement in both directions at once, and treating it as two unrelated adjustments loses the yield.\n",
+  "required": [
+   "id",
+   "recipeId",
+   "plannedQuantity",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "recipeId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "producingOutletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "forOutletIds": {
+    "type": "array",
+    "description": "**Where it goes.** A central kitchen produces for outlets that did not make it.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "plannedQuantity": {
+    "type": "number"
+   },
+   "actualQuantity": {
+    "type": "number",
+    "nullable": true,
+    "description": "BL-126. **Theoretical against actual is the whole point of recording this.** A recipe says 400 portions from the ingredients issued; the run says how many were made, and the gap is waste, theft or a recipe that is wrong.\n"
+   },
+   "scheduledFor": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "planned",
+     "inProgress",
+     "completed",
+     "cancelled"
+    ]
+   },
+   "varianceReason": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "Requisition": {
+  "x-ticvai-persistence": "inventory.requisition + inventory.requisition_line",
+  "type": "object",
+  "required": [
+   "id",
+   "requisitionNumber",
+   "venueId",
+   "status",
+   "lines",
+   "raisedByPrincipalId",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "requisitionNumber": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "departmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "status": {
+    "$ref": "#/components/schemas/RequisitionStatus"
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "lineId": {
+       "type": "string"
+      },
+      "itemId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "itemName": {
+       "type": "string"
+      },
+      "requestedQuantity": {
+       "type": "number"
+      },
+      "approvedQuantity": {
+       "type": "number",
+       "nullable": true
+      },
+      "orderedQuantity": {
+       "type": "number",
+       "nullable": true
+      },
+      "unit": {
+       "type": "string"
+      },
+      "estimatedCost": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   },
+   "estimatedTotal": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "raisedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "approvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "approvalNote": {
+    "type": "string",
+    "nullable": true
+   },
+   "requiredBy": {
+    "type": "string",
+    "format": "date"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "approvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "RequisitionStatus": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "pendingApproval",
+   "approved",
+   "rejected",
+   "returnedForInfo",
+   "ordered",
+   "closed",
+   "cancelled"
+  ]
+ },
+ "StockBatch": {
+  "type": "object",
+  "x-ticvai-persistence": "inventory.stock_batch",
+  "description": "BL-122. **`isPerishable` and `shelfLifeDays` are on the item, so a shelf life is declared and never instantiated.** Two deliveries of the same milk arriving a week apart are one stock level with one implied expiry, and the older one is invisible.\n**A batch is the instance that actually expires.** Without it, first-expiry-first-out is not computable and a venue discovers the problem by smell.\n",
+  "required": [
+   "id",
+   "itemId",
+   "locationId",
+   "quantity",
+   "receivedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "itemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "batchCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "lotNumber": {
+    "type": "string",
+    "nullable": true,
+    "description": "The supplier's own reference. **A recall names a lot number**, and an inventory that cannot resolve one has to discard everything.\n"
+   },
+   "quantity": {
+    "type": "number"
+   },
+   "receivedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "supplierId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "available",
+     "quarantined",
+     "expired",
+     "recalled",
+     "consumed",
+     "written-off"
+    ]
+   }
+  }
+ }
+}

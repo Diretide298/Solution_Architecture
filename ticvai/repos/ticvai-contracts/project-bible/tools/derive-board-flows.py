@@ -233,6 +233,7 @@ def main() -> int:
 
     used = set()
     authored_screens = set()
+    derived_hubs: dict[str, str] = {}
     for f in FLOWS.glob("*.yaml"):
         m = re.match(r"F(\d+)", f.name)
         if m:
@@ -242,6 +243,8 @@ def main() -> int:
         # A board an authored flow already reaches is left alone.
         if not str(doc.get("provenance", "")).startswith("derived"):
             authored_screens |= set(re.findall(r"\b[A-Z]{2,4}-\d{3}\b", text))
+        elif (doc.get("trigger") or {}).get("entryScreen"):
+            derived_hubs[doc["trigger"]["entryScreen"]] = f.name
     nxt = max(used) + 1 if used else 1
 
     written, skipped = [], []
@@ -255,10 +258,16 @@ def main() -> int:
         if not doc:
             skipped.append((key, "no hub-and-spoke route in the navigation"))
             continue
-        path = FLOWS / (fid + "-" + slug(doc["name"]) + ".yaml")
-        if path.exists():
-            skipped.append((key, path.name + " exists"))
+        # **A board already has its flow if a derived flow starts at its hub.** This used to test
+        # whether the file existed, and the file name carries an id numbered from the highest in
+        # use -- so the name was new on every run and the test could never be true. On 11 September
+        # four books added 34 boards and the preview offered 106 flows: all 72 that already existed,
+        # again, under new numbers.
+        hub = (doc.get("trigger") or {}).get("entryScreen")
+        if hub in derived_hubs:
+            skipped.append((key, derived_hubs[hub] + " exists"))
             continue
+        path = FLOWS / (fid + "-" + slug(doc["name"]) + ".yaml")
         written.append((path, doc))
         nxt += 1
 

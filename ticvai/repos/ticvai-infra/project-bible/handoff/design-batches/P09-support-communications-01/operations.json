@@ -1,0 +1,72 @@
+{
+ "listAnnouncements": {
+  "method": "GET",
+  "path": "/announcements",
+  "contract": "workforce",
+  "summary": "What staff have been told",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "unacknowledgedOnly",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Announcement"
+ },
+ "listSupportNotices": {
+  "method": "GET",
+  "path": "/support-notices",
+  "contract": "platform-ops",
+  "summary": "End-of-support notices",
+  "permission": "PLATFORM_RELEASE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SupportNotice"
+ },
+ "publishAnnouncement": {
+  "method": "POST",
+  "path": "/announcements",
+  "contract": "workforce",
+  "summary": "Tell staff something",
+  "permission": "ANNOUNCEMENT_PUBLISH",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "Announcement",
+  "responds": "Announcement"
+ },
+ "publishSupportNotice": {
+  "method": "POST",
+  "path": "/support-notices",
+  "contract": "platform-ops",
+  "summary": "Publish an end-of-support notice",
+  "permission": "PLATFORM_RELEASE_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "SupportNotice",
+  "responds": "SupportNotice"
+ }
+}

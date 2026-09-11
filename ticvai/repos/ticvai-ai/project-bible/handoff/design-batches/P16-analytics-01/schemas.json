@@ -1,0 +1,1189 @@
+{
+ "Alert": {
+  "type": "object",
+  "x-ticvai-persistence": "reporting.alert",
+  "description": "A raised alert. **Acknowledged rather than dismissed** — CF-134 asked for it markable, and the difference is that an acknowledgement records who saw it.\n",
+  "required": [
+   "id",
+   "ruleId",
+   "raisedAt",
+   "severity",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "ruleId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "raisedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "info",
+     "warning",
+     "critical"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "raised",
+     "acknowledged",
+     "resolved",
+     "expired"
+    ]
+   },
+   "observedValue": {
+    "type": "number"
+   },
+   "threshold": {
+    "type": "number"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "acknowledgedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "acknowledgedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "resolvedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**Set when the metric returns to range, automatically.** An alert that only a person can close is an alert list that only grows.\n"
+   },
+   "escalatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Where `VenueSettings.alerting.escalateAfterMinutes` passed with no acknowledgement. **A critical alert nobody acknowledged is the case escalation exists for.**\n"
+   }
+  }
+ },
+ "AlertRule": {
+  "type": "object",
+  "x-ticvai-persistence": "reporting.alert_rule",
+  "description": "BL-152, CF-134. **Six contracts detect their own trouble and none told a person.**\nFive sections ask for this and it is the same gap as `MessageTrigger`, seen from the operational side — **that one tells a guest something happened; this one tells an operator something is wrong.**\n**A threshold that nobody is watching is a threshold nobody set.** 6.1.57 wants an exception when a KPI leaves range, and an exception that arrives in a nightly report is an exception nobody acted on.\n",
+  "required": [
+   "id",
+   "name",
+   "metric",
+   "comparator",
+   "threshold",
+   "severity",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "metric": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/MetricSource"
+     }
+    ],
+    "description": "**From the closed set**, so a rule cannot watch something nothing produces — the same discipline `MetricSource` exists for.\n"
+   },
+   "comparator": {
+    "type": "string",
+    "enum": [
+     "above",
+     "below",
+     "outsideRange",
+     "changesBy",
+     "equals"
+    ]
+   },
+   "threshold": {
+    "type": "number"
+   },
+   "thresholdUpper": {
+    "type": "number",
+    "nullable": true
+   },
+   "windowMinutes": {
+    "type": "integer",
+    "default": 15,
+    "description": "**The window is what stops an alert firing on noise.** A queue that spikes for ninety seconds is not a queue that needs a manager, and a rule with no window is a rule somebody mutes within a week.\n"
+   },
+   "severity": {
+    "type": "string",
+    "enum": [
+     "info",
+     "warning",
+     "critical"
+    ]
+   },
+   "deliverTo": {
+    "type": "array",
+    "description": "CF-134. **The dashboard panel is the default and the only one that always applies.** Email or WhatsApp where the matrix names them — an operational alert arriving by email is an alert nobody sees in time.\n",
+    "items": {
+     "type": "string",
+     "enum": [
+      "dashboardPanel",
+      "email",
+      "whatsapp",
+      "sms"
+     ]
+    }
+   },
+   "recipientRoleIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "cooldownMinutes": {
+    "type": "integer",
+    "default": 30,
+    "description": "**How long before the same rule may fire again.** Without it, a metric hovering on a threshold produces forty alerts an hour and the panel becomes something people close.\n"
+   },
+   "isActive": {
+    "type": "boolean"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "CountVariance": {
+  "x-ticvai-persistence": "none — computed at close",
+  "type": "object",
+  "required": [
+   "countId",
+   "totalVarianceValue",
+   "lines"
+  ],
+  "properties": {
+   "countId": {
+    "type": "string"
+   },
+   "totalVarianceValue": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "exceptionCount": {
+    "type": "integer",
+    "description": "Lines beyond tolerance, requiring review before posting."
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "itemId",
+      "expectedQuantity",
+      "countedQuantity",
+      "variance",
+      "isException"
+     ],
+     "properties": {
+      "itemId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "itemName": {
+       "type": "string"
+      },
+      "sku": {
+       "type": "string"
+      },
+      "expectedQuantity": {
+       "type": "number"
+      },
+      "countedQuantity": {
+       "type": "number"
+      },
+      "variance": {
+       "type": "number"
+      },
+      "variancePercentage": {
+       "type": "number"
+      },
+      "varianceValue": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "isException": {
+       "type": "boolean"
+      },
+      "recountCount": {
+       "type": "integer",
+       "description": "A line counted several times is itself a finding."
+      },
+      "note": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
+ "CreateSegmentRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "name",
+   "criteria"
+  ],
+  "properties": {
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string",
+    "maxLength": 1000
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "match": {
+    "type": "string",
+    "enum": [
+     "all",
+     "any"
+    ],
+    "default": "all"
+   },
+   "criteria": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "$ref": "#/components/schemas/SegmentCriterion"
+    }
+   },
+   "excludeSegmentIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   }
+  }
+ },
+ "Dashboard": {
+  "x-ticvai-persistence": "reporting.dashboard + reporting.dashboard_tile",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateDashboardRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "ownerPrincipalId",
+     "aggregateCost",
+     "createdAt"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "ownerPrincipalId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "aggregateCost": {
+      "type": "string",
+      "enum": [
+       "low",
+       "medium",
+       "high"
+      ],
+      "description": "Combined refresh load of every tile."
+     },
+     "createdAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  ]
+ },
+ "DashboardData": {
+  "x-ticvai-persistence": "none — computed",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/Dashboard"
+   },
+   {
+    "type": "object",
+    "properties": {
+     "tileData": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "tileId": {
+         "type": "string",
+         "format": "uuid"
+        },
+        "result": {
+         "$ref": "#/components/schemas/ReportResult"
+        },
+        "isCached": {
+         "type": "boolean"
+        },
+        "error": {
+         "type": "string",
+         "nullable": true
+        }
+       }
+      }
+     }
+    }
+   }
+  ]
+ },
+ "DataSource": {
+  "type": "string",
+  "description": "What a report may be built over. **A closed set, and that is the point** — a builder that accepts any table will happily produce a report over data nobody maintains.\n**Eight sources added 18 August** (BL-143), each because the matrix asks for a report the builder could not source. `stockCounts` and `waste`: 6.1.21 wants count variance and `stockMovements` records the movement rather than **the count that found the discrepancy**. `workstations`, `devices` and `principals`: 6.1.28 — **who did what at which till** is the question an auditor asks first and it had no source. `loyalty`: 6.1.37, points earned, burned and expiring. `reviews`: 6.1.46. `queueEntries`: **wait times are already measured and nothing could report on them.**\n**Adding a source is a decision, not an omission.** `principals`, `guests`, `loyalty` and `reviews` all name a person, and `REPORT_EXPORT_PII` gates them.\n",
+  "enum": [
+   "orders",
+   "orderLines",
+   "payments",
+   "refunds",
+   "shifts",
+   "scanEvents",
+   "entitlements",
+   "products",
+   "inventory",
+   "stockMovements",
+   "stockCounts",
+   "waste",
+   "workstations",
+   "devices",
+   "principals",
+   "loyalty",
+   "reviews",
+   "queueEntries",
+   "guests",
+   "campaigns",
+   "cases",
+   "ledgerEntries",
+   "workOrders",
+   "approvals",
+   "purchaseOrders",
+   "receipts",
+   "requisitions",
+   "stockBatches",
+   "resourceBookings",
+   "delegations",
+   "forms",
+   "challenges",
+   "wallets",
+   "resaleListings"
+  ]
+ },
+ "FieldType": {
+  "type": "string",
+  "enum": [
+   "string",
+   "integer",
+   "decimal",
+   "money",
+   "boolean",
+   "date",
+   "dateTime",
+   "uuid",
+   "enum"
+  ]
+ },
+ "MessageChannel": {
+  "type": "string",
+  "enum": [
+   "email",
+   "sms",
+   "whatsapp",
+   "push",
+   "inApp",
+   "post"
+  ]
+ },
+ "MetricSource": {
+  "type": "string",
+  "description": "**A named metric with a verified source.** BL-053, 75 requirement rows.\n`reporting` is a generic builder, and **a generic builder makes every reporting requirement look covered** — it will happily assemble a report over data nobody produces. That is the shape to watch across the whole walk, and this enum is the answer to it: each value below was checked against the schema before being named.\n| Metric | Source | |---|---| | `occupancy` | `catalogue.channel_capacity.sold` and `leased` against `capacity` | | `capacityUtilisation` | `catalogue.channel_capacity.remaining` over the same window | | `admissionRate` | `access.scan_event.outcome`, in-direction | | `noShowRate` | Entitlements issued against scans that never arrived | | `conversion` | `orders.cart` against `orders.sales_order` | | `salesByOperator` | `orders.sales_order.principal_id` | | `salesByWorkstation` | The workstation on the shift that took it | | `waitTime` | `queue.waiting_guest.estimated_call_at` against `called_at` | | `throughput` | `queue.waiting_guest` completions per hour | | `abandonmentRate` | Queue entries that left before being called |\n**`salesByInstructor` is deliberately absent.** It needs the staff-assignment link that CL-01 covers, and naming a metric with no source is the defect this enum exists to prevent.\n",
+  "enum": [
+   "occupancy",
+   "capacityUtilisation",
+   "admissionRate",
+   "noShowRate",
+   "conversion",
+   "salesByOperator",
+   "salesByWorkstation",
+   "waitTime",
+   "throughput",
+   "abandonmentRate",
+   "inventoryValuation",
+   "stockTurnover",
+   "stockAgeing",
+   "wastageRate",
+   "resaleVolume",
+   "resaleCommission",
+   "salesByInstructor",
+   "resourceUtilisation",
+   "allocationUtilisation",
+   "channelAllocationBurn",
+   "membershipChurn",
+   "membershipRenewalRate",
+   "supplierDeliveryPerformance",
+   "revenuePerEntitlement",
+   "revenuePerVisitor",
+   "assetDowntime",
+   "meanTimeToRepair",
+   "challengeCompletionRate",
+   "attributedRevenue"
+  ],
+  "x-ticvai-extended": "18 August 2026",
+  "x-ticvai-extension-note": "**Nineteen metrics added when their upstream models landed**, which is how BL-053 was always going to close — not by changing `reporting` but by building the things it wanted to report on.\n`inventoryValuation`, `stockTurnover`, `stockAgeing` and `wastageRate` came from `inventory.StockBatch`; `resaleVolume` and `resaleCommission` from `orders.ResaleListing`; **`salesByInstructor` from `resources.Resource`, which was the one metric this enum deliberately refused to name in the morning** because nothing produced it. `allocationUtilisation` from `PartnerUser` and `ChannelListing`, `membershipChurn` from `Journey`, `supplierDeliveryPerformance` from `ProductionRun`, `assetDowntime` and `meanTimeToRepair` from `WorkOrder.downtimeMinutes`, `challengeCompletionRate` from `ChallengeProgress`, `attributedRevenue` from `AttributionTouch`.\n**Each was checked against the schema before being named.** That rule has not changed — naming a metric with no source is the defect this enum exists to prevent.\n"
+ },
+ "NaturalLanguageAnswer": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "conversationId",
+   "question",
+   "interpretation",
+   "result",
+   "confidence"
+  ],
+  "properties": {
+   "conversationId": {
+    "type": "string"
+   },
+   "question": {
+    "type": "string"
+   },
+   "interpretation": {
+    "type": "string",
+    "description": "What the question was understood to mean, in plain language."
+   },
+   "generatedQuery": {
+    "type": "object",
+    "description": "The structured query produced — data source, columns, filters, grouping. Returned so the answer can be checked. An answer nobody can verify is worse than no answer.\n",
+    "properties": {
+     "dataSource": {
+      "$ref": "#/components/schemas/DataSource"
+     },
+     "columns": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/ReportColumn"
+      }
+     },
+     "filters": {
+      "type": "array",
+      "items": {
+       "$ref": "#/components/schemas/ReportFilter"
+      }
+     },
+     "groupBy": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "result": {
+    "$ref": "#/components/schemas/ReportResult"
+   },
+   "confidence": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1
+   },
+   "suggestedFollowUps": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "modelVersion": {
+    "type": "string"
+   },
+   "tokensUsed": {
+    "type": "integer"
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "ProposedAction": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.proposed_action",
+  "required": [
+   "id",
+   "kind",
+   "targetContract",
+   "targetOperation",
+   "payload",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "interactionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "pricing",
+     "promotion",
+     "operational",
+     "financial",
+     "configuration"
+    ]
+   },
+   "targetContract": {
+    "type": "string",
+    "description": "Which contract would perform it. The assistant never performs it itself."
+   },
+   "targetOperation": {
+    "type": "string"
+   },
+   "payload": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "The request body a person would submit, ready to review."
+   },
+   "summary": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "proposed",
+     "approved",
+     "rejected",
+     "applied",
+     "expired"
+    ]
+   },
+   "approvalLevel": {
+    "type": "integer",
+    "description": "8.3.65. Multi-level, because a discount and a pricing change differ in authority."
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "decisionReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Required on rejection. **The only signal the assistant is proposing badly**, and without it a poor model degrades silently.\n"
+   },
+   "proposedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
+ "ReportColumn": {
+  "x-ticvai-persistence": "reporting.report_column",
+  "type": "object",
+  "required": [
+   "field"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "field": {
+    "type": "string"
+   },
+   "label": {
+    "type": "string"
+   },
+   "aggregation": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/Aggregation"
+     }
+    ],
+    "default": "none"
+   },
+   "sortOrder": {
+    "type": "integer"
+   },
+   "sortDirection": {
+    "type": "string",
+    "enum": [
+     "asc",
+     "desc"
+    ]
+   },
+   "format": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "ReportFilter": {
+  "x-ticvai-persistence": "reporting.report_filter",
+  "type": "object",
+  "required": [
+   "field",
+   "operator"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
+   },
+   "field": {
+    "type": "string"
+   },
+   "operator": {
+    "type": "string",
+    "enum": [
+     "equals",
+     "notEquals",
+     "greaterThan",
+     "lessThan",
+     "between",
+     "in",
+     "notIn",
+     "contains",
+     "isNull",
+     "isNotNull"
+    ]
+   },
+   "value": {},
+   "values": {
+    "type": "array",
+    "items": {}
+   },
+   "isParameter": {
+    "type": "boolean",
+    "default": false,
+    "description": "Prompted at run time rather than fixed. Parameters narrow the result; they never widen scope.\n"
+   }
+  }
+ },
+ "ReportResult": {
+  "x-ticvai-persistence": "none — result set, cached in object storage",
+  "type": "object",
+  "required": [
+   "executionId",
+   "columns",
+   "rows"
+  ],
+  "properties": {
+   "executionId": {
+    "type": "string"
+   },
+   "columns": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "key": {
+       "type": "string"
+      },
+      "label": {
+       "type": "string"
+      },
+      "type": {
+       "$ref": "#/components/schemas/FieldType"
+      }
+     }
+    }
+   },
+   "rows": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "additionalProperties": true
+    }
+   },
+   "totals": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "rowCount": {
+    "type": "integer"
+   },
+   "nextCursor": {
+    "type": "string",
+    "nullable": true
+   },
+   "generatedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "dataAsOf": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it prevents an argument about a figure that moved.\n"
+   }
+  }
+ },
+ "RunReportRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "properties": {
+   "parameters": {
+    "type": "object",
+    "additionalProperties": true
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "Narrows to one venue. Omitting it returns everything the caller's scope permits — it cannot be used to reach beyond that.\n"
+   },
+   "dateFrom": {
+    "type": "string",
+    "format": "date"
+   },
+   "dateTo": {
+    "type": "string",
+    "format": "date"
+   },
+   "forceAsync": {
+    "type": "boolean",
+    "default": false,
+    "description": "Queue regardless of size, for a result to be collected later."
+   }
+  }
+ },
+ "Segment": {
+  "x-ticvai-persistence": "marketing.segment + marketing.segment_criterion",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/CreateSegmentRequest"
+   },
+   {
+    "type": "object",
+    "required": [
+     "id",
+     "createdAt"
+    ],
+    "properties": {
+     "id": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "lastEvaluatedSize": {
+      "type": "integer",
+      "nullable": true
+     },
+     "lastEvaluatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true
+     },
+     "createdAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  ]
+ },
+ "SegmentCriterion": {
+  "x-ticvai-persistence": "marketing.segment_criterion",
+  "type": "object",
+  "required": [
+   "attribute",
+   "operator"
+  ],
+  "properties": {
+   "attribute": {
+    "type": "string",
+    "description": "Behavioural or profile attribute — visit count, last visit, lifetime value, product purchased, membership tier, venue visited, language.\n**Free-form rather than an enum, which is why 22.14.8, 5.3.19 and 5.5.17b were readable as gaps and are not.** `walletBalance`, `engagementTier` and `portfolioScope` are expressible today; what was missing was anybody saying so.\n**Three that need saying, because the naive reading is wrong:**\n`walletBalance` should segment on **`cash` credit only**. A guest with 200 dirhams of promotional credit expiring Friday is a different campaign from one with 200 of their own money, and treating them alike sends a spend-it-now message to somebody who was given it.\n`walletBalance.expiringWithinDays` is the segment that earns the attribute — **credit about to expire unspent is a guest about to be disappointed and a venue about to book breakage**, and only one of those is worth a message.\n`portfolioScope` aggregates across a `DelegatedAccess` delegation (CF-132) and **must not message every member about a household total** — that is how a venue tells a teenager what their parent spends.\n"
+   },
+   "operator": {
+    "type": "string",
+    "enum": [
+     "equals",
+     "notEquals",
+     "greaterThan",
+     "lessThan",
+     "between",
+     "in",
+     "notIn",
+     "exists",
+     "notExists",
+     "withinDays"
+    ]
+   },
+   "value": {},
+   "values": {
+    "type": "array",
+    "items": {}
+   }
+  }
+ },
+ "SegmentPreview": {
+  "x-ticvai-persistence": "none — evaluated live",
+  "type": "object",
+  "required": [
+   "segmentId",
+   "matchingCount",
+   "reachable"
+  ],
+  "properties": {
+   "segmentId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "matchingCount": {
+    "type": "integer"
+   },
+   "reachable": {
+    "type": "array",
+    "description": "Per channel, after consent and suppression. A segment of 50,000 with 3,000 email consents is a 3,000-person campaign.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "channel": {
+       "$ref": "#/components/schemas/MessageChannel"
+      },
+      "reachableCount": {
+       "type": "integer"
+      },
+      "excludedNoConsent": {
+       "type": "integer"
+      },
+      "excludedSuppressed": {
+       "type": "integer"
+      },
+      "excludedNoAddress": {
+       "type": "integer"
+      }
+     }
+    }
+   },
+   "evaluatedAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
+ "StockBatch": {
+  "type": "object",
+  "x-ticvai-persistence": "inventory.stock_batch",
+  "description": "BL-122. **`isPerishable` and `shelfLifeDays` are on the item, so a shelf life is declared and never instantiated.** Two deliveries of the same milk arriving a week apart are one stock level with one implied expiry, and the older one is invisible.\n**A batch is the instance that actually expires.** Without it, first-expiry-first-out is not computable and a venue discovers the problem by smell.\n",
+  "required": [
+   "id",
+   "itemId",
+   "locationId",
+   "quantity",
+   "receivedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "itemId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "locationId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "batchCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "lotNumber": {
+    "type": "string",
+    "nullable": true,
+    "description": "The supplier's own reference. **A recall names a lot number**, and an inventory that cannot resolve one has to discard everything.\n"
+   },
+   "quantity": {
+    "type": "number"
+   },
+   "receivedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   },
+   "supplierId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "available",
+     "quarantined",
+     "expired",
+     "recalled",
+     "consumed",
+     "written-off"
+    ]
+   }
+  }
+ },
+ "StockValuation": {
+  "x-ticvai-persistence": "none — computed",
+  "type": "object",
+  "required": [
+   "asAt",
+   "total",
+   "byLocation"
+  ],
+  "properties": {
+   "asAt": {
+    "type": "string",
+    "format": "date"
+   },
+   "total": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "byLocation": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "locationId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "locationName": {
+       "type": "string"
+      },
+      "value": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "itemCount": {
+       "type": "integer"
+      }
+     }
+    }
+   },
+   "byCategory": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "categoryId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "categoryName": {
+       "type": "string"
+      },
+      "value": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      }
+     }
+    }
+   }
+  }
+ },
+ "Suggestion": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.suggestion",
+  "description": "One answer to one question, with its reasoning and its confidence. **Built 24 August so that machine learning can be swapped in without touching a screen.**\n**A suggestion is never an action.** It proposes; `ProposedAction` and its approval path decide. A model that can order stock is a model that will order stock wrongly at three in the morning.\n**`inputs` is recorded, not just referenced.** A suggestion that cannot be reproduced cannot be defended to a finance controller asking why the system said to order four hundred.\n",
+  "required": [
+   "id",
+   "kind",
+   "basis",
+   "producedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/SuggestionKind"
+   },
+   "basis": {
+    "$ref": "#/components/schemas/SuggestionBasis"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "subjectRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "What it is about — a product, an outlet, an item, a party."
+   },
+   "value": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "The suggestion itself. Shape depends on `kind`."
+   },
+   "confidence": {
+    "type": "number",
+    "nullable": true,
+    "minimum": 0,
+    "maximum": 1,
+    "description": "**Null for a heuristic and that is honest.** A rule has no confidence — dressing one up with 0.85 is the fastest way to make a manager trust a number that means nothing.\n"
+   },
+   "explanation": {
+    "type": "string",
+    "description": "**Plain words, always present, whatever the basis.** *Because covers are up 12% on this day last year* — a suggestion a manager cannot explain to their own boss is a suggestion they will not action.\n"
+   },
+   "inputs": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "What went in. **Recorded so the answer can be reproduced** — and so that when a model replaces the rule, the two can be run against the same inputs and compared.\n"
+   },
+   "producerRef": {
+    "type": "string",
+    "description": "The rule name or the model id and version. **A model version is part of the record**: *the model said so* is not an answer to *which model, when*.\n"
+   },
+   "producedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**A demand forecast for Saturday is worthless on Sunday.** An expired suggestion is hidden rather than shown stale.\n"
+   }
+  }
+ },
+ "SuggestionBasis": {
+  "type": "string",
+  "description": "**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n",
+  "enum": [
+   "heuristic",
+   "statistical",
+   "model",
+   "hybrid",
+   "manual"
+  ]
+ },
+ "SuggestionKind": {
+  "type": "string",
+  "description": "What is being suggested. **A closed set, and the reason it is closed is the swap.** Every entry here is a question a venue asks that a model could answer better than a rule — and each one starts as a heuristic and becomes a model when there is data.\n**Six of these were drawn as their own endpoints on the client F&B boards** — `suggestPrice`, `simulateScenario`, `simulateSlaPolicy`, `suggestRequisition`, `suggestReplenishment`, `publishDemandPlan`. **Building six endpoints means six places to change when a model changes**, and the model will change more often than the venue's question does.\n",
+  "enum": [
+   "price",
+   "replenishment",
+   "requisition",
+   "demandForecast",
+   "prepPlan",
+   "menuEngineering",
+   "staffing",
+   "slaTarget",
+   "waitTime",
+   "upsell",
+   "segmentation",
+   "anomaly",
+   "scenario"
+  ]
+ },
+ "SuggestionOutcome": {
+  "type": "object",
+  "x-ticvai-persistence": "ai.suggestion_outcome",
+  "description": "**What actually happened, and this is the table that makes the swap possible at all.**\nA model needs labelled data and **the only source of labels is whether the venue took the advice and whether it worked.** A platform that suggests and never records the outcome has no training set a year later, and the swap he is planning for never happens.\n**Captured whether or not the suggestion was taken.** A rejected suggestion is a stronger signal than an accepted one — it is the case the rule got wrong.\n",
+  "required": [
+   "id",
+   "suggestionId",
+   "decision"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "suggestionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "decision": {
+    "type": "string",
+    "enum": [
+     "accepted",
+     "modified",
+     "rejected",
+     "ignored",
+     "expired"
+    ]
+   },
+   "actualValue": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": true,
+    "description": "What the venue did instead. **The label.** A suggestion of 400 units, an order of 250, and a stockout on Saturday is one training example worth more than a hundred accepted ones.\n"
+   },
+   "decidedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "decidedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "realisedOutcome": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": true,
+    "description": "**Filled in later by a job, not by a person.** Whether the stockout happened, whether the covers arrived, whether the margin held — nobody comes back to record this by hand, so nothing that depends on them doing so should be designed.\n"
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ }
+}

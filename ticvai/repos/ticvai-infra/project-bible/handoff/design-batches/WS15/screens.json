@@ -1,0 +1,1096 @@
+[
+ {
+  "id": "ADM-329",
+  "name": "Approval Matrix Command Center",
+  "module": "Platform",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Approval_Workflows_and_Governance_Reference.pdf",
+   "board": "3",
+   "number": "1",
+   "page": 21
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/approval-matrix-command-center-adm-329",
+   "component": "apps/ticvai-web/src/routes/platform/ApprovalMatrixCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "exitTo": [
+    "ADM-002",
+    "ADM-330",
+    "ADM-331",
+    "ADM-332",
+    "ADM-333",
+    "ADM-334",
+    "ADM-335",
+    "ADM-336",
+    "ADM-337",
+    "ADM-338"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-002",
+     "trigger": "Back to Platform Dashboard",
+     "provenance": "structural — pack board 3 wiring, 9 September 2026",
+     "back": true
+    },
+    {
+     "to": "ADM-338",
+     "trigger": "AI Routing Advisor & Matrix Optimization",
+     "provenance": "structural — pack board 3 wiring, 9 September 2026"
+    },
+    {
+     "to": "ADM-330",
+     "trigger": "Approval Authority Matrix",
+     "provenance": "structural — pack board 3 wiring, 9 September 2026"
+    },
+    {
+     "to": "ADM-331",
+     "trigger": "Organizational Hierarchy Routing",
+     "provenance": "structural — pack board 3 wiring, 9 September 2026"
+    },
+    {
+     "to": "ADM-332",
+     "trigger": "Department-Based Approval Matrix",
+     "provenance": "structural — pack board 3 wiring, 9 September 2026"
+    },
+    {
+     "to": "ADM-333",
+     "trigger": "Venue & Tenant Approval Matrix",
+     "provenance": "structural — pack board 3 wiring, 9 September 2026"
+    },
+    {
+     "to": "ADM-334",
+     "trigger": "Value & Threshold Routing",
+     "provenance": "structural — pack board 3 wiring, 9 September 2026"
+    },
+    {
+     "to": "ADM-335",
+     "trigger": "Risk-Based & Conditional Routing",
+     "provenance": "structural — pack board 3 wiring, 9 September 2026"
+    },
+    {
+     "to": "ADM-336",
+     "trigger": "Approver Group & Decision Policy",
+     "provenance": "structural — pack board 3 wiring, 9 September 2026"
+    },
+    {
+     "to": "ADM-337",
+     "trigger": "Routing Simulator & Conflict Detection",
+     "provenance": "structural — pack board 3 wiring, 9 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
+  "purpose": "Provide administrators with a centralized overview of all approval matrices configured across TICVAI.",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Active Approval Matrices",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 21 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Approval Rules",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 21 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Tenants Covered",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 21 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Venues Covered",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 21 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Departments Covered",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 21 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Unassigned Rules",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 21 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Routing Conflicts",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 21 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Governance Warnings",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 21 §KPI Cards"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The approval list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the approval untouched.",
+   "emptyFirstRun": "No approval yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the approval are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "entryState": {
+   "preloaded": [
+    "Active Approval Matrices",
+    "Approval Rules",
+    "Tenants Covered",
+    "Venues Covered",
+    "Departments Covered",
+    "Unassigned Rules"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-329"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 21. 0 of 0 labels bound to a contract property; 8 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-330",
+  "name": "Approval Authority Matrix",
+  "module": "Platform",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Approval_Workflows_and_Governance_Reference.pdf",
+   "board": "3",
+   "number": "2",
+   "page": 22
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/approval-authority-matrix-adm-330",
+   "component": "apps/ticvai-web/src/routes/platform/ApprovalAuthorityMatrix.tsx",
+   "status": "notStarted"
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configuration Dimensions) and no display directory — it is settings, not a population",
+  "purpose": "Provide a visual table showing who can approve what and up to which authority level.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Role",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 22 §Configuration Dimensions"
+      },
+      {
+       "kind": "selectField",
+       "label": "User",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 22 §Configuration Dimensions"
+      },
+      {
+       "kind": "selectField",
+       "label": "Department",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 22 §Configuration Dimensions"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 22 §Configuration Dimensions"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tenant",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 22 §Configuration Dimensions"
+      },
+      {
+       "kind": "selectField",
+       "label": "Business process",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 22 §Configuration Dimensions"
+      },
+      {
+       "kind": "selectField",
+       "label": "Transaction value",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 22 §Configuration Dimensions"
+      },
+      {
+       "kind": "selectField",
+       "label": "Percentage",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 22 §Configuration Dimensions"
+      },
+      {
+       "kind": "selectField",
+       "label": "Risk level",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 22 §Configuration Dimensions"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The approval authority configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the approval authority untouched.",
+   "emptyFirstRun": "No approval authority configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-330"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 22. 0 of 0 labels bound to a contract property; 9 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "navigation": {
+   "entryFrom": [
+    "ADM-329"
+   ],
+   "exitTo": [
+    "ADM-329"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-329",
+     "trigger": "Back to Approval Matrix Command Center",
+     "provenance": "structural — pack board 3 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-331",
+  "name": "Organizational Hierarchy Routing",
+  "module": "Platform",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Approval_Workflows_and_Governance_Reference.pdf",
+   "board": "3",
+   "number": "3",
+   "page": 23
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/organizational-hierarchy-routing-adm-331",
+   "component": "apps/ticvai-web/src/routes/platform/OrganizationalHierarchyRouting.tsx",
+   "status": "notStarted"
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure approval routing based on the client's organizational hierarchy.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 23"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 23"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The organizational hierarchy routing list.",
+   "error": "Could not load. Names which read failed and leaves the organizational hierarchy routing untouched.",
+   "emptyFirstRun": "No organizational hierarchy routing yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the organizational hierarchy routing are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-331"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 23. 0 of 0 labels bound to a contract property; 0 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "navigation": {
+   "entryFrom": [
+    "ADM-329"
+   ],
+   "exitTo": [
+    "ADM-329"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-329",
+     "trigger": "Back to Approval Matrix Command Center",
+     "provenance": "structural — pack board 3 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-332",
+  "name": "Department-Based Approval Matrix",
+  "module": "Platform",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Approval_Workflows_and_Governance_Reference.pdf",
+   "board": "3",
+   "number": "4",
+   "page": 24
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/department-based-approval-matrix-adm-332",
+   "component": "apps/ticvai-web/src/routes/platform/DepartmentBasedApprovalMatrix.tsx",
+   "status": "notStarted"
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Critical configuration change) and no display directory — it is settings, not a population",
+  "purpose": "Allow different departments to maintain different approval authority structures.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "→ IT Director",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 24 §Critical configuration change"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "banner",
+       "label": "Permissions this screen separates",
+       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** → Security Manager. Each needs attaching to the control it gates, or the screen needs the control.",
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 24 §Access permission modification"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The department-based approval configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the department-based approval untouched.",
+   "emptyFirstRun": "No department-based approval configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-332"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 24. 0 of 0 labels bound to a contract property; 2 of 12 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "navigation": {
+   "entryFrom": [
+    "ADM-329"
+   ],
+   "exitTo": [
+    "ADM-329"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-329",
+     "trigger": "Back to Approval Matrix Command Center",
+     "provenance": "structural — pack board 3 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-333",
+  "name": "Venue & Tenant Approval Matrix",
+  "module": "Platform",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Approval_Workflows_and_Governance_Reference.pdf",
+   "board": "3",
+   "number": "5",
+   "page": 24
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/venue-tenant-approval-matrix-adm-333",
+   "component": "apps/ticvai-web/src/routes/platform/VenueTenantApprovalMatrix.tsx",
+   "status": "notStarted"
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Allow approval policies to differ between TICVAI clients and between venues belonging to the same client.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 24"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 24"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The venue tenant approval list.",
+   "error": "Could not load. Names which read failed and leaves the venue tenant approval untouched.",
+   "emptyFirstRun": "No venue tenant approval yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the venue tenant approval are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-333"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 24. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "navigation": {
+   "entryFrom": [
+    "ADM-329"
+   ],
+   "exitTo": [
+    "ADM-329"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-329",
+     "trigger": "Back to Approval Matrix Command Center",
+     "provenance": "structural — pack board 3 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-334",
+  "name": "Value & Threshold Routing",
+  "module": "Platform",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Approval_Workflows_and_Governance_Reference.pdf",
+   "board": "3",
+   "number": "6",
+   "page": 25
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/value-threshold-routing-adm-334",
+   "component": "apps/ticvai-web/src/routes/platform/ValueThresholdRouting.tsx",
+   "status": "notStarted"
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure approval authority according to transaction value or percentage thresholds. Example — Refund",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 25"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 25"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The value threshold routing list.",
+   "error": "Could not load. Names which read failed and leaves the value threshold routing untouched.",
+   "emptyFirstRun": "No value threshold routing yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the value threshold routing are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-334"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 25. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "navigation": {
+   "entryFrom": [
+    "ADM-329"
+   ],
+   "exitTo": [
+    "ADM-329"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-329",
+     "trigger": "Back to Approval Matrix Command Center",
+     "provenance": "structural — pack board 3 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-335",
+  "name": "Risk-Based & Conditional Routing",
+  "module": "Platform",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Approval_Workflows_and_Governance_Reference.pdf",
+   "board": "3",
+   "number": "7",
+   "page": 26
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/risk-based-conditional-routing-adm-335",
+   "component": "apps/ticvai-web/src/routes/platform/RiskBasedConditionalRouting.tsx",
+   "status": "notStarted"
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Dynamically modify approval routing based on the risk or context of the request.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 26"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 26"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The risk-based conditional routing list.",
+   "error": "Could not load. Names which read failed and leaves the risk-based conditional routing untouched.",
+   "emptyFirstRun": "No risk-based conditional routing yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the risk-based conditional routing are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-335"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 26. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "navigation": {
+   "entryFrom": [
+    "ADM-329"
+   ],
+   "exitTo": [
+    "ADM-329"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-329",
+     "trigger": "Back to Approval Matrix Command Center",
+     "provenance": "structural — pack board 3 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-336",
+  "name": "Approver Group & Decision Policy",
+  "module": "Platform",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Approval_Workflows_and_Governance_Reference.pdf",
+   "board": "3",
+   "number": "8",
+   "page": 27
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/approver-group-decision-policy-adm-336",
+   "component": "apps/ticvai-web/src/routes/platform/ApproverGroupDecisionPolicy.tsx",
+   "status": "notStarted"
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Define cases where approval authority belongs to multiple people rather than one individual.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 27"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 27"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The approver group decision list.",
+   "error": "Could not load. Names which read failed and leaves the approver group decision untouched.",
+   "emptyFirstRun": "No approver group decision yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the approver group decision are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-336"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 27. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "navigation": {
+   "entryFrom": [
+    "ADM-329"
+   ],
+   "exitTo": [
+    "ADM-329"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-329",
+     "trigger": "Back to Approval Matrix Command Center",
+     "provenance": "structural — pack board 3 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-337",
+  "name": "Routing Simulator & Conflict Detection",
+  "module": "Platform",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Approval_Workflows_and_Governance_Reference.pdf",
+   "board": "3",
+   "number": "9",
+   "page": 27
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/routing-simulator-conflict-detection-adm-337",
+   "component": "apps/ticvai-web/src/routes/platform/RoutingSimulatorConflictDetection.tsx",
+   "status": "notStarted"
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Allow administrators to test the complete approval matrix before deployment. This is particularly important because Board 3 can contain hundreds of combinations.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 27"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 27"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The routing simulator conflict list.",
+   "error": "Could not load. Names which read failed and leaves the routing simulator conflict untouched.",
+   "emptyFirstRun": "No routing simulator conflict yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the routing simulator conflict are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-337"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 27. 0 of 0 labels bound to a contract property; 0 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "navigation": {
+   "entryFrom": [
+    "ADM-329"
+   ],
+   "exitTo": [
+    "ADM-329"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-329",
+     "trigger": "Back to Approval Matrix Command Center",
+     "provenance": "structural — pack board 3 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-338",
+  "name": "AI Routing Advisor & Matrix Optimization",
+  "module": "Platform",
+  "requiresModule": "core",
+  "wave": 3,
+  "source": {
+   "pack": "Approval_Workflows_and_Governance_Reference.pdf",
+   "board": "3",
+   "number": "10",
+   "page": 28
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/platform/ai-routing-advisor-matrix-optimization-adm-338",
+   "component": "apps/ticvai-web/src/routes/platform/AiRoutingAdvisorMatrixOptimization.tsx",
+   "status": "notStarted"
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Use TICVAI AI to analyze approval behavior and recommend improvements to the approval matrix. The source requires AI risk assessment, priority scoring and escalation recommendations.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 28"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Approval_Workflows_and_Governance_Reference.pdf, page 28"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The routing advisor optimization list.",
+   "error": "Could not load. Names which read failed and leaves the routing advisor optimization untouched.",
+   "emptyFirstRun": "No routing advisor optimization yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the routing advisor optimization are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-338"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 28. 0 of 0 labels bound to a contract property; 0 of 12 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "navigation": {
+   "entryFrom": [
+    "ADM-329"
+   ],
+   "exitTo": [
+    "ADM-329"
+   ],
+   "transitions": [
+    {
+     "to": "ADM-329",
+     "trigger": "Back to Approval Matrix Command Center",
+     "provenance": "structural — pack board 3 wiring, 9 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

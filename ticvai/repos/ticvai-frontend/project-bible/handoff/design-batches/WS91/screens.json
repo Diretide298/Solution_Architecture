@@ -1,0 +1,1222 @@
+[
+ {
+  "id": "BO-524",
+  "name": "Rental Pricing Command Center",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Rental_Management.pdf",
+   "board": "4",
+   "number": "1",
+   "page": 38
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/rental-pricing-command-center-bo-524",
+   "component": "apps/venue-management-web/src/routes/rentals/RentalPricingCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-100"
+   ],
+   "exitTo": [
+    "BO-100",
+    "BO-525",
+    "BO-526",
+    "BO-527",
+    "BO-528",
+    "BO-529",
+    "BO-530",
+    "BO-531",
+    "BO-532",
+    "BO-533"
+   ],
+   "transitions": [
+    {
+     "to": "BO-100",
+     "trigger": "Back to Venue Home",
+     "provenance": "structural — pack board 4 wiring, 11 September 2026",
+     "back": true
+    },
+    {
+     "to": "BO-525",
+     "trigger": "Pricing Profile Builder",
+     "provenance": "structural — pack board 4 wiring, 11 September 2026"
+    },
+    {
+     "to": "BO-526",
+     "trigger": "Duration & Tiered Pricing Configuration",
+     "provenance": "structural — pack board 4 wiring, 11 September 2026"
+    },
+    {
+     "to": "BO-527",
+     "trigger": "Calendar, Peak & Seasonal Pricing",
+     "provenance": "structural — pack board 4 wiring, 11 September 2026"
+    },
+    {
+     "to": "BO-528",
+     "trigger": "Dynamic Pricing & AI Recommendation",
+     "provenance": "structural — pack board 4 wiring, 11 September 2026"
+    },
+    {
+     "to": "BO-529",
+     "trigger": "Deposit & Security Hold Policy",
+     "provenance": "structural — pack board 4 wiring, 11 September 2026"
+    },
+    {
+     "to": "BO-530",
+     "trigger": "Deposit Lifecycle & Settlement Rules",
+     "provenance": "structural — pack board 4 wiring, 11 September 2026"
+    },
+    {
+     "to": "BO-531",
+     "trigger": "Late Fee, Grace Period & Extension Pricing",
+     "provenance": "structural — pack board 4 wiring, 11 September 2026"
+    },
+    {
+     "to": "BO-532",
+     "trigger": "Commercial Exceptions, Waivers & Overrides",
+     "provenance": "structural — pack board 4 wiring, 11 September 2026"
+    },
+    {
+     "to": "BO-533",
+     "trigger": "Pricing Simulation, Validation & AI Commercial Intelligence",
+     "provenance": "structural — pack board 4 wiring, 11 September 2026"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
+  "purpose": "Central management screen for all rental pricing and commercial policies.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: + Create Pricing Profile. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Rental_Management.pdf, page 38 §Actions"
+   }
+  ],
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search rental pricing",
+       "provenance": "pack Rental_Management.pdf, page 38 §Filters"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "Venue",
+        "Location",
+        "Product",
+        "Category",
+        "Pricing Model",
+        "Deposit Type",
+        "Effective Date",
+        "Status"
+       ],
+       "notes": "The pack filters this screen by venue, location, product, category, pricing model, deposit type and 2 more — which are present is a decision the pack already made.",
+       "provenance": "pack Rental_Management.pdf, page 38 §Filters"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Active Pricing Profiles",
+       "provenance": "pack Rental_Management.pdf, page 38 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Products Without Pricing",
+       "provenance": "pack Rental_Management.pdf, page 38 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Deposit Policies",
+       "provenance": "pack Rental_Management.pdf, page 38 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Dynamic Pricing Enabled",
+       "provenance": "pack Rental_Management.pdf, page 38 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Upcoming Price Changes",
+       "provenance": "pack Rental_Management.pdf, page 38 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pricing Exceptions",
+       "provenance": "pack Rental_Management.pdf, page 38 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Approval Pending",
+       "provenance": "pack Rental_Management.pdf, page 38 §KPI Cards"
+      },
+      {
+       "kind": "metricTile",
+       "label": "AI Recommendations",
+       "provenance": "pack Rental_Management.pdf, page 38 §KPI Cards"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "+ Create Pricing Profile",
+       "provenance": "pack Rental_Management.pdf, page 38 §Actions"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The rental pricing list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the rental pricing untouched.",
+   "emptyFirstRun": "No rental pricing yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the rental pricing are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "entryState": {
+   "preloaded": [
+    "Active Pricing Profiles",
+    "Products Without Pricing",
+    "Deposit Policies",
+    "Dynamic Pricing Enabled",
+    "Upcoming Price Changes",
+    "Pricing Exceptions"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-524"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 38. 0 of 8 labels bound to a contract property; 17 of 24 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-525",
+  "name": "Pricing Profile Builder",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Rental_Management.pdf",
+   "board": "4",
+   "number": "2",
+   "page": 39
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/pricing-profile-builder-bo-525",
+   "component": "apps/venue-management-web/src/routes/rentals/PricingProfileBuilder.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-524"
+   ],
+   "exitTo": [
+    "BO-524"
+   ],
+   "transitions": [
+    {
+     "to": "BO-524",
+     "trigger": "Back to Rental Pricing Command Center",
+     "provenance": "structural — pack board 4 wiring, 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Select) and no display directory — it is settings, not a population",
+  "purpose": "Create the master commercial pricing profile associated with a rental product.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**Pricing Profile Builder declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
+    "source": "contract — the screen's declared operations"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Flat Rate",
+       "provenance": "pack Rental_Management.pdf, page 39 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Duration Based",
+       "provenance": "pack Rental_Management.pdf, page 39 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tiered",
+       "provenance": "pack Rental_Management.pdf, page 39 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Peak / Off-Peak",
+       "provenance": "pack Rental_Management.pdf, page 39 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Weekend",
+       "provenance": "pack Rental_Management.pdf, page 39 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Seasonal",
+       "provenance": "pack Rental_Management.pdf, page 39 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Dynamic / AI-Assisted",
+       "provenance": "pack Rental_Management.pdf, page 39 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Hybrid",
+       "provenance": "pack Rental_Management.pdf, page 39 §Select"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The pricing profile configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the pricing profile untouched.",
+   "emptyFirstRun": "No pricing profile configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-525"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 39. 0 of 0 labels bound to a contract property; 8 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-526",
+  "name": "Duration & Tiered Pricing Configuration",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Rental_Management.pdf",
+   "board": "4",
+   "number": "3",
+   "page": 40
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/duration-tiered-pricing-configuration-bo-526",
+   "component": "apps/venue-management-web/src/routes/rentals/DurationTieredPricingConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-524"
+   ],
+   "exitTo": [
+    "BO-524"
+   ],
+   "transitions": [
+    {
+     "to": "BO-524",
+     "trigger": "Back to Rental Pricing Command Center",
+     "provenance": "structural — pack board 4 wiring, 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§For customer-defined durations; Configure) and no display directory — it is settings, not a population",
+  "purpose": "Configure pricing according to rental duration. This directly implements the fixed and dynamic-duration requirements.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "Minimum Charge: AED 40",
+       "provenance": "pack Rental_Management.pdf, page 40 §For customer-defined durations"
+      },
+      {
+       "kind": "textField",
+       "label": "Billing Increment: 15 minutes",
+       "provenance": "pack Rental_Management.pdf, page 40 §For customer-defined durations"
+      },
+      {
+       "kind": "textField",
+       "label": "Additional Increment: AED 10",
+       "provenance": "pack Rental_Management.pdf, page 40 §For customer-defined durations"
+      },
+      {
+       "kind": "selectField",
+       "label": "Exact usage",
+       "provenance": "pack Rental_Management.pdf, page 40 §Configure"
+      },
+      {
+       "kind": "textField",
+       "label": "Round up to 15 minutes",
+       "provenance": "pack Rental_Management.pdf, page 40 §Configure"
+      },
+      {
+       "kind": "textField",
+       "label": "Round up to 30 minutes",
+       "provenance": "pack Rental_Management.pdf, page 40 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Full next hour",
+       "provenance": "pack Rental_Management.pdf, page 40 §Configure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The duration tiered pricing configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the duration tiered pricing untouched.",
+   "emptyFirstRun": "No duration tiered pricing configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-526"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 40. 0 of 0 labels bound to a contract property; 7 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-527",
+  "name": "Calendar, Peak & Seasonal Pricing",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Rental_Management.pdf",
+   "board": "4",
+   "number": "4",
+   "page": 41
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/calendar-peak-seasonal-pricing-bo-527",
+   "component": "apps/venue-management-web/src/routes/rentals/CalendarPeakSeasonalPricing.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-524"
+   ],
+   "exitTo": [
+    "BO-524"
+   ],
+   "transitions": [
+    {
+     "to": "BO-524",
+     "trigger": "Back to Rental Pricing Command Center",
+     "provenance": "structural — pack board 4 wiring, 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Allow price differentiation according to date and time.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Rental_Management.pdf, page 41"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Rental_Management.pdf, page 41"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": []
+  },
+  "states": {
+   "loading": "The calendar peak seasonal list.",
+   "error": "Could not load. Names which read failed and leaves the calendar peak seasonal untouched.",
+   "emptyFirstRun": "No calendar peak seasonal yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the calendar peak seasonal are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-527"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 41. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-528",
+  "name": "Dynamic Pricing & AI Recommendation",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Rental_Management.pdf",
+   "board": "4",
+   "number": "5",
+   "page": 42
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/dynamic-pricing-ai-recommendation-bo-528",
+   "component": "apps/venue-management-web/src/routes/rentals/DynamicPricingAiRecommendation.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-524"
+   ],
+   "exitTo": [
+    "BO-524"
+   ],
+   "transitions": [
+    {
+     "to": "BO-524",
+     "trigger": "Back to Rental Pricing Command Center",
+     "provenance": "structural — pack board 4 wiring, 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Connect Rental Management to TICVAI's broader Dynamic Pricing capability without duplicating the core Dynamic Pricing module. The original rental requirements explicitly support dynamic pricing.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved: Accept | Modify | Reject | Schedule. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Rental_Management.pdf, page 42 §Actions"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Rental_Management.pdf, page 42"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Rental_Management.pdf, page 42"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Accept | Modify | Reject | Schedule",
+       "provenance": "pack Rental_Management.pdf, page 42 §Actions"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The dynamic pricing recommendation list.",
+   "error": "Could not load. Names which read failed and leaves the dynamic pricing recommendation untouched.",
+   "emptyFirstRun": "No dynamic pricing recommendation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the dynamic pricing recommendation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-528"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 42. 0 of 0 labels bound to a contract property; 1 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-529",
+  "name": "Deposit & Security Hold Policy",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Rental_Management.pdf",
+   "board": "4",
+   "number": "6",
+   "page": 43
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/deposit-security-hold-policy-bo-529",
+   "component": "apps/venue-management-web/src/routes/rentals/DepositSecurityHoldPolicy.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-524"
+   ],
+   "exitTo": [
+    "BO-524"
+   ],
+   "transitions": [
+    {
+     "to": "BO-524",
+     "trigger": "Back to Rental Pricing Command Center",
+     "provenance": "structural — pack board 4 wiring, 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Configure financial security required before equipment is released. The original scope supports fixed and percentage deposits and multiple deposit methods.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Credit Card Pre-Authorization, Card Charge, Wallet. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Rental_Management.pdf, page 43 §Enable"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Rental_Management.pdf, page 43"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Rental_Management.pdf, page 43"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Credit Card Pre-Authorization",
+       "provenance": "pack Rental_Management.pdf, page 43 §Enable"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Card Charge",
+       "provenance": "pack Rental_Management.pdf, page 43 §Enable"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Wallet",
+       "provenance": "pack Rental_Management.pdf, page 43 §Enable"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The deposit security hold list.",
+   "error": "Could not load. Names which read failed and leaves the deposit security hold untouched.",
+   "emptyFirstRun": "No deposit security hold yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the deposit security hold are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-529"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 43. 0 of 0 labels bound to a contract property; 3 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-530",
+  "name": "Deposit Lifecycle & Settlement Rules",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Rental_Management.pdf",
+   "board": "4",
+   "number": "7",
+   "page": 44
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/deposit-lifecycle-settlement-rules-bo-530",
+   "component": "apps/venue-management-web/src/routes/rentals/DepositLifecycleSettlementRules.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-524"
+   ],
+   "exitTo": [
+    "BO-524"
+   ],
+   "transitions": [
+    {
+     "to": "BO-524",
+     "trigger": "Back to Rental Pricing Command Center",
+     "provenance": "structural — pack board 4 wiring, 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Control what happens to the deposit throughout the rental lifecycle.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Automatic release",
+       "provenance": "pack Rental_Management.pdf, page 44 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Manual inspection required",
+       "provenance": "pack Rental_Management.pdf, page 44 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Supervisor approval threshold",
+       "provenance": "pack Rental_Management.pdf, page 44 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Partial capture permitted",
+       "provenance": "pack Rental_Management.pdf, page 44 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Full capture permitted",
+       "provenance": "pack Rental_Management.pdf, page 44 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Auto-release delay",
+       "provenance": "pack Rental_Management.pdf, page 44 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Refund method",
+       "provenance": "pack Rental_Management.pdf, page 44 §Configure"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The deposit lifecycle settlement configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the deposit lifecycle settlement untouched.",
+   "emptyFirstRun": "No deposit lifecycle settlement configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-530"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 44. 0 of 0 labels bound to a contract property; 7 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-531",
+  "name": "Late Fee, Grace Period & Extension Pricing",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Rental_Management.pdf",
+   "board": "4",
+   "number": "8",
+   "page": 44
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/late-fee-grace-period-extension-pricing-bo-531",
+   "component": "apps/venue-management-web/src/routes/rentals/LateFeeGracePeriodExtensionPricing.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-524"
+   ],
+   "exitTo": [
+    "BO-524"
+   ],
+   "transitions": [
+    {
+     "to": "BO-524",
+     "trigger": "Back to Rental Pricing Command Center",
+     "provenance": "structural — pack board 4 wiring, 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Select) and no display directory — it is settings, not a population",
+  "purpose": "Configure the commercial treatment of rentals that extend beyond the original return time. The source explicitly requires automatic late-fee calculation and grace-period configuration.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Fixed Fee",
+       "provenance": "pack Rental_Management.pdf, page 44 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Per Minute",
+       "provenance": "pack Rental_Management.pdf, page 44 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Per 15 Minutes",
+       "provenance": "pack Rental_Management.pdf, page 44 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Per 30 Minutes",
+       "provenance": "pack Rental_Management.pdf, page 44 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Per Hour",
+       "provenance": "pack Rental_Management.pdf, page 44 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tiered",
+       "provenance": "pack Rental_Management.pdf, page 44 §Select"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum Daily Charge",
+       "provenance": "pack Rental_Management.pdf, page 44 §Select"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The late fee grace configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the late fee grace untouched.",
+   "emptyFirstRun": "No late fee grace configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-531"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 44. 0 of 0 labels bound to a contract property; 7 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-532",
+  "name": "Commercial Exceptions, Waivers & Overrides",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Rental_Management.pdf",
+   "board": "4",
+   "number": "9",
+   "page": 45
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/commercial-exceptions-waivers-overrides-bo-532",
+   "component": "apps/venue-management-web/src/routes/rentals/CommercialExceptionsWaiversOverrides.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-524"
+   ],
+   "exitTo": [
+    "BO-524"
+   ],
+   "transitions": [
+    {
+     "to": "BO-524",
+     "trigger": "Back to Rental Pricing Command Center",
+     "provenance": "structural — pack board 4 wiring, 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Control authorized deviations from normal commercial policies.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Rental_Management.pdf, page 45"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Rental_Management.pdf, page 45"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": []
+  },
+  "states": {
+   "loading": "The commercial exceptions waivers list.",
+   "error": "Could not load. Names which read failed and leaves the commercial exceptions waivers untouched.",
+   "emptyFirstRun": "No commercial exceptions waivers yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the commercial exceptions waivers are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-532"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 45. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "BO-533",
+  "name": "Pricing Simulation, Validation & AI Commercial Intelligence",
+  "module": "Rentals",
+  "requiresModule": "resources",
+  "wave": 3,
+  "source": {
+   "pack": "Rental_Management.pdf",
+   "board": "4",
+   "number": "10",
+   "page": 46
+  },
+  "implementation": {
+   "app": "venue-management-web",
+   "route": "/rentals/pricing-simulation-validation-ai-commercial-intelligence-bo-533",
+   "component": "apps/venue-management-web/src/routes/rentals/PricingSimulationValidationAiCommercialIntellige.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "BO-524"
+   ],
+   "exitTo": [
+    "BO-524"
+   ],
+   "transitions": [
+    {
+     "to": "BO-524",
+     "trigger": "Back to Rental Pricing Command Center",
+     "provenance": "structural — pack board 4 wiring, 11 September 2026",
+     "back": true
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Allow administrators to test commercial configuration before publishing it. This is particularly important because rental pricing can involve duration, calendar, location, deposit and dynamic pricing simultaneously.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Rental_Management.pdf, page 46"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Rental_Management.pdf, page 46"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": []
+  },
+  "states": {
+   "loading": "The pricing simulation validation list.",
+   "error": "Could not load. Names which read failed and leaves the pricing simulation validation untouched.",
+   "emptyFirstRun": "No pricing simulation validation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the pricing simulation validation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [],
+  "wireframe": {
+   "status": "notStarted",
+   "board": "wireframes/P08 Venue Management.dc.html#bo-533"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 46. 0 of 0 labels bound to a contract property; 0 of 51 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P08",
+   "audience": "staff",
+   "formFactor": "web",
+   "shortName": "Venue Management",
+   "name": "Venue Management — Back Office",
+   "offlineCapable": false,
+   "app": "venue-management-web",
+   "operator": "venue",
+   "targetApp": {
+    "app": "venue-management",
+    "name": "TICVAI Venue Management",
+    "shell": "web",
+    "siblings": [
+     "P12",
+     "P13",
+     "P16"
+    ],
+    "note": "**Already one app in all but name** — P08, P13 and P16 declared the same `app` before this decision. One tenant-level surface that filters across venues, with analytics, CMS and the support desk as sections of it.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

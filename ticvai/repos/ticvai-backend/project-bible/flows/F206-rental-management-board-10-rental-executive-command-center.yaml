@@ -1,0 +1,137 @@
+id: F206
+name: 'Rental Management board 10: Rental Executive Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Rental Management board 10. **This route is read from the
+    screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-584
+  entryPoints:
+  - Arrives at Rental Executive Command Center
+steps:
+- step: 1
+  screen: BO-584
+  action: Opens Rental Executive Command Center
+  operations: []
+  outcome: Provide senior management with an immediate view of the overall rental business.
+- step: 2
+  screen: BO-585
+  action: Works in Rental Revenue & Commercial Analytics
+  operations: []
+  outcome: Analyze rental commercial performance. The original scope specifically requires reporting on
+    rental revenue.
+- step: 3
+  screen: BO-584
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-586
+  action: Works in Utilization & Capacity Analytics
+  operations: []
+  outcome: Understand how efficiently rental inventory is being used. The original requirements specifically
+    call for utilization-rate reporting.
+- step: 5
+  screen: BO-584
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-587
+  action: Works in Inventory & Equipment Performance Analytics
+  operations: []
+  outcome: Measure the operational performance of the physical rental fleet. The original requirements
+    call for reporting on inventory availability and equipment performance.
+- step: 7
+  screen: BO-584
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-588
+  action: Works in Rental Duration, Extension & Return Analytics
+  operations: []
+  outcome: Understand customer usage behavior after checkout. The source explicitly requires reporting
+    on rental duration and late returns.
+- step: 9
+  screen: BO-584
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-589
+  action: Works in Damage, Loss, Deposit & Exception Analytics
+  operations: []
+  outcome: Give management visibility into operational and financial risk. The original scope explicitly
+    requires reporting on damaged items and deposit collection/refund.
+- step: 11
+  screen: BO-584
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-590
+  action: Works in Location & Channel Performance
+  operations: []
+  outcome: Compare rental performance across physical locations and sales channels.
+- step: 13
+  screen: BO-584
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-591
+  action: Works in Rental Forecasting & Demand Intelligence
+  operations: []
+  outcome: Forecast future rental demand and identify capacity problems before they happen. This formally
+    incorporates the AI utilization/demand forecasting recommendation from the source.
+- step: 15
+  screen: BO-584
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-592
+  action: Works in Audit, Governance & Operational Control
+  operations: []
+  outcome: Provide management and administrators with traceability across Rental Management. The source
+    requires role-based permissions and audit logging for rental operations.
+- step: 17
+  screen: BO-584
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-593
+  action: Works in AI Rental Management Copilot & Action Center
+  operations: []
+  outcome: Provide a natural-language AI interface across the complete Rental Management module. I strongly
+    recommend this as the final screen because it aligns the rental module with TICVAI's overall AI-first
+    architecture. Instead of management havin
+branches:
+- at: 1
+  condition: Nothing has been set up on Rental Executive Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Rental Management board 10 visited
+primaryContract: unknown
+contracts:
+- unknown

@@ -1,0 +1,1102 @@
+{
+ "AiCatalogueBuilderConfigurationReviewInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What AI Catalogue Builder & Configuration Review submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "typeANaturalLanguageRequest": {
+    "type": "string",
+    "description": "Type a natural-language request"
+   },
+   "andPublishingIt": {
+    "type": "string",
+    "description": "and publishing it"
+   },
+   "productSafely": {
+    "type": "string",
+    "description": "product safely?”"
+   },
+   "eventualDesign": {
+    "type": "string",
+    "description": "eventual design"
+   },
+   "scheduledLifecycleGovernanceAndOwnership": {
+    "type": "string",
+    "format": "date-time",
+    "description": "scheduled lifecycle governance and ownership"
+   },
+   "scheduledLifecycleGovernanceAndAccountability": {
+    "type": "string",
+    "format": "date-time",
+    "description": "scheduled lifecycle governance and accountability"
+   }
+  }
+ },
+ "AiCatalogueBuilderConfigurationReviewView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What AI Catalogue Builder & Configuration Review displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "typeANaturalLanguageRequest": {
+    "type": "string",
+    "description": "Type a natural-language request"
+   },
+   "andPublishingIt": {
+    "type": "string",
+    "description": "and publishing it"
+   },
+   "productSafely": {
+    "type": "string",
+    "description": "product safely?”"
+   },
+   "eventualDesign": {
+    "type": "string",
+    "description": "eventual design"
+   },
+   "scheduledLifecycleGovernanceAndOwnership": {
+    "type": "string",
+    "format": "date-time",
+    "description": "scheduled lifecycle governance and ownership"
+   },
+   "scheduledLifecycleGovernanceAndAccountability": {
+    "type": "string",
+    "format": "date-time",
+    "description": "scheduled lifecycle governance and accountability"
+   }
+  }
+ },
+ "BulkProductCreationCatalogueImportInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Bulk Product Creation & Catalogue Import submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "excel": {
+    "type": "string",
+    "description": "Excel"
+   },
+   "csv": {
+    "type": "string",
+    "description": "CSV"
+   },
+   "structuredSpreadsheetTemplates": {
+    "type": "string",
+    "description": "Structured spreadsheet templates"
+   },
+   "existingCatalogueFiles": {
+    "type": "string",
+    "description": "Existing catalogue files"
+   },
+   "pdfBrochures": {
+    "type": "string",
+    "description": "PDF brochures"
+   },
+   "productDocuments": {
+    "type": "string",
+    "description": "Product documents"
+   },
+   "previewProductsBeforeCreation": {
+    "type": "string",
+    "description": "Preview products before creation"
+   },
+   "correctErrors": {
+    "type": "integer",
+    "description": "Correct errors"
+   },
+   "excludeSelectedRecords": {
+    "type": "string",
+    "description": "Exclude selected records"
+   }
+  }
+ },
+ "BulkProductCreationCatalogueImportView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Bulk Product Creation & Catalogue Import displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "excel": {
+    "type": "string",
+    "description": "Excel"
+   },
+   "csv": {
+    "type": "string",
+    "description": "CSV"
+   },
+   "structuredSpreadsheetTemplates": {
+    "type": "string",
+    "description": "Structured spreadsheet templates"
+   },
+   "existingCatalogueFiles": {
+    "type": "string",
+    "description": "Existing catalogue files"
+   },
+   "pdfBrochures": {
+    "type": "string",
+    "description": "PDF brochures"
+   },
+   "productDocuments": {
+    "type": "string",
+    "description": "Product documents"
+   },
+   "previewProductsBeforeCreation": {
+    "type": "string",
+    "description": "Preview products before creation"
+   },
+   "correctErrors": {
+    "type": "integer",
+    "description": "Correct errors"
+   },
+   "excludeSelectedRecords": {
+    "type": "string",
+    "description": "Exclude selected records"
+   }
+  }
+ },
+ "Channel": {
+  "type": "string",
+  "enum": [
+   "pos",
+   "kiosk",
+   "web",
+   "mobile",
+   "b2b",
+   "ota",
+   "callCentre"
+  ]
+ },
+ "ChannelPublicationAvailabilityInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Channel Publication & Availability submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "enableDisableChannels": {
+    "type": "boolean",
+    "description": "Enable/disable channels"
+   },
+   "previewPublicationStatus": {
+    "type": "string",
+    "description": "Preview publication status"
+   },
+   "detectMissingChannelDependencies": {
+    "type": "string",
+    "description": "Detect missing channel dependencies"
+   }
+  }
+ },
+ "ChannelPublicationAvailabilityView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Channel Publication & Availability displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "enableDisableChannels": {
+    "type": "boolean",
+    "description": "Enable/disable channels"
+   },
+   "previewPublicationStatus": {
+    "type": "string",
+    "description": "Preview publication status"
+   },
+   "detectMissingChannelDependencies": {
+    "type": "string",
+    "description": "Detect missing channel dependencies"
+   }
+  }
+ },
+ "CreateProductRequest": {
+  "type": "object",
+  "required": [
+   "code",
+   "name",
+   "kind",
+   "venueId"
+  ],
+  "properties": {
+   "code": {
+    "type": "string",
+    "maxLength": 64,
+    "pattern": "^[A-Za-z0-9_-]+$"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/ProductKind"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "channels": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/Channel"
+    }
+   },
+   "entitlementTemplateId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "dataMaskValues": {
+    "type": "object",
+    "additionalProperties": true
+   }
+  }
+ },
+ "LifecycleStatusWorkflowConfigurationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Lifecycle Status & Workflow Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "availableLifecycleStatuses": {
+    "type": "string",
+    "description": "Available lifecycle statuses"
+   },
+   "statusSequence": {
+    "type": "string",
+    "description": "Status sequence"
+   },
+   "allowedStatusTransitions": {
+    "type": "string",
+    "description": "Allowed status transitions"
+   },
+   "requiredInformationBeforeTransition": {
+    "type": "string",
+    "description": "Required information before transition"
+   },
+   "whetherApprovalIsRequired": {
+    "type": "boolean",
+    "description": "Whether approval is required"
+   },
+   "notificationTriggers": {
+    "type": "string",
+    "description": "Notification triggers"
+   },
+   "effectiveDateRequirements": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Effective-date requirements"
+   },
+   "validationRequirements": {
+    "type": "string",
+    "description": "Validation requirements"
+   },
+   "reasonCommentRequirements": {
+    "type": "string",
+    "description": "Reason/comment requirements"
+   },
+   "statusSpecificEditPermissions": {
+    "type": "string",
+    "description": "Status-specific edit permissions"
+   }
+  }
+ },
+ "LifecycleStatusWorkflowConfigurationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Lifecycle Status & Workflow Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "availableLifecycleStatuses": {
+    "type": "string",
+    "description": "Available lifecycle statuses"
+   },
+   "statusSequence": {
+    "type": "string",
+    "description": "Status sequence"
+   },
+   "allowedStatusTransitions": {
+    "type": "string",
+    "description": "Allowed status transitions"
+   },
+   "requiredInformationBeforeTransition": {
+    "type": "string",
+    "description": "Required information before transition"
+   },
+   "whetherApprovalIsRequired": {
+    "type": "boolean",
+    "description": "Whether approval is required"
+   },
+   "notificationTriggers": {
+    "type": "string",
+    "description": "Notification triggers"
+   },
+   "effectiveDateRequirements": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Effective-date requirements"
+   },
+   "validationRequirements": {
+    "type": "string",
+    "description": "Validation requirements"
+   },
+   "reasonCommentRequirements": {
+    "type": "string",
+    "description": "Reason/comment requirements"
+   },
+   "statusSpecificEditPermissions": {
+    "type": "string",
+    "description": "Status-specific edit permissions"
+   }
+  }
+ },
+ "Product": {
+  "x-ticvai-persistence": "catalogue.product",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "kind",
+   "venueId",
+   "scopePath",
+   "isSellable",
+   "hasVariants"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "description": {
+    "type": "string"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/ProductKind"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scopePath": {
+    "type": "string"
+   },
+   "createdByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "description": "1.4.18. **The approval gate refuses an approver who is the author, and nothing recorded either.** `SeatBlock`, `DelegatedAccess` and `ManualDiscountRequest` all carry this and the product passing through approval did not.\n"
+   },
+   "approvedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "responsibleDepartmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Who owns this product commercially. A scope node at `department` level."
+   },
+   "onSaleFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "1.4.8. **A seasonal product should not need somebody awake at midnight.** Archiving already runs on a timer in this contract, so the machinery exists; `effectiveFrom` appears on tax codes, FX rates and white-label policies and not here.\n"
+   },
+   "onSaleTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Retires the product automatically. **Retirement is not deletion** — the product stops selling and every order that referenced it still resolves.\n"
+   },
+   "lifecycleState": {
+    "$ref": "#/components/schemas/ProductLifecycleState"
+   },
+   "isSellable": {
+    "type": "boolean",
+    "description": "True only when live **and** carried by a published bundle. Approval and publication are different acts.\n"
+   },
+   "hasVariants": {
+    "type": "boolean"
+   },
+   "variantCount": {
+    "type": "integer"
+   },
+   "segmentTags": {
+    "type": "array",
+    "description": "7.3.5. **A channel and a segment tag are mandatory and nothing required either.** A catalogue that cannot be filtered by segment is a catalogue nobody can report on.\n**Hierarchical, not flat** — `family/with-toddlers` narrows `family` without duplicating it, which is how the promotions engine already treats scope.\n",
+    "items": {
+     "type": "string"
+    }
+   },
+   "codeSchema": {
+    "type": "string",
+    "readOnly": true,
+    "description": "7.3.4 specifies `[ParkCode]-[ProductType]-[Variant]`. **`Product.code` existed and nothing required a format**, so a venue with three thousand products had three thousand conventions.\nThe tenant sets the pattern and the platform generates against it. **Validation is the point, not the string** — a code typed by hand is a code that will not sort.\n"
+   },
+   "channels": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/Channel"
+    }
+   },
+   "entitlementTemplateId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "What the buyer receives. Null for products that grant nothing — F&B and retail. Identity and entitlement are separate concerns.\n"
+   },
+   "blockedOffline": {
+    "type": "boolean",
+    "description": "True for seated and retail. Seated because a seat map is not a count; retail because stock depletes in real time.\n"
+   },
+   "dataMaskValues": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "Custom fields. JSONB-backed, defined by the venue's data mask."
+   }
+  }
+ },
+ "ProductContextOwnershipAssignmentInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Product Context, Ownership & Assignment submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "tenant": {
+    "type": "string",
+    "description": "Tenant"
+   },
+   "businessUnit": {
+    "type": "string",
+    "description": "Business unit"
+   },
+   "legalEntity": {
+    "type": "string",
+    "description": "Legal entity"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "site": {
+    "type": "string",
+    "description": "Site"
+   },
+   "location": {
+    "type": "string",
+    "description": "Location"
+   },
+   "productOwner": {
+    "type": "string",
+    "description": "Product owner"
+   },
+   "creator": {
+    "type": "string",
+    "description": "Creator"
+   },
+   "responsibleDepartment": {
+    "type": "string",
+    "description": "Responsible department"
+   },
+   "operationalContact": {
+    "type": "string",
+    "description": "Operational contact"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer segment"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "salesTerritory": {
+    "type": "string",
+    "description": "Sales territory"
+   },
+   "brand": {
+    "type": "string",
+    "description": "Brand"
+   },
+   "productFamily": {
+    "type": "string",
+    "description": "Product family"
+   },
+   "segments": {
+    "type": "string",
+    "description": "segments"
+   }
+  }
+ },
+ "ProductContextOwnershipAssignmentView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Product Context, Ownership & Assignment displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "tenant": {
+    "type": "string",
+    "description": "Tenant"
+   },
+   "businessUnit": {
+    "type": "string",
+    "description": "Business unit"
+   },
+   "legalEntity": {
+    "type": "string",
+    "description": "Legal entity"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "site": {
+    "type": "string",
+    "description": "Site"
+   },
+   "location": {
+    "type": "string",
+    "description": "Location"
+   },
+   "productOwner": {
+    "type": "string",
+    "description": "Product owner"
+   },
+   "creator": {
+    "type": "string",
+    "description": "Creator"
+   },
+   "responsibleDepartment": {
+    "type": "string",
+    "description": "Responsible department"
+   },
+   "operationalContact": {
+    "type": "string",
+    "description": "Operational contact"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer segment"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "salesTerritory": {
+    "type": "string",
+    "description": "Sales territory"
+   },
+   "brand": {
+    "type": "string",
+    "description": "Brand"
+   },
+   "productFamily": {
+    "type": "string",
+    "description": "Product family"
+   },
+   "segments": {
+    "type": "string",
+    "description": "segments"
+   }
+  }
+ },
+ "ProductDuplicationTemplateLibraryView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Product Duplication & Template Library displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "optionsType": {
+    "type": "string",
+    "enum": [
+     "coreProductDetails",
+     "validity",
+     "pricingReferences",
+     "entitlements",
+     "capacityReferences",
+     "eligibility",
+     "salesChannels",
+     "media",
+     "policies",
+     "rules",
+     "content",
+     "images",
+     "relationships"
+    ],
+    "description": "Vocabulary listed under Duplication Options."
+   },
+   "standardAdmission": {
+    "type": "string",
+    "description": "Standard Admission"
+   },
+   "childAdmission": {
+    "type": "string",
+    "description": "Child Admission"
+   },
+   "vipTicket": {
+    "type": "string",
+    "description": "VIP Ticket"
+   },
+   "timeslotTicket": {
+    "type": "string",
+    "description": "Timeslot Ticket"
+   },
+   "eventTicket": {
+    "type": "string",
+    "description": "Event Ticket"
+   },
+   "groupProduct": {
+    "type": "string",
+    "description": "Group Product"
+   },
+   "annualPass": {
+    "type": "string",
+    "description": "Annual Pass"
+   },
+   "addOn": {
+    "type": "string",
+    "description": "Add-On"
+   },
+   "venueSpecificTemplates": {
+    "type": "string",
+    "description": "Venue-specific templates"
+   },
+   "dates": {
+    "type": "string",
+    "description": "Dates"
+   },
+   "prices": {
+    "type": "string",
+    "description": "Prices"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "capacity": {
+    "type": "integer",
+    "description": "Capacity"
+   },
+   "event": {
+    "type": "string",
+    "description": "Event"
+   },
+   "tax": {
+    "type": "string",
+    "description": "Tax"
+   },
+   "channels": {
+    "type": "string",
+    "description": "Channels"
+   }
+  }
+ },
+ "ProductImportExportEnvironmentTransferView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Product Import / Export & Environment Transfer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "mapVenueLocationReferences": {
+    "type": "string",
+    "description": "Map venue/location references"
+   },
+   "mapDependencies": {
+    "type": "string",
+    "description": "Map dependencies"
+   },
+   "detectMissingReferences": {
+    "type": "string",
+    "description": "Detect missing references"
+   },
+   "previewChanges": {
+    "type": "string",
+    "description": "Preview changes"
+   },
+   "executeTransfer": {
+    "type": "string",
+    "description": "Execute transfer"
+   }
+  }
+ },
+ "ProductKind": {
+  "type": "string",
+  "description": "**`openDated` added 24 August** from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: **valid on any date within an eligible range, rather than for a named performance or a fixed date.**\nThe mechanism already existed — `access.entitlement` carries `valid_from`, `valid_to`, `entries_allowed` and `frozen_days`, which is exactly an open-dated pass. **What was missing was the product saying it is one**, so a catalogue could not offer it and a report could not count it.\n**`datedAdmission` is a different thing and the two were being conflated**: dated is *this Tuesday*, open-dated is *any Tuesday between March and June*. A guest buying the second and being sold the first has bought the wrong ticket.\n",
+  "enum": [
+   "admission",
+   "timedAdmission",
+   "datedAdmission",
+   "openDated",
+   "seated",
+   "membership",
+   "bundle",
+   "fnb",
+   "retail",
+   "rental",
+   "addOn",
+   "giftCard"
+  ]
+ },
+ "ProductLifecycleCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Product Lifecycle Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "showCurrentLifecycleStatus": {
+    "type": "string",
+    "description": "Show current lifecycle status"
+   },
+   "oDraft": {
+    "type": "string",
+    "description": "o Draft"
+   },
+   "oInConfiguration": {
+    "type": "string",
+    "description": "o In Configuration"
+   },
+   "oPendingApproval": {
+    "type": "string",
+    "description": "o Pending Approval"
+   },
+   "oApproved": {
+    "type": "string",
+    "description": "o Approved"
+   },
+   "oScheduled": {
+    "type": "string",
+    "format": "date-time",
+    "description": "o Scheduled"
+   },
+   "oPublished": {
+    "type": "string",
+    "description": "o Published"
+   },
+   "oActive": {
+    "type": "integer",
+    "description": "o Active"
+   },
+   "oSuspended": {
+    "type": "string",
+    "description": "o Suspended"
+   },
+   "oDisabled": {
+    "type": "string",
+    "description": "o Disabled"
+   },
+   "oRetired": {
+    "type": "string",
+    "description": "o Retired"
+   },
+   "oArchived": {
+    "type": "string",
+    "description": "o Archived"
+   },
+   "showPublicationStatusByChannel": {
+    "type": "string",
+    "description": "Show publication status by channel"
+   },
+   "displayEffectiveActivationDates": {
+    "type": "string",
+    "description": "Display effective/activation dates"
+   },
+   "showPendingLifecycleActions": {
+    "type": "string",
+    "description": "Show pending lifecycle actions"
+   },
+   "allowAdvancedFilteringBy": {
+    "type": "boolean",
+    "description": "Allow advanced filtering by"
+   },
+   "oProductType": {
+    "type": "string",
+    "description": "o Product type"
+   },
+   "oVenue": {
+    "type": "string",
+    "description": "o Venue"
+   },
+   "oLocation": {
+    "type": "string",
+    "description": "o Location"
+   },
+   "oStatus": {
+    "type": "string",
+    "description": "o Status"
+   },
+   "oOwner": {
+    "type": "string",
+    "description": "o Owner"
+   },
+   "oDepartment": {
+    "type": "string",
+    "description": "o Department"
+   },
+   "oChannel": {
+    "type": "string",
+    "description": "o Channel"
+   },
+   "oEffectiveDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "o Effective date"
+   },
+   "oCreationDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "o Creation date"
+   },
+   "oLastModification": {
+    "type": "string",
+    "description": "o Last modification"
+   }
+  }
+ },
+ "ProductLifecycleState": {
+  "type": "string",
+  "enum": [
+   "draft",
+   "inReview",
+   "approved",
+   "live",
+   "withdrawn",
+   "archived"
+  ]
+ },
+ "PublicationActivationSchedulerInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.channel_allocation at 4%, so this is not an update to anything the package stores today and no new table has been decided",
+  "description": "**What Publication & Activation Scheduler submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "publication": {
+    "type": "string",
+    "description": "Publication"
+   },
+   "salesStart": {
+    "type": "string",
+    "description": "Sales start"
+   },
+   "activation": {
+    "type": "string",
+    "description": "Activation"
+   },
+   "salesSuspension": {
+    "type": "string",
+    "description": "Sales suspension"
+   },
+   "deactivation": {
+    "type": "string",
+    "description": "Deactivation"
+   },
+   "endOfSale": {
+    "type": "string",
+    "description": "End of sale"
+   },
+   "retirementTrigger": {
+    "type": "string",
+    "description": "Retirement trigger"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "time": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time"
+   },
+   "timeZone": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time zone"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "statusTransition": {
+    "type": "string",
+    "description": "Status transition"
+   },
+   "notification": {
+    "type": "string",
+    "description": "Notification"
+   },
+   "preActionValidation": {
+    "type": "string",
+    "description": "Pre-action validation"
+   },
+   "failureHandling": {
+    "type": "string",
+    "description": "Failure handling"
+   },
+   "upcomingActivations": {
+    "type": "string",
+    "description": "Upcoming activations"
+   },
+   "upcomingPublications": {
+    "type": "string",
+    "description": "Upcoming publications"
+   },
+   "endOfSaleDates": {
+    "type": "string",
+    "description": "End-of-sale dates"
+   },
+   "scheduledSuspensions": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Scheduled suspensions"
+   },
+   "lifecycleConflicts": {
+    "type": "string",
+    "description": "Lifecycle conflicts"
+   },
+   "failedScheduledJobs": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Failed scheduled jobs"
+   }
+  }
+ },
+ "PublicationActivationSchedulerView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over catalogue state, assembled at read time from tables that already exist",
+  "description": "**What Publication & Activation Scheduler displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "publication": {
+    "type": "string",
+    "description": "Publication"
+   },
+   "salesStart": {
+    "type": "string",
+    "description": "Sales start"
+   },
+   "activation": {
+    "type": "string",
+    "description": "Activation"
+   },
+   "salesSuspension": {
+    "type": "string",
+    "description": "Sales suspension"
+   },
+   "deactivation": {
+    "type": "string",
+    "description": "Deactivation"
+   },
+   "endOfSale": {
+    "type": "string",
+    "description": "End of sale"
+   },
+   "retirementTrigger": {
+    "type": "string",
+    "description": "Retirement trigger"
+   },
+   "date": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Date"
+   },
+   "time": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time"
+   },
+   "timeZone": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Time zone"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "product": {
+    "type": "string",
+    "description": "Product"
+   },
+   "statusTransition": {
+    "type": "string",
+    "description": "Status transition"
+   },
+   "notification": {
+    "type": "string",
+    "description": "Notification"
+   },
+   "preActionValidation": {
+    "type": "string",
+    "description": "Pre-action validation"
+   },
+   "failureHandling": {
+    "type": "string",
+    "description": "Failure handling"
+   },
+   "upcomingActivations": {
+    "type": "string",
+    "description": "Upcoming activations"
+   },
+   "upcomingPublications": {
+    "type": "string",
+    "description": "Upcoming publications"
+   },
+   "endOfSaleDates": {
+    "type": "string",
+    "description": "End-of-sale dates"
+   },
+   "scheduledSuspensions": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Scheduled suspensions"
+   },
+   "lifecycleConflicts": {
+    "type": "string",
+    "description": "Lifecycle conflicts"
+   },
+   "failedScheduledJobs": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Failed scheduled jobs"
+   }
+  }
+ }
+}

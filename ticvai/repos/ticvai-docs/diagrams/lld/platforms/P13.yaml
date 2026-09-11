@@ -1,5 +1,5 @@
 id: LLD-P13
-title: P13 Venue CMS — White Label — 60 screens
+title: P13 Venue CMS — White Label — 100 screens
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 audience: staff
@@ -20,7 +20,7 @@ deployment:
 why: null
 modulesUsed:
 - module: core
-  screens: 55
+  screens: 95
 - module: membership
   screens: 1
 - module: maintenance
@@ -47,9 +47,9 @@ servicesCalled:
 - service: OrderService
   operationCalls: 2
 coverage:
-  screens: 60
-  inAFlow: 49
-  drawn: 60
+  screens: 100
+  inAFlow: 89
+  drawn: 100
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
@@ -94,6 +94,10 @@ screens:
   - CMS-002
   - CMS-003
   - CMS-004
+  - CMS-061
+  - CMS-071
+  - CMS-081
+  - CMS-091
   boardFrames:
   - Marketing Board 7.dc.html#crm-7f
   wireframe: wireframes/P13 Venue CMS.dc.html#cms-001
@@ -1530,3 +1534,879 @@ screens:
   wireframe: wireframes/P13 Venue CMS.dc.html#cms-060
   inFlows:
   - 'F182 Waiver, Consent & Digital Form Management board 2: Waiver Operations Command Center'
+- screen: CMS-061
+  name: Digital Asset Management Command Center
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-001
+  - CMS-062
+  - CMS-063
+  - CMS-064
+  - CMS-065
+  - CMS-066
+  - CMS-067
+  - CMS-068
+  - CMS-069
+  - CMS-070
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-061
+  inFlows:
+  - 'F183 Digital Asset Management DAM board 1: Digital Asset Management Command Center'
+- screen: CMS-062
+  name: Central Digital Asset Library
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-061
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-062
+  inFlows:
+  - 'F183 Digital Asset Management DAM board 1: Digital Asset Management Command Center'
+- screen: CMS-063
+  name: Upload & Asset Ingestion Workspace
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-061
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-063
+  inFlows:
+  - 'F183 Digital Asset Management DAM board 1: Digital Asset Management Command Center'
+- screen: CMS-064
+  name: Folder, Collection & Workspace Management
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-061
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-064
+  inFlows:
+  - 'F183 Digital Asset Management DAM board 1: Digital Asset Management Command Center'
+- screen: CMS-065
+  name: Metadata & Taxonomy Management
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-061
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-065
+  inFlows:
+  - 'F183 Digital Asset Management DAM board 1: Digital Asset Management Command Center'
+- screen: CMS-066
+  name: Tags, Keywords & Classification
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-061
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-066
+  inFlows:
+  - 'F183 Digital Asset Management DAM board 1: Digital Asset Management Command Center'
+- screen: CMS-067
+  name: Advanced Search & Discovery
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-061
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-067
+  inFlows:
+  - 'F183 Digital Asset Management DAM board 1: Digital Asset Management Command Center'
+- screen: CMS-068
+  name: Digital Asset 360° Profile
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-061
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-068
+  inFlows:
+  - 'F183 Digital Asset Management DAM board 1: Digital Asset Management Command Center'
+- screen: CMS-069
+  name: Bulk Asset Management Workspace
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-061
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-069
+  inFlows:
+  - 'F183 Digital Asset Management DAM board 1: Digital Asset Management Command Center'
+- screen: CMS-070
+  name: Asset Activity, Recent Assets & Library Health
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-061
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-070
+  inFlows:
+  - 'F183 Digital Asset Management DAM board 1: Digital Asset Management Command Center'
+- screen: CMS-071
+  name: AI Asset Intelligence Command Center
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-001
+  - CMS-072
+  - CMS-073
+  - CMS-074
+  - CMS-075
+  - CMS-076
+  - CMS-077
+  - CMS-078
+  - CMS-079
+  - CMS-080
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-071
+  inFlows:
+  - 'F184 Digital Asset Management DAM board 2: AI Asset Intelligence Command Center'
+- screen: CMS-072
+  name: AI Auto-Tagging & Content Understanding
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-071
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-072
+  inFlows:
+  - 'F184 Digital Asset Management DAM board 2: AI Asset Intelligence Command Center'
+- screen: CMS-073
+  name: Semantic & Natural-Language Asset Search
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-071
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-073
+  inFlows:
+  - 'F184 Digital Asset Management DAM board 2: AI Asset Intelligence Command Center'
+- screen: CMS-074
+  name: Visual Similarity & Related Asset Discovery
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-071
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-074
+  inFlows:
+  - 'F184 Digital Asset Management DAM board 2: AI Asset Intelligence Command Center'
+- screen: CMS-075
+  name: Duplicate & Near-Duplicate Management
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-071
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-075
+  inFlows:
+  - 'F184 Digital Asset Management DAM board 2: AI Asset Intelligence Command Center'
+- screen: CMS-076
+  name: Asset Version Control & Revision History
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-071
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-076
+  inFlows:
+  - 'F184 Digital Asset Management DAM board 2: AI Asset Intelligence Command Center'
+- screen: CMS-077
+  name: Version Comparison & Replacement Impact
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-071
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-077
+  inFlows:
+  - 'F184 Digital Asset Management DAM board 2: AI Asset Intelligence Command Center'
+- screen: CMS-078
+  name: Transformation & Rendition Management
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-071
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-078
+  inFlows:
+  - 'F184 Digital Asset Management DAM board 2: AI Asset Intelligence Command Center'
+- screen: CMS-079
+  name: Rendition Processing & Delivery Readiness
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-071
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-079
+  inFlows:
+  - 'F184 Digital Asset Management DAM board 2: AI Asset Intelligence Command Center'
+- screen: CMS-080
+  name: AI Quality, Intelligence Review & Recommendations
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-071
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-080
+  inFlows:
+  - 'F184 Digital Asset Management DAM board 2: AI Asset Intelligence Command Center'
+- screen: CMS-081
+  name: DAM Governance & Rights Command Center
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-001
+  - CMS-082
+  - CMS-083
+  - CMS-084
+  - CMS-085
+  - CMS-086
+  - CMS-087
+  - CMS-088
+  - CMS-089
+  - CMS-090
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-081
+  inFlows:
+  - 'F185 Digital Asset Management DAM board 3: DAM Governance & Rights Command Center'
+- screen: CMS-082
+  name: Asset Ownership & Responsibility Management
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-081
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-082
+  inFlows:
+  - 'F185 Digital Asset Management DAM board 3: DAM Governance & Rights Command Center'
+- screen: CMS-083
+  name: Rights, License & Usage Policy Management
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-081
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-083
+  inFlows:
+  - 'F185 Digital Asset Management DAM board 3: DAM Governance & Rights Command Center'
+- screen: CMS-084
+  name: Asset Approval Workflow Management
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-081
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-084
+  inFlows:
+  - 'F185 Digital Asset Management DAM board 3: DAM Governance & Rights Command Center'
+- screen: CMS-085
+  name: Publication Eligibility & Governance Validation
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-081
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-085
+  inFlows:
+  - 'F185 Digital Asset Management DAM board 3: DAM Governance & Rights Command Center'
+- screen: CMS-086
+  name: Role-Based Asset Access & Permission Management
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-081
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-086
+  inFlows:
+  - 'F185 Digital Asset Management DAM board 3: DAM Governance & Rights Command Center'
+- screen: CMS-087
+  name: Secure Internal & External Sharing
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-081
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-087
+  inFlows:
+  - 'F185 Digital Asset Management DAM board 3: DAM Governance & Rights Command Center'
+- screen: CMS-088
+  name: Rights Expiry, Renewal & Usage Impact
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-081
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-088
+  inFlows:
+  - 'F185 Digital Asset Management DAM board 3: DAM Governance & Rights Command Center'
+- screen: CMS-089
+  name: Governance Audit Trail & Compliance Evidence
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-081
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-089
+  inFlows:
+  - 'F185 Digital Asset Management DAM board 3: DAM Governance & Rights Command Center'
+- screen: CMS-090
+  name: Governance Risk, Compliance & AI Recommendations
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-081
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-090
+  inFlows:
+  - 'F185 Digital Asset Management DAM board 3: DAM Governance & Rights Command Center'
+- screen: CMS-091
+  name: Asset Distribution & Delivery Command Center
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-001
+  - CMS-092
+  - CMS-093
+  - CMS-094
+  - CMS-095
+  - CMS-096
+  - CMS-097
+  - CMS-098
+  - CMS-099
+  - CMS-100
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-091
+  inFlows:
+  - 'F186 Digital Asset Management DAM board 4: Asset Distribution & Delivery Command Center'
+- screen: CMS-092
+  name: Asset Usage & Distribution Map
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-091
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-092
+  inFlows:
+  - 'F186 Digital Asset Management DAM board 4: Asset Distribution & Delivery Command Center'
+- screen: CMS-093
+  name: Channel & Distribution Configuration
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-091
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-093
+  inFlows:
+  - 'F186 Digital Asset Management DAM board 4: Asset Distribution & Delivery Command Center'
+- screen: CMS-094
+  name: Secure Delivery URL, CDN & Rendition Delivery
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-091
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-094
+  inFlows:
+  - 'F186 Digital Asset Management DAM board 4: Asset Distribution & Delivery Command Center'
+- screen: CMS-095
+  name: Asset Replacement & Propagation Management
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-091
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-095
+  inFlows:
+  - 'F186 Digital Asset Management DAM board 4: Asset Distribution & Delivery Command Center'
+- screen: CMS-096
+  name: Fallback, Expiry & Distribution Continuity
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-091
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-096
+  inFlows:
+  - 'F186 Digital Asset Management DAM board 4: Asset Distribution & Delivery Command Center'
+- screen: CMS-097
+  name: DAM API & Integration Hub
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-091
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-097
+  inFlows:
+  - 'F186 Digital Asset Management DAM board 4: Asset Distribution & Delivery Command Center'
+- screen: CMS-098
+  name: Delivery Monitoring & Integration Health
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-091
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-098
+  inFlows:
+  - 'F186 Digital Asset Management DAM board 4: Asset Distribution & Delivery Command Center'
+- screen: CMS-099
+  name: Asset Usage & Performance Analytics
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-091
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-099
+  inFlows:
+  - 'F186 Digital Asset Management DAM board 4: Asset Distribution & Delivery Command Center'
+- screen: CMS-100
+  name: Distribution Intelligence, AI Insights & Optimization
+  module: Media Library
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-091
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-100
+  inFlows:
+  - 'F186 Digital Asset Management DAM board 4: Asset Distribution & Delivery Command Center'

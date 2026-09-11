@@ -1,0 +1,1766 @@
+[
+ {
+  "id": "ADM-048",
+  "name": "Commercial Pricing Command Center",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "1",
+   "number": "10.1.1",
+   "page": 6
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/commercial-pricing-command-center-adm-048",
+   "component": "apps/ticvai-web/src/routes/commercial/CommercialPricingCommandCenter.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "exitTo": [
+    "ADM-002",
+    "ADM-049",
+    "ADM-050",
+    "ADM-051",
+    "ADM-052",
+    "ADM-053",
+    "ADM-054",
+    "ADM-055",
+    "ADM-056",
+    "ADM-057"
+   ],
+   "inferred": false,
+   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
+   "transitions": [
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-049",
+     "trigger": "Works in Price List Master Configuration",
+     "provenance": "flow F143 step 1→2",
+     "operation": "listCommercialPricing"
+    },
+    {
+     "to": "ADM-050",
+     "trigger": "Works in Price Category & Rate Type Library",
+     "provenance": "flow F143 step 3→4",
+     "operation": "listCommercialPricing"
+    },
+    {
+     "to": "ADM-051",
+     "trigger": "Works in Rate Structure Builder",
+     "provenance": "flow F143 step 5→6",
+     "operation": "listCommercialPricing"
+    },
+    {
+     "to": "ADM-052",
+     "trigger": "Works in Product & Service Price Assignment",
+     "provenance": "flow F143 step 7→8",
+     "operation": "listCommercialPricing"
+    },
+    {
+     "to": "ADM-053",
+     "trigger": "Works in Package, Bundle & Add-On Pricing",
+     "provenance": "flow F143 step 9→10",
+     "operation": "listCommercialPricing"
+    },
+    {
+     "to": "ADM-054",
+     "trigger": "Works in Market, Venue & Currency Pricing Structure",
+     "provenance": "flow F143 step 11→12",
+     "operation": "listCommercialPricing"
+    },
+    {
+     "to": "ADM-055",
+     "trigger": "Works in Price Hierarchy & Inheritance Configuration",
+     "provenance": "flow F143 step 13→14",
+     "operation": "listCommercialPricing"
+    },
+    {
+     "to": "ADM-056",
+     "trigger": "Works in Price List Templates, Clone & Reuse",
+     "provenance": "flow F143 step 15→16",
+     "operation": "listCommercialPricing"
+    },
+    {
+     "to": "ADM-057",
+     "trigger": "Works in Commercial Pricing Structure Validation",
+     "provenance": "flow F143 step 17→18",
+     "operation": "listCommercialPricing"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each price list should show) — counts over a population, then the population",
+  "purpose": "Provide the central administrative workspace for all commercial pricing structures across This is the first page a Revenue/Pricing Administrator sees when entering the module.",
+  "purposeNote": "Authorized administrators can view and manage TICVAI's complete commercial pricing portfolio from one centralized workspace.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: Create Price List, Duplicate, Open, Compare, Validate, View Dependencies, Export, Archive. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Quick Actions"
+   }
+  ],
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "filters",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search commercial pricing",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Filter by"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Filter by",
+       "columns": [
+        "CommercialPricingCommandCenterView.venue",
+        "CommercialPricingCommandCenterView.brand",
+        "CommercialPricingCommandCenterView.market",
+        "Country",
+        "CommercialPricingCommandCenterView.currency",
+        "Product Type",
+        "Price List Type",
+        "CommercialPricingCommandCenterView.owner",
+        "CommercialPricingCommandCenterView.status"
+       ],
+       "notes": "The pack filters this screen by venue, brand, market, country, currency, product type and 3 more — which are present is a decision the pack already made.",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Filter by"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Total Price Lists",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
+       "bindsTo": "CommercialPricingCommandCenterView.totalPriceLists"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Active Price Lists",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
+       "bindsTo": "CommercialPricingCommandCenterView.activePriceLists"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Draft Price Lists",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
+       "bindsTo": "CommercialPricingCommandCenterView.draftPriceLists"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Price Categories",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
+       "bindsTo": "CommercialPricingCommandCenterView.priceCategories"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Configured Rates",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
+       "bindsTo": "CommercialPricingCommandCenterView.configuredRates"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Products with Pricing",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
+       "bindsTo": "CommercialPricingCommandCenterView.productsWithPricing"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Products Missing Pricing",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
+       "bindsTo": "CommercialPricingCommandCenterView.productsMissingPricing"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Markets",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
+       "bindsTo": "CommercialPricingCommandCenterView.markets"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Currencies",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
+       "bindsTo": "CommercialPricingCommandCenterView.currencies"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pricing Validation Issues",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
+       "bindsTo": "CommercialPricingCommandCenterView.pricingValidationIssues"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Recently Modified Price Lists",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
+       "bindsTo": "CommercialPricingCommandCenterView.recentlyModifiedPriceLists"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Upcoming Price Structures",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Display",
+       "bindsTo": "CommercialPricingCommandCenterView.upcomingPriceStructures"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "moduleTiles",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every commercial pricing",
+       "columns": [
+        "CommercialPricingCommandCenterView.priceListId",
+        "CommercialPricingCommandCenterView.name",
+        "CommercialPricingCommandCenterView.code",
+        "CommercialPricingCommandCenterView.type",
+        "CommercialPricingCommandCenterView.currency",
+        "CommercialPricingCommandCenterView.market",
+        "CommercialPricingCommandCenterView.venue",
+        "CommercialPricingCommandCenterView.brand",
+        "CommercialPricingCommandCenterView.productCount",
+        "CommercialPricingCommandCenterView.rateCount",
+        "CommercialPricingCommandCenterView.effectivePeriod",
+        "CommercialPricingCommandCenterView.version",
+        "CommercialPricingCommandCenterView.status",
+        "CommercialPricingCommandCenterView.owner"
+       ],
+       "bindsTo": "CommercialPricingCommandCenterView",
+       "operation": "listCommercialPricing",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Each price list should show"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected commercial pricing",
+       "bindsTo": "CommercialPricingCommandCenterView",
+       "columns": [
+        "CommercialPricingCommandCenterView.priceListId",
+        "CommercialPricingCommandCenterView.name",
+        "CommercialPricingCommandCenterView.code",
+        "CommercialPricingCommandCenterView.type",
+        "CommercialPricingCommandCenterView.currency",
+        "CommercialPricingCommandCenterView.market",
+        "CommercialPricingCommandCenterView.venue",
+        "CommercialPricingCommandCenterView.brand",
+        "CommercialPricingCommandCenterView.productCount",
+        "CommercialPricingCommandCenterView.rateCount",
+        "CommercialPricingCommandCenterView.effectivePeriod",
+        "CommercialPricingCommandCenterView.version",
+        "CommercialPricingCommandCenterView.status",
+        "CommercialPricingCommandCenterView.owner"
+       ],
+       "notes": null,
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Each price list should show"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Create Price List",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Quick Actions",
+       "permission": "Create Price Lists"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Duplicate",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Quick Actions",
+       "permission": "Duplicate"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Open",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Compare",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Validate",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "View Dependencies",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Quick Actions"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Export",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Quick Actions",
+       "permission": "Export"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Archive",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Quick Actions",
+       "permission": "Archive"
+      },
+      {
+       "kind": "banner",
+       "label": "Permissions this screen separates",
+       "notes": "**The pack separates these permissions and no action on the screen claims them yet:** View Pricing, Modify Pricing Structure. Each needs attaching to the control it gates, or the screen needs the control.",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Separate permissions for"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmArchive",
+    "component": "confirmDialog",
+    "trigger": "Archive",
+    "body": "**Archive on a commercial pricing is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
+    "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 6 §Quick Actions"
+   }
+  ],
+  "states": {
+   "loading": "The commercial pricing list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the commercial pricing untouched.",
+   "emptyFirstRun": "No commercial pricing yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the commercial pricing are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCommercialPricing",
+    "contract": "catalogue",
+    "purpose": "Commercial Pricing Command Center",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-048"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 6. 32 of 35 labels bound to a contract property; 49 of 71 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-049",
+  "name": "Price List Master Configuration",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "1",
+   "number": "10.1.2",
+   "page": 8
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/price-list-master-configuration-adm-049",
+   "component": "apps/ticvai-web/src/routes/commercial/PriceListMasterConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-048"
+   ],
+   "exitTo": [
+    "ADM-048"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-048, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-048",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F143 step 2→3",
+     "operation": "setPriceListMaster"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "Create the master container that holds commercial rates. A Price List should be reusable across products and channels.",
+  "purposeNote": "Administrators can create reusable commercial price-list masters with clearly defined ownership, scope, currency, market, and business applicability.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Price List Name",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Price List Code",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Description",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Price List Type",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Legal Entity",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Brand",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Business Unit",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Country",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Market",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Default Currency",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Owner",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Tags",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Status",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Default Rate Category",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Default Rounding Profile",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Default Price Hierarchy",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Allow Overrides",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Allow Inheritance",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Allow Multiple Currencies",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Allow Product-Specific Rates",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 8 §Configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "provenance": "contract operation setPriceListMaster"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The price list master configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the price list master untouched.",
+   "emptyFirstRun": "No price list master configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setPriceListMaster",
+    "contract": "catalogue",
+    "purpose": "Price List Master Configuration",
+    "trigger": "onAction",
+    "invalidates": [
+     "setPriceListMaster"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-049"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 8. 0 of 0 labels bound to a contract property; 21 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-050",
+  "name": "Price Category & Rate Type Library",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "1",
+   "number": "10.1.3",
+   "page": 9
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/price-category-rate-type-library-adm-050",
+   "component": "apps/ticvai-web/src/routes/commercial/PriceCategoryRateTypeLibrary.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-048"
+   ],
+   "exitTo": [
+    "ADM-048"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-048, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-048",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F143 step 4→5",
+     "operation": "listPriceCategoryRate"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Define standardized commercial rate categories used across TICVAI. This avoids different venues independently creating categories such as: “Adult,” “Adult Standard,” “Normal Adult,” and “Full Adult.”",
+  "purposeNote": "types across all tenants, venues, and products.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 9"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 9"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listPriceCategoryRate",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The price category rate list.",
+   "error": "Could not load. Names which read failed and leaves the price category rate untouched.",
+   "emptyFirstRun": "No price category rate yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the price category rate are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listPriceCategoryRate",
+    "contract": "catalogue",
+    "purpose": "Price Category & Rate Type Library",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "PriceCategoryRateTypeLibraryView.adult",
+    "PriceCategoryRateTypeLibraryView.child",
+    "PriceCategoryRateTypeLibraryView.junior",
+    "PriceCategoryRateTypeLibraryView.senior",
+    "PriceCategoryRateTypeLibraryView.student"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-050"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 9. 0 of 0 labels bound to a contract property; 0 of 49 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-051",
+  "name": "Rate Structure Builder",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "1",
+   "number": "10.1.4",
+   "page": 11
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/rate-structure-builder-adm-051",
+   "component": "apps/ticvai-web/src/routes/commercial/RateStructureBuilder.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-048"
+   ],
+   "exitTo": [
+    "ADM-048"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-048, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-048",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F143 step 6→7",
+     "operation": "setRateStructure"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Detect) and no metric row",
+  "purpose": "Define the actual monetary rates contained within a price list. This is the core commercial configuration screen.",
+  "purposeNote": "Administrators can define monetary rate structures for all TICVAI commercial product types through configurable rate matrices.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Per Ticket, Per Membership Period. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 11 §Support"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every rate structure",
+       "columns": [
+        "Duplicate Rates",
+        "RateStructureBuilderView.missingAmounts",
+        "RateStructureBuilderView.unsupportedCurrency",
+        "RateStructureBuilderView.invalidDerivedRate",
+        "RateStructureBuilderView.circularRateRelationship"
+       ],
+       "bindsTo": "RateStructureBuilderView",
+       "operation": "setRateStructure",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 11 §Detect"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected rate structure",
+       "bindsTo": "RateStructureBuilderView",
+       "columns": [
+        "Duplicate Rates",
+        "RateStructureBuilderView.missingAmounts",
+        "RateStructureBuilderView.unsupportedCurrency",
+        "RateStructureBuilderView.invalidDerivedRate",
+        "RateStructureBuilderView.circularRateRelationship"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Adult”, “Child Reduced”, “Senior Reduced”, “Resident Reduced”, “Group Group”, “Each rate should contain”.",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 11 §Detect"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Per Ticket",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 11 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Per Membership Period",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 11 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The rate structure list.",
+   "error": "Could not load. Names which read failed and leaves the rate structure untouched.",
+   "emptyFirstRun": "No rate structure yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the rate structure are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setRateStructure",
+    "contract": "catalogue",
+    "purpose": "Rate Structure Builder",
+    "trigger": "onAction",
+    "invalidates": [
+     "setRateStructure"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Duplicate Rates",
+    "RateStructureBuilderView.missingAmounts",
+    "RateStructureBuilderView.unsupportedCurrency",
+    "RateStructureBuilderView.invalidDerivedRate",
+    "RateStructureBuilderView.circularRateRelationship"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-051"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 11. 4 of 5 labels bound to a contract property; 7 of 47 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-052",
+  "name": "Product & Service Price Assignment",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "1",
+   "number": "10.1.5",
+   "page": 13
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/product-service-price-assignment-adm-052",
+   "component": "apps/ticvai-web/src/routes/commercial/ProductServicePriceAssignment.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-048"
+   ],
+   "exitTo": [
+    "ADM-048"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-048, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-048",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F143 step 8→9",
+     "operation": "setProductServicePrice"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Product configuration should display) and no metric row",
+  "purpose": "Connect commercial rates to the actual products and services being sold.",
+  "purposeNote": "All sellable TICVAI objects can reference centrally managed price lists and rates without maintaining duplicate price definitions inside business modules.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Ticket Type. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 13 §Allow"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every product service price",
+       "columns": [
+        "Pricing Source: UAE Standard Admission 2027"
+       ],
+       "bindsTo": "ProductServicePriceAssignmentView",
+       "operation": "setProductServicePrice",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 13 §Product configuration should display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected product service price",
+       "bindsTo": "ProductServicePriceAssignmentView",
+       "columns": [
+        "Pricing Source: UAE Standard Admission 2027"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Pricing can be assigned to”, “Dependency View”.",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 13 §Product configuration should display"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Ticket Type",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 13 §Allow"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The product service price list.",
+   "error": "Could not load. Names which read failed and leaves the product service price untouched.",
+   "emptyFirstRun": "No product service price yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the product service price are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setProductServicePrice",
+    "contract": "catalogue",
+    "purpose": "Product & Service Price Assignment",
+    "trigger": "onAction",
+    "invalidates": [
+     "setProductServicePrice"
+    ]
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Pricing Source: UAE Standard Admission 2027"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-052"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 13. 0 of 1 labels bound to a contract property; 3 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-053",
+  "name": "Package, Bundle & Add-On Pricing",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "1",
+   "number": "10.1.6",
+   "page": 14
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/package-bundle-add-on-pricing-adm-053",
+   "component": "apps/ticvai-web/src/routes/commercial/PackageBundleAddOnPricing.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-048"
+   ],
+   "exitTo": [
+    "ADM-048"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-048, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-048",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F143 step 10→11",
+     "operation": "listPackageBundleAdd"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure pricing for; Configure whether the customer sees) and no display directory — it is settings, not a population",
+  "purpose": "Provide dedicated commercial structures for products containing multiple components. This is separate from the Product Relationship/Bundle module. Product Catalogue defines what the bundle contains. Pricing defines how that bundle is priced.",
+  "purposeNote": "Packages, bundles, and add-ons can use centralized commercial pricing while their product composition remains owned by the Product Catalogue.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Component Override. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Support"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Fast Track",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Configure pricing for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Parking",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Configure pricing for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Meal",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Configure pricing for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Photo",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Configure pricing for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Equipment",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Configure pricing for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Upgrade",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Configure pricing for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Additional Session",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Configure pricing for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Premium Access",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Configure pricing for"
+      },
+      {
+       "kind": "selectField",
+       "label": "Package Total Only",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Configure whether the customer sees"
+      },
+      {
+       "kind": "selectField",
+       "label": "Individual Components",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Configure whether the customer sees"
+      },
+      {
+       "kind": "textField",
+       "label": "Component + Package Saving",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Configure whether the customer sees"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Component Override",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 14 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The package bundle add-on configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the package bundle add-on untouched.",
+   "emptyFirstRun": "No package bundle add-on configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listPackageBundleAdd",
+    "contract": "catalogue",
+    "purpose": "Package, Bundle & Add-On Pricing",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-053"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 14. 0 of 0 labels bound to a contract property; 12 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-054",
+  "name": "Market, Venue & Currency Pricing Structure",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "1",
+   "number": "10.1.7",
+   "page": 15
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/market-venue-currency-pricing-structure-adm-054",
+   "component": "apps/ticvai-web/src/routes/commercial/MarketVenueCurrencyPricingStructure.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-048"
+   ],
+   "exitTo": [
+    "ADM-048"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-048, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-048",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F143 step 12→13",
+     "operation": "listMarketVenueCurrency"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure; FX-Assisted Setup) and no display directory — it is settings, not a population",
+  "purpose": "Support TICVAI's multi-country, multi-market, multi-venue and multi-currency commercial model.",
+  "purposeNote": "entities, and currencies.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Country",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Market",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Region",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Venue",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Brand",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Legal Entity",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Currency",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 15 §Configure"
+      },
+      {
+       "kind": "textField",
+       "label": "AED 250 ≈ SAR 255",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 15 §FX-Assisted Setup"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The market venue currency configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the market venue currency untouched.",
+   "emptyFirstRun": "No market venue currency configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listMarketVenueCurrency",
+    "contract": "catalogue",
+    "purpose": "Market, Venue & Currency Pricing Structure",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-054"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 15. 0 of 0 labels bound to a contract property; 8 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-055",
+  "name": "Price Hierarchy & Inheritance Configuration",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "1",
+   "number": "10.1.8",
+   "page": 17
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/price-hierarchy-inheritance-configuration-adm-055",
+   "component": "apps/ticvai-web/src/routes/commercial/PriceHierarchyInheritanceConfiguration.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-048"
+   ],
+   "exitTo": [
+    "ADM-048"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-048, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-048",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F143 step 14→15",
+     "operation": "setPriceHierarchyInheritance"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Administrators configure; Configure) and no display directory — it is settings, not a population",
+  "purpose": "Define where TICVAI should obtain a price when multiple commercial pricing layers exist. This is essential to prevent conflicting prices.",
+  "purposeNote": "The platform deterministically resolves the correct commercial price source across global, market, venue, and product hierarchies.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Hierarchy Level",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 17 §Administrators configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Priority",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 17 §Administrators configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Inheritance",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 17 §Administrators configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Override Permission",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 17 §Administrators configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Fallback Behavior",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 17 §Administrators configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Override Allowed",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 17 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Override Requires Reason",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 17 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Maximum Override Range",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 17 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Override Expiry",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 17 §Configure"
+      },
+      {
+       "kind": "textField",
+       "label": "Return to Parent Price",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 17 §Configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Save changes",
+       "provenance": "contract operation setPriceHierarchyInheritance"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The price hierarchy inheritance configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the price hierarchy inheritance untouched.",
+   "emptyFirstRun": "No price hierarchy inheritance configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "setPriceHierarchyInheritance",
+    "contract": "catalogue",
+    "purpose": "Price Hierarchy & Inheritance Configuration",
+    "trigger": "onAction",
+    "invalidates": [
+     "setPriceHierarchyInheritance"
+    ]
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-055"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 17. 0 of 0 labels bound to a contract property; 10 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-056",
+  "name": "Price List Templates, Clone & Reuse",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "1",
+   "number": "10.1.9",
+   "page": 18
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/price-list-templates-clone-reuse-adm-056",
+   "component": "apps/ticvai-web/src/routes/commercial/PriceListTemplatesCloneReuse.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-048"
+   ],
+   "exitTo": [
+    "ADM-048"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-048, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-048",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F143 step 16→17",
+     "operation": "listPriceListTemplate"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Options) and no display directory — it is settings, not a population",
+  "purpose": "Accelerate commercial setup across new venues, events, seasons and markets.",
+  "purposeNote": "Administrators can rapidly create consistent commercial pricing structures by cloning and reusing approved templates instead of rebuilding pricing manually.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Complete Price List. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 18 §Allow cloning"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "☑ Copy categories",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 18 §Options"
+      },
+      {
+       "kind": "textField",
+       "label": "☑ Copy rate structure",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 18 §Options"
+      },
+      {
+       "kind": "textField",
+       "label": "☑ Copy product mapping",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 18 §Options"
+      },
+      {
+       "kind": "textField",
+       "label": "☐ Copy monetary values",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 18 §Options"
+      },
+      {
+       "kind": "textField",
+       "label": "☑ Increase values by 5%",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 18 §Options"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Complete Price List",
+       "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 18 §Allow cloning"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The price list templates configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the price list templates untouched.",
+   "emptyFirstRun": "No price list templates configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listPriceListTemplate",
+    "contract": "catalogue",
+    "purpose": "Price List Templates, Clone & Reuse",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-056"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 18. 0 of 0 labels bound to a contract property; 6 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-057",
+  "name": "Commercial Pricing Structure Validation",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Pricing___Revenue_Management_Reference.pdf",
+   "board": "1",
+   "number": "10.1.10",
+   "page": 19
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/commercial-pricing-structure-validation-adm-057",
+   "component": "apps/ticvai-web/src/routes/commercial/CommercialPricingStructureValidation.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-048"
+   ],
+   "exitTo": [
+    "ADM-048"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-048, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Validate that the commercial pricing foundation is structurally complete before it proceeds to rule configuration, governance, or publication. This is not the final publication screen. Board 4 owns approval and publication. Board 1 defined what the commercial prices are and how they are structured.",
+  "purposeNote": "from progressing downstream without clearly identifying the issue. Board 1 — Final Screen Register # Screen Responsibility 10.1. Commercial Pricing Command",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 19"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Pricing___Revenue_Management_Reference.pdf, page 19"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listCommercialPricingStructure",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The commercial pricing structure list.",
+   "error": "Could not load. Names which read failed and leaves the commercial pricing structure untouched.",
+   "emptyFirstRun": "No commercial pricing structure yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the commercial pricing structure are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCommercialPricingStructure",
+    "contract": "catalogue",
+    "purpose": "Commercial Pricing Structure Validation",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "CommercialPricingStructureValidationView.requiredFieldsComplete",
+    "CommercialPricingStructureValidationView.currencyDefined",
+    "CommercialPricingStructureValidationView.ownershipAssigned",
+    "CommercialPricingStructureValidationView.categoriesConfigured",
+    "CommercialPricingStructureValidationView.monetaryValuesValid"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-057"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Pricing___Revenue_Management_Reference.pdf page 19. 0 of 0 labels bound to a contract property; 0 of 83 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

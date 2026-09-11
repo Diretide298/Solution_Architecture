@@ -1,0 +1,129 @@
+{
+ "addTip": {
+  "method": "POST",
+  "path": "/payments/{paymentId}/tip",
+  "contract": "orders",
+  "summary": "Record a tip against a payment",
+  "permission": "ORDER_MODIFY",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Payment"
+ },
+ "capturePayment": {
+  "method": "POST",
+  "path": "/payments/{paymentId}/capture",
+  "contract": "orders",
+  "summary": "Capture a previously authorised payment",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Payment"
+ },
+ "createPayment": {
+  "method": "POST",
+  "path": "/payments",
+  "contract": "orders",
+  "summary": "Take a payment against an order",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "CreatePaymentRequest",
+  "responds": "Payment"
+ },
+ "getB2bCredit": {
+  "method": "GET",
+  "path": "/b2b-accounts/{accountId}/credit",
+  "contract": "orders",
+  "summary": "Partner credit position",
+  "permission": "ORDER_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CreditPosition"
+ },
+ "inquirePaymentStatus": {
+  "method": "POST",
+  "path": "/payments/{paymentId}/inquiry",
+  "contract": "orders",
+  "summary": "Ask the provider what actually happened",
+  "permission": "ORDER_CREATE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "workstation",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Payment"
+ },
+ "overrideCreditLimit": {
+  "method": "POST",
+  "path": "/b2b-accounts/{accountId}/credit/override",
+  "contract": "orders",
+  "summary": "Authorise an order beyond the credit limit",
+  "permission": "CREDIT_OVERRIDE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CreditPosition"
+ },
+ "setB2bCreditLimit": {
+  "method": "PUT",
+  "path": "/b2b-accounts/{accountId}/credit",
+  "contract": "orders",
+  "summary": "Set a partner credit limit",
+  "permission": "CREDIT_MANAGE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CreditPosition"
+ }
+}

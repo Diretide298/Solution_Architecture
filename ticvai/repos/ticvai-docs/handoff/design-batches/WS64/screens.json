@@ -1,0 +1,1543 @@
+[
+ {
+  "id": "ADM-298",
+  "name": "My Tickets & Resale Marketplace Entry",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket Resale Marketplace_Reference.pdf",
+   "board": "3",
+   "number": "3.3.1",
+   "page": 40
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/my-tickets-resale-marketplace-entry-adm-298",
+   "component": "apps/ticvai-web/src/routes/commercial/MyTicketsResaleMarketplaceEntry.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-002"
+   ],
+   "exitTo": [
+    "ADM-002",
+    "ADM-299",
+    "ADM-300",
+    "ADM-301",
+    "ADM-302",
+    "ADM-303",
+    "ADM-304",
+    "ADM-305",
+    "ADM-306",
+    "ADM-307"
+   ],
+   "inferred": false,
+   "notes": "**The board's hub.** The workshop specified this module as boards of ten and opened each with a command centre; the other nine screens are that board's detail, so they are reached from here and return here.",
+   "transitions": [
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "carries": [
+      "tenantId"
+     ],
+     "provenance": "derived — ADM-002 declares entryState.params tenantId, so an edge into it must carry them"
+    },
+    {
+     "to": "ADM-299",
+     "trigger": "Works in Resale Eligibility & Ticket Selection",
+     "provenance": "flow F173 step 1→2",
+     "operation": "listTicketResaleMarketplace"
+    },
+    {
+     "to": "ADM-300",
+     "trigger": "Works in Create Listing & Resale Price Selection",
+     "provenance": "flow F173 step 3→4",
+     "operation": "listTicketResaleMarketplace"
+    },
+    {
+     "to": "ADM-301",
+     "trigger": "Works in Fees, Seller Proceeds & Listing Confirmation",
+     "provenance": "flow F173 step 5→6",
+     "operation": "listTicketResaleMarketplace"
+    },
+    {
+     "to": "ADM-302",
+     "trigger": "Works in My Resale Listings & Seller Dashboard",
+     "provenance": "flow F173 step 7→8",
+     "operation": "listTicketResaleMarketplace"
+    },
+    {
+     "to": "ADM-303",
+     "trigger": "Works in Official Resale Marketplace & Buyer Discovery",
+     "provenance": "flow F173 step 9→10",
+     "operation": "listTicketResaleMarketplace"
+    },
+    {
+     "to": "ADM-304",
+     "trigger": "Works in Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience",
+     "provenance": "flow F173 step 11→12",
+     "operation": "listTicketResaleMarketplace"
+    },
+    {
+     "to": "ADM-305",
+     "trigger": "Works in Buyer Checkout, Inventory Hold & Secure Payment",
+     "provenance": "flow F173 step 13→14",
+     "operation": "listTicketResaleMarketplace"
+    },
+    {
+     "to": "ADM-306",
+     "trigger": "Works in Resale Confirmation, Ownership Transfer & Ticket Delivery",
+     "provenance": "flow F173 step 15→16",
+     "operation": "listTicketResaleMarketplace"
+    },
+    {
+     "to": "ADM-307",
+     "trigger": "Works in White-Label Marketplace Deployment & Experience Architecture",
+     "provenance": "flow F173 step 17→18",
+     "operation": "listTicketResaleMarketplace"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Depending on ticket configuration) and no display directory — it is settings, not a population",
+  "purpose": "Provide the authenticated ticket holder with a simple and secure entry point into the official resale journey. The preferred starting point should be the customer's existing: My Account → My Tickets rather than asking customers to manually enter ticket numbers or upload ticket PDFs.",
+  "purposeNote": "An authenticated customer can immediately identify which owned tickets are eligible for resale and begin the official resale process without manually proving ticket ownership.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "View Ticket",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 40 §Depending on ticket configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Add to Wallet",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 40 §Depending on ticket configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Transfer",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 40 §Depending on ticket configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Exchange",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 40 §Depending on ticket configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Upgrade",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 40 §Depending on ticket configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Resell Ticket",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 40 §Depending on ticket configuration"
+      },
+      {
+       "kind": "selectField",
+       "label": "Request Refund",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 40 §Depending on ticket configuration"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The tickets resale marketplace configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the tickets resale marketplace untouched.",
+   "emptyFirstRun": "No tickets resale marketplace configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listTicketResaleMarketplace",
+    "contract": "orders",
+    "purpose": "My Tickets & Resale Marketplace Entry",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-298"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 40. 0 of 0 labels bound to a contract property; 7 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-299",
+  "name": "Resale Eligibility & Ticket Selection",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket Resale Marketplace_Reference.pdf",
+   "board": "3",
+   "number": "3.3.2",
+   "page": 42
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/resale-eligibility-ticket-selection-adm-299",
+   "component": "apps/ticvai-web/src/routes/commercial/ResaleEligibilityTicketSelection.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-298"
+   ],
+   "exitTo": [
+    "ADM-298"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-298, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-298",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F173 step 2→3",
+     "operation": "listResaleEligibilityTicket"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Explain whether the selected ticket can be resold before allowing a listing to be created.",
+  "purposeNote": "Customers receive an immediate, understandable and authoritative resale eligibility decision before entering the listing process.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every resale eligibility ticket",
+       "columns": [
+        "✓ Your ticket is eligible for resale",
+        "ResaleEligibilityTicketSelectionView.event",
+        "ResaleEligibilityTicketSelectionView.date",
+        "ResaleEligibilityTicketSelectionView.venue",
+        "ResaleEligibilityTicketSelectionView.seat",
+        "ResaleEligibilityTicketSelectionView.originalPrice",
+        "ResaleEligibilityTicketSelectionView.resaleClosingTime",
+        "ResaleEligibilityTicketSelectionView.applicableMarketplaceConditions"
+       ],
+       "bindsTo": "ResaleEligibilityTicketSelectionView",
+       "operation": "listResaleEligibilityTicket",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 42 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected resale eligibility ticket",
+       "bindsTo": "ResaleEligibilityTicketSelectionView",
+       "columns": [
+        "✓ Your ticket is eligible for resale",
+        "ResaleEligibilityTicketSelectionView.event",
+        "ResaleEligibilityTicketSelectionView.date",
+        "ResaleEligibilityTicketSelectionView.venue",
+        "ResaleEligibilityTicketSelectionView.seat",
+        "ResaleEligibilityTicketSelectionView.originalPrice",
+        "ResaleEligibilityTicketSelectionView.resaleClosingTime",
+        "ResaleEligibilityTicketSelectionView.applicableMarketplaceConditions"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Eligibility Check”, “Check applicable conditions such as”, “Do not simply display”, “Multiple Tickets”, “Backend Boundary”.",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 42 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The resale eligibility ticket list.",
+   "error": "Could not load. Names which read failed and leaves the resale eligibility ticket untouched.",
+   "emptyFirstRun": "No resale eligibility ticket yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the resale eligibility ticket are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listResaleEligibilityTicket",
+    "contract": "orders",
+    "purpose": "Resale Eligibility & Ticket Selection",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "✓ Your ticket is eligible for resale",
+    "ResaleEligibilityTicketSelectionView.event",
+    "ResaleEligibilityTicketSelectionView.date",
+    "ResaleEligibilityTicketSelectionView.venue",
+    "ResaleEligibilityTicketSelectionView.seat",
+    "ResaleEligibilityTicketSelectionView.originalPrice"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-299"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 42. 7 of 8 labels bound to a contract property; 8 of 43 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-300",
+  "name": "Create Listing & Resale Price Selection",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket Resale Marketplace_Reference.pdf",
+   "board": "3",
+   "number": "3.3.3",
+   "page": 43
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/create-listing-resale-price-selection-adm-300",
+   "component": "apps/ticvai-web/src/routes/commercial/CreateListingResalePriceSelection.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-298"
+   ],
+   "exitTo": [
+    "ADM-298"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-298, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-298",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F173 step 4→5",
+     "operation": "listCreateListingResale"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Allow an eligible seller to select a resale price within the client's approved marketplace rules.",
+  "purposeNote": "A seller can select a valid resale price while TICVAI automatically enforces the operator's configured commercial rules.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Ticket Resale Marketplace_Reference.pdf, page 43"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Ticket Resale Marketplace_Reference.pdf, page 43"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listCreateListingResale",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The create listing resale list.",
+   "error": "Could not load. Names which read failed and leaves the create listing resale untouched.",
+   "emptyFirstRun": "No create listing resale yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the create listing resale are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listCreateListingResale",
+    "contract": "orders",
+    "purpose": "Create Listing & Resale Price Selection",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "CreateListingResalePriceSelectionView.faceValueOnly",
+    "CreateListingResalePriceSelectionView.fixedPrice",
+    "CreateListingResalePriceSelectionView.sellerSelectedPrice",
+    "CreateListingResalePriceSelectionView.cappedPrice",
+    "CreateListingResalePriceSelectionView.operatorControlled"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-300"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 43. 0 of 0 labels bound to a contract property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-301",
+  "name": "Fees, Seller Proceeds & Listing Confirmation",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket Resale Marketplace_Reference.pdf",
+   "board": "3",
+   "number": "3.3.4",
+   "page": 45
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/fees-seller-proceeds-listing-confirmation-adm-301",
+   "component": "apps/ticvai-web/src/routes/commercial/FeesSellerProceedsListingConfirmation.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-298"
+   ],
+   "exitTo": [
+    "ADM-298"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-298, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-298",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F173 step 6→7",
+     "operation": "listFeeSellerProceed"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide complete financial transparency before the seller commits to publishing the listing. This is essential to prevent later disputes.",
+  "purposeNote": "The seller understands the resale price, applicable fees, estimated proceeds and settlement conditions before submitting the ticket for listing.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Ticket Resale Marketplace_Reference.pdf, page 45"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Ticket Resale Marketplace_Reference.pdf, page 45"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listFeeSellerProceed",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The fees seller proceeds list.",
+   "error": "Could not load. Names which read failed and leaves the fees seller proceeds untouched.",
+   "emptyFirstRun": "No fees seller proceeds yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the fees seller proceeds are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listFeeSellerProceed",
+    "contract": "orders",
+    "purpose": "Fees, Seller Proceeds & Listing Confirmation",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "FeesSellerProceedsListingConfirmationView.yourSellingPrice",
+    "FeesSellerProceedsListingConfirmationView.aed2200",
+    "FeesSellerProceedsListingConfirmationView.aed000",
+    "FeesSellerProceedsListingConfirmationView.youWillReceiveAed19800",
+    "FeesSellerProceedsListingConfirmationView.clearlyExplainApplicableSettlementRules"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-301"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 45. 0 of 0 labels bound to a contract property; 0 of 27 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-302",
+  "name": "My Resale Listings & Seller Dashboard",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket Resale Marketplace_Reference.pdf",
+   "board": "3",
+   "number": "3.3.5",
+   "page": 46
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/my-resale-listings-seller-dashboard-adm-302",
+   "component": "apps/ticvai-web/src/routes/commercial/MyResaleListingsSellerDashboard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-298"
+   ],
+   "exitTo": [
+    "ADM-298"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-298, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-298",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F173 step 8→9",
+     "operation": "listResaleListingSeller"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "commandCentre",
+  "patternReason": "the pack gives this screen both a metric directory (§Display; Show) and a per-row directory (§Each listing shows) — counts over a population, then the population",
+  "purpose": "Give sellers a dedicated self-service workspace to manage their resale activity after publishing.",
+  "purposeNote": "Sellers can independently understand and manage the complete status of their listings and settlements without contacting venue support for routine actions.",
+  "layout": {
+   "template": "dashboard",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "headline",
+     "components": [
+      {
+       "kind": "metricTile",
+       "label": "Active Listings",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 46 §Display",
+       "bindsTo": "MyResaleListingsSellerDashboardView.activeListings"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pending Approval",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 46 §Display",
+       "bindsTo": "MyResaleListingsSellerDashboardView.pendingApproval"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Sold",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 46 §Display",
+       "bindsTo": "MyResaleListingsSellerDashboardView.sold"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Expiring Soon",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 46 §Display",
+       "bindsTo": "MyResaleListingsSellerDashboardView.expiringSoon"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Seller Proceeds",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 46 §Display",
+       "bindsTo": "MyResaleListingsSellerDashboardView.sellerProceeds"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Pending Settlement",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 46 §Display",
+       "bindsTo": "MyResaleListingsSellerDashboardView.pendingSettlement"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Paid Settlements",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 46 §Display",
+       "bindsTo": "MyResaleListingsSellerDashboardView.paidSettlements"
+      },
+      {
+       "kind": "metricTile",
+       "label": "SOLD ✓",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 46 §Show"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Selling Price: AED 220",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 46 §Show",
+       "bindsTo": "MyResaleListingsSellerDashboardView.sellingPriceAed220"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Estimated Proceeds: AED 198",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 46 §Show",
+       "bindsTo": "MyResaleListingsSellerDashboardView.estimatedProceedsAed198"
+      },
+      {
+       "kind": "metricTile",
+       "label": "Settlement: Scheduled after event",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 46 §Show",
+       "bindsTo": "MyResaleListingsSellerDashboardView.settlementScheduledAfterEvent"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "moduleTiles",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every resale listings seller",
+       "columns": [
+        "MyResaleListingsSellerDashboardView.event",
+        "MyResaleListingsSellerDashboardView.date",
+        "MyResaleListingsSellerDashboardView.seat",
+        "MyResaleListingsSellerDashboardView.listingPrice",
+        "MyResaleListingsSellerDashboardView.originalPrice",
+        "MyResaleListingsSellerDashboardView.marketplaceStatus",
+        "MyResaleListingsSellerDashboardView.viewsWhereApplicable",
+        "MyResaleListingsSellerDashboardView.listingDate",
+        "MyResaleListingsSellerDashboardView.expiry",
+        "MyResaleListingsSellerDashboardView.sellerProceeds",
+        "MyResaleListingsSellerDashboardView.settlementStatus"
+       ],
+       "bindsTo": "MyResaleListingsSellerDashboardView",
+       "operation": "listResaleListingSeller",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 46 §Each listing shows"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected resale listings seller",
+       "bindsTo": "MyResaleListingsSellerDashboardView",
+       "columns": [
+        "MyResaleListingsSellerDashboardView.event",
+        "MyResaleListingsSellerDashboardView.date",
+        "MyResaleListingsSellerDashboardView.seat",
+        "MyResaleListingsSellerDashboardView.listingPrice",
+        "MyResaleListingsSellerDashboardView.originalPrice",
+        "MyResaleListingsSellerDashboardView.marketplaceStatus",
+        "MyResaleListingsSellerDashboardView.viewsWhereApplicable",
+        "MyResaleListingsSellerDashboardView.listingDate",
+        "MyResaleListingsSellerDashboardView.expiry",
+        "MyResaleListingsSellerDashboardView.sellerProceeds",
+        "MyResaleListingsSellerDashboardView.settlementStatus"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Reserved by Buyer”.",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 46 §Each listing shows"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The resale listings seller list; the counts above it resolve separately.",
+   "error": "Could not load. Names which read failed and leaves the resale listings seller untouched.",
+   "emptyFirstRun": "No resale listings seller yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the resale listings seller are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listResaleListingSeller",
+    "contract": "orders",
+    "purpose": "My Resale Listings & Seller Dashboard",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-302"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 46. 21 of 21 labels bound to a contract property; 22 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-303",
+  "name": "Official Resale Marketplace & Buyer Discovery",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket Resale Marketplace_Reference.pdf",
+   "board": "3",
+   "number": "3.3.6",
+   "page": 48
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/official-resale-marketplace-buyer-discovery-adm-303",
+   "component": "apps/ticvai-web/src/routes/commercial/OfficialResaleMarketplaceBuyerDiscovery.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-298"
+   ],
+   "exitTo": [
+    "ADM-298"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-298, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-298",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F173 step 10→11",
+     "operation": "listOfficialResaleMarketplace"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide buyers with a trusted client-branded marketplace for discovering authentic resale inventory.",
+  "purposeNote": "Customers can discover legitimate resale inventory in a trusted marketplace without interacting directly with unknown sellers.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved: Ticket Type, Price, Primary only. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Ticket Resale Marketplace_Reference.pdf, page 48 §Support"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Ticket Resale Marketplace_Reference.pdf, page 48"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Ticket Resale Marketplace_Reference.pdf, page 48"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Ticket Type",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 48 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Price",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 48 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resale only",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 48 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Primary only",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 48 §Support"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "components": []
+    }
+   ]
+  },
+  "states": {
+   "loading": "The official resale marketplace list.",
+   "error": "Could not load. Names which read failed and leaves the official resale marketplace untouched.",
+   "emptyFirstRun": "No official resale marketplace yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the official resale marketplace are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listOfficialResaleMarketplace",
+    "contract": "orders",
+    "purpose": "Official Resale Marketplace & Buyer Discovery",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "OfficialResaleMarketplaceBuyerDiscoveryView.officialTicketsOfficialResale",
+    "OfficialResaleMarketplaceBuyerDiscoveryView.asASeparateMarketplacePage",
+    "OfficialResaleMarketplaceBuyerDiscoveryView.event",
+    "OfficialResaleMarketplaceBuyerDiscoveryView.venue",
+    "OfficialResaleMarketplaceBuyerDiscoveryView.date"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-303"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 48. 0 of 0 labels bound to a contract property; 4 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-304",
+  "name": "Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket Resale Marketplace_Reference.pdf",
+   "board": "3",
+   "number": "3.3.7",
+   "page": 49
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/resale-ticket-detail-seat-selection-primary-vs-resale-ex-adm-304",
+   "component": "apps/ticvai-web/src/routes/commercial/ResaleTicketDetailSeatSelectionPrimaryVsResaleEx.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-298"
+   ],
+   "exitTo": [
+    "ADM-298"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-298, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-298",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F173 step 12→13",
+     "operation": "listResaleTicketDetail"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
+  "purpose": "Allow customers to understand exactly what they are purchasing and distinguish resale inventory from primary inventory.",
+  "purposeNote": "Buyers clearly understand whether a ticket is primary or resale inventory, its location/entitlements and the complete applicable price before checkout.",
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every resale ticket detail",
+       "columns": [
+        "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.event",
+        "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.venue",
+        "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.performance",
+        "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.ticketType",
+        "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.section",
+        "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.row",
+        "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.seat",
+        "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.accessibilityAttributes",
+        "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.applicableBenefits",
+        "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.resalePrice",
+        "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.fees",
+        "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.applicableRestrictions"
+       ],
+       "bindsTo": "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView",
+       "operation": "listResaleTicketDetail",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 49 §Display"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected resale ticket detail",
+       "bindsTo": "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView",
+       "columns": [
+        "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.event",
+        "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.venue",
+        "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.performance",
+        "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.ticketType",
+        "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.section",
+        "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.row",
+        "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.seat",
+        "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.accessibilityAttributes",
+        "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.applicableBenefits",
+        "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.resalePrice",
+        "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.fees",
+        "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.applicableRestrictions"
+       ],
+       "notes": "The pack groups this record's detail under its own headings: “Reserved Seating”, “Unavailable”, “AED 195”, “Important Commercial Benefit”, “Listing Availability”.",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 49 §Display"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The resale ticket detail list.",
+   "error": "Could not load. Names which read failed and leaves the resale ticket detail untouched.",
+   "emptyFirstRun": "No resale ticket detail yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the resale ticket detail are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listResaleTicketDetail",
+    "contract": "orders",
+    "purpose": "Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.event",
+    "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.venue",
+    "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.performance",
+    "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.ticketType",
+    "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.section",
+    "ResaleTicketDetailSeatSelectionPrimaryVsResaleExperiView.row"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-304"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 49. 12 of 12 labels bound to a contract property; 14 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-305",
+  "name": "Buyer Checkout, Inventory Hold & Secure Payment",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket Resale Marketplace_Reference.pdf",
+   "board": "3",
+   "number": "3.3.8",
+   "page": 51
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/buyer-checkout-inventory-hold-secure-payment-adm-305",
+   "component": "apps/ticvai-web/src/routes/commercial/BuyerCheckoutInventoryHoldSecurePayment.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-298"
+   ],
+   "exitTo": [
+    "ADM-298"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-298, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-298",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F173 step 14→15",
+     "operation": "listBuyerCheckoutInventory"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Select Resale Ticket) and no display directory — it is settings, not a population",
+  "purpose": "Provide a normal, secure TICVAI checkout while protecting the resale listing from simultaneous purchase.",
+  "purposeNote": "One buyer can securely purchase the resale ticket while TICVAI prevents concurrent purchase and maintains complete transaction integrity.",
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "↓",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 51 §Select Resale Ticket"
+      },
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listBuyerCheckoutInventory",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The buyer checkout inventory configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the buyer checkout inventory untouched.",
+   "emptyFirstRun": "No buyer checkout inventory configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listBuyerCheckoutInventory",
+    "contract": "orders",
+    "purpose": "Buyer Checkout, Inventory Hold & Secure Payment",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-305"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 51. 0 of 0 labels bound to a contract property; 1 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-306",
+  "name": "Resale Confirmation, Ownership Transfer & Ticket Delivery",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket Resale Marketplace_Reference.pdf",
+   "board": "3",
+   "number": "3.3.9",
+   "page": 52
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/resale-confirmation-ownership-transfer-ticket-delivery-adm-306",
+   "component": "apps/ticvai-web/src/routes/commercial/ResaleConfirmationOwnershipTransferTicketDeliver.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-298"
+   ],
+   "exitTo": [
+    "ADM-298"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-298, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "ADM-298",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F173 step 16→17",
+     "operation": "listResaleConfirmationOwnership"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
+  "purpose": "Provide the customer-facing completion experience after successful payment while the backend performs the secure entitlement transfer.",
+  "purposeNote": "After successful resale, the buyer receives control of the valid entitlement and applicable credentials, while the seller can no longer use the transferred ticket.",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. The screen has no content region rather than an empty one, and it needs a person before it is built.",
+    "source": "pack Ticket Resale Marketplace_Reference.pdf, page 52"
+   },
+   {
+    "operation": null,
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
+    "source": "pack Ticket Resale Marketplace_Reference.pdf, page 52"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "dataTable",
+       "derived": true,
+       "impliedBy": "listResaleConfirmationOwnership",
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The resale confirmation ownership list.",
+   "error": "Could not load. Names which read failed and leaves the resale confirmation ownership untouched.",
+   "emptyFirstRun": "No resale confirmation ownership yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the resale confirmation ownership are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listResaleConfirmationOwnership",
+    "contract": "orders",
+    "purpose": "Resale Confirmation, Ownership Transfer & Ticket Delivery",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "ResaleConfirmationOwnershipTransferTicketDeliveryView.followedBy",
+    "ResaleConfirmationOwnershipTransferTicketDeliveryView.yourTicketIsReady",
+    "ResaleConfirmationOwnershipTransferTicketDeliveryView.currentOwnerSellerA",
+    "ResaleConfirmationOwnershipTransferTicketDeliveryView.previousOwnerSellerA",
+    "ResaleConfirmationOwnershipTransferTicketDeliveryView.currentOwnerBuyerB"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-306"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 52. 0 of 0 labels bound to a contract property; 0 of 35 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "ADM-307",
+  "name": "White-Label Marketplace Deployment & Experience Architecture",
+  "module": "Commercial",
+  "requiresModule": "ticketing",
+  "wave": 3,
+  "source": {
+   "pack": "Ticket Resale Marketplace_Reference.pdf",
+   "board": "3",
+   "number": "3.3.10",
+   "page": 54
+  },
+  "implementation": {
+   "app": "ticvai-web",
+   "route": "/commercial/white-label-marketplace-deployment-experience-architectu-adm-307",
+   "component": "apps/ticvai-web/src/routes/commercial/WhiteLabelMarketplaceDeploymentExperienceArchite.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "ADM-298"
+   ],
+   "exitTo": [
+    "ADM-298"
+   ],
+   "inferred": false,
+   "notes": "**Reached from ADM-298, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+  },
+  "density": "compact",
+  "pattern": "configEditor",
+  "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
+  "purpose": "This is the key architecture/configuration screen It defines how each TICVAI client chooses to expose the resale marketplace to its customers. Deployment Model A — Embedded White-Label",
+  "purposeNote": "Each TICVAI tenant can deploy a secure, branded resale marketplace using embedded, hosted or headless architecture without requiring a separate marketplace backend implementation. Board 3 — Final Screen Register # Customer / Experience Screen Primary Responsibility 3.3.1 My Tickets & Resale Marketplace Entry Seller marketplace entry",
+  "gaps": [
+   {
+    "operation": null,
+    "why": "**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Domain configuration, Additional client languages. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract side.",
+    "source": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Support"
+   }
+  ],
+  "layout": {
+   "template": "form",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "fields",
+     "components": [
+      {
+       "kind": "selectField",
+       "label": "Marketplace Name",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Client Logo",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Brand Colors",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Typography",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Domain/Subdomain",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Support Contact",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Legal Links",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Seller Terms",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Buyer Terms",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Privacy",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Languages",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Authentication method",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "My Tickets",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Sell",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Buy",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "My Listings",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Transactions",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Settlements",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Configure"
+      },
+      {
+       "kind": "selectField",
+       "label": "Help",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Configure"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "publish",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Domain configuration",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Additional client languages",
+       "provenance": "pack Ticket Resale Marketplace_Reference.pdf, page 54 §Support"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The white-label marketplace deployment configuration as saved.",
+   "error": "Could not load. Names which read failed and leaves the white-label marketplace deployment untouched.",
+   "emptyFirstRun": "No white-label marketplace deployment configured yet. Carries the create action and says what the platform does in the meantime.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listWhiteLabelMarketplace",
+    "contract": "orders",
+    "purpose": "White-Label Marketplace Deployment & Experience Architecture",
+    "trigger": "onLoad"
+   }
+  ],
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P09 TICVAI Web.dc.html#adm-307"
+  },
+  "apisNote": "Regenerated 9 September 2026 from Ticket Resale Marketplace_Reference.pdf page 54. 0 of 0 labels bound to a contract property; 21 of 131 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "_platform": {
+   "code": "P09",
+   "audience": "platformAdmin",
+   "formFactor": "web",
+   "shortName": "TICVAI Web",
+   "name": "TICVAI Web — Platform Console",
+   "offlineCapable": false,
+   "app": "ticvai-web",
+   "operator": "ticvai",
+   "targetApp": {
+    "app": "ticvai-control",
+    "name": "TICVAI Control",
+    "shell": "web",
+    "siblings": [
+     "P10",
+     "P11",
+     "P14",
+     "P17"
+    ],
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

@@ -1,0 +1,1961 @@
+{
+ "FamilyHouseholdDependentMembershipConfigurationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Family, Household & Dependent Membership Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "individual": {
+    "type": "string",
+    "description": "Individual"
+   },
+   "couple": {
+    "type": "string",
+    "description": "Couple"
+   },
+   "family": {
+    "type": "string",
+    "description": "Family"
+   },
+   "household": {
+    "type": "string",
+    "description": "Household"
+   },
+   "parentChild": {
+    "type": "string",
+    "description": "Parent + Child"
+   },
+   "corporateGroup": {
+    "type": "string",
+    "description": "Corporate Group"
+   },
+   "customGroupStructure": {
+    "type": "string",
+    "description": "Custom Group Structure"
+   },
+   "primaryMember": {
+    "type": "string",
+    "description": "Primary Member"
+   },
+   "secondaryAdult": {
+    "type": "string",
+    "description": "Secondary Adult"
+   },
+   "dependent": {
+    "type": "string",
+    "description": "Dependent"
+   },
+   "child": {
+    "type": "string",
+    "description": "Child"
+   },
+   "guardian": {
+    "type": "string",
+    "description": "Guardian"
+   },
+   "authorizedManager": {
+    "type": "string",
+    "description": "Authorized Manager"
+   },
+   "minimumAge": {
+    "type": "string",
+    "description": "Minimum Age"
+   },
+   "maximumAge": {
+    "type": "string",
+    "description": "Maximum Age"
+   },
+   "relationshipRequirement": {
+    "type": "string",
+    "description": "Relationship Requirement"
+   },
+   "verificationRequirement": {
+    "type": "string",
+    "description": "Verification Requirement"
+   },
+   "sameHouseholdRequirementWhereApplicable": {
+    "type": "string",
+    "description": "Same Household Requirement where applicable"
+   },
+   "allowed": {
+    "type": "boolean",
+    "description": "Allowed"
+   },
+   "effectiveDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Effective Date"
+   },
+   "frequency": {
+    "type": "string",
+    "description": "Frequency"
+   },
+   "fee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fee"
+   },
+   "approval": {
+    "type": "string",
+    "description": "Approval"
+   },
+   "eligibilityRevalidation": {
+    "type": "string",
+    "description": "Eligibility Revalidation"
+   },
+   "maximum3Children": {
+    "type": "string",
+    "description": "Maximum 3 Children"
+   },
+   "gracePeriod": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Grace Period"
+   },
+   "renewalCorrection": {
+    "type": "string",
+    "description": "Renewal Correction"
+   },
+   "manualReview": {
+    "type": "string",
+    "description": "Manual Review"
+   }
+  }
+ },
+ "FamilyHouseholdDependentMembershipConfigurationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Family, Household & Dependent Membership Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "individual": {
+    "type": "string",
+    "description": "Individual"
+   },
+   "couple": {
+    "type": "string",
+    "description": "Couple"
+   },
+   "family": {
+    "type": "string",
+    "description": "Family"
+   },
+   "household": {
+    "type": "string",
+    "description": "Household"
+   },
+   "parentChild": {
+    "type": "string",
+    "description": "Parent + Child"
+   },
+   "corporateGroup": {
+    "type": "string",
+    "description": "Corporate Group"
+   },
+   "customGroupStructure": {
+    "type": "string",
+    "description": "Custom Group Structure"
+   },
+   "primaryMember": {
+    "type": "string",
+    "description": "Primary Member"
+   },
+   "secondaryAdult": {
+    "type": "string",
+    "description": "Secondary Adult"
+   },
+   "dependent": {
+    "type": "string",
+    "description": "Dependent"
+   },
+   "child": {
+    "type": "string",
+    "description": "Child"
+   },
+   "guardian": {
+    "type": "string",
+    "description": "Guardian"
+   },
+   "authorizedManager": {
+    "type": "string",
+    "description": "Authorized Manager"
+   },
+   "minimumAge": {
+    "type": "string",
+    "description": "Minimum Age"
+   },
+   "maximumAge": {
+    "type": "string",
+    "description": "Maximum Age"
+   },
+   "relationshipRequirement": {
+    "type": "string",
+    "description": "Relationship Requirement"
+   },
+   "verificationRequirement": {
+    "type": "string",
+    "description": "Verification Requirement"
+   },
+   "sameHouseholdRequirementWhereApplicable": {
+    "type": "string",
+    "description": "Same Household Requirement where applicable"
+   },
+   "allowed": {
+    "type": "boolean",
+    "description": "Allowed"
+   },
+   "effectiveDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Effective Date"
+   },
+   "frequency": {
+    "type": "string",
+    "description": "Frequency"
+   },
+   "fee": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fee"
+   },
+   "approval": {
+    "type": "string",
+    "description": "Approval"
+   },
+   "eligibilityRevalidation": {
+    "type": "string",
+    "description": "Eligibility Revalidation"
+   },
+   "maximum3Children": {
+    "type": "string",
+    "description": "Maximum 3 Children"
+   },
+   "gracePeriod": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Grace Period"
+   },
+   "renewalCorrection": {
+    "type": "string",
+    "description": "Renewal Correction"
+   },
+   "manualReview": {
+    "type": "string",
+    "description": "Manual Review"
+   }
+  }
+ },
+ "MembershipAnnualPassCommandCenterView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Membership & Annual Pass Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "activeMembershipProducts": {
+    "type": "integer",
+    "description": "Active Membership Products"
+   },
+   "annualPassProducts": {
+    "type": "integer",
+    "description": "Annual Pass Products"
+   },
+   "draftProducts": {
+    "type": "integer",
+    "description": "Draft Products"
+   },
+   "activeMembers": {
+    "type": "integer",
+    "description": "Active Members"
+   },
+   "familyMemberships": {
+    "type": "integer",
+    "description": "Family Memberships"
+   },
+   "membershipsExpiringSoon": {
+    "type": "string",
+    "description": "Memberships Expiring Soon"
+   },
+   "renewalEnabledProducts": {
+    "type": "integer",
+    "description": "Renewal-Enabled Products"
+   },
+   "suspendedProducts": {
+    "type": "integer",
+    "description": "Suspended Products"
+   },
+   "productsWithConfigurationIssues": {
+    "type": "string",
+    "description": "Products with Configuration Issues"
+   },
+   "averageMembershipDuration": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Average Membership Duration"
+   },
+   "productId": {
+    "type": "string",
+    "description": "Product ID"
+   },
+   "membershipName": {
+    "type": "string",
+    "description": "Membership Name"
+   },
+   "type": {
+    "type": "string",
+    "description": "Type"
+   },
+   "tier": {
+    "type": "string",
+    "description": "Tier"
+   },
+   "venueAttraction": {
+    "type": "string",
+    "description": "Venue/Attraction"
+   },
+   "validity": {
+    "type": "string",
+    "description": "Validity"
+   },
+   "activationMethod": {
+    "type": "string",
+    "description": "Activation Method"
+   },
+   "renewal": {
+    "type": "string",
+    "description": "Renewal"
+   },
+   "familyIndividual": {
+    "type": "string",
+    "description": "Family/Individual"
+   },
+   "currentMembers": {
+    "type": "integer",
+    "description": "Current Members"
+   },
+   "effectiveDates": {
+    "type": "integer",
+    "description": "Effective Dates"
+   },
+   "status": {
+    "type": "integer",
+    "description": "Status"
+   },
+   "owner": {
+    "type": "string",
+    "description": "Owner"
+   },
+   "annualPass": {
+    "type": "string",
+    "description": "Annual Pass"
+   },
+   "seasonPass": {
+    "type": "string",
+    "description": "Season Pass"
+   },
+   "monthlyMembership": {
+    "type": "string",
+    "description": "Monthly Membership"
+   },
+   "fixedTermMembership": {
+    "type": "string",
+    "description": "Fixed-Term Membership"
+   },
+   "corporateMembership": {
+    "type": "string",
+    "description": "Corporate Membership"
+   },
+   "familyMembership": {
+    "type": "string",
+    "description": "Family Membership"
+   },
+   "individualMembership": {
+    "type": "string",
+    "description": "Individual Membership"
+   },
+   "studentMembership": {
+    "type": "string",
+    "description": "Student Membership"
+   },
+   "vipMembership": {
+    "type": "string",
+    "description": "VIP Membership"
+   },
+   "customMembership": {
+    "type": "string",
+    "description": "Custom Membership"
+   },
+   "missingEntitlements": {
+    "type": "string",
+    "description": "Missing Entitlements"
+   },
+   "missingPricingAssociation": {
+    "type": "string",
+    "description": "Missing Pricing Association"
+   },
+   "missingValidity": {
+    "type": "string",
+    "description": "Missing Validity"
+   },
+   "invalidEligibility": {
+    "type": "string",
+    "description": "Invalid Eligibility"
+   },
+   "conflictingRules": {
+    "type": "string",
+    "description": "Conflicting Rules"
+   },
+   "missingRenewalPolicy": {
+    "type": "string",
+    "description": "Missing Renewal Policy"
+   },
+   "preview": {
+    "type": "string",
+    "description": "Preview"
+   }
+  }
+ },
+ "MembershipCommercialPricingChannelAssociationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Membership Commercial, Pricing & Channel Association displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "basePricingProfile": {
+    "type": "string",
+    "description": "Base Pricing Profile"
+   },
+   "membershipTierPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Membership Tier Price"
+   },
+   "renewalPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Renewal Price"
+   },
+   "promotionalPricingEligibility": {
+    "type": "string",
+    "description": "Promotional Pricing Eligibility"
+   },
+   "taxProfile": {
+    "type": "string",
+    "description": "Tax Profile"
+   },
+   "feeProfile": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Fee Profile"
+   },
+   "b2c": {
+    "type": "string",
+    "description": "B2C"
+   },
+   "mobileApp": {
+    "type": "string",
+    "description": "Mobile App"
+   },
+   "pos": {
+    "type": "string",
+    "description": "POS"
+   },
+   "callCenter": {
+    "type": "string",
+    "description": "Call Center"
+   },
+   "boxOffice": {
+    "type": "string",
+    "description": "Box Office"
+   },
+   "kiosk": {
+    "type": "string",
+    "description": "Kiosk"
+   },
+   "b2b": {
+    "type": "string",
+    "description": "B2B"
+   },
+   "corporate": {
+    "type": "string",
+    "description": "Corporate"
+   },
+   "reseller": {
+    "type": "string",
+    "description": "Reseller"
+   },
+   "api": {
+    "type": "string",
+    "description": "API"
+   },
+   "callCenterBoxOffice": {
+    "type": "string",
+    "description": "Call Center + Box Office"
+   },
+   "fullPayment": {
+    "type": "string",
+    "description": "Full Payment"
+   },
+   "installmentsWhereSupported": {
+    "type": "string",
+    "description": "Installments where supported"
+   },
+   "corporateCredit": {
+    "type": "string",
+    "description": "Corporate Credit"
+   },
+   "autoRenewPayment": {
+    "type": "string",
+    "description": "Auto-Renew Payment"
+   },
+   "area13IdentifiesEligibilityBenefit": {
+    "type": "string",
+    "description": "Area 13 identifies eligibility/benefit"
+   },
+   "alwaysAvailable": {
+    "type": "string",
+    "description": "Always Available"
+   },
+   "fixedSalesWindow": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Fixed Sales Window"
+   },
+   "seasonalSale": {
+    "type": "string",
+    "description": "Seasonal Sale"
+   },
+   "invitationOnly": {
+    "type": "string",
+    "description": "Invitation Only"
+   },
+   "capacityLimited": {
+    "type": "integer",
+    "description": "Capacity Limited"
+   }
+  }
+ },
+ "MembershipEligibilityQualificationRuleBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Membership Eligibility & Qualification Rule Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "age": {
+    "type": "string",
+    "description": "Age"
+   },
+   "personType": {
+    "type": "string",
+    "description": "Person Type"
+   },
+   "residency": {
+    "type": "string",
+    "description": "Residency"
+   },
+   "country": {
+    "type": "string",
+    "description": "Country"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer Segment"
+   },
+   "corporateAffiliation": {
+    "type": "string",
+    "description": "Corporate Affiliation"
+   },
+   "studentStatus": {
+    "type": "string",
+    "description": "Student Status"
+   },
+   "existingMembership": {
+    "type": "string",
+    "description": "Existing Membership"
+   },
+   "previousPurchase": {
+    "type": "string",
+    "description": "Previous Purchase"
+   },
+   "membershipHistory": {
+    "type": "string",
+    "description": "Membership History"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "promotionalQualification": {
+    "type": "string",
+    "description": "Promotional Qualification"
+   },
+   "residencyVerificationRequired": {
+    "type": "boolean",
+    "description": "Residency verification required"
+   },
+   "approvedCorporateAccountRequired": {
+    "type": "boolean",
+    "description": "Approved corporate account required"
+   },
+   "multipleMembershipsAllowed": {
+    "type": "boolean",
+    "description": "Multiple Memberships Allowed"
+   },
+   "oneMembershipPerCustomer": {
+    "type": "string",
+    "description": "One Membership per Customer"
+   },
+   "mutuallyExclusiveMemberships": {
+    "type": "string",
+    "description": "Mutually Exclusive Memberships"
+   },
+   "prerequisiteMembership": {
+    "type": "string",
+    "description": "Prerequisite Membership"
+   },
+   "existingTierRequirement": {
+    "type": "string",
+    "description": "Existing Tier Requirement"
+   },
+   "noVerification": {
+    "type": "string",
+    "description": "No Verification"
+   },
+   "customerDeclaration": {
+    "type": "string",
+    "description": "Customer Declaration"
+   },
+   "documentVerification": {
+    "type": "string",
+    "description": "Document Verification"
+   },
+   "identityVerification": {
+    "type": "string",
+    "description": "Identity Verification"
+   },
+   "staffVerification": {
+    "type": "string",
+    "description": "Staff Verification"
+   },
+   "externalVerification": {
+    "type": "string",
+    "description": "External Verification"
+   },
+   "allowDifferentRules": {
+    "type": "boolean",
+    "description": "Allow different rules"
+   },
+   "withAnExplanation": {
+    "type": "string",
+    "description": "with an explanation"
+   }
+  }
+ },
+ "MembershipEligibilityQualificationRuleBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Membership Eligibility & Qualification Rule Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "age": {
+    "type": "string",
+    "description": "Age"
+   },
+   "personType": {
+    "type": "string",
+    "description": "Person Type"
+   },
+   "residency": {
+    "type": "string",
+    "description": "Residency"
+   },
+   "country": {
+    "type": "string",
+    "description": "Country"
+   },
+   "customerSegment": {
+    "type": "string",
+    "description": "Customer Segment"
+   },
+   "corporateAffiliation": {
+    "type": "string",
+    "description": "Corporate Affiliation"
+   },
+   "studentStatus": {
+    "type": "string",
+    "description": "Student Status"
+   },
+   "existingMembership": {
+    "type": "string",
+    "description": "Existing Membership"
+   },
+   "previousPurchase": {
+    "type": "string",
+    "description": "Previous Purchase"
+   },
+   "membershipHistory": {
+    "type": "string",
+    "description": "Membership History"
+   },
+   "channel": {
+    "type": "string",
+    "description": "Channel"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "promotionalQualification": {
+    "type": "string",
+    "description": "Promotional Qualification"
+   },
+   "residencyVerificationRequired": {
+    "type": "boolean",
+    "description": "Residency verification required"
+   },
+   "approvedCorporateAccountRequired": {
+    "type": "boolean",
+    "description": "Approved corporate account required"
+   },
+   "multipleMembershipsAllowed": {
+    "type": "boolean",
+    "description": "Multiple Memberships Allowed"
+   },
+   "oneMembershipPerCustomer": {
+    "type": "string",
+    "description": "One Membership per Customer"
+   },
+   "mutuallyExclusiveMemberships": {
+    "type": "string",
+    "description": "Mutually Exclusive Memberships"
+   },
+   "prerequisiteMembership": {
+    "type": "string",
+    "description": "Prerequisite Membership"
+   },
+   "existingTierRequirement": {
+    "type": "string",
+    "description": "Existing Tier Requirement"
+   },
+   "noVerification": {
+    "type": "string",
+    "description": "No Verification"
+   },
+   "customerDeclaration": {
+    "type": "string",
+    "description": "Customer Declaration"
+   },
+   "documentVerification": {
+    "type": "string",
+    "description": "Document Verification"
+   },
+   "identityVerification": {
+    "type": "string",
+    "description": "Identity Verification"
+   },
+   "staffVerification": {
+    "type": "string",
+    "description": "Staff Verification"
+   },
+   "externalVerification": {
+    "type": "string",
+    "description": "External Verification"
+   },
+   "allowDifferentRules": {
+    "type": "boolean",
+    "description": "Allow different rules"
+   },
+   "withAnExplanation": {
+    "type": "string",
+    "description": "with an explanation"
+   }
+  }
+ },
+ "MembershipEntitlementAdmissionBenefitBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is control.webhook_delivery at 3%, so this is not an update to anything the package stores today and no new table has been decided",
+  "description": "**What Membership Entitlement & Admission Benefit Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "unlimitedAdmission": {
+    "type": "string",
+    "description": "Unlimited Admission"
+   },
+   "limitedAdmissions": {
+    "type": "string",
+    "description": "Limited Admissions"
+   },
+   "attractionAccess": {
+    "type": "string",
+    "description": "Attraction Access"
+   },
+   "eventAccess": {
+    "type": "string",
+    "description": "Event Access"
+   },
+   "zoneAccess": {
+    "type": "string",
+    "description": "Zone Access"
+   },
+   "fastTrack": {
+    "type": "string",
+    "description": "Fast Track"
+   },
+   "priorityEntry": {
+    "type": "string",
+    "description": "Priority Entry"
+   },
+   "guestTickets": {
+    "type": "string",
+    "description": "Guest Tickets"
+   },
+   "parking": {
+    "type": "string",
+    "description": "Parking"
+   },
+   "fBBenefit": {
+    "type": "string",
+    "description": "F&B Benefit"
+   },
+   "retailBenefit": {
+    "type": "string",
+    "description": "Retail Benefit"
+   },
+   "rentalBenefit": {
+    "type": "string",
+    "description": "Rental Benefit"
+   },
+   "specialEventAccess": {
+    "type": "string",
+    "description": "Special Event Access"
+   },
+   "bookingPrivileges": {
+    "type": "string",
+    "description": "Booking Privileges"
+   },
+   "otherConfiguredBenefits": {
+    "type": "string",
+    "description": "Other Configured Benefits"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "eventType": {
+    "type": "string",
+    "description": "Event Type"
+   },
+   "admissionType": {
+    "type": "string",
+    "description": "Admission Type"
+   },
+   "numberOfVisits": {
+    "type": "integer",
+    "description": "Number of Visits"
+   },
+   "period": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Period"
+   },
+   "days": {
+    "type": "string",
+    "description": "Days"
+   },
+   "times": {
+    "type": "string",
+    "description": "Times"
+   },
+   "timeslots": {
+    "type": "string",
+    "description": "Timeslots"
+   },
+   "perDay": {
+    "type": "string",
+    "description": "Per Day"
+   },
+   "perWeek": {
+    "type": "string",
+    "description": "Per Week"
+   },
+   "perMonth": {
+    "type": "string",
+    "description": "Per Month"
+   },
+   "perMembershipYear": {
+    "type": "string",
+    "description": "Per Membership Year"
+   },
+   "lifetimeOfMembership": {
+    "type": "string",
+    "description": "Lifetime of Membership"
+   },
+   "unlimitedGeneralAdmission": {
+    "type": "string",
+    "description": "Unlimited General Admission"
+   },
+   "freeParking": {
+    "type": "string",
+    "description": "Free Parking"
+   },
+   "memberSpecific": {
+    "type": "string",
+    "description": "Member Specific"
+   },
+   "familyShared": {
+    "type": "string",
+    "description": "Family Shared"
+   },
+   "dependentSpecific": {
+    "type": "string",
+    "description": "Dependent Specific"
+   },
+   "accountShared": {
+    "type": "string",
+    "description": "Account Shared"
+   }
+  }
+ },
+ "MembershipEntitlementAdmissionBenefitBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Membership Entitlement & Admission Benefit Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "unlimitedAdmission": {
+    "type": "string",
+    "description": "Unlimited Admission"
+   },
+   "limitedAdmissions": {
+    "type": "string",
+    "description": "Limited Admissions"
+   },
+   "attractionAccess": {
+    "type": "string",
+    "description": "Attraction Access"
+   },
+   "eventAccess": {
+    "type": "string",
+    "description": "Event Access"
+   },
+   "zoneAccess": {
+    "type": "string",
+    "description": "Zone Access"
+   },
+   "fastTrack": {
+    "type": "string",
+    "description": "Fast Track"
+   },
+   "priorityEntry": {
+    "type": "string",
+    "description": "Priority Entry"
+   },
+   "guestTickets": {
+    "type": "string",
+    "description": "Guest Tickets"
+   },
+   "parking": {
+    "type": "string",
+    "description": "Parking"
+   },
+   "fBBenefit": {
+    "type": "string",
+    "description": "F&B Benefit"
+   },
+   "retailBenefit": {
+    "type": "string",
+    "description": "Retail Benefit"
+   },
+   "rentalBenefit": {
+    "type": "string",
+    "description": "Rental Benefit"
+   },
+   "specialEventAccess": {
+    "type": "string",
+    "description": "Special Event Access"
+   },
+   "bookingPrivileges": {
+    "type": "string",
+    "description": "Booking Privileges"
+   },
+   "otherConfiguredBenefits": {
+    "type": "string",
+    "description": "Other Configured Benefits"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "eventType": {
+    "type": "string",
+    "description": "Event Type"
+   },
+   "admissionType": {
+    "type": "string",
+    "description": "Admission Type"
+   },
+   "numberOfVisits": {
+    "type": "integer",
+    "description": "Number of Visits"
+   },
+   "period": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Period"
+   },
+   "days": {
+    "type": "string",
+    "description": "Days"
+   },
+   "times": {
+    "type": "string",
+    "description": "Times"
+   },
+   "timeslots": {
+    "type": "string",
+    "description": "Timeslots"
+   },
+   "perDay": {
+    "type": "string",
+    "description": "Per Day"
+   },
+   "perWeek": {
+    "type": "string",
+    "description": "Per Week"
+   },
+   "perMonth": {
+    "type": "string",
+    "description": "Per Month"
+   },
+   "perMembershipYear": {
+    "type": "string",
+    "description": "Per Membership Year"
+   },
+   "lifetimeOfMembership": {
+    "type": "string",
+    "description": "Lifetime of Membership"
+   },
+   "unlimitedGeneralAdmission": {
+    "type": "string",
+    "description": "Unlimited General Admission"
+   },
+   "freeParking": {
+    "type": "string",
+    "description": "Free Parking"
+   },
+   "memberSpecific": {
+    "type": "string",
+    "description": "Member Specific"
+   },
+   "familyShared": {
+    "type": "string",
+    "description": "Family Shared"
+   },
+   "dependentSpecific": {
+    "type": "string",
+    "description": "Dependent Specific"
+   },
+   "accountShared": {
+    "type": "string",
+    "description": "Account Shared"
+   }
+  }
+ },
+ "MembershipProductTierBuilderInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is control.api_licence at 7%, so this is not an update to anything the package stores today and no new table has been decided",
+  "description": "**What Membership Product & Tier Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "membershipName": {
+    "type": "string",
+    "description": "Membership Name"
+   },
+   "membershipCode": {
+    "type": "string",
+    "description": "Membership Code"
+   },
+   "description": {
+    "type": "string",
+    "description": "Description"
+   },
+   "membershipType": {
+    "type": "string",
+    "description": "Membership Type"
+   },
+   "brand": {
+    "type": "string",
+    "description": "Brand"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "currencyContext": {
+    "type": "string",
+    "description": "Currency Context"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "description": "Effective To"
+   },
+   "standard": {
+    "type": "string",
+    "description": "Standard"
+   },
+   "silver": {
+    "type": "string",
+    "description": "Silver"
+   },
+   "gold": {
+    "type": "string",
+    "description": "Gold"
+   },
+   "platinum": {
+    "type": "string",
+    "description": "Platinum"
+   },
+   "vip": {
+    "type": "string",
+    "description": "VIP"
+   },
+   "customTiers": {
+    "type": "string",
+    "description": "Custom Tiers"
+   },
+   "tierLevel": {
+    "type": "string",
+    "description": "Tier Level"
+   },
+   "displayOrder": {
+    "type": "string",
+    "description": "Display Order"
+   },
+   "parentMembership": {
+    "type": "string",
+    "description": "Parent Membership"
+   },
+   "replacementMembership": {
+    "type": "string",
+    "description": "Replacement Membership"
+   },
+   "individualFamilyCorporate": {
+    "type": "string",
+    "description": "Individual / Family / Corporate"
+   },
+   "namedTransferable": {
+    "type": "string",
+    "description": "Named / Transferable"
+   },
+   "physicalDigital": {
+    "type": "string",
+    "description": "Physical / Digital"
+   },
+   "renewableNonRenewable": {
+    "type": "string",
+    "description": "Renewable / Non-Renewable"
+   },
+   "autoRenewEligible": {
+    "type": "string",
+    "description": "Auto-Renew Eligible"
+   },
+   "admissionBasedBenefitBasedHybrid": {
+    "type": "string",
+    "description": "Admission-Based / Benefit-Based / Hybrid"
+   },
+   "contracts": {
+    "type": "string",
+    "description": "contracts"
+   }
+  }
+ },
+ "MembershipProductTierBuilderView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Membership Product & Tier Builder displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "membershipName": {
+    "type": "string",
+    "description": "Membership Name"
+   },
+   "membershipCode": {
+    "type": "string",
+    "description": "Membership Code"
+   },
+   "description": {
+    "type": "string",
+    "description": "Description"
+   },
+   "membershipType": {
+    "type": "string",
+    "description": "Membership Type"
+   },
+   "brand": {
+    "type": "string",
+    "description": "Brand"
+   },
+   "venue": {
+    "type": "string",
+    "description": "Venue"
+   },
+   "attraction": {
+    "type": "string",
+    "description": "Attraction"
+   },
+   "market": {
+    "type": "string",
+    "description": "Market"
+   },
+   "currencyContext": {
+    "type": "string",
+    "description": "Currency Context"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "description": "Effective From"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "description": "Effective To"
+   },
+   "standard": {
+    "type": "string",
+    "description": "Standard"
+   },
+   "silver": {
+    "type": "string",
+    "description": "Silver"
+   },
+   "gold": {
+    "type": "string",
+    "description": "Gold"
+   },
+   "platinum": {
+    "type": "string",
+    "description": "Platinum"
+   },
+   "vip": {
+    "type": "string",
+    "description": "VIP"
+   },
+   "customTiers": {
+    "type": "string",
+    "description": "Custom Tiers"
+   },
+   "tierLevel": {
+    "type": "string",
+    "description": "Tier Level"
+   },
+   "displayOrder": {
+    "type": "string",
+    "description": "Display Order"
+   },
+   "parentMembership": {
+    "type": "string",
+    "description": "Parent Membership"
+   },
+   "replacementMembership": {
+    "type": "string",
+    "description": "Replacement Membership"
+   },
+   "individualFamilyCorporate": {
+    "type": "string",
+    "description": "Individual / Family / Corporate"
+   },
+   "namedTransferable": {
+    "type": "string",
+    "description": "Named / Transferable"
+   },
+   "physicalDigital": {
+    "type": "string",
+    "description": "Physical / Digital"
+   },
+   "renewableNonRenewable": {
+    "type": "string",
+    "description": "Renewable / Non-Renewable"
+   },
+   "autoRenewEligible": {
+    "type": "string",
+    "description": "Auto-Renew Eligible"
+   },
+   "admissionBasedBenefitBasedHybrid": {
+    "type": "string",
+    "description": "Admission-Based / Benefit-Based / Hybrid"
+   },
+   "contracts": {
+    "type": "string",
+    "description": "contracts"
+   }
+  }
+ },
+ "MembershipProductValidationApprovalPublicationVersioInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Membership Product Validation, Approval, Publication & Versioning submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "productDefinitionComplete": {
+    "type": "string",
+    "description": "Product Definition Complete"
+   },
+   "catalogueAssociation": {
+    "type": "string",
+    "description": "Catalogue Association"
+   },
+   "eligibilityRules": {
+    "type": "string",
+    "description": "Eligibility Rules"
+   },
+   "validity": {
+    "type": "string",
+    "description": "Validity"
+   },
+   "activation": {
+    "type": "string",
+    "description": "Activation"
+   },
+   "entitlements": {
+    "type": "string",
+    "description": "Entitlements"
+   },
+   "usageRules": {
+    "type": "string",
+    "description": "Usage Rules"
+   },
+   "pricingAssociation": {
+    "type": "string",
+    "description": "Pricing Association"
+   },
+   "taxFeeAssociation": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Tax/Fee Association"
+   },
+   "channelAvailability": {
+    "type": "string",
+    "description": "Channel Availability"
+   },
+   "renewalPolicy": {
+    "type": "string",
+    "description": "Renewal Policy"
+   },
+   "requiredCredentialConfiguration": {
+    "type": "string",
+    "description": "Required Credential Configuration"
+   },
+   "allowFutureConfigurationChanges": {
+    "type": "boolean",
+    "description": "Allow future configuration changes"
+   },
+   "effective1Jan": {
+    "type": "string",
+    "description": "Effective 1 Jan"
+   },
+   "configuredMigrationPolicy": {
+    "type": "string",
+    "description": "configured migration policy"
+   },
+   "activeMembersAffected": {
+    "type": "integer",
+    "description": "Active Members Affected"
+   },
+   "futureRenewals": {
+    "type": "string",
+    "description": "Future Renewals"
+   },
+   "entitlementsAffected": {
+    "type": "string",
+    "description": "Entitlements Affected"
+   },
+   "channels": {
+    "type": "string",
+    "description": "Channels"
+   },
+   "pricingDependencies": {
+    "type": "string",
+    "description": "Pricing Dependencies"
+   },
+   "accessDependencies": {
+    "type": "string",
+    "description": "Access Dependencies"
+   },
+   "b2c": {
+    "type": "string",
+    "description": "B2C"
+   },
+   "pos": {
+    "type": "string",
+    "description": "POS"
+   },
+   "mobileApp": {
+    "type": "string",
+    "description": "Mobile App"
+   },
+   "callCenter": {
+    "type": "string",
+    "description": "Call Center"
+   },
+   "b2b": {
+    "type": "string",
+    "description": "B2B"
+   },
+   "accessControl": {
+    "type": "string",
+    "description": "Access Control"
+   },
+   "ticketing": {
+    "type": "string",
+    "description": "Ticketing"
+   },
+   "otherDependentServices": {
+    "type": "string",
+    "description": "Other dependent services"
+   },
+   "membershipPass": {
+    "type": "string",
+    "description": "membership/pass?”"
+   },
+   "intelligence": {
+    "type": "string",
+    "description": "& Intelligence"
+   }
+  }
+ },
+ "MembershipProductValidationApprovalPublicationVersioView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Membership Product Validation, Approval, Publication & Versioning displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "productDefinitionComplete": {
+    "type": "string",
+    "description": "Product Definition Complete"
+   },
+   "catalogueAssociation": {
+    "type": "string",
+    "description": "Catalogue Association"
+   },
+   "eligibilityRules": {
+    "type": "string",
+    "description": "Eligibility Rules"
+   },
+   "validity": {
+    "type": "string",
+    "description": "Validity"
+   },
+   "activation": {
+    "type": "string",
+    "description": "Activation"
+   },
+   "entitlements": {
+    "type": "string",
+    "description": "Entitlements"
+   },
+   "usageRules": {
+    "type": "string",
+    "description": "Usage Rules"
+   },
+   "pricingAssociation": {
+    "type": "string",
+    "description": "Pricing Association"
+   },
+   "taxFeeAssociation": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Tax/Fee Association"
+   },
+   "channelAvailability": {
+    "type": "string",
+    "description": "Channel Availability"
+   },
+   "renewalPolicy": {
+    "type": "string",
+    "description": "Renewal Policy"
+   },
+   "requiredCredentialConfiguration": {
+    "type": "string",
+    "description": "Required Credential Configuration"
+   },
+   "allowFutureConfigurationChanges": {
+    "type": "boolean",
+    "description": "Allow future configuration changes"
+   },
+   "effective1Jan": {
+    "type": "string",
+    "description": "Effective 1 Jan"
+   },
+   "configuredMigrationPolicy": {
+    "type": "string",
+    "description": "configured migration policy"
+   },
+   "activeMembersAffected": {
+    "type": "integer",
+    "description": "Active Members Affected"
+   },
+   "futureRenewals": {
+    "type": "string",
+    "description": "Future Renewals"
+   },
+   "entitlementsAffected": {
+    "type": "string",
+    "description": "Entitlements Affected"
+   },
+   "channels": {
+    "type": "string",
+    "description": "Channels"
+   },
+   "pricingDependencies": {
+    "type": "string",
+    "description": "Pricing Dependencies"
+   },
+   "accessDependencies": {
+    "type": "string",
+    "description": "Access Dependencies"
+   },
+   "b2c": {
+    "type": "string",
+    "description": "B2C"
+   },
+   "pos": {
+    "type": "string",
+    "description": "POS"
+   },
+   "mobileApp": {
+    "type": "string",
+    "description": "Mobile App"
+   },
+   "callCenter": {
+    "type": "string",
+    "description": "Call Center"
+   },
+   "b2b": {
+    "type": "string",
+    "description": "B2B"
+   },
+   "accessControl": {
+    "type": "string",
+    "description": "Access Control"
+   },
+   "ticketing": {
+    "type": "string",
+    "description": "Ticketing"
+   },
+   "otherDependentServices": {
+    "type": "string",
+    "description": "Other dependent services"
+   },
+   "membershipPass": {
+    "type": "string",
+    "description": "membership/pass?”"
+   },
+   "intelligence": {
+    "type": "string",
+    "description": "& Intelligence"
+   }
+  }
+ },
+ "MembershipUsageVisitConsumptionRulesView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Membership Usage, Visit & Consumption Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "maximumVisitsPerDay": {
+    "type": "string",
+    "description": "Maximum Visits per Day"
+   },
+   "maximumAdmissionsPerPeriod": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Maximum Admissions per Period"
+   },
+   "sameDayReEntry": {
+    "type": "string",
+    "description": "Same-Day Re-entry"
+   },
+   "reEntryCooldown": {
+    "type": "string",
+    "description": "Re-entry Cooldown"
+   },
+   "concurrentReservations": {
+    "type": "string",
+    "description": "Concurrent Reservations"
+   },
+   "advanceBookingLimit": {
+    "type": "integer",
+    "description": "Advance Booking Limit"
+   },
+   "noShowTreatment": {
+    "type": "string",
+    "description": "No-Show Treatment"
+   },
+   "cancellationLimit": {
+    "type": "integer",
+    "description": "Cancellation Limit"
+   },
+   "guestUsage": {
+    "type": "string",
+    "description": "Guest Usage"
+   },
+   "benefitConsumption": {
+    "type": "string",
+    "description": "Benefit Consumption"
+   },
+   "reservationRequired": {
+    "type": "boolean",
+    "description": "Reservation Required"
+   },
+   "reservationOptional": {
+    "type": "string",
+    "description": "Reservation Optional"
+   },
+   "walkInAllowed": {
+    "type": "boolean",
+    "description": "Walk-In Allowed"
+   },
+   "maximumAdvanceBookingDays": {
+    "type": "string",
+    "description": "Maximum Advance Booking Days"
+   },
+   "maximumActiveFutureReservations": {
+    "type": "string",
+    "description": "Maximum Active Future Reservations"
+   },
+   "unlimitedSameDayReEntry": {
+    "type": "string",
+    "description": "Unlimited Same-Day Re-entry"
+   },
+   "noReEntry": {
+    "type": "string",
+    "description": "No Re-entry"
+   },
+   "reEntryAfterXMinutes": {
+    "type": "string",
+    "description": "Re-entry After X Minutes"
+   },
+   "venueSpecificRule": {
+    "type": "string",
+    "description": "Venue-Specific Rule"
+   },
+   "but": {
+    "type": "string",
+    "description": "but"
+   },
+   "parking12UsesThisYear": {
+    "type": "string",
+    "description": "Parking: 12 uses this year"
+   },
+   "rules": {
+    "type": "string",
+    "description": "rules"
+   }
+  }
+ },
+ "RenewalAutoRenewalMembershipContinuityConfigurationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Renewal, Auto-Renewal & Membership Continuity Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "manualRenewal": {
+    "type": "string",
+    "description": "Manual Renewal"
+   },
+   "customerSelfServiceRenewal": {
+    "type": "string",
+    "description": "Customer Self-Service Renewal"
+   },
+   "agentAssistedRenewal": {
+    "type": "string",
+    "description": "Agent-Assisted Renewal"
+   },
+   "autoRenewal": {
+    "type": "string",
+    "description": "Auto-Renewal"
+   },
+   "invitationOnlyRenewal": {
+    "type": "string",
+    "description": "Invitation-Only Renewal"
+   },
+   "nonRenewable": {
+    "type": "string",
+    "description": "Non-Renewable"
+   },
+   "through": {
+    "type": "string",
+    "description": "through"
+   },
+   "eligibleProducts": {
+    "type": "string",
+    "description": "Eligible Products"
+   },
+   "consentRequirement": {
+    "type": "string",
+    "description": "Consent Requirement"
+   },
+   "paymentMethodRequirement": {
+    "type": "string",
+    "description": "Payment Method Requirement"
+   },
+   "preRenewalNotification": {
+    "type": "string",
+    "description": "Pre-Renewal Notification"
+   },
+   "failureHandling": {
+    "type": "string",
+    "description": "Failure Handling"
+   },
+   "currentMembershipPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Current Membership Price"
+   },
+   "protectedRenewalPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Protected Renewal Price"
+   },
+   "renewalDiscount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Renewal Discount"
+   },
+   "loyaltyRate": {
+    "type": "number",
+    "description": "Loyalty Rate"
+   },
+   "fixedRenewalRate": {
+    "type": "number",
+    "description": "Fixed Renewal Rate"
+   },
+   "age": {
+    "type": "string",
+    "description": "Age"
+   },
+   "residency": {
+    "type": "string",
+    "description": "Residency"
+   },
+   "membershipStatus": {
+    "type": "string",
+    "description": "Membership Status"
+   },
+   "outstandingBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Outstanding Balance"
+   },
+   "qualification": {
+    "type": "string",
+    "description": "Qualification"
+   },
+   "corporateAssociation": {
+    "type": "string",
+    "description": "Corporate Association"
+   },
+   "sameTierOnly": {
+    "type": "string",
+    "description": "Same Tier Only"
+   },
+   "suggestedTier": {
+    "type": "string",
+    "description": "Suggested Tier"
+   }
+  }
+ },
+ "RenewalAutoRenewalMembershipContinuityConfigurationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Renewal, Auto-Renewal & Membership Continuity Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "manualRenewal": {
+    "type": "string",
+    "description": "Manual Renewal"
+   },
+   "customerSelfServiceRenewal": {
+    "type": "string",
+    "description": "Customer Self-Service Renewal"
+   },
+   "agentAssistedRenewal": {
+    "type": "string",
+    "description": "Agent-Assisted Renewal"
+   },
+   "autoRenewal": {
+    "type": "string",
+    "description": "Auto-Renewal"
+   },
+   "invitationOnlyRenewal": {
+    "type": "string",
+    "description": "Invitation-Only Renewal"
+   },
+   "nonRenewable": {
+    "type": "string",
+    "description": "Non-Renewable"
+   },
+   "through": {
+    "type": "string",
+    "description": "through"
+   },
+   "eligibleProducts": {
+    "type": "string",
+    "description": "Eligible Products"
+   },
+   "consentRequirement": {
+    "type": "string",
+    "description": "Consent Requirement"
+   },
+   "paymentMethodRequirement": {
+    "type": "string",
+    "description": "Payment Method Requirement"
+   },
+   "preRenewalNotification": {
+    "type": "string",
+    "description": "Pre-Renewal Notification"
+   },
+   "failureHandling": {
+    "type": "string",
+    "description": "Failure Handling"
+   },
+   "currentMembershipPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Current Membership Price"
+   },
+   "protectedRenewalPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Protected Renewal Price"
+   },
+   "renewalDiscount": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Renewal Discount"
+   },
+   "loyaltyRate": {
+    "type": "number",
+    "description": "Loyalty Rate"
+   },
+   "fixedRenewalRate": {
+    "type": "number",
+    "description": "Fixed Renewal Rate"
+   },
+   "age": {
+    "type": "string",
+    "description": "Age"
+   },
+   "residency": {
+    "type": "string",
+    "description": "Residency"
+   },
+   "membershipStatus": {
+    "type": "string",
+    "description": "Membership Status"
+   },
+   "outstandingBalance": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money",
+    "description": "Outstanding Balance"
+   },
+   "qualification": {
+    "type": "string",
+    "description": "Qualification"
+   },
+   "corporateAssociation": {
+    "type": "string",
+    "description": "Corporate Association"
+   },
+   "sameTierOnly": {
+    "type": "string",
+    "description": "Same Tier Only"
+   },
+   "suggestedTier": {
+    "type": "string",
+    "description": "Suggested Tier"
+   }
+  }
+ },
+ "ValidityActivationExpiryConfigurationInput": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "description": "**What Validity, Activation & Expiry Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "properties": {
+   "immediateOnPurchase": {
+    "type": "string",
+    "description": "Immediate on Purchase"
+   },
+   "fixedStartDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Fixed Start Date"
+   },
+   "firstVisit": {
+    "type": "string",
+    "description": "First Visit"
+   },
+   "manualActivation": {
+    "type": "string",
+    "description": "Manual Activation"
+   },
+   "customerActivation": {
+    "type": "string",
+    "description": "Customer Activation"
+   },
+   "configuredStart": {
+    "type": "string",
+    "description": "Configured start"
+   },
+   "configuredEnd": {
+    "type": "string",
+    "description": "Configured end"
+   }
+  }
+ },
+ "ValidityActivationExpiryConfigurationView": {
+  "type": "object",
+  "x-ticvai-drafted-shape": true,
+  "x-ticvai-persistence": "none — projection over subscription state, assembled at read time from tables that already exist",
+  "description": "**What Validity, Activation & Expiry Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
+  "properties": {
+   "immediateOnPurchase": {
+    "type": "string",
+    "description": "Immediate on Purchase"
+   },
+   "fixedStartDate": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Fixed Start Date"
+   },
+   "firstVisit": {
+    "type": "string",
+    "description": "First Visit"
+   },
+   "manualActivation": {
+    "type": "string",
+    "description": "Manual Activation"
+   },
+   "customerActivation": {
+    "type": "string",
+    "description": "Customer Activation"
+   },
+   "configuredStart": {
+    "type": "string",
+    "description": "Configured start"
+   },
+   "configuredEnd": {
+    "type": "string",
+    "description": "Configured end"
+   }
+  }
+ }
+}

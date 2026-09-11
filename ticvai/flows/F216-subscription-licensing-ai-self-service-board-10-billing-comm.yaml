@@ -1,0 +1,133 @@
+id: F216
+name: 'Subscription Licensing AI Self Service board 10: Billing & Commercial Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Subscription Licensing AI Self Service board 10. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-459
+  entryPoints:
+  - Arrives at Billing & Commercial Command Center
+steps:
+- step: 1
+  screen: ADM-459
+  action: Opens Billing & Commercial Command Center
+  operations: []
+  outcome: Provide finance, commercial and subscription teams with a consolidated view of the customer's
+    financial position.
+- step: 2
+  screen: ADM-460
+  action: Works in Billing Calculation & Charge Breakdown
+  operations: []
+  outcome: Calculate exactly what TICVAI should charge for the billing period. This screen must dynamically
+    change according to the commercial model.
+- step: 3
+  screen: ADM-459
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-461
+  action: Works in Consumption Reconciliation & Billing Approval
+  operations: []
+  outcome: This is an important new screen following the introduction of transaction-based contracts.
+    Finance must be able to reconcile the commercial consumption received from Board 9 before invoicing.
+- step: 5
+  screen: ADM-459
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-462
+  action: Works in Invoice & Payment Management
+  operations: []
+  outcome: Generate, issue and track customer invoices and payments.
+- step: 7
+  screen: ADM-459
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-463
+  action: Works in Subscription & Commercial Change Management
+  operations: []
+  outcome: Manage changes to an active commercial agreement without losing contractual history.
+- step: 9
+  screen: ADM-459
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-464
+  action: Works in Renewal Management Center
+  operations: []
+  outcome: Manage the complete customer renewal pipeline.
+- step: 11
+  screen: ADM-459
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-465
+  action: Works in AI Upgrade, Downgrade & Commercial Right-Sizing
+  operations: []
+  outcome: Use AI to recommend the best future commercial structure, not simply the most expensive package.
+    This remains a fundamental TICVAI AI principle.
+- step: 13
+  screen: ADM-459
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-466
+  action: Works in Commercial Scenario Simulator
+  operations: []
+  outcome: Allow commercial and finance teams to model different renewal or contract scenarios before
+    making an offer.
+- step: 15
+  screen: ADM-459
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-467
+  action: Works in Discount, Credit & Commercial Override Management
+  operations: []
+  outcome: Govern non-standard commercial terms.
+- step: 17
+  screen: ADM-459
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-468
+  action: Works in Renewal Approval, Activation & Commercial Handoff
+  operations: []
+  outcome: Finalize renewal and synchronize the approved future commercial agreement across TICVAI.
+branches:
+- at: 1
+  condition: Nothing has been set up on Billing & Commercial Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Subscription Licensing AI Self Service board 10 visited
+primaryContract: unknown
+contracts:
+- unknown
