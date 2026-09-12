@@ -31,7 +31,7 @@ labels.
 | OPEN — reviewer experience | **3** |
 | OPEN — correctness | **2** |
 | OPEN — polish | **5** |
-| DONE | **38** |
+| DONE | **40** |
 
 **One thing blocks: V-49.** Phase 4 of the bridge cannot be designed until it is
 answered. Nothing before phase 4 waits on it.
@@ -99,10 +99,19 @@ side; what remains is V-49 and V-50 under Blocked, and decisions 2 and 3.
 
 **Dropped rather than done.** `V-23` was never a bug — the States zoom cap of `1.1` is deliberate and commented. `V-25` asked whether two root tools should be kept or deleted; both now live in `ticvai/tools/`, so the question answered itself. `V-02` wanted a commit split that a fresh history made moot.
 
-## Done — 38
+## Done — 40
+
+**The bridge is deployed.** `adam.ainfinite.ai` serves it as of 12 September: `/api/settings/me`,
+`/api/links` and `/api/board/mine` all answer 401 rather than 404, which is the proof — those routes
+did not exist before. The gate holds on `/api/index` and `/pkg/ticvai/index`, `/settings.html`
+redirects to the sign-in page, and both hostnames carry the new routes. **Node's `fetch` passes
+through Cloudflare**, which mattered: error 1010 is what blocked `Python-urllib` from OpenProject,
+and the same edge sits in front of the viewer. Developers' MCP clients connect.
 
 | ID | Item |
 |---|---|
+| **V-55** | **`start.ps1` never set `TICVAI_SECRET_KEY`, so credential storage was off on every workstation.** `deploy.sh` generates the key on the server; nothing did it locally, and **the symptom is not an error** — the settings page says it cannot store a token and `settings-check` reports 8 of 10, which reads as the feature being broken rather than unconfigured. Found by running the harness against a hand-started uvicorn and reading the 503 body instead of the count. Now generated into `.dev-secret.key` on first run, gitignored beside `api/ticvai.db` for the reason that file is: it decrypts the tokens in it, and a key filed beside the thing it protects is not a key. An exported `TICVAI_SECRET_KEY` always wins — an environment somebody set deliberately outranks one a script guessed |
+| **V-54** | **`/api/health` was handing out the headcount.** It answered `{"ok":true,"accounts":29,"domain":"…"}` to anyone, unauthenticated by design — `lib/session.mjs` lists it among the paths the gate lets through — so on a public name that is the company's size, from a URL that looks like plumbing. Now `{"ok":true}`. **Nothing needed inventing to replace it:** `/api/auth/state` already answers `needsBootstrap` publicly, which is what all four readers actually wanted — "is this store empty" — and carries `domain` because the sign-in page must say which addresses can hold an account. So the domain stays public, legitimately; the count is what stopped leaking. Four readers moved across: `gate-check`, `logout-all-check`, `api-check` and **`start.ps1`, which the first grep missed** because it spells it `$health.accounts`. Pre-existing, not from the bridge — `80ccf7d` does not touch that route |
 | **V-40** | **UI/UX — every board, on its own page.** `lib/uiux.mjs`, `/pkg/<project>/uiux`, `public/uiux.{html,js,css}`, linked from the viewer's menu and the two rollup pages. `lib/wireframes.mjs` describes only the boards a screen points at, because its job is putting a frame on a screen's page — so **23 of the 58 boards were reachable from nowhere**, including every Inventory board and a hand-built index of 255 frame links, every one of which resolves. Reports frames, how many anything can name, and how many no screen claims: **0 named out of 10 is the signature of an unmapped pack**. `checks/uiux-check.mjs` holds it — 16 passed, and it fetches all 58 board files and a frame out of each of the 54 with frames |
 | **V-24** | Stop the second accounts API on 8788. **Done — nothing is listening on 8788 or 4619 any more.** It was a full second copy of the accounts API with no `TICVAI_DB`, so it defaulted to the real `api/ticvai.db` |
 | **V-36** | The workbook's `Scaling` sheet. Root cause was `build-schema-workbook.py` globbing `/home/claude/...`; `glob.glob` on a missing directory returns `[]` and raises nothing, so the workbook built with two empty sheets. **Restoring it surfaced a third `/home/claude` path in the same file** that no one had found — not a glob, so it failed the other way: `open` raised, `except Exception` swallowed it, and the `Service` column read `—` for all 379 tables. `Foreign writers` was empty with it. Now: Scaling 32 rows and TOTAL 674/46/264/38, Service across 17 services, Foreign writers on 37 tables. See V-41 |

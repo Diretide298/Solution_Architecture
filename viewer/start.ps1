@@ -265,6 +265,38 @@ $health = $null
 if (-not $NoApi) {
     Write-Host ''
     Write-Step "starting accounts and validation on $ApiPort"
+
+    # The credential key. `api/secrets.py` refuses to store an OpenProject token
+    # without one, and `deploy/deploy.sh` generates it on the server — but
+    # nothing did it here, so a workstation ran with credential storage quietly
+    # switched off. The symptom is not an error: the settings page says it
+    # cannot store a token, and `api/settings-check.mjs` reports 8 of 10 as
+    # though the feature were broken rather than unconfigured.
+    #
+    # Kept in `.dev-secret.key` beside the checkout, and gitignored. It decrypts
+    # the tokens in `api/ticvai.db`, so committing it would file the key beside
+    # the thing it protects. An exported TICVAI_SECRET_KEY always wins, because
+    # an environment somebody set deliberately outranks one this script guessed.
+    if (-not $env:TICVAI_SECRET_KEY) {
+        $keyFile = Join-Path $PSScriptRoot '.dev-secret.key'
+        if (Test-Path $keyFile) {
+            $env:TICVAI_SECRET_KEY = (Get-Content -Raw $keyFile).Trim()
+        }
+        else {
+            $generated = & $python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())" 2>$null
+            if ($? -and $generated) {
+                $generated = "$generated".Trim()
+                Set-Content -Path $keyFile -Value $generated -Encoding ascii -NoNewline
+                $env:TICVAI_SECRET_KEY = $generated
+                Write-Good "generated .dev-secret.key   credentials can be stored locally"
+            }
+            else {
+                Write-Warn 'No TICVAI_SECRET_KEY, and cryptography is not installed.'
+                Write-Warn 'The settings page will refuse to store an OpenProject token.'
+            }
+        }
+    }
+
     $apiArgs = "-m uvicorn api.main:app --port $ApiPort"
     if ($Shared) {
         $api = Start-Process -FilePath $python -ArgumentList $apiArgs `
@@ -317,7 +349,19 @@ Write-Good "viewer                   http://localhost:$Port"
 
 # ── where to go first ────────────────────────────────────────────────
 Write-Host ''
-if ($null -ne $health -and $health.accounts -eq 0) {
+# /api/health answers {ok:true} and nothing else now — it is unauthenticated, so
+# it no longer reports a headcount. /api/auth/state is where the sign-in page
+# asks the same question this needs: is there anybody yet.
+$needsBootstrap = $false
+if ($null -ne $health) {
+    try {
+        $state = Invoke-RestMethod -Uri "http://localhost:$ApiPort/api/auth/state" -TimeoutSec 2
+        $needsBootstrap = [bool]$state.needsBootstrap
+    }
+    catch { }
+}
+
+if ($needsBootstrap) {
     Write-Host '  No account exists yet.' -ForegroundColor Yellow
     Write-Host "  Open http://localhost:$Port and the first page will offer to make one." -ForegroundColor Yellow
     Write-Host "  It is an administrator, and it is the only account that page will ever make." -ForegroundColor DarkGray

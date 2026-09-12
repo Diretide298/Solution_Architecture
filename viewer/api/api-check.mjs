@@ -28,8 +28,7 @@ async function call(method, path, body, { jarName = 'a' } = {}) {
 }
 
 const health = await call('GET', '/api/health');
-check('the service is up', health.status === 200,
-  `${health.data?.accounts} accounts, domain ${health.data?.domain}`);
+check('the service is up', health.status === 200, `${health.status}`);
 
 // ── signed out, everything that writes must refuse ───────────────────
 const anon = await call('GET', '/api/auth/me');

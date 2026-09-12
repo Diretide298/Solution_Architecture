@@ -2262,5 +2262,18 @@ def apply_decisions(
 
 @app.get("/api/health")
 def health():
-    accounts = db.one("SELECT COUNT(*) AS n FROM account")["n"]
-    return {"ok": True, "accounts": accounts, "domain": security.ALLOWED_DOMAIN}
+    """Whether the service is answering. That is the whole answer.
+
+    It used to report the number of accounts and the allowed domain. This route
+    is unauthenticated by design — `lib/session.mjs` lists it among the paths the
+    gate lets through — so once this was on a public name that was the company's
+    headcount handed to anyone who asked, from a URL that looks like plumbing.
+
+    Nothing is lost by removing it. `/api/auth/state` already answers the one
+    question a caller legitimately has before it can sign in — whether the store
+    is empty — as `needsBootstrap`, and carries `domain` because the sign-in page
+    has to say which addresses can hold an account. The count itself had no
+    reader anywhere but three harnesses, and what each of them wanted was
+    "is this store empty", which is the field next door.
+    """
+    return {"ok": True}

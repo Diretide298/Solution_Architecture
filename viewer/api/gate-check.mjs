@@ -63,8 +63,16 @@ page.on('console', (m) => m.type() === 'error' && !EXPECTED.test(m.text()) && er
 page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
 await page.setViewport({ width: 1500, height: 1000 });
 
-const health = await fetch(`${API}/api/health`).then((r) => r.json());
-check('starting from an empty database', health.accounts === 0, `${health.accounts} accounts`);
+// `needsBootstrap` rather than a count from /api/health, which now answers
+// `{ok:true}` and nothing else — it is unauthenticated, and a headcount is
+// nobody's business. This asks the question the file actually has, and it is
+// the same field the door draws itself from, checked again at the end once the
+// first admin exists and it has to have flipped.
+// `atStart`, because the same field is read again at the end of this file
+// under its own name — the whole point being that it has flipped by then.
+const atStart = await fetch(`${API}/api/auth/state`).then((r) => r.json());
+check('starting from an empty database',
+  atStart.needsBootstrap === true, `needsBootstrap ${atStart.needsBootstrap}`);
 
 // ── the viewer will not draw for a stranger ──────────────────────────
 // Deliberately NOT signed in: this file exists to test the door, so it has to

@@ -45,7 +45,12 @@ const signedIn = async (jarName) =>
   (await call('GET', '/api/auth/me', undefined, { jarName })).data?.signedIn === true;
 
 const health = await call('GET', '/api/health');
-check('the service is up', health.status === 200, `${health.data?.accounts} accounts`);
+check('the service is up', health.status === 200, `${health.status}`);
+
+// Whether the store is empty. /api/health used to say, and no longer does —
+// it is unauthenticated, so it answers `{ok:true}` and nothing else now.
+// /api/auth/state is where the sign-in page asks the same question.
+const state = await call('GET', '/api/auth/state');
 
 // ── two people, several devices each ─────────────────────────────────
 const ADMIN = { email: 'harness.admin@softlabsgroup.com', password: 'a-long-enough-passphrase' };
@@ -55,7 +60,7 @@ const ADMIN = { email: 'harness.admin@softlabsgroup.com', password: 'a-long-enou
 // 5/24 — which reads as the feature being broken rather than the harness being
 // half set up. `/api/auth/bootstrap` only answers while there are no accounts,
 // so this is a no-op on a store that already has one.
-if (health.data?.accounts === 0) {
+if (state.data?.needsBootstrap) {
   await call('POST', '/api/auth/bootstrap', { ...ADMIN, name: 'Harness admin' });
 }
 
