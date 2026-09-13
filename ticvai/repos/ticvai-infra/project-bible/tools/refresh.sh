@@ -172,6 +172,9 @@ python3 tools/derive-platform.py
 python3 tools/derive-platform-deployment.py
 python3 tools/build-audience.py
 python3 tools/build-status.py
+# **Guest web and guest app are one product (12 September).** Writes handoff/, so it runs before
+# the mirrors copy handoff/ — after them, every repo would carry the previous run's audit.
+python3 tools/audit-guest-parity.py
 
 # **Mirrors last.** They copy handoff/, and build-status writes handoff/ — running the copy at the
 # top of this script mirrored the previous run's numbers and then failed its own drift check.

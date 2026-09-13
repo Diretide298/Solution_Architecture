@@ -50,8 +50,8 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 6 permissions apply here:
   `GUEST_VIEW, GUEST_VIEW_PII, ORDER_CREATE, ORDER_REPRINT, ORDER_VIEW, PRICE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **7 of these operations work offline**: createOrder, createPayment, evaluatePromotions, getCouponCode, getOrder, listConsentPurposes, reprintOrder
-  — and the rest do not. A surface that looks the same online and off is lying.
+- **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store. Offline, a screen shows what was already loaded, under the banner below.
+- **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -276,7 +276,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "error": "Could not load. Names which read failed and leaves the shopping cart untouched.",
    "emptyFirstRun": "No shopping cart yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the shopping cart are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
    {
@@ -364,6 +365,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "shortName": "Guest Web",
    "name": "Guest Web — Storefront",
    "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
    "app": "guest-web",
    "operator": "guest",
    "targetApp": {
@@ -591,7 +601,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "error": "Could not load. Names which read failed and leaves the guest attendee forms untouched.",
    "emptyFirstRun": "No guest attendee forms yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the guest attendee forms are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Not available, and the offline banner says why.** A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice."
   },
   "apis": [
    {
@@ -713,6 +724,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "shortName": "Guest Web",
    "name": "Guest Web — Storefront",
    "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
    "app": "guest-web",
    "operator": "guest",
    "targetApp": {
@@ -874,7 +894,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "error": "Could not load. Names which read failed and leaves the checkout payment untouched.",
    "emptyFirstRun": "No checkout payment yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the checkout payment are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Not available, and the offline banner says why.** A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice."
   },
   "apis": [
    {
@@ -934,6 +955,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "shortName": "Guest Web",
    "name": "Guest Web — Storefront",
    "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
    "app": "guest-web",
    "operator": "guest",
    "targetApp": {
@@ -1098,7 +1128,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "error": "Could not load. Names which read failed and leaves the booking confirmation untouched.",
    "emptyFirstRun": "No booking confirmation yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the booking confirmation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "apis": [
    {
@@ -1142,6 +1173,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "shortName": "Guest Web",
    "name": "Guest Web — Storefront",
    "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
    "app": "guest-web",
    "operator": "guest",
    "targetApp": {
@@ -1274,7 +1314,8 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "error": "Could not load the booking. **The hold is unaffected** — a failed page load must not release inventory.",
    "emptyFirstRun": "**Not reachable empty** — a link always names an order. An empty state here means the token did not resolve, which is the error state.",
    "emptyNoResults": "The filter narrowed it and the pay for booking are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "**The token is the credential, so there is no permission case** — either it resolves or it has gone."
+   "emptyNoAccess": "**The token is the credential, so there is no permission case** — either it resolves or it has gone.",
+   "offline": "**Not available, and the offline banner says why.** A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice."
   },
   "apis": [
    {
@@ -1312,6 +1353,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "shortName": "Guest Web",
    "name": "Guest Web — Storefront",
    "offlineCapable": false,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
    "app": "guest-web",
    "operator": "guest",
    "targetApp": {

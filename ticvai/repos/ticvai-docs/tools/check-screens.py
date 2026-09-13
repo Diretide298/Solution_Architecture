@@ -1213,6 +1213,44 @@ def main() -> int:
                 f"{_sid}: has drifted from {_twin_id} in {', '.join(_drift)} — re-run "
                 f"tools/applied/{_tool.get(_code, '<the tool that made it>')} --apply")
 
+    # ── guest web and guest app say the same thing offline ────────────────────────────────────
+    #
+    # **Decided 12 September 2026: guest web and guest app are identical, offline included.**
+    # `screens/_guest-pairs.yaml` puts every P01 and P02 screen in one capability group; every
+    # member of a group carries one `states.offline`, and both platforms one `offlineBanner`.
+    # Until that day no web screen had an offline state and every app screen had one — nothing
+    # compared them because nothing knew which web screen was which app screen.
+    _gp_path = SCREENS / "_guest-pairs.yaml"
+    if _gp_path.exists():
+        _gp = yaml.safe_load(_gp_path.read_text(encoding="utf-8")) or {}
+        _fix = "re-run tools/applied/apply-guest-offline-parity.py --apply"
+        _grouped: dict = {}
+        for _g in _gp.get("groups") or []:
+            _members = (_g.get("web") or []) + (_g.get("app") or [])
+            for _m in _members:
+                if _m in _grouped:
+                    ERRORS.append(f"{_m}: in two guest parity groups, {_grouped[_m]} and {_g.get('key')}")
+                _grouped[_m] = _g.get("key")
+                if _m not in _all:
+                    ERRORS.append(f"screens/_guest-pairs.yaml: {_g.get('key')} names {_m}, which does not exist")
+            _texts = {str((_all[_m][1].get("states") or {}).get("offline") or "")
+                      for _m in _members if _m in _all}
+            if len(_texts) > 1:
+                ERRORS.append(f"guest parity {_g.get('key')}: {', '.join(_members)} carry different "
+                              f"offline states — {_fix}")
+        for _sid, (_code, _sc) in sorted(_all.items()):
+            if _code in ("P01", "P02") and _sid not in _grouped:
+                ERRORS.append(f"{_sid}: a guest web or app screen in no group of screens/_guest-pairs.yaml "
+                              "— place it, or its offline story has nothing to agree with")
+        _banners = {}
+        for f in files:
+            _d = yaml.safe_load(f.read_text(encoding="utf-8"))
+            if _d["platform"]["code"] in ("P01", "P02"):
+                _banners[_d["platform"]["code"]] = json.dumps(_d["platform"].get("offlineBanner"),
+                                                              sort_keys=True)
+        if "null" in _banners.values() or len(set(_banners.values())) > 1:
+            ERRORS.append(f"P01/P02: offlineBanner is missing or differs — guest web and app show one banner; {_fix}")
+
     for w in WARNINGS:
         print(f"  WARN  {w}")
     for e in ERRORS:

@@ -83,7 +83,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams: []
   goesTo:
   - WEB-002
@@ -122,7 +123,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - eventId<-deepLink
   goesTo:
@@ -147,7 +149,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams: []
   goesTo:
   - WEB-001
@@ -173,7 +176,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - eventId<-WEB-002
   - productId<-WEB-001
@@ -201,7 +205,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - productId<-WEB-004
   goesTo:
@@ -230,7 +235,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - performanceId<-navigation
   goesTo:
@@ -260,7 +266,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - performanceId<-deepLink
   goesTo:
@@ -291,7 +298,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - cartId<-session
   - bundleId<-navigation
@@ -319,7 +327,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - itemId<-deepLink
   - subjectId<-session
@@ -353,7 +362,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - cartId<-WEB-008
   - code<-deepLink
@@ -394,7 +404,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - deviceId<-deepLink
   - itemId<-deepLink
@@ -428,7 +439,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - orderId<-deepLink
   - paymentId<-navigation
@@ -458,7 +470,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - orderId<-WEB-012
   goesTo:
@@ -486,7 +499,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - token<-deepLink
   goesTo:
@@ -510,7 +524,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - entryId<-deepLink
   goesTo:
@@ -551,7 +566,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - cartId<-session
   - challengeId<-deepLink
@@ -588,7 +604,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - deviceId<-deepLink
   - itemId<-deepLink
@@ -624,7 +641,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - entitlementId<-deepLink
   - orderId<-deepLink
@@ -654,7 +672,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - orderId<-deepLink
   goesTo:
@@ -684,7 +703,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - subjectId<-session
   goesTo:
@@ -715,7 +735,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - cardCode<-deepLink
   - subjectId<-session
@@ -745,7 +766,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - productId<-WEB-001
   goesTo:
@@ -772,7 +794,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - orderId<-deepLink
   goesTo:
@@ -811,7 +834,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - deviceId<-deepLink
   - itemId<-deepLink
@@ -842,7 +866,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams: []
   goesTo:
   - WEB-001
@@ -865,7 +890,8 @@ screens:
   - emptyNoAccess
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams: []
   goesTo:
   - WEB-001
@@ -897,7 +923,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - deviceId<-deepLink
   - itemId<-deepLink
@@ -924,7 +951,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams: []
   goesTo:
   - WEB-001
@@ -948,7 +976,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams: []
   goesTo:
   - WEB-001
@@ -972,7 +1001,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - orderId<-deepLink
   - transferId<-deepLink
@@ -1004,7 +1034,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - reservationId<-deepLink
   - groupBookingId<-navigation
@@ -1032,7 +1063,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - promotionId<-deepLink
   goesTo:
@@ -1057,7 +1089,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - cartId<-session
   - outletId<-deepLink
@@ -1083,7 +1116,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - caseId<-deepLink
   goesTo:
@@ -1107,7 +1141,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams: []
   goesTo:
   - WEB-001
@@ -1139,7 +1174,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - outletId<-deepLink
   - venueId<-session
@@ -1164,7 +1200,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - outletId<-deepLink
   goesTo:
@@ -1188,7 +1225,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - orderId<-deepLink
   - sessionId<-deepLink
@@ -1215,7 +1253,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - mapId<-deepLink
   - venueId<-session
@@ -1244,7 +1283,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - entryId<-deepLink
   goesTo:
@@ -1268,7 +1308,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - entitlementId<-deepLink
   - venueId<-session
@@ -1294,7 +1335,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - outletId<-deepLink
   goesTo:
@@ -1321,7 +1363,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams: []
   goesTo:
   - WEB-001
@@ -1348,7 +1391,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams:
   - conversationId<-deepLink
   - outletId<-session
@@ -1372,7 +1416,8 @@ screens:
   - emptyNoResults
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams: []
   goesTo:
   - WEB-001
@@ -1392,7 +1437,8 @@ screens:
   - emptyNoAccess
   - error
   - loading
-  offlineState: false
+  - offline
+  offlineState: true
   entryParams: []
   goesTo:
   - WEB-001

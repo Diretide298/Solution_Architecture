@@ -59,16 +59,19 @@ question is whether the client wants it or whether a designer liked it.
 
 ---
 
-## Where the app is genuinely right to be ahead
+## Where the app was once thought right to be ahead
 
-**In-venue capabilities belong on a phone in a pocket, and putting them on a website would be
-building something nobody opens.**
+**Superseded 12 September 2026 — see the end of this document.** This section argued that
+in-venue capabilities belong on a phone in a pocket and that none of them was a parity gap:
 
 `GST-021` interactive map · `GST-022` wait times · `GST-023` virtual queue · `GST-024` F&B
 ordering to a location · `GST-025` order tracking · `GST-030` in-venue notifications ·
 `GST-055` dynamic QR · `GST-062` shop-and-drop collection.
 
-**None of these is a parity gap.** A guest standing at a ride does not open a laptop.
+**The web drew six of them anyway on 26 August** (`WEB-036`–`041`, then `WEB-046`), because a
+guest in a venue is holding a phone, not a laptop, and a phone opens a link without an install. A
+map in a browser is a map. **Only the dynamic QR stays app-only**, for the reason the 2 September
+session gave: a gate credential needs a copy on the device.
 
 ---
 
@@ -143,7 +146,8 @@ it.
 
 **Parity is the default and a difference needs a stated reason.** Three groups:
 
-**In-venue only, app by design** — 8 capabilities. No action.
+**In-venue** — *said "app by design, no action" until 12 September.* Seven of the eight are on both
+shells now; the dynamic QR stays on the app.
 
 **Should be on both** — ticket transfer, reservations, offers, retail, lost and found, search,
 loyalty, newsletter. **8 capabilities, and each is a screen rather than a contract**, because
@@ -155,3 +159,30 @@ the operations already exist.
 information and companion mode. **Eight screens with no requirement behind them**, and the
 question is whether they were agreed somewhere we have not seen or whether they are design
 enthusiasm.
+
+---
+
+## 12 September — identical, offline included
+
+**Decided: guest web and guest app should be identical.** Operation parity was closed on 10
+September (web 154, app 155 — only `enrolFacePass` differs, for the camera). What was left is
+everything *around* the operations, and it now has a pairing and an audit:
+
+- **`screens/_guest-pairs.yaml`** puts every P01 and P02 screen in one capability group — 42 on
+  both shells, 3 folded into other screens on the web, 7 app-only, 1 web-only — and records each
+  one-shell group as deliberate, a gap, or a question for the client.
+- **`tools/audit-guest-parity.py`** reads that and every layer that describes a guest screen and
+  writes **`handoff/guest-parity-audit.md`**: waves, licences, entry links, flows, frontend
+  manifests, contracts, events, bundles and the documents that argued for a difference.
+
+**Offline is the first difference closed.** No web screen had an offline state and every app
+screen had one, so a web guest who lost signal read *"Could not load"*. Both shells now carry one
+`offlineBanner` — *"You're offline. Connect to the internet to book, pay, order or join a queue."*
+— and every screen in a group carries the same offline state word for word, written to be true on
+both: *"already loaded"* is this visit's page on the web and the device's store on the app. **The
+web stays `offlineCapable: false`**; the shells differ in what they can keep, not in what the guest
+is told. `check-screens` fails a group that disagrees and a guest screen in no group.
+
+**Open, for the client:** Digital Companion Mode, cabana booking screens, the five itinerary
+screens and the RTL specimen are app-only with no requirement behind them; the account dashboard
+is web-only. Add to calendar is a gap on the web.

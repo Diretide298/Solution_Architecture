@@ -376,7 +376,14 @@ def render_screen(s: dict, dark: bool, offline_platform: bool, plat: dict) -> st
     side_html = f'<div class="side">{side}</div>' if side else ""
 
     off = "offline" in states
-    strip = '<div class="strip">offline capable · works from the local journal</div>' if off else ""
+    # **The strip said "works from the local journal" on every screen with an offline state** —
+    # true of a till, false of a guest screen, and false twice over on the web. A platform that
+    # declares its banner shows the banner's words instead (guest web and app, 12 September).
+    _banner = (plat.get("offlineBanner") or {}).get("message")
+    if off and _banner:
+        strip = f'<div class="strip">offline &middot; {esc(_banner)}</div>'
+    else:
+        strip = '<div class="strip">offline capable · works from the local journal</div>' if off else ""
 
     ops = [a.get("operationId") for a in (s.get("apis") or []) if a.get("operationId")]
     ops_line = " · ".join(ops[:4]) + (f" +{len(ops) - 4}" if len(ops) > 4 else "")         if ops else "none declared"

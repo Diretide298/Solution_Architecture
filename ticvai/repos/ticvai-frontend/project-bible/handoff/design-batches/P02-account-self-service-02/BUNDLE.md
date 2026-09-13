@@ -52,6 +52,7 @@ convincingly. It is never a caption.
   not sit enabled and fail.
 - **1 of these operations work offline**: getWaiverStatus
   — and the rest do not. A surface that looks the same online and off is lying.
+- **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
@@ -157,7 +158,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyFirstRun": "**No refunds or listings yet.** The venue's policy is shown regardless, so a guest knows the answer before they need it.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Refunds and listings need the server. **A queued refund request is a promise nobody made.**"
+   "offline": "**Not available, and the offline banner says why.** Refunds and resale listings need the server — a queued refund request is a promise nobody made."
   },
   "apis": [
    {
@@ -202,6 +203,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "shortName": "Guest App",
    "name": "Guest App — Mobile",
    "offlineCapable": true,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
    "app": "guest-app",
    "operator": "guest",
    "targetApp": {
@@ -319,7 +329,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyFirstRun": "**Not enrolled.** What a face pass is for, where it works, and what withdrawing it does — **before** the camera opens.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Biometric enrolment never works offline. **A face captured and queued is a face the guest cannot withdraw until it uploads.**"
+   "offline": "**Not available, and the offline banner says why.** Biometric enrolment never happens offline — a face captured and queued is a face the guest cannot withdraw until it uploads."
   },
   "apis": [
    {
@@ -367,6 +377,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "shortName": "Guest App",
    "name": "Guest App — Mobile",
    "offlineCapable": true,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
    "app": "guest-app",
    "operator": "guest",
    "targetApp": {
@@ -504,7 +523,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "emptyFirstRun": "**No stored cards.** A guest arrives here after a first purchase, so the empty state is the common one.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops somebody concluding the record does not exist.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Stored cards are shown from cache, masked. **Storing and transferring need the server.**"
+   "offline": "**The offline banner shows.** Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server."
   },
   "apis": [
    {
@@ -584,6 +603,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "shortName": "Guest App",
    "name": "Guest App — Mobile",
    "offlineCapable": true,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
    "app": "guest-app",
    "operator": "guest",
    "targetApp": {
@@ -692,7 +720,7 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
    "emptyFirstRun": "**No second factor enrolled.** Explains what one protects before asking for a phone number.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Enrolment needs the server. **A second factor is not a second factor if it was set up offline.**"
+   "offline": "**Nothing here is offered offline, and the banner says so.** An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a second factor set up offline is not a second factor."
   },
   "apis": [
    {
@@ -752,6 +780,15 @@ Every field of every screen in this batch. **`machine` is what a screen is in th
    "shortName": "Guest App",
    "name": "Guest App — Mobile",
    "offlineCapable": true,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
    "app": "guest-app",
    "operator": "guest",
    "targetApp": {

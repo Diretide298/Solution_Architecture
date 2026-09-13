@@ -202,7 +202,8 @@ def main() -> int:
             s = dict(s)
             s["_platform"] = {k: v for k, v in doc["platform"].items()
                               if k in ("code", "name", "shortName", "audience", "formFactor",
-                                       "app", "operator", "offlineCapable", "targetApp")}
+                                       "app", "operator", "offlineCapable", "offlineBanner",
+                                       "targetApp")}
             screens.append(s)
             used_ops |= {x.get("operationId") for x in (s.get("apis") or []) if x.get("operationId")}
             for t in ((s.get("navigation") or {}).get("transitions") or []):
@@ -233,6 +234,25 @@ def main() -> int:
     offline = sorted(o for o, v in op_defs.items() if v.get("offlineCapable"))
     plat = screens[0]["_platform"] if screens else {}
     app = (plat.get("targetApp") or {}).get("app", "?")
+    # **The banner is drawn, not described.** Guest web and app carry one `offlineBanner` since
+    # 12 September; a bundle that leaves it in `_platform` alone gets built without it.
+    ban = plat.get("offlineBanner") or {}
+    banner_rule = (f"- **Offline, every screen shows one banner, the same on web and app:** "
+                   f"*\"{ban.get('message')}\"* {ban.get('shows', '')} {ban.get('clears', '')} "
+                   f"**It never** {ban.get('never', '')} Each screen's `states.offline` says what "
+                   f"stays on screen and what waits.\n") if ban.get("message") else ""
+    # **An online-only bundle was told "7 of these operations work offline".** True of the
+    # operation on a shell that keeps a store, false of this one — and a builder reading it draws
+    # an offline mode the web cannot have.
+    if plat.get("offlineCapable"):
+        offline_rule = (f"- **{len(offline)} of these operations work offline**"
+                        f"{': ' + ', '.join(offline[:8]) if offline else ''}\n"
+                        f"  {'— and the rest do not. A surface that looks the same online and off is lying.' if offline else ''}\n")
+    else:
+        offline_rule = ("- **This shell is online only.** None of these operations is served offline here, "
+                        "whatever it can do on a shell that keeps a store."
+                        + (" Offline, a screen shows what was already loaded, under the banner below.\n"
+                           if ban.get("message") else "\n"))
 
     brief = f"""# {b['id']} — {b['label']}
 
@@ -286,9 +306,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** {len(perms)} permissions apply here:
   `{', '.join(perms[:12])}`{'…' if len(perms) > 12 else ''}. A control nobody can use must say so,
   not sit enabled and fail.
-- **{len(offline)} of these operations work offline**{': ' + ', '.join(offline[:8]) if offline else ''}
-  {'— and the rest do not. A surface that looks the same online and off is lying.' if offline else ''}
-- **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
+{offline_rule}{banner_rule}- **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
 - **`entryState.params` is what the screen must be given.** A screen that renders without them is
   the empty-state bug, not the happy path.

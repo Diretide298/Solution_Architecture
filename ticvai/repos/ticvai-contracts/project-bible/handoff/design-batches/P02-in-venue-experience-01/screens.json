@@ -109,7 +109,7 @@
    "emptyFirstRun": "Not applicable",
    "emptyNoResults": "The filter narrowed it and the menu item are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached menu shown with a staleness warning. Ordering is refused — availability changes by the minute"
+   "offline": "**The offline banner shows.** The dish already loaded stays, with a note that it may be out of date and its allergens in full. Ordering is refused — availability changes by the minute."
   },
   "apis": [
    {
@@ -154,6 +154,15 @@
    "shortName": "Guest App",
    "name": "Guest App — Mobile",
    "offlineCapable": true,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
    "app": "guest-app",
    "operator": "guest",
    "targetApp": {
@@ -263,7 +272,7 @@
    "error": "Could not load. Names which read failed and leaves the shop drop collection untouched.",
    "emptyFirstRun": "No shop drop collection configured. Carries the create action and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cannot look up. Shows the drop reference held locally so a guest can quote it"
+   "offline": "**The offline banner shows, and lookup cannot run.** A drop reference already on screen stays visible so the guest can quote it at the collection point. Reserving merchandise needs the connection."
   },
   "apis": [
    {
@@ -286,6 +295,15 @@
    "shortName": "Guest App",
    "name": "Guest App — Mobile",
    "offlineCapable": true,
+   "offlineBanner": {
+    "kind": "banner",
+    "state": "warning",
+    "message": "You're offline. Connect to the internet to book, pay, order or join a queue.",
+    "shows": "The moment the connection drops, on every screen, above the screen's own content.",
+    "clears": "By itself as soon as the connection is back, with a short \"Back online\" confirmation.",
+    "never": "Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing.",
+    "provenance": "Decided 12 September 2026 — guest web and guest app behave identically offline and say so with the same banner."
+   },
    "app": "guest-app",
    "operator": "guest",
    "targetApp": {

@@ -7,6 +7,16 @@ platform:
   surface: guestFacing
   runtime: reactWeb
   offlineCapable: false
+  offlineBanner:
+    kind: banner
+    state: warning
+    message: You're offline. Connect to the internet to book, pay, order or join a queue.
+    shows: The moment the connection drops, on every screen, above the screen's own content.
+    clears: By itself as soon as the connection is back, with a short "Back online" confirmation.
+    never: Covers what is already on screen, or appears for a server error — that is the screen's own
+      error state, and a guest told they are offline when the venue is down reconnects for nothing.
+    provenance: Decided 12 September 2026 — guest web and guest app behave identically offline and say
+      so with the same banner.
   themes:
   - light
   directions:
@@ -214,6 +224,9 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
+      Anything that spends money, holds capacity or changes the account waits for the connection, and
+      its button says so rather than failing.'
   apis:
   - operationId: getTenantAppStatus
     purpose: Maintenance check before rendering anything
@@ -349,6 +362,9 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
+      Anything that spends money, holds capacity or changes the account waits for the connection, and
+      its button says so rather than failing.'
   apis:
   - operationId: listProducts
     contract: catalogue
@@ -468,6 +484,8 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows.** Results come only from what was already loaded, with a note
+      that newer items may exist.'
   apis:
   - operationId: searchCatalogue
     contract: catalogue
@@ -604,6 +622,9 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
+      Anything that spends money, holds capacity or changes the account waits for the connection, and
+      its button says so rather than failing.'
   apis:
   - operationId: getProduct
     contract: catalogue
@@ -754,6 +775,9 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
+      Anything that spends money, holds capacity or changes the account waits for the connection, and
+      its button says so rather than failing.'
   apis:
   - operationId: evaluatePromotions
     contract: promotions
@@ -874,6 +898,9 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
+      Anything that spends money, holds capacity or changes the account waits for the connection, and
+      its button says so rather than failing.'
   apis:
   - operationId: getAvailability
     contract: catalogue
@@ -1012,6 +1039,9 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
+      Anything that spends money, holds capacity or changes the account waits for the connection, and
+      its button says so rather than failing.'
   apis:
   - operationId: createSeatHold
     contract: seating
@@ -1139,6 +1169,9 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
+      Anything that spends money, holds capacity or changes the account waits for the connection, and
+      its button says so rather than failing.'
   apis:
   - operationId: addCartLine
     contract: orders
@@ -1291,6 +1324,9 @@ screens:
       offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
+      Anything that spends money, holds capacity or changes the account waits for the connection, and
+      its button says so rather than failing.'
   apis:
   - operationId: getWishlist
     contract: marketing-crm
@@ -1473,6 +1509,9 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
+      Anything that spends money, holds capacity or changes the account waits for the connection, and
+      its button says so rather than failing.'
   apis:
   - operationId: getCart
     contract: orders
@@ -1689,6 +1728,8 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**Not available, and the offline banner says why.** A payment needs the gateway, and pretending
+      otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice.'
   apis:
   - operationId: addToWishlist
     contract: marketing-crm
@@ -1888,6 +1929,8 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**Not available, and the offline banner says why.** A payment needs the gateway, and pretending
+      otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice.'
   apis:
   - operationId: transferOrderTickets
     contract: orders
@@ -2041,6 +2084,9 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
+      Anything that spends money, holds capacity or changes the account waits for the connection, and
+      its button says so rather than failing.'
   apis:
   - operationId: transferOrderTickets
     contract: orders
@@ -2165,6 +2211,8 @@ screens:
       and offers to clear it.
     emptyNoAccess: '**The token is the credential, so there is no permission case** — either it resolves
       or it has gone.'
+    offline: '**Not available, and the offline banner says why.** A payment needs the gateway, and pretending
+      otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice.'
   apis:
   - operationId: getPaymentLink
     contract: orders
@@ -2277,6 +2325,8 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows.** The last known position stays on screen with its age. Joining,
+      leaving and being admitted all need the connection.'
   apis:
   - operationId: joinQueue
     contract: queue
@@ -2490,6 +2540,8 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**Not available, and the offline banner says why.** Signing in, registering and verifying
+      a code need the server.'
   apis:
   - operationId: registerGuest
     contract: identity
@@ -2760,6 +2812,9 @@ screens:
       offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
+      Anything that spends money, holds capacity or changes the account waits for the connection, and
+      its button says so rather than failing.'
   apis:
   - operationId: addToWishlist
     contract: marketing-crm
@@ -2972,6 +3027,8 @@ screens:
       when the list is empty, and this screen gained the list before it gained the sentence.'
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing,
+      transferring and adding to a phone wallet need the connection.'
   apis:
   - operationId: listMyEntitlements
     contract: access
@@ -3154,6 +3211,9 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
+      Anything that spends money, holds capacity or changes the account waits for the connection, and
+      its button says so rather than failing.'
   apis:
   - operationId: transferOrderTickets
     contract: orders
@@ -3340,6 +3400,9 @@ screens:
       when the list is empty, and this screen gained the list before it gained the sentence.'
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
+      Anything that spends money, holds capacity or changes the account waits for the connection, and
+      its button says so rather than failing.'
   apis:
   - operationId: getGuestProfile
     contract: marketing-crm
@@ -3499,6 +3562,8 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows.** Balances and stored cards already loaded stay visible with
+      their age, cards masked. Storing a card and transferring value need the server.'
   apis:
   - operationId: getWallet
     contract: retail
@@ -3677,6 +3742,9 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
+      Anything that spends money, holds capacity or changes the account waits for the connection, and
+      its button says so rather than failing.'
   apis:
   - operationId: listProducts
     contract: catalogue
@@ -3821,6 +3889,9 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
+      Anything that spends money, holds capacity or changes the account waits for the connection, and
+      its button says so rather than failing.'
   apis:
   - operationId: transferOrderTickets
     contract: orders
@@ -4030,6 +4101,9 @@ screens:
       when the list is empty, and this screen gained the list before it gained the sentence.'
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**Nothing here is offered offline, and the banner says so.** An erasure request or a device
+      change queued and never sent is worse than one that could not be made — the legal clock starts when
+      the platform receives it, and a second factor set up offline is not a second factor.'
   apis:
   - operationId: addToWishlist
     contract: marketing-crm
@@ -4209,6 +4283,8 @@ screens:
       offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows.** Cases already loaded stay read-only with their age, so a guest
+      can see what they raised without believing a reply arrived. Raising and replying need the connection.'
   apis:
   - operationId: getTenantAppStatus
     contract: white-label
@@ -4329,6 +4405,9 @@ screens:
     emptyFirstRun: —
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
+      Anything that spends money, holds capacity or changes the account waits for the connection, and
+      its button says so rather than failing.'
   apis:
   - operationId: submitReview
     contract: marketing-crm
@@ -4494,6 +4573,8 @@ screens:
       when the list is empty, and this screen gained the list before it gained the sentence.'
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**Not available, and the offline banner says why.** A consent change must reach the server
+      to mean anything.'
   apis:
   - operationId: recordConsent
     contract: marketing-crm
@@ -4631,6 +4712,9 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
+      Anything that spends money, holds capacity or changes the account waits for the connection, and
+      its button says so rather than failing.'
   apis:
   - operationId: getTenantAppStatus
     contract: white-label
@@ -4700,6 +4784,9 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows instead of this page.** Being offline is the guest''s connection,
+      not the venue''s — an error or maintenance page shown for a dropped signal tells a guest the venue
+      is down.'
   apis:
   - operationId: getTenantAppStatus
     contract: white-label
@@ -4813,6 +4900,8 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows.** Sending, claiming and listing for resale need the connection
+      — a transfer nobody received is a ticket nobody holds. Tickets already loaded stay visible.'
   apis:
   - operationId: transferOrderTickets
     contract: orders
@@ -4975,6 +5064,9 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows.** Reservations already loaded stay visible with their age. Booking,
+      changing and cancelling need the connection — a table held offline is a table two people think they
+      have.'
   apis:
   - operationId: listReservations
     contract: orders
@@ -5136,6 +5228,9 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
+      Anything that spends money, holds capacity or changes the account waits for the connection, and
+      its button says so rather than failing.'
   apis:
   - operationId: listPromotions
     contract: promotions
@@ -5291,6 +5386,9 @@ screens:
       to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
+      Anything that spends money, holds capacity or changes the account waits for the connection, and
+      its button says so rather than failing.'
   apis:
   - operationId: listMerchandise
     contract: retail
@@ -5448,6 +5546,8 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows.** Reports already loaded stay read-only with their age. Reporting
+      and replying need the connection.'
   apis:
   - operationId: listMyCases
     contract: marketing-crm
@@ -5585,6 +5685,8 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
+    offline: '**The offline banner shows. Last known rates stay, with their age.** A rate is a number
+      a guest may act on, and an undated one they cannot judge.'
   apis:
   - operationId: listFxRates
     contract: finance
@@ -5712,6 +5814,8 @@ screens:
       empty panel.'
     emptyNoResults: Nothing matches.
     emptyNoAccess: '**Sign in to see this.** A guest who is not signed in is offered the door, not refused.'
+    offline: '**The offline banner shows.** The menu already loaded stays with its age. Ordering, claiming
+      a table and booking wait for the connection — an order placed offline is food nobody is making.'
   apis:
   - operationId: getGuestMenu
     contract: fnb
@@ -5856,6 +5960,8 @@ screens:
       empty panel.'
     emptyNoResults: Nothing matches.
     emptyNoAccess: '**Sign in to see this.** A guest who is not signed in is offered the door, not refused.'
+    offline: '**The offline banner shows.** The dish already loaded stays, with a note that it may be
+      out of date and its allergens in full. Ordering is refused — availability changes by the minute.'
   apis:
   - operationId: getGuestMenu
     contract: fnb
@@ -5955,6 +6061,8 @@ screens:
       empty panel.'
     emptyNoResults: Nothing matches.
     emptyNoAccess: '**Sign in to see this.** A guest who is not signed in is offered the door, not refused.'
+    offline: '**The offline banner shows.** The last status stays on screen with its age and is never
+      presented as current. Settling the bill waits for the connection.'
   apis:
   - operationId: getGuestOrderStatus
     contract: fnb
@@ -6070,6 +6178,10 @@ screens:
       empty panel.'
     emptyNoResults: Nothing matches.
     emptyNoAccess: '**Sign in to see this.** A guest who is not signed in is offered the door, not refused.'
+    offline: '**The offline banner shows.** A map and route graph already loaded stay usable, so directions
+      do not need a signal. Wait times show their last reading marked out of date, never as live — a queue
+      length from an hour ago sends a guest to the wrong ride. With no map loaded yet, the screen asks
+      the guest to reconnect.'
   apis:
   - operationId: getVenueMap
     contract: venue-map
@@ -6192,6 +6304,9 @@ screens:
       empty panel.'
     emptyNoResults: Nothing matches.
     emptyNoAccess: '**Sign in to see this.** A guest who is not signed in is offered the door, not refused.'
+    offline: '**The offline banner shows.** The guest''s place stays on screen with its age, so they can
+      see they hold it. Joining and leaving need the connection — a place taken offline is a place nobody
+      else can see.'
   apis:
   - operationId: joinQueue
     contract: queue
@@ -6328,6 +6443,8 @@ screens:
       empty panel.'
     emptyNoResults: Nothing matches.
     emptyNoAccess: '**Sign in to see this.** A guest who is not signed in is offered the door, not refused.'
+    offline: '**The offline banner shows.** A reservation already confirmed stays on screen with its plate
+      and car park. Reserving, paying and changing the plate need the connection.'
   apis:
   - operationId: listParkingFacilities
     contract: access
@@ -6468,6 +6585,9 @@ screens:
       empty panel.'
     emptyNoResults: Nothing matches.
     emptyNoAccess: '**Sign in to see this.** A guest who is not signed in is offered the door, not refused.'
+    offline: '**The offline banner shows, and lookup cannot run.** A drop reference already on screen
+      stays visible so the guest can quote it at the collection point. Reserving merchandise needs the
+      connection.'
   apis:
   - operationId: listMerchandise
     contract: retail
@@ -6578,6 +6698,8 @@ screens:
       empty panel.'
     emptyNoResults: Nothing matches.
     emptyNoAccess: '**Sign in to see this.** A guest who is not signed in is offered the door, not refused.'
+    offline: '**The offline banner shows.** The last known balance stays with its age, and **points earned
+      since are not shown** — and that is said. Redeeming and referring need the connection.'
   apis:
   - operationId: getLoyaltyPosition
     contract: marketing-crm
@@ -6698,6 +6820,8 @@ screens:
       empty panel.'
     emptyNoResults: Nothing matches.
     emptyNoAccess: '**Sign in to see this.** A guest who is not signed in is offered the door, not refused.'
+    offline: '**Not available, and the offline banner says why.** The assistant needs the connection;
+      conversations already loaded stay readable.'
   apis:
   - operationId: createAiConversation
     contract: ai
@@ -6817,6 +6941,9 @@ screens:
       empty panel.'
     emptyNoResults: Nothing matches.
     emptyNoAccess: '**Sign in to see this.** A guest who is not signed in is offered the door, not refused.'
+    offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
+      Anything that spends money, holds capacity or changes the account waits for the connection, and
+      its button says so rather than failing.'
   apis:
   - operationId: listFaqs
     contract: white-label
@@ -6897,6 +7024,9 @@ screens:
     emptyFirstRun: '**Nothing here yet for this venue.** Names what turns it on rather than showing an
       empty panel.'
     emptyNoAccess: '**Sign in to see this.** A guest who is not signed in is offered the door, not refused.'
+    offline: '**The offline banner shows.** Notices already received stay listed. New queue calls and
+      order updates arrive once the connection is back, and the banner is the warning that they may be
+      late.'
   apis:
   - operationId: claimLocationSession
     contract: fnb

@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/index-boards.py",
- "generated": "2026-09-11",
+ "generated": "2026-09-12",
  "note": "One record per board file under `wireframes/`, keyed by content hash so an unchanged board is never re-read. **A frame in a `generated` board is the screen's own YAML rendered as boxes, not a drawing** \u2014 only `clientPack` and `claudeDesign` frames are evidence that somebody designed something.",
  "counts": {
   "boards": 22,
@@ -1655,8 +1655,8 @@
   {
    "file": "APP guest.dc.html",
    "provenance": "clientPack",
-   "bytes": 1227617,
-   "sha256": "ee4ed0fb04f74267",
+   "bytes": 1233630,
+   "sha256": "04b4e2665e806506",
    "frames": 134,
    "screensFramed": 134,
    "screens": [
@@ -1938,7 +1938,7 @@
     "P05"
    ],
    "firstIndexed": "2026-09-10",
-   "lastSeen": "2026-09-11"
+   "lastSeen": "2026-09-12"
   },
   {
    "file": "APP ticvai-control.dc.html",
@@ -3034,7 +3034,7 @@
     "P17"
    ],
    "firstIndexed": "2026-09-10",
-   "lastSeen": "2026-09-11"
+   "lastSeen": "2026-09-12"
   },
   {
    "file": "APP venue-management.dc.html",
@@ -4677,7 +4677,7 @@
     "P16"
    ],
    "firstIndexed": "2026-09-10",
-   "lastSeen": "2026-09-11"
+   "lastSeen": "2026-09-12"
   },
   {
    "file": "APP venue-pos.dc.html",
@@ -4776,7 +4776,7 @@
     "P15"
    ],
    "firstIndexed": "2026-09-10",
-   "lastSeen": "2026-09-11"
+   "lastSeen": "2026-09-12"
   },
   {
    "file": "APP venue-staff-mobile.dc.html",
@@ -5009,13 +5009,13 @@
     "P07"
    ],
    "firstIndexed": "2026-09-10",
-   "lastSeen": "2026-09-11"
+   "lastSeen": "2026-09-12"
   },
   {
    "file": "P01 Guest Web.dc.html",
    "provenance": "generated",
-   "bytes": 1003520,
-   "sha256": "faafa83c151169c3",
+   "bytes": 1005912,
+   "sha256": "bc1a13a251d4b7e0",
    "frames": 46,
    "screensFramed": 46,
    "screens": [
@@ -5119,13 +5119,13 @@
     "P01"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-09-11"
+   "lastSeen": "2026-09-12"
   },
   {
    "file": "P02 Guest App.dc.html",
    "provenance": "generated",
-   "bytes": 192059,
-   "sha256": "516ab6f05d6980f8",
+   "bytes": 195680,
+   "sha256": "6a66e027a4a64501",
    "frames": 71,
    "screensFramed": 71,
    "screens": [
@@ -5279,7 +5279,7 @@
     "P02"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-09-11"
+   "lastSeen": "2026-09-12"
   },
   {
    "file": "P04 Venue POS.dc.html",
@@ -5357,7 +5357,7 @@
     "P04"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-09-11"
+   "lastSeen": "2026-09-12"
   },
   {
    "file": "P05 Guest Kiosk.dc.html",
@@ -5409,7 +5409,7 @@
     "P05"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-09-11"
+   "lastSeen": "2026-09-12"
   },
   {
    "file": "P06 Venue Staff App.dc.html",
@@ -5619,7 +5619,7 @@
     "P06"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-09-11"
+   "lastSeen": "2026-09-12"
   },
   {
    "file": "P07 Venue Scanner.dc.html",
@@ -5659,7 +5659,7 @@
     "P07"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-09-11"
+   "lastSeen": "2026-09-12"
   },
   {
    "file": "P08 Venue Management.dc.html",
@@ -6906,7 +6906,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-09-11"
+   "lastSeen": "2026-09-12"
   },
   {
    "file": "P09 TICVAI Web.dc.html",
@@ -7817,7 +7817,7 @@
     "P09"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-09-11"
+   "lastSeen": "2026-09-12"
   },
   {
    "file": "P10 Partner Web.dc.html",
@@ -7938,7 +7938,7 @@
     "P10"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-09-11"
+   "lastSeen": "2026-09-12"
   },
   {
    "file": "P11 Accreditation Web.dc.html",
@@ -7972,7 +7972,7 @@
     "P11"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-09-11"
+   "lastSeen": "2026-09-12"
   },
   {
    "file": "P12 Venue Support.dc.html",
@@ -8047,7 +8047,7 @@
     "P12"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-09-11"
+   "lastSeen": "2026-09-12"
   },
   {
    "file": "P13 Venue CMS.dc.html",
@@ -8266,7 +8266,7 @@
     "P13"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-09-11"
+   "lastSeen": "2026-09-12"
   },
   {
    "file": "P14 Developer.dc.html",
@@ -8300,7 +8300,7 @@
     "P14"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-09-11"
+   "lastSeen": "2026-09-12"
   },
   {
    "file": "P15 Kitchen Display.dc.html",
@@ -8338,7 +8338,7 @@
     "P15"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-09-11"
+   "lastSeen": "2026-09-12"
   },
   {
    "file": "P16 Venue Analytics.dc.html",
@@ -8495,7 +8495,7 @@
     "P16"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-09-11"
+   "lastSeen": "2026-09-12"
   },
   {
    "file": "P17 TICVAI Sign-up.dc.html",
@@ -8561,7 +8561,7 @@
     "P17"
    ],
    "firstIndexed": "2026-09-11",
-   "lastSeen": "2026-09-11"
+   "lastSeen": "2026-09-12"
   },
   {
    "file": "TICVAI Wireframe Boards.dc.html",
@@ -8575,7 +8575,7 @@
    "anchors": [],
    "platforms": [],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-09-11"
+   "lastSeen": "2026-09-12"
   }
  ]
 }

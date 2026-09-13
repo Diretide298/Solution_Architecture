@@ -47,6 +47,22 @@ properties:
         type: boolean
         default: false
         description: Drives whether screens must declare an `offline` state.
+      offlineBanner:
+        type: object
+        description: >
+          **What a person sees the moment the connection drops, on every screen of the platform.**
+          Added 12 September 2026 for the guest product: web and app carry the same object, written
+          from `screens/_guest-pairs.yaml`, and `check-screens` fails them for differing. Distinct
+          from `offlineCapable` — the banner says the guest is offline; the flag says what the shell
+          can still serve.
+        properties:
+          kind: { type: string }
+          state: { type: string, enum: [info, warning, danger] }
+          message: { type: string, description: The words on the banner. }
+          shows: { type: string }
+          clears: { type: string }
+          never: { type: string }
+          provenance: { type: string }
       themes: { type: array, items: { type: string, enum: [light, dark] } }
       directions:
         type: array

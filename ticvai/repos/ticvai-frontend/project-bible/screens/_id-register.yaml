@@ -16,7 +16,7 @@ _note: '**The issue log for screen ids, and the reason it exists.** On 4 Septemb
   `tools/check-screens.py` fails on a screen issued above the recorded high-water mark. Regenerate with
   `tools/derive-id-register.py --apply` and commit it in the same change.'
 generatedBy: tools/derive-id-register.py
-updated: '2026-09-11'
+updated: '2026-09-12'
 prefixes:
   ACC:
     issued: 8

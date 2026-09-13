@@ -109,7 +109,7 @@ cd viewer && npm start        →  http://localhost:4173
 
 **96 journeys of a target 60.** Seventeen contracts have exactly one — `subscription` has one over 1628 operations. **Every journey written so far has found a defect**, which is the argument for writing more.
 
-**759 of the 1629 screens cannot be reached** from their platform's entry point (measured 11 September), and navigation is still inferred rather than designed on most of the estate.
+**1629 screens cannot be reached** from their platform's entry point, and navigation is still inferred rather than designed on most of the estate.
 
 **16 conflicts are open.** None blocks build; four need an email and one needs a workshop.
 

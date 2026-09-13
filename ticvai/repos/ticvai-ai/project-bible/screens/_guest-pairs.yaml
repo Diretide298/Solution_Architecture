@@ -1,0 +1,395 @@
+# Guest web (P01) and guest app (P02) — one product, grouped by what each screen is for.
+#
+# **Decided 12 September 2026: guest web and guest app should be identical.** The 10 September
+# decision made them one product in two shells; this file is what that means screen by screen.
+#
+# **Every P01 and P02 screen is in exactly one group**, and `check-screens` fails a screen that is
+# in none. A group is one capability. Where web draws it as one screen and the app as two or three,
+# they are still one group — that is a layout choice, not a functional difference.
+#
+#   paired    the same capability on both shells
+#   folded    one shell has a screen, the other does the same job inside other screens
+#             (`foldedInto` names them) — the operations are on both, the screen is not
+#   appOnly   on the app and not the web; `decision` says whether that is deliberate, a gap, or
+#             a question for the client
+#   webOnly   the reverse
+#
+# **`offline` is the one offline state every member of the group carries, word for word.** It is
+# written to be true on both shells: "already loaded" is this visit's page on the web and the
+# device's store on the app. `defaultOffline` applies where a group names none. Applied by
+# tools/applied/apply-guest-offline-parity.py, which is meant to be re-run after any screen edit.
+#
+# **`sanctioned` records a difference somebody decided**, as `{dimension: reason}` citing the
+# decision. `tools/audit-guest-parity.py` keeps it in the report at `info` with the reason, so a
+# decided difference stays visible instead of vanishing.
+#
+# **No offline text may claim a screen keeps working** in the words `check-screens` reads as a
+# promise ("keeps working", "continues", "works from"…) — the web holds no offline store, so a
+# promise true on the app would be a lie on the web.
+
+decided: 12 September 2026
+
+# **The banner, once, for both shells.** Written onto `platform.offlineBanner` of P01 and P02.
+banner:
+  kind: banner
+  state: warning
+  message: You're offline. Connect to the internet to book, pay, order or join a queue.
+  shows: The moment the connection drops, on every screen, above the screen's own content.
+  clears: By itself as soon as the connection is back, with a short "Back online" confirmation.
+  never: Covers what is already on screen, or appears for a server error — that is the screen's own
+    error state, and a guest told they are offline when the venue is down reconnects for nothing.
+  provenance: Decided 12 September 2026 — guest web and guest app behave identically offline and say
+    so with the same banner.
+
+defaultOffline: >-
+  **The offline banner shows.** What was already loaded stays on screen, marked with its age.
+  Anything that spends money, holds capacity or changes the account waits for the connection, and
+  its button says so rather than failing.
+
+groups:
+# ── discovery ────────────────────────────────────────────────────────────────────────────────
+- key: home
+  kind: paired
+  web: [WEB-001]
+  app: [GST-001]
+- key: browse
+  kind: paired
+  web: [WEB-002]
+  app: [GST-002, GST-003, GST-005]
+  note: The app splits categories, the listing and what's on into three screens; the web filters one.
+- key: search
+  kind: paired
+  web: [WEB-003]
+  app: [GST-063]
+  offline: >-
+    **The offline banner shows.** Results come only from what was already loaded, with a note that
+    newer items may exist.
+- key: detail
+  kind: paired
+  web: [WEB-004]
+  app: [GST-004, GST-006]
+  note: The app draws events and attractions separately; the web's detail covers both.
+
+# ── booking ─────────────────────────────────────────────────────────────────────────────────
+- key: ticket-selection
+  kind: paired
+  web: [WEB-005]
+  app: [GST-008]
+- key: date-and-session
+  kind: paired
+  web: [WEB-006]
+  app: [GST-007]
+- key: seat-selection
+  kind: paired
+  web: [WEB-007]
+  app: [GST-049]
+- key: add-ons
+  kind: paired
+  web: [WEB-008]
+  app: [GST-048, GST-056]
+- key: wishlist
+  kind: paired
+  web: [WEB-009]
+  app: [GST-020]
+- key: waiting-room
+  kind: paired
+  web: [WEB-015]
+  app: [GST-046]
+  offline: >-
+    **The offline banner shows.** The last known position stays on screen with its age. Joining,
+    leaving and being admitted all need the connection.
+
+# ── cart and checkout ───────────────────────────────────────────────────────────────────────
+- key: cart
+  kind: paired
+  web: [WEB-010]
+  app: [GST-041]
+- key: checkout-and-payment
+  kind: paired
+  web: [WEB-011, WEB-012, WEB-014]
+  app: [GST-009]
+  note: The app folds attendee details and paying a booking link into Review & Payment; the web
+    gives each its own page, and a payment link from an email opens a browser.
+  offline: >-
+    **Not available, and the offline banner says why.** A payment needs the gateway, and pretending
+    otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered
+    twice.
+- key: confirmation
+  kind: paired
+  web: [WEB-013]
+  app: [GST-010]
+
+# ── account ─────────────────────────────────────────────────────────────────────────────────
+- key: sign-in
+  kind: paired
+  web: [WEB-016]
+  app: [GST-042]
+  offline: >-
+    **Not available, and the offline banner says why.** Signing in, registering and verifying a code
+    need the server.
+- key: account-hub
+  kind: webOnly
+  web: [WEB-017]
+  decision: raise
+  note: The web has an account dashboard; the app reaches the same things from Home and Profile.
+    A navigation difference rather than a capability one, but it is a difference.
+- key: tickets
+  kind: paired
+  web: [WEB-018]
+  app: [GST-012, GST-013]
+  offline: >-
+    **The offline banner shows.** Tickets already loaded stay visible with their age. Sharing,
+    transferring and adding to a phone wallet need the connection.
+- key: order-history
+  kind: paired
+  web: [WEB-019]
+  app: [GST-019]
+- key: profile
+  kind: paired
+  web: [WEB-020]
+  app: [GST-039]
+- key: privacy-security-devices
+  kind: paired
+  web: [WEB-024]
+  app: [GST-066, GST-073]
+  offline: >-
+    **Nothing here is offered offline, and the banner says so.** An erasure request or a device
+    change queued and never sent is worse than one that could not be made — the legal clock starts
+    when the platform receives it, and a second factor set up offline is not a second factor.
+- key: ticket-transfer
+  kind: paired
+  web: [WEB-030]
+  app: [GST-014, GST-045]
+  offline: >-
+    **The offline banner shows.** Sending, claiming and listing for resale need the connection — a
+    transfer nobody received is a ticket nobody holds. Tickets already loaded stay visible.
+- key: reservations
+  kind: paired
+  web: [WEB-031]
+  app: [GST-016, GST-017]
+  offline: >-
+    **The offline banner shows.** Reservations already loaded stay visible with their age. Booking,
+    changing and cancelling need the connection — a table held offline is a table two people think
+    they have.
+- key: refunds-and-resale
+  kind: folded
+  app: [GST-067]
+  foldedInto: [WEB-019, WEB-030]
+  note: createRefundRequest is on Order History and createResaleListing on Ticket Transfer on the web.
+  offline: >-
+    **Not available, and the offline banner says why.** Refunds and resale listings need the server —
+    a queued refund request is a promise nobody made.
+- key: share-and-group-booking
+  kind: folded
+  app: [GST-072]
+  foldedInto: [WEB-017, WEB-018, WEB-031, WEB-043]
+  offline: >-
+    **The offline banner shows.** Tickets already shared stay visible. Sharing, invitations and
+    referrals need the connection — a transfer nobody received is a ticket nobody holds.
+- key: add-to-calendar
+  kind: appOnly
+  app: [GST-018]
+  decision: gap
+  note: Adding a visit to a calendar is as much a desktop act as a phone one, and issueWalletPass is
+    already on the web's My Tickets.
+- key: dynamic-qr-ticket
+  kind: appOnly
+  app: [GST-055]
+  decision: deliberate
+  note: The 2 September session decided a dynamic-QR ticket bought on the web is redirected into the
+    app, because a credential that needs a network round trip at a gate fails at the gate
+    (_components.yaml, credentialPresenter).
+- key: face-pass
+  kind: appOnly
+  app: [GST-069]
+  decision: deliberate
+  note: enrolFacePass needs a camera and a liveness check (apply-web-parity.py). Viewing and revoking an
+    enrolment are on the web's Devices, Wishlist & Consent.
+  offline: >-
+    **Not available, and the offline banner says why.** Biometric enrolment never happens offline — a
+    face captured and queued is a face the guest cannot withdraw until it uploads.
+
+# ── money and value ─────────────────────────────────────────────────────────────────────────
+- key: wallet-and-payment-methods
+  kind: paired
+  web: [WEB-021]
+  app: [GST-011, GST-071]
+  offline: >-
+    **The offline banner shows.** Balances and stored cards already loaded stay visible with their
+    age, cards masked. Storing a card and transferring value need the server.
+- key: memberships
+  kind: paired
+  web: [WEB-022, WEB-023]
+  app: [GST-015]
+- key: loyalty
+  kind: paired
+  web: [WEB-043]
+  app: [GST-036]
+  offline: >-
+    **The offline banner shows.** The last known balance stays with its age, and **points earned since
+    are not shown** — and that is said. Redeeming and referring need the connection.
+- key: offers
+  kind: paired
+  web: [WEB-032]
+  app: [GST-037]
+- key: multi-currency
+  kind: paired
+  web: [WEB-035]
+  app: [GST-044]
+  sanctioned:
+    wave: CF-111 — web is Wave 1 because that is where an overseas guest compares before booking, and
+      the app is Wave 2 because that is where they check after.
+  offline: >-
+    **The offline banner shows. Last known rates stay, with their age.** A rate is a number a guest
+    may act on, and an undated one they cannot judge.
+
+# ── in venue ────────────────────────────────────────────────────────────────────────────────
+- key: venue-map-and-wait-times
+  kind: paired
+  web: [WEB-039]
+  app: [GST-021, GST-022]
+  note: The app separates the map from the wait-times list; the web shows both on one page.
+  offline: >-
+    **The offline banner shows.** A map and route graph already loaded stay usable, so directions do
+    not need a signal. Wait times show their last reading marked out of date, never as live — a queue
+    length from an hour ago sends a guest to the wrong ride. With no map loaded yet, the screen asks
+    the guest to reconnect.
+- key: virtual-queue
+  kind: paired
+  web: [WEB-040]
+  app: [GST-023]
+  offline: >-
+    **The offline banner shows.** The guest's place stays on screen with its age, so they can see
+    they hold it. Joining and leaving need the connection — a place taken offline is a place nobody
+    else can see.
+- key: fnb-order
+  kind: paired
+  web: [WEB-036]
+  app: [GST-024]
+  offline: >-
+    **The offline banner shows.** The menu already loaded stays with its age. Ordering, claiming a
+    table and booking wait for the connection — an order placed offline is food nobody is making.
+- key: menu-item
+  kind: paired
+  web: [WEB-037]
+  app: [GST-061]
+  offline: >-
+    **The offline banner shows.** The dish already loaded stays, with a note that it may be out of
+    date and its allergens in full. Ordering is refused — availability changes by the minute.
+- key: order-tracking
+  kind: paired
+  web: [WEB-038]
+  app: [GST-025]
+  offline: >-
+    **The offline banner shows.** The last status stays on screen with its age and is never presented
+    as current. Settling the bill waits for the connection.
+- key: parking
+  kind: paired
+  web: [WEB-041]
+  app: [GST-027, GST-028]
+  offline: >-
+    **The offline banner shows.** A reservation already confirmed stays on screen with its plate and
+    car park. Reserving, paying and changing the plate need the connection.
+- key: shop
+  kind: paired
+  web: [WEB-033]
+  app: [GST-026]
+- key: shop-and-drop
+  kind: paired
+  web: [WEB-042]
+  app: [GST-062]
+  offline: >-
+    **The offline banner shows, and lookup cannot run.** A drop reference already on screen stays
+    visible so the guest can quote it at the collection point. Reserving merchandise needs the
+    connection.
+- key: in-venue-notifications
+  kind: paired
+  web: [WEB-046]
+  app: [GST-030]
+  offline: >-
+    **The offline banner shows.** Notices already received stay listed. New queue calls and order
+    updates arrive once the connection is back, and the banner is the warning that they may be late.
+- key: venue-info
+  kind: paired
+  web: [WEB-028]
+  app: [GST-029]
+- key: reserve-table-or-cabana
+  kind: folded
+  app: [GST-070]
+  foldedInto: [WEB-031, WEB-036, WEB-040]
+  note: The web books a table and joins a restaurant waitlist on F&B, books a resource on My
+    Reservations, and joins a waitlist on Virtual Queue. Every operation is on both shells.
+  offline: >-
+    **The offline banner shows.** Availability already loaded stays with its age. **Booking is not
+    offered** — a table held offline is a table two people think they have.
+- key: digital-companion-mode
+  kind: appOnly
+  app: [GST-038]
+  decision: raise
+  note: Unsourced (CF-92) — reads as a framing for the in-venue screens rather than a capability.
+    "What is near you" lives here and nowhere on the web.
+- key: cabana-booking
+  kind: appOnly
+  app: [GST-050, GST-058]
+  decision: raise
+  note: Unsourced (guest-surface-parity.md). bookResource and getResourceAvailability are on the web's
+    My Reservations, so the web can book a cabana with no screen drawn for choosing one.
+- key: itinerary-planning
+  kind: appOnly
+  app: [GST-051, GST-052, GST-053, GST-054, GST-059]
+  decision: raise
+  note: Five screens with no requirement (guest-surface-parity.md); GST-054 assumes parked AI.
+
+# ── engagement and support ──────────────────────────────────────────────────────────────────
+- key: help-and-cases
+  kind: paired
+  web: [WEB-025]
+  app: [GST-068]
+  offline: >-
+    **The offline banner shows.** Cases already loaded stay read-only with their age, so a guest can
+    see what they raised without believing a reply arrived. Raising and replying need the connection.
+- key: help-content-and-accessibility
+  kind: paired
+  web: [WEB-045]
+  app: [GST-040, GST-057]
+- key: lost-and-found
+  kind: paired
+  web: [WEB-034]
+  app: [GST-034]
+  offline: >-
+    **The offline banner shows.** Reports already loaded stay read-only with their age. Reporting and
+    replying need the connection.
+- key: feedback
+  kind: paired
+  web: [WEB-026]
+  app: [GST-035]
+- key: newsletter
+  kind: paired
+  web: [WEB-027]
+  app: [GST-065]
+  offline: >-
+    **Not available, and the offline banner says why.** A consent change must reach the server to mean
+    anything.
+- key: ai-concierge
+  kind: paired
+  web: [WEB-044]
+  app: [GST-031, GST-032, GST-033]
+  offline: >-
+    **Not available, and the offline banner says why.** The assistant needs the connection;
+    conversations already loaded stay readable.
+
+# ── system ──────────────────────────────────────────────────────────────────────────────────
+- key: system-states
+  kind: paired
+  web: [WEB-029]
+  app: [GST-047]
+  offline: >-
+    **The offline banner shows instead of this page.** Being offline is the guest's connection, not
+    the venue's — an error or maintenance page shown for a dropped signal tells a guest the venue is
+    down.
+- key: rtl-specimen
+  kind: appOnly
+  app: [GST-043]
+  decision: raise
+  note: Both platforms declare ltr and rtl. This screen calls nothing — it is a specimen of the Arabic
+    layout, drawn for the app only.

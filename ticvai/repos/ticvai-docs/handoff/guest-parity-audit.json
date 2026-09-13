@@ -1,0 +1,2374 @@
+{
+ "generatedBy": "tools/audit-guest-parity.py",
+ "generated": "2026-09-14",
+ "screens": {
+  "P01": 46,
+  "P02": 71
+ },
+ "groups": {
+  "paired": 42,
+  "webOnly": 1,
+  "folded": 3,
+  "appOnly": 7
+ },
+ "severity": {
+  "high": 26,
+  "medium": 109,
+  "low": 197,
+  "info": 4
+ },
+ "findings": [
+  {
+   "severity": "high",
+   "dimension": "coverage",
+   "where": "add-to-calendar",
+   "detail": "GST-018 Add to Calendar / Reminders — app only (gap). Adding a visit to a calendar is as much a desktop act as a phone one, and issueWalletPass is already on the web's My Tickets.",
+   "fix": "add the screen to the web"
+  },
+  {
+   "severity": "high",
+   "dimension": "frontend manifest",
+   "where": "frontend/guest-app.yaml",
+   "detail": "lists 80 screens against 71: missing 8 (GST-066, GST-067, GST-068, GST-069, GST-070, GST-071, GST-072, GST-073); ghosts ['GST-060', 'GST-064']; 4 renamed, 1 in another wave",
+   "fix": "derive-frontend.py carries `screens`, `screenCount` and `byWave` over from the previous file (`e.setdefault` on every existing key) and never recomputes them — derive them"
+  },
+  {
+   "severity": "high",
+   "dimension": "frontend manifest",
+   "where": "frontend/guest-web.yaml",
+   "detail": "lists 35 screens against 46: missing 11 (WEB-036, WEB-037, WEB-038, WEB-039, WEB-040, WEB-041, WEB-042, WEB-043, WEB-044, WEB-045, WEB-046); ghosts —; 6 renamed, 1 in another wave",
+   "fix": "derive-frontend.py carries `screens`, `screenCount` and `byWave` over from the previous file (`e.setdefault` on every existing key) and never recomputes them — derive them"
+  },
+  {
+   "severity": "high",
+   "dimension": "licence",
+   "where": "ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033)",
+   "detail": "web requires ['ai'], app requires ['ai', 'fnb', 'ticketing'] — a tenant licensed for one and not the other sees it on one shell only",
+   "fix": "one requiresModule for the capability"
+  },
+  {
+   "severity": "high",
+   "dimension": "licence",
+   "where": "checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009)",
+   "detail": "web requires ['marketing', 'ticketing'], app requires ['ticketing'] — a tenant licensed for one and not the other sees it on one shell only",
+   "fix": "one requiresModule for the capability"
+  },
+  {
+   "severity": "high",
+   "dimension": "licence",
+   "where": "help-content-and-accessibility (WEB-045 ↔ GST-040/GST-057)",
+   "detail": "web requires ['core'], app requires ['core', 'marketing'] — a tenant licensed for one and not the other sees it on one shell only",
+   "fix": "one requiresModule for the capability"
+  },
+  {
+   "severity": "high",
+   "dimension": "licence",
+   "where": "home (WEB-001 ↔ GST-001)",
+   "detail": "web requires ['ticketing'], app requires ['marketing'] — a tenant licensed for one and not the other sees it on one shell only",
+   "fix": "one requiresModule for the capability"
+  },
+  {
+   "severity": "high",
+   "dimension": "licence",
+   "where": "in-venue-notifications (WEB-046 ↔ GST-030)",
+   "detail": "web requires ['marketing'], app requires ['fnb'] — a tenant licensed for one and not the other sees it on one shell only",
+   "fix": "one requiresModule for the capability"
+  },
+  {
+   "severity": "high",
+   "dimension": "licence",
+   "where": "lost-and-found (WEB-034 ↔ GST-034)",
+   "detail": "web requires ['marketing'], app requires ['fnb'] — a tenant licensed for one and not the other sees it on one shell only",
+   "fix": "one requiresModule for the capability"
+  },
+  {
+   "severity": "high",
+   "dimension": "licence",
+   "where": "privacy-security-devices (WEB-024 ↔ GST-066/GST-073)",
+   "detail": "web requires ['marketing'], app requires ['core'] — a tenant licensed for one and not the other sees it on one shell only",
+   "fix": "one requiresModule for the capability"
+  },
+  {
+   "severity": "high",
+   "dimension": "licence",
+   "where": "shop (WEB-033 ↔ GST-026)",
+   "detail": "web requires ['retail'], app requires ['games'] — a tenant licensed for one and not the other sees it on one shell only",
+   "fix": "one requiresModule for the capability"
+  },
+  {
+   "severity": "high",
+   "dimension": "licence",
+   "where": "sign-in (WEB-016 ↔ GST-042)",
+   "detail": "web requires ['ticketing'], app requires ['core'] — a tenant licensed for one and not the other sees it on one shell only",
+   "fix": "one requiresModule for the capability"
+  },
+  {
+   "severity": "high",
+   "dimension": "licence",
+   "where": "venue-info (WEB-028 ↔ GST-029)",
+   "detail": "web requires ['core'], app requires ['fnb'] — a tenant licensed for one and not the other sees it on one shell only",
+   "fix": "one requiresModule for the capability"
+  },
+  {
+   "severity": "high",
+   "dimension": "licence",
+   "where": "venue-map-and-wait-times (WEB-039 ↔ GST-021/GST-022)",
+   "detail": "web requires ['queue'], app requires ['queue', 'seating'] — a tenant licensed for one and not the other sees it on one shell only",
+   "fix": "one requiresModule for the capability"
+  },
+  {
+   "severity": "high",
+   "dimension": "licence",
+   "where": "wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071)",
+   "detail": "web requires ['retail'], app requires ['core', 'retail'] — a tenant licensed for one and not the other sees it on one shell only",
+   "fix": "one requiresModule for the capability"
+  },
+  {
+   "severity": "high",
+   "dimension": "wave",
+   "where": "help-and-cases (WEB-025 ↔ GST-068)",
+   "detail": "ships in wave 1 on the web and wave 2 on the app",
+   "fix": "one wave for both, or record why one shell waits"
+  },
+  {
+   "severity": "high",
+   "dimension": "wave",
+   "where": "lost-and-found (WEB-034 ↔ GST-034)",
+   "detail": "ships in wave 3 on the web and wave 2 on the app",
+   "fix": "one wave for both, or record why one shell waits"
+  },
+  {
+   "severity": "high",
+   "dimension": "wave",
+   "where": "newsletter (WEB-027 ↔ GST-065)",
+   "detail": "ships in wave 2 on the web and wave 3 on the app",
+   "fix": "one wave for both, or record why one shell waits"
+  },
+  {
+   "severity": "high",
+   "dimension": "wave",
+   "where": "order-history (WEB-019 ↔ GST-019)",
+   "detail": "ships in wave 1 on the web and wave 2 on the app",
+   "fix": "one wave for both, or record why one shell waits"
+  },
+  {
+   "severity": "high",
+   "dimension": "wave",
+   "where": "parking (WEB-041 ↔ GST-027/GST-028)",
+   "detail": "ships in wave 2 on the web and wave 3 on the app",
+   "fix": "one wave for both, or record why one shell waits"
+  },
+  {
+   "severity": "high",
+   "dimension": "wave",
+   "where": "privacy-security-devices (WEB-024 ↔ GST-066/GST-073)",
+   "detail": "ships in wave 3 on the web and wave 2 on the app",
+   "fix": "one wave for both, or record why one shell waits"
+  },
+  {
+   "severity": "high",
+   "dimension": "wave",
+   "where": "shop-and-drop (WEB-042 ↔ GST-062)",
+   "detail": "ships in wave 2 on the web and wave 3 on the app",
+   "fix": "one wave for both, or record why one shell waits"
+  },
+  {
+   "severity": "high",
+   "dimension": "wave",
+   "where": "ticket-transfer (WEB-030 ↔ GST-014/GST-045)",
+   "detail": "ships in wave 1 on the web and wave 2 on the app",
+   "fix": "one wave for both, or record why one shell waits"
+  },
+  {
+   "severity": "high",
+   "dimension": "wave",
+   "where": "venue-info (WEB-028 ↔ GST-029)",
+   "detail": "ships in wave 1 on the web and wave 2 on the app",
+   "fix": "one wave for both, or record why one shell waits"
+  },
+  {
+   "severity": "high",
+   "dimension": "wave",
+   "where": "virtual-queue (WEB-040 ↔ GST-023)",
+   "detail": "ships in wave 2 on the web and wave 3 on the app",
+   "fix": "one wave for both, or record why one shell waits"
+  },
+  {
+   "severity": "high",
+   "dimension": "wave",
+   "where": "waiting-room (WEB-015 ↔ GST-046)",
+   "detail": "ships in wave 2 on the web and wave 1 on the app",
+   "fix": "one wave for both, or record why one shell waits"
+  },
+  {
+   "severity": "medium",
+   "dimension": "contracts",
+   "where": "contracts/satellite/ai.yaml:7",
+   "detail": "x-ticvai-platforms names P02 and not P01",
+   "fix": "name both guest shells"
+  },
+  {
+   "severity": "medium",
+   "dimension": "contracts",
+   "where": "contracts/satellite/fnb.yaml:17",
+   "detail": "x-ticvai-platforms names P02 and not P01",
+   "fix": "name both guest shells"
+  },
+  {
+   "severity": "medium",
+   "dimension": "contracts",
+   "where": "contracts/satellite/games.yaml:12",
+   "detail": "x-ticvai-platforms names P02 and not P01",
+   "fix": "name both guest shells"
+  },
+  {
+   "severity": "medium",
+   "dimension": "contracts",
+   "where": "contracts/satellite/marketing-crm.yaml:21",
+   "detail": "x-ticvai-platforms names P02 and not P01",
+   "fix": "name both guest shells"
+  },
+  {
+   "severity": "medium",
+   "dimension": "contracts",
+   "where": "contracts/satellite/queue.yaml:10",
+   "detail": "x-ticvai-platforms names P02 and not P01",
+   "fix": "name both guest shells"
+  },
+  {
+   "severity": "medium",
+   "dimension": "contracts",
+   "where": "contracts/satellite/retail.yaml:10",
+   "detail": "x-ticvai-platforms names P02 and not P01",
+   "fix": "name both guest shells"
+  },
+  {
+   "severity": "medium",
+   "dimension": "contracts",
+   "where": "contracts/satellite/venue-map.yaml:8",
+   "detail": "x-ticvai-platforms names P02 and not P01",
+   "fix": "name both guest shells"
+  },
+  {
+   "severity": "medium",
+   "dimension": "coverage",
+   "where": "account-hub",
+   "detail": "WEB-017 My Account Dashboard — web only (raise). The web has an account dashboard; the app reaches the same things from Home and Profile. A navigation difference rather than a capability one, but it is a difference.",
+   "fix": "ask the client whether it ships, then add it to both or remove it"
+  },
+  {
+   "severity": "medium",
+   "dimension": "coverage",
+   "where": "cabana-booking",
+   "detail": "GST-050 Resource Booking – Cabana, GST-058 Resource Availability (Cabana) — app only (raise). Unsourced (guest-surface-parity.md). bookResource and getResourceAvailability are on the web's My Reservations, so the web can book a cabana with no screen drawn for choosing one.",
+   "fix": "ask the client whether it ships, then add it to both or remove it"
+  },
+  {
+   "severity": "medium",
+   "dimension": "coverage",
+   "where": "digital-companion-mode",
+   "detail": "GST-038 Digital Companion Mode — app only (raise). Unsourced (CF-92) — reads as a framing for the in-venue screens rather than a capability. \"What is near you\" lives here and nowhere on the web.",
+   "fix": "ask the client whether it ships, then add it to both or remove it"
+  },
+  {
+   "severity": "medium",
+   "dimension": "coverage",
+   "where": "itinerary-planning",
+   "detail": "GST-051 Plan Your Adventure – Start, GST-052 Suggested Itineraries, GST-053 Build Your Own Itinerary, GST-054 AI Optimized Itinerary, GST-059 Plan My Day – In Progress — app only (raise). Five screens with no requirement (guest-surface-parity.md); GST-054 assumes parked AI.",
+   "fix": "ask the client whether it ships, then add it to both or remove it"
+  },
+  {
+   "severity": "medium",
+   "dimension": "coverage",
+   "where": "rtl-specimen",
+   "detail": "GST-043 Arabic / RTL Experience — app only (raise). Both platforms declare ltr and rtl. This screen calls nothing — it is a specimen of the Arabic layout, drawn for the app only.",
+   "fix": "ask the client whether it ships, then add it to both or remove it"
+  },
+  {
+   "severity": "medium",
+   "dimension": "cross-shell handover",
+   "where": "help-content-and-accessibility (WEB-045 ↔ GST-040/GST-057)",
+   "detail": "GST-040 hands the guest to WEB-034 on the web — \"They report something lost\" (flow F54 step 2→3)",
+   "fix": "a twin exists on the same shell; hand over only where the device matters"
+  },
+  {
+   "severity": "medium",
+   "dimension": "cross-shell handover",
+   "where": "lost-and-found (WEB-034 ↔ GST-034)",
+   "detail": "WEB-034 hands the guest to GST-034 on the app — \"They track it\" (flow F54 step 3→4)",
+   "fix": "a twin exists on the same shell; hand over only where the device matters"
+  },
+  {
+   "severity": "medium",
+   "dimension": "cross-shell handover",
+   "where": "loyalty (WEB-043 ↔ GST-036)",
+   "detail": "GST-036 hands the guest to WEB-024 on the web — \"They see rewards and manage their devices\" (flow F53 step 1→2)",
+   "fix": "a twin exists on the same shell; hand over only where the device matters"
+  },
+  {
+   "severity": "medium",
+   "dimension": "cross-shell handover",
+   "where": "privacy-security-devices (WEB-024 ↔ GST-066/GST-073)",
+   "detail": "WEB-024 hands the guest to GST-037 on the app — \"Offers are shown against what they hold\" (flow F53 step 2→3)",
+   "fix": "a twin exists on the same shell; hand over only where the device matters"
+  },
+  {
+   "severity": "medium",
+   "dimension": "cross-shell handover",
+   "where": "shop (WEB-033 ↔ GST-026)",
+   "detail": "WEB-033 hands the guest to GST-062 on the app — \"On the way out they find their collection point\" (flow F51 step 2→3)",
+   "fix": "a twin exists on the same shell; hand over only where the device matters"
+  },
+  {
+   "severity": "medium",
+   "dimension": "cross-shell handover",
+   "where": "sign-in (WEB-016 ↔ GST-042)",
+   "detail": "WEB-016 hands the guest to GST-039 on the app — \"They set a profile\" (flow F56 step 3→4)",
+   "fix": "a twin exists on the same shell; hand over only where the device matters"
+  },
+  {
+   "severity": "medium",
+   "dimension": "cross-shell handover",
+   "where": "sign-in (WEB-016 ↔ GST-042)",
+   "detail": "GST-042 hands the guest to WEB-016 on the web — \"A guest who checked out anonymously links their order\" (flow F56 step 2→3)",
+   "fix": "a twin exists on the same shell; hand over only where the device matters"
+  },
+  {
+   "severity": "medium",
+   "dimension": "cross-shell handover",
+   "where": "ticket-transfer (WEB-030 ↔ GST-014/GST-045)",
+   "detail": "WEB-030 hands the guest to GST-014 on the app — \"The friend claims it in the app\" (flow F55 step 4→5)",
+   "fix": "a twin exists on the same shell; hand over only where the device matters"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design",
+   "where": "Claude Design",
+   "detail": "web 13/13 batches drawn, app 0/18 — the web is designed and the app is generated boxes, and the only app reference (TICVAI_Mobile.dc.html) uses a different design system from the drawn web frames",
+   "fix": "draw the app batches against the web's house style, or decide which system is the guest's"
+  },
+  {
+   "severity": "medium",
+   "dimension": "documents",
+   "where": "docs/active/mom-digest.md:3830",
+   "detail": "\"can differ in functionality\" — a client minute says web and app may differ — the 12 September rule says they do not; worth confirming with the client",
+   "fix": "confirm with the client"
+  },
+  {
+   "severity": "medium",
+   "dimension": "entry parameters",
+   "where": "ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033)",
+   "detail": "web opens with ['conversationId', 'outletId'], app with ['cartId', 'conversationId', 'orderId', 'outletId'] — one shared link cannot open both",
+   "fix": "one deep-link shape per capability"
+  },
+  {
+   "severity": "medium",
+   "dimension": "entry parameters",
+   "where": "cart (WEB-010 ↔ GST-041)",
+   "detail": "web opens with ['cartId', 'code', 'lineId'], app with ['cartId', 'lineId', 'productId'] — one shared link cannot open both",
+   "fix": "one deep-link shape per capability"
+  },
+  {
+   "severity": "medium",
+   "dimension": "entry parameters",
+   "where": "checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009)",
+   "detail": "web opens with ['deviceId', 'itemId', 'orderId', 'paymentId', 'subjectId', 'token'], app with ['cartId', 'orderId', 'paymentId', 'token'] — one shared link cannot open both",
+   "fix": "one deep-link shape per capability"
+  },
+  {
+   "severity": "medium",
+   "dimension": "entry parameters",
+   "where": "date-and-session (WEB-006 ↔ GST-007)",
+   "detail": "web opens with ['performanceId'], app with ['eventId'] — one shared link cannot open both",
+   "fix": "one deep-link shape per capability"
+  },
+  {
+   "severity": "medium",
+   "dimension": "entry parameters",
+   "where": "detail (WEB-004 ↔ GST-004/GST-006)",
+   "detail": "web opens with ['eventId', 'productId'], app with ['eventId', 'performanceId', 'productId'] — one shared link cannot open both",
+   "fix": "one deep-link shape per capability"
+  },
+  {
+   "severity": "medium",
+   "dimension": "entry parameters",
+   "where": "help-and-cases (WEB-025 ↔ GST-068)",
+   "detail": "web opens with —, app with ['subjectId'] — one shared link cannot open both",
+   "fix": "one deep-link shape per capability"
+  },
+  {
+   "severity": "medium",
+   "dimension": "entry parameters",
+   "where": "help-content-and-accessibility (WEB-045 ↔ GST-040/GST-057)",
+   "detail": "web opens with —, app with ['caseId'] — one shared link cannot open both",
+   "fix": "one deep-link shape per capability"
+  },
+  {
+   "severity": "medium",
+   "dimension": "entry parameters",
+   "where": "home (WEB-001 ↔ GST-001)",
+   "detail": "web opens with —, app with ['subjectId'] — one shared link cannot open both",
+   "fix": "one deep-link shape per capability"
+  },
+  {
+   "severity": "medium",
+   "dimension": "entry parameters",
+   "where": "lost-and-found (WEB-034 ↔ GST-034)",
+   "detail": "web opens with ['caseId'], app with ['caseId', 'orderId'] — one shared link cannot open both",
+   "fix": "one deep-link shape per capability"
+  },
+  {
+   "severity": "medium",
+   "dimension": "entry parameters",
+   "where": "memberships (WEB-022/WEB-023 ↔ GST-015)",
+   "detail": "web opens with ['orderId', 'productId'], app with ['guestLinkId', 'subjectId'] — one shared link cannot open both",
+   "fix": "one deep-link shape per capability"
+  },
+  {
+   "severity": "medium",
+   "dimension": "entry parameters",
+   "where": "newsletter (WEB-027 ↔ GST-065)",
+   "detail": "web opens with ['deviceId', 'itemId', 'subjectId'], app with ['subjectId'] — one shared link cannot open both",
+   "fix": "one deep-link shape per capability"
+  },
+  {
+   "severity": "medium",
+   "dimension": "entry parameters",
+   "where": "offers (WEB-032 ↔ GST-037)",
+   "detail": "web opens with ['promotionId'], app with ['code', 'promotionId'] — one shared link cannot open both",
+   "fix": "one deep-link shape per capability"
+  },
+  {
+   "severity": "medium",
+   "dimension": "entry parameters",
+   "where": "order-tracking (WEB-038 ↔ GST-025)",
+   "detail": "web opens with ['orderId', 'sessionId', 'venueId'], app with ['orderId', 'sessionId'] — one shared link cannot open both",
+   "fix": "one deep-link shape per capability"
+  },
+  {
+   "severity": "medium",
+   "dimension": "entry parameters",
+   "where": "parking (WEB-041 ↔ GST-027/GST-028)",
+   "detail": "web opens with ['entitlementId', 'venueId'], app with ['entitlementId'] — one shared link cannot open both",
+   "fix": "one deep-link shape per capability"
+  },
+  {
+   "severity": "medium",
+   "dimension": "entry parameters",
+   "where": "privacy-security-devices (WEB-024 ↔ GST-066/GST-073)",
+   "detail": "web opens with ['deviceId', 'enrolmentId', 'itemId', 'subjectId'], app with ['deviceId', 'subjectId'] — one shared link cannot open both",
+   "fix": "one deep-link shape per capability"
+  },
+  {
+   "severity": "medium",
+   "dimension": "entry parameters",
+   "where": "reservations (WEB-031 ↔ GST-016/GST-017)",
+   "detail": "web opens with ['groupBookingId', 'reservationId', 'resourceId'], app with ['reservationId'] — one shared link cannot open both",
+   "fix": "one deep-link shape per capability"
+  },
+  {
+   "severity": "medium",
+   "dimension": "entry parameters",
+   "where": "shop (WEB-033 ↔ GST-026)",
+   "detail": "web opens with ['cartId', 'outletId'], app with ['cardCode', 'outletId'] — one shared link cannot open both",
+   "fix": "one deep-link shape per capability"
+  },
+  {
+   "severity": "medium",
+   "dimension": "entry parameters",
+   "where": "shop-and-drop (WEB-042 ↔ GST-062)",
+   "detail": "web opens with ['outletId'], app with — — one shared link cannot open both",
+   "fix": "one deep-link shape per capability"
+  },
+  {
+   "severity": "medium",
+   "dimension": "entry parameters",
+   "where": "sign-in (WEB-016 ↔ GST-042)",
+   "detail": "web opens with ['cartId', 'challengeId', 'methodId', 'providerId'], app with ['challengeId', 'methodId', 'providerId'] — one shared link cannot open both",
+   "fix": "one deep-link shape per capability"
+  },
+  {
+   "severity": "medium",
+   "dimension": "entry parameters",
+   "where": "ticket-selection (WEB-005 ↔ GST-008)",
+   "detail": "web opens with ['productId'], app with ['orderId'] — one shared link cannot open both",
+   "fix": "one deep-link shape per capability"
+  },
+  {
+   "severity": "medium",
+   "dimension": "entry parameters",
+   "where": "venue-info (WEB-028 ↔ GST-029)",
+   "detail": "web opens with —, app with ['venueId'] — one shared link cannot open both",
+   "fix": "one deep-link shape per capability"
+  },
+  {
+   "severity": "medium",
+   "dimension": "entry parameters",
+   "where": "venue-map-and-wait-times (WEB-039 ↔ GST-021/GST-022)",
+   "detail": "web opens with ['mapId', 'venueId'], app with ['mapId'] — one shared link cannot open both",
+   "fix": "one deep-link shape per capability"
+  },
+  {
+   "severity": "medium",
+   "dimension": "events",
+   "where": "events/whitelabel-contentPublished.yaml",
+   "detail": "consumed by guest-app only",
+   "fix": "both guest shells render the content this event invalidates"
+  },
+  {
+   "severity": "medium",
+   "dimension": "flows",
+   "where": "F01",
+   "detail": "\"Guest buys a ticket online\" walks web screens only, though its capabilities exist on the app (cart, checkout-and-payment, confirmation, date-and-session, detail, home)",
+   "fix": "name both platforms, or say why the journey is one shell's"
+  },
+  {
+   "severity": "medium",
+   "dimension": "flows",
+   "where": "F02",
+   "detail": "\"Guest buys seated tickets\" walks web screens only, though its capabilities exist on the app (cart, checkout-and-payment, date-and-session, seat-selection)",
+   "fix": "name both platforms, or say why the journey is one shell's"
+  },
+  {
+   "severity": "medium",
+   "dimension": "flows",
+   "where": "F11",
+   "detail": "\"Guest orders food to a lounger\" walks app screens only, though its capabilities exist on the web (checkout-and-payment, fnb-order, order-tracking)",
+   "fix": "name both platforms, or say why the journey is one shell's"
+  },
+  {
+   "severity": "medium",
+   "dimension": "flows",
+   "where": "F17",
+   "detail": "\"A guest buys merchandise and collects later\" walks app screens only, though its capabilities exist on the web (shop)",
+   "fix": "name both platforms, or say why the journey is one shell's"
+  },
+  {
+   "severity": "medium",
+   "dimension": "flows",
+   "where": "F18",
+   "detail": "\"A guest plays an arcade game\" walks app screens only, though its capabilities exist on the web (shop)",
+   "fix": "name both platforms, or say why the journey is one shell's"
+  },
+  {
+   "severity": "medium",
+   "dimension": "flows",
+   "where": "F19",
+   "detail": "\"A membership works in another country\" walks app screens only, though its capabilities exist on the web (memberships)",
+   "fix": "name both platforms, or say why the journey is one shell's"
+  },
+  {
+   "severity": "medium",
+   "dimension": "flows",
+   "where": "F21",
+   "detail": "\"A ride queue fills and a guest is redirected\" walks app screens only, though its capabilities exist on the web (browse, venue-map-and-wait-times)",
+   "fix": "name both platforms, or say why the journey is one shell's"
+  },
+  {
+   "severity": "medium",
+   "dimension": "flows",
+   "where": "F25",
+   "detail": "\"A guest rents a cabana\" walks app screens only, though its capabilities exist on the web (venue-map-and-wait-times)",
+   "fix": "name both platforms, or say why the journey is one shell's"
+  },
+  {
+   "severity": "medium",
+   "dimension": "flows",
+   "where": "F26",
+   "detail": "\"A venue maps its site\" walks app screens only, though its capabilities exist on the web (venue-map-and-wait-times)",
+   "fix": "name both platforms, or say why the journey is one shell's"
+  },
+  {
+   "severity": "medium",
+   "dimension": "flows",
+   "where": "F48",
+   "detail": "\"A guest finds it, queues for it, and eats\" walks app screens only, though its capabilities exist on the web (fnb-order, in-venue-notifications, order-tracking, venue-map-and-wait-times, virtual-queue)",
+   "fix": "name both platforms, or say why the journey is one shell's"
+  },
+  {
+   "severity": "medium",
+   "dimension": "flows",
+   "where": "F50",
+   "detail": "\"A guest arrives, parks, and gets in\" walks app screens only, though its capabilities exist on the web (dynamic-qr-ticket, parking, tickets)",
+   "fix": "name both platforms, or say why the journey is one shell's"
+  },
+  {
+   "severity": "medium",
+   "dimension": "flows",
+   "where": "F52",
+   "detail": "\"A guest books a cabana and uses it\" walks app screens only, though its capabilities exist on the web (cabana-booking, reservations)",
+   "fix": "name both platforms, or say why the journey is one shell's"
+  },
+  {
+   "severity": "medium",
+   "dimension": "frontend manifest",
+   "where": "frontend/guest-app.yaml",
+   "detail": "also carries KSK screens — the kiosk (reactWeb) ships inside the reactNative guest app while the web, the app's sibling, ships separately",
+   "fix": "decide whether TICVAI Guest is one codebase or three"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033)",
+   "detail": "the web calls listAiConversations here; the app calls listAiConversations on GST-068",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033)",
+   "detail": "the app calls addCartLine, checkoutCart, createGuestFnbOrder, getCart, getGuestOrderStatus here; the web calls addCartLine on WEB-008/WEB-010/WEB-033; checkoutCart on WEB-010; createGuestFnbOrder on WEB-036; getCart on WEB-010; getGuestOrderStatus on WEB-036/WEB-038",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "cart (WEB-010 ↔ GST-041)",
+   "detail": "the web calls addCartLine, evaluatePromotions, getCouponCode here; the app calls addCartLine on GST-032/GST-048/GST-050/GST-053/GST-056; evaluatePromotions on GST-036/GST-037; getCouponCode on GST-037",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "cart (WEB-010 ↔ GST-041)",
+   "detail": "the app calls claimCart, listProductVariants here; the web calls claimCart on WEB-016; listProductVariants on WEB-005",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009)",
+   "detail": "the web calls addToWishlist, getGuestProfile, getOrder, getWishlist, listConsentPurposes, listGuestDevices, recordConsent, registerGuestDevice, removeFromWishlist, revokeGuestDevice, updateMyProfile, uploadGuestDocument here; the app calls addToWishlist on GST-020; getGuestProfile on GST-001; getOrder on GST-010/GST-018/GST-019; getWishlist on GST-020; listConsentPurposes on GST-065; listGuestDevices on GST-073; recordConsent on GST-039/GST-065; registerGuestDevice on GST-073; removeFromWishlist on GST-020; revokeGuestDevice on GST-073; updateMyProfile on GST-039; uploadGuestDocument on GST-066",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009)",
+   "detail": "the app calls acquireInventoryHold, checkoutCart, getCart here; the web calls acquireInventoryHold on WEB-006; checkoutCart on WEB-010; getCart on WEB-010",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "date-and-session (WEB-006 ↔ GST-007)",
+   "detail": "the web calls acquireInventoryHold, getPerformance here; the app calls acquireInventoryHold on GST-009; getPerformance on GST-006",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "date-and-session (WEB-006 ↔ GST-007)",
+   "detail": "the app calls listPerformances here; the web calls listPerformances on WEB-002/WEB-004",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "detail (WEB-004 ↔ GST-004/GST-006)",
+   "detail": "the app calls getPerformance here; the web calls getPerformance on WEB-006",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "feedback (WEB-026 ↔ GST-035)",
+   "detail": "the app calls raiseMyCase here; the web calls raiseMyCase on WEB-034",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "fnb-order (WEB-036 ↔ GST-024)",
+   "detail": "the web calls createTableReservation, joinRestaurantWaitlist here; the app calls createTableReservation on GST-070; joinRestaurantWaitlist on GST-070",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "help-and-cases (WEB-025 ↔ GST-068)",
+   "detail": "the web calls getTenantAppStatus here; the app calls getTenantAppStatus on GST-001/GST-038/GST-047",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "help-and-cases (WEB-025 ↔ GST-068)",
+   "detail": "the app calls listAiConversations here; the web calls listAiConversations on WEB-044",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "help-content-and-accessibility (WEB-045 ↔ GST-040/GST-057)",
+   "detail": "the app calls listMyCases, raiseMyCase, replyToMyCase here; the web calls listMyCases on WEB-034; raiseMyCase on WEB-034; replyToMyCase on WEB-034",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "home (WEB-001 ↔ GST-001)",
+   "detail": "the web calls listProducts here; the app calls listProducts on GST-002/GST-003/GST-005/GST-015/GST-021/GST-038/GST-044/GST-050/GST-051/GST-052/GST-053/GST-054/GST-058/GST-059",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "home (WEB-001 ↔ GST-001)",
+   "detail": "the app calls getGuestProfile, listMyEntitlements, searchCatalogue here; the web calls getGuestProfile on WEB-011/WEB-020; listMyEntitlements on WEB-018; searchCatalogue on WEB-002/WEB-003",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "loyalty (WEB-043 ↔ GST-036)",
+   "detail": "the web calls createReferral, redeemLoyaltyPoints here; the app calls createReferral on GST-072; redeemLoyaltyPoints on GST-071",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "memberships (WEB-022/WEB-023 ↔ GST-015)",
+   "detail": "the web calls getProduct, transferOrderTickets here; the app calls getProduct on GST-004/GST-006; transferOrderTickets on GST-008/GST-009/GST-010/GST-012/GST-013/GST-014/GST-019/GST-045/GST-055",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "memberships (WEB-022/WEB-023 ↔ GST-015)",
+   "detail": "the app calls grantDelegation, listDelegations here; the web calls grantDelegation on WEB-024; listDelegations on WEB-024",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "newsletter (WEB-027 ↔ GST-065)",
+   "detail": "the web calls addToWishlist, getWishlist, listGuestDevices, registerGuestDevice, removeFromWishlist, revokeGuestDevice here; the app calls addToWishlist on GST-020; getWishlist on GST-020; listGuestDevices on GST-073; registerGuestDevice on GST-073; removeFromWishlist on GST-020; revokeGuestDevice on GST-073",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "newsletter (WEB-027 ↔ GST-065)",
+   "detail": "the app calls listConsentPurposes here; the web calls listConsentPurposes on WEB-011/WEB-020",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "offers (WEB-032 ↔ GST-037)",
+   "detail": "the app calls getCouponCode here; the web calls getCouponCode on WEB-010",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "order-history (WEB-019 ↔ GST-019)",
+   "detail": "the web calls createRefundRequest here; the app calls createRefundRequest on GST-067",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "privacy-security-devices (WEB-024 ↔ GST-066/GST-073)",
+   "detail": "the web calls addToWishlist, getFacePassEnrolment, getWaiverStatus, getWishlist, grantDelegation, listDelegations, recordConsent, removeFromWishlist, revokeFacePass here; the app calls addToWishlist on GST-020; getFacePassEnrolment on GST-069; getWaiverStatus on GST-067; getWishlist on GST-020; grantDelegation on GST-015; listDelegations on GST-015; recordConsent on GST-039/GST-065; removeFromWishlist on GST-020; revokeFacePass on GST-069",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "privacy-security-devices (WEB-024 ↔ GST-066/GST-073)",
+   "detail": "the app calls createMfaChallenge, updateGuestPreferences, uploadGuestDocument, verifyGuestEmail here; the web calls createMfaChallenge on WEB-016; updateGuestPreferences on WEB-020; uploadGuestDocument on WEB-011; verifyGuestEmail on WEB-020",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "profile (WEB-020 ↔ GST-039)",
+   "detail": "the web calls getGuestProfile, listConsentPurposes, updateGuestPreferences, verifyGuestEmail here; the app calls getGuestProfile on GST-001; listConsentPurposes on GST-065; updateGuestPreferences on GST-066; verifyGuestEmail on GST-073",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "reservations (WEB-031 ↔ GST-016/GST-017)",
+   "detail": "the web calls bookResource, getGroupBooking, getResourceAvailability, updateTableReservation here; the app calls bookResource on GST-070; getGroupBooking on GST-072; getResourceAvailability on GST-070; updateTableReservation on GST-070",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "search (WEB-003 ↔ GST-063)",
+   "detail": "the web calls listProducts here; the app calls listProducts on GST-002/GST-003/GST-005/GST-015/GST-021/GST-038/GST-044/GST-050/GST-051/GST-052/GST-053/GST-054/GST-058/GST-059",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "shop (WEB-033 ↔ GST-026)",
+   "detail": "the web calls addCartLine here; the app calls addCartLine on GST-032/GST-048/GST-050/GST-053/GST-056",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "shop (WEB-033 ↔ GST-026)",
+   "detail": "the app calls getGameCard here; the web calls getGameCard on WEB-021",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "shop-and-drop (WEB-042 ↔ GST-062)",
+   "detail": "the web calls listMerchandise, lookupMerchandise, reserveMerchandise here; the app calls listMerchandise on GST-026; lookupMerchandise on GST-026; reserveMerchandise on GST-026",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "sign-in (WEB-016 ↔ GST-042)",
+   "detail": "the web calls claimCart, createMfaChallenge here; the app calls claimCart on GST-041; createMfaChallenge on GST-073",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "ticket-selection (WEB-005 ↔ GST-008)",
+   "detail": "the web calls evaluatePromotions, listProductVariants here; the app calls evaluatePromotions on GST-036/GST-037; listProductVariants on GST-041",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "ticket-selection (WEB-005 ↔ GST-008)",
+   "detail": "the app calls transferOrderTickets here; the web calls transferOrderTickets on WEB-012/WEB-013/WEB-018/WEB-019/WEB-023/WEB-030",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "ticket-transfer (WEB-030 ↔ GST-014/GST-045)",
+   "detail": "the web calls createResaleListing here; the app calls createResaleListing on GST-067",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "tickets (WEB-018 ↔ GST-012/GST-013)",
+   "detail": "the web calls issueWalletPass, shareEntitlement here; the app calls issueWalletPass on GST-018; shareEntitlement on GST-072",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "venue-info (WEB-028 ↔ GST-029)",
+   "detail": "the web calls getTenantAppStatus here; the app calls getTenantAppStatus on GST-001/GST-038/GST-047",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "venue-info (WEB-028 ↔ GST-029)",
+   "detail": "the app calls listDeliveryLocations, listDiningOutlets here; the web calls listDeliveryLocations on WEB-036; listDiningOutlets on WEB-036",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "venue-map-and-wait-times (WEB-039 ↔ GST-021/GST-022)",
+   "detail": "the web calls listQueues here; the app calls listQueues on GST-023",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "venue-map-and-wait-times (WEB-039 ↔ GST-021/GST-022)",
+   "detail": "the app calls listProducts here; the web calls listProducts on WEB-001/WEB-002/WEB-003/WEB-022/WEB-035",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "virtual-queue (WEB-040 ↔ GST-023)",
+   "detail": "the web calls joinWaitlist, leaveWaitlist here; the app calls joinWaitlist on GST-070; leaveWaitlist on GST-070",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "virtual-queue (WEB-040 ↔ GST-023)",
+   "detail": "the app calls listQueues here; the web calls listQueues on WEB-039",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071)",
+   "detail": "the web calls getGameCard here; the app calls getGameCard on GST-026",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "operations",
+   "where": "wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071)",
+   "detail": "the app calls redeemLoyaltyPoints here; the web calls redeemLoyaltyPoints on WEB-043",
+   "fix": "same operations on the same capability, so a guest finds it in the same place"
+  },
+  {
+   "severity": "medium",
+   "dimension": "overlays",
+   "where": "cart (WEB-010 ↔ GST-041)",
+   "detail": "declared on the web only",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "overlays",
+   "where": "checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009)",
+   "detail": "declared on the web only",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "overlays",
+   "where": "newsletter (WEB-027 ↔ GST-065)",
+   "detail": "declared on the web only",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "platform",
+   "where": "themes",
+   "detail": "web declares ['light'], app declares ['light', 'dark'] — a guest who uses dark mode on the app gets light on the web; both boards are drawn light",
+   "fix": "declare the same themes on both, or record why the web has no dark mode"
+  },
+  {
+   "severity": "medium",
+   "dimension": "states",
+   "where": "profile (WEB-020 ↔ GST-039)",
+   "detail": "web only ['emptyNoResults'], app only —",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "states",
+   "where": "shop-and-drop (WEB-042 ↔ GST-062)",
+   "detail": "web only ['emptyNoResults'], app only —",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "states",
+   "where": "ticket-selection (WEB-005 ↔ GST-008)",
+   "detail": "web only ['emptyNoResults'], app only —",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "add-ons (WEB-008 ↔ GST-048/GST-056)",
+   "detail": "web ['C86'], app ['C87', 'C88'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033)",
+   "detail": "web —, app ['AI-02'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "browse (WEB-002 ↔ GST-002/GST-003/GST-005)",
+   "detail": "web ['C79'], app ['C02', 'C84'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "cart (WEB-010 ↔ GST-041)",
+   "detail": "web ['C02'], app ['C56'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009)",
+   "detail": "web ['C03', 'C04'], app ['C47'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "confirmation (WEB-013 ↔ GST-010)",
+   "detail": "web ['C03'], app ['C02'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "date-and-session (WEB-006 ↔ GST-007)",
+   "detail": "web ['C81'], app ['C02'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "detail (WEB-004 ↔ GST-004/GST-006)",
+   "detail": "web ['C79'], app ['C02', 'C84'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "feedback (WEB-026 ↔ GST-035)",
+   "detail": "web ['C33'], app ['C62'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "fnb-order (WEB-036 ↔ GST-024)",
+   "detail": "web —, app ['C05'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "help-and-cases (WEB-025 ↔ GST-068)",
+   "detail": "web ['C105'], app ['read-write'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "help-content-and-accessibility (WEB-045 ↔ GST-040/GST-057)",
+   "detail": "web —, app ['C17'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "home (WEB-001 ↔ GST-001)",
+   "detail": "web ['C79'], app ['C02'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "in-venue-notifications (WEB-046 ↔ GST-030)",
+   "detail": "web —, app ['C61'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "lost-and-found (WEB-034 ↔ GST-034)",
+   "detail": "web ['C00'], app ['C18'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "loyalty (WEB-043 ↔ GST-036)",
+   "detail": "web —, app ['C64'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "memberships (WEB-022/WEB-023 ↔ GST-015)",
+   "detail": "web ['C31'], app ['C03'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "menu-item (WEB-037 ↔ GST-061)",
+   "detail": "web —, app ['C05'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "multi-currency (WEB-035 ↔ GST-044)",
+   "detail": "web ['C00'], app ['C107'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "newsletter (WEB-027 ↔ GST-065)",
+   "detail": "web ['C59'], app ['C00'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "offers (WEB-032 ↔ GST-037)",
+   "detail": "web ['C00'], app ['C86'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "order-history (WEB-019 ↔ GST-019)",
+   "detail": "web ['C34'], app ['C21'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "order-tracking (WEB-038 ↔ GST-025)",
+   "detail": "web —, app ['C05'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "parking (WEB-041 ↔ GST-027/GST-028)",
+   "detail": "web —, app ['C23'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "privacy-security-devices (WEB-024 ↔ GST-066/GST-073)",
+   "detail": "web ['C93'], app ['read-write'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "profile (WEB-020 ↔ GST-039)",
+   "detail": "web ['C36'], app ['C58'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "reservations (WEB-031 ↔ GST-016/GST-017)",
+   "detail": "web ['C00'], app ['C02'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "search (WEB-003 ↔ GST-063)",
+   "detail": "web ['C79'], app ['C00'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "seat-selection (WEB-007 ↔ GST-049)",
+   "detail": "web ['C51'], app ['C53'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "shop (WEB-033 ↔ GST-026)",
+   "detail": "web ['C00'], app ['C08'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "shop-and-drop (WEB-042 ↔ GST-062)",
+   "detail": "web —, app ['C21'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "sign-in (WEB-016 ↔ GST-042)",
+   "detail": "web ['C36'], app ['C56'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "ticket-selection (WEB-005 ↔ GST-008)",
+   "detail": "web ['C80'], app ['C02'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "ticket-transfer (WEB-030 ↔ GST-014/GST-045)",
+   "detail": "web ['C00'], app ['C02'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "tickets (WEB-018 ↔ GST-012/GST-013)",
+   "detail": "web ['C09'], app ['C02'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "venue-info (WEB-028 ↔ GST-029)",
+   "detail": "web ['C105'], app ['C17'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "venue-map-and-wait-times (WEB-039 ↔ GST-021/GST-022)",
+   "detail": "web —, app ['C39', 'C82'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "virtual-queue (WEB-040 ↔ GST-023)",
+   "detail": "web —, app ['C82'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "waiting-room (WEB-015 ↔ GST-046)",
+   "detail": "web —, app ['C98'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071)",
+   "detail": "web ['C21'], app ['C37', 'read-write'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "capability code",
+   "where": "wishlist (WEB-009 ↔ GST-020)",
+   "detail": "web ['C79'], app ['C58'] — traceability counts them as two",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "add-ons (WEB-008 ↔ GST-048/GST-056)",
+   "detail": "web only ['secondaryButton'], app only ['dataTable'] (4 vs 5 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033)",
+   "detail": "web only ['cardList'], app only — (7 vs 14 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "browse (WEB-002 ↔ GST-002/GST-003/GST-005)",
+   "detail": "web only ['cardList', 'datePicker', 'multiSelect', 'searchField'], app only — (6 vs 6 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "cart (WEB-010 ↔ GST-041)",
+   "detail": "web only ['banner', 'destructiveButton', 'secondaryButton', 'textField'], app only — (11 vs 2 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009)",
+   "detail": "web only ['banner', 'cartPanel', 'consentBlock', 'dataTable', 'destructiveButton', 'textField'], app only — (26 vs 5 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "confirmation (WEB-013 ↔ GST-010)",
+   "detail": "web only ['banner'], app only — (6 vs 3 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "date-and-session (WEB-006 ↔ GST-007)",
+   "detail": "web only ['cardList', 'datePicker', 'primaryButton'], app only ['dataTable'] (4 vs 1 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "detail (WEB-004 ↔ GST-004/GST-006)",
+   "detail": "web only ['banner', 'primaryButton'], app only — (4 vs 3 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "fnb-order (WEB-036 ↔ GST-024)",
+   "detail": "web only ['cardList'], app only — (7 vs 5 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "help-and-cases (WEB-025 ↔ GST-068)",
+   "detail": "web only ['secondaryButton'], app only — (4 vs 3 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "help-content-and-accessibility (WEB-045 ↔ GST-040/GST-057)",
+   "detail": "web only ['cardList'], app only ['metricTile', 'primaryButton', 'secondaryButton'] (4 vs 8 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "home (WEB-001 ↔ GST-001)",
+   "detail": "web only ['banner', 'cardList', 'iconButton', 'secondaryButton'], app only — (6 vs 2 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "in-venue-notifications (WEB-046 ↔ GST-030)",
+   "detail": "web only ['cardList', 'detailPanel'], app only ['secondaryButton'] (3 vs 2 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "loyalty (WEB-043 ↔ GST-036)",
+   "detail": "web only ['cardList', 'detailPanel'], app only — (4 vs 2 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "menu-item (WEB-037 ↔ GST-061)",
+   "detail": "web only ['cardList'], app only ['banner', 'selectField'] (4 vs 4 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "newsletter (WEB-027 ↔ GST-065)",
+   "detail": "web only ['confirmDialog', 'destructiveButton'], app only — (12 vs 4 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "offers (WEB-032 ↔ GST-037)",
+   "detail": "web only ['secondaryButton'], app only — (5 vs 3 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "order-tracking (WEB-038 ↔ GST-025)",
+   "detail": "web only ['cardList'], app only — (4 vs 2 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "parking (WEB-041 ↔ GST-027/GST-028)",
+   "detail": "web only ['cardList'], app only — (6 vs 7 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "privacy-security-devices (WEB-024 ↔ GST-066/GST-073)",
+   "detail": "web only ['confirmDialog'], app only — (12 vs 8 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "profile (WEB-020 ↔ GST-039)",
+   "detail": "web only ['dataTable', 'detailPanel', 'secondaryButton'], app only ['textField'] (8 vs 7 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "reservations (WEB-031 ↔ GST-016/GST-017)",
+   "detail": "web only ['confirmDialog', 'secondaryButton'], app only — (7 vs 5 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "search (WEB-003 ↔ GST-063)",
+   "detail": "web only —, app only ['searchField'] (2 vs 3 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "seat-selection (WEB-007 ↔ GST-049)",
+   "detail": "web only ['banner'], app only — (6 vs 7 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "shop (WEB-033 ↔ GST-026)",
+   "detail": "web only ['primaryButton', 'searchField', 'secondaryButton'], app only — (7 vs 2 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "shop-and-drop (WEB-042 ↔ GST-062)",
+   "detail": "web only ['cardList', 'dataTable', 'detailPanel', 'secondaryButton'], app only ['banner'] (7 vs 2 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "ticket-selection (WEB-005 ↔ GST-008)",
+   "detail": "web only ['banner', 'cardList', 'dataTable', 'detailPanel'], app only ['secondaryButton'] (6 vs 2 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "venue-info (WEB-028 ↔ GST-029)",
+   "detail": "web only —, app only ['dataTable'] (1 vs 2 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "venue-map-and-wait-times (WEB-039 ↔ GST-021/GST-022)",
+   "detail": "web only ['cardList'], app only — (4 vs 5 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "virtual-queue (WEB-040 ↔ GST-023)",
+   "detail": "web only ['cardList'], app only — (5 vs 3 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "waiting-room (WEB-015 ↔ GST-046)",
+   "detail": "web only ['secondaryButton'], app only — (3 vs 2 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071)",
+   "detail": "web only —, app only ['primaryButton', 'secondaryButton'] (3 vs 7 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "components",
+   "where": "wishlist (WEB-009 ↔ GST-020)",
+   "detail": "web only ['confirmDialog', 'secondaryButton'], app only — (7 vs 3 components)",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "coverage",
+   "where": "refunds-and-resale",
+   "detail": "GST-067 Refunds & Resale has no web screen; its operations are on WEB-019, WEB-030; getWaiverStatus on WEB-024",
+   "fix": "draw the screen on the other shell, or record the fold as the decision"
+  },
+  {
+   "severity": "low",
+   "dimension": "coverage",
+   "where": "reserve-table-or-cabana",
+   "detail": "GST-070 Reserve a Table or Cabana has no web screen; its operations are on WEB-031, WEB-036, WEB-040",
+   "fix": "draw the screen on the other shell, or record the fold as the decision"
+  },
+  {
+   "severity": "low",
+   "dimension": "coverage",
+   "where": "share-and-group-booking",
+   "detail": "GST-072 Share & Group Booking has no web screen; its operations are on WEB-017, WEB-018, WEB-031, WEB-043",
+   "fix": "draw the screen on the other shell, or record the fold as the decision"
+  },
+  {
+   "severity": "low",
+   "dimension": "documents",
+   "where": "contracts/spine/catalogue.yaml:784",
+   "detail": "\"browses by category and cannot search\" — GST-063 Search exists since 17 August",
+   "fix": "rewrite to the 12 September rule"
+  },
+  {
+   "severity": "low",
+   "dimension": "documents",
+   "where": "docs/active/design-plan.md:267",
+   "detail": "\"guest-app surfaces are not\" — P02 is offlineCapable: true",
+   "fix": "rewrite to the 12 September rule"
+  },
+  {
+   "severity": "low",
+   "dimension": "documents",
+   "where": "docs/registers/conflicts.md:148",
+   "detail": "\"stay app-only by design\" — CF-93 predates WEB-036–046 and the 10 September decision",
+   "fix": "rewrite to the 12 September rule"
+  },
+  {
+   "severity": "low",
+   "dimension": "layout split",
+   "where": "add-ons (WEB-008 ↔ GST-048/GST-056)",
+   "detail": "1 screen(s) on the web, 2 on the app: Add-ons & Upsell ↔ Upsell / Cross-Sell; Bundle Package",
+   "fix": "fine if deliberate; a builder should know it is one capability"
+  },
+  {
+   "severity": "low",
+   "dimension": "layout split",
+   "where": "ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033)",
+   "detail": "1 screen(s) on the web, 3 on the app: AI Concierge – Home ↔ AI Concierge – Home; AI Concierge – Chat; AI Concierge – Contextual Help",
+   "fix": "fine if deliberate; a builder should know it is one capability"
+  },
+  {
+   "severity": "low",
+   "dimension": "layout split",
+   "where": "browse (WEB-002 ↔ GST-002/GST-003/GST-005)",
+   "detail": "1 screen(s) on the web, 3 on the app: Event & Attraction Listing ↔ Explore Categories; Event & Attraction Listing; What's On",
+   "fix": "fine if deliberate; a builder should know it is one capability"
+  },
+  {
+   "severity": "low",
+   "dimension": "layout split",
+   "where": "checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009)",
+   "detail": "3 screen(s) on the web, 1 on the app: Guest Details & Attendee Forms; Checkout — Payment; Pay for a Booking ↔ Review & Payment",
+   "fix": "fine if deliberate; a builder should know it is one capability"
+  },
+  {
+   "severity": "low",
+   "dimension": "layout split",
+   "where": "detail (WEB-004 ↔ GST-004/GST-006)",
+   "detail": "1 screen(s) on the web, 2 on the app: Attraction Details ↔ Attraction Details; Event / Exhibition Details",
+   "fix": "fine if deliberate; a builder should know it is one capability"
+  },
+  {
+   "severity": "low",
+   "dimension": "layout split",
+   "where": "help-content-and-accessibility (WEB-045 ↔ GST-040/GST-057)",
+   "detail": "1 screen(s) on the web, 2 on the app: Help Centre & Accessibility ↔ Help & Support; Accessibility Information",
+   "fix": "fine if deliberate; a builder should know it is one capability"
+  },
+  {
+   "severity": "low",
+   "dimension": "layout split",
+   "where": "memberships (WEB-022/WEB-023 ↔ GST-015)",
+   "detail": "2 screen(s) on the web, 1 on the app: Membership Plans; Membership Management ↔ Memberships",
+   "fix": "fine if deliberate; a builder should know it is one capability"
+  },
+  {
+   "severity": "low",
+   "dimension": "layout split",
+   "where": "parking (WEB-041 ↔ GST-027/GST-028)",
+   "detail": "1 screen(s) on the web, 2 on the app: Parking – Reserve & Pay ↔ Parking – Reserve & Pay; Parking – Reservation Confirmed",
+   "fix": "fine if deliberate; a builder should know it is one capability"
+  },
+  {
+   "severity": "low",
+   "dimension": "layout split",
+   "where": "privacy-security-devices (WEB-024 ↔ GST-066/GST-073)",
+   "detail": "1 screen(s) on the web, 2 on the app: Devices, Wishlist & Consent ↔ Privacy & My Data; Security & Sign-in",
+   "fix": "fine if deliberate; a builder should know it is one capability"
+  },
+  {
+   "severity": "low",
+   "dimension": "layout split",
+   "where": "reservations (WEB-031 ↔ GST-016/GST-017)",
+   "detail": "1 screen(s) on the web, 2 on the app: My Reservations ↔ My Reservations; Reservation Details",
+   "fix": "fine if deliberate; a builder should know it is one capability"
+  },
+  {
+   "severity": "low",
+   "dimension": "layout split",
+   "where": "ticket-transfer (WEB-030 ↔ GST-014/GST-045)",
+   "detail": "1 screen(s) on the web, 2 on the app: Ticket Transfer ↔ Ticket Transfer; Ticket Delivery & Sharing",
+   "fix": "fine if deliberate; a builder should know it is one capability"
+  },
+  {
+   "severity": "low",
+   "dimension": "layout split",
+   "where": "tickets (WEB-018 ↔ GST-012/GST-013)",
+   "detail": "1 screen(s) on the web, 2 on the app: My Tickets ↔ My Tickets; Ticket Details",
+   "fix": "fine if deliberate; a builder should know it is one capability"
+  },
+  {
+   "severity": "low",
+   "dimension": "layout split",
+   "where": "venue-map-and-wait-times (WEB-039 ↔ GST-021/GST-022)",
+   "detail": "1 screen(s) on the web, 2 on the app: Venue Map & Wait Times ↔ Interactive Map; Attraction Wait Times",
+   "fix": "fine if deliberate; a builder should know it is one capability"
+  },
+  {
+   "severity": "low",
+   "dimension": "layout split",
+   "where": "wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071)",
+   "detail": "1 screen(s) on the web, 2 on the app: Wallet & Gift Cards ↔ Wallet Overview; Payment Methods",
+   "fix": "fine if deliberate; a builder should know it is one capability"
+  },
+  {
+   "severity": "low",
+   "dimension": "naming",
+   "where": "cart (WEB-010 ↔ GST-041)",
+   "detail": "\"Shopping Cart\" ↔ \"Checkout Entry\"",
+   "fix": "one name for one journey (31 August rule)"
+  },
+  {
+   "severity": "low",
+   "dimension": "naming",
+   "where": "date-and-session (WEB-006 ↔ GST-007)",
+   "detail": "\"Date & Session Selection\" ↔ \"Select Date & Time\"",
+   "fix": "one name for one journey (31 August rule)"
+  },
+  {
+   "severity": "low",
+   "dimension": "naming",
+   "where": "feedback (WEB-026 ↔ GST-035)",
+   "detail": "\"Survey & Feedback\" ↔ \"Feedback & Ratings\"",
+   "fix": "one name for one journey (31 August rule)"
+  },
+  {
+   "severity": "low",
+   "dimension": "naming",
+   "where": "help-and-cases (WEB-025 ↔ GST-068)",
+   "detail": "\"Help Centre / FAQ\" ↔ \"Help & My Cases\"",
+   "fix": "one name for one journey (31 August rule)"
+  },
+  {
+   "severity": "low",
+   "dimension": "naming",
+   "where": "home (WEB-001 ↔ GST-001)",
+   "detail": "\"Home / Landing\" ↔ \"Home – Default\"",
+   "fix": "one name for one journey (31 August rule)"
+  },
+  {
+   "severity": "low",
+   "dimension": "naming",
+   "where": "newsletter (WEB-027 ↔ GST-065)",
+   "detail": "\"Newsletter Subscription\" ↔ \"Newsletter & Preferences\"",
+   "fix": "one name for one journey (31 August rule)"
+  },
+  {
+   "severity": "low",
+   "dimension": "naming",
+   "where": "profile (WEB-020 ↔ GST-039)",
+   "detail": "\"Profile & Preferences\" ↔ \"Profile\"",
+   "fix": "one name for one journey (31 August rule)"
+  },
+  {
+   "severity": "low",
+   "dimension": "naming",
+   "where": "search (WEB-003 ↔ GST-063)",
+   "detail": "\"Search Results\" ↔ \"Search\"",
+   "fix": "one name for one journey (31 August rule)"
+  },
+  {
+   "severity": "low",
+   "dimension": "naming",
+   "where": "shop (WEB-033 ↔ GST-026)",
+   "detail": "\"Shop\" ↔ \"Retail / Merchandise\"",
+   "fix": "one name for one journey (31 August rule)"
+  },
+  {
+   "severity": "low",
+   "dimension": "naming",
+   "where": "shop-and-drop (WEB-042 ↔ GST-062)",
+   "detail": "\"Retail & Shop and Drop\" ↔ \"Shop & Drop Collection\"",
+   "fix": "one name for one journey (31 August rule)"
+  },
+  {
+   "severity": "low",
+   "dimension": "naming",
+   "where": "sign-in (WEB-016 ↔ GST-042)",
+   "detail": "\"Login / Register\" ↔ \"Simple Registration & OTP\"",
+   "fix": "one name for one journey (31 August rule)"
+  },
+  {
+   "severity": "low",
+   "dimension": "naming",
+   "where": "system-states (WEB-029 ↔ GST-047)",
+   "detail": "\"Error / Sold Out / Maintenance\" ↔ \"Maintenance / Upgrade Page\"",
+   "fix": "one name for one journey (31 August rule)"
+  },
+  {
+   "severity": "low",
+   "dimension": "naming",
+   "where": "ticket-selection (WEB-005 ↔ GST-008)",
+   "detail": "\"Ticket Type Selection\" ↔ \"Tickets & Add-ons\"",
+   "fix": "one name for one journey (31 August rule)"
+  },
+  {
+   "severity": "low",
+   "dimension": "naming",
+   "where": "venue-info (WEB-028 ↔ GST-029)",
+   "detail": "\"Contact & Venue Information\" ↔ \"Venue Info & Services\"",
+   "fix": "one name for one journey (31 August rule)"
+  },
+  {
+   "severity": "low",
+   "dimension": "naming",
+   "where": "wishlist (WEB-009 ↔ GST-020)",
+   "detail": "\"Wishlist\" ↔ \"Saved Items / Wishlist\"",
+   "fix": "one name for one journey (31 August rule)"
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "add-ons (WEB-008 ↔ GST-048/GST-056)",
+   "detail": "leads on to ['date-and-session', 'seat-selection', 'ticket-selection'] on the web only and ['browse'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033)",
+   "detail": "leads on to — on the web only and ['browse'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "browse (WEB-002 ↔ GST-002/GST-003/GST-005)",
+   "detail": "leads on to ['search'] on the web only and — on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "cart (WEB-010 ↔ GST-041)",
+   "detail": "leads on to ['checkout-and-payment', 'confirmation', 'ticket-transfer'] on the web only and ['browse'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009)",
+   "detail": "leads on to ['cart', 'confirmation'] on the web only and ['browse'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "confirmation (WEB-013 ↔ GST-010)",
+   "detail": "leads on to ['cart', 'checkout-and-payment', 'tickets'] on the web only and ['browse'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "date-and-session (WEB-006 ↔ GST-007)",
+   "detail": "leads on to ['add-ons', 'cart', 'seat-selection', 'ticket-selection'] on the web only and ['browse'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "detail (WEB-004 ↔ GST-004/GST-006)",
+   "detail": "leads on to ['search', 'ticket-selection'] on the web only and — on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "feedback (WEB-026 ↔ GST-035)",
+   "detail": "leads on to ['help-and-cases', 'newsletter', 'venue-info'] on the web only and ['browse'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "fnb-order (WEB-036 ↔ GST-024)",
+   "detail": "leads on to — on the web only and ['browse', 'checkout-and-payment', 'order-tracking'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "help-and-cases (WEB-025 ↔ GST-068)",
+   "detail": "leads on to ['feedback', 'home', 'newsletter', 'venue-info'] on the web only and ['profile'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "help-content-and-accessibility (WEB-045 ↔ GST-040/GST-057)",
+   "detail": "leads on to — on the web only and ['browse'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "home (WEB-001 ↔ GST-001)",
+   "detail": "leads on to ['ai-concierge', 'fnb-order', 'help-content-and-accessibility', 'in-venue-notifications', 'loyalty', 'menu-item', 'order-tracking', 'parking', 'search', 'shop-and-drop', 'sign-in', 'venue-map-and-wait-times', 'virtual-queue'] on the web only and — on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "in-venue-notifications (WEB-046 ↔ GST-030)",
+   "detail": "leads on to — on the web only and ['ai-concierge', 'browse'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "lost-and-found (WEB-034 ↔ GST-034)",
+   "detail": "leads on to — on the web only and ['browse'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "loyalty (WEB-043 ↔ GST-036)",
+   "detail": "leads on to — on the web only and ['browse'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "memberships (WEB-022/WEB-023 ↔ GST-015)",
+   "detail": "leads on to ['privacy-security-devices', 'wallet-and-payment-methods'] on the web only and ['browse'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "menu-item (WEB-037 ↔ GST-061)",
+   "detail": "leads on to — on the web only and ['shop-and-drop'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "multi-currency (WEB-035 ↔ GST-044)",
+   "detail": "leads on to ['reservations', 'ticket-transfer'] on the web only and ['browse'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "newsletter (WEB-027 ↔ GST-065)",
+   "detail": "leads on to ['feedback', 'help-and-cases', 'venue-info'] on the web only and — on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "offers (WEB-032 ↔ GST-037)",
+   "detail": "leads on to — on the web only and ['browse', 'wallet-and-payment-methods'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "order-history (WEB-019 ↔ GST-019)",
+   "detail": "leads on to ['account-hub', 'sign-in', 'tickets'] on the web only and ['browse'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "order-tracking (WEB-038 ↔ GST-025)",
+   "detail": "leads on to — on the web only and ['browse', 'in-venue-notifications'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "parking (WEB-041 ↔ GST-027/GST-028)",
+   "detail": "leads on to — on the web only and ['browse', 'tickets'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "privacy-security-devices (WEB-024 ↔ GST-066/GST-073)",
+   "detail": "leads on to ['home', 'memberships', 'wallet-and-payment-methods'] on the web only and ['profile'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "profile (WEB-020 ↔ GST-039)",
+   "detail": "leads on to ['account-hub', 'sign-in', 'tickets'] on the web only and ['browse', 'newsletter'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "reservations (WEB-031 ↔ GST-016/GST-017)",
+   "detail": "leads on to ['multi-currency', 'ticket-transfer'] on the web only and ['browse'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "search (WEB-003 ↔ GST-063)",
+   "detail": "leads on to ['browse', 'detail'] on the web only and — on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "seat-selection (WEB-007 ↔ GST-049)",
+   "detail": "leads on to ['add-ons', 'cart', 'date-and-session', 'ticket-selection'] on the web only and ['browse'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "shop (WEB-033 ↔ GST-026)",
+   "detail": "leads on to — on the web only and ['browse'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "shop-and-drop (WEB-042 ↔ GST-062)",
+   "detail": "leads on to — on the web only and ['menu-item'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "sign-in (WEB-016 ↔ GST-042)",
+   "detail": "leads on to ['account-hub', 'order-history', 'tickets'] on the web only and ['browse'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "system-states (WEB-029 ↔ GST-047)",
+   "detail": "leads on to — on the web only and ['browse'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "ticket-selection (WEB-005 ↔ GST-008)",
+   "detail": "leads on to ['add-ons', 'cart', 'date-and-session', 'seat-selection'] on the web only and ['browse'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "ticket-transfer (WEB-030 ↔ GST-014/GST-045)",
+   "detail": "leads on to ['multi-currency', 'reservations'] on the web only and ['browse'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "tickets (WEB-018 ↔ GST-012/GST-013)",
+   "detail": "leads on to ['account-hub', 'order-history', 'sign-in'] on the web only and ['browse', 'dynamic-qr-ticket'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "venue-info (WEB-028 ↔ GST-029)",
+   "detail": "leads on to ['feedback', 'help-and-cases', 'newsletter'] on the web only and ['browse'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "venue-map-and-wait-times (WEB-039 ↔ GST-021/GST-022)",
+   "detail": "leads on to — on the web only and ['browse', 'itinerary-planning', 'virtual-queue'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "virtual-queue (WEB-040 ↔ GST-023)",
+   "detail": "leads on to — on the web only and ['browse', 'fnb-order'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "waiting-room (WEB-015 ↔ GST-046)",
+   "detail": "leads on to — on the web only and ['browse'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071)",
+   "detail": "leads on to ['memberships', 'privacy-security-devices'] on the web only and ['browse', 'profile', 'wishlist'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "navigation",
+   "where": "wishlist (WEB-009 ↔ GST-020)",
+   "detail": "leads on to ['date-and-session', 'seat-selection', 'ticket-selection'] on the web only and ['browse'] on the app only",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "section",
+   "where": "help-content-and-accessibility (WEB-045 ↔ GST-040/GST-057)",
+   "detail": "web section ['Support'], app ['Discovery & Browse', 'Engagement & Support']",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "section",
+   "where": "menu-item (WEB-037 ↔ GST-061)",
+   "detail": "web section ['In-venue Services'], app ['In-Venue Experience']",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "section",
+   "where": "newsletter (WEB-027 ↔ GST-065)",
+   "detail": "web section ['Engagement & Support'], app ['Marketing']",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "section",
+   "where": "privacy-security-devices (WEB-024 ↔ GST-066/GST-073)",
+   "detail": "web section ['Membership, Loyalty & Value'], app ['Account & Self-Service']",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "section",
+   "where": "search (WEB-003 ↔ GST-063)",
+   "detail": "web section ['Discovery & Browse'], app ['Discovery']",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "section",
+   "where": "shop-and-drop (WEB-042 ↔ GST-062)",
+   "detail": "web section ['Retail'], app ['In-Venue Experience']",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "section",
+   "where": "ticket-transfer (WEB-030 ↔ GST-014/GST-045)",
+   "detail": "web section ['Ticketing'], app ['Account & Self-Service', 'Ticketing']",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "section",
+   "where": "venue-info (WEB-028 ↔ GST-029)",
+   "detail": "web section ['Engagement & Support'], app ['In-venue Services']",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "section",
+   "where": "wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071)",
+   "detail": "web section ['Membership, Loyalty & Value'], app ['Account & Self-Service', 'Membership, Loyalty & Value']",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "section",
+   "where": "wishlist (WEB-009 ↔ GST-020)",
+   "detail": "web section ['Booking & Selection'], app ['Account & Self-Service']",
+   "fix": ""
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "add-ons (WEB-008 ↔ GST-048/GST-056)",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033)",
+   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "browse (WEB-002 ↔ GST-002/GST-003/GST-005)",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "cart (WEB-010 ↔ GST-041)",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009)",
+   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "date-and-session (WEB-006 ↔ GST-007)",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "detail (WEB-004 ↔ GST-004/GST-006)",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "feedback (WEB-026 ↔ GST-035)",
+   "detail": "3 state(s) worded differently: emptyFirstRun, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "fnb-order (WEB-036 ↔ GST-024)",
+   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "help-and-cases (WEB-025 ↔ GST-068)",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "help-content-and-accessibility (WEB-045 ↔ GST-040/GST-057)",
+   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "home (WEB-001 ↔ GST-001)",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "in-venue-notifications (WEB-046 ↔ GST-030)",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoAccess, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "loyalty (WEB-043 ↔ GST-036)",
+   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "memberships (WEB-022/WEB-023 ↔ GST-015)",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "menu-item (WEB-037 ↔ GST-061)",
+   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "newsletter (WEB-027 ↔ GST-065)",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "order-tracking (WEB-038 ↔ GST-025)",
+   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "parking (WEB-041 ↔ GST-027/GST-028)",
+   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "privacy-security-devices (WEB-024 ↔ GST-066/GST-073)",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "profile (WEB-020 ↔ GST-039)",
+   "detail": "3 state(s) worded differently: emptyFirstRun, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "reservations (WEB-031 ↔ GST-016/GST-017)",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "search (WEB-003 ↔ GST-063)",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "shop (WEB-033 ↔ GST-026)",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "shop-and-drop (WEB-042 ↔ GST-062)",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoAccess, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "sign-in (WEB-016 ↔ GST-042)",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "system-states (WEB-029 ↔ GST-047)",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "ticket-selection (WEB-005 ↔ GST-008)",
+   "detail": "3 state(s) worded differently: emptyFirstRun, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "ticket-transfer (WEB-030 ↔ GST-014/GST-045)",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "tickets (WEB-018 ↔ GST-012/GST-013)",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "venue-info (WEB-028 ↔ GST-029)",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "venue-map-and-wait-times (WEB-039 ↔ GST-021/GST-022)",
+   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "virtual-queue (WEB-040 ↔ GST-023)",
+   "detail": "5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "waiting-room (WEB-015 ↔ GST-046)",
+   "detail": "3 state(s) worded differently: emptyFirstRun, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071)",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "low",
+   "dimension": "state wording",
+   "where": "wishlist (WEB-009 ↔ GST-020)",
+   "detail": "4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading",
+   "fix": "one copy per state — the 12 September offline sync is the model"
+  },
+  {
+   "severity": "info",
+   "dimension": "coverage",
+   "where": "dynamic-qr-ticket",
+   "detail": "GST-055 Dynamic QR Ticket — app only (deliberate). The 2 September session decided a dynamic-QR ticket bought on the web is redirected into the app, because a credential that needs a network round trip at a gate fails at the gate (_components.yaml, credentialPresenter).",
+   "fix": ""
+  },
+  {
+   "severity": "info",
+   "dimension": "coverage",
+   "where": "face-pass",
+   "detail": "GST-069 Face Pass — app only (deliberate). enrolFacePass needs a camera and a liveness check (apply-web-parity.py). Viewing and revoking an enrolment are on the web's Devices, Wishlist & Consent. Not callable on the web: enrolFacePass.",
+   "fix": ""
+  },
+  {
+   "severity": "info",
+   "dimension": "operations",
+   "where": "app only",
+   "detail": "enrolFacePass — camera and liveness, deliberate (apply-web-parity.py)",
+   "fix": ""
+  },
+  {
+   "severity": "info",
+   "dimension": "wave",
+   "where": "multi-currency (WEB-035 ↔ GST-044)",
+   "detail": "ships in wave 1 on the web and wave 2 on the app — sanctioned: CF-111 — web is Wave 1 because that is where an overseas guest compares before booking, and the app is Wave 2 because that is where they check after.",
+   "fix": ""
+  }
+ ]
+}

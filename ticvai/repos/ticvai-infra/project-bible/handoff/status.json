@@ -1,6 +1,6 @@
 {
  "scope": "platform",
- "generated": "2026-09-11",
+ "generated": "2026-09-12",
  "note": "Derived on every run by tools/build-status.py. A hand-maintained status page is worse than none, because somebody plans against it.",
  "counts": {
   "operations": 1628,

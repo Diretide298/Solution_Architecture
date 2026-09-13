@@ -34,7 +34,7 @@
   ],
   "storedProcedures": [],
   "wave": 1,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-002",
@@ -138,7 +138,8 @@
    "error": "Could not load. Names which read failed and leaves the home landing untouched.",
    "emptyFirstRun": "No home landing yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the home landing are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -174,7 +175,7 @@
   "writes": [],
   "storedProcedures": [],
   "wave": 1,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001",
@@ -203,7 +204,8 @@
    "error": "Could not load. Names which read failed and leaves the event attraction listing untouched.",
    "emptyFirstRun": "No event attraction listing yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the event attraction listing are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -232,7 +234,7 @@
   "writes": [],
   "storedProcedures": [],
   "wave": 1,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001",
@@ -268,7 +270,8 @@
    "error": "Could not load. Names which read failed and leaves the search results untouched.",
    "emptyFirstRun": "No search results yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the search results are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** Results come only from what was already loaded, with a note that newer items may exist."
   },
   "overlays": []
  },
@@ -304,7 +307,7 @@
   "writes": [],
   "storedProcedures": [],
   "wave": 1,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001",
@@ -339,7 +342,8 @@
    "error": "Could not load. Names which read failed and leaves the attraction untouched.",
    "emptyFirstRun": "No attraction yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the attraction are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -372,7 +376,7 @@
   ],
   "storedProcedures": [],
   "wave": 1,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001",
@@ -424,7 +428,8 @@
    "error": "Could not load. Names which read failed and leaves the ticket type selection untouched.",
    "emptyFirstRun": "No ticket type selection yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the ticket type selection are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -460,7 +465,7 @@
   ],
   "storedProcedures": [],
   "wave": 1,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001",
@@ -509,7 +514,8 @@
    "error": "Could not load. Names which read failed and leaves the date session selection untouched.",
    "emptyFirstRun": "No date session selection yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the date session selection are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -545,7 +551,7 @@
   ],
   "storedProcedures": [],
   "wave": 2,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001",
@@ -595,7 +601,8 @@
    "error": "Could not load. Names which read failed and leaves the interactive seat selection untouched.",
    "emptyFirstRun": "No interactive seat selection yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the interactive seat selection are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -640,7 +647,7 @@
   ],
   "storedProcedures": [],
   "wave": 2,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001",
@@ -684,7 +691,8 @@
    "error": "Could not load. Names which read failed and leaves the add-ons upsell untouched.",
    "emptyFirstRun": "No add-ons upsell yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the add-ons upsell are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -719,7 +727,7 @@
   ],
   "storedProcedures": [],
   "wave": 3,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001",
@@ -763,7 +771,8 @@
    "error": "Could not load",
    "emptyFirstRun": "Nothing saved \u2014 explains what the list is for",
    "emptyNoResults": "The filter narrowed it and the wishlist are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": [
    {
@@ -823,7 +832,7 @@
   ],
   "storedProcedures": [],
   "wave": 1,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001",
@@ -874,7 +883,8 @@
    "error": "Could not load. Names which read failed and leaves the shopping cart untouched.",
    "emptyFirstRun": "No shopping cart yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the shopping cart are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": [
    {
@@ -943,7 +953,7 @@
   ],
   "storedProcedures": [],
   "wave": 1,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001",
@@ -981,7 +991,8 @@
    "error": "Could not load. Names which read failed and leaves the guest attendee forms untouched.",
    "emptyFirstRun": "No guest attendee forms yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the guest attendee forms are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Not available, and the offline banner says why.** A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice."
   },
   "overlays": [
    {
@@ -1043,7 +1054,7 @@
   ],
   "storedProcedures": [],
   "wave": 1,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001",
@@ -1088,7 +1099,8 @@
    "error": "Could not load. Names which read failed and leaves the checkout payment untouched.",
    "emptyFirstRun": "No checkout payment yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the checkout payment are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Not available, and the offline banner says why.** A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice."
   },
   "overlays": []
  },
@@ -1127,7 +1139,7 @@
   ],
   "storedProcedures": [],
   "wave": 1,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001",
@@ -1185,7 +1197,8 @@
    "error": "Could not load. Names which read failed and leaves the booking confirmation untouched.",
    "emptyFirstRun": "No booking confirmation yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the booking confirmation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -1226,7 +1239,7 @@
   ],
   "storedProcedures": [],
   "wave": 1,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-013"
@@ -1251,7 +1264,8 @@
    "error": "Could not load the booking. **The hold is unaffected** \u2014 a failed page load must not release inventory.",
    "emptyFirstRun": "**Not reachable empty** \u2014 a link always names an order. An empty state here means the token did not resolve, which is the error state.",
    "emptyNoResults": "The filter narrowed it and the pay for booking are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "**The token is the credential, so there is no permission case** \u2014 either it resolves or it has gone."
+   "emptyNoAccess": "**The token is the credential, so there is no permission case** \u2014 either it resolves or it has gone.",
+   "offline": "**Not available, and the offline banner says why.** A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice."
   },
   "overlays": []
  },
@@ -1286,7 +1300,7 @@
   ],
   "storedProcedures": [],
   "wave": 2,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001"
@@ -1302,7 +1316,8 @@
    "error": "**Lost the queue position.** The worst failure on this screen: it re-queues rather than silently admitting, and says so, because a guest who thinks they lost their place will open a second tab and make it worse",
    "emptyFirstRun": "\u2014",
    "emptyNoResults": "The filter narrowed it and the branded queue waiting are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** The last known position stays on screen with its age. Joining, leaving and being admitted all need the connection."
   },
   "overlays": []
  },
@@ -1378,7 +1393,7 @@
   ],
   "storedProcedures": [],
   "wave": 1,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001",
@@ -1432,7 +1447,8 @@
    "error": "Could not load. Names which read failed and leaves the login register untouched.",
    "emptyFirstRun": "No login register yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the login register are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Not available, and the offline banner says why.** Signing in, registering and verifying a code need the server."
   },
   "overlays": [
    {
@@ -1488,7 +1504,7 @@
   ],
   "storedProcedures": [],
   "wave": 1,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001",
@@ -1536,7 +1552,8 @@
    "error": "Partial. Each tile fails independently",
    "emptyFirstRun": "A new account with no orders \u2014 offers what to do next",
    "emptyNoResults": "The filter narrowed it and the account are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": [
    {
@@ -1600,7 +1617,7 @@
   ],
   "storedProcedures": [],
   "wave": 1,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001",
@@ -1649,7 +1666,8 @@
    "error": "Could not load",
    "emptyFirstRun": "No tickets \u2014 distinguishes never bought from all past",
    "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** \u2014 an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection."
   },
   "overlays": []
  },
@@ -1692,7 +1710,7 @@
   ],
   "storedProcedures": [],
   "wave": 1,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001",
@@ -1742,7 +1760,8 @@
    "error": "Could not load. Names which read failed and leaves the order history untouched.",
    "emptyFirstRun": "No order history yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the order history are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -1790,7 +1809,7 @@
   ],
   "storedProcedures": [],
   "wave": 1,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001",
@@ -1840,7 +1859,8 @@
    "error": "**Save failed and the form keeps what was typed.** A consent change that silently did not save is a compliance failure, so the screen states it rather than showing success",
    "emptyFirstRun": "\u2014",
    "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** \u2014 an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -1890,7 +1910,7 @@
   ],
   "storedProcedures": [],
   "wave": 2,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001",
@@ -1936,7 +1956,8 @@
    "error": "Could not load. Names which read failed and leaves the wallet gift cards untouched.",
    "emptyFirstRun": "No wallet gift cards yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the wallet gift cards are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server."
   },
   "overlays": []
  },
@@ -1969,7 +1990,7 @@
   "writes": [],
   "storedProcedures": [],
   "wave": 2,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001",
@@ -2016,7 +2037,8 @@
    "error": "Could not load. Names which read failed and leaves the membership plans untouched.",
    "emptyFirstRun": "No membership plans yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the membership plans are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -2056,7 +2078,7 @@
   ],
   "storedProcedures": [],
   "wave": 2,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001",
@@ -2103,7 +2125,8 @@
    "error": "Could not load. Cancellation and renewal are both blocked",
    "emptyFirstRun": "\u2014",
    "emptyNoResults": "The filter narrowed it and the membership are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -2169,7 +2192,7 @@
   ],
   "storedProcedures": [],
   "wave": 3,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001",
@@ -2221,7 +2244,8 @@
    "error": "Could not load",
    "emptyFirstRun": "No points yet \u2014 explains how they accrue",
    "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** \u2014 an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Nothing here is offered offline, and the banner says so.** An erasure request or a device change queued and never sent is worse than one that could not be made \u2014 the legal clock starts when the platform receives it, and a second factor set up offline is not a second factor."
   },
   "overlays": [
    {
@@ -2272,7 +2296,7 @@
   ],
   "storedProcedures": [],
   "wave": 1,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001",
@@ -2302,7 +2326,8 @@
    "error": "Could not load",
    "emptyFirstRun": "No articles \u2014 offers contact instead of an empty help centre",
    "emptyNoResults": "The filter narrowed it and the help faq are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** Cases already loaded stay read-only with their age, so a guest can see what they raised without believing a reply arrived. Raising and replying need the connection."
   },
   "overlays": []
  },
@@ -2333,7 +2358,7 @@
   ],
   "storedProcedures": [],
   "wave": 3,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001",
@@ -2362,7 +2387,8 @@
    "loading": "Survey loads",
    "error": "Could not submit. **The answers are kept** and retried",
    "emptyFirstRun": "\u2014",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -2407,7 +2433,7 @@
   ],
   "storedProcedures": [],
   "wave": 2,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001",
@@ -2426,7 +2452,8 @@
    "error": "Could not subscribe. **Consent is not recorded on a failed request**, because a subscription the guest believes happened and did not is worse than a visible failure",
    "emptyFirstRun": "\u2014",
    "emptyNoResults": "Nothing matches the current filters. **The filters are named and clearable from here** \u2014 an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. **Added 25 August with the derived list component**: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**Not available, and the offline banner says why.** A consent change must reach the server to mean anything."
   },
   "overlays": [
    {
@@ -2468,7 +2495,7 @@
   "writes": [],
   "storedProcedures": [],
   "wave": 1,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001",
@@ -2498,7 +2525,8 @@
    "error": "Could not load. Falls back to the tenant contact details from the cached config",
    "emptyFirstRun": "\u2014",
    "emptyNoResults": "The filter narrowed it and the contact venue information are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -2525,7 +2553,7 @@
   "writes": [],
   "storedProcedures": [],
   "wave": 1,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001"
@@ -2541,7 +2569,8 @@
    "error": "**This screen is the error state.** It distinguishes sold out, closed, and platform unavailable \u2014 three different things a guest must not confuse, because only one means come back later",
    "emptyFirstRun": "\u2014",
    "emptyNoResults": "The filter narrowed it and the error sold out are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows instead of this page.** Being offline is the guest's connection, not the venue's \u2014 an error or maintenance page shown for a dropped signal tells a guest the venue is down."
   },
   "overlays": []
  },
@@ -2581,7 +2610,7 @@
   ],
   "storedProcedures": [],
   "wave": 1,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001",
@@ -2615,7 +2644,8 @@
    "error": "Could not load. Names which read failed and leaves the ticket transfer untouched.",
    "emptyFirstRun": "No ticket transfer yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the ticket transfer are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** Sending, claiming and listing for resale need the connection \u2014 a transfer nobody received is a ticket nobody holds. Tickets already loaded stay visible."
   },
   "overlays": []
  },
@@ -2663,7 +2693,7 @@
   ],
   "storedProcedures": [],
   "wave": 2,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001",
@@ -2689,7 +2719,8 @@
    "error": "Could not load. Names which read failed and leaves the reservations untouched.",
    "emptyFirstRun": "No reservations yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the reservations are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** Reservations already loaded stay visible with their age. Booking, changing and cancelling need the connection \u2014 a table held offline is a table two people think they have."
   },
   "overlays": [
    {
@@ -2730,7 +2761,7 @@
   ],
   "storedProcedures": [],
   "wave": 2,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001"
@@ -2746,7 +2777,8 @@
    "error": "Could not load. Names which read failed and leaves the offers promotions untouched.",
    "emptyFirstRun": "No offers promotions yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the offers promotions are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -2788,7 +2820,7 @@
   ],
   "storedProcedures": [],
   "wave": 2,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001"
@@ -2813,7 +2845,8 @@
    "error": "Could not load. Names which read failed and leaves the shop untouched.",
    "emptyFirstRun": "No shop yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the shop are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -2848,7 +2881,7 @@
   ],
   "storedProcedures": [],
   "wave": 3,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001"
@@ -2872,7 +2905,8 @@
    "error": "Could not load. Names which read failed and leaves the lost found untouched.",
    "emptyFirstRun": "No lost found yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the lost found are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows.** Reports already loaded stay read-only with their age. Reporting and replying need the connection."
   },
   "overlays": []
  },
@@ -2901,7 +2935,7 @@
   "writes": [],
   "storedProcedures": [],
   "wave": 1,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001",
@@ -2935,7 +2969,8 @@
    "error": "Could not load. Names which read failed and leaves the multi-currency pricing untouched.",
    "emptyFirstRun": "No multi-currency pricing yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the multi-currency pricing are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "offline": "**The offline banner shows. Last known rates stay, with their age.** A rate is a number a guest may act on, and an undated one they cannot judge."
   },
   "overlays": []
  },
@@ -2992,7 +3027,7 @@
   ],
   "storedProcedures": [],
   "wave": 2,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001"
@@ -3008,7 +3043,8 @@
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
    "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused."
+   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "offline": "**The offline banner shows.** The menu already loaded stays with its age. Ordering, claiming a table and booking wait for the connection \u2014 an order placed offline is food nobody is making."
   },
   "overlays": []
  },
@@ -3035,7 +3071,7 @@
   "writes": [],
   "storedProcedures": [],
   "wave": 2,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001"
@@ -3051,7 +3087,8 @@
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
    "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused."
+   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "offline": "**The offline banner shows.** The dish already loaded stays, with a note that it may be out of date and its allergens in full. Ordering is refused \u2014 availability changes by the minute."
   },
   "overlays": []
  },
@@ -3088,7 +3125,7 @@
   ],
   "storedProcedures": [],
   "wave": 2,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001"
@@ -3104,7 +3141,8 @@
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
    "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused."
+   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "offline": "**The offline banner shows.** The last status stays on screen with its age and is never presented as current. Settling the bill waits for the connection."
   },
   "overlays": []
  },
@@ -3143,7 +3181,7 @@
   ],
   "storedProcedures": [],
   "wave": 2,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001"
@@ -3159,7 +3197,8 @@
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
    "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused."
+   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "offline": "**The offline banner shows.** A map and route graph already loaded stay usable, so directions do not need a signal. Wait times show their last reading marked out of date, never as live \u2014 a queue length from an hour ago sends a guest to the wrong ride. With no map loaded yet, the screen asks the guest to reconnect."
   },
   "overlays": []
  },
@@ -3202,7 +3241,7 @@
   ],
   "storedProcedures": [],
   "wave": 2,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001"
@@ -3218,7 +3257,8 @@
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
    "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused."
+   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "offline": "**The offline banner shows.** The guest's place stays on screen with its age, so they can see they hold it. Joining and leaving need the connection \u2014 a place taken offline is a place nobody else can see."
   },
   "overlays": []
  },
@@ -3253,7 +3293,7 @@
   ],
   "storedProcedures": [],
   "wave": 2,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001"
@@ -3269,7 +3309,8 @@
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
    "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused."
+   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "offline": "**The offline banner shows.** A reservation already confirmed stays on screen with its plate and car park. Reserving, paying and changing the plate need the connection."
   },
   "overlays": []
  },
@@ -3305,7 +3346,7 @@
   ],
   "storedProcedures": [],
   "wave": 2,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001"
@@ -3321,7 +3362,8 @@
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
    "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused."
+   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "offline": "**The offline banner shows, and lookup cannot run.** A drop reference already on screen stays visible so the guest can quote it at the collection point. Reserving merchandise needs the connection."
   },
   "overlays": []
  },
@@ -3364,7 +3406,7 @@
   ],
   "storedProcedures": [],
   "wave": 2,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001"
@@ -3380,7 +3422,8 @@
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
    "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused."
+   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "offline": "**The offline banner shows.** The last known balance stays with its age, and **points earned since are not shown** \u2014 and that is said. Redeeming and referring need the connection."
   },
   "overlays": []
  },
@@ -3442,7 +3485,7 @@
   ],
   "storedProcedures": [],
   "wave": 2,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001"
@@ -3458,7 +3501,8 @@
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
    "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused."
+   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "offline": "**Not available, and the offline banner says why.** The assistant needs the connection; conversations already loaded stay readable."
   },
   "overlays": []
  },
@@ -3486,7 +3530,7 @@
   "writes": [],
   "storedProcedures": [],
   "wave": 2,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001"
@@ -3502,7 +3546,8 @@
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
    "emptyNoResults": "Nothing matches.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused."
+   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -3533,7 +3578,7 @@
   ],
   "storedProcedures": [],
   "wave": 2,
-  "offline": false,
+  "offline": true,
   "specified": true,
   "exits": [
    "WEB-001"
@@ -3548,7 +3593,8 @@
    "loading": "Content resolves in place.",
    "error": "Could not load. **The rest of the site is unaffected.**",
    "emptyFirstRun": "**Nothing here yet for this venue.** Names what turns it on rather than showing an empty panel.",
-   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused."
+   "emptyNoAccess": "**Sign in to see this.** A guest who is not signed in is offered the door, not refused.",
+   "offline": "**The offline banner shows.** Notices already received stay listed. New queue calls and order updates arrive once the connection is back, and the banner is the warning that they may be late."
   },
   "overlays": []
  },
@@ -3634,7 +3680,7 @@
    "emptyFirstRun": "No home default yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the home default are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -3705,7 +3751,7 @@
    "emptyFirstRun": "No explore categories yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the explore categories are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -3785,7 +3831,7 @@
    "emptyFirstRun": "No event attraction listing yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the event attraction listing are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -3857,7 +3903,7 @@
    "emptyFirstRun": "No attraction yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the attraction are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -3921,7 +3967,7 @@
    "emptyFirstRun": "No what's yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the what's are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -3985,7 +4031,7 @@
    "emptyFirstRun": "No event exhibition yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the event exhibition are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -4050,7 +4096,7 @@
    "emptyFirstRun": "No select date time yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the select date time are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -4118,7 +4164,7 @@
    "error": "Could not load. Names which read failed and leaves the tickets add-ons untouched.",
    "emptyFirstRun": "No tickets add-ons configured. Carries the create action and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -4228,7 +4274,7 @@
    "emptyFirstRun": "No review payment yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the review payment are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**Not available.** A payment needs the gateway, and pretending otherwise takes money we cannot confirm"
+   "offline": "**Not available, and the offline banner says why.** A payment needs the gateway, and pretending otherwise takes money nobody can confirm. What was typed stays on screen so nothing is entered twice."
   },
   "overlays": []
  },
@@ -4303,7 +4349,7 @@
    "emptyFirstRun": "No booking confirmation yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the booking confirmation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -4374,7 +4420,7 @@
    "emptyFirstRun": "No wallet overview yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the wallet overview are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server."
   },
   "overlays": []
  },
@@ -4461,7 +4507,7 @@
    "emptyFirstRun": "No tickets yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the tickets are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection."
   },
   "overlays": []
  },
@@ -4544,7 +4590,7 @@
    "emptyFirstRun": "**Sold out is a real answer.** Offers the next available rather than a dead end",
    "emptyNoResults": "The filter narrowed it and the ticket are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** Tickets already loaded stay visible with their age. Sharing, transferring and adding to a phone wallet need the connection."
   },
   "overlays": []
  },
@@ -4617,7 +4663,7 @@
    "emptyFirstRun": "**Sold out is a real answer.** Offers the next available rather than a dead end",
    "emptyNoResults": "The filter narrowed it and the ticket transfer are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** Sending, claiming and listing for resale need the connection \u2014 a transfer nobody received is a ticket nobody holds. Tickets already loaded stay visible."
   },
   "overlays": []
  },
@@ -4703,7 +4749,7 @@
    "emptyFirstRun": "No memberships yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the memberships are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -4779,7 +4825,7 @@
    "emptyFirstRun": "No reservations yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the reservations are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** Reservations already loaded stay visible with their age. Booking, changing and cancelling need the connection \u2014 a table held offline is a table two people think they have."
   },
   "overlays": [
    {
@@ -4856,7 +4902,7 @@
    "emptyFirstRun": "No reservation yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the reservation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** Reservations already loaded stay visible with their age. Booking, changing and cancelling need the connection \u2014 a table held offline is a table two people think they have."
   },
   "overlays": [
    {
@@ -4937,7 +4983,7 @@
    "emptyFirstRun": "No add calendar reminders yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the add calendar reminders are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -5013,7 +5059,7 @@
    "emptyFirstRun": "No order history yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the order history are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -5085,7 +5131,7 @@
    "emptyFirstRun": "No saved items wishlist yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the saved items wishlist are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": [
    {
@@ -5184,7 +5230,7 @@
    "emptyFirstRun": "No interactive map yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the interactive map are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**The cached map and graph.** Live wait times are absent and routing still works \u2014 which is the right way round, because a guest with no signal in the middle of a park needs directions more than they need a queue length."
+   "offline": "**The offline banner shows.** A map and route graph already loaded stay usable, so directions do not need a signal. Wait times show their last reading marked out of date, never as live \u2014 a queue length from an hour ago sends a guest to the wrong ride. With no map loaded yet, the screen asks the guest to reconnect."
   },
   "overlays": []
  },
@@ -5263,7 +5309,7 @@
    "emptyFirstRun": "No attraction wait times yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the attraction wait times are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** A map and route graph already loaded stay usable, so directions do not need a signal. Wait times show their last reading marked out of date, never as live \u2014 a queue length from an hour ago sends a guest to the wrong ride. With no map loaded yet, the screen asks the guest to reconnect."
   },
   "overlays": []
  },
@@ -5343,7 +5389,7 @@
    "emptyFirstRun": "No virtual queue yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the virtual queue are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** The guest's place stays on screen with its age, so they can see they hold it. Joining and leaving need the connection \u2014 a place taken offline is a place nobody else can see."
   },
   "overlays": []
  },
@@ -5444,7 +5490,7 @@
    "emptyFirstRun": "No browse order yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the browse order are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** The menu already loaded stays with its age. Ordering, claiming a table and booking wait for the connection \u2014 an order placed offline is food nobody is making."
   },
   "overlays": []
  },
@@ -5532,7 +5578,7 @@
    "emptyFirstRun": "**Sold out is a real answer.** Offers the next available rather than a dead end",
    "emptyNoResults": "The filter narrowed it and the order tracking are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** The last status stays on screen with its age and is never presented as current. Settling the bill waits for the connection."
   },
   "overlays": []
  },
@@ -5622,7 +5668,7 @@
    "emptyFirstRun": "No retail merchandise yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the retail merchandise are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -5700,7 +5746,7 @@
    "emptyFirstRun": "\u2014",
    "emptyNoResults": "The filter narrowed it and the parking reserve pay are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** A reservation already confirmed stays on screen with its plate and car park. Reserving, paying and changing the plate need the connection."
   },
   "overlays": []
  },
@@ -5776,7 +5822,7 @@
    "emptyFirstRun": "No parking reservation confirmed yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the parking reservation confirmed are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** A reservation already confirmed stays on screen with its plate and car park. Reserving, paying and changing the plate need the connection."
   },
   "overlays": []
  },
@@ -5842,7 +5888,7 @@
    "emptyFirstRun": "No venue info services yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the venue info services are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -5919,7 +5965,7 @@
    "error": "Could not load. Names which read failed and leaves the in-venue notifications untouched.",
    "emptyFirstRun": "No in-venue notifications configured. Carries the create action and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** Notices already received stay listed. New queue calls and order updates arrive once the connection is back, and the banner is the warning that they may be late."
   },
   "overlays": []
  },
@@ -6025,7 +6071,7 @@
    "emptyFirstRun": "No concierge home yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the concierge home are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**Not available, and the offline banner says why.** The assistant needs the connection; conversations already loaded stay readable."
   },
   "overlays": []
  },
@@ -6151,7 +6197,7 @@
    "emptyFirstRun": "No concierge chat yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the concierge chat are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**Not available, and the offline banner says why.** The assistant needs the connection; conversations already loaded stay readable."
   },
   "overlays": []
  },
@@ -6231,7 +6277,7 @@
    "error": "Could not load. Names which read failed and leaves the concierge contextual help untouched.",
    "emptyFirstRun": "No concierge contextual help configured. Carries the create action and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**Not available, and the offline banner says why.** The assistant needs the connection; conversations already loaded stay readable."
   },
   "overlays": []
  },
@@ -6302,7 +6348,7 @@
    "emptyFirstRun": "No lost found yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the lost found are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** Reports already loaded stay read-only with their age. Reporting and replying need the connection."
   },
   "overlays": []
  },
@@ -6371,7 +6417,7 @@
    "error": "Could not load. Names which read failed and leaves the feedback ratings untouched.",
    "emptyFirstRun": "No feedback ratings configured. Carries the create action and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -6450,7 +6496,7 @@
    "emptyFirstRun": "No loyalty rewards yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the loyalty rewards are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Last known balance with its age. **Points earned since are not shown**, and that is said"
+   "offline": "**The offline banner shows.** The last known balance stays with its age, and **points earned since are not shown** \u2014 and that is said. Redeeming and referring need the connection."
   },
   "overlays": []
  },
@@ -6527,7 +6573,7 @@
    "emptyFirstRun": "No offers promotions yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the offers promotions are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -6598,7 +6644,7 @@
    "emptyFirstRun": "No digital companion mode yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the digital companion mode are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -6672,7 +6718,7 @@
    "error": "Could not load. Names which read failed and leaves the profile untouched.",
    "emptyFirstRun": "No profile configured. Carries the create action and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -6755,7 +6801,7 @@
    "emptyFirstRun": "No help support yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the help support are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -6840,7 +6886,7 @@
    "emptyFirstRun": "\u2014",
    "emptyNoResults": "The filter narrowed it and the checkout entry are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -6953,7 +6999,7 @@
    "emptyFirstRun": "No simple registration otp yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the simple registration otp are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**Not available, and the offline banner says why.** Signing in, registering and verifying a code need the server."
   },
   "overlays": [
    {
@@ -7015,7 +7061,7 @@
    "emptyFirstRun": "No arabic rtl experience yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the arabic rtl experience are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -7080,7 +7126,7 @@
    "emptyFirstRun": "No multi-currency pricing yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the multi-currency pricing are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**Last known rates, with their age shown.** A rate is a number a guest may act on, and an undated one they cannot judge"
+   "offline": "**The offline banner shows. Last known rates stay, with their age.** A rate is a number a guest may act on, and an undated one they cannot judge."
   },
   "overlays": []
  },
@@ -7148,7 +7194,7 @@
    "error": "Availability unavailable. **Selection is blocked** \u2014 overselling is worse than waiting",
    "emptyFirstRun": "**Sold out is a real answer.** Offers the next available rather than a dead end",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** Sending, claiming and listing for resale need the connection \u2014 a transfer nobody received is a ticket nobody holds. Tickets already loaded stay visible."
   },
   "overlays": []
  },
@@ -7219,7 +7265,7 @@
    "emptyFirstRun": "No branded queue waiting yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the branded queue waiting are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** The last known position stays on screen with its age. Joining, leaving and being admitted all need the connection."
   },
   "overlays": []
  },
@@ -7282,7 +7328,7 @@
    "emptyFirstRun": "No maintenance upgrade yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the maintenance upgrade are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows instead of this page.** Being offline is the guest's connection, not the venue's \u2014 an error or maintenance page shown for a dropped signal tells a guest the venue is down."
   },
   "overlays": []
  },
@@ -7357,7 +7403,7 @@
    "emptyFirstRun": "No upsell cross-sell yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the upsell cross-sell are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -7429,7 +7475,7 @@
    "emptyFirstRun": "No interactive seat selection yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the interactive seat selection are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -7512,7 +7558,7 @@
    "emptyFirstRun": "No resource booking cabana yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the resource booking cabana are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -7586,7 +7632,7 @@
    "emptyFirstRun": "No plan your adventure yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the plan your adventure are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -7670,7 +7716,7 @@
    "emptyFirstRun": "No suggested itineraries yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the suggested itineraries are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -7762,7 +7808,7 @@
    "emptyFirstRun": "No build your own yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the build your own are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -7862,7 +7908,7 @@
    "emptyFirstRun": "No optimized itinerary yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the optimized itinerary are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -7931,7 +7977,7 @@
    "error": "Availability unavailable. **Selection is blocked** \u2014 overselling is worse than waiting",
    "emptyFirstRun": "**Sold out is a real answer.** Offers the next available rather than a dead end",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -8010,7 +8056,7 @@
    "emptyFirstRun": "No bundle package yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the bundle package are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -8072,7 +8118,7 @@
    "emptyFirstRun": "No accessibility information yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the accessibility information are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -8144,7 +8190,7 @@
    "emptyFirstRun": "No resource availability (cabana) yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the resource availability (cabana) are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -8224,7 +8270,7 @@
    "emptyFirstRun": "No plan day progress yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the plan day progress are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached content with its age. **Nothing that spends money or holds capacity works offline**"
+   "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
  },
@@ -8278,7 +8324,7 @@
    "emptyFirstRun": "Not applicable",
    "emptyNoResults": "The filter narrowed it and the menu item are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cached menu shown with a staleness warning. Ordering is refused \u2014 availability changes by the minute"
+   "offline": "**The offline banner shows.** The dish already loaded stays, with a note that it may be out of date and its allergens in full. Ordering is refused \u2014 availability changes by the minute."
   },
   "overlays": []
  },
@@ -8346,7 +8392,7 @@
    "error": "Could not load. Names which read failed and leaves the shop drop collection untouched.",
    "emptyFirstRun": "No shop drop collection configured. Carries the create action and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cannot look up. Shows the drop reference held locally so a guest can quote it"
+   "offline": "**The offline banner shows, and lookup cannot run.** A drop reference already on screen stays visible so the guest can quote it at the collection point. Reserving merchandise needs the connection."
   },
   "overlays": []
  },
@@ -8400,7 +8446,7 @@
    "emptyFirstRun": "No search yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the search are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**Searches the cached catalogue only**, with a note that newer items may exist"
+   "offline": "**The offline banner shows.** Results come only from what was already loaded, with a note that newer items may exist."
   },
   "overlays": []
  },
@@ -8465,7 +8511,7 @@
    "emptyFirstRun": "No newsletter preferences yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the newsletter preferences are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**Not available.** A consent change must reach the server to mean anything"
+   "offline": "**Not available, and the offline banner says why.** A consent change must reach the server to mean anything."
   },
   "overlays": []
  },
@@ -8537,7 +8583,7 @@
    "emptyFirstRun": "**Nothing requested yet.** No export, no erasure, no document \u2014 and that is the ordinary state. **The screen explains what each request means before offering it**, because an erasure a guest did not understand is one they will phone about.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it \u2014 naming the scope is what stops somebody concluding the record does not exist.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "**Nothing here works offline and it says so.** An erasure request queued on a phone and never sent is worse than one that could not be made \u2014 the legal clock starts when the platform receives it, not when the guest taps."
+   "offline": "**Nothing here is offered offline, and the banner says so.** An erasure request or a device change queued and never sent is worse than one that could not be made \u2014 the legal clock starts when the platform receives it, and a second factor set up offline is not a second factor."
   },
   "overlays": [
    {
@@ -8612,7 +8658,7 @@
    "emptyFirstRun": "**No refunds or listings yet.** The venue's policy is shown regardless, so a guest knows the answer before they need it.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it \u2014 naming the scope is what stops somebody concluding the record does not exist.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Refunds and listings need the server. **A queued refund request is a promise nobody made.**"
+   "offline": "**Not available, and the offline banner says why.** Refunds and resale listings need the server \u2014 a queued refund request is a promise nobody made."
   },
   "overlays": []
  },
@@ -8674,7 +8720,7 @@
    "emptyFirstRun": "**No cases open.** The concierge sits here too \u2014 most questions never become a case, and that is the intent.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it \u2014 naming the scope is what stops somebody concluding the record does not exist.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Cases need the server. **Cached cases are shown read-only with their age**, so a guest can see what they raised without believing a reply arrived."
+   "offline": "**The offline banner shows.** Cases already loaded stay read-only with their age, so a guest can see what they raised without believing a reply arrived. Raising and replying need the connection."
   },
   "overlays": []
  },
@@ -8736,7 +8782,7 @@
    "emptyFirstRun": "**Not enrolled.** What a face pass is for, where it works, and what withdrawing it does \u2014 **before** the camera opens.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it \u2014 naming the scope is what stops somebody concluding the record does not exist.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Biometric enrolment never works offline. **A face captured and queued is a face the guest cannot withdraw until it uploads.**"
+   "offline": "**Not available, and the offline banner says why.** Biometric enrolment never happens offline \u2014 a face captured and queued is a face the guest cannot withdraw until it uploads."
   },
   "overlays": [
    {
@@ -8820,7 +8866,7 @@
    "emptyFirstRun": "**Nothing reserved.** Availability shows regardless; a guest looking at an empty list should still see what is bookable.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it \u2014 naming the scope is what stops somebody concluding the record does not exist.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Availability is cached with its age. **Booking is not** \u2014 a table held offline is a table two people think they have."
+   "offline": "**The offline banner shows.** Availability already loaded stays with its age. **Booking is not offered** \u2014 a table held offline is a table two people think they have."
   },
   "overlays": []
  },
@@ -8895,7 +8941,7 @@
    "emptyFirstRun": "**No stored cards.** A guest arrives here after a first purchase, so the empty state is the common one.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it \u2014 naming the scope is what stops somebody concluding the record does not exist.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Stored cards are shown from cache, masked. **Storing and transferring need the server.**"
+   "offline": "**The offline banner shows.** Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server."
   },
   "overlays": []
  },
@@ -8971,7 +9017,7 @@
    "emptyFirstRun": "**Nothing shared.** A guest holding eight tickets sees the option here rather than discovering it at the gate.",
    "emptyNoResults": "**Nothing here yet.** The scope is what narrowed it \u2014 naming the scope is what stops somebody concluding the record does not exist.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Shared tickets are cached so a gate can still read them. **Sharing needs the server** \u2014 a transfer nobody received is a ticket nobody holds."
+   "offline": "**The offline banner shows.** Tickets already shared stay visible. Sharing, invitations and referrals need the connection \u2014 a transfer nobody received is a ticket nobody holds."
   },
   "overlays": []
  },
@@ -9041,7 +9087,7 @@
    "error": "Could not load. **Says what failed and offers one way onward**, never a bare failure.",
    "emptyFirstRun": "**No second factor enrolled.** Explains what one protects before asking for a phone number.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
-   "offline": "Enrolment needs the server. **A second factor is not a second factor if it was set up offline.**"
+   "offline": "**Nothing here is offered offline, and the banner says so.** An erasure request or a device change queued and never sent is worse than one that could not be made \u2014 the legal clock starts when the platform receives it, and a second factor set up offline is not a second factor."
   },
   "overlays": []
  },
