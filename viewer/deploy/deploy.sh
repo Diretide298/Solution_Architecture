@@ -149,6 +149,48 @@ fi
 say "Application at $APP_DIR"
 mkdir -p "$APP_DIR"
 
+# ── a snapshot before anything is copied ────────────────────────────────────
+#
+# Taken on every deploy, before the first file moves. The nightly one at 03:17
+# can be most of a day old by the time a deploy runs, and a deploy is when the
+# database is most at risk: the restart at the end runs db.init(), and a
+# migration that goes wrong does it to the only copy.
+#
+# This was a runbook step until 14 September. A step in a runbook is the one
+# somebody skips on the day it would have mattered, so it lives here now, and a
+# deploy that cannot take a snapshot stops instead of carrying on without one.
+#
+# `sqlite3 .backup` rather than cp, for the nightly job's reason: the service is
+# still running, and a copy of a live file opens and is wrong. `quick_check`
+# before it counts, so "a snapshot exists" means one that opens.
+#
+# Run as $APP_USER, not root. Opening a WAL database can create its -wal and
+# -shm files, and if root creates them the service — which is not root — can no
+# longer write to its own database. The directory is 0700 and the file 0600:
+# it holds password hashes.
+#
+# `predeploy-*`, not `ticvai-*`. The nightly job prunes `ticvai-*.db` to 14, so a
+# shared name would let a busy week of deploys push the nightly history out.
+# These keep their own ten.
+#
+# **The credential key is not copied here, on purpose.** This directory holds
+# the ciphertext, and a key filed beside it is not a key. It belongs in the
+# password manager.
+LIVE_DB="$APP_DIR/viewer/api/ticvai.db"
+if [[ -f "$LIVE_DB" ]]; then
+  install -d -m 700 -o "$APP_USER" -g "$APP_USER" "$APP_DIR/backups"
+  SNAPSHOT="$APP_DIR/backups/predeploy-$(date +%Y%m%d-%H%M%S).db"
+  sudo -u "$APP_USER" sqlite3 "$LIVE_DB" ".backup '$SNAPSHOT'" \
+    || { rm -f "$SNAPSHOT"; die "could not snapshot $LIVE_DB. The application has not been touched yet — fix this before deploying."; }
+  [[ "$(sudo -u "$APP_USER" sqlite3 "$SNAPSHOT" 'PRAGMA quick_check;' 2>&1)" == "ok" ]] \
+    || { rm -f "$SNAPSHOT"; die "the snapshot of $LIVE_DB failed its integrity check. The application has not been touched yet."; }
+  chmod 600 "$SNAPSHOT"
+  note "snapshot taken — $SNAPSHOT"
+  ls -1t "$APP_DIR"/backups/predeploy-*.db | tail -n +11 | xargs -r rm --
+else
+  note "no database yet — nothing to snapshot"
+fi
+
 # The database is excluded from the copy, not merely gitignored. This is the
 # step that would otherwise overwrite live accounts and verdicts with whatever
 # happened to be in a working tree, and it is the one mistake here that cannot

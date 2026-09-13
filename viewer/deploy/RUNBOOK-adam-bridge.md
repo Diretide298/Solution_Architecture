@@ -2,7 +2,8 @@
 
 **Every command, in order.** Hand this to whoever has root on the box.
 
-Target commit: **`a387a7a`** — on both remotes (`github` and `origin`) as of 8 September 2026.
+First deployed at **`a387a7a`**, live on 12 September 2026. A redeploy takes whatever is on
+`main` — §2 checks that you actually have it.
 
 | | |
 |---|---|
@@ -18,6 +19,11 @@ This is a **routine redeploy of an existing install**. Section 7 covers a first-
 ---
 
 ## 0. What is new in this deploy
+
+> **Redeploying after the first one?** Skip to §1. The key already exists and is reused, and
+> the migrations have run. What changed since: **the database is snapshotted automatically
+> before every deploy** (§1), and `/api/health` now answers `{"ok":true}` and nothing else.
+> The rest of this section describes the first bridge deploy.
 
 Three commits since `cfa4f90`. Two things need an operator's attention; everything else
 is ordinary.
@@ -68,15 +74,21 @@ export SRC=/path/to/the/checkout        # the directory that contains viewer/ an
 ls "$SRC"                               # expect: viewer  ticvai  .gitignore  ...
 ```
 
-### Take a database snapshot first
+### The database snapshot is taken for you
 
-```bash
-sudo -u ticvai /usr/local/bin/ticvai-backup
-ls -lt /srv/ticvai/backups/ | head -3
+`deploy.sh` snapshots the live database before it copies a single file, checks that the copy
+opens, and **stops if it cannot** — before the application has been touched. You will see:
+
+```
+    snapshot taken — /srv/ticvai/backups/predeploy-YYYYMMDD-HHMMSS.db
 ```
 
-Expect a fresh `ticvai-YYYYMMDD-HHMMSS.db`. This holds real accounts, e-mail addresses,
-password hashes and every recorded verdict. **Do not copy it off the server.**
+The last ten are kept, separately from the fourteen nightly `ticvai-*.db` ones. They hold real
+accounts, e-mail addresses, password hashes and every recorded verdict. **Do not copy them off
+the server.**
+
+**The credential key is in no snapshot, on purpose** — it decrypts what the snapshots hold.
+Keeping it in the password manager (§3) is still your job.
 
 ---
 
@@ -89,26 +101,15 @@ git pull
 git log -1 --oneline
 ```
 
-Expect exactly:
-
-```
-a387a7a The September board work, and five decisions the two databases forced
-```
-
-If you get a different hash, you are on a remote that has not received the push, or on a
-different branch. Check with `git branch -vv` and `git remote -v` before going further.
+Then confirm you are on what was pushed, not just on *something*:
 
 ```bash
-# confirm all three commits arrived
-git log --oneline -4
+git fetch --quiet && git status -sb | head -1
 ```
 
-```
-a387a7a The September board work, and five decisions the two databases forced
-80ccf7d The ADAM bridge: a developer's Claude reads the package and the board
-4cf5098 Flatten the page ground so it stops arguing with the scene
-cfa4f90 Build the two databases ADR-0038 and ADR-0039 decided
-```
+Expect `## main...origin/main` (or `...github/main`) with **no `[behind N]`**. If it says
+behind, the pull did not land — check `git branch -vv` and `git remote -v` before going
+further. Deploying an old checkout over a newer box rolls the box back.
 
 ---
 
@@ -128,7 +129,7 @@ something to be careful about. It takes two to four minutes, most of it `apt-get
 |---|---|---|
 | `==> Packages` | apt, Node 22 check, pm2 | a Node older than 22 gets replaced |
 | `==> Service account` | `ticvai` user | already exists — normal |
-| `==> Application` | rsync into `/srv/ticvai/viewer`, `npm install` | the live database is **excluded** from the copy |
+| `==> Application` | **snapshots the live database**, then rsync into `/srv/ticvai/viewer`, `npm install` | stops before copying anything if the snapshot fails; the live database is **excluded** from the copy |
 | `==> the packages` | rsync `ticvai/` into place | dies naming a path if a registered package is missing |
 | `==> Python environment` | venv + pip, then **asserts** `cryptography` | **new this deploy** — see below |
 | `==> Database` | migrations run at service startup | nothing to do by hand |
@@ -275,6 +276,37 @@ cd "$SRC" && git checkout main && cd viewer && sudo ./deploy/deploy.sh
 **Leave `/etc/ticvai/secret.key` alone during a rollback.** Deleting it does not undo
 anything; it strands every credential stored since the deploy.
 
+### Restoring the database from a snapshot
+
+Only if the *data* went wrong. Rolling back code, above, does not need this.
+
+```bash
+ls -lt /srv/ticvai/backups/ | head      # newest first; predeploy-* are from deploys
+```
+
+```bash
+P=/srv/ticvai/backups/predeploy-YYYYMMDD-HHMMSS.db    # the one you want
+LIVE=/srv/ticvai/viewer/api/ticvai.db
+
+sudo -u ticvai HOME=/home/ticvai pm2 stop ticvai-api
+sudo -u ticvai HOME=/home/ticvai pm2 stop ticvai-viewer
+
+# keep what you are about to replace
+sudo -u ticvai sqlite3 "$LIVE" ".backup '/srv/ticvai/backups/replaced-$(date +%Y%m%d-%H%M%S).db'"
+
+sudo -u ticvai sqlite3 "$P" 'PRAGMA quick_check;'      # expect: ok
+
+# the old -wal would be replayed onto the snapshot and corrupt it, so it goes first
+sudo rm -f "$LIVE-wal" "$LIVE-shm"
+sudo install -o ticvai -g ticvai -m 600 "$P" "$LIVE"
+
+sudo -u ticvai HOME=/home/ticvai pm2 start ticvai-api
+sudo -u ticvai HOME=/home/ticvai pm2 start ticvai-viewer
+```
+
+Anything recorded between the snapshot and now is lost. That is why the current file is copied
+aside first rather than overwritten.
+
 Logs:
 
 ```bash
@@ -291,6 +323,7 @@ sudo -u ticvai HOME=/home/ticvai pm2 logs ticvai-viewer --lines 100
 | sign-in returns to the sign-in page | cookie `Domain` wrong | the deploy asserts this — read what it printed |
 | `/api/settings/me` is 404 | code did not copy | check `git log -1` in `$SRC`, redeploy |
 | a package route 404s on `adamapi` | old `/api/*` spelling; `cicd` is not in the per-name list | use `adam.ainfinite.ai`, or add `cicd` to the regex in `deploy/nginx/adamapi.ainfinite.ai` |
+| deploy stops at `could not snapshot` or `failed its integrity check` | the live database cannot be read, or is damaged | nothing was deployed. Do not force past it — run `sudo -u ticvai sqlite3 /srv/ticvai/viewer/api/ticvai.db 'PRAGMA integrity_check;'` and, if it is damaged, restore from the newest good snapshot (above) |
 
 ---
 
@@ -362,6 +395,7 @@ sudo -u ticvai HOME=/home/ticvai pm2 logs ticvai-viewer         # follow one
 sudo -u ticvai HOME=/home/ticvai pm2 restart ticvai-viewer      # after a package drop
 sudo -u ticvai HOME=/home/ticvai pm2 restart ticvai-api --update-env   # after an env change
 sudo -u ticvai /usr/local/bin/ticvai-backup                     # snapshot now
+ls -lt /srv/ticvai/backups/ | head                              # snapshots, newest first
 ```
 
 ---
