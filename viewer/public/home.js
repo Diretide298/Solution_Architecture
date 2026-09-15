@@ -363,7 +363,7 @@ function renderPanel() {
 
   panel.textContent = '';
   panel.hidden = false;
-  panel.style.setProperty('--tint', LAYOUT[key].tier === 'core' ? '#e0ae52' : '#48cfcb');
+  panel.style.setProperty('--tint', LAYOUT[key].tier === 'core' ? '#e0ae52' : '#00c4e8');
 
   const head = document.createElement('div');
   head.className = 'panel-head';
@@ -555,10 +555,13 @@ async function main() {
   // Pointed at the door itself, carrying the project so the address still names
   // what the figures below are counting. Still an anchor with a real href, so
   // middle-click and open-in-new-tab keep working.
+  //
+  // 15 September: the lockup goes to the landing page now, as it does from every
+  // other page. It still picks no package — the landing page names none.
   const lockup = document.querySelector('.home-lockup');
   if (lockup) {
-    lockup.href = current ? `/home.html?project=${encodeURIComponent(current)}` : '/home.html';
-    lockup.setAttribute('aria-label', 'Adam');
+    lockup.href = '/landing.html';
+    lockup.setAttribute('aria-label', 'Adam — about Adam');
   }
 
   // A first visit names no project, and every package read below hangs off one.

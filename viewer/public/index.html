@@ -34,6 +34,7 @@
     <link rel="stylesheet" href="/burst.css" />
     <link rel="stylesheet" href="/burst-map.css" />
     <link rel="stylesheet" href="/cicd.css" />
+    <link rel="stylesheet" href="/build.css" />
     <link rel="icon" href="/brand/adam-mark.png" />
     <script>
       // A new browser session starts at the door.
@@ -51,8 +52,10 @@
         var seen = sessionStorage.getItem('ticvai-session');
         sessionStorage.setItem('ticvai-session', '1');
         var asked = location.search.length > 1 || location.hash.length > 1;
+        // The landing page, not the project door: every new visit starts on
+        // what Adam is, and "Open workspace" there goes on to the door.
         if (!seen && !asked) {
-          location.replace('/home.html');
+          location.replace('/landing.html');
         }
       } catch { /* storage can be denied outright; then the viewer just opens */ }
 
@@ -132,9 +135,10 @@
                One file for both themes, too. The chrome is dark whichever theme
                is on, so the white-ink cut is right in both — a day/night pair
                here would be two names for the same picture. -->
-          <!-- Back to the door. It used to point at "/", which is this page, so
-               the lockup was a reload button dressed as a link. -->
-          <a class="brand" href="/home.html" aria-label="Adam — every layer">
+          <!-- To the landing page. It used to point at "/", which is this page,
+               then at the project door; the door is still the house icon on the
+               right, and the mark now goes where every mark on the site goes. -->
+          <a class="brand" href="/landing.html" aria-label="Adam — about Adam">
             <img
               class="brand-lockup"
               src="/brand/adam-lockup-night.png"
@@ -1028,6 +1032,11 @@
         <section class="view cicd-view sheet" id="view-cicd-pipeline" hidden></section>
         <section class="view cicd-view" id="view-cicd-burst" hidden></section>
         <section class="view cicd-view" id="view-cicd-cell" hidden></section>
+
+        <!-- ── Build ──────────────────────────────────────────────────
+             The package in the order tools/refresh.sh makes it. One empty
+             host, filled by `build.js` the first time the tab is opened. -->
+        <section class="view build-view" id="view-build-chronology" hidden></section>
 
         <section class="view audit" id="view-audit" hidden>
           <div class="audit-head">

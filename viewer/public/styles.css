@@ -84,35 +84,35 @@
   color-scheme: light;
 
   /* the dark chrome — the same idea in both themes, a shade apart */
-  --chrome-1: #333333;
-  --chrome-2: #3a3a3a;
-  --chrome-fill: #4a4a4a;
-  --chrome-border: #565656;
-  --chrome-text: #f7f7f7;
-  --chrome-muted: #adadad;
+  --chrome-1: #0b161c;
+  --chrome-2: #12212a;
+  --chrome-fill: #1a2d37;
+  --chrome-border: #26404c;
+  --chrome-text: #f2fafc;
+  --chrome-muted: #9fb6bf;
 
   /* the page */
-  --bg-canvas: #f5f5f5;
+  --bg-canvas: #f3f7f9;
   --bg-panel: #ffffff;
   --bg-card: #ffffff;
-  --bg-card-head: #f0f0f0;
-  --bg-raised: #fafafa;
-  --bg-hover: #f0f0f0;
+  --bg-card-head: #edf3f6;
+  --bg-raised: #f8fbfc;
+  --bg-hover: #e9f1f4;
   --node-fill: #ffffff;
 
-  --border: #e4e4e4;
-  --divider: #f0f0f0;
-  --border-strong: #cfcfcf;
+  --border: #dfe8ec;
+  --divider: #edf3f6;
+  --border-strong: #c7d5db;
 
-  --text: #2e2e2e;
-  --text-dim: #6e6e6e;
-  --text-faint: #8a8a8a;
+  --text: #1d2c33;
+  --text-dim: #5d7079;
+  --text-faint: #7a8c94;
 
-  --accent: #229799;
-  --accent-bright: #48cfcb;
-  --accent-soft: #e5f7f6;
-  --accent-line: #a6e6e4;
-  --accent-text: #1c7e80;
+  --accent: #0078a0;
+  --accent-bright: #00b4e0;
+  --accent-soft: #e3f5fb;
+  --accent-line: #9cd9ec;
+  --accent-text: #006f91;
 
   --warm-fill: #fbf6ec;
   --warm-line: #eadfc8;
@@ -122,7 +122,7 @@
 
   --amber: #c08a2e;
   --red: #c0564f;
-  --dot-grid: #e2e2e2;
+  --dot-grid: #dbe6eb;
 
   --ink-on-fill: #ffffff;
   --ink-on-accent: #ffffff;
@@ -213,7 +213,7 @@
      lane that is a $ref are drawn together in the Spine view and used to differ
      only by whether the consumer was critical — so a critical event and a $ref
      into shared/ were the same amber, saying two different things. */
-  --edge-event: #1f8d8f;
+  --edge-event: #0086b0;
   --edge-critical: #b07a24;
   --edge-ref: #7c5fc0;
   --edge-permission: #b04a84;
@@ -252,34 +252,34 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --chrome-1: #111111;
-  --chrome-2: #333333;
-  --chrome-fill: #2e2e2e;
-  --chrome-border: #3a3a3a;
-  --chrome-text: #ededed;
-  --chrome-muted: #9a9a9a;
+  --chrome-1: #03080b;
+  --chrome-2: #0b151b;
+  --chrome-fill: #0f1d24;
+  --chrome-border: #1a2c35;
+  --chrome-text: #eaf6fa;
+  --chrome-muted: #8ea5ae;
 
-  --bg-canvas: #1a1a1a;
-  --bg-panel: #1f1f1f;
-  --bg-card: #242424;
-  --bg-card-head: #2c2c2c;
-  --bg-raised: #202020;
-  --bg-hover: #2c2c2c;
-  --node-fill: #242424;
+  --bg-canvas: #040709;
+  --bg-panel: #071015;
+  --bg-card: #0b161c;
+  --bg-card-head: #0f1e25;
+  --bg-raised: #08131a;
+  --bg-hover: #10212a;
+  --node-fill: #0b161c;
 
-  --border: #3a3a3a;
-  --divider: #333333;
-  --border-strong: #4d4d4d;
+  --border: #1a2c35;
+  --divider: #12222a;
+  --border-strong: #28414d;
 
-  --text: #ededed;
-  --text-dim: #9a9a9a;
-  --text-faint: #787878;
+  --text: #e8f3f6;
+  --text-dim: #93a9b1;
+  --text-faint: #7d949d;
 
-  --accent: #2bb3b0;
-  --accent-bright: #48cfcb;
-  --accent-soft: #123a3a;
-  --accent-line: #2c7c7d;
-  --accent-text: #48cfcb;
+  --accent: #00b4e0;
+  --accent-bright: #00c4e8;
+  --accent-soft: #062a38;
+  --accent-line: #0b6f8c;
+  --accent-text: #00c4e8;
 
   --warm-fill: #2b2418;
   --warm-line: #463a24;
@@ -289,10 +289,10 @@
 
   --amber: #d9a143;
   --red: #d96c63;
-  --dot-grid: #333333;
+  --dot-grid: #12232b;
 
-  --ink-on-fill: #101010;
-  --ink-on-accent: #0d2020;
+  --ink-on-fill: #03080b;
+  --ink-on-accent: #00161e;
 
   --tint-1: rgba(255, 255, 255, 0.035);
   --tint-2: rgba(255, 255, 255, 0.06);
@@ -301,7 +301,7 @@
   --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.06);
   --shadow-2: 0 8px 24px rgba(0, 0, 0, 0.4);
   --shadow-3: 0 24px 60px rgba(0, 0, 0, 0.55);
-  --scrim: rgba(0, 0, 0, 0.6);
+  --scrim: rgba(0, 4, 8, 0.62);
   --shadow-ink: rgba(0, 0, 0, 0.5);
 
   --route-write: #6ba6e8;
@@ -313,7 +313,7 @@
 
   /* Lifted for the dark field. The galaxies draw these additively, so the day
      values would come out muddy under 'lighter' compositing. */
-  --kind-contract: #48cfcb;
+  --kind-contract: #00c4e8;
   --kind-operation: #6aa5f5;
   --kind-schema: #5fc28a;
   --kind-enum: #a98ae0;
@@ -326,7 +326,7 @@
   --kind-event: #b79ae8;
   --kind-decision: #7fc0d8;
 
-  --edge-event: #48cfcb;
+  --edge-event: #00c4e8;
   --edge-critical: #e0ae52;
   --edge-ref: #a98ae0;
   --edge-permission: #e07ab0;
@@ -489,6 +489,23 @@ body {
 }
 .chrome-divider-sm { height: 22px; margin: 0 16px; }
 .chrome-right { display: flex; align-items: center; gap: 12px; flex: none; }
+
+/* The two rails give way before the page does, at every width.
+   The scroll-instead-of-wrap rule used to start at 1180px, on the measurement
+   that the bar fitted above it. It stopped fitting when the Build tab arrived:
+   at 1536px — a 1920px screen at 125% — row one ran 25px past the window, and
+   because `body` scrolls sideways at desktop widths, the whole app slid left
+   and the theme toggle sat past the edge. Natural width while there is room,
+   shrink-and-scroll when there is not, so the next tab cannot do it again. */
+.layer-tray, .view-tabs {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+.layer-tray::-webkit-scrollbar, .view-tabs::-webkit-scrollbar { display: none; }
+.layer-tray button, .mode { flex: none; white-space: nowrap; }
 
 /* ── brand ─────────────────────────────────────────────────────────
    The client's mark, rendered white rather than served white — a filter is
@@ -666,7 +683,8 @@ body {
 .layer-tray {
   display: flex;
   gap: 2px;
-  flex: none;
+  /* No `flex: none` here: it outranked the shrink-and-scroll rule above on
+     order alone, and a rail that cannot shrink pushes the page sideways. */
   padding: 4px;
   border-radius: 11px;
   background: color-mix(in srgb, #000 22%, var(--chrome-1));
@@ -701,7 +719,12 @@ body {
 
 /* ── search ────────────────────────────────────────────────────────── */
 .search-trigger {
-  flex: 0 1 240px;
+  /* Gives up its width before the layer rail does. With equal shrink the rail
+     lost 26px at 1536px and put its last tab behind a scroll nothing hints at.
+     Shrink is weighted by basis, and the rail's basis is three times this one,
+     so the factor has to be large for the search box to go first; it has a
+     120px floor and a Ctrl K that still works. */
+  flex: 0 100 240px;
   display: flex;
   align-items: center;
   gap: 9px;

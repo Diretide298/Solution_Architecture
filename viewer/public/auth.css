@@ -20,40 +20,41 @@
 
 :is(.invite-page, .signin-page) {
   /* night */
-  --stage: #080b0c;
-  --card-fill: rgba(18, 23, 25, 0.82);
-  --card-line: rgba(72, 207, 203, 0.16);
+  --stage: #030709;
+  --card-fill: rgba(8, 16, 21, 0.82);
+  --card-line: rgba(0, 196, 232, 0.16);
   --card-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
-  --ink-title: #edf2f2;
-  --ink-body: #96a3a4;
-  --ink-strong: #cfdada;
-  --ink-label: #7e8c8d;
-  --ink-faint: #6e7b7c;
-  --field-fill: #0e1314;
-  --field-line: #24302f;
-  --field-focus: #2bb3b0;
-  --cta: linear-gradient(135deg, #2bb3b0, #48cfcb);
-  --cta-ink: #04211f;
-  --cta-glow: rgba(43, 179, 176, 0.34);
+  --ink-title: #eaf4f7;
+  --ink-body: #93a5ac;
+  --ink-strong: #cddbe0;
+  --ink-label: #7c8e95;
+  --ink-faint: #6c7e85;
+  --field-fill: #081116;
+  --field-line: #1c2d35;
+  --field-focus: #00b4e0;
+  --cta: linear-gradient(135deg, #0096c0, #00c4e8);
+  --cta-ink: #ffffff;
+  --cta-glow: rgba(0, 180, 224, 0.34);
 }
 
 /* Day is the default here, as everywhere else in the viewer: :root carries it
    and only night sits behind the attribute. Written second so it wins. */
 :root:not([data-theme="dark"]) :is(.invite-page, .signin-page) {
-  --stage: #e6f1f6;
+  --stage: #e4f2f8;
   --card-fill: rgba(255, 255, 255, 0.88);
-  --card-line: rgba(31, 143, 145, 0.18);
+  --card-line: rgba(0, 120, 160, 0.18);
   --card-shadow: 0 22px 60px rgba(21, 43, 49, 0.14);
   --ink-title: #16323a;
   --ink-body: #5f7274;
   --ink-strong: #2a4a50;
   --ink-label: #6c7d7f;
   --ink-faint: #7a8a8b;
-  --field-fill: #f7fafa;
-  --field-line: #dbe3e4;
-  --field-focus: #1f8f91;
-  --cta: linear-gradient(135deg, #1f8f91, #3fc9c5);
-  --cta-glow: rgba(31, 143, 145, 0.26);
+  --field-fill: #f6fafc;
+  --field-line: #d8e4e9;
+  --field-focus: #0078a0;
+  --cta: linear-gradient(135deg, #006f91, #0086ad);
+  --cta-ink: #ffffff;
+  --cta-glow: rgba(0, 120, 160, 0.26);
 }
 
 :is(.invite-page, .signin-page) {
@@ -192,14 +193,14 @@
 .auth-ring {
   width: 14px; height: 14px;
   border-radius: 50%;
-  border: 1.6px solid #48cfcb;
+  border: 1.6px solid #00c4e8;
 }
-.auth-ring + .auth-ring { margin-left: -5px; border-color: #2bb3b0; }
-/* Day. The two above are the night accents — #48cfcb reads 1.68:1 on the pale
-   auth ground and #2bb3b0 2.28:1, so on this page they were rings nobody could
+.auth-ring + .auth-ring { margin-left: -5px; border-color: #0096c0; }
+/* Day. The two above are the night accents — #00c4e8 reads 1.9:1 on the pale
+   auth ground and #0096c0 3.2:1, so on this page they were rings nobody could
    see. The scheme's own two teals, a step apart for the same reason. */
-:root:not([data-theme="dark"]) .auth-ring { border-color: #218dae; }
-:root:not([data-theme="dark"]) .auth-ring + .auth-ring { border-color: #12566b; }
+:root:not([data-theme="dark"]) .auth-ring { border-color: #0078a0; }
+:root:not([data-theme="dark"]) .auth-ring + .auth-ring { border-color: #004f6a; }
 .auth-by { display: flex; flex-direction: column; gap: 2px; }
 .auth-by-label {
   font-size: 8.5px; font-weight: 700; letter-spacing: 0.16em;
@@ -208,7 +209,7 @@
 .auth-by-name {
   font-size: 12.5px; font-weight: 700; line-height: 1; color: var(--ink-strong);
 }
-.auth-by-name b { color: #48cfcb; font-weight: 700; }
-:root:not([data-theme="dark"]) .auth-by-name b { color: #218dae; }
+.auth-by-name b { color: #00c4e8; font-weight: 700; }
+:root:not([data-theme="dark"]) .auth-by-name b { color: #0078a0; }
 .auth-partner { margin-left: auto; width: 74px; flex: none; opacity: 0.5; }
 :root[data-theme="dark"] .auth-partner { filter: brightness(0) invert(1); opacity: 0.55; }

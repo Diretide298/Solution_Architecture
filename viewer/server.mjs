@@ -35,6 +35,7 @@ import { buildDecisions } from './lib/decisions.mjs';
 import { buildDomains } from './lib/domains.mjs';
 import { buildPlatforms } from './lib/platforms.mjs';
 import { buildCicd } from './lib/cicd.mjs';
+import { buildChronology } from './lib/build.mjs';
 import { buildUiux } from './lib/uiux.mjs';
 import { buildSearch } from './lib/search.mjs';
 import { buildDiagrams, readDiagramDetail } from './lib/diagrams.mjs';
@@ -216,6 +217,7 @@ function newPackage(project) {
     platforms: null,
     uiux: null,
     cicd: null,
+    build: null,
     search: null,
     diagrams: null,
     /** the in-flight rebuild, so concurrent requests coalesce onto one */
@@ -315,7 +317,7 @@ async function refreshIndex(pkg, reason = 'startup') {
     let index = null, indexSlim = null, detailByFile = null;
     let journeys = null, backend = null, domain = null, decisions = null;
     let lineage = null, tooltips = null, diagrams = null, domains = null;
-    let platforms = null, uiux = null, cicd = null, search = null;
+    let platforms = null, uiux = null, cicd = null, build = null, search = null;
     try {
       index = await buildIndex(ROOT, pkg.contracts);
       // split once per rebuild, not once per request
@@ -455,6 +457,10 @@ async function refreshIndex(pkg, reason = 'startup') {
       // comparisons between them rather than anything any one of them states.
       cicd = await buildCicd(ROOT).catch(() => null);
 
+      // The order the package is made in, read off `tools/refresh.sh`, with
+      // what each step writes and which earlier step it reads.
+      build = await buildChronology(ROOT).catch(() => null);
+
       // What the palette can find. It searched `index.nodes` and nothing
       // else — 1,979 contract nodes — so a reviewer looking for a screen id,
       // an ADR or a table got "No match", which reads as "not in this
@@ -472,7 +478,7 @@ async function refreshIndex(pkg, reason = 'startup') {
       Object.assign(pkg, {
         index, indexSlim, detailByFile,
         journeys, backend, domain, decisions, lineage, tooltips, diagrams, domains,
-        platforms, uiux, cicd, search,
+        platforms, uiux, cicd, build, search,
       });
       // everything stringified and compressed against the old build is stale
       pkg.packed.clear();
@@ -1013,6 +1019,11 @@ const server = http.createServer(async (req, res) => {
     if (route === 'cicd') {
       if (!pkg.cicd) await refreshIndex(pkg, 'on demand');
       return sendCachedJson(res, req, pkg.packed, 'cicd', pkg.cicd);
+    }
+
+    if (route === 'build') {
+      if (!pkg.build) await refreshIndex(pkg, 'on demand');
+      return sendCachedJson(res, req, pkg.packed, 'build', pkg.build);
     }
 
     if (route === 'platforms') {

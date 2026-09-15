@@ -156,6 +156,25 @@ export const LAYERS = [
     groups: [['tiers', 'Tiers'], ['size', 'Size']],
   },
   {
+    // **Build is the order the package is made in.** Every other tab shows a
+    // derived artefact as it stands; none of them shows that the lineage has to
+    // exist before the schema, or that the id register has to be current before
+    // a screen check can pass. `tools/refresh.sh` is the only place that order is
+    // written down, so this layer reads the script rather than restating it.
+    //
+    // Before CI/CD on purpose: the rebuild is what a commit carries, and the
+    // pipeline is what happens to it next.
+    key: 'build',
+    label: 'Build',
+    hint: 'tools/refresh.sh — the package, derived step by step from the contracts',
+    tip:
+      'How the package came to hold what it holds. **Each step is a tool in tools/refresh.sh, in ' +
+      'the order the script runs it**, with the file it writes and the earlier steps it reads. ' +
+      'The contracts sit on the right because every step resolves back to them.',
+    modes: [['build-chronology', 'Chronology']],
+    groups: [['tiers', 'Tiers'], ['size', 'Size']],
+  },
+  {
     // **CI/CD is a layer because the three folders that decide it are three
     // folders nothing joined.** `repos/` holds what a pull request has to pass,
     // `services/` holds what each service becomes, and `deploy/` holds what
@@ -220,6 +239,14 @@ export const LAYERS = [
  * conversation is a view nobody opens twice.
  */
 export const MODE_TIPS = {
+  'build-chronology': {
+    title: 'Chronology',
+    body:
+      'The package in the order it is made. **Each step is a tool in tools/refresh.sh**, with '
+      + 'the file it writes, the number that file holds and the earlier steps it reads. Step '
+      + 'through with the arrow keys, or play it; the contracts stay pinned on the right '
+      + 'because everything resolves back to them.',
+  },
   'services-graph': {
     title: 'Graph',
     body:
@@ -412,6 +439,7 @@ export const layerOf = (key) => LAYERS.find((l) => l.key === key) ?? LAYERS[1];
 export const VIEWS = [
   'uiux-screens', 'uiux-boards', 'uiux-platforms',
   'cicd-pipeline', 'cicd-burst', 'cicd-cell',
+  'build-chronology',
   'graph', 'structure', 'er', 'lineage', 'journey', 'screen', 'apps', 'waves',
   'states', 'events', 'data', 'migrations', 'routing', 'reader', 'decisions', 'audit',
   'timeline', 'supersession', 'register', 'decision',

@@ -1,0 +1,23 @@
+{
+  "name": "adam-landing-journey",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "The journey diagrams on the Adam landing page. Builds into ../public/landing-journey/.",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch"
+  },
+  "dependencies": {
+    "gsap": "^3.13.0",
+    "motion": "^12.23.12",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.13",
+    "@vitejs/plugin-react": "^5.0.2",
+    "tailwindcss": "^4.1.13",
+    "vite": "^7.1.5"
+  }
+}

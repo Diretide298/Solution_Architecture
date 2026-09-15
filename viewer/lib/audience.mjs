@@ -104,9 +104,13 @@ export function layersFor(role) {
   // schedule made checkable — what a change has to pass before it reaches them,
   // and which stages of that do not exist yet. A client who is told the second
   // part by the page is better placed than one who is told it by a slipped date.
+  //
+  // `build` is here for both roles too. It is how every other tab came to hold
+  // what it holds — the regeneration script, step by step — and nothing in it
+  // is a reason rather than a fact: the ADRs it cites stay behind Decisions.
   return role === 'client'
-    ? ['frontend', 'uiux', 'contracts', 'domain', 'backend', 'services', 'cicd']
-    : ['frontend', 'uiux', 'contracts', 'domain', 'backend', 'services', 'cicd', 'decisions'];
+    ? ['frontend', 'uiux', 'contracts', 'domain', 'backend', 'services', 'build', 'cicd']
+    : ['frontend', 'uiux', 'contracts', 'domain', 'backend', 'services', 'build', 'cicd', 'decisions'];
 }
 
 /** null means "whatever the layer normally offers". A client gets every mode

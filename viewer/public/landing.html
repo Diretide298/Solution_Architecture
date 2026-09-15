@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Adam — every layer, one reference graph</title>
+    <link rel="icon" href="/brand/adam-mark.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/landing.css" />
+    <!-- The journey diagrams: React, Tailwind and React Bits, built from
+         viewer/landing-app into public/landing-journey/. -->
+    <link rel="stylesheet" href="/landing-journey/journey.css" />
+    <!-- The four animation modules from the Claude Design handoff, unchanged.
+         Classic scripts: each only defines a global, and landing.js starts them. -->
+    <script src="/adam-flow.js"></script>
+    <script src="/adam-chain.js"></script>
+    <script src="/adam-journey-stages.js"></script>
+    <script src="/adam-journey.js"></script>
+  </head>
+
+  <!-- The front door. Public, light only, and the page every new visit starts
+       on; the lockup in the viewer comes back here, and "Open workspace" goes
+       on to the project door, through sign-in when there is no session. -->
+  <body class="landing" id="top">
+    <div class="lp-shell">
+      <header class="lp-header">
+        <a class="lp-lockup" href="/landing.html" aria-label="Adam">
+          <img src="/brand/adam-lockup-day.png" alt="Adam" />
+        </a>
+        <nav class="lp-nav" aria-label="Sections">
+          <a href="#what">What it is</a>
+          <a href="#journey">The journey</a>
+          <a href="#chain">The chain</a>
+          <a href="#read">Reading it back</a>
+        </nav>
+        <div class="lp-actions">
+          <a class="lp-btn" href="#demo">Book a demo</a>
+          <a class="lp-btn lp-btn-fill" href="/home.html" data-workspace>Open workspace</a>
+        </div>
+      </header>
+
+      <section class="lp-hero">
+        <p class="lp-eyebrow">The context layer for AI-assisted development</p>
+        <div class="lp-hero-grid">
+          <h1 class="lp-h1">Every layer,<br />one reference graph.</h1>
+          <div class="lp-hero-copy">
+            <p class="lp-lede">Every screen, contract, state model, table and decision in the delivery package — indexed, cross-referenced, and checked against each other. The requirements a workshop produced, the decisions taken about them, and every artefact derived from those decisions, in one place that refuses to contradict itself.</p>
+            <p class="lp-pipeline">Requirements → decisions → contracts → data model → screens → handoff</p>
+            <div class="lp-hero-cta">
+              <a class="lp-btn lp-btn-fill" href="/home.html" data-workspace>Open workspace</a>
+              <a class="lp-btn" href="#journey">See how it works</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="lp-scene-section">
+        <div class="lp-plate" id="lp-plate">
+          <div class="lp-stage" id="lp-stage">
+            <canvas class="lp-flow" data-scene="flow" aria-hidden="true"></canvas>
+            <div class="lp-scene-grid">
+              <div class="lp-scene-col">
+                <div style="height: 38px"></div>
+                <div class="lp-scene-row">
+                  <canvas data-scene="adam" data-focus="src" aria-label="Adam" style="max-width: 206px; aspect-ratio: 1 / 1"></canvas>
+                </div>
+                <p class="lp-scene-cap">Understands<br />your context</p>
+                <p class="lp-scene-sub">Schema &amp; contracts · Documentation<br />Data &amp; APIs · Requirements · Decisions</p>
+              </div>
+              <div class="lp-scene-col">
+                <p class="lp-scene-label">Developer<br />in the loop</p>
+                <div class="lp-scene-row">
+                  <canvas data-scene="dev" data-focus="hub" aria-label="A developer at work, reading the package" style="max-width: 340px; aspect-ratio: 816 / 574"></canvas>
+                </div>
+                <p class="lp-scene-cap is-muted">Collaborate.<br />Refine. Iterate.</p>
+              </div>
+              <div class="lp-scene-col">
+                <p class="lp-scene-label">Production-ready<br />software</p>
+                <div class="lp-scene-row">
+                  <canvas data-scene="out" data-focus="dst" aria-label="Production-ready software" style="max-width: 224px; aspect-ratio: 1 / 1"></canvas>
+                </div>
+                <p class="lp-scene-cap">Built for<br />what's next</p>
+                <p class="lp-scene-sub">Tested · Documented · Secure<br />Scalable · Ready to deploy</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="lp-figures" id="lp-figures" aria-label="The package, counted"></section>
+      <p class="lp-figures-note">Counted from the package this instance serves, at design 87% and build 33%.</p>
+
+      <section id="what" class="lp-section">
+        <p class="lp-eyebrow">01 / What Adam is</p>
+        <h2 class="lp-h2 lp-what-h2">A contract-first package that refuses to contradict itself.</h2>
+        <div class="lp-cards3">
+          <div class="lp-card">
+            <span class="lp-kicker">Nine validators</span>
+            <h3>Nothing merges that disagrees</h3>
+            <p>A screen cannot call an operation that does not exist. An operation cannot name a table stored nowhere. A state model cannot anchor on a schema with no values. A flow cannot step through a screen that was deleted.</p>
+          </div>
+          <div class="lp-card">
+            <span class="lp-kicker">Four hops, no duplication</span>
+            <h3>Nothing holds a copy of anything else's truth</h3>
+            <p>A screen names an operation; the operation resolves against the contracts; the contract resolves against the schema; the schema resolves against the relationship graph.</p>
+          </div>
+          <div class="lp-card">
+            <span class="lp-kicker">Derived, not maintained</span>
+            <h3>Every artefact is regenerated where it can be</h3>
+            <p>The boards come from the screens, the schema reference from the contracts, the relationship graph from both. A hand-maintained copy is a copy that goes stale, and this package has been bitten by that three times.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="journey" class="lp-section">
+        <p class="lp-eyebrow">02 / The journey — before the derivation</p>
+        <div class="lp-lead-grid">
+          <h2 class="lp-h2">From a room full of requirements to a decision the package can hold.</h2>
+          <p class="lp-intro">Seven steps happen with people in the room. Each one leaves something behind that Adam can read — a parsed pack, a minute, an ADR, a signed verdict — so the next step starts from the record rather than from memory.</p>
+        </div>
+        <div class="lp-journey" id="lp-journey">
+          <canvas aria-hidden="true"></canvas>
+          <ol class="lp-jrow is-top" id="lp-jrow-top"></ol>
+          <ol class="lp-jrow is-bottom" id="lp-jrow-bottom"></ol>
+          <p class="lp-exit" data-exit>Ready for build</p>
+        </div>
+      </section>
+
+      <section id="chain" class="lp-section">
+        <p class="lp-eyebrow">03 / The derivation chain</p>
+        <div class="lp-lead-grid">
+          <h2 class="lp-h2">One command, in dependency order.</h2>
+          <p class="lp-intro">After any change to the contracts, screens, flows, states or events, everything downstream is rebuilt. The order matters — the domain closure reads the lineage, and the status reads the closure. Pick a step to see what it writes and why it exists.</p>
+        </div>
+        <div class="lp-chain-grid">
+          <ol class="lp-chain-list" id="lp-chain-list"></ol>
+          <aside class="lp-panel">
+            <div class="lp-panel-diagram">
+              <canvas id="lp-chain-canvas" aria-label="The step, drawn as a diagram in the viewer's own language"></canvas>
+            </div>
+            <span class="lp-panel-step" id="lp-step-n">Step 01 of 15</span>
+            <h3 id="lp-step-t"></h3>
+            <p class="lp-panel-why" id="lp-step-why"></p>
+            <div class="lp-panel-facts">
+              <div class="lp-fact"><span>Runs</span><code id="lp-step-tool"></code></div>
+              <div class="lp-fact"><span>Writes</span><code class="is-writes" id="lp-step-writes"></code></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="read" class="lp-section">
+        <p class="lp-eyebrow">04 / Reading it back</p>
+        <div class="lp-read-grid">
+          <div class="lp-read-card">
+            <h3>Four layers, one switch</h3>
+            <p>Contracts sit near the middle deliberately: the API is the join between the outer two, and every other layer is drawn by resolving against it.</p>
+            <ul class="lp-layers" id="lp-layers"></ul>
+          </div>
+          <div class="lp-read-card">
+            <h3>And read by the assistant writing the code</h3>
+            <p>Thirteen tools over MCP answer from the same index the viewer draws: one screen with its operations and states, one flow with its branches, one table with its columns and migration, one ADR in full, or the file behind any of them.</p>
+            <div class="lp-tools" id="lp-tools"></div>
+            <p class="lp-read-note">Only one of them writes, and all it writes is the record that a work package is about an artefact. The package itself stays read-only from the bridge.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="demo" class="lp-section">
+        <div class="lp-cta">
+          <div>
+            <h2>See it against your own delivery package.</h2>
+            <p class="lp-cta-body">Adam reads the package straight from the repository. Nothing is uploaded, and nothing leaves the machine it runs on.</p>
+          </div>
+          <div class="lp-cta-actions">
+            <div class="lp-cta-row">
+              <a class="lp-cta-fill" href="/home.html" data-workspace>Open workspace</a>
+              <a class="lp-cta-ghost" href="#demo">Book a demo</a>
+            </div>
+            <p class="lp-cta-fine">Access is by invitation. Ask whoever runs the package to send you one — an invite works once and expires after seven days.</p>
+          </div>
+        </div>
+      </section>
+
+      <footer class="lp-footer">
+        <span class="lp-rings" aria-hidden="true"><span></span><span></span></span>
+        <span class="lp-by">
+          <span class="lp-by-label">Powered by</span>
+          <span class="lp-by-name">Ainfinite<b>Core</b></span>
+        </span>
+        <img class="lp-softlabs" src="/brand/softlabs-logo.webp" alt="Softlabs Group" />
+      </footer>
+    </div>
+
+    <script type="module" src="/landing.js"></script>
+  </body>
+</html>

@@ -1,0 +1,463 @@
+/**
+ * Build — the chronology layer.
+ *
+ * Tokens only, no literal colours, so it follows the theme like every other
+ * view. Everything is scoped to `.bld-*` or to the one mode.
+ */
+
+/* A reading surface, not a tree: the shell rails go, as they do for CI/CD. */
+body[data-mode="build-chronology"] #sidebar-left,
+body[data-mode="build-chronology"] #sidebar-right {
+  display: none;
+}
+body[data-mode="build-chronology"] .app {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "top"
+    "main";
+}
+
+.build-view {
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  background:
+    radial-gradient(circle at 1px 1px, var(--dot-grid) 1px, transparent 0) 0 0 / 22px 22px,
+    var(--bg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .build-view { scroll-behavior: auto; }
+}
+
+.bld-col { max-width: 1320px; margin: 0 auto; padding: 22px 18px 0; }
+
+/* ── hero ──────────────────────────────────────────────────────────────── */
+.bld-hero { padding: 6px 2px 20px; }
+.bld-eyebrow {
+  margin: 0 0 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+.bld-title { margin: 0; font-size: 30px; font-weight: 800; letter-spacing: -0.02em; color: var(--text); }
+.bld-sub { margin: 12px 0 0; max-width: 76ch; font-size: 14px; line-height: 1.65; color: var(--text-dim); }
+.bld-sub strong { color: var(--text); }
+.bld-source { margin: 12px 0 0; font-family: var(--mono); font-size: 11.5px; color: var(--text-faint); }
+.bld-sub code, .bld-source code, .bld-summary code, .bld-why code {
+  font-family: var(--mono);
+  font-size: .9em;
+  padding: 0 4px;
+  border-radius: 4px;
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+.bld-error {
+  margin: 18px 0;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  color: var(--text-dim);
+}
+
+/* ── totals ────────────────────────────────────────────────────────────── */
+.bld-totals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+  gap: 10px;
+  margin: 0 0 26px;
+}
+.bld-total {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+.bld-total b {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--accent-text);
+  font-variant-numeric: tabular-nums;
+}
+.bld-total span { font-size: 11.5px; color: var(--text-faint); }
+
+/* ── the flow: steps on the left, contracts pinned on the right ────────── */
+.bld-flow {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 290px;
+  gap: 0 56px;
+  align-items: start;
+  padding-bottom: 40px;
+}
+
+.bld-wires {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 2;
+}
+.bld-wire {
+  fill: none;
+  stroke: var(--accent-bright);
+  stroke-width: 1.6;
+  stroke-dasharray: 5 6;
+  opacity: .85;
+  animation: bld-flow 1.1s linear infinite;
+}
+.bld-wire.is-contracts { stroke: var(--accent); stroke-width: 2; opacity: .9; }
+.bld-wire-end { fill: var(--accent-bright); }
+.bld-wire-end.is-contracts { fill: var(--accent); }
+@keyframes bld-flow { to { stroke-dashoffset: -22; } }
+
+/* The rail the steps come down. */
+.bld-stages {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 34px;
+}
+.bld-stages::before {
+  content: "";
+  position: absolute;
+  left: 11px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  border-radius: 2px;
+  background: linear-gradient(var(--accent-line), var(--line) 85%);
+}
+
+.bld-act {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  margin: 26px 0 10px -34px;
+  padding-left: 34px;
+  transition: opacity .35s ease;
+}
+.bld-act:first-child { margin-top: 0; }
+.bld-act-name {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+.bld-act-blurb { font-size: 12.5px; color: var(--text-faint); }
+.bld-act.is-pending { opacity: .35; }
+
+/* ── a step ────────────────────────────────────────────────────────────── */
+.bld-stage {
+  position: relative;
+  margin: 0 0 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+  box-shadow: var(--shadow-1);
+  transition: opacity .35s ease, transform .35s ease, border-color .2s ease, box-shadow .25s ease;
+}
+.bld-node {
+  position: absolute;
+  left: -29px;
+  top: 19px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  background: var(--bg);
+  transition: background .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+.bld-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+}
+.bld-num {
+  flex: none;
+  min-width: 28px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-faint);
+}
+.bld-name { margin: 0; flex: 1; font-size: 15.5px; font-weight: 700; color: var(--text); }
+.bld-line { flex: none; font-family: var(--mono); font-size: 11px; color: var(--text-faint); }
+.bld-line.is-gone { color: var(--amber); }
+
+.bld-body {
+  display: grid;
+  gap: 12px;
+  padding: 0 16px 16px 56px;
+}
+
+/* Pending: the title only, faint, so the shape of what is coming is visible
+   without giving it away. Done: the whole card, calm. Active: lit. */
+.bld-stage.is-pending { opacity: .38; box-shadow: none; }
+.bld-stage.is-pending .bld-body { display: none; }
+.bld-stage.is-done:not(.is-upstream) .bld-body { display: none; }
+.bld-stage.is-done .bld-node { background: var(--accent-line); border-color: var(--accent-line); }
+
+.bld-stage.is-active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), 0 14px 44px color-mix(in srgb, var(--accent) 22%, transparent);
+  animation: bld-arrive .45s ease both;
+}
+.bld-stage.is-active .bld-node {
+  background: var(--accent-bright);
+  border-color: var(--accent-bright);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent-bright) 25%, transparent);
+}
+.bld-stage.is-active .bld-num { color: var(--accent-text); }
+
+.bld-stage.is-upstream:not(.is-active) {
+  border-color: var(--accent-line);
+  border-style: dashed;
+}
+.bld-stage.is-upstream:not(.is-active) .bld-body { display: grid; }
+.bld-stage.is-upstream:not(.is-active) .bld-body > :not(.bld-figure):not(.bld-writes-wrap) { display: none; }
+
+@keyframes bld-arrive {
+  from { opacity: .4; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bld-stage.is-active { animation: none; }
+  .bld-wire { animation: none; }
+}
+
+.bld-figure { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.bld-figure b {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--accent-text);
+  font-variant-numeric: tabular-nums;
+}
+.bld-figure span { font-size: 13px; color: var(--text-dim); }
+
+.bld-summary { margin: 0; max-width: 78ch; font-size: 13.5px; line-height: 1.6; color: var(--text); }
+.bld-summary strong { font-weight: 700; }
+
+.bld-label {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.bld-muted { font-size: 12px; color: var(--text-faint); }
+
+.bld-reads { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.bld-reads .bld-label { margin-right: 4px; }
+.bld-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--bg-raised);
+  font: inherit;
+  font-size: 12px;
+  color: var(--text);
+  cursor: default;
+}
+button.bld-chip { cursor: pointer; }
+button.bld-chip:hover { border-color: var(--accent); color: var(--accent-text); }
+.bld-chip.is-contracts {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  font-family: var(--mono);
+}
+.bld-chip.is-check { font-family: var(--mono); font-size: 11px; }
+
+.bld-tools { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 14px; }
+.bld-tool { display: inline-flex; align-items: baseline; gap: 6px; }
+.bld-tool code, .bld-writes code { font-family: var(--mono); font-size: 12px; color: var(--text); }
+.bld-tool.is-gone code { color: var(--amber); text-decoration: line-through; }
+
+.bld-why {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg-raised);
+}
+.bld-why > summary {
+  padding: 7px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+.bld-why > summary:hover { color: var(--accent-text); }
+.bld-why > p { margin: 0; padding: 0 12px 10px; font-size: 13px; line-height: 1.6; color: var(--text-dim); max-width: 80ch; }
+.bld-why > p strong { color: var(--text); }
+.bld-why > .bld-checks { padding: 0 12px 12px; }
+
+.bld-writes-wrap { display: grid; gap: 6px; }
+.bld-writes { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.bld-writes li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.bld-writes li.is-missing code { color: var(--amber); }
+
+.bld-open {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--accent-text);
+  text-decoration: none;
+}
+.bld-open::after { content: "→"; }
+.bld-open:hover { background: var(--accent-soft); }
+.bld-ship { background: var(--accent); border-color: var(--accent); color: var(--ink-on-accent); }
+.bld-ship::after { content: none; }
+.bld-ship:hover { background: var(--accent-bright); }
+
+.bld-checks { display: flex; flex-wrap: wrap; gap: 6px; }
+.bld-finale .bld-num { color: var(--accent-text); }
+
+/* ── the contracts column ──────────────────────────────────────────────── */
+.bld-contracts {
+  position: sticky;
+  top: 12px;
+  max-height: calc(100vh - var(--topbar-h) - 96px);
+  overflow-y: auto;
+  padding: 14px 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+  box-shadow: var(--shadow-1);
+  transition: border-color .3s ease, box-shadow .3s ease;
+  z-index: 1;
+}
+.bld-contracts.is-lit {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), 0 14px 44px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+.bld-aside-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 10px; }
+.bld-aside-head .bld-label { color: var(--accent-text); font-size: 11.5px; }
+.bld-aside-note { margin: 6px 0 4px; font-size: 12px; line-height: 1.5; color: var(--text-faint); }
+.bld-tier {
+  margin: 12px 0 4px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.bld-contract-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.bld-contract {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 3px 6px;
+  border-radius: 6px;
+  font-size: 12.5px;
+}
+.bld-contract-name { color: var(--text); font-family: var(--mono); font-size: 12px; }
+.bld-contract-ops { color: var(--text-faint); font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.bld-contract-bar {
+  position: absolute;
+  left: 6px;
+  bottom: 0;
+  height: 2px;
+  width: calc(var(--w) - 12px);
+  border-radius: 2px;
+  background: var(--accent-line);
+  opacity: .55;
+  transition: background .3s ease, opacity .3s ease;
+}
+.bld-contracts.is-lit .bld-contract-bar {
+  background: var(--accent-bright);
+  opacity: 1;
+  animation: bld-pulse .9s ease both;
+  animation-delay: calc(var(--i) * 18ms);
+}
+@keyframes bld-pulse {
+  from { transform: scaleX(0); transform-origin: left; }
+  to { transform: scaleX(1); transform-origin: left; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bld-contracts.is-lit .bld-contract-bar { animation: none; }
+}
+.bld-contracts > .bld-open { margin-top: 14px; }
+
+/* ── controls ──────────────────────────────────────────────────────────── */
+.bld-controls {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 -18px;
+  padding: 10px 18px;
+  border-top: 1px solid var(--line);
+  background: color-mix(in srgb, var(--bg) 90%, transparent);
+  backdrop-filter: blur(8px);
+}
+.bld-btn {
+  padding: 7px 13px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  cursor: pointer;
+}
+.bld-btn:hover { border-color: var(--accent); color: var(--accent-text); }
+.bld-btn.is-primary { min-width: 76px; border-color: var(--accent); background: var(--accent); color: var(--ink-on-accent); }
+.bld-btn.is-primary:hover { background: var(--accent-bright); color: var(--ink-on-accent); }
+.bld-btn.is-primary.is-on { background: var(--accent-soft); color: var(--accent-text); }
+.bld-btn.is-quiet { font-weight: 600; color: var(--text-dim); }
+.bld-where { display: inline-flex; align-items: baseline; gap: 10px; margin: 0 auto 0 8px; }
+.bld-counter { font-size: 13px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+.bld-act-now {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+
+/* ── presenting ────────────────────────────────────────────────────────── */
+.build-view.is-presenting { background-color: var(--bg); }
+.build-view.is-presenting .bld-col { max-width: 1500px; padding-top: 34px; }
+.build-view.is-presenting .bld-title { font-size: 40px; }
+.build-view.is-presenting .bld-sub { font-size: 16px; }
+.build-view.is-presenting .bld-name { font-size: 19px; }
+.build-view.is-presenting .bld-summary { font-size: 15.5px; }
+.build-view.is-presenting .bld-figure b { font-size: 40px; }
+
+/* ── narrow ────────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .bld-flow { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .bld-contracts { position: static; order: -1; max-height: 260px; }
+  .bld-wires { display: none; }
+  .bld-body { padding-left: 16px; }
+  .bld-title { font-size: 24px; }
+}

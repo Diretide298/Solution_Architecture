@@ -20,33 +20,33 @@
      where the lattice is the only thing between the copy and the edge. */
   --scrim: radial-gradient(
     ellipse at 22% 45%,
-    rgba(8, 11, 12, 0.15) 0%,
-    rgba(8, 11, 12, 0.62) 55%,
-    rgba(8, 11, 12, 0.92) 100%
+    rgba(3, 7, 9, 0.15) 0%,
+    rgba(3, 7, 9, 0.62) 55%,
+    rgba(3, 7, 9, 0.92) 100%
   );
 
-  --win-fill: rgba(14, 19, 20, 0.86);
-  --win-line: #1e2a2a;
-  --win-rule: #1e2a2a;
+  --win-fill: rgba(8, 16, 21, 0.86);
+  --win-line: #17262d;
+  --win-rule: #17262d;
   --win-bar: rgba(255, 255, 255, 0.03);
-  --win-dot: #3a4546;
+  --win-dot: #34464e;
   --win-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
-  --gutter: #3e4a4b;
-  --accent-ink: #48cfcb;
+  --gutter: #3b4b52;
+  --accent-ink: #00c4e8;
 
   /* The five tokens the scenes are authored against. Both themes carry the
      same scene data and differ only here, which is the whole reason a line is
      a [text, token] pair rather than markup. */
-  --code-com: #8a9899;
-  --code-key: #8fb6b7;
-  --code-val: #c8d4d4;
-  --code-acc: #48cfcb;
+  --code-com: #87989f;
+  --code-key: #8ab4c2;
+  --code-val: #c6d3d8;
+  --code-acc: #00c4e8;
   --code-warn: #d9a143;
 
-  --ok-fill: rgba(43, 179, 176, 0.12);
-  --ok-line: rgba(43, 179, 176, 0.3);
-  --ok-ink: #8fe5e2;
-  --ok-dot: #48cfcb;
+  --ok-fill: rgba(0, 180, 224, 0.12);
+  --ok-line: rgba(0, 180, 224, 0.3);
+  --ok-ink: #8fe3f5;
+  --ok-dot: #00c4e8;
   --warn-fill: rgba(217, 161, 67, 0.11);
   --warn-line: rgba(217, 161, 67, 0.28);
   --warn-ink: #e7c384;
@@ -56,30 +56,30 @@
 :root:not([data-theme="dark"]) .signin-page {
   --scrim: radial-gradient(
     ellipse at 22% 45%,
-    rgba(230, 241, 246, 0.2) 0%,
-    rgba(230, 241, 246, 0.66) 55%,
-    rgba(230, 241, 246, 0.93) 100%
+    rgba(228, 242, 248, 0.2) 0%,
+    rgba(228, 242, 248, 0.66) 55%,
+    rgba(228, 242, 248, 0.93) 100%
   );
 
   --win-fill: rgba(255, 255, 255, 0.9);
-  --win-line: #dfe6e7;
-  --win-rule: #e6ecec;
-  --win-bar: #f4f7f7;
-  --win-dot: #cbd5d5;
+  --win-line: #dce6ea;
+  --win-rule: #e4ecef;
+  --win-bar: #f3f7f9;
+  --win-dot: #c8d5db;
   --win-shadow: 0 22px 60px rgba(21, 43, 49, 0.14);
-  --gutter: #a9b5b6;
-  --accent-ink: #1f8f91;
+  --gutter: #a6b5bb;
+  --accent-ink: #0078a0;
 
   --code-com: #8a9899;
-  --code-key: #3e7c7e;
-  --code-val: #31474c;
-  --code-acc: #12878a;
+  --code-key: #3a7488;
+  --code-val: #2e464f;
+  --code-acc: #006f91;
   --code-warn: #9a6b18;
 
-  --ok-fill: rgba(31, 143, 145, 0.1);
-  --ok-line: rgba(31, 143, 145, 0.28);
-  --ok-ink: #146d6f;
-  --ok-dot: #1f8f91;
+  --ok-fill: rgba(0, 120, 160, 0.1);
+  --ok-line: rgba(0, 120, 160, 0.28);
+  --ok-ink: #005a76;
+  --ok-dot: #0078a0;
   --warn-fill: rgba(154, 107, 24, 0.09);
   --warn-line: rgba(154, 107, 24, 0.26);
   --warn-ink: #8a6218;

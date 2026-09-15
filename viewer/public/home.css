@@ -27,24 +27,24 @@
      light on a ground — two gradients arguing about where the centre is. The
      scene carries the focus on its own. */
   --field: #ffffff;
-  --ink: #12211f;
-  --body: #4a5f5e;
-  --support: #52706e;
-  --meta: #6d8482;
-  --meta-dim: #869997;
-  --line: #d9e5e4;
-  --line-soft: #e2ecec;
-  --line-hard: #c6d8d7;
-  --accent: #229799;
-  --accent-deep: #1c7e80;
+  --ink: #10222a;
+  --body: #4a5d66;
+  --support: #52707a;
+  --meta: #6d828b;
+  --meta-dim: #86979e;
+  --line: #d9e5ea;
+  --line-soft: #e2ecf0;
+  --line-hard: #c6d6dd;
+  --accent: #0078a0;
+  --accent-deep: #006f91;
   --amber: #b07a24;
   --veil: #ffffff;
-  --scrim: rgba(247, 250, 250, 0.86);
+  --scrim: rgba(246, 250, 252, 0.86);
   --panel: rgba(255, 255, 255, 0.86);
-  --chip-line: #cde2e1;
-  --chip-fill: #eef7f6;
+  --chip-line: #cde0e8;
+  --chip-fill: #eef6f9;
   --on-accent: #ffffff;
-  --pill-line: #c9dedd;
+  --pill-line: #c9dce4;
   --pill-fill: rgba(255, 255, 255, 0.78);
 
   margin: 0;
@@ -64,26 +64,26 @@
   /* Flat black, for the reason the day cut is flat white — and one more: every
      stop of the old field was a green-cyan near-black, tinted toward an accent
      that is not the brand's. The ground had a hue and it fought the scene. */
-  --field: #000000;
-  --ink: #edf4f3;
-  --body: #9cafae;
-  --support: #93a6a5;
-  --meta: #78908e;
-  --meta-dim: #6d8482;
-  --line: #1d2c30;
-  --line-soft: #1e2c30;
-  --line-hard: #223338;
-  --accent: #48cfcb;
-  --accent-deep: #2bb3b0;
+  --field: #000206;
+  --ink: #eaf6fa;
+  --body: #9cb0b8;
+  --support: #93a8b0;
+  --meta: #78909a;
+  --meta-dim: #6d838c;
+  --line: #16262e;
+  --line-soft: #172830;
+  --line-hard: #1d313a;
+  --accent: #00c4e8;
+  --accent-deep: #00b4e0;
   --amber: #e0ae52;
-  --veil: #000000;
-  --scrim: rgba(8, 10, 11, 0.82);
-  --panel: rgba(12, 18, 21, 0.82);
-  --chip-line: #1e3238;
-  --chip-fill: #132227;
-  --on-accent: #06211f;
-  --pill-line: #1e3b3f;
-  --pill-fill: rgba(10, 20, 22, 0.72);
+  --veil: #000206;
+  --scrim: rgba(0, 4, 8, 0.82);
+  --panel: rgba(5, 12, 16, 0.82);
+  --chip-line: #173440;
+  --chip-fill: #0b1f27;
+  --on-accent: #00161e;
+  --pill-line: #174250;
+  --pill-fill: rgba(4, 14, 19, 0.72);
 }
 
 /* The curtain takes the door's own ground rather than the viewer's, because
@@ -411,7 +411,8 @@
   padding: 9px 18px;
   border-radius: 10px;
   background: linear-gradient(135deg, var(--accent), var(--accent-deep));
-  color: var(--on-accent);
+  /* White on every gradient button, in both themes (16 Sep). */
+  color: #ffffff;
   font-size: 12.5px;
   font-weight: 700;
   text-decoration: none;

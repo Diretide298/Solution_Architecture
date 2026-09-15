@@ -479,14 +479,22 @@ async function openArtefactHash(hash) {
 
 // ── layer switching ──────────────────────────────────────────────────
 /**
- * Below 1100px the two topbar rails scroll instead of wrapping, so the button
- * that just became active can be off screen. Scroll it back — a segmented
- * control that does not show its own selection is worse than a wrapped one.
+ * When the bar is narrower than its tabs the two rails scroll instead of
+ * wrapping, so the button that just became active can be off screen. Scroll it
+ * back — a segmented control that does not show its own selection is worse
+ * than a wrapped one.
+ *
+ * The rail and only the rail. This was `scrollIntoView`, which scrolls every
+ * scrollable ancestor to bring the button into view — and `body` scrolls
+ * sideways at desktop widths, so centring a tab slid the whole app left.
  */
 function revealActive(rail) {
   const active = rail.querySelector('.active');
   if (!active || rail.scrollWidth <= rail.clientWidth) return;
-  active.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+  const box = rail.getBoundingClientRect();
+  const tab = active.getBoundingClientRect();
+  const centre = rail.scrollLeft + (tab.left - box.left) - (box.width - tab.width) / 2;
+  rail.scrollTo({ left: Math.max(0, centre), behavior: 'smooth' });
 }
 
 /**
@@ -537,6 +545,8 @@ function layerCount(key) {
     // argument as Architecture below, and the landing page and the summary
     // count the same thing.
     case 'cicd': return state.cicd?.stats?.artefacts ?? null;
+    // Steps, not tools: the tab is the chronology, and a step is what it shows.
+    case 'build': return state.build?.stats?.stages ?? null;
     case 'contracts': return nodes.filter((n) => n.type === 'operation').length || null;
     case 'domain': return state.domain?.machines?.length ?? null;
     case 'backend': return state.backend?.tables?.length ?? null;
@@ -683,6 +693,11 @@ function renderLayerSummary() {
   } else if (state.layer === 'decisions') {
     const adrs = state.decisions?.adrs?.length ?? 0;
     if (adrs) parts.push(`${adrs} decisions`);
+  }
+  if (state.layer === 'build') {
+    const stats = state.build?.stats;
+    if (stats?.stages) parts.push(`${stats.stages} steps`);
+    if (stats?.tools) parts.push(`${stats.tools} tools`);
   }
   out.textContent = parts.join(' · ');
 }
@@ -876,6 +891,8 @@ const LAYER_PARTS = {
   // count reads it — so it is a part like any other rather than a fetch
   // hidden inside a view.
   cicd: ['cicd'],
+  // The chronology view reads the same part, and the tab count comes off it.
+  build: ['build'],
 };
 /**
  * Parts a layer does not need to draw itself, but which its panes read.
@@ -1288,6 +1305,22 @@ function openCicd(mode) {
   cicdModule.then((m) => m?.show(mode));
 }
 
+/**
+ * Bring up the Build chronology, the first time it is asked for. Same shape as
+ * `openCicd`: imported on the tab, told which view is showing.
+ */
+let buildModule = null;
+function openBuild(mode) {
+  if (!buildModule) {
+    buildModule = import('/build.js').catch((e) => {
+      const box = $(`view-${mode}`);
+      if (box) box.append(el('p', 'auth-note', `Could not load this view: ${e.message}`));
+      return null;
+    });
+  }
+  buildModule.then((m) => m?.show(mode));
+}
+
 export function setMode(mode) {
   // a keyboard shortcut can name a view another layer owns — follow it there
   if (!layerOf(state.layer).modes.some(([m]) => m === mode)) {
@@ -1317,7 +1350,10 @@ export function setMode(mode) {
   // or on its way; either way the tray and the summary want re-reading
   queueMicrotask(() => { refreshLayerCounts(); renderLayerSummary(); });
   if (mode.startsWith('uiux-')) { openUiux(mode); return; }
+  // Leaving the chronology pauses a presentation that is playing through it.
+  if (!mode.startsWith('build-')) buildModule?.then((m) => m?.hide());
   if (mode.startsWith('cicd-')) { openCicd(mode); return; }
+  if (mode.startsWith('build-')) { openBuild(mode); return; }
 
   if (mode === 'graph') {
     // A galaxy scope parks its frame loop when the view goes away, so coming

@@ -1,0 +1,38 @@
+/* Tailwind without its preflight reset: this CSS lands on the existing landing
+   page, and a reset would restyle every heading and list outside the journey. */
+@layer theme, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@source "./";
+
+/* The landing page's palette, as Tailwind colours (bg-adam-soft, text-adam-deep …). */
+@theme {
+  --color-adam-ink: #0d2333;
+  --color-adam-body: #48606c;
+  --color-adam-strong: #20404f;
+  --color-adam-muted: #5d7280;
+  --color-adam-deep: #0268ce;
+  --color-adam-line: #0389d7;
+  --color-adam-bright: #04d8f2;
+  --color-adam-soft: #e3f5fb;
+  --color-adam-rule: #dfe8ec;
+  --color-adam-raised: #f8fbfc;
+  --color-adam-ok: #0f9d6e;
+  --color-adam-warn: #c08a2e;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --animate-shine: shine 5s linear infinite;
+  @keyframes shine {
+    0% { background-position: 100%; }
+    100% { background-position: -100%; }
+  }
+}
+
+/* The diagram sits above the signal corridor at the foot of each band. */
+.jd-root {
+  position: relative;
+  height: calc(100% - 26px);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}

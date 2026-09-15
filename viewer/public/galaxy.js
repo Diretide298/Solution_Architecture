@@ -230,20 +230,20 @@ const CAM_FLIGHT_ZOOM = 1.45;
 
 const INK_DARK = {
   core: { core: '252,230,184', body: '224,174,82' },      // shared / innermost
-  spine: { core: '214,248,246', body: '72,207,203' },
-  satellite: { core: '175,235,232', body: '43,179,176' },
-  mote: '150,232,228',
-  moteHot: '224,250,248',
-  moteMid: '96,214,210',
-  moteRim: '72,207,203',
-  filament: '120,214,210',
+  spine: { core: '214,244,252', body: '0,196,232' },
+  satellite: { core: '170,230,245', body: '0,160,210' },
+  mote: '140,224,245',
+  moteHot: '222,248,254',
+  moteMid: '80,206,238',
+  moteRim: '0,196,232',
+  filament: '110,206,236',
   linkCritical: '224,174,82',
-  linkOrdinary: '120,214,210',
+  linkOrdinary: '110,206,236',
   packetCritical: '255,224,166',
-  packetOrdinary: '207,247,245',
-  label: '226,242,241',
-  sublabel: '147,166,165',
-  guide: 'rgba(143,207,204,.16)',
+  packetOrdinary: '204,244,253',
+  label: '226,241,246',
+  sublabel: '147,166,173',
+  guide: 'rgba(130,204,230,.16)',
 };
 
 /**
@@ -254,7 +254,7 @@ const INK_DARK = {
  * not read off --kind-*.
  */
 const KIND_DARK = {
-  contract:   { core: '214,248,246', body: '72,207,203' },
+  contract:   { core: '214,244,252', body: '0,196,232' },
   operation:  { core: '198,222,255', body: '106,165,245' },
   schema:     { core: '198,240,216', body: '95,194,138' },
   enum:       { core: '226,214,248', body: '169,138,224' },

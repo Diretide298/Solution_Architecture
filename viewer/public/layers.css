@@ -68,7 +68,7 @@ body[data-layer="decisions"] { --layer: var(--accent); --layer-soft: color-mix(i
 
 /* Night. The original field. */
 :root[data-theme="dark"] .galaxy-field {
-  background: #000000;
+  background: #000206;
   background-attachment: fixed;
 }
 
@@ -79,7 +79,7 @@ body[data-layer="decisions"] { --layer: var(--accent); --layer-soft: color-mix(i
   background: linear-gradient(#EDF4F8 55%, transparent);
 }
 :root[data-theme="dark"] .view:has(> .galaxy-field:not([hidden])) .graph-toolbar {
-  background: linear-gradient(#0E171B 55%, transparent);
+  background: linear-gradient(#050C10 55%, transparent);
 }
 .view.sheet:has(> .galaxy-field[hidden]) .graph-toolbar {
   background: linear-gradient(var(--bg) 60%, transparent);
@@ -90,17 +90,17 @@ body[data-layer="decisions"] { --layer: var(--accent); --layer-soft: color-mix(i
    toolbar keeps its ordinary ink and only the night one is overridden here.
    Left unconditional it would put near-white controls on a near-white sphere,
    which is the same bug this rule was written to fix, mirrored. */
-:root[data-theme="dark"] .view:has(> .galaxy-field:not([hidden])) .graph-toolbar .graph-hint { color: #8FB3B1; }
-:root[data-theme="dark"] .view:has(> .galaxy-field:not([hidden])) .graph-toolbar .toggle { color: #9CAFAE; }
+:root[data-theme="dark"] .view:has(> .galaxy-field:not([hidden])) .graph-toolbar .graph-hint { color: #8EB0BD; }
+:root[data-theme="dark"] .view:has(> .galaxy-field:not([hidden])) .graph-toolbar .toggle { color: #9BB0B8; }
 :root[data-theme="dark"] .view:has(> .galaxy-field:not([hidden])) .graph-toolbar .seg {
   background: rgba(255, 255, 255, .05);
   border-color: rgba(255, 255, 255, .10);
 }
-:root[data-theme="dark"] .view:has(> .galaxy-field:not([hidden])) .graph-toolbar .seg button { color: #9CAFAE; }
-:root[data-theme="dark"] .view:has(> .galaxy-field:not([hidden])) .graph-toolbar .seg button:hover { color: #DCECEB; }
+:root[data-theme="dark"] .view:has(> .galaxy-field:not([hidden])) .graph-toolbar .seg button { color: #9BB0B8; }
+:root[data-theme="dark"] .view:has(> .galaxy-field:not([hidden])) .graph-toolbar .seg button:hover { color: #DCEBF0; }
 :root[data-theme="dark"] .view:has(> .galaxy-field:not([hidden])) .graph-toolbar .seg button.active {
-  background: rgba(72, 207, 203, .16);
-  color: #9EE7E4;
+  background: rgba(0, 196, 232, .16);
+  color: #9CE6F6;
 }
 /* The one control on these views whose popup the page does not draw.
    A native <select> list is painted by the browser, and the browser picks its
@@ -113,17 +113,17 @@ body[data-layer="decisions"] { --layer: var(--accent); --layer-soft: color-mix(i
 :root[data-theme="dark"] .view:has(> .galaxy-field:not([hidden])) .graph-toolbar .scope-select {
   background: rgba(255, 255, 255, .05);
   border-color: rgba(255, 255, 255, .12);
-  color: #DCECEB;
+  color: #DCEBF0;
   color-scheme: dark;
 }
 :root[data-theme="dark"] .view:has(> .galaxy-field:not([hidden])) .graph-toolbar .scope-select option {
-  background: #16232A;
-  color: #DCECEB;
+  background: #0D1C23;
+  color: #DCEBF0;
 }
 :root[data-theme="dark"] .view:has(> .galaxy-field:not([hidden])) .graph-toolbar .ghost-btn {
   background: rgba(255, 255, 255, .05);
   border-color: rgba(255, 255, 255, .12);
-  color: #9CAFAE;
+  color: #9BB0B8;
 }
 
 /* Docked across the foot on a bottom-up scrim, as the design has it. A box in
@@ -149,8 +149,8 @@ body[data-layer="decisions"] { --layer: var(--accent); --layer-soft: color-mix(i
   font-size: 11.5px;
 }
 :root[data-theme="dark"] .galaxy-legend {
-  background: linear-gradient(to top, rgba(8, 11, 12, .93) 34%, rgba(8, 11, 12, 0));
-  color: #9CAFAE;
+  background: linear-gradient(to top, rgba(3, 7, 9, .93) 34%, rgba(3, 7, 9, 0));
+  color: #9BB0B8;
 }
 .galaxy-legend .legend-dot { width: 8px; height: 8px; }
 /* The trailing note is a sentence about the whole picture, not another key, so
@@ -162,7 +162,7 @@ body[data-layer="decisions"] { --layer: var(--accent); --layer-soft: color-mix(i
   font-size: 10.5px;
 }
 :root[data-theme="dark"] .galaxy-legend .legend-row:not(:has(.legend-dot)) {
-  color: #78908E;
+  color: #78909A;
 }
 
 /* ── drag to pan ────────────────────────────────────────────────── */

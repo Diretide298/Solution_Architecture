@@ -26,7 +26,12 @@ const TTL_FAIL_MS = 5_000;
 
 const cache = new Map(); // token -> { account, until }
 
-/** Only the pages a signed-out visitor must be able to reach to sign in. */
+/**
+ * Only the pages a signed-out visitor must be able to reach to sign in — and
+ * the landing page, which is the front door and exists to be read before
+ * anybody has an account. Its four animation modules are named one by one:
+ * they draw, they read nothing from the package and send nothing anywhere.
+ */
 const PUBLIC = new Set([
   '/login.html',
   '/invite.html',
@@ -35,6 +40,15 @@ const PUBLIC = new Set([
   '/login-demo.js',
   '/favicon.ico',
   '/api/health',
+  '/landing.html',
+  '/landing.js',
+  '/adam-flow.js',
+  '/adam-chain.js',
+  '/adam-journey.js',
+  '/adam-journey-stages.js',
+  // the journey diagrams' built bundle (viewer/landing-app → public/landing-journey)
+  '/landing-journey/journey.js',
+  '/landing-journey/journey.css',
 ]);
 
 /**
@@ -71,8 +85,16 @@ const isStylesheet = (pathname) =>
   && !pathname.includes('..')
   && pathname.lastIndexOf('/') === 0;
 
+/** The landing page's artwork: images only, one directory, nothing beneath it. */
+const isLandingAsset = (pathname) =>
+  pathname.startsWith('/landing-assets/')
+  && !pathname.includes('..')
+  && pathname.lastIndexOf('/') === '/landing-assets/'.length - 1
+  && /\.(png|webp|svg)$/i.test(pathname);
+
 export function isPublic(pathname) {
-  return PUBLIC.has(pathname) || isBrandAsset(pathname) || isStylesheet(pathname);
+  return PUBLIC.has(pathname) || isBrandAsset(pathname) || isStylesheet(pathname)
+    || isLandingAsset(pathname);
 }
 
 export function readCookie(header, name = COOKIE) {
@@ -280,7 +302,11 @@ export async function gate(req, res, url, apiBase) {
     return { answered: true, role: null };
   }
 
-  res.writeHead(302, { ...headers, Location: '/login.html' });
+  // The front of the site is the landing page for a stranger, and every other
+  // page is the sign-in door. The landing page's own "Open workspace" goes to
+  // /home.html, which lands here and is sent to sign in.
+  const front = url.pathname === '/' || url.pathname === '/index.html';
+  res.writeHead(302, { ...headers, Location: front ? '/landing.html' : '/login.html' });
   res.end();
   return { answered: true, role: null };
 }
