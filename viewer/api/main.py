@@ -67,7 +67,10 @@ app.add_middleware(
         "https://adam.ainfinite.ai",
     ] + _extra,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "DELETE"],
+    # PUT is here for the two settings routes. Without it the preflight answers
+    # 400 and saving a token or a git identity fails from the deployed page only:
+    # same-origin callers (the viewer's proxy, the checks) never send a preflight.
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["Content-Type"],
     # A cross-origin fetch can read almost none of the response headers unless
     # they are named here — the browser hides the rest even from a call that

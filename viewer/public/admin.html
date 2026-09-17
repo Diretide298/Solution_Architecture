@@ -256,28 +256,22 @@
       </section>
 
       <!-- ── your own password ────────────────────────────────────── -->
+      <!-- Moved to the settings page, which everybody can open. Here it was
+           behind the admin gate, so a reviewer had no way to change their own
+           password at all. A pointer stays for whoever looks for it here. -->
       <section class="admin-panel">
         <h2 class="admin-heading">Your password</h2>
-        <p class="auth-note auth-fine">
-          Changing it signs out every other session on your account, which is
-          the point of changing it.
+        <p class="auth-note">
+          Your own password, OpenProject token and sessions are on
+          <a href="/settings.html#password">your settings page</a>.
         </p>
-        <label class="auth-label" for="pw-current">Current password</label>
-        <input id="pw-current" class="auth-input" type="password" autocomplete="current-password" />
-        <label class="auth-label" for="pw-new">New password</label>
-        <input id="pw-new" class="auth-input" type="password" autocomplete="new-password" />
-        <label class="auth-label" for="pw-confirm">New password again</label>
-        <input id="pw-confirm" class="auth-input" type="password" autocomplete="new-password" />
-        <p class="auth-error" id="pw-error" hidden></p>
-        <p class="auth-ok" id="pw-ok" hidden>Changed. Other sessions have been signed out.</p>
-        <button id="pw-submit" class="auth-button" type="button">Change it</button>
       </section>
     </main>
 
     <script type="module">
       import {
         authState, listAccounts, setAccountActive, setAccountRole,
-        createInvite, listInvites, revokeInvite, changePassword, logoutAccount,
+        createInvite, listInvites, revokeInvite, logoutAccount,
         makeReset,
       } from '/validation.js';
       import { attachSubSearch } from '/subsearch.js';
@@ -618,29 +612,6 @@
         };
         return cell;
       }
-
-      // ── password ───────────────────────────────────────────────
-      $('pw-submit').onclick = async () => {
-        $('pw-error').hidden = true;
-        $('pw-ok').hidden = true;
-        const next = $('pw-new').value;
-        if (next !== $('pw-confirm').value) {
-          $('pw-error').textContent = 'Those two passwords are not the same.';
-          $('pw-error').hidden = false;
-          return;
-        }
-        $('pw-submit').disabled = true;
-        try {
-          await changePassword($('pw-current').value, next);
-          for (const id of ['pw-current', 'pw-new', 'pw-confirm']) $(id).value = '';
-          $('pw-ok').hidden = false;
-        } catch (error) {
-          $('pw-error').textContent = error.message;
-          $('pw-error').hidden = false;
-        } finally {
-          $('pw-submit').disabled = false;
-        }
-      };
 
       // Narrowing the accounts list. Ninety rows and no way to find one but
       // Ctrl+F, which highlights the name and leaves the other eighty-nine on

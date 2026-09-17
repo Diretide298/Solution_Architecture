@@ -12092,15 +12092,34 @@ function bindSections() {
 // The viewer reads without one. An account is needed to write a verdict,
 // because a verdict is only worth having if it says who gave it.
 
+/** Two letters for a person: the initials of a two-word name, otherwise the
+ *  first two of whatever they are called. Shared by the top-bar button and the
+ *  drawer, so the two can never disagree about who you are. */
+function initialsOf(who) {
+  const source = (who.name || who.email).trim();
+  const initials = source.includes(' ')
+    ? source.split(/\s+/).slice(0, 2).map((w) => w[0]).join('')
+    : source.slice(0, 2);
+  return initials.toUpperCase();
+}
+
+// Whatever opened the drawer, so closing it hands the focus back there — the
+// initials in the top bar usually, a verdict block asking for a sign-in
+// sometimes — rather than dropping it on the page.
+let accountOpener = null;
+
 function openAccountPanel() {
+  accountOpener = document.activeElement;
   $('account-panel').hidden = false;
   renderAccountPanel();
-  const first = auth.account() ? null : $('signin-email');
-  first?.focus();
+  (auth.account() ? $('account-close') : $('signin-email'))?.focus();
 }
 
 function closeAccountPanel() {
+  if ($('account-panel').hidden) return;
   $('account-panel').hidden = true;
+  if (accountOpener && document.contains(accountOpener)) accountOpener.focus();
+  accountOpener = null;
 }
 
 function renderAccountPanel() {
@@ -12110,11 +12129,17 @@ function renderAccountPanel() {
   $('account-offline').hidden = reachable;
   $('account-signin').hidden = Boolean(who) || !reachable;
   $('account-signed').hidden = !who;
+  $('account-foot').hidden = !who;
   $('account-title').textContent = who ? 'Your account' : 'Sign in';
 
   if (who) {
-    $('account-email').textContent = who.email;
-    $('account-role-note').textContent = who.role === 'admin' ? ', an admin' : '';
+    $('account-avatar').textContent = initialsOf(who);
+    // The name when there is one, with the address under it — the address is
+    // what signs in; the name is only what people call you.
+    $('account-name').textContent = who.name || who.email;
+    $('account-email').textContent = who.name ? who.email : '';
+    $('account-role').textContent = who.role;
+    $('account-role').dataset.role = who.role;
     $('account-admin').hidden = who.role !== 'admin';
     // Never reopen already armed. This panel is opened and closed all day, and
     // a confirm left standing from a change of mind ten minutes ago would sit
@@ -12282,11 +12307,7 @@ function renderAccountButton() {
       : 'The validation service is not running';
     return;
   }
-  const source = (who.name || who.email).trim();
-  const initials = source.includes(' ')
-    ? source.split(/\s+/).slice(0, 2).map((w) => w[0]).join('')
-    : source.slice(0, 2);
-  badge.textContent = initials.toUpperCase();
+  badge.textContent = initialsOf(who);
   button.classList.add('signed-in');
   button.title = `${who.email} — ${who.role}`;
 }
@@ -12310,6 +12331,7 @@ function bindAccountUI() {
   $('account-toggle').onclick = () =>
     ($('account-panel').hidden ? openAccountPanel() : closeAccountPanel());
   $('account-panel').onclick = (e) => { if (e.target === $('account-panel')) closeAccountPanel(); };
+  $('account-close').onclick = closeAccountPanel;
   // a verdict block asking for a sign-in
   document.addEventListener('ticvai:signin', openAccountPanel);
 
@@ -12742,6 +12764,16 @@ function bindUI() {
     // that instead, leaving the source open on top of a view that had changed.
     if (!$('peek').hidden) {
       if (e.key === 'Escape') { e.preventDefault(); closePeek(); return; }
+    }
+
+    // The account drawer sits over the view, so while it is open it takes every
+    // key before the view does. Escape closes it. It used to fall through to the
+    // "Escape means out" rule below and send somebody to the home page from an
+    // account panel they only meant to dismiss — and a letter typed into its
+    // sign-in box must not switch the view underneath either.
+    if (!$('account-panel').hidden) {
+      if (e.key === 'Escape') { e.preventDefault(); closeAccountPanel(); }
+      return;
     }
 
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {

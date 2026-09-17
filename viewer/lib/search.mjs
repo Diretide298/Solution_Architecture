@@ -319,8 +319,18 @@ export async function buildSearch(root, subjects = {}) {
       terms: 'cicd ci cd pipeline delivery build ship deploy github actions workflow job step '
         + 'gate dockerfile image registry publish terraform runbook repos services deploy '
         + 'compose scenario variant continuous integration deployment' },
-    { id: 'uiux', name: 'UI/UX — screens, flows and boards', href: '/uiux.html',
+    // The layer, not the old page: `uiux.html` only redirects here now, and a
+    // search result that lands on a redirect is a result that flashes.
+    { id: 'uiux', name: 'UI/UX — screens, flows and boards', href: '/?layer=uiux&mode=uiux-screens',
       terms: 'uiux wireframes boards frames screens flows' },
+    // Everybody's own settings. Findable by what people call the things on it,
+    // because nobody searches for "settings" when what they want is to change a
+    // password or paste an OpenProject token.
+    { id: 'settings', name: 'Settings — password, OpenProject, git identity, Claude connector',
+      sub: 'your account, and signing out of other devices',
+      href: '/settings.html',
+      terms: 'settings account profile password change openproject token pms git email identity '
+        + 'claude connector mcp bridge sessions sign out everywhere preferences' },
     { id: 'domains', name: 'Domain lenses', href: '/domains.html',
       terms: 'domain lenses cross-cutting subjects ai flash sale' },
     { id: 'audit', name: 'Audit the delivery package', href: '/audit.html',

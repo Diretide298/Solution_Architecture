@@ -13,7 +13,7 @@
         }
       } catch { /* storage can be denied outright; day is a fine fallback */ }
     </script>
-    <title>Adam — your settings</title>
+    <title>Adam — settings</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -24,34 +24,135 @@
     <link rel="stylesheet" href="/layers.css" />
     <link rel="icon" href="/brand/adam-mark.png" />
     <style>
-      /* Small enough to live here rather than in a ninth stylesheet that every
-         other page would then load for nothing. */
+      /* Only this page uses these, so they live here rather than in a stylesheet
+         every other page would then load for nothing. */
+
+      /* ── the layout: sections on the left, the section on the right ── */
+      .set-layout {
+        max-width: 1080px; margin: 0 auto;
+        padding: 26px 22px 80px;
+        display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 34px;
+        align-items: start;
+      }
+      .set-nav { position: sticky; top: 84px; }
+      .set-nav-title {
+        margin: 0 0 14px; font-size: 22px; font-weight: 800; letter-spacing: -.01em;
+        color: var(--text);
+      }
+      .set-nav-list { display: grid; gap: 2px; }
+      .set-nav a {
+        display: block; padding: 8px 12px; border-radius: 7px;
+        font-size: 13px; color: var(--text-dim); text-decoration: none;
+        border-left: 2px solid transparent;
+      }
+      .set-nav a:hover { color: var(--text); background: var(--bg-hover); }
+      .set-nav a[aria-current='true'] {
+        color: var(--accent-text); background: var(--accent-soft);
+        border-left-color: var(--accent); font-weight: 600;
+      }
+      .set-nav a[hidden] { display: none; }
+      .set-nav-group {
+        margin: 14px 0 4px; padding: 0 12px;
+        font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+        color: var(--text-faint);
+      }
+      .set-nav-group[hidden] { display: none; }
+
+      /* Room below the last section, so a link to one near the end (#sessions)
+         can still bring it to the top instead of stopping where the page runs out. */
+      .set-content { display: grid; gap: 18px; min-width: 0; padding-bottom: 55vh; }
+      .set-section { scroll-margin-top: 84px; margin: 0; }
+      .set-section[hidden] { display: none; }
+      .set-section .admin-heading {
+        display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+        margin-top: 0;
+      }
+      .set-lede { margin-top: -4px; }
+
+      /* ── controls ── */
       .set-grid { display: grid; gap: 10px; }
       .set-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-      .set-row .auth-input { flex: 1 1 22rem; min-width: 0; }
+      .set-row .auth-input { flex: 1 1 22rem; min-width: 0; margin: 0; }
+      .set-fields { display: grid; gap: 2px; max-width: 420px; }
+      .set-fields .auth-input { margin: 0; }
+      .set-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 14px; }
+      .set-actions .auth-button { width: auto; margin: 0; padding: 8px 18px; }
       .set-state {
         font: 500 0.82rem/1.5 'Plus Jakarta Sans', system-ui, sans-serif;
-        min-height: 1.4em;
+        min-height: 1.4em; margin: 0;
       }
-      .set-state[data-tone='good'] { color: #2bb3b0; }
-      .set-state[data-tone='bad'] { color: #e2685f; }
+      .set-state[data-tone='good'] { color: var(--ok); }
+      .set-state[data-tone='bad'] { color: var(--error); }
       .set-mono {
         font-family: 'JetBrains Mono', ui-monospace, monospace;
         font-size: 0.78rem;
-        white-space: pre-wrap;
-        word-break: break-all;
-        padding: 12px 14px;
-        border-radius: 10px;
-        background: rgba(127, 127, 127, 0.1);
-        border: 1px solid rgba(127, 127, 127, 0.2);
+        white-space: pre-wrap; word-break: break-all;
+        padding: 12px 14px; border-radius: 10px;
+        background: var(--bg-raised);
+        border: 1px solid var(--border);
       }
       .set-badge {
         font: 600 0.72rem/1 'Plus Jakarta Sans', system-ui, sans-serif;
-        padding: 5px 9px;
-        border-radius: 999px;
-        border: 1px solid rgba(127, 127, 127, 0.28);
+        padding: 5px 9px; border-radius: 999px;
+        color: var(--text-dim);
+        border: 1px solid var(--border-strong);
       }
-      .set-badge[data-on='yes'] { color: #2bb3b0; border-color: rgba(43, 179, 176, 0.5); }
+      .set-badge[data-on='yes'] {
+        color: var(--accent-text); border-color: var(--accent-line); background: var(--accent-soft);
+      }
+
+      /* ── the account card ── */
+      .set-who {
+        display: grid; grid-template-columns: 56px minmax(0, 1fr) auto;
+        gap: 16px; align-items: center;
+      }
+      .set-avatar {
+        width: 56px; height: 56px; border-radius: 50%;
+        display: grid; place-items: center;
+        font-size: 19px; font-weight: 700;
+        color: var(--accent-text); background: var(--accent-soft);
+        border: 1px solid var(--accent-line);
+      }
+      .set-name { font-size: 16px; font-weight: 700; color: var(--text); overflow: hidden; text-overflow: ellipsis; }
+      .set-email { font-size: 13px; color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; }
+      .set-facts {
+        display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 8px 16px;
+        margin: 18px 0 0; padding-top: 16px; border-top: 1px solid var(--border);
+        font-size: 13px;
+      }
+      .set-facts dt { color: var(--text-faint); }
+      .set-facts dd { margin: 0; color: var(--text); }
+
+      /* ── doors to other pages ── */
+      .set-links { display: grid; gap: 8px; }
+      .set-link {
+        display: flex; justify-content: space-between; align-items: center; gap: 12px;
+        padding: 12px 14px; border-radius: 8px;
+        border: 1px solid var(--border);
+        color: var(--text); text-decoration: none;
+      }
+      .set-link:hover { border-color: var(--accent-line); background: var(--bg-hover); }
+      .set-link small { display: block; margin-top: 2px; font-size: 12px; color: var(--text-dim); }
+      .set-link::after { content: '\203A'; font-size: 18px; color: var(--text-faint); }
+
+      /* ── narrow screens: the section list becomes a strip across the top ── */
+      @media (max-width: 820px) {
+        /* minmax(0, …), not 1fr: a plain 1fr column is as wide as its widest
+           unbreakable content, and the strip of section chips below is exactly
+           that — it pushed the whole page past the edge of a phone. */
+        .set-layout { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 16px 14px 60px; }
+        .set-nav, .set-content { min-width: 0; }
+        .set-nav { position: sticky; top: 52px; z-index: 5; background: var(--bg); padding: 8px 0; }
+        .set-nav-title { display: none; }
+        .set-nav-list { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+        .set-nav-list::-webkit-scrollbar { display: none; }
+        .set-nav a { flex: none; border-left: 0; border: 1px solid var(--border); border-radius: 999px; }
+        .set-nav-group { display: none; }
+        .set-who { grid-template-columns: 48px minmax(0, 1fr); }
+        .set-who .account-role { grid-column: 1 / -1; justify-self: start; }
+        .set-facts { grid-template-columns: 1fr; gap: 2px; }
+        .set-facts dd { margin-bottom: 8px; }
+      }
     </style>
   </head>
   <body class="admin-page">
@@ -61,7 +162,7 @@
           <img class="brand-lockup brand-lockup-day" src="/brand/adam-lockup-day.png" alt="Adam" />
           <img class="brand-lockup brand-lockup-night" src="/brand/adam-lockup-night.png" alt="" aria-hidden="true" />
         </a>
-        <span class="brand-sub">your settings</span>
+        <span class="brand-sub">settings</span>
       </div>
       <div class="admin-bar-right">
         <span id="whoami" class="admin-who"></span>
@@ -77,78 +178,200 @@
       </div>
     </main>
 
-    <main id="settings" class="admin-main" hidden>
-      <!-- ── OpenProject ──────────────────────────────────────────── -->
-      <section class="admin-panel">
-        <h2 class="admin-heading">
-          OpenProject <span id="op-state" class="set-badge" data-on="no">not connected</span>
-        </h2>
-        <p class="auth-note">
-          <strong>Your own token, not a shared one.</strong> Anything ADAM does in the PMS is done
-          as you, so the history there names a person rather than a robot. It is encrypted before
-          it is stored and never sent back to this page — you will see the last four characters,
-          which is enough to recognise which one you pasted.
-        </p>
-        <!-- Said before the field rather than after a failed save: a deployment
-             with no encryption key cannot store a credential, and finding that
-             out by typing a live token into a box is the wrong order. -->
-        <p class="auth-note" id="op-nokey" hidden></p>
+    <div id="settings" class="set-layout" hidden>
+      <!-- ── the section list ─────────────────────────────────────── -->
+      <nav class="set-nav" aria-label="Settings sections">
+        <h1 class="set-nav-title">Settings</h1>
+        <div class="set-nav-list">
+          <a href="#account">Account</a>
+          <a href="#password">Password</a>
+          <div class="set-nav-group">Connections</div>
+          <a href="#openproject">OpenProject</a>
+          <a href="#git">Git identity</a>
+          <a href="#connector">Claude connector</a>
+          <div class="set-nav-group">Security</div>
+          <a href="#sessions">Sessions</a>
+          <div class="set-nav-group" id="nav-admin-group" hidden>Admin</div>
+          <a href="#admin" id="nav-admin" hidden>Administration</a>
+        </div>
+      </nav>
 
-        <div class="set-grid" id="op-form">
-          <div class="set-row">
-            <input id="op-endpoint" class="auth-input" type="url" placeholder="https://pms.example.com" />
+      <main class="set-content">
+        <!-- ── account ──────────────────────────────────────────────── -->
+        <section class="admin-panel set-section" id="account">
+          <h2 class="admin-heading">Account</h2>
+          <div class="set-who">
+            <span class="set-avatar" id="me-avatar" aria-hidden="true">·</span>
+            <div style="min-width: 0">
+              <div class="set-name" id="me-name"></div>
+              <div class="set-email" id="me-email"></div>
+            </div>
+            <span class="account-role" id="me-role"></span>
           </div>
-          <div class="set-row">
-            <input id="op-token" class="auth-input" type="password" autocomplete="off"
-                   placeholder="Paste an API token" />
-            <button id="op-save" class="chip" type="button">Check and save</button>
-            <button id="op-forget" class="chip" type="button" hidden>Remove</button>
+          <dl class="set-facts">
+            <dt>What your role can do</dt>
+            <dd id="me-role-says"></dd>
+            <dt>Name and address</dt>
+            <dd>Set when your invitation was accepted. The address is what you sign in with.</dd>
+          </dl>
+        </section>
+
+        <!-- ── password ─────────────────────────────────────────────── -->
+        <!-- Here, for everybody. It used to be a panel on the accounts page,
+             which only admins can open — so a reviewer had no way to change
+             their own password at all. -->
+        <section class="admin-panel set-section" id="password">
+          <h2 class="admin-heading">Password</h2>
+          <p class="auth-note set-lede">
+            At least 12 characters. Changing it signs out every other session on your account —
+            which is the point, if you think somebody else has it. If you use the Claude connector,
+            avoid quote characters, and update the connector afterwards.
+          </p>
+          <div class="set-fields">
+            <label class="auth-label" for="pw-current">Current password</label>
+            <input id="pw-current" class="auth-input" type="password" autocomplete="current-password" />
+            <label class="auth-label" for="pw-new">New password</label>
+            <input id="pw-new" class="auth-input" type="password" autocomplete="new-password" minlength="12" />
+            <label class="auth-label" for="pw-confirm">New password again</label>
+            <input id="pw-confirm" class="auth-input" type="password" autocomplete="new-password" minlength="12" />
           </div>
-          <p class="set-state" id="op-says"></p>
-        </div>
+          <div class="set-actions">
+            <button id="pw-submit" class="auth-button" type="button">Change password</button>
+            <p class="set-state" id="pw-says" role="status"></p>
+          </div>
+        </section>
 
-        <p class="auth-note">
-          Make one in OpenProject under <strong>My account → Access tokens</strong>. ADAM checks it
-          against the instance before keeping it — a token that does not work is worse than none,
-          because it looks configured and fails later somewhere that reads as a different fault.
-        </p>
-      </section>
+        <!-- ── OpenProject ──────────────────────────────────────────── -->
+        <section class="admin-panel set-section" id="openproject">
+          <h2 class="admin-heading">
+            OpenProject <span id="op-state" class="set-badge" data-on="no">not connected</span>
+          </h2>
+          <p class="auth-note set-lede">
+            <strong>Your own token, not a shared one.</strong> Anything ADAM does in the PMS is done
+            as you, so the history there names a person rather than a robot. It is encrypted before
+            it is stored and never sent back to this page — you will see the last four characters,
+            which is enough to recognise which one you pasted.
+          </p>
+          <!-- Said before the field rather than after a failed save: a deployment
+               with no encryption key cannot store a credential, and finding that
+               out by typing a live token into a box is the wrong order. -->
+          <p class="auth-note" id="op-nokey" hidden></p>
 
-      <!-- ── git identity ─────────────────────────────────────────── -->
-      <section class="admin-panel">
-        <h2 class="admin-heading">Your git identity</h2>
-        <p class="auth-note">
-          The address your commits carry, when it differs from the one you sign in with. It is what
-          lets a commit be matched back to the work package it belongs to. Not a secret, and blank
-          is fine — blank honestly means "not stated" rather than a guess nobody made.
-        </p>
-        <div class="set-row">
-          <input id="git-email" class="auth-input" type="email" placeholder="you@example.com" />
-          <button id="git-save" class="chip" type="button">Save</button>
-        </div>
-        <p class="set-state" id="git-says"></p>
-      </section>
+          <div class="set-grid" id="op-form">
+            <label class="auth-label" for="op-endpoint">OpenProject address</label>
+            <div class="set-row">
+              <input id="op-endpoint" class="auth-input" type="url" placeholder="https://pms.example.com" />
+            </div>
+            <label class="auth-label" for="op-token">API token</label>
+            <div class="set-row">
+              <input id="op-token" class="auth-input" type="password" autocomplete="off"
+                     placeholder="Paste an API token" />
+              <button id="op-save" class="chip" type="button">Check and save</button>
+              <button id="op-forget" class="chip" type="button" hidden>Remove</button>
+            </div>
+            <p class="set-state" id="op-says" role="status"></p>
+          </div>
 
-      <!-- ── the bridge ───────────────────────────────────────────── -->
-      <section class="admin-panel">
-        <h2 class="admin-heading">The ADAM bridge</h2>
-        <p class="auth-note">
-          Nine read-only tools that let your local Claude read this package — screens, journeys,
-          contracts, tables, services, modules and the decisions behind them. Run this once, with
-          your own password where it says so.
-        </p>
-        <div class="set-mono" id="mcp-line">…</div>
-        <div class="set-row" style="margin-top: 10px">
-          <button id="mcp-copy" class="chip" type="button">Copy</button>
-          <span class="set-state" id="mcp-says"></span>
-        </div>
-        <p class="auth-note">
-          Everything it can read is what <em>you</em> can read — it signs in as your account and
-          inherits the same refusals. There is no shared login, deliberately: one would hand every
-          reader the widest role in the building.
-        </p>
-      </section>
-    </main>
+          <p class="auth-note auth-fine">
+            Make one in OpenProject under <strong>My account → Access tokens</strong>. ADAM checks it
+            against the instance before keeping it — a token that does not work is worse than none,
+            because it looks configured and fails later somewhere that reads as a different fault.
+            Removing it here does not revoke it there.
+          </p>
+        </section>
+
+        <!-- ── git identity ─────────────────────────────────────────── -->
+        <section class="admin-panel set-section" id="git">
+          <h2 class="admin-heading">Git identity</h2>
+          <p class="auth-note set-lede">
+            The address your commits carry, when it differs from the one you sign in with. It is what
+            lets a commit be matched back to the work package it belongs to. Not a secret, and blank
+            is fine — blank honestly means "not stated" rather than a guess nobody made.
+          </p>
+          <div class="set-row">
+            <input id="git-email" class="auth-input" type="email" placeholder="you@example.com"
+                   aria-label="Git email" />
+            <button id="git-save" class="chip" type="button">Save</button>
+          </div>
+          <p class="set-state" id="git-says" role="status"></p>
+        </section>
+
+        <!-- ── the Claude connector ─────────────────────────────────── -->
+        <section class="admin-panel set-section" id="connector">
+          <h2 class="admin-heading">Claude connector</h2>
+          <p class="auth-note set-lede">
+            Thirteen tools that let Claude Code on your machine read this package — screens, journeys,
+            contracts, tables, services, modules and the decisions behind them — and, once OpenProject
+            is connected above, the work scheduled against it.
+          </p>
+          <p class="auth-note">
+            <strong>The easy way:</strong> ask an ADAM admin for the connector setup zip, unzip it
+            and double-click <code>setup.cmd</code>. It checks your password, installs the connector
+            and registers it with Claude Code — nothing below is needed.
+          </p>
+          <p class="auth-label">Or by hand, once, in PowerShell or Git Bash — with Node.js 22+ and a copy of <code>viewer/mcp</code></p>
+          <div class="set-mono" id="mcp-line">…</div>
+          <div class="set-actions">
+            <button id="mcp-copy" class="chip" type="button">Copy</button>
+            <p class="set-state" id="mcp-says" role="status"></p>
+          </div>
+          <p class="auth-note auth-fine">
+            Put your own password in place of <code>YOUR_PASSWORD</code> and the path to your copy in
+            place of <code>PATH-TO-REPO</code>. Keep every <code>-e</code> before the
+            <code>'--'</code>, and keep the quotes on <code>'--'</code> — PowerShell drops a bare one.
+            Not in Command Prompt. Then check it with <code>claude mcp get adam</code>: all three
+            values should be listed under <strong>Environment</strong>.
+          </p>
+          <p class="auth-note auth-fine">
+            Everything it can read is what <em>you</em> can read — it signs in as your account and
+            inherits the same refusals. There is no shared login, deliberately: one would hand every
+            reader the widest role in the building.
+          </p>
+        </section>
+
+        <!-- ── sessions ─────────────────────────────────────────────── -->
+        <section class="admin-panel set-section" id="sessions">
+          <h2 class="admin-heading">Sessions</h2>
+          <p class="auth-note set-lede">
+            <strong>Sign out</strong> ends the session in this browser.
+            <strong>Sign out everywhere</strong> is for the sessions you cannot reach — a laptop left
+            somewhere, a borrowed machine. It ends every session on your account,
+            <strong>this browser included</strong>. Nothing else changes: your account stays
+            enabled, and every verdict you have recorded keeps your name on it.
+          </p>
+          <div class="set-actions">
+            <button id="sess-signout" class="chip" type="button">Sign out</button>
+            <button id="sess-all" class="chip" type="button">Sign out everywhere</button>
+          </div>
+          <div id="sess-all-confirm" hidden>
+            <p class="auth-note" style="margin-top: 14px">
+              <strong>End every session on your account?</strong> You will be signed out here too,
+              and sent back to the sign-in page.
+            </p>
+            <div class="set-actions">
+              <button id="sess-all-go" class="auth-button" type="button">Yes, end every session</button>
+              <button id="sess-all-cancel" class="chip" type="button">Cancel</button>
+            </div>
+          </div>
+          <p class="set-state" id="sess-says" role="status"></p>
+        </section>
+
+        <!-- ── administration (admins only) ─────────────────────────── -->
+        <section class="admin-panel set-section" id="admin" hidden>
+          <h2 class="admin-heading">Administration</h2>
+          <div class="set-links">
+            <a class="set-link" href="/admin.html">
+              <span><strong>Accounts and invites</strong>
+                <small>Invite people, change roles, disable accounts, make password-reset links</small></span>
+            </a>
+            <a class="set-link" href="/audit.html">
+              <span><strong>Audit the delivery package</strong>
+                <small>What the package's own checks found</small></span>
+            </a>
+          </div>
+        </section>
+      </main>
+    </div>
 
     <script type="module" src="/settings.js"></script>
   </body>

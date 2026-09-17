@@ -341,11 +341,13 @@ come back.
 Then, to connect their local Claude:
 
 ```bash
-claude mcp add adam -- node /path/to/adam/viewer/mcp/server.mjs \
-  -e ADAM_VIEWER_URL=https://adam.ainfinite.ai \
-  -e ADAM_EMAIL=you@softlabsgroup.com \
-  -e ADAM_PASSWORD=...
+claude mcp add -s user adam -e ADAM_VIEWER_URL=https://adam.ainfinite.ai -e ADAM_EMAIL=you@softlabsgroup.com -e 'ADAM_PASSWORD=YOUR_PASSWORD' '--' node /path/to/adam/viewer/mcp/server.mjs
 ```
+
+**Every `-e` before the `--`** — after it they are passed to node and ignored, and the bridge
+starts with no credentials. **Keep `'--'` quoted:** PowerShell drops a bare `--` on its way into
+npm's `claude.ps1` and the command fails. `claude mcp get adam` should list all three under
+`Environment:`.
 
 They need a checkout of this repository for `server.mjs`; everything it reads comes over
 HTTPS from the deployed viewer. Thirteen tools — see `viewer/mcp/README.md`.

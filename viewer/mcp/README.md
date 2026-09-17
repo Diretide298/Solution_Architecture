@@ -6,15 +6,58 @@ about the work scheduled against it** in OpenProject. Phases 1 to 3 of
 
 ## What a developer runs
 
+**The easy way is the setup zip.** Build it once, hand it out:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File viewer\mcp\setup\build-zip.ps1
+```
+
+That writes `adam-connector-setup.zip` (about 33 KB, gitignored) at the repository root. It holds the
+connector files, `setup.cmd`, `uninstall.cmd`, `setup.ps1` and a README, and nothing personal — the
+same file works for everyone. A developer unzips it and double-clicks `setup.cmd`, which:
+
+1. checks for Node.js 22+ and Claude Code,
+2. asks for their ADAM email and password (hidden),
+3. **signs in to ADAM with them before changing anything** — a wrong password stops here,
+4. copies the connector to `%USERPROFILE%\.adam\connector`,
+5. registers it with `claude mcp add -s user` in the order that works in PowerShell (see below),
+   reads the registration back, and
+6. optionally runs `mcp-check.mjs` against the live site.
+
+Running it again updates the connector or the stored password; `uninstall.cmd` removes both. It refuses
+a password containing `"` or ending in `\`, which Windows PowerShell 5.1 cannot pass to a program
+intact. Rebuild the zip whenever anything in `viewer/mcp` changes; the README inside is stamped with
+the commit it was built from. The scripts are kept to plain ASCII on purpose — PowerShell 5.1 reads a
+BOM-less script in the ANSI code page — and `build-zip.ps1` refuses to build if that slips.
+
+**By hand**, for Git Bash or a machine where the zip is not an option:
+
 A viewer must be reachable — the MCP reads through it and has no other source. **Most developers
 should point at the deployed one and run nothing locally:**
 
 ```bash
-claude mcp add adam -- node C:/path/to/adam/viewer/mcp/server.mjs \
-  -e ADAM_VIEWER_URL=https://adam.ainfinite.ai \
-  -e ADAM_EMAIL=you@softlabsgroup.com \
-  -e ADAM_PASSWORD=...
+claude mcp add -s user adam -e ADAM_VIEWER_URL=https://adam.ainfinite.ai -e ADAM_EMAIL=you@softlabsgroup.com -e 'ADAM_PASSWORD=YOUR_PASSWORD' '--' node C:/path/to/adam/viewer/mcp/server.mjs
 ```
+
+**Every `-e` goes before the `--`.** Everything after `--` is passed to node as arguments, and
+`server.mjs` never reads its arguments. This line was first published the other way round, which
+registers a server with an empty environment that then cannot sign in — `claude mcp get adam`
+shows it at once: the credentials appear under `Args:` instead of `Environment:`.
+
+**And keep the quotes on `'--'`.** In PowerShell, `claude` is npm's `claude.ps1` wrapper, and
+PowerShell silently drops a bare `--` passed to a script; the command then fails with
+`missing required argument 'commandOrUrl'`. Quoted, it gets through, and bash simply removes the
+quotes — so this one line works in PowerShell and Git Bash alike. Not in Command Prompt (`cmd.exe`),
+which does not treat single quotes as quotes.
+
+One line, because `\` is not a line continuation in PowerShell. The password is single-quoted, which
+both bash and PowerShell treat literally. `-s user` makes the bridge available in every project you
+open; without it, it only appears when Claude runs in the directory you added it from.
+
+The password ends up in plain text in Claude's own settings file (`~/.claude.json`), readable by
+anything running as you. Use a password for ADAM that you use nowhere else, and one **without quote
+characters**: Windows PowerShell 5.1 splits the argument at a `"` inside it, and the command fails
+with the same `missing required argument` error. Tested 17 September.
 
 Working on the viewer itself? Run `./start.ps1` and drop `ADAM_VIEWER_URL` for the local default.
 

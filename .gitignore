@@ -74,3 +74,7 @@ ticvai/Updating old wireframes/
 # same question.
 ticvai/_dump/
 ticvai/_review-*/
+
+# --- the connector setup zip, built from viewer/mcp by build-zip.ps1 ---------
+# A build output, rebuilt whenever the connector changes and handed out by hand.
+/adam-connector-setup.zip

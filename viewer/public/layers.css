@@ -1412,17 +1412,130 @@ body[data-layer="decisions"] { --layer: var(--accent); --layer-soft: color-mix(i
 }
 .account-initials { line-height: 1; }
 
-.account-dialog {
-  width: min(520px, 92vw);
-  max-height: 86vh; overflow-y: auto;
-  margin: 8vh auto 0;
-  background: var(--bg-panel);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 20px 22px;
-  box-shadow: var(--shadow-3);
+/* The drawer. From the right, full height, over a scrim — it was a dialog in
+   the middle of the screen, which hid the view it was opened over and put the
+   way out in a different place every time the panel changed height. */
+.account-backdrop {
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; justify-content: flex-end;
+  background: var(--scrim);
+  animation: drawer-fade .18s ease-out;
 }
-.account-title { margin: 0 0 12px; font-size: 16px; color: var(--text); }
+.account-drawer {
+  width: min(380px, 100vw); height: 100%;
+  display: flex; flex-direction: column;
+  box-sizing: border-box;
+  padding-top: var(--safe-top, 0px);
+  background: var(--bg-panel);
+  border-left: 1px solid var(--border);
+  box-shadow: var(--shadow-3);
+  animation: drawer-in .24s cubic-bezier(.2, .8, .2, 1);
+}
+@keyframes drawer-in { from { transform: translateX(100%); } to { transform: none; } }
+@keyframes drawer-fade { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .account-backdrop, .account-drawer { animation: none; }
+}
+/* On a phone, the whole width: a 10px sliver of dimmed view is not a way back,
+   only something to miss-tap. */
+@media (max-width: 480px) {
+  .account-drawer { width: 100vw; border-left: 0; }
+}
+
+.account-drawer-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 16px 14px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.account-title { margin: 0; font-size: 15px; font-weight: 700; color: var(--text); }
+.account-close svg { width: 14px; height: 14px; }
+.account-drawer-body { flex: 1; overflow-y: auto; padding: 18px 20px 20px; }
+.account-drawer-foot {
+  display: grid; gap: 8px;
+  padding: 14px 20px 18px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-raised);
+}
+.account-drawer-foot[hidden] { display: none; }
+
+/* who you are */
+.account-id {
+  display: grid; grid-template-columns: 44px minmax(0, 1fr) auto;
+  gap: 12px; align-items: center;
+  margin-bottom: 18px;
+}
+.account-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 15px; font-weight: 700; letter-spacing: .02em;
+  color: var(--accent-text);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-line);
+}
+.account-who-name, .account-who-email { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.account-who-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.account-who-email { font-size: 12px; color: var(--text-dim); margin-top: 1px; }
+.account-role {
+  padding: 3px 8px; border-radius: 999px;
+  font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em;
+  color: var(--text-dim); border: 1px solid var(--border-strong);
+}
+.account-role[data-role="admin"] {
+  color: var(--accent-text); border-color: var(--accent-line); background: var(--accent-soft);
+}
+
+/* the one big door */
+.drawer-primary {
+  display: grid; grid-template-columns: 36px minmax(0, 1fr) 14px;
+  gap: 12px; align-items: center;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--accent-line);
+  background: var(--accent-soft);
+  color: var(--text); text-decoration: none;
+}
+.drawer-primary:hover, .drawer-primary:focus-visible { border-color: var(--accent); outline: none; }
+.drawer-primary-icon {
+  width: 36px; height: 36px; border-radius: 9px;
+  display: grid; place-items: center;
+  color: var(--ink-on-accent); background: var(--accent);
+}
+.drawer-primary-icon svg { width: 20px; height: 20px; }
+.drawer-primary-text b { display: block; font-size: 13.5px; }
+.drawer-primary-text small { display: block; margin-top: 2px; font-size: 11.5px; line-height: 1.45; color: var(--text-dim); }
+.drawer-chevron { width: 14px; height: 14px; color: var(--text-faint); }
+
+/* the smaller doors, grouped */
+.drawer-group { margin-top: 22px; }
+.drawer-group[hidden] { display: none; }
+.drawer-group-title {
+  margin: 0 0 4px;
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+  color: var(--text-faint);
+}
+.drawer-link {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin: 0 -10px; padding: 9px 10px;
+  border-radius: 7px;
+  font-size: 13px; color: var(--text); text-decoration: none;
+}
+.drawer-link::after { content: '\203A'; font-size: 17px; line-height: 1; color: var(--text-faint); }
+.drawer-link:hover, .drawer-link:focus-visible { background: var(--bg-hover); outline: none; }
+/* app.js marks the review link loud when somebody has named you */
+.drawer-link.auth-button-loud { color: var(--accent-text); font-weight: 600; }
+
+/* the way out */
+.drawer-foot-btn {
+  width: 100%; padding: 9px 14px;
+  font: inherit; font-size: 13px; cursor: pointer;
+  color: var(--text); background: var(--bg-panel);
+  border: 1px solid var(--border-strong); border-radius: 7px;
+}
+.drawer-foot-btn:hover { background: var(--bg-hover); }
+.drawer-foot-quiet { color: var(--text-dim); background: transparent; border-color: var(--border); }
+.drawer-foot-btn[hidden] { display: none; }
+#signout-all-confirm .auth-note { margin: 2px 0 0; }
+#signout-all-confirm .auth-button { margin-top: 8px; }
 
 .invite-row { display: flex; gap: 7px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
 .invite-row .auth-input { flex: 1 1 200px; margin: 0; }
@@ -1530,7 +1643,6 @@ body[data-layer="decisions"] { --layer: var(--accent); --layer-soft: color-mix(i
 .auth-button-quiet:hover { color: var(--text); border-color: var(--text-faint); filter: none; }
 
 @media (max-width: 760px) {
-  .account-dialog { margin-top: 0; border-radius: 0; min-height: 100vh; }
   .verdict-history-row { grid-template-columns: 10px 1fr; }
   .verdict-history-when { grid-column: 2; }
 }
