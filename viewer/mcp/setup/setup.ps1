@@ -1,23 +1,28 @@
 <#
 .SYNOPSIS
-    Connects Claude Code on this computer to ADAM.
+    Connects Claude Code on this computer to ADAM, for one code folder.
 
 .DESCRIPTION
-    What a developer runs from the connector setup zip, usually by
-    double-clicking setup.cmd beside it. It:
+    What a developer runs from the connector setup zip. Run it from the code
+    folder whose Claude Code sessions should use ADAM:
 
+        cd C:\work\ticvai-backend
+        C:\Downloads\adam-connector\setup.cmd
+
+    It:
       1. checks that Node.js 22+ and Claude Code are installed,
       2. asks for your ADAM email and password (the password is hidden),
       3. checks that they actually sign in to ADAM - before changing anything,
       4. lists the ADAM projects you can open and asks which one to use,
-      5. asks which folder that is for - one code folder, or every folder,
+      5. asks which folder it is for - the folder it was started from by default,
       6. copies the connector to %USERPROFILE%\.adam\connector,
-      7. registers it with Claude Code for that folder (or for all of them),
+      7. registers it with Claude Code for that folder only,
       8. and, if you want, runs the full connection test.
 
-    Run it once per folder to give each folder its own ADAM project: a folder
-    setting wins over the every-folder one. Running it again for the same
-    folder replaces that folder's setting. uninstall.cmd removes all of them.
+    Only Claude Code sessions opened in that folder - in VS Code or a terminal -
+    can use ADAM. Every folder is possible, but only when asked for ("all").
+    Run it again from another folder to add that one; running it again for the
+    same folder replaces that folder's setting. uninstall.cmd removes them all.
 
     ASCII only, on purpose: Windows PowerShell 5.1 reads a script saved without
     a byte-order mark in the machine's ANSI code page, and a dash or a curly
@@ -33,13 +38,16 @@
     The ADAM project id (for example ticvai). Asked for when not given.
 
 .PARAMETER Folder
-    The code folder this is for. "all" means every folder. Asked for when not given.
+    The code folder this is for, or "all" for every folder. Asked for when not given.
 
 .PARAMETER Test
     ask (default), yes or no - whether to run the full connection test at the end.
 
 .PARAMETER Uninstall
-    Remove the connector from Claude Code and delete the installed files.
+    Remove every registration setup made, and delete the installed files.
+
+.PARAMETER RemoveFolder
+    Remove the registration for this one folder only.
 
 .PARAMETER Name
     The name Claude Code knows the connector by. Leave it as adam.
@@ -48,7 +56,10 @@
     Where the connector files go. Leave it as the default.
 
 .EXAMPLE
-    .\setup.ps1
+    cd C:\work\ticvai-backend; C:\Downloads\adam-connector\setup.cmd
+
+.EXAMPLE
+    .\setup.ps1 -RemoveFolder C:\work\ticvai-backend
 
 .EXAMPLE
     .\setup.ps1 -Uninstall
@@ -61,13 +72,21 @@ param(
     [ValidateSet('ask', 'yes', 'no')]
     [string]$Test = 'ask',
     [switch]$Uninstall,
+    [string]$RemoveFolder = '',
     [string]$Name = 'adam',
     [string]$InstallDir = (Join-Path $env:USERPROFILE '.adam\connector')
 )
 
 $ErrorActionPreference = 'Stop'
+# Where setup was started from, before anything moves: the folder a developer
+# ran it in is the folder they mean. Double-clicked, it is the zip's own folder,
+# which is never a code folder, so then there is no default.
+$LaunchDir = (Get-Location).ProviderPath
 $Here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Files = @('server.mjs', 'client.mjs', 'tools.mjs', 'mcp-check.mjs')
+# Kept beside the installed connector, so a folder can be removed later
+# without the zip.
+$Tools = @('setup.ps1', 'setup.cmd', 'uninstall.cmd')
 $ViewerUrl = $ViewerUrl.TrimEnd('/')
 # One line per registration setup has made: scope|folder|project. Read by the
 # uninstall, which has to stand in each folder to remove that folder's entry.
@@ -83,43 +102,89 @@ function Stop-Setup([string]$text) {
     exit 1
 }
 
-# `claude` in PowerShell is usually npm's claude.ps1 wrapper, and PowerShell
-# drops a bare `--` on its way into a script - which breaks `claude mcp add`.
-# Asking for an Application skips the wrapper and finds claude.cmd or
-# claude.exe, which receive every argument as given.
+# ---- running Claude Code -------------------------------------------------------
+#
+# npm installs `claude` as claude.ps1 and claude.cmd, and both are poor ways in:
+# PowerShell drops a bare `--` on its way into the .ps1, and the .cmd goes
+# through Command Prompt, which reads & % ^ | < > in a password as its own.
+# The .cmd only starts bin\claude.exe beside it, so that is what is run, with
+# every argument quoted the way a Windows program reads them. A claude.exe on
+# the PATH (the native installer) is used as it is.
 function Find-Claude {
-    $found = Get-Command claude -CommandType Application -ErrorAction SilentlyContinue |
-        Select-Object -First 1
-    if ($found) { return $found.Source }
+    $all = @(Get-Command claude -CommandType Application -All -ErrorAction SilentlyContinue)
+    $exe = $all | Where-Object { $_.Source -like '*.exe' } | Select-Object -First 1
+    if ($exe) { return [pscustomobject]@{ Path = $exe.Source; Safe = $true } }
+    foreach ($shim in $all) {
+        $inner = Join-Path (Split-Path -Parent $shim.Source) 'node_modules\@anthropic-ai\claude-code\bin\claude.exe'
+        if (Test-Path -LiteralPath $inner) { return [pscustomobject]@{ Path = $inner; Safe = $true } }
+    }
+    if ($all.Count) { return [pscustomobject]@{ Path = $all[0].Source; Safe = $false } }
     return $null
 }
 
-# Every call to claude goes through here, for two reasons.
-#
-# Windows PowerShell turns anything a program writes to stderr into an error
-# record, and under $ErrorActionPreference = 'Stop' the first one ends the
-# script. Claude writes ordinary answers there ("No MCP server found"), so
-# these calls run with errors as plain text instead.
-#
-# And the arguments go in as one array. Passed loose through a function, a bare
-# `--` is eaten by PowerShell's own parameter binding - the same fault as the
-# claude.ps1 wrapper. Splatted to a program as an array, it arrives intact.
-function Invoke-Claude([string]$Exe, [string[]]$ArgList) {
-    $ErrorActionPreference = 'Continue'
-    $lines = & $Exe @ArgList 2>&1 | ForEach-Object { "$_" }
-    return [pscustomobject]@{ Code = $LASTEXITCODE; Text = ($lines -join "`n") }
+# One argument list as one Windows command line: quoted when it has to be, with
+# backslashes doubled only where they come before a quote.
+function ConvertTo-CommandLine([string[]]$ArgList) {
+    $out = foreach ($arg in $ArgList) {
+        if ($arg -ne '' -and $arg -notmatch '[\s"]') { $arg; continue }
+        $text = '"'
+        $slashes = 0
+        foreach ($ch in $arg.ToCharArray()) {
+            if ($ch -eq '\') { $slashes++; continue }
+            if ($ch -eq '"') { $text += ('\' * ($slashes * 2 + 1)) + '"'; $slashes = 0; continue }
+            $text += ('\' * $slashes) + $ch
+            $slashes = 0
+        }
+        $text + ('\' * ($slashes * 2)) + '"'
+    }
+    return ($out -join ' ')
 }
 
-function Test-Registered([string]$claude, [string]$serverName) {
-    return ((Invoke-Claude $claude @('mcp', 'get', $serverName)).Code -eq 0)
+# Every call to Claude Code goes through here. `Where` is the folder it runs in,
+# spelled exactly as given: Claude Code files a folder setting under the folder
+# as it saw it, and PowerShell's own Set-Location would change the spelling.
+function Invoke-Claude([string[]]$ArgList, [string]$Where = '') {
+    $info = New-Object System.Diagnostics.ProcessStartInfo
+    $info.FileName = $script:Claude.Path
+    $info.Arguments = ConvertTo-CommandLine $ArgList
+    $info.UseShellExecute = $false
+    $info.CreateNoWindow = $true
+    $info.RedirectStandardOutput = $true
+    $info.RedirectStandardError = $true
+    if ($Where) { $info.WorkingDirectory = $Where } else { $info.WorkingDirectory = $env:USERPROFILE }
+    $process = [System.Diagnostics.Process]::Start($info)
+    $outTask = $process.StandardOutput.ReadToEndAsync()
+    $errTask = $process.StandardError.ReadToEndAsync()
+    $process.WaitForExit()
+    return [pscustomobject]@{ Code = $process.ExitCode; Text = ($outTask.Result + $errTask.Result).Trim() }
 }
 
-# A folder registration is stored by Claude Code against the folder it was made
-# in, so adding, reading and removing one all have to run from inside it.
-function Invoke-ClaudeIn([string]$Where, [string]$Exe, [string[]]$ArgList) {
-    if (-not $Where) { return (Invoke-Claude $Exe $ArgList) }
-    Push-Location -LiteralPath $Where
-    try { return (Invoke-Claude $Exe $ArgList) } finally { Pop-Location }
+# ---- folders -------------------------------------------------------------------
+
+# The folder as the disk spells it. A path typed as c:\work\API is stored by
+# Claude Code as typed, and VS Code opens C:\work\api; they must agree.
+function Get-TrueCase([string]$Path) {
+    $full = [System.IO.Path]::GetFullPath($Path).TrimEnd('\')
+    $root = [System.IO.Path]::GetPathRoot($full)
+    if ($full.Length -le $root.TrimEnd('\').Length) { return $root }
+    $current = $root.ToUpper()
+    foreach ($part in $full.Substring($root.Length).Split('\')) {
+        if (-not $part) { continue }
+        $found = @([System.IO.Directory]::GetDirectories($current, $part))
+        if ($found.Count -eq 1) { $current = $found[0] } else { $current = Join-Path $current $part }
+    }
+    return $current
+}
+
+# Every spelling Claude Code may know this folder by. VS Code hands it the drive
+# letter in lower case (c:\work) and a terminal in upper case (C:\work), and
+# Claude Code keeps the two apart - so a folder is registered under both.
+function Get-Spellings([string]$Path) {
+    if ($Path -match '^[A-Za-z]:\\') {
+        return @(($Path.Substring(0, 1).ToUpper() + $Path.Substring(1)),
+                 ($Path.Substring(0, 1).ToLower() + $Path.Substring(1)))
+    }
+    return @($Path)
 }
 
 function Read-Ledger {
@@ -136,49 +201,59 @@ function Write-Ledger($entries) {
     Set-Content -LiteralPath $Ledger -Value $lines -Encoding ASCII
 }
 
+function Remove-FolderRegistration([string]$Path) {
+    $removed = $false
+    foreach ($spelling in (Get-Spellings $Path)) {
+        if (-not (Test-Path -LiteralPath $spelling)) { continue }
+        if ((Invoke-Claude @('mcp', 'remove', $Name, '-s', 'local') $spelling).Code -eq 0) { $removed = $true }
+    }
+    return $removed
+}
+
 function Show-RemoveHelp($entries) {
-    Write-Host '  To remove it from Claude Code later, double-click uninstall.cmd, or run:'
+    $script = Join-Path $InstallDir 'setup.ps1'
+    Write-Host '  To remove it later: double-click uninstall.cmd (removes everything), or run:'
     foreach ($entry in $entries) {
         if ($entry.Scope -eq 'user') {
             Write-Host "     claude mcp remove $Name -s user" -ForegroundColor Gray
-            Write-Host '        (every folder)' -ForegroundColor DarkGray
+            Write-Host '        (the every-folder setting)' -ForegroundColor DarkGray
         } else {
-            Write-Host "     cd `"$($entry.Folder)`"; claude mcp remove $Name -s local" -ForegroundColor Gray
-            Write-Host '        (that folder only)' -ForegroundColor DarkGray
+            Write-Host "     powershell -ExecutionPolicy Bypass -File `"$script`" -RemoveFolder `"$($entry.Folder)`"" -ForegroundColor Gray
+            Write-Host "        ($($entry.Folder) only)" -ForegroundColor DarkGray
         }
     }
 }
 
 Write-Host ''
 Write-Host 'ADAM connector for Claude Code' -ForegroundColor White
+$script:Claude = Find-Claude
 
-# ---- uninstall ---------------------------------------------------------------
-if ($Uninstall) {
-    Step 'Removing the connector'
-    $claude = Find-Claude
-    if (-not $claude) {
-        Note 'Claude Code is not installed, so there is nothing registered to remove.'
+# ---- removing ------------------------------------------------------------------
+if ($Uninstall -or $RemoveFolder) {
+    if (-not $script:Claude) { Stop-Setup 'Claude Code is not installed, so there is nothing registered to remove.' }
+    $entries = Read-Ledger
+    if ($RemoveFolder) {
+        Step 'Removing ADAM from one folder'
+        $target = Get-TrueCase $RemoveFolder.Trim().Trim('"')
+        if (Remove-FolderRegistration $target) { Good "removed '$Name' from $target" }
+        else { Note "'$Name' was not registered for $target" }
+        Write-Ledger @($entries | Where-Object { -not ($_.Scope -eq 'local' -and $_.Folder -ieq $target) })
     } else {
-        # Every folder setup registered, then the every-folder one - which is
-        # removed whether or not the ledger knows about it.
-        foreach ($entry in (Read-Ledger | Where-Object { $_.Scope -eq 'local' })) {
+        Step 'Removing the connector'
+        foreach ($entry in ($entries | Where-Object { $_.Scope -eq 'local' })) {
             if (-not (Test-Path -LiteralPath $entry.Folder)) {
                 Note "skipped $($entry.Folder) - that folder no longer exists"
                 continue
             }
-            $gone = Invoke-ClaudeIn $entry.Folder $claude @('mcp', 'remove', $Name, '-s', 'local')
-            if ($gone.Code -eq 0) { Good "removed '$Name' from $($entry.Folder)" }
+            if (Remove-FolderRegistration $entry.Folder) { Good "removed '$Name' from $($entry.Folder)" }
             else { Note "nothing to remove in $($entry.Folder)" }
         }
-        $gone = Invoke-Claude $claude @('mcp', 'remove', $Name, '-s', 'user')
-        if ($gone.Code -eq 0) { Good "removed the every-folder '$Name'" }
-        if (Test-Registered $claude $Name) {
-            Note "'$Name' is still registered for this folder. Remove it with:  claude mcp remove $Name"
+        # Removed whether or not the ledger knows about it: an older setup made one.
+        if ((Invoke-Claude @('mcp', 'remove', $Name, '-s', 'user')).Code -eq 0) { Good "removed the every-folder '$Name'" }
+        if (Test-Path -LiteralPath $InstallDir) {
+            Remove-Item -LiteralPath $InstallDir -Recurse -Force
+            Good "deleted $InstallDir"
         }
-    }
-    if (Test-Path -LiteralPath $InstallDir) {
-        Remove-Item -LiteralPath $InstallDir -Recurse -Force
-        Good "deleted $InstallDir"
     }
     Write-Host ''
     Write-Host 'Done. Restart Claude Code for the change to show.' -ForegroundColor White
@@ -189,9 +264,9 @@ if ($Uninstall) {
 # ---- 1. what this computer needs -----------------------------------------------
 Step 'Checking this computer'
 
-foreach ($file in $Files) {
+foreach ($file in ($Files + $Tools)) {
     if (-not (Test-Path -LiteralPath (Join-Path $Here $file))) {
-        Stop-Setup "$file is missing next to this script. Unzip the whole folder first, then run setup.cmd from inside it."
+        Stop-Setup "$file is missing next to this script. Unzip the whole folder first, then run setup.cmd from it."
     }
 }
 
@@ -207,11 +282,10 @@ if ($major -lt 22) {
 }
 Good "Node.js $nodeVersion"
 
-$claude = Find-Claude
-if (-not $claude) {
+if (-not $script:Claude) {
     Stop-Setup 'Claude Code is not installed. Install it with:  npm install -g @anthropic-ai/claude-code   then open a new window and run setup again.'
 }
-$claudeVersion = ((Invoke-Claude $claude @('--version')).Text -split "`n")[0]
+$claudeVersion = ((Invoke-Claude @('--version')).Text -split "`n")[0]
 Good "Claude Code $claudeVersion"
 
 # ---- 2. who you are ------------------------------------------------------------
@@ -231,15 +305,10 @@ if (-not $password) {
 }
 if (-not $password) { Stop-Setup 'No password was given.' }
 
-# Windows PowerShell 5.1 does not escape a double quote inside an argument it
-# passes to a program, so a password containing one arrives cut in two and the
-# registration fails. A trailing backslash can swallow the closing quote the
-# same way. Refused here, with the reason, rather than failing further on.
-if ($password.Contains('"')) {
-    Stop-Setup 'Your ADAM password contains a double quote ("), which Windows PowerShell cannot pass on intact. Change your ADAM password to one without quotes (Settings -> Password), then run setup again.'
-}
-if ($password.EndsWith('\')) {
-    Stop-Setup 'Your ADAM password ends with a backslash (\), which Windows PowerShell cannot pass on intact. Change your ADAM password (Settings -> Password), then run setup again.'
+# Only when Claude Code could not be run directly: through Command Prompt these
+# characters do not arrive as typed.
+if (-not $script:Claude.Safe -and $password -match '["&%^|<>!]') {
+    Stop-Setup 'Your ADAM password contains one of  " & % ^ | < > !  which this Claude Code install cannot receive intact. Update Claude Code (npm install -g @anthropic-ai/claude-code), or change your ADAM password (Settings -> Password), then run setup again.'
 }
 
 # ---- 3. prove it signs in, before touching anything --------------------------
@@ -320,16 +389,30 @@ try {
 
 # ---- 5. which folder ------------------------------------------------------------
 Step 'Choosing the folder'
-Note 'Claude Code uses this project when you start it in the folder you give here.'
-Note 'Paste the path of your code folder, or press Enter to use it in every folder.'
+# The folder setup was started from, unless that is somewhere no code lives.
+$default = ''
+$launch = $LaunchDir.TrimEnd('\')
+$notCode = @($Here, $InstallDir, $env:USERPROFILE, $env:windir) | ForEach-Object { "$_".TrimEnd('\') }
+if ($launch -and -not ($notCode -contains $launch) -and -not $launch.StartsWith("$env:windir\", 'OrdinalIgnoreCase') -and
+        $launch -notmatch '^[A-Za-z]:$') {
+    $default = $launch
+}
+Note 'Only Claude Code sessions opened in this folder - in VS Code or a terminal - will be able to use ADAM.'
+if ($default) { Note 'Press Enter for the folder shown, paste another path, or type all for every folder.' }
+else { Note 'Paste the path of your code folder, or type all for every folder.' }
 while ($true) {
     if (-not $Folder) {
-        $Folder = (Read-Host '   Folder (Enter = every folder)').Trim().Trim('"')
-        if (-not $Folder) { $Folder = 'all' }
+        if ($default) {
+            $Folder = (Read-Host "   Folder [$default]").Trim().Trim('"')
+            if (-not $Folder) { $Folder = $default }
+        } else {
+            $Folder = (Read-Host '   Folder').Trim().Trim('"')
+            if (-not $Folder) { continue }
+        }
     }
     if ($Folder -eq 'all') { break }
     if (Test-Path -LiteralPath $Folder -PathType Container) {
-        $Folder = (Resolve-Path -LiteralPath $Folder).ProviderPath.TrimEnd('\')
+        $Folder = Get-TrueCase $Folder
         break
     }
     Note "There is no folder at $Folder."
@@ -338,13 +421,16 @@ while ($true) {
 $scope = 'user'
 $where = ''
 if ($Folder -ne 'all') { $scope = 'local'; $where = $Folder }
-if ($scope -eq 'user') { Good 'every folder' } else { Good $Folder }
+if ($scope -eq 'user') { Good 'every folder' } else { Good $where }
 
 # ---- 6. put the connector somewhere that stays -------------------------------
 Step 'Installing the connector'
 New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
-foreach ($file in $Files) {
-    Copy-Item -LiteralPath (Join-Path $Here $file) -Destination (Join-Path $InstallDir $file) -Force
+foreach ($file in ($Files + $Tools)) {
+    $from = Join-Path $Here $file
+    $to = Join-Path $InstallDir $file
+    # Run again from the installed copy, a file is already where it goes.
+    if ($from -ine $to) { Copy-Item -LiteralPath $from -Destination $to -Force }
 }
 $server = Join-Path $InstallDir 'server.mjs'
 Good "copied to $InstallDir"
@@ -352,41 +438,47 @@ Note 'You can delete the downloaded zip now - Claude Code uses this copy.'
 
 # ---- 7. tell Claude Code about it --------------------------------------------
 Step 'Registering it with Claude Code'
-# Only the entry at this scope is replaced. A folder entry wins over the
-# every-folder one, so the two can hold different projects side by side.
-$gone = Invoke-ClaudeIn $where $claude @('mcp', 'remove', $Name, '-s', $scope)
-if ($gone.Code -eq 0) { Note "replacing the '$Name' connector that was already there" }
-if ($scope -eq 'user' -and (Test-Registered $claude $Name)) {
+# Every -e before the --: anything after it is handed to node, which ignores it.
+$envArgs = @('-e', "ADAM_VIEWER_URL=$ViewerUrl", '-e', "ADAM_PROJECT=$Project")
+if ($scope -eq 'local') { $envArgs += @('-e', "ADAM_WORKDIR=$where") }
+$envArgs += @('-e', "ADAM_EMAIL=$Email", '-e', "ADAM_PASSWORD=$password")
+$places = @('')
+if ($scope -eq 'local') { $places = Get-Spellings $where }
+
+foreach ($place in $places) {
+    if ((Invoke-Claude @('mcp', 'remove', $Name, '-s', $scope) $place).Code -eq 0 -and $place -eq $places[0]) {
+        Note "replacing the '$Name' connector that was already there"
+    }
+    $added = Invoke-Claude (@('mcp', 'add', '-s', $scope, $Name) + $envArgs + @('--', 'node', $server)) $place
+    if ($added.Code -ne 0) {
+        Stop-Setup "Claude Code refused the registration: $($added.Text)"
+    }
+    # Read back rather than trusted. `claude mcp get` prints the password, so
+    # its output is checked here and never shown.
+    $details = (Invoke-Claude @('mcp', 'get', $Name) $place).Text
+    $envOk = ($details -match 'ADAM_EMAIL=') -and ($details -match 'ADAM_PASSWORD=') -and
+             ($details -match 'ADAM_VIEWER_URL=') -and ($details -match ('ADAM_PROJECT=' + [regex]::Escape($Project)))
+    $argsOk = $details -match [regex]::Escape('server.mjs')
+    if (-not ($envOk -and $argsOk)) {
+        Stop-Setup "The connector was registered but does not read back correctly. In that folder, run:  claude mcp get $Name   and send the output (without the password line) to an ADAM admin."
+    }
+}
+
+$entries = @(Read-Ledger | Where-Object { -not ($_.Scope -eq $scope -and $_.Folder -ieq $where) })
+if ($scope -eq 'local') {
+    # An every-folder registration would let every other session in too, which
+    # is what a folder registration is meant to prevent. An older setup made one.
+    if ((Invoke-Claude @('mcp', 'remove', $Name, '-s', 'user')).Code -eq 0) {
+        Note "removed the every-folder '$Name' an earlier setup made, so other folders cannot use ADAM"
+    }
+    $entries = @($entries | Where-Object { $_.Scope -ne 'user' })
+} elseif ($scope -eq 'user' -and ((Invoke-Claude @('mcp', 'get', $Name)).Text -notmatch 'User config')) {
     Stop-Setup "A connector called '$Name' already exists outside your user settings. Remove it first with:  claude mcp remove $Name   then run setup again."
 }
-
-# Every -e before the --: anything after it is handed to node, which ignores it.
-# A folder registration also names the folder, which is where adam_pull writes
-# .adam/ when Claude does not say.
-$addArgs = @('mcp', 'add', '-s', $scope, $Name,
-    '-e', "ADAM_VIEWER_URL=$ViewerUrl",
-    '-e', "ADAM_PROJECT=$Project")
-if ($scope -eq 'local') { $addArgs += @('-e', "ADAM_WORKDIR=$where") }
-$addArgs += @('-e', "ADAM_EMAIL=$Email", '-e', "ADAM_PASSWORD=$password", '--', 'node', $server)
-$added = Invoke-ClaudeIn $where $claude $addArgs
-if ($added.Code -ne 0) {
-    Stop-Setup "Claude Code refused the registration: $($added.Text)"
-}
-
-# Read back rather than trusted. `claude mcp get` prints the password, so its
-# output is checked here and never shown.
-$details = (Invoke-ClaudeIn $where $claude @('mcp', 'get', $Name)).Text
-$envOk = ($details -match 'ADAM_EMAIL=') -and ($details -match 'ADAM_PASSWORD=') -and
-         ($details -match 'ADAM_VIEWER_URL=') -and ($details -match ('ADAM_PROJECT=' + [regex]::Escape($Project)))
-$argsOk = $details -match [regex]::Escape('server.mjs')
-if (-not ($envOk -and $argsOk)) {
-    Stop-Setup "The connector was registered but does not read back correctly. Run:  claude mcp get $Name   and send the output (without the password line) to an ADAM admin."
-}
-$entries = @(Read-Ledger | Where-Object { -not ($_.Scope -eq $scope -and $_.Folder -eq $where) })
 $entries += [pscustomobject]@{ Scope = $scope; Folder = $where; Project = $Project }
 Write-Ledger $entries
 if ($scope -eq 'user') { Good "registered as '$Name' for every folder, reading $Project" }
-else { Good "registered as '$Name' for $where, reading $Project" }
+else { Good "registered as '$Name' for $where only, reading $Project" }
 
 # ---- 8. optionally, the full test --------------------------------------------
 $run = $Test
@@ -424,10 +516,12 @@ Write-Host ''
 Write-Host 'Done.' -ForegroundColor White
 Write-Host ''
 if ($scope -eq 'user') {
-    Write-Host '  1. Restart Claude Code (or start a new session).'
+    Write-Host '  1. Restart Claude Code. Every folder can use ADAM.'
 } else {
-    Write-Host '  1. Start Claude Code in that folder:'
-    Write-Host "     cd `"$where`"; claude" -ForegroundColor Gray
+    Write-Host '  1. Open that folder and start Claude Code there - in VS Code (File > Open Folder),'
+    Write-Host '     or in a terminal:' -NoNewline
+    Write-Host "  cd `"$where`"; claude" -ForegroundColor Gray
+    Write-Host '     Claude Code sessions in any other folder, or in a subfolder of it, cannot use ADAM.'
 }
 Write-Host "  2. Store your OpenProject token once, so Claude can see your tickets:"
 Write-Host "     $ViewerUrl/settings.html#openproject"
@@ -437,7 +531,7 @@ Write-Host '       Pull ticket 6046 into this folder and tell me what it touches
 Write-Host '       I have finished 6046 - propose closing it with a comment.' -ForegroundColor Gray
 Write-Host '     Claude shows you any OpenProject change first; nothing changes until you say yes.'
 Write-Host ''
-Write-Host '  Another folder or project? Run setup again.   Changed your ADAM password? Run setup again.'
+Write-Host '  Another folder? Run setup from it.   Changed your ADAM password? Run setup again in each folder.'
 Write-Host ''
 Write-Host '  Set up now:'
 foreach ($entry in (Read-Ledger)) {

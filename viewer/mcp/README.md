@@ -15,27 +15,36 @@ powershell -ExecutionPolicy Bypass -File viewer\mcp\setup\build-zip.ps1
 
 That writes `adam-connector-setup.zip` (about 33 KB, gitignored) at the repository root. It holds the
 connector files, `setup.cmd`, `uninstall.cmd`, `setup.ps1` and a README, and nothing personal — the
-same file works for everyone. A developer unzips it and double-clicks `setup.cmd`, which:
+same file works for everyone. A developer unzips it and runs `setup.cmd` **from the code folder**
+whose Claude Code sessions should use ADAM (`cd C:\work\repo; C:\Downloads\adam-connector\setup.cmd`),
+which:
 
 1. checks for Node.js 22+ and Claude Code,
 2. asks for their ADAM email and password (hidden),
 3. **signs in to ADAM with them before changing anything** — a wrong password stops here,
 4. lists the ADAM projects that account can open (`/api/projects`) and asks for one by number,
-5. asks for the code folder it is for, or Enter for every folder,
+5. asks for the folder, offering the one it was started from (Enter takes it; `all` means every
+   folder; double-clicked, there is no default and a path must be pasted),
 6. copies the connector to `%USERPROFILE%\.adam\connector`,
-7. registers it with `claude mcp add` — `-s local` from inside that folder, or `-s user` for
-   every folder — with `ADAM_PROJECT` set, in the order that works in PowerShell (see below),
-   and reads the registration back,
+7. registers it with `claude mcp add -s local` for that folder only — or `-s user` for `all` —
+   with `ADAM_PROJECT` and `ADAM_WORKDIR` set, reads it back, and removes any every-folder
+   registration an older setup left, so no other session can use ADAM,
 8. optionally runs `mcp-check.mjs` against the live site, and prints the `claude mcp remove`
    line for each registration it holds.
 
-**One registration per folder.** Claude Code prefers a folder's own (`local`) entry over the
-`user` one, so a developer on two packages runs setup twice, once per checkout. Setup keeps a
-ledger of what it registered in `registrations.txt` beside the installed connector, because
-removing a folder entry has to happen from inside that folder. Running it again for the same
-folder replaces that entry; `uninstall.cmd` removes every one of them and the files. It refuses
-a password containing `"` or ending in `\`, which Windows PowerShell 5.1 cannot pass to a program
-intact. Rebuild the zip whenever anything in `viewer/mcp` changes; the README inside is stamped with
+**One registration per folder, and two spellings of each.** Claude Code files a `local`
+registration under the folder it was run in, *as spelled*: VS Code starts it in `c:\work\repo`
+and a terminal in `C:\work\repo`, and `~/.claude.json` keeps those as two different projects.
+So setup registers both. It cannot use `Set-Location` for that — PowerShell rewrites the drive
+letter to upper case — and starts Claude Code with `ProcessStartInfo.WorkingDirectory` instead.
+It also starts npm's `bin\claude.exe` directly rather than `claude.cmd`, so Command Prompt never
+sees the password: any character works, including `"`, `&`, `%` and a trailing `\`.
+
+A developer on two packages runs setup from each checkout. Setup keeps a ledger of what it
+registered in `registrations.txt` beside the installed connector, with copies of `setup.ps1`,
+`setup.cmd` and `uninstall.cmd`; `setup.ps1 -RemoveFolder <path>` removes one folder (both
+spellings), and `uninstall.cmd` removes every registration and the files. A session opened on
+a subfolder of a registered folder does not see ADAM — Claude Code matches the folder exactly. Rebuild the zip whenever anything in `viewer/mcp` changes; the README inside is stamped with
 the commit it was built from. The scripts are kept to plain ASCII on purpose — PowerShell 5.1 reads a
 BOM-less script in the ANSI code page — and `build-zip.ps1` refuses to build if that slips.
 
