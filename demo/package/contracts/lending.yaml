@@ -13,6 +13,7 @@ info:
     - Ids are strings: books `bk_…`, members `mb_…`, loans `ln_…`.
 tags:
   - name: Books
+  - name: Members
   - name: Loans
 paths:
   /books:
@@ -32,6 +33,113 @@ paths:
                   items:
                     type: array
                     items: { $ref: '#/components/schemas/Book' }
+    post:
+      operationId: addBook
+      tags: [Books]
+      summary: Add a book to the catalogue
+      description: |
+        Staff add a title. `title` and `author` are required and trimmed; `totalCopies`
+        is 1 to 50. The new book starts with every copy on the shelf. A book with the
+        same title and author (ignoring case) already in the catalogue is 409
+        `duplicate_book`; a bad body is 400 `invalid_request`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/NewBook' }
+      responses:
+        '201':
+          description: The book that was added.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Book' }
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: That book is already in the catalogue.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+  /books/search:
+    get:
+      operationId: searchBooks
+      tags: [Books]
+      summary: Find books by title or author
+      description: |
+        `q` matches title or author, case-insensitive, anywhere in the text; at least
+        2 characters, else 400 `invalid_request`. `available=true` keeps only books
+        with a copy on the shelf. Results are sorted by title.
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema: { type: string, minLength: 2 }
+        - name: available
+          in: query
+          required: false
+          schema: { type: boolean }
+      responses:
+        '200':
+          description: Matching books.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Book' }
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /members:
+    post:
+      operationId: registerMember
+      tags: [Members]
+      summary: Register a member
+      description: |
+        `name` is required (2 to 80 characters, trimmed); `email` is required and must
+        look like an address. An email already registered (ignoring case) is 409
+        `duplicate_member`. The new member has no loans.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/NewMember' }
+      responses:
+        '201':
+          description: The member that was registered.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Member' }
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: That email is already registered.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+  /loans/overdue:
+    get:
+      operationId: listOverdueLoans
+      tags: [Loans]
+      summary: Every overdue loan, for the desk
+      description: |
+        Active loans whose `dueAt` is before now, most overdue first, each with
+        `daysOverdue` (whole days, at least 1) and the member's name and the book's
+        title so the desk can call without a second lookup.
+      responses:
+        '200':
+          description: Overdue loans.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/OverdueLoan' }
   /books/{bookId}:
     get:
       operationId: getBook
@@ -106,6 +214,34 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           description: Already returned.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+  /loans/{loanId}/renew:
+    post:
+      operationId: renewLoan
+      tags: [Loans]
+      summary: Renew a loan for another 14 days
+      description: |
+        Moves `dueAt` 14 days later and counts the renewal. Checked in this order:
+        an unknown loan is 404 `loan_not_found`; a returned loan is 409
+        `already_returned`; an overdue loan (`dueAt` before now) is 409
+        `loan_overdue`; a loan already renewed twice is 409 `renewal_limit_reached`.
+      parameters:
+        - name: loanId
+          in: path
+          required: true
+          schema: { type: string, example: ln_0001 }
+      responses:
+        '200':
+          description: The renewed loan.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Loan' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: The loan cannot be renewed.
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/Problem' }
@@ -203,6 +339,42 @@ components:
         overdue:
           type: boolean
           description: Only on listMemberLoans. True for an active loan past dueAt.
+        renewals:
+          type: integer
+          minimum: 0
+          maximum: 2
+          description: How many times renewLoan has extended it.
+    NewBook:
+      type: object
+      required: [title, author]
+      additionalProperties: false
+      properties:
+        title: { type: string, minLength: 1, maxLength: 200 }
+        author: { type: string, minLength: 1, maxLength: 120 }
+        totalCopies: { type: integer, minimum: 1, maximum: 50, default: 1 }
+    Member:
+      type: object
+      required: [id, name, email]
+      properties:
+        id: { type: string, example: mb_0003 }
+        name: { type: string }
+        email: { type: string, format: email }
+    NewMember:
+      type: object
+      required: [name, email]
+      additionalProperties: false
+      properties:
+        name: { type: string, minLength: 2, maxLength: 80 }
+        email: { type: string, format: email }
+    OverdueLoan:
+      allOf:
+        - $ref: '#/components/schemas/Loan'
+        - type: object
+          required: [daysOverdue, memberName, bookTitle]
+          properties:
+            daysOverdue: { type: integer, minimum: 1 }
+            memberName: { type: string }
+            bookTitle: { type: string }
     Problem:
       type: object
       required: [status, code, title]
@@ -218,5 +390,9 @@ components:
             - loan_limit_reached
             - no_copies_available
             - already_returned
+            - loan_overdue
+            - renewal_limit_reached
+            - duplicate_book
+            - duplicate_member
         title: { type: string }
         detail: { type: string }
