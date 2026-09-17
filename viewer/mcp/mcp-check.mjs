@@ -13,9 +13,14 @@
  * ADAM_EMAIL / ADAM_PASSWORD; without those the whole live block is skipped,
  * because a viewer that is not up is not a broken MCP server.
  *
- * **Inside the live block, nothing skips.** A lookup that finds nothing to test
- * fails. Two real bugs — a table lookup that could never resolve a bare name,
- * and a `didYouMean` list of names that existed nowhere — sat behind a
+ * **Inside the live block, nothing skips quietly.** A lookup that finds nothing to
+ * test fails. The one exception is a layer the package does not have at all - a
+ * demo package may be a single contract - and that skip names the package and
+ * the layer, and only happens when the tool itself reports the absence. Against
+ * TICVAI, which has every layer, nothing skips.
+ *
+ * Why so strict: two real bugs — a table lookup that could never resolve a bare
+ * name, and a `didYouMean` list of names that existed nowhere — sat behind a
  * benign-looking `skip` line, because the search that fed them was capped at 25
  * and the first table fell off the end. A check that skips quietly is a check
  * that lies.
@@ -213,28 +218,69 @@ if (!viewerUp) {
 } else if (!process.env.ADAM_EMAIL || !process.env.ADAM_PASSWORD) {
   skip('the live tools', 'set ADAM_EMAIL and ADAM_PASSWORD');
 } else {
+  // **Which package, and what is in it.** Not every package has every layer:
+  // TICVAI has screens, tables, services and decisions; a demo package may be
+  // one contract. A layer the package does not have is said out loud as a
+  // skip naming the package - the tool itself reports the absence - and a
+  // layer it does have must work. TICVAI has them all, so for TICVAI nothing
+  // here skips.
+  const project = process.env.ADAM_PROJECT || 'ticvai';
+  const absent = (what, layer) => skip(what, `${project} has no ${layer}`);
+
+  const signIn = await fetch(`${base}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ email: process.env.ADAM_EMAIL, password: process.env.ADAM_PASSWORD }),
+  });
+  const token = (signIn.headers.getSetCookie?.() ?? [])
+    .map((c) => /ticvai_session=([^;]+)/.exec(c)?.[1]).find(Boolean);
+  const cookie = token ? `ticvai_session=${decodeURIComponent(token)}` : '';
+  const indexUrl = `${base}/pkg/${encodeURIComponent(project)}/index`;
+  const index = token ? await (await fetch(indexUrl, { headers: { cookie } })).json().catch(() => ({})) : {};
+  // The contract with the most in it: TICVAI's is `access`, 756 KB on disk.
+  const perFile = new Map();
+  for (const n of index.nodes ?? []) if (n.file) perFile.set(n.file, (perFile.get(n.file) ?? 0) + 1);
+  const biggest = [...perFile].sort((a, b) => b[1] - a[1])[0]?.[0];
+  const firstOp = (index.nodes ?? []).find((n) => n.file === biggest && n.type === 'operation')?.name;
+  const contractName = biggest ? String(biggest).split('/').pop().replace(/\.(ya?ml|json)$/i, '') : 'access';
+  // What the link check links to: TICVAI's first web screen, or an operation.
+  const [linkKind, linkId] = project === 'ticvai' || !firstOp
+    ? ['screen', 'WEB-001'] : ['operation', `${contractName}#${firstOp}`];
+
+  // A search that finds nothing lists every kind the package's index holds.
+  const corpus = parse(await mcp.send('tools/call', {
+    name: 'adam_search', arguments: { q: 'zz-no-such-artefact-zz' },
+  }));
+  const kindsHere = new Set(corpus.kindsAvailable ?? []);
+  const contractList = [...perFile.keys()].map((f) => String(f).split('/').pop());
+  const contractsSaid = contractList.length > 6 ? `${contractList.length} contracts` : `contracts ${contractList.join(', ') || 'none'}`;
+  console.log(`  ....  ${project}: ${contractsSaid}; searchable ${[...kindsHere].join(', ') || 'nothing'}`);
+
   // A generous limit on purpose. At the default 25 the first `flow` and the
   // first `table` fell off the end, both lookups below reported "search found
   // nothing of that kind", and two real bugs sat behind that skip for a while.
   // A check that skips quietly is a check that lies.
-  const search = await mcp.send('tools/call', {
-    name: 'adam_search', arguments: { q: 'access', limit: 100 },
-  });
-  const found = parse(search);
-  if (found.hits?.length) {
-    pass(`adam_search returned ${found.total} hits across ${Object.keys(found.kinds).length} kinds`);
-  } else fail('adam_search returned hits', JSON.stringify(found).slice(0, 300));
+  const found = parse(await mcp.send('tools/call', {
+    name: 'adam_search', arguments: { q: project === 'ticvai' ? 'access' : 'a', limit: 100 },
+  }));
+  if ([...kindsHere].every((k) => k === 'page')) {
+    absent('adam_search hits and kinds', 'searchable artefacts (screens, tables, journeys)');
+  } else {
+    if (found.hits?.length) {
+      pass(`adam_search returned ${found.total} hits across ${Object.keys(found.kinds).length} kinds`);
+    } else fail('adam_search returned hits', JSON.stringify(found).slice(0, 300));
 
-  // `kinds` must describe the whole result, not the corpus and not the page:
-  // its counts have to add up to `total`. An earlier draft of this assertion
-  // demanded every named kind appear in `hits` too, which is wrong for the same
-  // reason the bug it was chasing was wrong — `hits` is one page of `total`,
-  // and a kind with one hit at position 200 is real and not on it.
-  const kinds = found.kinds ?? {};
-  const summed = Object.values(kinds).reduce((a, b) => a + b, 0);
-  if (Object.keys(kinds).length && summed === found.total) {
-    pass(`kinds counts the whole result (${summed} across ${Object.keys(kinds).length} kinds)`);
-  } else fail('kinds counts the whole result', `summed ${summed} vs total ${found.total}`);
+    // `kinds` must describe the whole result, not the corpus and not the page:
+    // its counts have to add up to `total`. An earlier draft of this assertion
+    // demanded every named kind appear in `hits` too, which is wrong for the same
+    // reason the bug it was chasing was wrong — `hits` is one page of `total`,
+    // and a kind with one hit at position 200 is real and not on it.
+    const kinds = found.kinds ?? {};
+    const summed = Object.values(kinds).reduce((a, b) => a + b, 0);
+    if (Object.keys(kinds).length && summed === found.total) {
+      pass(`kinds counts the whole result (${summed} across ${Object.keys(kinds).length} kinds)`);
+    } else fail('kinds counts the whole result', `summed ${summed} vs total ${found.total}`);
+  }
 
   // Drive the other lookups off a *filtered* search per kind, so a hit that
   // exists past the page cap is still found. Not hardcoded ids — those move
@@ -246,14 +292,15 @@ if (!viewerUp) {
     return r.hits?.[0]?.id;
   };
   const cases = [
-    ['adam_screen', { id: await first('screen') }, 'screen'],
-    ['adam_journey', { id: await first('flow') }, 'journey'],
-    ['adam_contract', { name: 'access' }, 'contract'],
-    ['adam_table', { name: await first('table') }, 'table'],
+    ['adam_screen', { id: kindsHere.has('screen') ? await first('screen') : null }, 'screen', 'screens'],
+    ['adam_journey', { id: kindsHere.has('flow') ? await first('flow') : null }, 'journey', 'journeys'],
+    ['adam_contract', { name: perFile.size || project === 'ticvai' ? contractName : null }, 'contract', 'contracts'],
+    ['adam_table', { name: kindsHere.has('table') ? await first('table') : null }, 'table', 'tables'],
   ];
-  for (const [tool, args, key] of cases) {
+  for (const [tool, args, key, layer] of cases) {
     const only = Object.values(args)[0];
-    if (!only) { fail(tool, `search returned no hit of that kind to look up — kinds: ${found.kinds}`); continue; }
+    if (only === null) { absent(tool, layer); continue; }
+    if (!only) { fail(tool, `search returned no hit of that kind to look up — kinds: ${JSON.stringify(found.kinds)}`); continue; }
     const answer = await mcp.send('tools/call', { name: tool, arguments: args });
     const body = parse(answer);
     if (body.found && body[key]) pass(`${tool}(${only}) returned a ${key}`);
@@ -278,15 +325,20 @@ if (!viewerUp) {
     else fail('adam_file read the ADR', JSON.stringify(src).slice(0, 200));
   } else if (adrs.result?.isError && seen.forbidden) {
     pass('adam_decisions is refused for this account, and says so');
+  } else if (project !== 'ticvai' && /records no decisions/.test(seen.error ?? '')) {
+    absent('adam_decisions', 'decisions');
   } else {
     fail('adam_decisions', JSON.stringify(seen).slice(0, 300));
   }
 
-  // The 756 KB contract must come back as a map, not as a context window.
-  const big = await mcp.send('tools/call', { name: 'adam_contract', arguments: { name: 'access' } });
+  // The biggest contract (TICVAI's is 756 KB) must come back as a map, not as a
+  // context window.
+  const big = await mcp.send('tools/call', { name: 'adam_contract', arguments: { name: contractName } });
   const size = big.result?.content?.[0]?.text?.length ?? 0;
-  if (size > 0 && size < 120_000) pass(`adam_contract(access) is ${Math.round(size / 1024)} KB, under the ceiling`);
-  else fail('adam_contract(access) stays under the ceiling', `${Math.round(size / 1024)} KB`);
+  if (!perFile.size && project !== 'ticvai') absent('the contract size ceiling', 'contracts');
+  else if (parse(big).found && size > 0 && size < 120_000) {
+    pass(`adam_contract(${contractName}) is ${Math.round(size / 1024) || '<1'} KB, under the ceiling`);
+  } else fail(`adam_contract(${contractName}) stays under the ceiling`, `${Math.round(size / 1024)} KB: ${JSON.stringify(parse(big)).slice(0, 150)}`);
 
   // **V-46, from the client's side.** The MCP leans on the viewer answering a
   // conditional request; without it every tool call re-downloads a whole layer,
@@ -294,20 +346,12 @@ if (!viewerUp) {
   // rather than in the viewer's own harness because this is the consumer that
   // breaks, and because a deployed viewer predating the fix must still work
   // through the `generatedAt` fallback.
-  const signIn = await fetch(`${base}/api/auth/login`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ email: process.env.ADAM_EMAIL, password: process.env.ADAM_PASSWORD }),
-  });
-  const token = (signIn.headers.getSetCookie?.() ?? [])
-    .map((c) => /ticvai_session=([^;]+)/.exec(c)?.[1]).find(Boolean);
   if (token) {
-    const cookie = `ticvai_session=${decodeURIComponent(token)}`;
-    const full = await fetch(`${base}/pkg/ticvai/index`, { headers: { cookie } });
+    const full = await fetch(indexUrl, { headers: { cookie } });
     const tag = full.headers.get('etag');
     const size = (await full.arrayBuffer()).byteLength;
     if (tag) {
-      const again = await fetch(`${base}/pkg/ticvai/index`,
+      const again = await fetch(indexUrl,
         { headers: { cookie, 'if-none-match': tag } });
       const saved = (await again.arrayBuffer()).byteLength;
       if (again.status === 304 && saved === 0) {
@@ -316,7 +360,7 @@ if (!viewerUp) {
 
       // A validator that matches anything is worse than none: it would serve a
       // stale package forever and look like a working cache.
-      const stale = await fetch(`${base}/pkg/ticvai/index`,
+      const stale = await fetch(indexUrl,
         { headers: { cookie, 'if-none-match': '"not-the-etag"' } });
       if (stale.status === 200) pass('a stale validator refetches rather than 304ing');
       else fail('a stale validator refetches', `got ${stale.status}`);
@@ -328,22 +372,28 @@ if (!viewerUp) {
   // Services and modules — phase 2. Neither needed a new server route: the
   // handoff said both were missing and both were already being served.
   const svc = parse(await mcp.send('tools/call', { name: 'adam_service', arguments: {} }));
-  if (svc.total > 0) pass(`adam_service listed ${svc.total} services`);
-  else fail('adam_service listed services', JSON.stringify(svc).slice(0, 200));
+  if (project !== 'ticvai' && /describes no services/.test(svc.error ?? '')) {
+    absent('adam_service', 'services');
+  } else {
+    if (svc.total > 0) pass(`adam_service listed ${svc.total} services`);
+    else fail('adam_service listed services', JSON.stringify(svc).slice(0, 200));
 
-  const one = svc.services?.[0]?.name;
-  const deep = parse(await mcp.send('tools/call', { name: 'adam_service', arguments: { name: one } }));
-  if (deep.found && deep.service?.operationsByContract) pass(`adam_service(${one}) returned its contracts`);
-  else fail(`adam_service(${one})`, JSON.stringify(deep).slice(0, 200));
+    const one = svc.services?.[0]?.name;
+    const deep = parse(await mcp.send('tools/call', { name: 'adam_service', arguments: { name: one } }));
+    if (deep.found && deep.service?.operationsByContract) pass(`adam_service(${one}) returned its contracts`);
+    else fail(`adam_service(${one})`, JSON.stringify(deep).slice(0, 200));
 
-  // Said out loud, without the suffix — how anybody actually refers to them.
-  const short = one?.replace(/Service$/, '');
-  const spoken = parse(await mcp.send('tools/call', { name: 'adam_service', arguments: { name: short } }));
-  if (spoken.found) pass(`adam_service("${short}") resolves without the suffix`);
-  else fail(`adam_service("${short}")`, JSON.stringify(spoken).slice(0, 200));
+    // Said out loud, without the suffix — how anybody actually refers to them.
+    const short = one?.replace(/Service$/, '');
+    const spoken = parse(await mcp.send('tools/call', { name: 'adam_service', arguments: { name: short } }));
+    if (spoken.found) pass(`adam_service("${short}") resolves without the suffix`);
+    else fail(`adam_service("${short}")`, JSON.stringify(spoken).slice(0, 200));
+  }
 
   const mods = parse(await mcp.send('tools/call', { name: 'adam_module', arguments: {} }));
-  if (mods.total > 0) pass(`adam_module listed ${mods.total} modules`);
+  const noWorkbook = project !== 'ticvai' && /workbook is not present/.test(mods.error ?? '');
+  if (noWorkbook) absent('adam_module and adam_table', 'tables or modules');
+  else if (mods.total > 0) pass(`adam_module listed ${mods.total} modules`);
   else fail('adam_module listed modules', JSON.stringify(mods).slice(0, 200));
 
   // **The size guard, and it is not theoretical.** 160 fields across the 395
@@ -357,7 +407,9 @@ if (!viewerUp) {
     const n = answer.result?.content?.[0]?.text?.length ?? 0;
     if (n > worst[1]) worst = [m.name, n];
   }
-  if (worst[1] > 0 && worst[1] < 40_000) {
+  if (noWorkbook) {
+    // already said above
+  } else if (worst[1] > 0 && worst[1] < 40_000) {
     pass(`the largest module answer is ${worst[0]} at ${Math.round(worst[1] / 1024)} KB`);
   } else fail('module answers stay small', `${worst[0]} is ${Math.round(worst[1] / 1024)} KB`);
 
@@ -384,12 +436,12 @@ if (!viewerUp) {
       // changes state, so it undoes itself rather than leaving a row behind for
       // the next run to trip over.
       const made = parse(await mcp.send('tools/call', {
-        name: 'adam_link', arguments: { kind: 'screen', id: 'WEB-001', key: first },
+        name: 'adam_link', arguments: { kind: linkKind, id: linkId, key: first },
       }));
       if (made.ok) {
-        pass(`adam_link recorded screen WEB-001 against #${first}`);
+        pass(`adam_link recorded ${linkKind} ${linkId} against #${first}`);
         const seen = parse(await mcp.send('tools/call', {
-          name: 'adam_links', arguments: { kind: 'screen', id: 'WEB-001' },
+          name: 'adam_links', arguments: { kind: linkKind, id: linkId },
         }));
         if (seen.found && seen.links.some((l) => l.workPackage === String(first))) {
           pass('adam_links reads it back');
@@ -471,9 +523,11 @@ if (!viewerUp) {
   // The bare name, without its module. The tool's own description promises
   // this works; it did not, because `fold` strips the dot before the regex
   // that was meant to find one, and the fallback was dead code.
-  const bare = parse(await mcp.send('tools/call',
+  const bare = noWorkbook ? { skipped: true } : parse(await mcp.send('tools/call',
     { name: 'adam_table', arguments: { name: 'entitlement' } }));
-  if (bare.found || (bare.didYouMean ?? []).length > 1) {
+  if (bare.skipped) {
+    // no tables in this package; said above
+  } else if (bare.found || (bare.didYouMean ?? []).length > 1) {
     pass(bare.found ? 'adam_table resolves a bare table name' : 'a bare table name that is ambiguous asks which');
     // Whatever it offers must be a name that exists. The doubled prefix bug
     // handed back `access.access.entitlement`, which names nothing.
