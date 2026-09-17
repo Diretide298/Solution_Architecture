@@ -10,5 +10,7 @@ Work ticket $ARGUMENTS, following "Working a ticket (ADAM)" in CLAUDE.md:
    what you found, and ask before linking it.
 2. Build what the ticket and its contract describe, in the app and packages CLAUDE.md lists.
 3. Add tests for the success case and each listed error. Run `pnpm lint`, `pnpm typecheck` and `pnpm test` until they pass.
-4. `adam_propose` the done status, 100%, and a 2-4 line comment. Show me the proposal and stop.
+4. `adam_propose` **Closed**, 100%, and a 2-4 line comment. If the build or the tests are not
+   finished, propose **In progress** with an honest % done instead; if something outside this
+   repository blocks it, propose **On hold** and say what. Show me the proposal and stop.
    Do not run `adam_apply` until I say yes.

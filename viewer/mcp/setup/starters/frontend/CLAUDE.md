@@ -49,7 +49,21 @@ ADAM is connected for this folder. It holds the screens, journeys and contracts;
    rather than guessing a name or a shape.
 2. Build exactly what the ticket and its linked artefacts describe, in the app it names.
 3. Add tests next to the code (`*.test.ts[x]`). `pnpm lint`, `pnpm typecheck` and `pnpm test` must pass.
-4. `adam_propose` the ticket: the done status, 100%, and a 2-4 line comment on what was built and
+4. `adam_propose` the ticket: **Closed**, 100% (see the statuses below), and a 2-4 line comment on what was built and
    that the checks pass. Show the proposal and **wait for a yes** before `adam_apply`.
+
+## Ticket statuses (OpenProject)
+
+| Status | Use it when |
+|---|---|
+| **New** | Not started. Never set it yourself. |
+| **In progress** | Work has started but is not finished - a build that stopped part-way, or tests still failing. |
+| **Closed** | Done: built as the ticket and its contract describe, and the tests pass. |
+| **On hold** | Blocked on something outside this repository - a missing contract, an unanswered question. Say what in the comment. |
+| **Rejected** | Only when the person says the ticket will not be done. Never on your own. |
+
+Pair the status with % done: In progress 10-90, Closed 100, On hold unchanged.
+These are the statuses on pms.softlabsgroup.in. `adam_propose` with only a ticket number lists
+the live ones; if they differ from this table, use those.
 
 `.adam/` is a local copy and is git-ignored. Never commit it.
