@@ -300,7 +300,7 @@ if ($Project) {
         Write-Host ("     {0}. {1}  ({2})" -f ($i + 1), $label, $projects[$i].id)
     }
     while (-not $picked) {
-        $answer = (Read-Host "   Select number for project [1-$($projects.Count)]").Trim()
+        $answer = (Read-Host "   Enter the project number [1-$($projects.Count)]").Trim()
         $number = 0
         if ([int]::TryParse($answer, [ref]$number) -and $number -ge 1 -and $number -le $projects.Count) {
             $picked = $projects[$number - 1]

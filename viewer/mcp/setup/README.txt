@@ -28,7 +28,7 @@ SET IT UP
 
         1. TICVAI  (ticvai)
         2. ...
-     Select number for project [1-2]: 1
+     Enter the project number [1-2]: 1
 
   5. Paste the path of the code folder you work on it in, for example
      C:\work	icvai-backend - or press Enter to use it in every folder.
