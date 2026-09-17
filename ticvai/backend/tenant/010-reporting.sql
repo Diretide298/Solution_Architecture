@@ -1,4 +1,4 @@
--- reporting — 13 tables
+-- reporting — 12 tables
 -- **Derived. Do not hand-edit.**
 
 -- A rule that fired. Acknowledged rather than dismissed — an alert that disappears when clicked
@@ -126,15 +126,6 @@ CREATE TABLE IF NOT EXISTS reporting.report_definition (
     created_at                        timestamptz,
     last_run_at                       timestamptz,
     scope_path                        text
-);
-
--- Generated, not stored. ReportField declares persistence: none — metadata catalogue, generated:
--- the fields a report may use are read off the DataSource at build time, and a stored catalogue
--- and a schema that disagree is a builder offering fields that no longer exist. Retrievable so a
--- report can be found by what it answers
-CREATE TABLE IF NOT EXISTS reporting.report_field (
-    id                                uuid PRIMARY KEY NOT NULL,
-    definition_id                     uuid NOT NULL
 );
 
 -- A condition applied before aggregation. Hangs off: a child of reporting.report_definition;

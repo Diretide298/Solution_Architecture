@@ -41,7 +41,7 @@ servicesCalled:
 - service: TenancyService
   operationCalls: 28
 - service: IdentityService
-  operationCalls: 26
+  operationCalls: 25
 - service: WhiteLabelService
   operationCalls: 20
 - service: MarketingService
@@ -68,7 +68,6 @@ screens:
   operations:
   - forceLogout
   - getCurrentSession
-  - getGuestSession
   - listActiveSessions
   - listMfaMethods
   - listSsoProviders

@@ -5520,12 +5520,22 @@ screens:
   navigation:
     entryFrom:
     - GST-001
+    - GST-042
     inferred: true
     exitTo:
     - GST-001
     - GST-002
     - GST-003
+    - GST-042
     transitions:
+    - to: GST-042
+      trigger: Opens the cart without a verified sign-in
+      precondition: no verified guest session, and the site's guestCheckout is off
+      carries:
+      - cartId
+      returnsTo: GST-041
+      provenance: decided 17 September 2026 — no order against an unproven contact; rule on identity verifyGuestEmail,
+        per-site guestCheckout off by default (matrix 2.6.28)
     - to: GST-001
       trigger: Home – Default
       carries:
@@ -5589,8 +5599,9 @@ screens:
     emptyFirstRun: —
     emptyNoResults: The filter narrowed it and the checkout entry are still there. Names the active filter
       and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: '**Never shown as an empty cart.** With the site''s `guestCheckout` off, a guest who
+      is not signed in, or whose account is unverified, is sent to sign-in before the cart opens, and
+      comes back to this cart with it intact.'
     offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
@@ -5635,7 +5646,9 @@ screens:
       from: navigation
     - name: productId
       from: navigation
-    coldEntry: Resolves from the session; a cold arrival is the ordinary case.
+    coldEntry: Resolves from the session; a cold arrival is the ordinary case. **A cold arrival without
+      a verified sign-in goes to sign-in first** when the site's `guestCheckout` is off, and returns here
+      with the cart.
   wireframe:
     status: notStarted
     provenance: generated
@@ -5657,11 +5670,13 @@ screens:
   navigation:
     entryFrom:
     - GST-001
+    - GST-041
     inferred: true
     exitTo:
     - GST-001
     - GST-002
     - GST-003
+    - GST-041
     transitions:
     - to: GST-001
       trigger: Home – Default
@@ -5680,6 +5695,13 @@ screens:
       provenance: flow F56 step 2→3
       crossesDevice: true
       back: false
+    - to: GST-041
+      trigger: Signed in and verified — back to the cart
+      precondition: arrived from the cart
+      carries:
+      - cartId
+      provenance: decided 17 September 2026 — no order against an unproven contact; rule on identity verifyGuestEmail,
+        per-site guestCheckout off by default (matrix 2.6.28)
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**:
     removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own

@@ -5,7 +5,7 @@ real schema, and returns. There is no business logic, no validation beyond the p
 correctness guarantee — **this exists to measure what a deployment topology costs**, and the
 database work is the part that varies with topology.
 
-16 operations · 5 tables touched · scope levels: region, tenant, venue, workstation
+17 operations · 5 tables touched · scope levels: region, tenant, venue, workstation
 """
 from __future__ import annotations
 
@@ -107,7 +107,7 @@ async def _start() -> None:
 async def health() -> dict:
     # **Reported per tenant and in total.** One number across every tenant database is the
     # number that made `max_connections` look comfortable while a Saturday evening was not.
-    return {"service": "CrossRegionService", "operations": 16,
+    return {"service": "CrossRegionService", "operations": 17,
             "coldStartMs": getattr(app.state, "cold_start_ms", None),
             "tenantPools": len(pools),
             "poolSize": sum(p.get_size() for p in pools.values()),
@@ -268,6 +268,16 @@ async def release_wallet_authorisation(request: Request) -> dict:
     scope: workstation · permission: ORDER_CREATE · offline: False
     """
     return await run("releaseWalletAuthorisation", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.post("/wallet-authorisations/{authorisationId}/release")
+async def relinquish_wallet_authorisation(request: Request) -> dict:
+    """Release a hold without capturing
+
+    scope: workstation · permission: ORDER_CREATE · offline: False
+    """
+    return await run("relinquishWalletAuthorisation", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 

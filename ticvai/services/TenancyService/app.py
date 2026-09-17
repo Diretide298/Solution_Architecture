@@ -5,7 +5,7 @@ real schema, and returns. There is no business logic, no validation beyond the p
 correctness guarantee — **this exists to measure what a deployment topology costs**, and the
 database work is the part that varies with topology.
 
-52 operations · 36 tables touched · scope levels: brand, region, tenant, venue, workstation
+78 operations · 39 tables touched · scope levels: brand, region, tenant, venue, workstation
 """
 from __future__ import annotations
 
@@ -107,7 +107,7 @@ async def _start() -> None:
 async def health() -> dict:
     # **Reported per tenant and in total.** One number across every tenant database is the
     # number that made `max_connections` look comfortable while a Saturday evening was not.
-    return {"service": "TenancyService", "operations": 52,
+    return {"service": "TenancyService", "operations": 78,
             "coldStartMs": getattr(app.state, "cold_start_ms", None),
             "tenantPools": len(pools),
             "poolSize": sum(p.get_size() for p in pools.values()),
@@ -171,6 +171,46 @@ async def amend_attendance(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.put("/matrix-multi-level")
+async def approve_matrix_multi_level(request: Request) -> dict:
+    """Approval Matrix & Multi-Level Approval Configuration
+
+    scope: venue · permission: APPROVAL_REQUEST · offline: False
+    """
+    return await run("approveMatrixMultiLevel", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/role-authority-delegation")
+async def approve_role_authority_delegation(request: Request) -> dict:
+    """Roles, Authority, Delegation & Approval Limits
+
+    scope: venue · permission: APPROVAL_REQUEST · offline: False
+    """
+    return await run("approveRoleAuthorityDelegation", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/unified-decision")
+async def approve_unified_decision(request: Request) -> dict:
+    """Unified Approval Inbox & Decision Workspace
+
+    scope: venue · permission: APPROVAL_REQUEST · offline: False
+    """
+    return await run("approveUnifiedDecision", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/versioning-governance")
+async def approve_versioning_governance(request: Request) -> dict:
+    """Versioning, Governance, Approval & Publication
+
+    scope: venue · permission: APPROVAL_REQUEST · offline: False
+    """
+    return await run("approveVersioningGovernance", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.post("/guest-broadcast")
 async def broadcast_to_guests(request: Request) -> dict:
     """broadcastToGuests
@@ -208,6 +248,16 @@ async def create_approval_request(request: Request) -> dict:
     scope: venue · permission: APPROVAL_REQUEST · offline: False
     """
     return await run("createApprovalRequest", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.post("/automation-autonomou-action")
+async def create_automation_autonomou_action(request: Request) -> dict:
+    """Automation Execution & Autonomous Action Monitor
+
+    scope: venue · permission: APPROVAL_REQUEST · offline: False
+    """
+    return await run("createAutomationAutonomouAction", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -361,6 +411,26 @@ async def get_workstation_health(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.post("/accreditation-badges")
+async def issue_accreditation_badge(request: Request) -> dict:
+    """Issue a badge
+
+    scope: venue · permission: APPROVAL_ACT · offline: False
+    """
+    return await run("issueAccreditationBadge", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/accreditation-badges")
+async def list_accreditation_badges(request: Request) -> dict:
+    """Badges issued and their state
+
+    scope: venue · permission: APPROVAL_VIEW · offline: False
+    """
+    return await run("listAccreditationBadges", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/announcements")
 async def list_announcements(request: Request) -> dict:
     """What staff have been told
@@ -421,6 +491,26 @@ async def list_audit_records(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/condition-decision-logic")
+async def list_condition_decision_logic(request: Request) -> dict:
+    """Conditions, Decision Logic & Decision Tables
+
+    scope: venue · permission: APPROVAL_VIEW · offline: False
+    """
+    return await run("listConditionDecisionLogic", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/cross-module-orchestration")
+async def list_cross_module_orchestration(request: Request) -> dict:
+    """Cross-Module Orchestration Monitor
+
+    scope: venue · permission: APPROVAL_VIEW · offline: False
+    """
+    return await run("listCrossModuleOrchestration", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/devices")
 async def list_devices(request: Request) -> dict:
     """List registered devices
@@ -451,6 +541,16 @@ async def list_outlets(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/process-automation-opportunity")
+async def list_process_automation_opportunity(request: Request) -> dict:
+    """Process Optimization & Automation Opportunity Center
+
+    scope: venue · permission: APPROVAL_VIEW · offline: False
+    """
+    return await run("listProcessAutomationOpportunity", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/rota-assignments")
 async def list_rota_assignments(request: Request) -> dict:
     """The rota
@@ -461,6 +561,16 @@ async def list_rota_assignments(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/rule-workflow")
+async def list_rule_workflow(request: Request) -> dict:
+    """Rules & Workflow Command Center
+
+    scope: venue · permission: APPROVAL_VIEW · offline: False
+    """
+    return await run("listRuleWorkflow", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/sale-boards")
 async def list_sale_boards(request: Request) -> dict:
     """List sale boards
@@ -468,6 +578,106 @@ async def list_sale_boards(request: Request) -> dict:
     scope: venue · permission: SCOPE_VIEW · offline: True
     """
     return await run("listSaleBoards", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/shift-swaps")
+async def list_shift_swap_requests(request: Request) -> dict:
+    """Swap requests and their state
+
+    scope: venue · permission: WORKFORCE_VIEW · offline: False
+    """
+    return await run("listShiftSwapRequests", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/sla-escalation-bottleneck")
+async def list_sla_escalation_bottleneck(request: Request) -> dict:
+    """SLA, Escalation & Bottleneck Monitor
+
+    scope: venue · permission: APPROVAL_VIEW · offline: False
+    """
+    return await run("listSlaEscalationBottleneck", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/sla-escalation-reminder")
+async def list_sla_escalation_reminder(request: Request) -> dict:
+    """SLA, Escalation, Reminder & Timeout Rules
+
+    scope: venue · permission: APPROVAL_VIEW · offline: False
+    """
+    return await run("listSlaEscalationReminder", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/step-up-policies")
+async def list_step_up_policies(request: Request) -> dict:
+    """What needs a second factor here
+
+    scope: tenant · permission: APPROVAL_CONFIGURE · offline: False
+    """
+    return await run("listStepUpPolicies", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/training-records")
+async def list_training_records(request: Request) -> dict:
+    """Training completed and what is expiring
+
+    scope: venue · permission: WORKFORCE_VIEW · offline: False
+    """
+    return await run("listTrainingRecords", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/workflow")
+async def list_workflow(request: Request) -> dict:
+    """Workflow Operations Command Center
+
+    scope: venue · permission: APPROVAL_VIEW · offline: False
+    """
+    return await run("listWorkflow", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/workflow-autonomou-governance")
+async def list_workflow_autonomou_governance(request: Request) -> dict:
+    """AI Workflow Intelligence & Autonomous Governance Center
+
+    scope: venue · permission: APPROVAL_VIEW · offline: False
+    """
+    return await run("listWorkflowAutonomouGovernance", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/workflow-exception-failure")
+async def list_workflow_exception_failure(request: Request) -> dict:
+    """Workflow Exception, Failure & Recovery Center
+
+    scope: venue · permission: APPROVAL_VIEW · offline: False
+    """
+    return await run("listWorkflowExceptionFailure", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/workflow-instance-process")
+async def list_workflow_instance_process(request: Request) -> dict:
+    """Workflow Instance Monitor & Process Timeline
+
+    scope: venue · permission: APPROVAL_VIEW · offline: False
+    """
+    return await run("listWorkflowInstanceProcess", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/workflow-process-performance")
+async def list_workflow_process_performance(request: Request) -> dict:
+    """Workflow Analytics & Process Performance
+
+    scope: venue · permission: APPROVAL_VIEW · offline: False
+    """
+    return await run("listWorkflowProcessPerformance", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -601,6 +811,26 @@ async def set_role_permissions(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.put("/step-up-policies")
+async def set_step_up_policy(request: Request) -> dict:
+    """Raise what needs a second factor
+
+    scope: tenant · permission: APPROVAL_CONFIGURE · offline: False
+    """
+    return await run("setStepUpPolicy", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/trigger-action-cross")
+async def set_trigger_action_cross(request: Request) -> dict:
+    """Trigger, Action & Cross-Module Orchestration Configuration
+
+    scope: venue · permission: APPROVAL_REQUEST · offline: False
+    """
+    return await run("setTriggerActionCross", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.put("/venues/{venueId}/settings")
 async def set_venue_settings(request: Request) -> dict:
     """Set support hours, quiet hours, segregated access and alerting
@@ -608,6 +838,36 @@ async def set_venue_settings(request: Request) -> dict:
     scope: venue · permission: TENANT_CONFIGURE · offline: False
     """
     return await run("setVenueSettings", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/visual-business-rule")
+async def set_visual_business_rule(request: Request) -> dict:
+    """Visual Business Rule Builder
+
+    scope: venue · permission: APPROVAL_REQUEST · offline: False
+    """
+    return await run("setVisualBusinessRule", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/visual-workflow")
+async def set_visual_workflow(request: Request) -> dict:
+    """Visual Workflow Designer
+
+    scope: venue · permission: APPROVAL_REQUEST · offline: False
+    """
+    return await run("setVisualWorkflow", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/workflow-testing-impact")
+async def simulate_workflow_testing_impact(request: Request) -> dict:
+    """Workflow Testing, Simulation & Impact Analysis
+
+    scope: venue · permission: APPROVAL_REQUEST · offline: False
+    """
+    return await run("simulateWorkflowTestingImpact", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 

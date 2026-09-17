@@ -124,6 +124,9 @@ READS = {
  "getLoyaltyPosition": [
   "SELECT * FROM marketing.loyalty_programme LIMIT 50"
  ],
+ "getMarketingSubscription": [
+  "SELECT * FROM marketing.subscription LIMIT 50"
+ ],
  "getMessageStatus": [
   "SELECT * FROM marketing.message_dispatch LIMIT 50"
  ],
@@ -290,6 +293,9 @@ READS = {
  ],
  "setConsentPurposes": [
   "SELECT * FROM marketing.consent_purpose LIMIT 50"
+ ],
+ "setMarketingSubscription": [
+  "SELECT * FROM marketing.subscription LIMIT 50"
  ],
  "setMessageTrigger": [
   "SELECT * FROM marketing.message_template LIMIT 50",
@@ -497,6 +503,9 @@ WRITES = {
  ],
  "setConsentPurposes": [
   "SELECT id FROM marketing.consent_purpose ORDER BY id LIMIT 1 FOR UPDATE"
+ ],
+ "setMarketingSubscription": [
+  "SELECT id FROM marketing.subscription ORDER BY id LIMIT 1 FOR UPDATE"
  ],
  "setMessageTrigger": [
   "SELECT id FROM marketing.message_trigger WHERE scope_path LIKE $1 ORDER BY id LIMIT 1 FOR UPDATE"

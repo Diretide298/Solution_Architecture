@@ -107,9 +107,9 @@ screens:
   purpose: Get someone into the app, fast, on a device that may be shared.
   gaps:
   - operation: getCurrentSession
-    why: '**5 declared operations reach no component on this screen**: getCurrentSession, getGuestSession,
-      listMfaMethods, listSsoProviders, listPartnerAgreements. Either the screen is missing what calls
-      them, or the declaration is residue.'
+    why: '**4 declared operations reach no component on this screen**: getCurrentSession, listMfaMethods,
+      listSsoProviders, listPartnerAgreements. Either the screen is missing what calls them, or the declaration
+      is residue.'
     source: the screen's own declarations
   layout:
     template: split
@@ -226,10 +226,6 @@ screens:
   - operationId: getCurrentSession
     contract: identity
     purpose: Current session and effective permissions
-    trigger: onLoad
-  - operationId: getGuestSession
-    contract: identity
-    purpose: Read the current guest session
     trigger: onLoad
   - operationId: listActiveSessions
     contract: identity

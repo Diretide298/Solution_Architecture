@@ -5,7 +5,7 @@ real schema, and returns. There is no business logic, no validation beyond the p
 correctness guarantee — **this exists to measure what a deployment topology costs**, and the
 database work is the part that varies with topology.
 
-35 operations · 14 tables touched · scope levels: venue, workstation
+37 operations · 15 tables touched · scope levels: venue, workstation
 """
 from __future__ import annotations
 
@@ -107,7 +107,7 @@ async def _start() -> None:
 async def health() -> dict:
     # **Reported per tenant and in total.** One number across every tenant database is the
     # number that made `max_connections` look comfortable while a Saturday evening was not.
-    return {"service": "RetailService", "operations": 35,
+    return {"service": "RetailService", "operations": 37,
             "coldStartMs": getattr(app.state, "cold_start_ms", None),
             "tenantPools": len(pools),
             "poolSize": sum(p.get_size() for p in pools.values()),
@@ -371,6 +371,16 @@ async def list_retail_sales(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/store-rules")
+async def list_store_rules(request: Request) -> dict:
+    """Rules and controls in force in the store
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listStoreRules", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/wallets/{subjectId}/transactions")
 async def list_wallet_transactions(request: Request) -> dict:
     """Wallet transaction history
@@ -458,6 +468,16 @@ async def set_return_policy(request: Request) -> dict:
     scope: venue · permission: REGION_CONFIGURE · offline: False
     """
     return await run("setReturnPolicy", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/store-rules")
+async def set_store_rules(request: Request) -> dict:
+    """Change a store rule
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("setStoreRules", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 

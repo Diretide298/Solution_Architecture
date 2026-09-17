@@ -22,7 +22,7 @@ steps:
   action: Platform Login / MFA.
   operations:
   - forceLogout
-  - getGuestSession
+  - getCurrentSession
   - listActiveSessions
   - revokeAllSessions
   outcome: 4 operations, 4 of them previously unwalked.
@@ -31,7 +31,7 @@ steps:
   action: Partner Login / MFA.
   operations:
   - forceLogout
-  - getGuestSession
+  - getCurrentSession
   - listActiveSessions
   - listPartnerAgreements
   - overrideCreditLimit
@@ -43,7 +43,7 @@ steps:
   action: Agent Login.
   operations:
   - forceLogout
-  - getGuestSession
+  - getCurrentSession
   - listActiveSessions
   - revokeAllSessions
   outcome: 4 operations, 4 of them previously unwalked.

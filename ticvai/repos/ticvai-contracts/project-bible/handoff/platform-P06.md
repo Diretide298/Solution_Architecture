@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | Screens | 96 |
-| Operations | 184 |
+| Operations | 183 |
 | Contracts | 17 |
 | Modules | 4 |
 | Undrawn | 0 |
@@ -81,8 +81,8 @@
 
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
-| `EMP-001` | Sign in | Operations | 1 | 5 | yes |
-| `EMP-002` | Select venue & role | Operations | 1 | 6 | yes |
+| `EMP-001` | Sign in | Operations | 1 | 4 | yes |
+| `EMP-002` | Select venue & role | Operations | 1 | 5 | yes |
 | `EMP-003` | Home — on duty | Operations | 1 | 17 | yes |
 | `EMP-004` | Task list | Operations | 1 | 15 | yes |
 | `EMP-005` | Task detail | Operations | 1 | 15 | yes |
@@ -118,7 +118,7 @@
 | `EMP-039` | Announcements | Operations | 2 | 4 | yes |
 | `EMP-040` | Knowledge base | Operations | 2 | 1 | yes |
 | `EMP-041` | Training | Operations | 3 | 2 | yes |
-| `EMP-042` | Profile | Operations | 1 | 4 | yes |
+| `EMP-042` | Profile | Operations | 1 | 3 | yes |
 | `EMP-043` | Device settings | Operations | 1 | 2 | yes |
 | `EMP-044` | Accessibility | Operations | 2 | 0 | yes |
 | `EMP-045` | Arabic / RTL | Operations | 1 | 0 | yes |

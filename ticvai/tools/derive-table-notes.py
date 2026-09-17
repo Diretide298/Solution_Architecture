@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -486,11 +487,16 @@ def main() -> int:
         existing = str(storage.get(t) or "").strip()
         parts = []
 
+        # **The note is rebuilt, never extended.** An existing note ends with the two sentences this
+        # loop writes, and reusing it whole appended them again on every refresh — found 17
+        # September with 168 notes carrying the same *Hangs off* line up to a hundred times.
+        kept = re.split(r"\s*\*\*(?:Hangs off|Reached by)\*\*:", existing, maxsplit=1)[0].strip()
+
         what = WHAT.get(t)
         if what:
             parts.append(what)
-        elif existing:
-            parts.append(existing)
+        elif kept:
+            parts.append(kept)
         else:
             # **No hand-written meaning and no existing note.** Say what the shape says and no
             # more — an invented sentence is worse than an honest structural one.

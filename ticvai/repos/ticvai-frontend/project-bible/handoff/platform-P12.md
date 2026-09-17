@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | Screens | 28 |
-| Operations | 55 |
+| Operations | 54 |
 | Contracts | 7 |
 | Modules | 5 |
 | Undrawn | 0 |
@@ -76,7 +76,7 @@
 
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
-| `SUP-001` | Venue Management Sign In | Access & Availability | 3 | 8 | yes |
+| `SUP-001` | Venue Management Sign In | Access & Availability | 3 | 7 | yes |
 | `SUP-002` | Agent Dashboard | Overview | 3 | 9 | yes |
 | `SUP-003` | Availability & Routing Settings | Access & Availability | 3 | 1 | yes |
 | `SUP-004` | Conversation Queue | Conversations | 2 | 10 | yes |

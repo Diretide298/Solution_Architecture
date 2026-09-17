@@ -425,6 +425,18 @@ def main() -> int:
             if _t.split(".")[-1] in _none:
                 ERRORS.append(f"{_t} is stored in postgres and its schema declares persistence "
                               "none — one of the two is wrong")
+        # **And the DDL has to agree with the store.** On 17 September the schema reference said
+        # `redis` for both session registries and `derived` for `inventory.stock_level`, and
+        # `derive-ddl.py` created all of them anyway — this rule compared the reference with the
+        # contract and never looked at what was generated from it.
+        _sql = "".join(p.read_text(encoding="utf-8") for p in (ROOT / "backend").rglob("*.sql"))
+        _created = set(re.findall(r'CREATE TABLE IF NOT EXISTS ([a-z_]+)\."?([a-z_]+)"?', _sql))
+        for _t, _store in sorted((_s.get("store") or {}).items()):
+            if ":" in _t or "." not in _t or _store in ("postgres", "postgres-analytical"):
+                continue
+            if tuple(_t.split(".", 1)) in _created:
+                ERRORS.append(f"{_t} is stored in {_store} and backend/ creates it as a Postgres "
+                              "table — run tools/derive-ddl.py --apply")
 
     # 29. The repo mirrors match the root. `repos/update-bible.sh` says it plainly —
     # **project-bible/ is a copy, not a source** — and nothing ran it. On 20 August the mirror held

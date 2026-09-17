@@ -241,7 +241,13 @@ def main() -> int:
 
     lin = json.loads((ROOT / "handoff" / "api-data-lineage.json").read_text(encoding="utf-8"))
     sch = json.loads((ROOT / "handoff" / "schema-reference.json").read_text(encoding="utf-8"))
-    real = {t for t in sch["cols"] if "." in t and ":" not in t}
+    # Only what Postgres holds gets SQL. A Redis-stored table — the two session registries — is
+    # touched as a cache key, which is what the deployed service would do; querying it as a table
+    # measured a store the topology does not have.
+    store = sch.get("store") or {}
+    redis_tables = {t for t, v in store.items() if v == "redis" and ":" not in t}
+    real = {t for t in sch["cols"] if "." in t and ":" not in t
+            and store.get(t, "postgres") in ("postgres", "postgres-analytical")}
 
     by_svc: dict[str, list] = defaultdict(list)
     for op, v in lin.items():
@@ -309,7 +315,9 @@ def main() -> int:
             if w:
                 writes[op] = w[:2]
 
-            c = [k for k in v.get("reads", []) + v.get("writes", []) if k.startswith("cache:")]
+            c = [k if k.startswith("cache:") else f"cache:{k}"
+                 for k in v.get("reads", []) + v.get("writes", [])
+                 if k.startswith("cache:") or k in redis_tables]
             if c:
                 caches[op] = [f"{k}:bench" for k in dict.fromkeys(c)]
 

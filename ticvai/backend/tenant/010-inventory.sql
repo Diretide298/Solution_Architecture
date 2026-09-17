@@ -1,4 +1,4 @@
--- inventory — 19 tables
+-- inventory — 18 tables
 -- **Derived. Do not hand-edit.**
 
 -- A stock take. Its lines carry both the counted number and the recount, because two counts that
@@ -263,14 +263,6 @@ CREATE TABLE IF NOT EXISTS inventory.stock_batch (
     expires_at                        date,
     supplier_id                       uuid,
     status                            text
-);
-
--- Derived from movements, not stored. StockPosition declares persistence: none — derived from
--- movements, which is the correct design: a stored level and a movement ledger that disagree is a
--- stock count nobody can reconcile. Gating the sale reads the derivation
-CREATE TABLE IF NOT EXISTS inventory.stock_level (
-    id                                uuid PRIMARY KEY NOT NULL,
-    item_id                           uuid NOT NULL
 );
 
 -- Who a venue buys from, invoicing in their own currency

@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | Screens | 11 |
-| Operations | 23 |
+| Operations | 22 |
 | Contracts | 5 |
 | Modules | 1 |
 | Undrawn | 0 |
@@ -63,7 +63,7 @@
 
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
-| `SCN-001` | Sign in | Access | 1 | 8 | yes |
+| `SCN-001` | Sign in | Access | 1 | 7 | yes |
 | `SCN-002` | Access point & direction | Access | 1 | 3 | yes |
 | `SCN-003` | Ready to scan | Access | 1 | 9 | yes |
 | `SCN-007` | Group admission | Access | 1 | 7 | yes |

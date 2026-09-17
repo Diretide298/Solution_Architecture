@@ -1,7 +1,7 @@
 $id: ticvai/roles-by-app.yaml
 title: Permissions each shipped app requires
 generatedBy: tools/derive-app-roles.py
-generated: '2026-09-12'
+generated: '2026-09-17'
 description: '**Derived from what each app''s screens call, not decided here.** For every app, the permissions
   its operations declare in `x-ticvai-permission`, tiered by what the key permits. Role names, headcounts
   and the approval hierarchy are deliberately absent: who at a venue may configure pricing is the client''s
@@ -110,7 +110,7 @@ apps:
     - P14
     - P17
     screens: 537
-    operations: 538
+    operations: 537
     permissions: 62
     tiers:
       read:
@@ -183,7 +183,6 @@ apps:
     - checkoutCart
     - getCart
     - getCurrentSession
-    - getGuestSession
     - listMfaMethods
     - listSsoProviders
     - login
@@ -192,7 +191,7 @@ apps:
     - removeCartLine
     - sendTransactionalMessage
     - updateCartLine
-    operationsWithNoPermissionCount: 13
+    operationsWithNoPermissionCount: 12
   venue-management:
     name: TICVAI Venue Management
     platforms:
@@ -201,7 +200,7 @@ apps:
     - P13
     - P16
     screens: 811
-    operations: 810
+    operations: 809
     permissions: 107
     tiers:
       read:
@@ -319,7 +318,6 @@ apps:
     - getCurrentSession
     - getGuestMenu
     - getGuestOrderStatus
-    - getGuestSession
     - getTenantAppStatus
     - getWaitTimes
     - getWishlist
@@ -333,7 +331,7 @@ apps:
     - recordDeviceHeartbeat
     - recordGamePlay
     - syncGamePlays
-    operationsWithNoPermissionCount: 18
+    operationsWithNoPermissionCount: 17
   venue-pos:
     name: TICVAI POS
     platforms:
@@ -406,7 +404,7 @@ apps:
     - P06
     - P07
     screens: 107
-    operations: 191
+    operations: 190
     permissions: 55
     tiers:
       read:
@@ -470,7 +468,6 @@ apps:
     operationsWithNoPermission:
     - createTableReservation
     - getCurrentSession
-    - getGuestSession
     - getWaitTimes
     - listDeliveryLocations
     - listDiningOutlets
@@ -479,4 +476,4 @@ apps:
     - login
     - logout
     - selectRole
-    operationsWithNoPermissionCount: 11
+    operationsWithNoPermissionCount: 10

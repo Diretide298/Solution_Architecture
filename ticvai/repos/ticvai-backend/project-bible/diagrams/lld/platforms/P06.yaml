@@ -59,7 +59,7 @@ servicesCalled:
 - service: CatalogueService
   operationCalls: 17
 - service: IdentityService
-  operationCalls: 16
+  operationCalls: 13
 - service: AiService
   operationCalls: 8
 - service: RetailService
@@ -81,7 +81,6 @@ screens:
   density: comfortable
   operations:
   - getCurrentSession
-  - getGuestSession
   - listMfaMethods
   - listSsoProviders
   - login
@@ -111,7 +110,6 @@ screens:
   density: comfortable
   operations:
   - getCurrentSession
-  - getGuestSession
   - listMfaMethods
   - listRoles
   - listSsoProviders
@@ -1392,7 +1390,6 @@ screens:
   density: comfortable
   operations:
   - getCurrentSession
-  - getGuestSession
   - listMfaMethods
   - listSsoProviders
   states:

@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-12",
+ "generated": "2026-09-17",
  "note": "Derived from `x-ticvai-audience` on every operation. **One field, five values** \u2014 `x-ticvai-guest-callable` and `x-ticvai-auth` were two vocabularies answering the same question differently and were collapsed on 18 August (ADR-0025).",
  "field": "x-ticvai-audience",
  "values": [
@@ -794,7 +794,6 @@
     "getCommissionStatement",
     "getCurrentSession",
     "getFinancialReport",
-    "getGuestSession",
     "getMessageStatus",
     "getOrder",
     "getOrderStatement",
@@ -1020,7 +1019,6 @@
     "control.webhook_delivery",
     "control.webhook_subscription",
     "identity.delegated_access",
-    "identity.guest_session",
     "identity.mfa_challenge",
     "identity.mfa_method",
     "identity.mfa_recovery_code",
@@ -1048,7 +1046,6 @@
     "orders.payment",
     "orders.refund",
     "orders.sales_order",
-    "pii.subject",
     "platform.org_unit",
     "platform.outbox",
     "promotions.promotion",
@@ -1062,11 +1059,11 @@
     "subscription.partner_quote"
    ],
    "counts": {
-    "operations": 162,
+    "operations": 161,
     "screens": 58,
     "flows": 9,
     "contracts": 10,
-    "tables": 66
+    "tables": 64
    }
   },
   "public": {

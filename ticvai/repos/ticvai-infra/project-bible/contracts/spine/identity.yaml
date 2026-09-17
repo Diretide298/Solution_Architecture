@@ -128,9 +128,25 @@ paths:
         because they are one act with two halves, and splitting them invites a `confirm` that works without
         a `send`.
 
-        **Unverified accounts still buy.** Blocking purchase on verification loses the sale and teaches
-        nobody — what an unverified account cannot do is *receive a transfer* or *reset a password*, which
-        are the two paths that matter.
+        **An unverified account does not buy — decided 17 September 2026**, replacing *unverified accounts
+        still buy*, which this description said while `registerGuest` and `GuestSession.isVerified` said
+        the opposite. Tickets go to an address, and an unproven address is how somebody receives a
+        stranger''s tickets.
+
+        **On the guest web and the guest app, the site''s `guestCheckout` feature decides the route**
+        (requirement matrix 2.6.28 and 2.6.67 — guest checkout, configurable per site). It is **off by
+        default**.
+
+        - **Off:** the guest signs in, verified, before the cart opens. An unverified or anonymous
+        session is sent to sign-in instead of being shown the cart.
+
+        - **On:** the guest may check out without an account, and proves the email or mobile the tickets
+        go to with a one-time code at checkout (`requestGuestOtp`, purpose `verify`) — the *dual OTP
+        validation* of the reference checkout the client walked through.
+
+        **The kiosk is exempt.** A walk-up pays at the kiosk and takes printed tickets, so there is no
+        address to prove (matrix 2.1.10). An unverified account also cannot *receive a transfer* or
+        *reset a password*, for the same reason.
 
         '
       tags:
@@ -1126,7 +1142,9 @@ paths:
       - anonymous
       summary: Create a guest account
       description: 'Email or mobile. Verification follows via OTP; the account exists but is unverified
-        until then, and an unverified account may browse but not transact.
+        until then, and an unverified account may browse but not transact — on the guest web and app it
+        is sent to sign-in before the cart. The full rule, including per-site guest checkout, is on
+        `verifyGuestEmail` (decided 17 September 2026).
 
         '
       tags:
@@ -1390,16 +1408,8 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
-        - "P06 EMP-001 Sign in"
-        - "P06 EMP-002 Select venue & role"
-        - "P06 EMP-042 Profile"
-        - "P07 SCN-001 Sign in"
-        - "P09 ADM-001 Platform Login / MFA"
-        - "P10 PTR-001 Partner Login / MFA"
-        - "P12 SUP-001 Venue Management Sign In"
       x-ticvai-audience:
       - guest
-      - partner
       x-ticvai-read-routing: primary
       summary: Read the current guest session
       tags:
@@ -2243,7 +2253,9 @@ components:
         isVerified:
           type: boolean
           description: 'False until an OTP or a verified provider identity confirms ownership. An unverified
-            account may browse but not transact.
+            account may browse but not transact: the guest web and app send it to sign-in before the cart,
+            and `checkoutCart` refuses it. UAE Pass returns a verified identity, so it starts true. Rule on
+            `verifyGuestEmail`, decided 17 September 2026.
 
             '
         identityProviders:

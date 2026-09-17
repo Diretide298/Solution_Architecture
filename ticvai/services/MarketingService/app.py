@@ -5,7 +5,7 @@ real schema, and returns. There is no business logic, no validation beyond the p
 correctness guarantee — **this exists to measure what a deployment topology costs**, and the
 database work is the part that varies with topology.
 
-96 operations · 52 tables touched · scope levels: tenant, venue
+166 operations · 53 tables touched · scope levels: tenant, venue
 """
 from __future__ import annotations
 
@@ -107,7 +107,7 @@ async def _start() -> None:
 async def health() -> dict:
     # **Reported per tenant and in total.** One number across every tenant database is the
     # number that made `max_connections` look comfortable while a Saturday evening was not.
-    return {"service": "MarketingService", "operations": 96,
+    return {"service": "MarketingService", "operations": 166,
             "coldStartMs": getattr(app.state, "cold_start_ms", None),
             "tenantPools": len(pools),
             "poolSize": sum(p.get_size() for p in pools.values()),
@@ -221,6 +221,26 @@ async def adjust_loyalty_points(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.put("/privacy-testing")
+async def approve_privacy_testing(request: Request) -> dict:
+    """Privacy Configuration Testing, Approval & Publication
+
+    scope: venue · permission: MARKETING_MANAGE · offline: False
+    """
+    return await run("approvePrivacyTesting", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/waiver-testing")
+async def approve_waiver_testing(request: Request) -> dict:
+    """Waiver Approval, Testing & Publication Workspace
+
+    scope: venue · permission: MARKETING_MANAGE · offline: False
+    """
+    return await run("approveWaiverTesting", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.post("/conversations/{conversationId}/claim")
 async def claim_conversation(request: Request) -> dict:
     """An agent takes it
@@ -258,6 +278,16 @@ async def create_case(request: Request) -> dict:
     scope: venue · permission: CASE_MANAGE · offline: True
     """
     return await run("createCase", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.post("/case-classification-intelligent")
+async def create_case_classification_intelligent(request: Request) -> dict:
+    """Case Creation, Classification & Intelligent Routing
+
+    scope: venue · permission: MARKETING_MANAGE · offline: False
+    """
+    return await run("createCaseClassificationIntelligent", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -481,6 +511,16 @@ async def get_loyalty_position(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/marketing-subscriptions")
+async def get_marketing_subscription(request: Request) -> dict:
+    """What this guest has opted into
+
+    scope: tenant · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("getMarketingSubscription", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/messages/{messageId}")
 async def get_message_status(request: Request) -> dict:
     """Delivery status of one message
@@ -561,6 +601,26 @@ async def launch_campaign(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/agent-workload-availability")
+async def list_agent_workload_availability(request: Request) -> dict:
+    """Agent Workload, Availability & Workforce Control
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listAgentWorkloadAvailability", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/business-event-notification")
+async def list_business_event_notification(request: Request) -> dict:
+    """Business Event & Notification Trigger Mapping
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listBusinessEventNotification", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/campaigns")
 async def list_campaigns(request: Request) -> dict:
     """List campaigns
@@ -568,6 +628,16 @@ async def list_campaigns(request: Request) -> dict:
     scope: venue · permission: MARKETING_VIEW · offline: False
     """
     return await run("listCampaigns", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/case-resolution-closure")
+async def list_case_resolution_closure(request: Request) -> dict:
+    """Case Resolution, Closure & Customer Feedback
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listCaseResolutionClosure", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -581,6 +651,46 @@ async def list_cases(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/communication-service")
+async def list_communication_service(request: Request) -> dict:
+    """Communication Service Command Center
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listCommunicationService", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/compliance-evidence-waiver")
+async def list_compliance_evidence_waiver(request: Request) -> dict:
+    """Compliance Evidence, Audit & Waiver Repository
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listComplianceEvidenceWaiver", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/consent-evidence-withdrawal")
+async def list_consent_evidence_withdrawal(request: Request) -> dict:
+    """Consent Evidence, History & Withdrawal Management
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listConsentEvidenceWithdrawal", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/consent-preference-communication")
+async def list_consent_preference_communication(request: Request) -> dict:
+    """Consent, Preference & Communication Policy Enforcement
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listConsentPreferenceCommunication", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/consent-purposes")
 async def list_consent_purposes(request: Request) -> dict:
     """Configured consent purposes
@@ -591,6 +701,26 @@ async def list_consent_purposes(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/contact")
+async def list_contact(request: Request) -> dict:
+    """Contact Center Operations Command Center
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listContact", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/contact-automation")
+async def list_contact_automation(request: Request) -> dict:
+    """AI Contact Center Intelligence & Automation Studio
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listContactAutomation", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/conversations")
 async def list_conversations(request: Request) -> dict:
     """The omnichannel inbox
@@ -598,6 +728,166 @@ async def list_conversations(request: Request) -> dict:
     scope: tenant · permission: CASE_VIEW · offline: False
     """
     return await run("listConversations", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/cookie-banner-preference")
+async def list_cookie_banner_preference(request: Request) -> dict:
+    """Cookie Banner & Preference Center Designer
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listCookieBannerPreference", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/cookie-tracking-digital")
+async def list_cookie_tracking_digital(request: Request) -> dict:
+    """Cookie, Tracking & Digital Technology Registry
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listCookieTrackingDigital", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/customer-privacy-consent")
+async def list_customer_privacy_consent(request: Request) -> dict:
+    """Customer Privacy, Consent & Preference 360°
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listCustomerPrivacyConsent", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/customer-satisfaction-feedback")
+async def list_customer_satisfaction_feedback(request: Request) -> dict:
+    """Customer Satisfaction, Feedback & Voice of Customer
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listCustomerSatisfactionFeedback", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/customer-service")
+async def list_customer_service(request: Request) -> dict:
+    """Customer Service Command Center
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listCustomerService", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/customer-service-profile")
+async def list_customer_service_profile(request: Request) -> dict:
+    """Customer 360° Service Profile
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listCustomerServiceProfile", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/data-processing-purpose")
+async def list_data_processing_purpose(request: Request) -> dict:
+    """Data Processing Purpose & Lawful Basis Registry
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listDataProcessingPurpose", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/data-retention-expiry")
+async def list_data_retention_expiry(request: Request) -> dict:
+    """Data Retention, Expiry & Legal Hold Operations
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listDataRetentionExpiry", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/data-subject-customer")
+async def list_data_subject_customer(request: Request) -> dict:
+    """Data Subject / Customer Privacy Request Management
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listDataSubjectCustomer", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/deletion-anonymization-restriction")
+async def list_deletion_anonymization_restriction(request: Request) -> dict:
+    """Deletion, Anonymization & Restriction Operations
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listDeletionAnonymizationRestriction", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/delivery-communication-platform")
+async def list_delivery_communication_platform(request: Request) -> dict:
+    """AI Delivery Optimization & Communication Platform Diagnostics
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listDeliveryCommunicationPlatform", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/delivery-queue-failure")
+async def list_delivery_queue_failure(request: Request) -> dict:
+    """Delivery Queue, Failure & Retry Management
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listDeliveryQueueFailure", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/digital-signing-collection")
+async def list_digital_signing_collection(request: Request) -> dict:
+    """Digital Signing & Collection Operations
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listDigitalSigningCollection", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/dynamic-field-question")
+async def list_dynamic_field_question(request: Request) -> dict:
+    """Dynamic Fields, Questions & Conditional Logic
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listDynamicFieldQuestion", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/escalation-collaboration-internal")
+async def list_escalation_collaboration_internal(request: Request) -> dict:
+    """Escalation, Collaboration & Internal Resolution
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listEscalationCollaborationInternal", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/escalation-critical-case")
+async def list_escalation_critical_case(request: Request) -> dict:
+    """Escalation & Critical Case Monitor
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listEscalationCriticalCase", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -661,6 +951,26 @@ async def list_message_triggers(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/minor-guardian-group")
+async def list_minor_guardian_group(request: Request) -> dict:
+    """Minor, Guardian & Group Consent Management
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listMinorGuardianGroup", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/missing-expired-invalid")
+async def list_missing_expired_invalid(request: Request) -> dict:
+    """Missing, Expired & Invalid Waiver Management
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listMissingExpiredInvalid", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/my/cases")
 async def list_my_cases(request: Request) -> dict:
     """The cases this guest raised
@@ -671,6 +981,96 @@ async def list_my_cases(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/participant-waiver-statu")
+async def list_participant_waiver_status(request: Request) -> dict:
+    """Participant Waiver Status & Tracking
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listParticipantWaiverStatus", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/privacy")
+async def list_privacy(request: Request) -> dict:
+    """Privacy Operations Command Center
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listPrivacy", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/privacy-compliance")
+async def list_privacy_compliance(request: Request) -> dict:
+    """Privacy Analytics & AI Compliance Intelligence
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listPrivacyCompliance", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/privacy-consent")
+async def list_privacy_consent(request: Request) -> dict:
+    """Privacy & Consent Configuration Command Center
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listPrivacyConsent", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/privacy-evidence-compliance")
+async def list_privacy_evidence_compliance(request: Request) -> dict:
+    """Privacy Audit, Evidence & Compliance Reporting
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listPrivacyEvidenceCompliance", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/privacy-notice-policy")
+async def list_privacy_notice_policy(request: Request) -> dict:
+    """Privacy Notice, Policy & Terms Version Management
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listPrivacyNoticePolicy", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/product-event-experience")
+async def list_product_event_experience(request: Request) -> dict:
+    """Product, Event & Experience Association
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listProductEventExperience", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/provider-health-usage")
+async def list_provider_health_usage(request: Request) -> dict:
+    """Provider Health, Usage & Cost Monitoring
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listProviderHealthUsage", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/quality-agent-evaluation")
+async def list_quality_agent_evaluation(request: Request) -> dict:
+    """Quality Management & Agent Evaluation
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listQualityAgentEvaluation", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/reviews")
 async def list_reviews(request: Request) -> dict:
     """List guest reviews and ratings
@@ -678,6 +1078,16 @@ async def list_reviews(request: Request) -> dict:
     scope: venue · permission: MARKETING_VIEW · offline: False
     """
     return await run("listReviews", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/routing-priority-throttling")
+async def list_routing_priority_throttling(request: Request) -> dict:
+    """Routing, Priority, Throttling & Fallback Rules
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listRoutingPriorityThrottling", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -698,6 +1108,126 @@ async def list_segments(request: Request) -> dict:
     scope: venue · permission: MARKETING_VIEW · offline: False
     """
     return await run("listSegments", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/service-root-cause")
+async def list_service_root_cause(request: Request) -> dict:
+    """Service Analytics & Root-Cause Intelligence
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listServiceRootCause", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/site-waiver-exception")
+async def list_site_waiver_exception(request: Request) -> dict:
+    """On-Site Waiver & Exception Handling
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listSiteWaiverException", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/sla-policy-service")
+async def list_sla_policy_service(request: Request) -> dict:
+    """SLA Policy & Service-Level Management
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listSlaPolicyService", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/system-transactional-template")
+async def list_system_transactional_template(request: Request) -> dict:
+    """System Transactional Template Registry
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listSystemTransactionalTemplate", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/unified-interaction-communication")
+async def list_unified_interaction_communication(request: Request) -> dict:
+    """Unified Interaction & Communication History
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listUnifiedInteractionCommunication", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/versioning-effective-date")
+async def list_versioning_effective_date(request: Request) -> dict:
+    """Versioning, Effective Dates & Legal Change Control
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listVersioningEffectiveDate", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/waiver")
+async def list_waiver(request: Request) -> dict:
+    """Waiver Operations Command Center
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listWaiver", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/waiver-compliance-operational")
+async def list_waiver_compliance_operational(request: Request) -> dict:
+    """Waiver Analytics, Compliance & Operational Insights
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listWaiverComplianceOperational", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/waiver-compliance-risk")
+async def list_waiver_compliance_risk(request: Request) -> dict:
+    """AI Waiver Compliance & Risk Intelligence Center
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listWaiverComplianceRisk", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/waiver-consent")
+async def list_waiver_consent(request: Request) -> dict:
+    """Waiver & Consent Command Center
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listWaiverConsent", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/waiver-template-master")
+async def list_waiver_template_master(request: Request) -> dict:
+    """Waiver Template Library & Master Setup
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listWaiverTemplateMaster", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/waiver-trigger-eligibility")
+async def list_waiver_trigger_eligibility(request: Request) -> dict:
+    """Waiver Trigger, Eligibility & Completion Rules
+
+    scope: venue · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("listWaiverTriggerEligibility", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -951,6 +1481,46 @@ async def set_call_disposition(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.put("/case-investigation-resolution")
+async def set_case_investigation_resolution(request: Request) -> dict:
+    """Case Investigation & Resolution Workspace
+
+    scope: venue · permission: MARKETING_MANAGE · offline: False
+    """
+    return await run("setCaseInvestigationResolution", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/channel-provider")
+async def set_channel_provider(request: Request) -> dict:
+    """Channel & Provider Configuration
+
+    scope: venue · permission: MARKETING_MANAGE · offline: False
+    """
+    return await run("setChannelProvider", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/communication-preference-marketing")
+async def set_communication_preference_marketing(request: Request) -> dict:
+    """Communication Preference & Marketing Permission Configuration
+
+    scope: venue · permission: MARKETING_MANAGE · offline: False
+    """
+    return await run("setCommunicationPreferenceMarketing", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/consent-capture-point")
+async def set_consent_capture_point(request: Request) -> dict:
+    """Consent Capture Point & Customer Journey Configuration
+
+    scope: venue · permission: MARKETING_MANAGE · offline: False
+    """
+    return await run("setConsentCapturePoint", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.put("/consent-purposes")
 async def set_consent_purposes(request: Request) -> dict:
     """Configure consent purposes
@@ -958,6 +1528,66 @@ async def set_consent_purposes(request: Request) -> dict:
     scope: tenant · permission: GUEST_MANAGE · offline: False
     """
     return await run("setConsentPurposes", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/customer-service-copilot")
+async def set_customer_service_copilot(request: Request) -> dict:
+    """AI Customer Service Copilot & Knowledge Workspace
+
+    scope: venue · permission: MARKETING_MANAGE · offline: False
+    """
+    return await run("setCustomerServiceCopilot", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/data-discovery-access")
+async def set_data_discovery_access(request: Request) -> dict:
+    """Data Discovery, Access, Export & Correction Workspace
+
+    scope: venue · permission: MARKETING_MANAGE · offline: False
+    """
+    return await run("setDataDiscoveryAccess", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/digital-waiver-form")
+async def set_digital_waiver_form(request: Request) -> dict:
+    """Digital Waiver & Form Builder
+
+    scope: venue · permission: MARKETING_MANAGE · offline: False
+    """
+    return await run("setDigitalWaiverForm", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/intelligent-routing-skill")
+async def set_intelligent_routing_skill(request: Request) -> dict:
+    """Intelligent Routing, Skills & Assignment Engine
+
+    scope: venue · permission: MARKETING_MANAGE · offline: False
+    """
+    return await run("setIntelligentRoutingSkill", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/localization-branding-customer")
+async def set_localization_branding_customer(request: Request) -> dict:
+    """Localization, Branding & Customer Experience Configuration
+
+    scope: venue · permission: MARKETING_MANAGE · offline: False
+    """
+    return await run("setLocalizationBrandingCustomer", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/marketing-subscriptions")
+async def set_marketing_subscription(request: Request) -> dict:
+    """Subscribe or unsubscribe
+
+    scope: tenant · permission: MARKETING_VIEW · offline: False
+    """
+    return await run("setMarketingSubscription", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -971,6 +1601,56 @@ async def set_message_trigger(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.put("/minor-guardian-age")
+async def set_minor_guardian_age(request: Request) -> dict:
+    """Minor, Guardian & Age-Based Privacy Configuration
+
+    scope: venue · permission: MARKETING_MANAGE · offline: False
+    """
+    return await run("setMinorGuardianAge", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/order-booking-ticket")
+async def set_order_booking_ticket(request: Request) -> dict:
+    """Order, Booking & Ticket Service Workspace
+
+    scope: venue · permission: MARKETING_MANAGE · offline: False
+    """
+    return await run("setOrderBookingTicket", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/privacy-compliance-exception")
+async def set_privacy_compliance_exception(request: Request) -> dict:
+    """Privacy Compliance, Exception & Investigation Workspace
+
+    scope: venue · permission: MARKETING_MANAGE · offline: False
+    """
+    return await run("setPrivacyComplianceException", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/refund-compensation-service")
+async def set_refund_compensation_service(request: Request) -> dict:
+    """Refund, Compensation & Service Exception Workspace
+
+    scope: venue · permission: MARKETING_MANAGE · offline: False
+    """
+    return await run("setRefundCompensationService", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/sender-identity-domain")
+async def set_sender_identity_domain(request: Request) -> dict:
+    """Sender Identity, Domain & Brand Configuration
+
+    scope: venue · permission: MARKETING_MANAGE · offline: False
+    """
+    return await run("setSenderIdentityDomain", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.put("/seo-metadata")
 async def set_seo_metadata(request: Request) -> dict:
     """Titles, descriptions, canonicals and hreflang
@@ -978,6 +1658,26 @@ async def set_seo_metadata(request: Request) -> dict:
     scope: tenant · permission: MARKETING_MANAGE · offline: False
     """
     return await run("setSeoMetadata", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/signatory-signature-guardian")
+async def set_signatory_signature_guardian(request: Request) -> dict:
+    """Signatory, Signature & Guardian Rule Configuration
+
+    scope: venue · permission: MARKETING_MANAGE · offline: False
+    """
+    return await run("setSignatorySignatureGuardian", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/waiver-verification-validation")
+async def set_waiver_verification_validation(request: Request) -> dict:
+    """Waiver Verification & Validation Workspace
+
+    scope: venue · permission: MARKETING_MANAGE · offline: False
+    """
+    return await run("setWaiverVerificationValidation", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 

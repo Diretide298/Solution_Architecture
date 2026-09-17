@@ -38,7 +38,7 @@
   "redis": 4,
   "qdrant": 1
  },
- "generated": "2026-09-12",
+ "generated": "2026-09-17",
  "note": "Derived by closure from the contract, not listed. See handoff/README.md \u2014 the hand-maintained version of this drifted four times in one day.",
  "counts": {
   "operations": 33,

@@ -93,9 +93,9 @@ screens:
     select, act'
   purpose: Get an employee onto a shared device fast.
   gaps:
-  - operation: getGuestSession
-    why: '**2 declared operations reach no component on this screen**: getGuestSession, listSsoProviders.
-      Either the screen is missing what calls them, or the declaration is residue.'
+  - operation: listSsoProviders
+    why: '**1 declared operation reaches no component on this screen**: listSsoProviders. Either the screen
+      is missing what calls them, or the declaration is residue.'
     source: the screen's own declarations
   layout:
     template: split
@@ -181,10 +181,6 @@ screens:
     contract: identity
     purpose: Current session and effective permissions
     trigger: onLoad
-  - operationId: getGuestSession
-    contract: identity
-    purpose: Read the current guest session
-    trigger: onLoad
   - operationId: listMfaMethods
     contract: identity
     purpose: Enrolled MFA methods
@@ -256,9 +252,9 @@ screens:
     select, act'
   purpose: Confirm which hat this person is wearing today.
   gaps:
-  - operation: getGuestSession
-    why: '**3 declared operations reach no component on this screen**: getGuestSession, listSsoProviders,
-      listRoles. Either the screen is missing what calls them, or the declaration is residue.'
+  - operation: listSsoProviders
+    why: '**2 declared operations reach no component on this screen**: listSsoProviders, listRoles. Either
+      the screen is missing what calls them, or the declaration is residue.'
     source: the screen's own declarations
   layout:
     template: split
@@ -343,10 +339,6 @@ screens:
   - operationId: getCurrentSession
     contract: identity
     purpose: Current session and effective permissions
-    trigger: onLoad
-  - operationId: getGuestSession
-    contract: identity
-    purpose: Read the current guest session
     trigger: onLoad
   - operationId: listMfaMethods
     contract: identity
@@ -8529,9 +8521,9 @@ screens:
     select, act'
   purpose: Change what this person controls about themselves.
   gaps:
-  - operation: getGuestSession
-    why: '**2 declared operations reach no component on this screen**: getGuestSession, listSsoProviders.
-      Either the screen is missing what calls them, or the declaration is residue.'
+  - operation: listSsoProviders
+    why: '**1 declared operation reaches no component on this screen**: listSsoProviders. Either the screen
+      is missing what calls them, or the declaration is residue.'
     source: the screen's own declarations
   layout:
     template: split
@@ -8602,10 +8594,6 @@ screens:
   - operationId: listMfaMethods
     contract: identity
     purpose: Enrolled MFA methods
-    trigger: onLoad
-  - operationId: getGuestSession
-    contract: identity
-    purpose: Read the current guest session
     trigger: onLoad
   - operationId: listSsoProviders
     contract: identity

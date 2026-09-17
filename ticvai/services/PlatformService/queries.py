@@ -30,6 +30,9 @@ READS = {
   "SELECT * FROM ledger.fx_rate LIMIT 50",
   "SELECT * FROM platform.tenant LIMIT 50"
  ],
+ "createPartnerQuote": [
+  "SELECT * FROM subscription.partner_quote LIMIT 50"
+ ],
  "createPartnerUser": [
   "SELECT * FROM control.partner_agreement LIMIT 50",
   "SELECT * FROM identity.principal LIMIT 50",
@@ -116,6 +119,9 @@ READS = {
   "SELECT * FROM control.rollout LIMIT 50",
   "SELECT * FROM control.rollout_cell LIMIT 50"
  ],
+ "getScalingPolicy": [
+  "SELECT * FROM control.scaling_policy LIMIT 50"
+ ],
  "getSubscription": [
   "SELECT * FROM control.subscription LIMIT 50"
  ],
@@ -149,6 +155,12 @@ READS = {
  "listApiVersions": [
   "SELECT * FROM control.api_version LIMIT 50"
  ],
+ "listArchivalJobs": [
+  "SELECT * FROM control.archival_job LIMIT 50"
+ ],
+ "listBackupRuns": [
+  "SELECT * FROM control.backup_run LIMIT 50"
+ ],
  "listBurstEnvironments": [
   "SELECT * FROM catalogue.performance LIMIT 50"
  ],
@@ -177,6 +189,9 @@ READS = {
  ],
  "listPartnerAgreements": [
   "SELECT * FROM control.partner_agreement LIMIT 50"
+ ],
+ "listPartnerQuotes": [
+  "SELECT * FROM subscription.partner_quote LIMIT 50"
  ],
  "listPartnerUsers": [
   "SELECT * FROM control.partner_user LIMIT 50",
@@ -214,6 +229,9 @@ READS = {
  ],
  "listVenueTypeTemplates": [
   "SELECT * FROM control.venue_type_template LIMIT 50"
+ ],
+ "listWafRules": [
+  "SELECT * FROM control.waf_rule LIMIT 50"
  ],
  "listWebhookDeliveries": [
   "SELECT * FROM control.webhook_delivery LIMIT 50"
@@ -323,8 +341,14 @@ READS = {
   "SELECT * FROM control.developer_account LIMIT 50",
   "SELECT * FROM identity.principal LIMIT 50"
  ],
+ "setScalingPolicy": [
+  "SELECT * FROM control.scaling_policy LIMIT 50"
+ ],
  "setSubscription": [
   "SELECT * FROM control.subscription LIMIT 50"
+ ],
+ "setWafPolicy": [
+  "SELECT * FROM control.waf_rule LIMIT 50"
  ],
  "settleAiUsage": [
   "SELECT * FROM ai.interaction WHERE scope_path LIKE $1 LIMIT 50",
@@ -393,6 +417,9 @@ WRITES = {
  "createPartnerAgreement": [
   "SELECT id FROM approvals.request WHERE scope_path LIKE $1 ORDER BY id LIMIT 1 FOR UPDATE",
   "SELECT id FROM control.partner_agreement ORDER BY id LIMIT 1 FOR UPDATE"
+ ],
+ "createPartnerQuote": [
+  "SELECT id FROM subscription.partner_quote ORDER BY id LIMIT 1 FOR UPDATE"
  ],
  "createPartnerUser": [
   "SELECT id FROM control.partner_user ORDER BY id LIMIT 1 FOR UPDATE"
@@ -532,8 +559,14 @@ WRITES = {
   "SELECT id FROM control.developer_account ORDER BY id LIMIT 1 FOR UPDATE",
   "SELECT id FROM identity.delegated_access WHERE scope_path LIKE $1 ORDER BY id LIMIT 1 FOR UPDATE"
  ],
+ "setScalingPolicy": [
+  "SELECT id FROM control.scaling_policy ORDER BY id LIMIT 1 FOR UPDATE"
+ ],
  "setSubscription": [
   "SELECT id FROM control.subscription ORDER BY id LIMIT 1 FOR UPDATE"
+ ],
+ "setWafPolicy": [
+  "SELECT id FROM control.waf_rule ORDER BY id LIMIT 1 FOR UPDATE"
  ],
  "settleAiUsage": [
   "SELECT id FROM control.usage_record ORDER BY id LIMIT 1 FOR UPDATE"

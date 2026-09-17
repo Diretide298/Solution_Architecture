@@ -56,6 +56,9 @@ READS = {
  "listAiProviders": [
   "SELECT * FROM ai.provider WHERE scope_path LIKE $1 LIMIT 50"
  ],
+ "listIndexFailures": [
+  "SELECT * FROM ai.index_failure LIMIT 50"
+ ],
  "listIndexJobs": [
   "SELECT * FROM ai.index_job LIMIT 50"
  ],

@@ -31,7 +31,7 @@ servicesCalled:
 - service: CatalogueService
   operationCalls: 33
 - service: IdentityService
-  operationCalls: 15
+  operationCalls: 14
 - service: MarketingService
   operationCalls: 9
 - service: ReportingService
@@ -55,7 +55,6 @@ screens:
   - forceLogout
   - getB2bCredit
   - getCurrentSession
-  - getGuestSession
   - listActiveSessions
   - listMfaMethods
   - listPartnerAgreements

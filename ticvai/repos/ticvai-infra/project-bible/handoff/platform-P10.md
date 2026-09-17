@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | Screens | 51 |
-| Operations | 135 |
+| Operations | 134 |
 | Contracts | 10 |
 | Modules | 9 |
 | Undrawn | 0 |
@@ -51,7 +51,7 @@
 
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
-| `PTR-001` | Partner Login / MFA | Access & Account | 2 | 12 | yes |
+| `PTR-001` | Partner Login / MFA | Access & Account | 2 | 11 | yes |
 | `PTR-002` | Partner Dashboard | Overview | 2 | 16 | yes |
 | `PTR-003` | Profile & Company Details | Access & Account | 2 | 4 | yes |
 | `PTR-004` | Notifications | Access & Account | 3 | 2 | yes |

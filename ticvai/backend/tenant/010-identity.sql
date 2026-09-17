@@ -1,4 +1,4 @@
--- identity — 16 tables
+-- identity — 14 tables
 -- **Derived. Do not hand-edit.**
 
 -- Written by the authorisation layer on every call, not by an operation Hangs off: reaches
@@ -32,13 +32,6 @@ CREATE TABLE IF NOT EXISTS identity.delegated_access (
     granted_by                        uuid NOT NULL,
     revoked_by                        uuid NOT NULL,
     scope_id                          uuid NOT NULL
-);
-
--- Redis. GuestSession declares persistence: none — Redis session registry. Separate from the staff
--- session by lifetime and auth path, and neither is a row
-CREATE TABLE IF NOT EXISTS identity.guest_session (
-    id                                uuid PRIMARY KEY NOT NULL,
-    subject_id                        uuid NOT NULL
 );
 
 -- an issued MFA challenge and its outcome Hangs off: a child of identity.principal; reaches
@@ -156,15 +149,6 @@ CREATE TABLE IF NOT EXISTS identity.segregation_rule (
     rationale                         text,
     allow_with_compensating_control   boolean,
     scope_path                        text
-);
-
--- Redis, not Postgres. ActiveSession and Session both declare persistence: none — Redis session
--- registry, and ADR-0004 makes a session a token with a validity window rather than a row. The
--- schema reference had it as a Postgres table with one column — a core auth table with nothing in
--- it, found while chasing Hrushikant's role_permission note
-CREATE TABLE IF NOT EXISTS identity."session" (
-    id                                uuid PRIMARY KEY NOT NULL,
-    principal_id                      uuid NOT NULL
 );
 
 -- Which provider group becomes which role. The join that stops SSO meaning manual role assignment

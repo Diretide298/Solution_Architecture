@@ -2013,6 +2013,12 @@ paths:
 
         **One cart, one order, one receipt** across ticketing, F&B and retail (14 August).
 
+        **No order against an unproven contact on the guest web or app** (decided 17 September 2026;
+        the rule is on `identity` `verifyGuestEmail`). A signed-in session must be verified; where the
+        site''s `guestCheckout` feature is on, a guest without an account must have proved the email or
+        mobile the tickets go to with a one-time code. **Kiosk walk-up orders are exempt** — the tickets
+        are printed for the person standing there.
+
         '
       tags:
       - cart
@@ -2044,6 +2050,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Order'
+        '403':
+          description: 'The contact the tickets would go to is not proven — an unverified session, or a
+            guest checkout with no confirmed one-time code. **The client sends the guest to sign-in or to
+            the code step and keeps the cart**; nothing is released.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           description: 'A lease expired between the last read and checkout. **Names which line**, so the
             guest loses one thing rather than the cart.

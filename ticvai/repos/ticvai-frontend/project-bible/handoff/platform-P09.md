@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | Screens | 446 |
-| Operations | 404 |
+| Operations | 403 |
 | Contracts | 15 |
 | Modules | 13 |
 | Undrawn | 0 |
@@ -93,7 +93,7 @@
 
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
-| `ADM-001` | Platform Login / MFA | Access & Identity | 1 | 8 | yes |
+| `ADM-001` | Platform Login / MFA | Access & Identity | 1 | 7 | yes |
 | `ADM-002` | Platform Dashboard | Overview & Health | 1 | 6 | yes |
 | `ADM-003` | Cross-Tenant Health Dashboard | Overview & Health | 2 | 10 | yes |
 | `ADM-004` | Platform Audit Log | Overview & Health | 2 | 1 | yes |

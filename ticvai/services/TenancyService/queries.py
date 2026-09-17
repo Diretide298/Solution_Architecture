@@ -89,6 +89,12 @@ READS = {
   "SELECT * FROM platform.device_heartbeat LIMIT 50",
   "SELECT * FROM platform.workstation WHERE scope_path LIKE $1 LIMIT 50"
  ],
+ "issueAccreditationBadge": [
+  "SELECT * FROM approvals.accreditation_badge LIMIT 50"
+ ],
+ "listAccreditationBadges": [
+  "SELECT * FROM approvals.accreditation_badge LIMIT 50"
+ ],
  "listAnnouncements": [
   "SELECT * FROM workforce.announcement LIMIT 50",
   "SELECT * FROM workforce.announcement_receipt LIMIT 50"
@@ -129,6 +135,15 @@ READS = {
  ],
  "listSaleBoards": [
   "SELECT * FROM platform.sale_board LIMIT 50"
+ ],
+ "listShiftSwapRequests": [
+  "SELECT * FROM workforce.shift_swap LIMIT 50"
+ ],
+ "listStepUpPolicies": [
+  "SELECT * FROM approvals.step_up_policy LIMIT 50"
+ ],
+ "listTrainingRecords": [
+  "SELECT * FROM workforce.training_record LIMIT 50"
  ],
  "listWorkstations": [
   "SELECT * FROM platform.device LIMIT 50",
@@ -174,6 +189,9 @@ READS = {
   "SELECT * FROM identity.role LIMIT 50",
   "SELECT * FROM identity.role_permission LIMIT 50",
   "SELECT * FROM identity.segregation_rule WHERE scope_path LIKE $1 LIMIT 50"
+ ],
+ "setStepUpPolicy": [
+  "SELECT * FROM approvals.step_up_policy LIMIT 50"
  ],
  "setVenueSettings": [
   "SELECT * FROM access.access_point WHERE scope_path LIKE $1 LIMIT 50",
@@ -244,6 +262,9 @@ WRITES = {
   "SELECT id FROM approvals.escalation ORDER BY id LIMIT 1 FOR UPDATE",
   "SELECT id FROM approvals.request WHERE scope_path LIKE $1 ORDER BY id LIMIT 1 FOR UPDATE"
  ],
+ "issueAccreditationBadge": [
+  "SELECT id FROM approvals.accreditation_badge ORDER BY id LIMIT 1 FOR UPDATE"
+ ],
  "listAuditRecords": [
   "SELECT id FROM platform.audit_read ORDER BY id LIMIT 1 FOR UPDATE"
  ],
@@ -286,6 +307,9 @@ WRITES = {
  "setRolePermissions": [
   "SELECT id FROM identity.role_permission ORDER BY id LIMIT 1 FOR UPDATE",
   "SELECT id FROM platform.audit_record ORDER BY id LIMIT 1 FOR UPDATE"
+ ],
+ "setStepUpPolicy": [
+  "SELECT id FROM approvals.step_up_policy ORDER BY id LIMIT 1 FOR UPDATE"
  ],
  "setVenueSettings": [
   "SELECT id FROM platform.venue_settings ORDER BY id LIMIT 1 FOR UPDATE"

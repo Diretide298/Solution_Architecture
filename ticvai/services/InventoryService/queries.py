@@ -65,8 +65,7 @@ READS = {
  ],
  "getStockPositions": [
   "SELECT * FROM inventory.item LIMIT 50",
-  "SELECT * FROM inventory.location LIMIT 50",
-  "SELECT * FROM inventory.stock_level LIMIT 50"
+  "SELECT * FROM inventory.location LIMIT 50"
  ],
  "getStockTransfer": [
   "SELECT * FROM fnb.cold_chain_event LIMIT 50",
@@ -74,7 +73,6 @@ READS = {
  ],
  "getStockValuation": [
   "SELECT * FROM inventory.item LIMIT 50",
-  "SELECT * FROM inventory.stock_level LIMIT 50",
   "SELECT * FROM ledger.account LIMIT 50"
  ],
  "getSuggestedRequisitions": [

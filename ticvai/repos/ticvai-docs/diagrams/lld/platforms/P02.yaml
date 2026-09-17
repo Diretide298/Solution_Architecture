@@ -1255,6 +1255,7 @@ screens:
   - GST-001
   - GST-002
   - GST-003
+  - GST-042
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-041
   inFlows: null
@@ -1299,6 +1300,7 @@ screens:
   - GST-001
   - GST-002
   - GST-003
+  - GST-041
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-042
   inFlows:

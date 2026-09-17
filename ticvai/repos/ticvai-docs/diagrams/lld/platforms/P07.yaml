@@ -27,7 +27,7 @@ servicesCalled:
 - service: AccessService
   operationCalls: 56
 - service: IdentityService
-  operationCalls: 7
+  operationCalls: 6
 - service: OrderService
   operationCalls: 3
 - service: CrossRegionService
@@ -48,7 +48,6 @@ screens:
   operations:
   - getCurrentSession
   - getCurrentShift
-  - getGuestSession
   - listMfaMethods
   - listSsoProviders
   - login

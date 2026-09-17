@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/audit-guest-parity.py",
- "generated": "2026-09-14",
+ "generated": "2026-09-17",
  "screens": {
   "P01": 46,
   "P02": 71
@@ -13,7 +13,7 @@
  },
  "severity": {
   "high": 26,
-  "medium": 109,
+  "medium": 111,
   "low": 197,
   "info": 4
  },
@@ -346,6 +346,20 @@
    "where": "Claude Design",
    "detail": "web 13/13 batches drawn, app 0/18 — the web is designed and the app is generated boxes, and the only app reference (TICVAI_Mobile.dc.html) uses a different design system from the drawn web frames",
    "fix": "draw the app batches against the web's house style, or decide which system is the guest's"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
+   "where": "P01-cart-checkout-01",
+   "detail": "1 of 5 screens differ from the YAML (WEB-010)",
+   "fix": "python3 tools/export-design-batch.py P01-cart-checkout-01"
+  },
+  {
+   "severity": "medium",
+   "dimension": "design bundles",
+   "where": "P02-cart-checkout-01",
+   "detail": "1 of 3 screens differ from the YAML (GST-041)",
+   "fix": "python3 tools/export-design-batch.py P02-cart-checkout-01"
   },
   {
    "severity": "medium",
@@ -1519,7 +1533,7 @@
   {
    "severity": "low",
    "dimension": "documents",
-   "where": "docs/registers/conflicts.md:148",
+   "where": "docs/registers/conflicts.md:149",
    "detail": "\"stay app-only by design\" — CF-93 predates WEB-036–046 and the 10 September decision",
    "fix": "rewrite to the 12 September rule"
   },

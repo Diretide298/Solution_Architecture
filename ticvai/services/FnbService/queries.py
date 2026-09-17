@@ -62,8 +62,7 @@ READS = {
  ],
  "createGuestFnbOrder": [
   "SELECT * FROM fnb.location_session LIMIT 50",
-  "SELECT * FROM fnb.menu_item LIMIT 50",
-  "SELECT * FROM inventory.stock_level LIMIT 50"
+  "SELECT * FROM fnb.menu_item LIMIT 50"
  ],
  "createMenu": [
   "SELECT * FROM fnb.menu LIMIT 50",
@@ -215,7 +214,6 @@ READS = {
  ],
  "planProductionRun": [
   "SELECT * FROM fnb.recipe LIMIT 50",
-  "SELECT * FROM inventory.stock_level LIMIT 50",
   "SELECT * FROM platform.outlet LIMIT 50"
  ],
  "printOrderLabel": [

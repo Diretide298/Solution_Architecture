@@ -74,7 +74,7 @@
   "operator": "venue",
   "counts": {
    "screens": 96,
-   "operations": 184,
+   "operations": 183,
    "contracts": 17,
    "modules": 4,
    "undrawn": 0,
@@ -92,7 +92,7 @@
   "operator": "venue",
   "counts": {
    "screens": 11,
-   "operations": 23,
+   "operations": 22,
    "contracts": 5,
    "modules": 1,
    "undrawn": 0,
@@ -126,7 +126,7 @@
   "operator": "ticvai",
   "counts": {
    "screens": 446,
-   "operations": 404,
+   "operations": 403,
    "contracts": 15,
    "modules": 13,
    "undrawn": 0,
@@ -144,7 +144,7 @@
   "operator": "partner",
   "counts": {
    "screens": 51,
-   "operations": 135,
+   "operations": 134,
    "contracts": 10,
    "modules": 9,
    "undrawn": 0,
@@ -177,7 +177,7 @@
   "operator": "venue",
   "counts": {
    "screens": 28,
-   "operations": 55,
+   "operations": 54,
    "contracts": 7,
    "modules": 5,
    "undrawn": 0,

@@ -84,7 +84,7 @@ docs/adr/       44 architecture decisions
 docs/active/    the working documents — audits, briefs, handoffs
 docs/registers/ conflicts (CF-*), backlog, decisions
 
-backend/        DDL, generated — 388 tables, 574 foreign keys, 279 indexes
+backend/        DDL, generated — 388 tables, 569 foreign keys, 279 indexes
 services/       16 FastAPI skeletons for topology benchmarking
 deploy/         four deployment configurations plus three burst variants
 tools/          the generators and the checks

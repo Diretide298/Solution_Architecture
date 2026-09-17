@@ -361,6 +361,9 @@ READS = {
  "releaseSeatHold": [
   "SELECT * FROM seating.seat_hold LIMIT 50"
  ],
+ "relinquishInventoryHold": [
+  "SELECT * FROM catalogue.inventory_hold LIMIT 50"
+ ],
  "renewInventoryHold": [
   "SELECT * FROM catalogue.inventory_hold LIMIT 50"
  ],

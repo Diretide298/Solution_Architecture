@@ -5,7 +5,7 @@ real schema, and returns. There is no business logic, no validation beyond the p
 correctness guarantee — **this exists to measure what a deployment topology costs**, and the
 database work is the part that varies with topology.
 
-29 operations · 22 tables touched · scope levels: tenant, venue
+29 operations · 21 tables touched · scope levels: tenant, venue
 """
 from __future__ import annotations
 

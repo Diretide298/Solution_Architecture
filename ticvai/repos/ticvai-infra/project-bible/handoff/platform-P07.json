@@ -7,11 +7,11 @@
  "audience": "staff",
  "formFactor": "handheld",
  "offlineCapable": true,
- "generated": "2026-09-12",
+ "generated": "2026-09-17",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 11,
-  "operations": 23,
+  "operations": 22,
   "contracts": 5,
   "modules": 1,
   "undrawn": 0,
@@ -36,14 +36,14 @@
   },
   {
    "contract": "identity",
-   "operations": 7
-  },
-  {
-   "contract": "cross-region",
-   "operations": 2
+   "operations": 6
   },
   {
    "contract": "orders",
+   "operations": 2
+  },
+  {
+   "contract": "cross-region",
    "operations": 2
   },
   {
@@ -58,7 +58,7 @@
    "module": "Access",
    "wave": 1,
    "route": "/access/sign-in",
-   "operations": 8,
+   "operations": 7,
    "drawn": true
   },
   {

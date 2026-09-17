@@ -7,11 +7,11 @@
  "audience": "staff",
  "formFactor": "mobileApp",
  "offlineCapable": true,
- "generated": "2026-09-12",
+ "generated": "2026-09-17",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 96,
-  "operations": 184,
+  "operations": 183,
   "contracts": 17,
   "modules": 4,
   "undrawn": 0,
@@ -89,10 +89,6 @@
   },
   {
    "contract": "identity",
-   "operations": 8
-  },
-  {
-   "contract": "queue",
    "operations": 7
   },
   {
@@ -100,11 +96,15 @@
    "operations": 7
   },
   {
+   "contract": "queue",
+   "operations": 7
+  },
+  {
    "contract": "ai",
    "operations": 4
   },
   {
-   "contract": "venue-map",
+   "contract": "retail",
    "operations": 2
   },
   {
@@ -116,7 +116,7 @@
    "operations": 2
   },
   {
-   "contract": "retail",
+   "contract": "venue-map",
    "operations": 2
   },
   {
@@ -131,7 +131,7 @@
    "module": "Operations",
    "wave": 1,
    "route": "/operations/sign-in",
-   "operations": 5,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -140,7 +140,7 @@
    "module": "Operations",
    "wave": 1,
    "route": "/operations/select-venue-role",
-   "operations": 6,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -464,7 +464,7 @@
    "module": "Operations",
    "wave": 1,
    "route": "/operations/profile",
-   "operations": 4,
+   "operations": 3,
    "drawn": true
   },
   {

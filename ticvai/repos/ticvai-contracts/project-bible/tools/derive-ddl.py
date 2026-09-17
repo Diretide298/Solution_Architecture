@@ -173,6 +173,8 @@ TYPE_MAP = {
     "numeric": "numeric(18,4)",
 }
 
+POSTGRES_STORES = {"postgres", "postgres-analytical"}
+
 RESERVED = {"table", "order", "user", "group", "check", "default", "references", "primary",
             "column", "constraint", "index", "unique", "all", "any", "case", "end", "from",
             "to", "grant", "limit", "offset", "return", "session", "authorization"}
@@ -227,7 +229,14 @@ def main() -> int:
     S = json.loads((ROOT / "handoff" / "schema-reference.json").read_text(encoding="utf-8"))
     cols = S["cols"]
     storage = S.get("storage") or {}
-    real = {t for t in cols if "." in t and ":" not in t}
+    # **A table the schema reference stores somewhere else is not a Postgres table.** Until 17
+    # September this took every name in `cols`, so `identity.session` and `identity.guest_session`
+    # — both "none — Redis session registry" in the contract — and `inventory.stock_level`, which
+    # is derived from movements, were all created here. The schema reference had them right under
+    # `store`; this file never asked it.
+    store = S.get("store") or {}
+    real = {t for t in cols if "." in t and ":" not in t
+            and store.get(t, "postgres") in POSTGRES_STORES}
 
     by_schema: dict[str, list] = defaultdict(list)
     for t in sorted(real):

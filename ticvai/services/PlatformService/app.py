@@ -5,7 +5,7 @@ real schema, and returns. There is no business logic, no validation beyond the p
 correctness guarantee — **this exists to measure what a deployment topology costs**, and the
 database work is the part that varies with topology.
 
-109 operations · 57 tables touched · scope levels: platform, tenant, venue
+167 operations · 62 tables touched · scope levels: platform, region, tenant, venue
 """
 from __future__ import annotations
 
@@ -107,7 +107,7 @@ async def _start() -> None:
 async def health() -> dict:
     # **Reported per tenant and in total.** One number across every tenant database is the
     # number that made `max_connections` look comfortable while a Saturday evening was not.
-    return {"service": "PlatformService", "operations": 109,
+    return {"service": "PlatformService", "operations": 167,
             "coldStartMs": getattr(app.state, "cold_start_ms", None),
             "tenantPools": len(pools),
             "poolSize": sum(p.get_size() for p in pools.values()),
@@ -171,6 +171,36 @@ async def apply_migration(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.put("/booking-limit-commercial")
+async def approve_booking_limit_commercial(request: Request) -> dict:
+    """Booking Limits, Commercial Exceptions & Approval
+
+    scope: tenant · permission: PLATFORM_CELL_MANAGE · offline: False
+    """
+    return await run("approveBookingLimitCommercial", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/membership-product-validation")
+async def approve_membership_product_validation(request: Request) -> dict:
+    """Membership Product Validation, Approval, Publication & Versioning
+
+    scope: tenant · permission: PLATFORM_CELL_MANAGE · offline: False
+    """
+    return await run("approveMembershipProductValidation", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/partner-statu-lifecycle")
+async def approve_partner_statu_lifecycle(request: Request) -> dict:
+    """Partner Approval, Status & Lifecycle Management
+
+    scope: tenant · permission: PLATFORM_CELL_MANAGE · offline: False
+    """
+    return await run("approvePartnerStatuLifecycle", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.post("/cells/{cellId}/cancel-decommission")
 async def cancel_decommission(request: Request) -> dict:
     """Halt a decommission
@@ -228,6 +258,16 @@ async def create_partner_agreement(request: Request) -> dict:
     scope: tenant · permission: PARTNER_MANAGE · offline: False
     """
     return await run("createPartnerAgreement", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.post("/partner-quotes")
+async def create_partner_quote(request: Request) -> dict:
+    """Raise a quote
+
+    scope: tenant · permission: PARTNER_MANAGE · offline: False
+    """
+    return await run("createPartnerQuote", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -491,6 +531,16 @@ async def get_rollout(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/scaling-policies")
+async def get_scaling_policy(request: Request) -> dict:
+    """The floors, ceilings and target utilisation a cell scales on
+
+    scope: region · permission: PLATFORM_CELL_VIEW · offline: False
+    """
+    return await run("getScalingPolicy", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/tenants/{tenantId}/subscription")
 async def get_subscription(request: Request) -> dict:
     """Read the current subscription
@@ -581,6 +631,26 @@ async def list_api_versions(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/archival-jobs")
+async def list_archival_jobs(request: Request) -> dict:
+    """Archival and retention jobs
+
+    scope: region · permission: PLATFORM_CELL_VIEW · offline: False
+    """
+    return await run("listArchivalJobs", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/backup-runs")
+async def list_backup_runs(request: Request) -> dict:
+    """Backups taken and what they cover
+
+    scope: region · permission: PLATFORM_CELL_VIEW · offline: False
+    """
+    return await run("listBackupRuns", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/burst-environments")
 async def list_burst_environments(request: Request) -> dict:
     """On-sale environments
@@ -621,6 +691,66 @@ async def list_channel_listings(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/commercial-agreement")
+async def list_commercial_agreement(request: Request) -> dict:
+    """Commercial Agreement Command Center
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listCommercialAgreement", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/commercial-agreement-health")
+async def list_commercial_agreement_health(request: Request) -> dict:
+    """Commercial Agreement 360°, Health & AI Review
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listCommercialAgreementHealth", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/commercial-allocation-quota")
+async def list_commercial_allocation_quota(request: Request) -> dict:
+    """Commercial Allocation, Quota & Commitment Management
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listCommercialAllocationQuota", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/commission-calculation-settlement")
+async def list_commission_calculation_settlement(request: Request) -> dict:
+    """Commission Calculation & Settlement Management
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listCommissionCalculationSettlement", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/commission-margin-incentive")
+async def list_commission_margin_incentive(request: Request) -> dict:
+    """Commission, Margin & Incentive Management
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listCommissionMarginIncentive", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/credit-limit-exposure")
+async def list_credit_limit_exposure(request: Request) -> dict:
+    """Credit Limit & Exposure Management
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listCreditLimitExposure", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/dead-letters")
 async def list_dead_letters(request: Request) -> dict:
     """Undeliverable events
@@ -628,6 +758,16 @@ async def list_dead_letters(request: Request) -> dict:
     scope: platform · permission: PLATFORM_CELL_VIEW · offline: False
     """
     return await run("listDeadLetters", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/deposit-guarantee-financial")
+async def list_deposit_guarantee_financial(request: Request) -> dict:
+    """Deposit, Guarantee & Financial Security Management
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listDepositGuaranteeFinancial", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -651,6 +791,106 @@ async def list_integration_listings(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/member")
+async def list_member(request: Request) -> dict:
+    """Member Operations Command Center
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listMember", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/member-exception-override")
+async def list_member_exception_override(request: Request) -> dict:
+    """Member Exceptions, Overrides & Service Recovery
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listMemberExceptionOverride", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/member-lifecycle-case")
+async def list_member_lifecycle_case(request: Request) -> dict:
+    """Member Lifecycle History, Audit & Case Timeline
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listMemberLifecycleCase", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/membership-activation-credential")
+async def list_membership_activation_credential(request: Request) -> dict:
+    """Membership Activation, Assignment & Credential Management
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listMembershipActivationCredential", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/membership-annual-pass")
+async def list_membership_annual_pass(request: Request) -> dict:
+    """Membership & Annual Pass Command Center
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listMembershipAnnualPass", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/membership-commercial-pricing")
+async def list_membership_commercial_pricing(request: Request) -> dict:
+    """Membership Commercial, Pricing & Channel Association
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listMembershipCommercialPricing", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/membership-freeze-suspension")
+async def list_membership_freeze_suspension(request: Request) -> dict:
+    """Membership Freeze, Suspension & Reactivation Management
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listMembershipFreezeSuspension", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/membership-renewal-retention")
+async def list_membership_renewal_retention(request: Request) -> dict:
+    """Membership Analytics, Renewal Intelligence & AI Retention Center
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listMembershipRenewalRetention", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/membership-upgrade-downgrade")
+async def list_membership_upgrade_downgrade(request: Request) -> dict:
+    """Membership Upgrade, Downgrade & Product Migration Operations
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listMembershipUpgradeDowngrade", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/membership-usage-visit")
+async def list_membership_usage_visit(request: Request) -> dict:
+    """Membership Usage, Visit & Consumption Rules
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listMembershipUsageVisit", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/migrations")
 async def list_migrations(request: Request) -> dict:
     """The migration register
@@ -661,6 +901,36 @@ async def list_migrations(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/partner")
+async def list_partner(request: Request) -> dict:
+    """Partner Management Command Center
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listPartner", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/partner")
+async def list_partner2(request: Request) -> dict:
+    """Partner Operations Command Center
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listPartner2", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/partner-access-role")
+async def list_partner_access_role(request: Request) -> dict:
+    """Partner Access, Roles & Permission Profile
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listPartnerAccessRole", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/partner-agreements")
 async def list_partner_agreements(request: Request) -> dict:
     """Commercial agreements with B2B partners
@@ -668,6 +938,126 @@ async def list_partner_agreements(request: Request) -> dict:
     scope: tenant · permission: PARTNER_MANAGE · offline: False
     """
     return await run("listPartnerAgreements", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/partner-cancellation-refund")
+async def list_partner_cancellation_refund(request: Request) -> dict:
+    """Partner Cancellations, Refunds & Amendments
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listPartnerCancellationRefund", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/partner-contact-user")
+async def list_partner_contact_user(request: Request) -> dict:
+    """Partner Contacts & User Administration
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listPartnerContactUser", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/partner-dispute-case")
+async def list_partner_dispute_case(request: Request) -> dict:
+    """Partner Disputes, Cases & Service Management
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listPartnerDisputeCase", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/partner-documentation-compliance")
+async def list_partner_documentation_compliance(request: Request) -> dict:
+    """Partner Documentation & Compliance Repository
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listPartnerDocumentationCompliance", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/partner-onboarding-application")
+async def list_partner_onboarding_application(request: Request) -> dict:
+    """Partner Onboarding & Application Workflow
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listPartnerOnboardingApplication", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/partner-order-booking")
+async def list_partner_order_booking(request: Request) -> dict:
+    """Partner Orders & Booking Management
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listPartnerOrderBooking", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/partner-performance-scorecard")
+async def list_partner_performance_scorecard(request: Request) -> dict:
+    """Partner Performance Scorecard & Risk Monitoring
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listPartnerPerformanceScorecard", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/partner-profile-readiness")
+async def list_partner_profile_readiness(request: Request) -> dict:
+    """Partner 360° Profile, Readiness & AI Review
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listPartnerProfileReadiness", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/partner-quotes")
+async def list_partner_quotes(request: Request) -> dict:
+    """Quotes offered to this partner
+
+    scope: tenant · permission: PARTNER_VIEW · offline: False
+    """
+    return await run("listPartnerQuotes", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/partner-reconciliation-exception")
+async def list_partner_reconciliation_exception(request: Request) -> dict:
+    """Partner Reconciliation & Exception Management
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listPartnerReconciliationException", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/partner-relationship")
+async def list_partner_relationship(request: Request) -> dict:
+    """Partner AI Intelligence & Relationship Optimization
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listPartnerRelationship", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/partner-statement-account")
+async def list_partner_statement_account(request: Request) -> dict:
+    """Partner Statement & Account Activity
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listPartnerStatementAccount", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -698,6 +1088,26 @@ async def list_releases(request: Request) -> dict:
     scope: tenant · permission: PLATFORM_RELEASE_VIEW · offline: False
     """
     return await run("listReleases", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/renewal-auto")
+async def list_renewal_auto(request: Request) -> dict:
+    """Renewal Operations & Auto-Renewal Management
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listRenewalAuto", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/reservation-hold-release")
+async def list_reservation_hold_release(request: Request) -> dict:
+    """Reservations, Holds & Release Management
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listReservationHoldRelease", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -771,6 +1181,16 @@ async def list_tenants(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/territory-market-distribution")
+async def list_territory_market_distribution(request: Request) -> dict:
+    """Territory, Market & Distribution Rights
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listTerritoryMarketDistribution", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/upgrade-schedules")
 async def list_upgrade_schedules(request: Request) -> dict:
     """Scheduled tenant upgrades
@@ -788,6 +1208,26 @@ async def list_venue_type_templates(request: Request) -> dict:
     scope: tenant · permission: TENANT_VIEW · offline: False
     """
     return await run("listVenueTypeTemplates", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/visit-admission-entitlement")
+async def list_visit_admission_entitlement(request: Request) -> dict:
+    """Visit, Admission & Entitlement Usage Monitor
+
+    scope: tenant · permission: PLATFORM_TENANT_VIEW · offline: False
+    """
+    return await run("listVisitAdmissionEntitlement", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/waf-policies")
+async def list_waf_rules(request: Request) -> dict:
+    """Web application firewall rules in force
+
+    scope: region · permission: PLATFORM_CELL_VIEW · offline: False
+    """
+    return await run("listWafRules", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -1081,6 +1521,16 @@ async def schedule_tenant_upgrade(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.put("/agreement-contract-term")
+async def set_agreement_contract_term(request: Request) -> dict:
+    """Agreement & Contract Terms Builder
+
+    scope: tenant · permission: PLATFORM_CELL_MANAGE · offline: False
+    """
+    return await run("setAgreementContractTerm", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.put("/api-licensing")
 async def set_api_licensing(request: Request) -> dict:
     """Which API modules a tenant has licensed, and on what terms
@@ -1121,6 +1571,116 @@ async def set_developer_members(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.put("/family-household-dependent")
+async def set_family_household_dependent(request: Request) -> dict:
+    """Family, Household & Dependent Membership Configuration
+
+    scope: tenant · permission: PLATFORM_CELL_MANAGE · offline: False
+    """
+    return await run("setFamilyHouseholdDependent", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/member-membership-account")
+async def set_member_membership_account(request: Request) -> dict:
+    """Member 360° Membership Account Workspace
+
+    scope: tenant · permission: PLATFORM_CELL_MANAGE · offline: False
+    """
+    return await run("setMemberMembershipAccount", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/membership-eligibility-qualification")
+async def set_membership_eligibility_qualification(request: Request) -> dict:
+    """Membership Eligibility & Qualification Rule Builder
+
+    scope: tenant · permission: PLATFORM_CELL_MANAGE · offline: False
+    """
+    return await run("setMembershipEligibilityQualification", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/membership-entitlement-admission")
+async def set_membership_entitlement_admission(request: Request) -> dict:
+    """Membership Entitlement & Admission Benefit Builder
+
+    scope: tenant · permission: PLATFORM_CELL_MANAGE · offline: False
+    """
+    return await run("setMembershipEntitlementAdmission", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/membership-product-tier")
+async def set_membership_product_tier(request: Request) -> dict:
+    """Membership Product & Tier Builder
+
+    scope: tenant · permission: PLATFORM_CELL_MANAGE · offline: False
+    """
+    return await run("setMembershipProductTier", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/partner-brand-venue")
+async def set_partner_brand_venue(request: Request) -> dict:
+    """Partner Brand, Venue & Business Scope Assignment
+
+    scope: tenant · permission: PLATFORM_CELL_MANAGE · offline: False
+    """
+    return await run("setPartnerBrandVenue", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/partner-profile-organization")
+async def set_partner_profile_organization(request: Request) -> dict:
+    """Partner Profile & Organization Setup
+
+    scope: tenant · permission: PLATFORM_CELL_MANAGE · offline: False
+    """
+    return await run("setPartnerProfileOrganization", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/partner-rate-net")
+async def set_partner_rate_net(request: Request) -> dict:
+    """Partner Rate & Net Pricing Configuration
+
+    scope: tenant · permission: PLATFORM_CELL_MANAGE · offline: False
+    """
+    return await run("setPartnerRateNet", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/payment-term-billing")
+async def set_payment_term_billing(request: Request) -> dict:
+    """Payment Terms, Billing & Account Configuration
+
+    scope: tenant · permission: PLATFORM_CELL_MANAGE · offline: False
+    """
+    return await run("setPaymentTermBilling", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/renewal-auto-membership")
+async def set_renewal_auto_membership(request: Request) -> dict:
+    """Renewal, Auto-Renewal & Membership Continuity Configuration
+
+    scope: tenant · permission: PLATFORM_CELL_MANAGE · offline: False
+    """
+    return await run("setRenewalAutoMembership", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/scaling-policies")
+async def set_scaling_policy(request: Request) -> dict:
+    """Change the scaling policy
+
+    scope: region · permission: PLATFORM_CELL_MANAGE · offline: False
+    """
+    return await run("setScalingPolicy", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.put("/tenants/{tenantId}/subscription")
 async def set_subscription(request: Request) -> dict:
     """Assign or change a subscription
@@ -1128,6 +1688,26 @@ async def set_subscription(request: Request) -> dict:
     scope: tenant · permission: PLATFORM_TENANT_MANAGE · offline: False
     """
     return await run("setSubscription", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/validity-activation-expiry")
+async def set_validity_activation_expiry(request: Request) -> dict:
+    """Validity, Activation & Expiry Configuration
+
+    scope: tenant · permission: PLATFORM_CELL_MANAGE · offline: False
+    """
+    return await run("setValidityActivationExpiry", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/waf-policies")
+async def set_waf_policy(request: Request) -> dict:
+    """Change the firewall policy
+
+    scope: region · permission: PLATFORM_CELL_MANAGE · offline: False
+    """
+    return await run("setWafPolicy", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 

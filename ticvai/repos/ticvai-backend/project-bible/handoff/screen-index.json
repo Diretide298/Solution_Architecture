@@ -839,6 +839,7 @@
    "WEB-011",
    "WEB-012",
    "WEB-013",
+   "WEB-016",
    "WEB-030"
   ],
   "pattern": "statusTracker",
@@ -846,13 +847,19 @@
    "WEB-005",
    "WEB-006",
    "WEB-007",
-   "WEB-008"
+   "WEB-008",
+   "WEB-016"
   ],
   "transitions": [
    {
-    "to": "WEB-011",
-    "trigger": "Enters contact details and answers consent",
-    "provenance": "flow F01 step 5\u21926, F02 step 3\u21924, F55 step 1\u21922"
+    "to": "WEB-016",
+    "trigger": "Opens the cart without a verified sign-in",
+    "precondition": "no verified guest session, and the site's guestCheckout is off",
+    "carries": [
+     "cartId"
+    ],
+    "returnsTo": "WEB-010",
+    "provenance": "decided 17 September 2026 \u2014 no order against an unproven contact; rule on identity verifyGuestEmail, per-site guestCheckout off by default (matrix 2.6.28)"
    },
    {
     "to": "WEB-030",
@@ -875,6 +882,11 @@
      "orderId"
     ],
     "provenance": "derived \u2014 WEB-013 declares entryState.params orderId, so an edge into it must carry them"
+   },
+   {
+    "to": "WEB-011",
+    "trigger": "Enters contact details and answers consent",
+    "provenance": "flow F01 step 5\u21926, F02 step 3\u21924, F55 step 1\u21922"
    }
   ],
   "machine": null,
@@ -883,7 +895,7 @@
    "error": "Could not load. Names which read failed and leaves the shopping cart untouched.",
    "emptyFirstRun": "No shopping cart yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the shopping cart are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**Never shown as an empty cart.** With the site's `guestCheckout` off, a guest who is not signed in, or whose account is unverified, is sent to sign-in before the cart opens, and comes back to this cart with it intact.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": [
@@ -1397,13 +1409,15 @@
   "specified": true,
   "exits": [
    "WEB-001",
+   "WEB-010",
    "WEB-017",
    "WEB-018",
    "WEB-019"
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "WEB-001"
+   "WEB-001",
+   "WEB-010"
   ],
   "transitions": [
    {
@@ -1439,6 +1453,15 @@
     "provenance": "flow F56 step 3\u21924",
     "crossesDevice": true,
     "back": false
+   },
+   {
+    "to": "WEB-010",
+    "trigger": "Signed in and verified \u2014 back to the cart",
+    "precondition": "arrived from the cart",
+    "carries": [
+     "cartId"
+    ],
+    "provenance": "decided 17 September 2026 \u2014 no order against an unproven contact; rule on identity verifyGuestEmail, per-site guestCheckout off by default (matrix 2.6.28)"
    }
   ],
   "machine": null,
@@ -6855,13 +6878,25 @@
   "exits": [
    "GST-001",
    "GST-002",
-   "GST-003"
+   "GST-003",
+   "GST-042"
   ],
   "pattern": "statusTracker",
   "entryFrom": [
-   "GST-001"
+   "GST-001",
+   "GST-042"
   ],
   "transitions": [
+   {
+    "to": "GST-042",
+    "trigger": "Opens the cart without a verified sign-in",
+    "precondition": "no verified guest session, and the site's guestCheckout is off",
+    "carries": [
+     "cartId"
+    ],
+    "returnsTo": "GST-041",
+    "provenance": "decided 17 September 2026 \u2014 no order against an unproven contact; rule on identity verifyGuestEmail, per-site guestCheckout off by default (matrix 2.6.28)"
+   },
    {
     "to": "GST-001",
     "trigger": "Home \u2013 Default",
@@ -6885,7 +6920,7 @@
    "error": "**Declined reads differently from unresolved.** An unresolved payment inquires rather than retries, and nothing is issued until it resolves",
    "emptyFirstRun": "\u2014",
    "emptyNoResults": "The filter narrowed it and the checkout entry are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "**Never shown as an empty cart.** With the site's `guestCheckout` off, a guest who is not signed in, or whose account is unverified, is sent to sign-in before the cart opens, and comes back to this cart with it intact.",
    "offline": "**The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing."
   },
   "overlays": []
@@ -6961,11 +6996,13 @@
   "exits": [
    "GST-001",
    "GST-002",
-   "GST-003"
+   "GST-003",
+   "GST-041"
   ],
   "pattern": "listDetail",
   "entryFrom": [
-   "GST-001"
+   "GST-001",
+   "GST-041"
   ],
   "transitions": [
    {
@@ -6990,6 +7027,15 @@
     "provenance": "flow F56 step 2\u21923",
     "crossesDevice": true,
     "back": false
+   },
+   {
+    "to": "GST-041",
+    "trigger": "Signed in and verified \u2014 back to the cart",
+    "precondition": "arrived from the cart",
+    "carries": [
+     "cartId"
+    ],
+    "provenance": "decided 17 September 2026 \u2014 no order against an unproven contact; rule on identity verifyGuestEmail, per-site guestCheckout off by default (matrix 2.6.28)"
    }
   ],
   "machine": null,
@@ -13900,7 +13946,6 @@
   "operations": [
    "login",
    "getCurrentSession",
-   "getGuestSession",
    "listMfaMethods",
    "listSsoProviders"
   ],
@@ -13915,14 +13960,12 @@
    "cache:idempotency",
    "cache:resolution",
    "identity.delegated_access",
-   "identity.guest_session",
    "identity.mfa_method",
    "identity.principal",
    "identity.principal_credential",
    "identity.role",
    "identity.session",
-   "identity.sso_provider",
-   "pii.subject"
+   "identity.sso_provider"
   ],
   "writes": [
    "cache:idempotency",
@@ -13978,7 +14021,6 @@
   "operations": [
    "selectRole",
    "getCurrentSession",
-   "getGuestSession",
    "listMfaMethods",
    "listSsoProviders",
    "listRoles"
@@ -13994,13 +14036,11 @@
    "cache:idempotency",
    "cache:resolution",
    "identity.delegated_access",
-   "identity.guest_session",
    "identity.mfa_method",
    "identity.principal",
    "identity.role",
    "identity.session",
-   "identity.sso_provider",
-   "pii.subject"
+   "identity.sso_provider"
   ],
   "writes": [
    "cache:idempotency",
@@ -17950,7 +17990,6 @@
   "operations": [
    "getCurrentSession",
    "listMfaMethods",
-   "getGuestSession",
    "listSsoProviders"
   ],
   "services": [
@@ -17963,13 +18002,11 @@
   "reads": [
    "cache:resolution",
    "identity.delegated_access",
-   "identity.guest_session",
    "identity.mfa_method",
    "identity.principal",
    "identity.role",
    "identity.session",
-   "identity.sso_provider",
-   "pii.subject"
+   "identity.sso_provider"
   ],
   "writes": [
    "cache:resolution"
@@ -21190,7 +21227,6 @@
    "login",
    "getCurrentShift",
    "getCurrentSession",
-   "getGuestSession",
    "listMfaMethods",
    "listSsoProviders",
    "selectRole",
@@ -21208,7 +21244,6 @@
    "cache:idempotency",
    "cache:resolution",
    "identity.delegated_access",
-   "identity.guest_session",
    "identity.mfa_method",
    "identity.principal",
    "identity.principal_credential",
@@ -21217,7 +21252,6 @@
    "identity.session",
    "identity.sso_provider",
    "orders.shift",
-   "pii.subject",
    "platform.org_unit"
   ],
   "writes": [
@@ -60063,7 +60097,6 @@
    "login",
    "forceLogout",
    "getCurrentSession",
-   "getGuestSession",
    "listActiveSessions",
    "listMfaMethods",
    "listSsoProviders",
@@ -60080,14 +60113,12 @@
    "cache:idempotency",
    "cache:resolution",
    "identity.delegated_access",
-   "identity.guest_session",
    "identity.mfa_method",
    "identity.principal",
    "identity.principal_credential",
    "identity.role",
    "identity.session",
-   "identity.sso_provider",
-   "pii.subject"
+   "identity.sso_provider"
   ],
   "writes": [
    "cache:idempotency",
@@ -84812,7 +84843,6 @@
    "getB2bCredit",
    "forceLogout",
    "getCurrentSession",
-   "getGuestSession",
    "listActiveSessions",
    "listMfaMethods",
    "listSsoProviders",
@@ -84835,7 +84865,6 @@
    "cache:resolution",
    "control.partner_agreement",
    "identity.delegated_access",
-   "identity.guest_session",
    "identity.mfa_method",
    "identity.principal",
    "identity.principal_credential",
@@ -84843,8 +84872,7 @@
    "identity.session",
    "identity.sso_provider",
    "orders.b2b_credit",
-   "orders.credit_override",
-   "pii.subject"
+   "orders.credit_override"
   ],
   "writes": [
    "cache:idempotency",
@@ -88945,7 +88973,6 @@
    "login",
    "forceLogout",
    "getCurrentSession",
-   "getGuestSession",
    "listActiveSessions",
    "listMfaMethods",
    "listSsoProviders",
@@ -88962,14 +88989,12 @@
    "cache:idempotency",
    "cache:resolution",
    "identity.delegated_access",
-   "identity.guest_session",
    "identity.mfa_method",
    "identity.principal",
    "identity.principal_credential",
    "identity.role",
    "identity.session",
-   "identity.sso_provider",
-   "pii.subject"
+   "identity.sso_provider"
   ],
   "writes": [
    "cache:idempotency",

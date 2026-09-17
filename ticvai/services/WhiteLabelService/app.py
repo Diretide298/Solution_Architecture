@@ -5,7 +5,7 @@ real schema, and returns. There is no business logic, no validation beyond the p
 correctness guarantee — **this exists to measure what a deployment topology costs**, and the
 database work is the part that varies with topology.
 
-50 operations · 18 tables touched · scope levels: tenant
+51 operations · 18 tables touched · scope levels: tenant
 """
 from __future__ import annotations
 
@@ -107,7 +107,7 @@ async def _start() -> None:
 async def health() -> dict:
     # **Reported per tenant and in total.** One number across every tenant database is the
     # number that made `max_connections` look comfortable while a Saturday evening was not.
-    return {"service": "WhiteLabelService", "operations": 50,
+    return {"service": "WhiteLabelService", "operations": 51,
             "coldStartMs": getattr(app.state, "cold_start_ms", None),
             "tenantPools": len(pools),
             "poolSize": sum(p.get_size() for p in pools.values()),
@@ -448,6 +448,16 @@ async def release_custom_domain(request: Request) -> dict:
     scope: tenant · permission: TENANT_CONFIGURE · offline: False
     """
     return await run("releaseCustomDomain", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.delete("/tenant-domains/{domainId}")
+async def relinquish_custom_domain(request: Request) -> dict:
+    """Give the domain up
+
+    scope: tenant · permission: TENANT_CONFIGURE · offline: False
+    """
+    return await run("relinquishCustomDomain", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 

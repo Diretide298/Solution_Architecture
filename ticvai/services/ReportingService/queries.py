@@ -76,9 +76,6 @@ READS = {
  "listReportExecutions": [
   "SELECT * FROM reporting.execution LIMIT 50"
  ],
- "listReportFields": [
-  "SELECT * FROM reporting.report_field LIMIT 50"
- ],
  "listReportSchedules": [
   "SELECT * FROM reporting.schedule LIMIT 50"
  ],

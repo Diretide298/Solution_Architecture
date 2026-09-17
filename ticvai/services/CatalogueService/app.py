@@ -5,7 +5,7 @@ real schema, and returns. There is no business logic, no validation beyond the p
 correctness guarantee — **this exists to measure what a deployment topology costs**, and the
 database work is the part that varies with topology.
 
-136 operations · 48 tables touched · scope levels: region, venue, workstation
+344 operations · 48 tables touched · scope levels: region, venue, workstation
 """
 from __future__ import annotations
 
@@ -107,7 +107,7 @@ async def _start() -> None:
 async def health() -> dict:
     # **Reported per tenant and in total.** One number across every tenant database is the
     # number that made `max_connections` look comfortable while a Saturday evening was not.
-    return {"service": "CatalogueService", "operations": 136,
+    return {"service": "CatalogueService", "operations": 344,
             "coldStartMs": getattr(app.state, "cold_start_ms", None),
             "tenantPools": len(pools),
             "poolSize": sum(p.get_size() for p in pools.values()),
@@ -178,6 +178,56 @@ async def analyse_promotion_conflicts(request: Request) -> dict:
     scope: venue · permission: PRICE_VIEW · offline: False
     """
     return await run("analysePromotionConflicts", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/campaign-workflow")
+async def approve_campaign_workflow(request: Request) -> dict:
+    """Campaign Approval Workflow Designer
+
+    scope: venue · permission: PRICE_CONFIGURE · offline: False
+    """
+    return await run("approveCampaignWorkflow", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/decision")
+async def approve_decision(request: Request) -> dict:
+    """Approval Inbox & Decision Workspace
+
+    scope: venue · permission: PRICE_CONFIGURE · offline: False
+    """
+    return await run("approveDecision", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/pricing-workflow-authority")
+async def approve_pricing_workflow_authority(request: Request) -> dict:
+    """Pricing Approval Workflow & Authority Matrix
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("approvePricingWorkflowAuthority", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/review-decision")
+async def approve_review_decision(request: Request) -> dict:
+    """Approval Review & Decision Workspace
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("approveReviewDecision", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/workflow")
+async def approve_workflow(request: Request) -> dict:
+    """Approval Workflow Designer
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("approveWorkflow", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -291,6 +341,16 @@ async def copy_seat_map_section(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.post("/bulk-product-catalogue")
+async def create_bulk_product_catalogue(request: Request) -> dict:
+    """Bulk Product Creation & Catalogue Import
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("createBulkProductCatalogue", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.post("/bundles")
 async def create_bundle(request: Request) -> dict:
     """Create a bundle
@@ -308,6 +368,16 @@ async def create_channel_capacity(request: Request) -> dict:
     scope: venue · permission: CAPACITY_CONFIGURE · offline: False
     """
     return await run("createChannelCapacity", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.post("/channel-profile")
+async def create_channel_profile(request: Request) -> dict:
+    """Channel Creation & Profile Configuration
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("createChannelProfile", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -348,6 +418,16 @@ async def create_event(request: Request) -> dict:
     scope: venue · permission: EVENT_CONFIGURE · offline: False
     """
     return await run("createEvent", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.post("/live-dynamic-price")
+async def create_live_dynamic_price(request: Request) -> dict:
+    """Live Dynamic Price Execution & Deployment Monitor
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("createLiveDynamicPrice", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -801,6 +881,26 @@ async def leave_waitlist(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/advanced-offer")
+async def list_advanced_offer(request: Request) -> dict:
+    """Advanced Offer Command Center
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listAdvancedOffer", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/advanced-offer-guardrail")
+async def list_advanced_offer_guardrail(request: Request) -> dict:
+    """Advanced Offer Guardrails & Conflict Controls
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listAdvancedOfferGuardrail", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/allocation-splits")
 async def list_allocation_splits(request: Request) -> dict:
     """List allocation split definitions
@@ -821,6 +921,156 @@ async def list_alternative_codes(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/audience-discovery-targeting")
+async def list_audience_discovery_targeting(request: Request) -> dict:
+    """AI Audience Discovery & Targeting Optimization
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listAudienceDiscoveryTargeting", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/audience-preview-reach")
+async def list_audience_preview_reach(request: Request) -> dict:
+    """Audience Preview, Reach & Eligibility Simulator
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listAudiencePreviewReach", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/automation-policy-autonomou")
+async def list_automation_policy_autonomous(request: Request) -> dict:
+    """Automation Policy & Autonomous Pricing Orchestrator
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listAutomationPolicyAutonomous", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/behavioral-transaction-targeting")
+async def list_behavioral_transaction_targeting(request: Request) -> dict:
+    """Behavioral & Transaction Targeting
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listBehavioralTransactionTargeting", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/best-offer-customer")
+async def list_best_offer_customer(request: Request) -> dict:
+    """Best Offer & Customer Benefit Resolver
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listBestOfferCustomer", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/budget-consumption-forecast")
+async def list_budget_consumption_forecast(request: Request) -> dict:
+    """Budget Consumption & Forecast Monitor
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listBudgetConsumptionForecast", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/bulk-pricing-update")
+async def list_bulk_pricing_update(request: Request) -> dict:
+    """Bulk Pricing Update, Import & Mass Maintenance
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listBulkPricingUpdate", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/bundle-availability-capacity")
+async def list_bundle_availability_capacity(request: Request) -> dict:
+    """Bundle Availability, Capacity & Validation
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listBundleAvailabilityCapacity", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/bundle-availability-channel")
+async def list_bundle_availability_channel(request: Request) -> dict:
+    """Bundle Availability by Channel, Venue & Partner
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listBundleAvailabilityChannel", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/bundle-availability-forecast")
+async def list_bundle_availability_forecast(request: Request) -> dict:
+    """Bundle Availability Forecast, Alerts & Recovery
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listBundleAvailabilityForecast", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/bundle-bogo-advanced")
+async def list_bundle_bogo_advanced(request: Request) -> dict:
+    """Bundle, BOGO & Advanced Offer Analytics
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listBundleBogoAdvanced", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/bundle-combo")
+async def list_bundle_combo(request: Request) -> dict:
+    """Bundle & Combo Command Center
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listBundleCombo", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/bundle-pricing-commercial")
+async def list_bundle_pricing_commercial(request: Request) -> dict:
+    """Bundle Pricing & Commercial Model
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listBundlePricingCommercial", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/bundle-sellability-dependency")
+async def list_bundle_sellability_dependency(request: Request) -> dict:
+    """Bundle Sellability & Dependency Rule Engine
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listBundleSellabilityDependency", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/bundle-validity-scheduling")
+async def list_bundle_validity_scheduling(request: Request) -> dict:
+    """Bundle Validity, Scheduling & Redemption Rules
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listBundleValidityScheduling", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/bundles")
 async def list_bundles(request: Request) -> dict:
     """List bundles
@@ -828,6 +1078,86 @@ async def list_bundles(request: Request) -> dict:
     scope: venue · permission: PRODUCT_VIEW · offline: False
     """
     return await run("listBundles", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/calculation-validation-reconciliation")
+async def list_calculation_validation_reconciliation(request: Request) -> dict:
+    """Calculation Validation, Reconciliation & Service Interface
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listCalculationValidationReconciliation", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/campaign-calendar-timeline")
+async def list_campaign_calendar_timeline(request: Request) -> dict:
+    """Campaign Calendar & Timeline
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listCampaignCalendarTimeline", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/campaign-experiment-test")
+async def list_campaign_experiment_test(request: Request) -> dict:
+    """Campaign Experiment & A/B Test Manager
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listCampaignExperimentTest", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/campaign-financial-commercial")
+async def list_campaign_financial_commercial(request: Request) -> dict:
+    """Campaign Financial & Commercial Simulator
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listCampaignFinancialCommercial", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/campaign-governance-budget")
+async def list_campaign_governance_budget(request: Request) -> dict:
+    """Campaign Governance & Budget Command Center
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listCampaignGovernanceBudget", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/campaign-promotion-performance")
+async def list_campaign_promotion_performance(request: Request) -> dict:
+    """Campaign & Promotion Performance Explorer
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listCampaignPromotionPerformance", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/capacity-pool-reservation")
+async def list_capacity_pool_reservation(request: Request) -> dict:
+    """Capacity Pool & Reservation Manager
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listCapacityPoolReservation", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/cart-transaction-threshold")
+async def list_cart_transaction_threshold(request: Request) -> dict:
+    """Cart & Transaction Threshold Rules
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listCartTransactionThreshold", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -841,6 +1171,66 @@ async def list_catalogue_bundles(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/change-impact-analysi")
+async def list_change_impact_analysis(request: Request) -> dict:
+    """Change Impact Analysis
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listChangeImpactAnalysis", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/change-propagation-dependency")
+async def list_change_propagation_dependency(request: Request) -> dict:
+    """Change Propagation & Dependency Control
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listChangePropagationDependency", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/channel")
+async def list_channel(request: Request) -> dict:
+    """Channel Operations Command Center
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listChannel", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/channel")
+async def list_channel2(request: Request) -> dict:
+    """AI Channel Optimization & Intelligence Center
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listChannel2", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/channel-allocation-rebalancing")
+async def list_channel_allocation_rebalancing(request: Request) -> dict:
+    """Channel Allocation & Rebalancing Operations
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listChannelAllocationRebalancing", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/channel-based-pricing")
+async def list_channel_based_pricing(request: Request) -> dict:
+    """Channel-Based Pricing Rules
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listChannelBasedPricing", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/channel-capacities")
 async def list_channel_capacities(request: Request) -> dict:
     """List capacity envelopes
@@ -848,6 +1238,186 @@ async def list_channel_capacities(request: Request) -> dict:
     scope: venue · permission: PRODUCT_VIEW · offline: False
     """
     return await run("listChannelCapacities", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/channel-connection-integration")
+async def list_channel_connection_integration(request: Request) -> dict:
+    """Channel Connection & Integration Manager
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listChannelConnectionIntegration", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/channel-customer-segment")
+async def list_channel_customer_segment(request: Request) -> dict:
+    """Channel, Customer Segment & Location Dynamic Rules
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listChannelCustomerSegment", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/channel-exception-incident")
+async def list_channel_exception_incident(request: Request) -> dict:
+    """Channel Exceptions, Incidents & Recovery
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listChannelExceptionIncident", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/channel-governance-sla")
+async def list_channel_governance_sla(request: Request) -> dict:
+    """Channel Governance, SLA & Partner Control
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listChannelGovernanceSla", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/channel-log-transaction")
+async def list_channel_log_transaction(request: Request) -> dict:
+    """Channel Audit, Logs & Transaction Traceability
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listChannelLogTransaction", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/channel-performance-commercial")
+async def list_channel_performance_commercial(request: Request) -> dict:
+    """Channel Performance & Commercial Analytics
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listChannelPerformanceCommercial", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/channel-sale-rule")
+async def list_channel_sale_rule(request: Request) -> dict:
+    """Channel Sales Rules, Limits & Restrictions
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listChannelSaleRule", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/channel-sale-schedule")
+async def list_channel_sale_schedule(request: Request) -> dict:
+    """Channel Sales Schedule & Availability Windows
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listChannelSaleSchedule", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/cheapest-lowest-value")
+async def list_cheapest_lowest_value(request: Request) -> dict:
+    """Cheapest / Lowest-Value Item Promotion
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listCheapestLowestValue", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/code-eligibility-restriction")
+async def list_code_eligibility_restriction(request: Request) -> dict:
+    """Code Eligibility & Restriction Manager
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listCodeEligibilityRestriction", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/code-security-fraud")
+async def list_code_security_fraud(request: Request) -> dict:
+    """Code Security, Fraud & Exception Center
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listCodeSecurityFraud", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/commercial-pricing")
+async def list_commercial_pricing(request: Request) -> dict:
+    """Commercial Pricing Command Center
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listCommercialPricing", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/commercial-pricing-structure")
+async def list_commercial_pricing_structure(request: Request) -> dict:
+    """Commercial Pricing Structure Validation
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listCommercialPricingStructure", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/competitor-pricing-market")
+async def list_competitor_pricing_market(request: Request) -> dict:
+    """Competitor Pricing & Market Position Intelligence
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listCompetitorPricingMarket", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/component-inventory-availability")
+async def list_component_inventory_availability(request: Request) -> dict:
+    """Component Inventory & Availability Matrix
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listComponentInventoryAvailability", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/conflict")
+async def list_conflict(request: Request) -> dict:
+    """Conflict Simulation & AI Optimization
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listConflict", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/conflict-detection-resolution")
+async def list_conflict_detection_resolution(request: Request) -> dict:
+    """Conflict Detection & Resolution Center
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listConflictDetectionResolution", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/context-location-channel")
+async def list_context_location_channel(request: Request) -> dict:
+    """Context, Location, Channel & Time Targeting
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listContextLocationChannel", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -871,6 +1441,116 @@ async def list_coupon_codes(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/crm-customer-segment")
+async def list_crm_customer_segment(request: Request) -> dict:
+    """CRM & Customer Segment Manager
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listCrmCustomerSegment", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/currency-precision-rounding")
+async def list_currency_precision_rounding(request: Request) -> dict:
+    """Currency Precision, Rounding & Monetary Rules
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listCurrencyPrecisionRounding", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/customer-eligibility-rule")
+async def list_customer_eligibility_rule(request: Request) -> dict:
+    """Customer & Eligibility Rules by Channel
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listCustomerEligibilityRule", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/customer-membership-segment")
+async def list_customer_membership_segment(request: Request) -> dict:
+    """Customer, Membership & Segment Discount Rules
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listCustomerMembershipSegment", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/customer-segment-channel")
+async def list_customer_segment_channel(request: Request) -> dict:
+    """Customer, Segment, Channel & Partner Analytics
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listCustomerSegmentChannel", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/customer-segment-profile")
+async def list_customer_segment_profile(request: Request) -> dict:
+    """Customer Segment & Profile Pricing Rules
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listCustomerSegmentProfile", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/demand-booking-curve")
+async def list_demand_booking_curve(request: Request) -> dict:
+    """AI Demand Forecasting & Booking Curve Studio
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listDemandBookingCurve", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/discount-calculation-application")
+async def list_discount_calculation_application(request: Request) -> dict:
+    """Discount Calculation & Application Sequence
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listDiscountCalculationApplication", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/discount-cap-maximum")
+async def list_discount_cap_maximum(request: Request) -> dict:
+    """Discount Cap & Maximum Benefit Controller
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listDiscountCapMaximum", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/discount-limit-guardrail")
+async def list_discount_limit_guardrail(request: Request) -> dict:
+    """Discount Limits, Guardrails & Commercial Controls
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listDiscountLimitGuardrail", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/discount-margin-profitability")
+async def list_discount_margin_profitability(request: Request) -> dict:
+    """Discount, Margin & Profitability Analytics
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listDiscountMarginProfitability", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/donation-campaigns")
 async def list_donation_campaigns(request: Request) -> dict:
     """Campaigns a guest can give to
@@ -878,6 +1558,106 @@ async def list_donation_campaigns(request: Request) -> dict:
     scope: venue · permission: PRODUCT_VIEW · offline: True
     """
     return await run("listDonationCampaigns", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/dynamic-bundle")
+async def list_dynamic_bundle(request: Request) -> dict:
+    """Dynamic Bundle Operations Command Center
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listDynamicBundle", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/dynamic-bundle")
+async def list_dynamic_bundle2(request: Request) -> dict:
+    """Dynamic Bundle Simulation & AI Optimization
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listDynamicBundle2", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/dynamic-bundle-rule")
+async def list_dynamic_bundle_rule(request: Request) -> dict:
+    """Dynamic Bundle Rule & Composition Engine
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listDynamicBundleRule", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/dynamic-component-substitution")
+async def list_dynamic_component_substitution(request: Request) -> dict:
+    """Dynamic Component Substitution Engine
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listDynamicComponentSubstitution", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/dynamic-price-band")
+async def list_dynamic_price_band(request: Request) -> dict:
+    """Dynamic Price Bands, Ladders & Adjustment Matrix
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listDynamicPriceBand", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/dynamic-pricing-automation")
+async def list_dynamic_pricing_automation(request: Request) -> dict:
+    """Dynamic Pricing Automation Policy & Control
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listDynamicPricingAutomation", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/dynamic-pricing-guardrail")
+async def list_dynamic_pricing_guardrail(request: Request) -> dict:
+    """Dynamic Pricing Guardrails & Commercial Protection
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listDynamicPricingGuardrail", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/dynamic-pricing-performance")
+async def list_dynamic_pricing_performance(request: Request) -> dict:
+    """Dynamic Pricing Performance & Optimization Analytics
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listDynamicPricingPerformance", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/dynamic-pricing-strategy")
+async def list_dynamic_pricing_strategy(request: Request) -> dict:
+    """Dynamic Pricing Strategy Command Center
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listDynamicPricingStrategy", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/effective-date-season")
+async def list_effective_date_season(request: Request) -> dict:
+    """Effective Date, Season & Day-Based Pricing Rules
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listEffectiveDateSeason", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -901,6 +1681,56 @@ async def list_events(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/executive-promotion-reporting")
+async def list_executive_promotion_reporting(request: Request) -> dict:
+    """Executive Promotion Intelligence & Reporting Studio
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listExecutivePromotionReporting", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/fee-surcharge")
+async def list_fee_surcharge(request: Request) -> dict:
+    """Fee & Surcharge Library
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listFeeSurcharge", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/fee-waiver-tax")
+async def list_fee_waiver_tax(request: Request) -> dict:
+    """Fee Waiver, Tax Exemption & Exception Rules
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listFeeWaiverTax", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/governance-risk-launch")
+async def list_governance_risk_launch(request: Request) -> dict:
+    """Governance Audit, AI Risk & Launch Readiness
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listGovernanceRiskLaunch", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/governance-risk-monitoring")
+async def list_governance_risk_monitoring(request: Request) -> dict:
+    """Governance Risk, AI Monitoring & Control Center
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listGovernanceRiskMonitoring", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/guest/memberships")
 async def list_guest_memberships(request: Request) -> dict:
     """A guest's memberships, benefits and history
@@ -908,6 +1738,36 @@ async def list_guest_memberships(request: Request) -> dict:
     scope: venue · permission: PRODUCT_VIEW · offline: False
     """
     return await run("listGuestMemberships", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/incrementality-attribution-cannibalization")
+async def list_incrementality_attribution_cannibalization(request: Request) -> dict:
+    """Incrementality, Attribution & Cannibalization Analysis
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listIncrementalityAttributionCannibalization", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/internal-demand-booking")
+async def list_internal_demand_booking(request: Request) -> dict:
+    """Internal Demand & Booking Signal Hub
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listInternalDemandBooking", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/inventory-capacity-channel")
+async def list_inventory_capacity_channel(request: Request) -> dict:
+    """Inventory, Capacity & Channel Allocation
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listInventoryCapacityChannel", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -921,6 +1781,156 @@ async def list_inventory_holds(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/learning-model-performance")
+async def list_learning_model_performance(request: Request) -> dict:
+    """AI Learning, Model Performance & Optimization Feedback
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listLearningModelPerformance", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/location-venue-event")
+async def list_location_venue_event(request: Request) -> dict:
+    """Location, Venue & Event Pricing Rules
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listLocationVenueEvent", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/market-tourism-holiday")
+async def list_market_tourism_holiday(request: Request) -> dict:
+    """Market, Tourism, Holiday & Contextual Signal Hub
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listMarketTourismHoliday", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/market-venue-currency")
+async def list_market_venue_currency(request: Request) -> dict:
+    """Market, Venue & Currency Pricing Structure
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listMarketVenueCurrency", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/membership-loyalty-guest")
+async def list_membership_loyalty_guest(request: Request) -> dict:
+    """Membership, Loyalty & Guest Eligibility
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listMembershipLoyaltyGuest", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/membership-loyalty-pricing")
+async def list_membership_loyalty_pricing(request: Request) -> dict:
+    """Membership & Loyalty Pricing Rules
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listMembershipLoyaltyPricing", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/multi-buy-quantity")
+async def list_multi_buy_quantity(request: Request) -> dict:
+    """Multi-Buy & Quantity Offer Configurator
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listMultiBuyQuantity", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/nearby-event-exhibition")
+async def list_nearby_event_exhibition(request: Request) -> dict:
+    """Nearby Event, Exhibition & Local Demand Intelligence
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listNearbyEventExhibition", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/next-best-action")
+async def list_next_best_action(request: Request) -> dict:
+    """AI Optimization & Next-Best-Action Center
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listNextBestAction", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/offer-basket-trace")
+async def list_offer_basket_trace(request: Request) -> dict:
+    """Offer Simulation, Basket Trace & AI Optimization
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listOfferBasketTrace", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/package-bundle-add")
+async def list_package_bundle_add(request: Request) -> dict:
+    """Package, Bundle & Add-On Pricing
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listPackageBundleAdd", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/partner-external-product")
+async def list_partner_external_product(request: Request) -> dict:
+    """Partner & External Product Bundle Manager
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listPartnerExternalProduct", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/partner-payment-eligibility")
+async def list_partner_payment_eligibility(request: Request) -> dict:
+    """Partner, B2B & Payment Eligibility
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listPartnerPaymentEligibility", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/payment-method-bank")
+async def list_payment_method_bank(request: Request) -> dict:
+    """Payment Method, Bank & Partner Discount Rules
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listPaymentMethodBank", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/percentage-fixed-discount")
+async def list_percentage_fixed_discount(request: Request) -> dict:
+    """Percentage & Fixed Discount Configurator
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listPercentageFixedDiscount", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/events/{eventId}/performances")
 async def list_performances(request: Request) -> dict:
     """List performances of an event
@@ -928,6 +1938,46 @@ async def list_performances(request: Request) -> dict:
     scope: venue · permission: PRODUCT_VIEW · offline: True
     """
     return await run("listPerformances", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/price-calculation-sequence")
+async def list_price_calculation_sequence(request: Request) -> dict:
+    """Price Calculation Sequence & Formula Engine
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listPriceCalculationSequence", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/price-category-rate")
+async def list_price_category_rate(request: Request) -> dict:
+    """Price Category & Rate Type Library
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listPriceCategoryRate", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/price-elasticity-revenue")
+async def list_price_elasticity_revenue(request: Request) -> dict:
+    """Price Elasticity & Revenue Response Intelligence
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listPriceElasticityRevenue", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/price-list-template")
+async def list_price_list_template(request: Request) -> dict:
+    """Price List Templates, Clone & Reuse
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listPriceListTemplate", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -951,6 +2001,106 @@ async def list_prices(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/pricing")
+async def list_pricing(request: Request) -> dict:
+    """AI Pricing Intelligence Command Center
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listPricing", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/pricing-change-impact")
+async def list_pricing_change_impact(request: Request) -> dict:
+    """Pricing Change Impact Analysis
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listPricingChangeImpact", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/pricing-compliance")
+async def list_pricing_compliance(request: Request) -> dict:
+    """Pricing History, Audit & Compliance Explorer
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listPricingCompliance", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/pricing-distribution-synchronization")
+async def list_pricing_distribution_synchronization(request: Request) -> dict:
+    """Pricing Distribution, Synchronization & Publication Monitor
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listPricingDistributionSynchronization", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/pricing-governance")
+async def list_pricing_governance(request: Request) -> dict:
+    """Pricing Governance Command Center
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listPricingGovernance", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/pricing-recommendation-explainability")
+async def list_pricing_recommendation_explainability(request: Request) -> dict:
+    """AI Pricing Recommendation & Explainability Center
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listPricingRecommendationExplainability", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/pricing-rollback-emergency")
+async def list_pricing_rollback_emergency(request: Request) -> dict:
+    """Pricing Rollback & Emergency Control Center
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listPricingRollbackEmergency", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/pricing-rule")
+async def list_pricing_rule(request: Request) -> dict:
+    """Pricing Rule Command Center
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listPricingRule", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/pricing-rule-priority")
+async def list_pricing_rule_priority(request: Request) -> dict:
+    """Pricing Rule Priority, Conflict Resolution & Testing
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listPricingRulePriority", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/pricing-version-baseline")
+async def list_pricing_version_baseline(request: Request) -> dict:
+    """Pricing Version & Baseline Management
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listPricingVersionBaseline", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/product-categories")
 async def list_product_categories(request: Request) -> dict:
     """listProductCategories
@@ -958,6 +2108,76 @@ async def list_product_categories(request: Request) -> dict:
     scope: venue · permission: PRODUCT_VIEW · offline: True
     """
     return await run("listProductCategories", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/product-duplication-template")
+async def list_product_duplication_template(request: Request) -> dict:
+    """Product Duplication & Template Library
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listProductDuplicationTemplate", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/product-governance")
+async def list_product_governance(request: Request) -> dict:
+    """Product Governance Command Center
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listProductGovernance", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/product-import-export")
+async def list_product_import_export(request: Request) -> dict:
+    """Product Import / Export & Environment Transfer
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listProductImportExport", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/product-lifecycle")
+async def list_product_lifecycle(request: Request) -> dict:
+    """Product Lifecycle Command Center
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listProductLifecycle", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/product-price-availability")
+async def list_product_price_availability(request: Request) -> dict:
+    """Product, Price & Availability Synchronization
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listProductPriceAvailability", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/product-retirement-suspension")
+async def list_product_retirement_suspension(request: Request) -> dict:
+    """Product Retirement, Suspension & Archive
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listProductRetirementSuspension", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/product-trail-change")
+async def list_product_trail_change(request: Request) -> dict:
+    """Product Audit Trail & Change History
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listProductTrailChange", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -991,6 +2211,106 @@ async def list_products(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/promotion-activity-version")
+async def list_promotion_activity_version(request: Request) -> dict:
+    """Promotion Audit, Activity & Version History
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listPromotionActivityVersion", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/promotion-alert-exception")
+async def list_promotion_alert_exception(request: Request) -> dict:
+    """Promotion Alerts & Exception Center
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listPromotionAlertException", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/promotion-campaign")
+async def list_promotion_campaign(request: Request) -> dict:
+    """Promotion & Campaign Directory
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listPromotionCampaign", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/promotion-channel")
+async def list_promotion_channel(request: Request) -> dict:
+    """Promotion Channel & Publication Monitor
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listPromotionChannel", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/promotion-decision-trace")
+async def list_promotion_decision_trace(request: Request) -> dict:
+    """Promotion Decision Trace & Transaction Explainer
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listPromotionDecisionTrace", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/promotion-exclusion-compatibility")
+async def list_promotion_exclusion_compatibility(request: Request) -> dict:
+    """Promotion Exclusion & Compatibility Matrix
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listPromotionExclusionCompatibility", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/promotion-health-performance")
+async def list_promotion_health_performance(request: Request) -> dict:
+    """Promotion Health & Performance Monitor
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listPromotionHealthPerformance", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/promotion-lifecycle-statu")
+async def list_promotion_lifecycle_status(request: Request) -> dict:
+    """Promotion Lifecycle & Status Manager
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listPromotionLifecycleStatus", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/promotion-performance")
+async def list_promotion_performance(request: Request) -> dict:
+    """Promotion Performance Command Center
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listPromotionPerformance", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/promotion-priority-hierarchy")
+async def list_promotion_priority_hierarchy(request: Request) -> dict:
+    """Promotion Priority & Hierarchy Manager
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listPromotionPriorityHierarchy", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/promotions")
 async def list_promotions(request: Request) -> dict:
     """List promotions
@@ -998,6 +2318,186 @@ async def list_promotions(request: Request) -> dict:
     scope: venue · permission: PRICE_VIEW · offline: True
     """
     return await run("listPromotions", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/quantity-group-volume")
+async def list_quantity_group_volume(request: Request) -> dict:
+    """Quantity, Group & Volume Pricing Rules
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listQuantityGroupVolume", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/real-time-availability")
+async def list_real_time_availability(request: Request) -> dict:
+    """Real-Time Availability & Checkout Validation
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listRealTimeAvailability", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/real-time-channel")
+async def list_real_time_channel(request: Request) -> dict:
+    """Real-Time Channel Availability & Inventory Monitor
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listRealTimeChannel", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/recommendation-review-decision")
+async def list_recommendation_review_decision(request: Request) -> dict:
+    """AI Recommendation Review & Decision Queue
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listRecommendationReviewDecision", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/redemption")
+async def list_redemption(request: Request) -> dict:
+    """Redemption Analytics, Audit & AI Optimization
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listRedemption", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/redemption-code-lookup")
+async def list_redemption_code_lookup(request: Request) -> dict:
+    """Redemption Monitor & Code Lookup
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listRedemptionCodeLookup", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/redemption-conversion-funnel")
+async def list_redemption_conversion_funnel(request: Request) -> dict:
+    """Redemption, Conversion & Funnel Analytics
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listRedemptionConversionFunnel", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/redemption-discount-exposure")
+async def list_redemption_discount_exposure(request: Request) -> dict:
+    """Redemption, Discount & Exposure Limit Manager
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listRedemptionDiscountExposure", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/residency-nationality-market")
+async def list_residency_nationality_market(request: Request) -> dict:
+    """Residency, Nationality & Market Pricing Rules
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listResidencyNationalityMarket", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/revenue")
+async def list_revenue(request: Request) -> dict:
+    """Revenue Optimization Command Center
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listRevenue", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/revenue-allocation-cost")
+async def list_revenue_allocation_cost(request: Request) -> dict:
+    """Revenue Allocation, Cost & Settlement Rules
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listRevenueAllocationCost", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/revenue-demand-impact")
+async def list_revenue_demand_impact(request: Request) -> dict:
+    """Revenue & Demand Impact Forecasting
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listRevenueDemandImpact", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/reward-selection-substitution")
+async def list_reward_selection_substitution(request: Request) -> dict:
+    """Reward Selection, Substitution & Customer Choice
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listRewardSelectionSubstitution", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/rollback-recovery")
+async def list_rollback_recovery(request: Request) -> dict:
+    """Rollback & Recovery Management
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listRollbackRecovery", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/rule-priority-conflict")
+async def list_rule_priority_conflict(request: Request) -> dict:
+    """Rule Priority, Conflict Resolution & Dynamic Pricing Test Console
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listRulePriorityConflict", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/sale-channel")
+async def list_sale_channel(request: Request) -> dict:
+    """Sales Channel Command Center
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listSaleChannel", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/scenario-modeling-what")
+async def list_scenario_modeling_what(request: Request) -> dict:
+    """Scenario Modeling & What-If Analysis
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listScenarioModelingWhat", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/seasonal-calendar-day")
+async def list_seasonal_calendar_day(request: Request) -> dict:
+    """Seasonal, Calendar, Day & Timeslot Dynamic Rules
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listSeasonalCalendarDay", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -1051,6 +2551,116 @@ async def list_seats(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/signal-data-quality")
+async def list_signal_data_quality(request: Request) -> dict:
+    """AI Signal Registry, Data Quality & Model Governance
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listSignalDataQuality", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/special-price-guest")
+async def list_special_price_guest(request: Request) -> dict:
+    """Special Price & Guest Offer Configurator
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listSpecialPriceGuest", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/stacking-conflict")
+async def list_stacking_conflict(request: Request) -> dict:
+    """Stacking & Conflict Command Center
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listStackingConflict", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/targeting-conflict-frequency")
+async def list_targeting_conflict_frequency(request: Request) -> dict:
+    """Targeting Conflict, Frequency & Exclusion Controls
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listTargetingConflictFrequency", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/targeting-eligibility")
+async def list_targeting_eligibility(request: Request) -> dict:
+    """Targeting & Eligibility Command Center
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listTargetingEligibility", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/tax-fee-calculation")
+async def list_tax_fee_calculation(request: Request) -> dict:
+    """Tax, Fee & Calculation Command Center
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listTaxFeeCalculation", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/threshold-action-automatic")
+async def list_threshold_action_automatic(request: Request) -> dict:
+    """Threshold Actions & Automatic Suspension
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listThresholdActionAutomatic", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/time-based-seasonal")
+async def list_time_based_seasonal(request: Request) -> dict:
+    """Time-Based & Seasonal Discount Rules
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listTimeBasedSeasonal", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/timeslot-performance-time")
+async def list_timeslot_performance_time(request: Request) -> dict:
+    """Timeslot, Performance & Time-of-Day Pricing Rules
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listTimeslotPerformanceTime", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/unique-code-generation")
+async def list_unique_code_generation(request: Request) -> dict:
+    """Unique Code Generation & Batch Manager
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listUniqueCodeGeneration", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/upsell-cross-sell")
+async def list_upsell_cross_sell(request: Request) -> dict:
+    """Upsell, Cross-Sell & Attach-Rate Analytics
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listUpsellCrossSell", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/upsell-rules")
 async def list_upsell_rules(request: Request) -> dict:
     """List upsell and cross-sell rules
@@ -1058,6 +2668,36 @@ async def list_upsell_rules(request: Request) -> dict:
     scope: venue · permission: PRODUCT_VIEW · offline: False
     """
     return await run("listUpsellRules", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/usage-capacity-frequency")
+async def list_usage_capacity_frequency(request: Request) -> dict:
+    """Usage, Capacity & Frequency Control
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listUsageCapacityFrequency", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/validity-date-time")
+async def list_validity_date_time(request: Request) -> dict:
+    """Validity, Date & Time Control
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listValidityDateTime", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/volume-bulk-tier")
+async def list_volume_bulk_tier(request: Request) -> dict:
+    """Volume, Bulk & Tier Discount Configurator
+
+    scope: venue · permission: PRICE_VIEW · offline: False
+    """
+    return await run("listVolumeBulkTier", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -1078,6 +2718,16 @@ async def list_waitlist_entries(request: Request) -> dict:
     scope: venue · permission: PRODUCT_VIEW · offline: False
     """
     return await run("listWaitlistEntries", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/weather-demand-impact")
+async def list_weather_demand_impact(request: Request) -> dict:
+    """Weather Intelligence & Demand Impact Configuration
+
+    scope: venue · permission: PRODUCT_VIEW · offline: False
+    """
+    return await run("listWeatherDemandImpact", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -1111,6 +2761,16 @@ async def preview_allocation_split(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.put("/activation-scheduler")
+async def publish_activation_scheduler(request: Request) -> dict:
+    """Publication & Activation Scheduler
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("publishActivationScheduler", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.post("/catalogue/bundles")
 async def publish_bundle(request: Request) -> dict:
     """Compute, sign and publish a catalogue bundle
@@ -1118,6 +2778,36 @@ async def publish_bundle(request: Request) -> dict:
     scope: venue · permission: PRODUCT_CONFIGURE · offline: False
     """
     return await run("publishBundle", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/channel-availability")
+async def publish_channel_availability(request: Request) -> dict:
+    """Channel Publication & Availability
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("publishChannelAvailability", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/channel-readiness-validation")
+async def publish_channel_readiness_validation(request: Request) -> dict:
+    """Channel Publication, Readiness & AI Validation
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("publishChannelReadinessValidation", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/pricing-effective-date")
+async def publish_pricing_effective_date(request: Request) -> dict:
+    """Pricing Publication & Effective-Date Scheduler
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("publishPricingEffectiveDate", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -1211,6 +2901,46 @@ async def release_seat_hold(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.post("/channel-capacities/{channelCapacityId}/channel-allocations/release")
+async def relinquish_channel_allocation(request: Request) -> dict:
+    """Return unsold channel allocation to the general pool
+
+    scope: venue · permission: CAPACITY_CONFIGURE · offline: False
+    """
+    return await run("relinquishChannelAllocation", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.delete("/inventory-holds/{inventoryHoldId}")
+async def relinquish_inventory_hold(request: Request) -> dict:
+    """Return unsold units
+
+    scope: workstation · permission: ORDER_CREATE · offline: False
+    """
+    return await run("relinquishInventoryHold", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.delete("/seat-blocks/{blockId}")
+async def relinquish_seat_block(request: Request) -> dict:
+    """Release a block back to sale
+
+    scope: venue · permission: CAPACITY_CONFIGURE · offline: False
+    """
+    return await run("relinquishSeatBlock", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.delete("/seat-holds/{holdId}")
+async def relinquish_seat_hold(request: Request) -> dict:
+    """Release a hold
+
+    scope: venue · permission: ORDER_CREATE · offline: False
+    """
+    return await run("relinquishSeatHold", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.post("/inventory-holds/{inventoryHoldId}/renew")
 async def renew_inventory_hold(request: Request) -> dict:
     """Extend a lease TTL
@@ -1271,6 +3001,66 @@ async def set_alternative_codes(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.put("/booking-velocity-time")
+async def set_booking_velocity_time(request: Request) -> dict:
+    """Booking Velocity & Time-to-Event Rule Builder
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("setBookingVelocityTime", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/bundle-component")
+async def set_bundle_component(request: Request) -> dict:
+    """Bundle Component Builder
+
+    scope: venue · permission: PRICE_CONFIGURE · offline: False
+    """
+    return await run("setBundleComponent", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/bundle-definition")
+async def set_bundle_definition(request: Request) -> dict:
+    """Bundle Definition & Setup
+
+    scope: venue · permission: PRICE_CONFIGURE · offline: False
+    """
+    return await run("setBundleDefinition", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/buy-get-bogo")
+async def set_buy_get_bogo(request: Request) -> dict:
+    """Buy X Get Y / BOGO Rule Builder
+
+    scope: venue · permission: PRICE_CONFIGURE · offline: False
+    """
+    return await run("setBuyGetBogo", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/campaign-budget-financial")
+async def set_campaign_budget_financial(request: Request) -> dict:
+    """Campaign Budget & Financial Limit Setup
+
+    scope: venue · permission: PRICE_CONFIGURE · offline: False
+    """
+    return await run("setCampaignBudgetFinancial", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/catalogue-review")
+async def set_catalogue_review(request: Request) -> dict:
+    """AI Catalogue Builder & Configuration Review
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("setCatalogueReview", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.put("/channel-capacities/{channelCapacityId}/channel-allocations")
 async def set_channel_allocations(request: Request) -> dict:
     """Allocate envelope capacity across channels
@@ -1278,6 +3068,136 @@ async def set_channel_allocations(request: Request) -> dict:
     scope: venue · permission: CAPACITY_CONFIGURE · offline: False
     """
     return await run("setChannelAllocations", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/channel-fee-payment")
+async def set_channel_fee_payment(request: Request) -> dict:
+    """Channel Fees, Payment & Fulfillment Configuration
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("setChannelFeePayment", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/channel-pricing-commercial")
+async def set_channel_pricing_commercial(request: Request) -> dict:
+    """Channel Pricing & Commercial Profile Assignment
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("setChannelPricingCommercial", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/code-distribution-manager")
+async def set_code_distribution_manager(request: Request) -> dict:
+    """Code Distribution & Assignment Manager
+
+    scope: venue · permission: PRICE_CONFIGURE · offline: False
+    """
+    return await run("setCodeDistributionManager", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/coupon-promo-code")
+async def set_coupon_promo_code(request: Request) -> dict:
+    """Coupon & Promo Code Builder
+
+    scope: venue · permission: PRICE_CONFIGURE · offline: False
+    """
+    return await run("setCouponPromoCode", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/cross-category-promotion")
+async def set_cross_category_promotion(request: Request) -> dict:
+    """Cross-Category Promotion Builder
+
+    scope: venue · permission: PRICE_CONFIGURE · offline: False
+    """
+    return await run("setCrossCategoryPromotion", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/demand-occupancy-availability")
+async def set_demand_occupancy_availability(request: Request) -> dict:
+    """Demand, Occupancy & Availability Rule Builder
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("setDemandOccupancyAvailability", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/dynamic-pricing-strategy")
+async def set_dynamic_pricing_strategy(request: Request) -> dict:
+    """Dynamic Pricing Strategy Builder
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("setDynamicPricingStrategy", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/eligibility-rule")
+async def set_eligibility_rule(request: Request) -> dict:
+    """Eligibility Rule Builder
+
+    scope: venue · permission: PRICE_CONFIGURE · offline: False
+    """
+    return await run("setEligibilityRule", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/fee-applicability-charging")
+async def set_fee_applicability_charging(request: Request) -> dict:
+    """Fee Applicability & Charging Rule Builder
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("setFeeApplicabilityCharging", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/fixed-price-offer")
+async def set_fixed_price_offer(request: Request) -> dict:
+    """Fixed-Price & “N for X” Offer Builder
+
+    scope: venue · permission: PRICE_CONFIGURE · offline: False
+    """
+    return await run("setFixedPriceOffer", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/gift-free-product")
+async def set_gift_free_product(request: Request) -> dict:
+    """Gift, Free Product & Added-Value Offer Builder
+
+    scope: venue · permission: PRICE_CONFIGURE · offline: False
+    """
+    return await run("setGiftFreeProduct", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/guest-choice-build")
+async def set_guest_choice_build(request: Request) -> dict:
+    """Guest Choice & Build-Your-Own Bundle Designer
+
+    scope: venue · permission: PRICE_CONFIGURE · offline: False
+    """
+    return await run("setGuestChoiceBuild", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/lifecycle-statu-workflow")
+async def set_lifecycle_statu_workflow(request: Request) -> dict:
+    """Lifecycle Status & Workflow Configuration
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("setLifecycleStatuWorkflow", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -1291,6 +3211,26 @@ async def set_map_zones(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.put("/price-hierarchy-inheritance")
+async def set_price_hierarchy_inheritance(request: Request) -> dict:
+    """Price Hierarchy & Inheritance Configuration
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("setPriceHierarchyInheritance", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/price-list-master")
+async def set_price_list_master(request: Request) -> dict:
+    """Price List Master Configuration
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("setPriceListMaster", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.put("/price-lists/{priceListId}/prices")
 async def set_prices(request: Request) -> dict:
     """Set prices in bulk
@@ -1298,6 +3238,36 @@ async def set_prices(request: Request) -> dict:
     scope: venue · permission: PRICE_CONFIGURE · offline: False
     """
     return await run("setPrices", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/pricing")
+async def set_pricing(request: Request) -> dict:
+    """Pricing Simulation Studio
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("setPricing", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/pricing-change-request")
+async def set_pricing_change_request(request: Request) -> dict:
+    """Pricing Change Request & Workspace
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("setPricingChangeRequest", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/pricing-experiment")
+async def set_pricing_experiment(request: Request) -> dict:
+    """A/B Pricing Experiment Studio
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("setPricingExperiment", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -1311,6 +3281,16 @@ async def set_product_attributes(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.put("/product-catalogue")
+async def set_product_catalogue(request: Request) -> dict:
+    """Product & Catalogue Assignment
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("setProductCatalogue", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.put("/product-categories")
 async def set_product_categories(request: Request) -> dict:
     """setProductCategories
@@ -1318,6 +3298,46 @@ async def set_product_categories(request: Request) -> dict:
     scope: venue · permission: PRODUCT_CONFIGURE · offline: False
     """
     return await run("setProductCategories", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/product-context-ownership")
+async def set_product_context_ownership(request: Request) -> dict:
+    """Product Context, Ownership & Assignment
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("setProductContextOwnership", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/product-service-price")
+async def set_product_service_price(request: Request) -> dict:
+    """Product & Service Price Assignment
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("setProductServicePrice", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/promotion-rule")
+async def set_promotion_rule(request: Request) -> dict:
+    """Promotion Rule Builder
+
+    scope: venue · permission: PRICE_CONFIGURE · offline: False
+    """
+    return await run("setPromotionRule", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/promotion-stacking-rule")
+async def set_promotion_stacking_rule(request: Request) -> dict:
+    """Promotion Stacking Rule Builder
+
+    scope: venue · permission: PRICE_CONFIGURE · offline: False
+    """
+    return await run("setPromotionStackingRule", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -1331,6 +3351,26 @@ async def set_promotion_variants(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.put("/rate-structure")
+async def set_rate_structure(request: Request) -> dict:
+    """Rate Structure Builder
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("setRateStructure", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/rule-test-recommendation")
+async def set_rule_test_recommendation(request: Request) -> dict:
+    """Rule Test, Simulation & AI Recommendation Workspace
+
+    scope: venue · permission: PRICE_CONFIGURE · offline: False
+    """
+    return await run("setRuleTestRecommendation", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.put("/seat-maps/{seatMapId}/rules")
 async def set_seating_rules(request: Request) -> dict:
     """Set seating rules
@@ -1338,6 +3378,46 @@ async def set_seating_rules(request: Request) -> dict:
     scope: venue · permission: CAPACITY_CONFIGURE · offline: False
     """
     return await run("setSeatingRules", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/tax-profile-jurisdiction")
+async def set_tax_profile_jurisdiction(request: Request) -> dict:
+    """Tax Profile & Jurisdiction Configuration
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("setTaxProfileJurisdiction", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/tax-rule-treatment")
+async def set_tax_rule_treatment(request: Request) -> dict:
+    """Tax Rule & Treatment Builder
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("setTaxRuleTreatment", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/bundle-preview-recommendation")
+async def simulate_bundle_preview_recommendation(request: Request) -> dict:
+    """Bundle Preview, Simulation & AI Recommendation
+
+    scope: venue · permission: PRICE_CONFIGURE · offline: False
+    """
+    return await run("simulateBundlePreviewRecommendation", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/price-breakdown-calculation")
+async def simulate_price_breakdown_calculation(request: Request) -> dict:
+    """Price Breakdown, Calculation Simulation & Explainability
+
+    scope: venue · permission: PRODUCT_CONFIGURE · offline: False
+    """
+    return await run("simulatePriceBreakdownCalculation", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 

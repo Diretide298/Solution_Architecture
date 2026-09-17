@@ -315,6 +315,9 @@ READS = {
  "releaseStoredValue": [
   "SELECT * FROM orders.stored_value_authorisation WHERE scope_path LIKE $1 LIMIT 50"
  ],
+ "relinquishStoredValue": [
+  "SELECT * FROM orders.stored_value_authorisation WHERE scope_path LIKE $1 LIMIT 50"
+ ],
  "removeCartLine": [
   "SELECT * FROM orders.cart_line LIMIT 50"
  ],

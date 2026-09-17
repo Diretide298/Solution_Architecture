@@ -29,7 +29,7 @@ schemas:
   tables: 11
   stores:
   - postgres
-  largestTable: seating.seat_map
+  largestTable: seating.seat_hold
 operationsByContract:
 - contract: catalogue
   count: 176

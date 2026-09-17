@@ -38,6 +38,9 @@ READS = {
  "releaseWalletAuthorisation": [
   "SELECT * FROM platform.wallet_authorisation LIMIT 50"
  ],
+ "relinquishWalletAuthorisation": [
+  "SELECT * FROM platform.wallet_authorisation LIMIT 50"
+ ],
  "resolveGuestLink": [
   "SELECT * FROM platform.guest_link LIMIT 50"
  ],

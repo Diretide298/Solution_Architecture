@@ -5,7 +5,7 @@ real schema, and returns. There is no business logic, no validation beyond the p
 correctness guarantee — **this exists to measure what a deployment topology costs**, and the
 database work is the part that varies with topology.
 
-30 operations · 45 tables touched · scope levels: region, tenant, venue
+31 operations · 46 tables touched · scope levels: region, tenant, venue
 """
 from __future__ import annotations
 
@@ -107,7 +107,7 @@ async def _start() -> None:
 async def health() -> dict:
     # **Reported per tenant and in total.** One number across every tenant database is the
     # number that made `max_connections` look comfortable while a Saturday evening was not.
-    return {"service": "AiService", "operations": 30,
+    return {"service": "AiService", "operations": 31,
             "coldStartMs": getattr(app.state, "cold_start_ms", None),
             "tenantPools": len(pools),
             "poolSize": sum(p.get_size() for p in pools.values()),
@@ -258,6 +258,16 @@ async def list_ai_providers(request: Request) -> dict:
     scope: region · permission: AI_CONFIGURE · offline: False
     """
     return await run("listAiProviders", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/index-failures")
+async def list_index_failures(request: Request) -> dict:
+    """Records an index could not embed
+
+    scope: tenant · permission: AI_CONFIGURE · offline: False
+    """
+    return await run("listIndexFailures", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 

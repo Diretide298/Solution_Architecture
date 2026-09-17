@@ -2904,6 +2904,12 @@ components:
       properties:
         featureKey:
           type: string
+          description: '`guestCheckout` is **off by default** (decided 17 September 2026, matrix 2.6.28):
+            off, the guest web and app send the guest to sign-in, verified, before the cart; on, a guest
+            may check out without an account after proving their contact with a one-time code. The kiosk
+            is not governed by it. Rule on `identity` `verifyGuestEmail`.
+
+            '
           enum:
           - digitalCompanionMode
           - aiConciergeChat

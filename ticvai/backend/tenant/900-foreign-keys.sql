@@ -3,7 +3,7 @@
 -- its use** — orders reaches catalogue, catalogue reaches platform, and something
 -- reaches back. Tables first, constraints last, is the only ordering that terminates.
 --
--- 550 of 594 declared references. The ones that reach the
+-- 545 of 589 declared references. The ones that reach the
 -- other database are in ../990-cross-database-references.sql and are not constraints
 -- any more.
 
@@ -136,7 +136,6 @@ ALTER TABLE games.redemption ADD CONSTRAINT fk_redemption_issued_by_principal_id
 ALTER TABLE games.redemption ADD CONSTRAINT fk_redemption_venue_id FOREIGN KEY (venue_id) REFERENCES platform.org_unit(id);
 ALTER TABLE games.redemption_line ADD CONSTRAINT fk_redemption_line_prize_id FOREIGN KEY (prize_id) REFERENCES games.prize(id);
 ALTER TABLE games.redemption_line ADD CONSTRAINT fk_redemption_line_redemption_id FOREIGN KEY (redemption_id) REFERENCES games.redemption(id);
-ALTER TABLE identity."session" ADD CONSTRAINT fk_session_principal_id FOREIGN KEY (principal_id) REFERENCES identity.principal(id);
 ALTER TABLE identity.authz_audit ADD CONSTRAINT fk_authz_audit_actor_principal_id FOREIGN KEY (actor_principal_id) REFERENCES identity.principal(id);
 ALTER TABLE identity.authz_audit ADD CONSTRAINT fk_authz_audit_subject_principal_id FOREIGN KEY (subject_principal_id) REFERENCES identity.principal(id);
 ALTER TABLE identity.delegated_access ADD CONSTRAINT fk_delegated_access_created_by_principal_id FOREIGN KEY (created_by_principal_id) REFERENCES identity.principal(id);
@@ -146,7 +145,6 @@ ALTER TABLE identity.delegated_access ADD CONSTRAINT fk_delegated_access_revoked
 ALTER TABLE identity.delegated_access ADD CONSTRAINT fk_delegated_access_role_id FOREIGN KEY (role_id) REFERENCES identity.role(id);
 ALTER TABLE identity.delegated_access ADD CONSTRAINT fk_delegated_access_scope_id FOREIGN KEY (scope_id) REFERENCES platform.org_unit(id);
 ALTER TABLE identity.delegated_access ADD CONSTRAINT fk_delegated_access_subject_id FOREIGN KEY (subject_id) REFERENCES pii.subject(id);
-ALTER TABLE identity.guest_session ADD CONSTRAINT fk_guest_session_subject_id FOREIGN KEY (subject_id) REFERENCES pii.subject(id);
 ALTER TABLE identity.mfa_challenge ADD CONSTRAINT fk_mfa_challenge_principal_id FOREIGN KEY (principal_id) REFERENCES identity.principal(id);
 ALTER TABLE identity.mfa_method ADD CONSTRAINT fk_mfa_method_principal_id FOREIGN KEY (principal_id) REFERENCES identity.principal(id);
 ALTER TABLE identity.mfa_recovery_code ADD CONSTRAINT fk_mfa_recovery_code_principal_id FOREIGN KEY (principal_id) REFERENCES identity.principal(id);
@@ -195,7 +193,6 @@ ALTER TABLE inventory.requisition_line ADD CONSTRAINT fk_requisition_line_requis
 ALTER TABLE inventory.stock_batch ADD CONSTRAINT fk_stock_batch_item_id FOREIGN KEY (item_id) REFERENCES inventory.item(id);
 ALTER TABLE inventory.stock_batch ADD CONSTRAINT fk_stock_batch_location_id FOREIGN KEY (location_id) REFERENCES inventory.location(id);
 ALTER TABLE inventory.stock_batch ADD CONSTRAINT fk_stock_batch_supplier_id FOREIGN KEY (supplier_id) REFERENCES inventory.supplier(id);
-ALTER TABLE inventory.stock_level ADD CONSTRAINT fk_stock_level_item_id FOREIGN KEY (item_id) REFERENCES inventory.item(id);
 ALTER TABLE inventory.supplier ADD CONSTRAINT fk_supplier_account_id FOREIGN KEY (account_id) REFERENCES ledger.account(id);
 ALTER TABLE inventory.transfer ADD CONSTRAINT fk_transfer_dispatched_by_principal_id FOREIGN KEY (dispatched_by_principal_id) REFERENCES identity.principal(id);
 ALTER TABLE inventory.transfer ADD CONSTRAINT fk_transfer_from_location_id FOREIGN KEY (from_location_id) REFERENCES fnb.delivery_location(id);
@@ -459,7 +456,6 @@ ALTER TABLE reporting.export ADD CONSTRAINT fk_export_requested_by_principal_id 
 ALTER TABLE reporting.report_column ADD CONSTRAINT fk_report_column_definition_id FOREIGN KEY (definition_id) REFERENCES reporting.report_definition(id);
 ALTER TABLE reporting.report_column ADD CONSTRAINT fk_report_column_report_definition_id FOREIGN KEY (report_definition_id) REFERENCES reporting.report_definition(id);
 ALTER TABLE reporting.report_definition ADD CONSTRAINT fk_report_definition_created_by_principal_id FOREIGN KEY (created_by_principal_id) REFERENCES identity.principal(id);
-ALTER TABLE reporting.report_field ADD CONSTRAINT fk_report_field_definition_id FOREIGN KEY (definition_id) REFERENCES reporting.report_definition(id);
 ALTER TABLE reporting.report_filter ADD CONSTRAINT fk_report_filter_definition_id FOREIGN KEY (definition_id) REFERENCES reporting.report_definition(id);
 ALTER TABLE reporting.report_filter ADD CONSTRAINT fk_report_filter_report_definition_id FOREIGN KEY (report_definition_id) REFERENCES reporting.report_definition(id);
 ALTER TABLE reporting.report_parameter ADD CONSTRAINT fk_report_parameter_definition_id FOREIGN KEY (definition_id) REFERENCES reporting.report_definition(id);
@@ -469,7 +465,6 @@ ALTER TABLE reporting.schedule_recipient ADD CONSTRAINT fk_schedule_recipient_pr
 ALTER TABLE resources.booking ADD CONSTRAINT fk_booking_resource_id FOREIGN KEY (resource_id) REFERENCES resources.resource(id);
 ALTER TABLE resources.booking ADD CONSTRAINT fk_booking_subject_id FOREIGN KEY (subject_id) REFERENCES pii.subject(id);
 ALTER TABLE resources.resource ADD CONSTRAINT fk_resource_principal_id FOREIGN KEY (principal_id) REFERENCES identity.principal(id);
-ALTER TABLE resources.session_participant ADD CONSTRAINT fk_session_participant_session_id FOREIGN KEY (session_id) REFERENCES identity."session"(id);
 ALTER TABLE resources.session_participant ADD CONSTRAINT fk_session_participant_subject_id FOREIGN KEY (subject_id) REFERENCES pii.subject(id);
 ALTER TABLE retail."return" ADD CONSTRAINT fk_return_accepted_by_principal_id FOREIGN KEY (accepted_by_principal_id) REFERENCES identity.principal(id);
 ALTER TABLE retail."return" ADD CONSTRAINT fk_return_refund_id FOREIGN KEY (refund_id) REFERENCES orders.refund(id);

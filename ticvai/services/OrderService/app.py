@@ -5,7 +5,7 @@ real schema, and returns. There is no business logic, no validation beyond the p
 correctness guarantee — **this exists to measure what a deployment topology costs**, and the
 database work is the part that varies with topology.
 
-97 operations · 59 tables touched · scope levels: tenant, venue, workstation
+187 operations · 59 tables touched · scope levels: tenant, venue, workstation
 """
 from __future__ import annotations
 
@@ -107,7 +107,7 @@ async def _start() -> None:
 async def health() -> dict:
     # **Reported per tenant and in total.** One number across every tenant database is the
     # number that made `max_connections` look comfortable while a Saturday evening was not.
-    return {"service": "OrderService", "operations": 97,
+    return {"service": "OrderService", "operations": 187,
             "coldStartMs": getattr(app.state, "cold_start_ms", None),
             "tenantPools": len(pools),
             "poolSize": sum(p.get_size() for p in pools.values()),
@@ -228,6 +228,36 @@ async def apply_manual_discount(request: Request) -> dict:
     scope: workstation · permission: ORDER_DISCOUNT · offline: True
     """
     return await run("applyManualDiscount", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/exception-service-recovery")
+async def approve_exception_service_recovery(request: Request) -> dict:
+    """Approval, Exception & Service Recovery Management
+
+    scope: venue · permission: ORDER_CREATE · offline: False
+    """
+    return await run("approveExceptionServiceRecovery", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/group-discount-exception")
+async def approve_group_discount_exception(request: Request) -> dict:
+    """Group Discount, Exception & Approval Workflow
+
+    scope: venue · permission: ORDER_CREATE · offline: False
+    """
+    return await run("approveGroupDiscountException", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/listing-moderation")
+async def approve_listing_moderation(request: Request) -> dict:
+    """Listing Approval & Moderation
+
+    scope: venue · permission: ORDER_CREATE · offline: False
+    """
+    return await run("approveListingModeration", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -391,6 +421,16 @@ async def create_cash_movement(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.post("/listing-seller")
+async def create_listing_seller(request: Request) -> dict:
+    """Listing Creation & Seller Configuration
+
+    scope: venue · permission: ORDER_CREATE · offline: False
+    """
+    return await run("createListingSeller", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.post("/orders")
 async def create_order(request: Request) -> dict:
     """Create an order
@@ -398,6 +438,16 @@ async def create_order(request: Request) -> dict:
     scope: workstation · permission: ORDER_CREATE · offline: True
     """
     return await run("createOrder", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.post("/order-source-channel")
+async def create_order_source_channel(request: Request) -> dict:
+    """Order Creation & Source/Channel Configuration
+
+    scope: venue · permission: ORDER_CREATE · offline: False
+    """
+    return await run("createOrderSourceChannel", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -458,6 +508,16 @@ async def create_reservation(request: Request) -> dict:
     scope: venue · permission: ORDER_CREATE · offline: False
     """
     return await run("createReservation", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.post("/upgrade-credential-regeneration")
+async def create_upgrade_credential_regeneration(request: Request) -> dict:
+    """Upgrade Execution, Credential Regeneration & Channel Controls
+
+    scope: venue · permission: ORDER_CREATE · offline: False
+    """
+    return await run("createUpgradeCredentialRegeneration", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -651,6 +711,76 @@ async def list_abandoned_carts(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/amendment-after-sale")
+async def list_amendment_after_sale(request: Request) -> dict:
+    """Amendment & After-Sales Command Center
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listAmendmentAfterSale", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/amendment-after-sale")
+async def list_amendment_after_sale2(request: Request) -> dict:
+    """Amendment History, Audit & After-Sales Analytics
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listAmendmentAfterSale2", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/bulk-group-assisted")
+async def list_bulk_group_assisted(request: Request) -> dict:
+    """Bulk, Group & Assisted Upgrade Operations
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listBulkGroupAssisted", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/buyer-checkout-inventory")
+async def list_buyer_checkout_inventory(request: Request) -> dict:
+    """Buyer Checkout, Inventory Hold & Secure Payment
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listBuyerCheckoutInventory", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/buyer-purchase-resale")
+async def list_buyer_purchase_resale(request: Request) -> dict:
+    """Buyer Purchase & Resale Order Management
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listBuyerPurchaseResale", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/capacity-inventory-reconciliation")
+async def list_capacity_inventory_reconciliation(request: Request) -> dict:
+    """Capacity & Inventory Reconciliation
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listCapacityInventoryReconciliation", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/capacity-reservation-inventory")
+async def list_capacity_reservation_inventory(request: Request) -> dict:
+    """Capacity Reservation & Inventory Commitment
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listCapacityReservationInventory", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/shifts/{shiftId}/cash-movements")
 async def list_cash_movements(request: Request) -> dict:
     """Lifts, adds and the opening float
@@ -668,6 +798,26 @@ async def list_chargebacks(request: Request) -> dict:
     scope: venue · permission: ORDER_REFUND_APPROVE · offline: False
     """
     return await run("listChargebacks", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/create-listing-resale")
+async def list_create_listing_resale(request: Request) -> dict:
+    """Create Listing & Resale Price Selection
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listCreateListingResale", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/credential-revocation-regeneration")
+async def list_credential_revocation_regeneration(request: Request) -> dict:
+    """Credential Revocation & Regeneration
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listCredentialRevocationRegeneration", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -691,6 +841,46 @@ async def list_deposit_boxes(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/deposit-partial-payment")
+async def list_deposit_partial_payment(request: Request) -> dict:
+    """Deposit, Partial Payment & Outstanding Balance Management
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listDepositPartialPayment", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/external-payment-partner")
+async def list_external_payment_partner(request: Request) -> dict:
+    """External Payment, Partner & Settlement Reference Mapping
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listExternalPaymentPartner", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/fee-seller-proceed")
+async def list_fee_seller_proceed(request: Request) -> dict:
+    """Fees, Seller Proceeds & Listing Confirmation
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listFeeSellerProceed", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/financial-traceability")
+async def list_financial_traceability(request: Request) -> dict:
+    """Financial Traceability, Control & Audit Explorer
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listFinancialTraceability", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/fraud-rules")
 async def list_fraud_rules(request: Request) -> dict:
     """listFraudRules
@@ -698,6 +888,126 @@ async def list_fraud_rules(request: Request) -> dict:
     scope: tenant · permission: ORDER_VIEW · offline: False
     """
     return await run("listFraudRules", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/group-amendment-cancellation")
+async def list_group_amendment_cancellation(request: Request) -> dict:
+    """Group Amendments, Cancellation & Refund Operations
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listGroupAmendmentCancellation", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/group-arrival-check")
+async def list_group_arrival_check(request: Request) -> dict:
+    """Group Arrival, Check-In & Admission Operations
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listGroupArrivalCheck", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/group-booking")
+async def list_group_booking(request: Request) -> dict:
+    """Group Booking Operations Command Center
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listGroupBooking", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/group-booking-reconciliation")
+async def list_group_booking_reconciliation(request: Request) -> dict:
+    """Group Booking Reconciliation, Closure & Performance
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listGroupBookingReconciliation", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/group-customer-organization")
+async def list_group_customer_organization(request: Request) -> dict:
+    """Group Customer & Organization Profile
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listGroupCustomerOrganization", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/group-enquiry-opportunity")
+async def list_group_enquiry_opportunity(request: Request) -> dict:
+    """Group Enquiry & Opportunity Capture
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listGroupEnquiryOpportunity", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/group-payment-deposit")
+async def list_group_payment_deposit(request: Request) -> dict:
+    """Group Payment, Deposit & Balance Management
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listGroupPaymentDeposit", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/group-requirement-availability")
+async def list_group_requirement_availability(request: Request) -> dict:
+    """Group Requirements, Availability & Capacity Planner
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listGroupRequirementAvailability", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/group-sale")
+async def list_group_sale(request: Request) -> dict:
+    """Group Sales Command Center
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listGroupSale", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/group-sale")
+async def list_group_sale2(request: Request) -> dict:
+    """Group Sales Analytics & AI Intelligence Center
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listGroupSale2", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/group-ticket-fulfillment")
+async def list_group_ticket_fulfillment(request: Request) -> dict:
+    """Group Ticket Fulfillment & Distribution
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listGroupTicketFulfillment", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/group-ticket-seat")
+async def list_group_ticket_seat(request: Request) -> dict:
+    """Group Ticket, Seat & Entitlement Allocation
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listGroupTicketSeat", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -711,6 +1021,16 @@ async def list_invitation_allowances(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/listing-lifecycle-expiry")
+async def list_listing_lifecycle_expiry(request: Request) -> dict:
+    """Listing Lifecycle, Expiry & Cancellation
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listListingLifecycleExpiry", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/my/orders")
 async def list_my_orders(request: Request) -> dict:
     """The orders this guest placed
@@ -718,6 +1038,56 @@ async def list_my_orders(request: Request) -> dict:
     scope: tenant · permission: - · offline: False
     """
     return await run("listMyOrders", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/official-resale-marketplace")
+async def list_official_resale_marketplace(request: Request) -> dict:
+    """Official Resale Marketplace & Buyer Discovery
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listOfficialResaleMarketplace", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/order-financial-reconciliation")
+async def list_order_financial_reconciliation(request: Request) -> dict:
+    """Order Financial Analytics & AI Reconciliation Intelligence
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listOrderFinancialReconciliation", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/order-lifecycle-timeline")
+async def list_order_lifecycle_timeline(request: Request) -> dict:
+    """Order Lifecycle Timeline, SLA, Exceptions & AI Operations
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listOrderLifecycleTimeline", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/order-line-product")
+async def list_order_line_product(request: Request) -> dict:
+    """Order Line, Product & Entitlement Composition
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listOrderLineProduct", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/order-payment-detail")
+async def list_order_payment_detail(request: Request) -> dict:
+    """Order Payment Detail & Transaction Ledger
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listOrderPaymentDetail", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -731,6 +1101,26 @@ async def list_order_refunds(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/order-reservation")
+async def list_order_reservation(request: Request) -> dict:
+    """Order & Reservation Command Center
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listOrderReservation", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/order-split-merge")
+async def list_order_split_merge(request: Request) -> dict:
+    """Order Split, Merge & Transaction Relationship Management
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listOrderSplitMerge", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/orders")
 async def list_orders(request: Request) -> dict:
     """List orders
@@ -738,6 +1128,26 @@ async def list_orders(request: Request) -> dict:
     scope: venue · permission: ORDER_VIEW · offline: True
     """
     return await run("listOrders", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/participant-guest-list")
+async def list_participant_guest_list(request: Request) -> dict:
+    """Participants, Guest Lists & Group Structure
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listParticipantGuestList", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/payment-order-financial")
+async def list_payment_order_financial(request: Request) -> dict:
+    """Payment & Order Financial Command Center
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listPaymentOrderFinancial", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -751,6 +1161,16 @@ async def list_payment_providers(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/payment-reconciliation-exception")
+async def list_payment_reconciliation_exception(request: Request) -> dict:
+    """Payment Reconciliation & Exception Management
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listPaymentReconciliationException", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/payment-tokens")
 async def list_payment_tokens(request: Request) -> dict:
     """A guest's saved payment methods
@@ -761,6 +1181,196 @@ async def list_payment_tokens(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.get("/person-type-product")
+async def list_person_type_product(request: Request) -> dict:
+    """Person-Type, Product & Entitlement Conversion Rules
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listPersonTypeProduct", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/quote-booking-conversion")
+async def list_quote_booking_conversion(request: Request) -> dict:
+    """Quote-to-Booking Conversion & Confirmation
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listQuoteBookingConversion", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/quote-revision-negotiation")
+async def list_quote_revision_negotiation(request: Request) -> dict:
+    """Quote Revision, Negotiation & Version Management
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listQuoteRevisionNegotiation", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/refund-dispute-resale")
+async def list_refund_dispute_resale(request: Request) -> dict:
+    """Refunds, Disputes & Resale Exceptions
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listRefundDisputeResale", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/related-order-transaction")
+async def list_related_order_transaction(request: Request) -> dict:
+    """Related Order & Transaction Relationship Explorer
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listRelatedOrderTransaction", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/resale")
+async def list_resale(request: Request) -> dict:
+    """Resale Operations Command Center
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listResale", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/resale")
+async def list_resale2(request: Request) -> dict:
+    """Resale Analytics & AI Intelligence
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listResale2", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/resale-confirmation-ownership")
+async def list_resale_confirmation_ownership(request: Request) -> dict:
+    """Resale Confirmation, Ownership Transfer & Ticket Delivery
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listResaleConfirmationOwnership", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/resale-eligibility-ticket")
+async def list_resale_eligibility_ticket(request: Request) -> dict:
+    """Resale Eligibility & Ticket Selection
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listResaleEligibilityTicket", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/resale-fee-commission")
+async def list_resale_fee_commission(request: Request) -> dict:
+    """Resale Fees, Commission & Seller Proceeds
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listResaleFeeCommission", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/resale-fraud-duplicate")
+async def list_resale_fraud_duplicate(request: Request) -> dict:
+    """Resale Fraud & Duplicate Sale Protection
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listResaleFraudDuplicate", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/resale-inventory-availability")
+async def list_resale_inventory_availability(request: Request) -> dict:
+    """Resale Inventory & Availability Management
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listResaleInventoryAvailability", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/resale-listing-seller")
+async def list_resale_listing_seller(request: Request) -> dict:
+    """My Resale Listings & Seller Dashboard
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listResaleListingSeller", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/resale-marketplace")
+async def list_resale_marketplace(request: Request) -> dict:
+    """Resale Marketplace Command Center
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listResaleMarketplace", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/resale-ownership")
+async def list_resale_ownership(request: Request) -> dict:
+    """Resale Audit & Ownership History
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listResaleOwnership", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/resale-policy-marketplace")
+async def list_resale_policy_marketplace(request: Request) -> dict:
+    """Resale Policy & Marketplace Settings
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listResalePolicyMarketplace", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/resale-pricing-price")
+async def list_resale_pricing_price(request: Request) -> dict:
+    """Resale Pricing & Price Guardrails
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listResalePricingPrice", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/resale-ticket-detail")
+async def list_resale_ticket_detail(request: Request) -> dict:
+    """Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listResaleTicketDetail", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/reservation-confirmation-expiry")
+async def list_reservation_confirmation_expiry(request: Request) -> dict:
+    """Reservation Confirmation, Expiry & Fulfillment Readiness
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listReservationConfirmationExpiry", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.get("/reservations")
 async def list_reservations(request: Request) -> dict:
     """List reservations
@@ -768,6 +1378,16 @@ async def list_reservations(request: Request) -> dict:
     scope: venue · permission: ORDER_VIEW · offline: False
     """
     return await run("listReservations", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/seller-settlement-payout")
+async def list_seller_settlement_payout(request: Request) -> dict:
+    """Seller Settlement & Payout Management
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listSellerSettlementPayout", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -788,6 +1408,106 @@ async def list_sync_rejections(request: Request) -> dict:
     scope: venue · permission: ORDER_VIEW · offline: False
     """
     return await run("listSyncRejections", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/ticket-ownership-transfer")
+async def list_ticket_ownership_transfer(request: Request) -> dict:
+    """Ticket Ownership Transfer Management
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listTicketOwnershipTransfer", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/ticket-reissue-fulfillment")
+async def list_ticket_reissue_fulfillment(request: Request) -> dict:
+    """Ticket Reissue & Fulfillment Regeneration
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listTicketReissueFulfillment", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/ticket-resale-marketplace")
+async def list_ticket_resale_marketplace(request: Request) -> dict:
+    """My Tickets & Resale Marketplace Entry
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listTicketResaleMarketplace", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/upgrade-conversion")
+async def list_upgrade_conversion(request: Request) -> dict:
+    """Upgrade & Conversion Command Center
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listUpgradeConversion", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/upgrade-eligibility-qualification")
+async def list_upgrade_eligibility_qualification(request: Request) -> dict:
+    """Upgrade Eligibility & Qualification Rules
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listUpgradeEligibilityQualification", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/upgrade-exception")
+async def list_upgrade_exception(request: Request) -> dict:
+    """Upgrade History, Exception Management & Audit Explorer
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listUpgradeException", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/upgrade-financial-treatment")
+async def list_upgrade_financial_treatment(request: Request) -> dict:
+    """Upgrade Financial Treatment & Price Difference Rules
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listUpgradeFinancialTreatment", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/upgrade-timing-usage")
+async def list_upgrade_timing_usage(request: Request) -> dict:
+    """Upgrade Timing, Usage & Ticket Status Rules
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listUpgradeTimingUsage", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/void-reversal-same")
+async def list_void_reversal_same(request: Request) -> dict:
+    """Void, Reversal & Same-Day Correction Management
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listVoidReversalSame", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.get("/white-label-marketplace")
+async def list_white_label_marketplace(request: Request) -> dict:
+    """White-Label Marketplace Deployment & Experience Architecture
+
+    scope: venue · permission: ORDER_VIEW · offline: False
+    """
+    return await run("listWhiteLabelMarketplace", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -901,6 +1621,16 @@ async def release_stored_value(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.post("/stored-value/authorisations/{authorisationId}/release")
+async def relinquish_stored_value(request: Request) -> dict:
+    """Give a hold back
+
+    scope: venue · permission: ORDER_CREATE · offline: False
+    """
+    return await run("relinquishStoredValue", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.delete("/carts/{cartId}/lines/{lineId}")
 async def remove_cart_line(request: Request) -> dict:
     """Take something out
@@ -981,6 +1711,26 @@ async def resume_shift(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.put("/after-sale-financial")
+async def set_after_sale_financial(request: Request) -> dict:
+    """After-Sales Financial Settlement & Adjustment Workspace
+
+    scope: venue · permission: ORDER_CREATE · offline: False
+    """
+    return await run("setAfterSaleFinancial", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/amendment-eligibility-policy")
+async def set_amendment_eligibility_policy(request: Request) -> dict:
+    """Amendment Eligibility & Policy Rule Builder
+
+    scope: venue · permission: ORDER_CREATE · offline: False
+    """
+    return await run("setAmendmentEligibilityPolicy", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.put("/b2b-accounts/{accountId}/credit")
 async def set_b2b_credit_limit(request: Request) -> dict:
     """Set a partner credit limit
@@ -988,6 +1738,26 @@ async def set_b2b_credit_limit(request: Request) -> dict:
     scope: venue · permission: CREDIT_MANAGE · offline: False
     """
     return await run("setB2bCreditLimit", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/cancellation-partial-policy")
+async def set_cancellation_partial_policy(request: Request) -> dict:
+    """Cancellation & Partial Cancellation Policy Configuration
+
+    scope: venue · permission: ORDER_CREATE · offline: False
+    """
+    return await run("setCancellationPartialPolicy", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/customer-guest-account")
+async def set_customer_guest_account(request: Request) -> dict:
+    """Customer, Guest & Account Assignment
+
+    scope: venue · permission: ORDER_CREATE · offline: False
+    """
+    return await run("setCustomerGuestAccount", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 
@@ -1001,6 +1771,86 @@ async def set_fraud_rules(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.put("/group-booking-handover")
+async def set_group_booking_handover(request: Request) -> dict:
+    """Group Booking 360° & Handover Workspace
+
+    scope: venue · permission: ORDER_CREATE · offline: False
+    """
+    return await run("setGroupBookingHandover", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/group-operational-planning")
+async def set_group_operational_planning(request: Request) -> dict:
+    """Group Operational Planning & Task Workspace
+
+    scope: venue · permission: ORDER_CREATE · offline: False
+    """
+    return await run("setGroupOperationalPlanning", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/group-package-experience")
+async def set_group_package_experience(request: Request) -> dict:
+    """Group Package & Experience Builder
+
+    scope: venue · permission: ORDER_CREATE · offline: False
+    """
+    return await run("setGroupPackageExperience", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/group-quotation-proposal")
+async def set_group_quotation_proposal(request: Request) -> dict:
+    """Group Quotation Builder & Proposal Generation
+
+    scope: venue · permission: ORDER_CREATE · offline: False
+    """
+    return await run("setGroupQuotationProposal", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/multi-payment-split")
+async def set_multi_payment_split(request: Request) -> dict:
+    """Multi-Payment, Split Tender & Payment Allocation Configuration
+
+    scope: venue · permission: ORDER_CREATE · offline: False
+    """
+    return await run("setMultiPaymentSplit", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/order-amendment")
+async def set_order_amendment(request: Request) -> dict:
+    """Order Amendment Workspace
+
+    scope: venue · permission: ORDER_CREATE · offline: False
+    """
+    return await run("setOrderAmendment", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/order-detail-transaction")
+async def set_order_detail_transaction(request: Request) -> dict:
+    """Order Detail & Transaction Workspace
+
+    scope: venue · permission: ORDER_CREATE · offline: False
+    """
+    return await run("setOrderDetailTransaction", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/order-reservation-statu")
+async def set_order_reservation_status(request: Request) -> dict:
+    """Order & Reservation Status Lifecycle Configuration
+
+    scope: venue · permission: ORDER_CREATE · offline: False
+    """
+    return await run("setOrderReservationStatus", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.put("/payment-providers")
 async def set_payment_provider(request: Request) -> dict:
     """Configure a gateway and its routing
@@ -1011,6 +1861,16 @@ async def set_payment_provider(request: Request) -> dict:
                      request.headers.get(TENANT_HEADER))
 
 
+@app.put("/pro-rata-residual")
+async def set_pro_rata_residual(request: Request) -> dict:
+    """Pro-Rata, Residual Value & Entitlement Credit Configuration
+
+    scope: venue · permission: ORDER_CREATE · offline: False
+    """
+    return await run("setProRataResidual", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
 @app.put("/venues/{venueId}/refund-policy")
 async def set_refund_policy(request: Request) -> dict:
     """Set a venue's refund policy
@@ -1018,6 +1878,46 @@ async def set_refund_policy(request: Request) -> dict:
     scope: venue · permission: REGION_CONFIGURE · offline: False
     """
     return await run("setRefundPolicy", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/resale-eligibility-rule")
+async def set_resale_eligibility_rule(request: Request) -> dict:
+    """Resale Eligibility Rule Configuration
+
+    scope: venue · permission: ORDER_CREATE · offline: False
+    """
+    return await run("setResaleEligibilityRule", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/resale-marketplace-recommendation")
+async def set_resale_marketplace_recommendation(request: Request) -> dict:
+    """AI Resale Configuration & Marketplace Recommendations
+
+    scope: venue · permission: ORDER_CREATE · offline: False
+    """
+    return await run("setResaleMarketplaceRecommendation", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/reservation-hold-policy")
+async def set_reservation_hold_policy(request: Request) -> dict:
+    """Reservation & Hold Policy Configuration
+
+    scope: venue · permission: ORDER_CREATE · offline: False
+    """
+    return await run("setReservationHoldPolicy", request.headers.get("x-scope-path", "uae"),
+                     request.headers.get(TENANT_HEADER))
+
+
+@app.put("/upgrade-conversion-path")
+async def set_upgrade_conversion_path(request: Request) -> dict:
+    """Upgrade & Conversion Path Builder
+
+    scope: venue · permission: ORDER_CREATE · offline: False
+    """
+    return await run("setUpgradeConversionPath", request.headers.get("x-scope-path", "uae"),
                      request.headers.get(TENANT_HEADER))
 
 

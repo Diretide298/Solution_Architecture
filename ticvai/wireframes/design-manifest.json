@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/derive-design-manifest.py",
- "generated": "2026-09-12",
+ "generated": "2026-09-17",
  "note": "The Claude Design work list. Status is read off wireframes/frames/ every run and never stored, so a batch cannot claim to be finished and not be. Batches with thin screens sort last: a screen with fewer than 4 components cannot be drawn from what it declares, and drawing it invents requirements.",
  "batchSize": 10,
  "drawableAt": 4,

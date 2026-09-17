@@ -96,8 +96,8 @@ screens:
   purpose: PIN or badge. Session carries the workstation.
   gaps:
   - operation: getCurrentSession
-    why: '**3 declared operations reach no component on this screen**: getCurrentSession, getGuestSession,
-      listSsoProviders. Either the screen is missing what calls them, or the declaration is residue.'
+    why: '**2 declared operations reach no component on this screen**: getCurrentSession, listSsoProviders.
+      Either the screen is missing what calls them, or the declaration is residue.'
     source: the screen's own declarations
   layout:
     template: split
@@ -199,10 +199,6 @@ screens:
   - operationId: getCurrentSession
     contract: identity
     purpose: Current session and effective permissions
-    trigger: onLoad
-  - operationId: getGuestSession
-    contract: identity
-    purpose: Read the current guest session
     trigger: onLoad
   - operationId: listMfaMethods
     contract: identity

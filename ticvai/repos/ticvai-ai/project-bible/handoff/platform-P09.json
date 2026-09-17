@@ -7,11 +7,11 @@
  "audience": "platformAdmin",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-12",
+ "generated": "2026-09-17",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 446,
-  "operations": 404,
+  "operations": 403,
   "contracts": 15,
   "modules": 13,
   "undrawn": 0,
@@ -152,7 +152,7 @@
   },
   {
    "contract": "identity",
-   "operations": 16
+   "operations": 15
   },
   {
    "contract": "marketing-crm",
@@ -175,11 +175,11 @@
    "operations": 3
   },
   {
-   "contract": "workforce",
+   "contract": "tenancy",
    "operations": 2
   },
   {
-   "contract": "tenancy",
+   "contract": "workforce",
    "operations": 2
   }
  ],
@@ -190,7 +190,7 @@
    "module": "Access & Identity",
    "wave": 1,
    "route": "/general/platform-login-mfa",
-   "operations": 8,
+   "operations": 7,
    "drawn": true
   },
   {

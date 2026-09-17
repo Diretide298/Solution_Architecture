@@ -68,6 +68,9 @@ READS = {
  "listRetailSales": [
   "SELECT * FROM retail.sale LIMIT 50"
  ],
+ "listStoreRules": [
+  "SELECT * FROM retail.store_rule LIMIT 50"
+ ],
  "listWalletTransactions": [
   "SELECT * FROM retail.wallet_transaction LIMIT 50"
  ],
@@ -94,6 +97,9 @@ READS = {
  ],
  "setReturnPolicy": [
   "SELECT * FROM retail.return_policy LIMIT 50"
+ ],
+ "setStoreRules": [
+  "SELECT * FROM retail.store_rule LIMIT 50"
  ],
  "suspendWallet": [
   "SELECT * FROM retail.wallet LIMIT 50"
@@ -168,6 +174,9 @@ WRITES = {
  ],
  "setReturnPolicy": [
   "SELECT id FROM retail.return_policy ORDER BY id LIMIT 1 FOR UPDATE"
+ ],
+ "setStoreRules": [
+  "SELECT id FROM retail.store_rule ORDER BY id LIMIT 1 FOR UPDATE"
  ],
  "suspendWallet": [
   "SELECT id FROM retail.wallet ORDER BY id LIMIT 1 FOR UPDATE"

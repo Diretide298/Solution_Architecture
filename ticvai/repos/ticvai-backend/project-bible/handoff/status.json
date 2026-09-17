@@ -1,15 +1,15 @@
 {
  "scope": "platform",
- "generated": "2026-09-12",
+ "generated": "2026-09-17",
  "note": "Derived on every run by tools/build-status.py. A hand-maintained status page is worse than none, because somebody plans against it.",
  "counts": {
   "operations": 1628,
   "contracts": 28,
   "tables": 388,
   "stores": 5,
-  "foreignKeys": 574,
+  "foreignKeys": 569,
   "indexes": 279,
-  "tablesWritten": 388,
+  "tablesWritten": 384,
   "relationships": 978,
   "states": 125,
   "events": 29,
@@ -126,9 +126,9 @@
   "build": [
    {
     "name": "Tables written",
-    "done": 388,
+    "done": 384,
     "total": 388,
-    "percent": 100,
+    "percent": 99,
     "note": "Counted from backend/. ADR-0024 said DDL waits for the design to settle; ADR-0038 and ADR-0039 settled it."
    },
    {
@@ -311,15 +311,15 @@
   }
  ],
  "conflicts": {
-  "open": 16,
+  "open": 17,
   "closed": 149,
   "withdrawn": 6,
   "blocking": 0,
   "byOwner": {
    "Chinmay + Dinesh": 4,
+   "Chinmay": 2,
    "Chinmay + Qossai": 2,
    "Dinesh": 1,
-   "Chinmay": 1,
    "Chinmay + Allam": 1,
    "Allam": 1,
    "Dinesh + Qossai": 1,
@@ -344,7 +344,8 @@
    "CF-168",
    "CF-169",
    "CF-170",
-   "CF-171"
+   "CF-171",
+   "CF-172"
   ]
  },
  "stores": [
