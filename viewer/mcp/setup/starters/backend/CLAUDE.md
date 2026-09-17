@@ -19,15 +19,27 @@ dotnet test TICVAI-Backend.slnx
 dotnet run --project src/TICVAI.Api        # needs Database:ConnectionString
 ```
 
-## Read before writing code
+## Coding standards
 
-1. `project-bible/setup/naming-and-style.md` - naming per layer, money, time, banned words
-2. `project-bible/setup/backend-patterns.md` - banned APIs, structure, error handling
-3. `project-bible/setup/api-conventions.md` - contract-first rules, errors, paging, versioning
-4. `project-bible/setup/quality-gates.md` - what CI enforces
-5. `project-bible/setup/git-and-mrs.md` - commits and merge requests
-6. `project-bible/setup/llm-conventions.md` - rules for AI-written code
-7. As needed: `data-and-storage.md`, `config-and-secrets.md`, `dependencies.md`, `adding-things.md`
+Loaded into every session, so every ticket is built to them:
+
+@project-bible/setup/naming-and-style.md
+@project-bible/setup/backend-patterns.md
+@project-bible/setup/quality-gates.md
+
+Read these when the work calls for them, not before:
+
+| Read | When |
+|---|---|
+| `project-bible/setup/api-conventions.md` | adding or changing an endpoint, an error or paging |
+| `project-bible/setup/git-and-mrs.md` | before a commit or a merge request |
+| `project-bible/setup/llm-conventions.md` | before a commit: what AI-written code must carry |
+| `project-bible/setup/data-and-storage.md` | touching tables, migrations or local storage |
+| `project-bible/setup/config-and-secrets.md` | adding a setting, a connection string or a secret |
+| `project-bible/setup/dependencies.md` | adding a package |
+| `project-bible/setup/adding-things.md` | adding a module, a permission or an integration |
+
+In one session, a document already read does not need reading again.
 
 Those documents were written when the platform targeted .NET 8. **This repository is
 .NET 10**; where a document names a version, use 10. Everything else in them applies.
