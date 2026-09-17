@@ -1,5 +1,5 @@
 /**
- * The thirteen tools, and where each gets its answer.
+ * The sixteen tools, and where each gets its answer.
  *
  * **Nine read the package.** They are selectors over bulk payloads, not
  * proxies: there is no `/api/screen?id=BO-102`, so a layer is fetched whole,
@@ -23,10 +23,14 @@
  * caller. `adam_links` and `adam_link` read and write the one thing neither
  * system can hold on its own: which artefact a work package is about.
  *
- * **`adam_link` is the only tool here that writes**, and all it can write is
- * that row. Nothing here can change a work package, a status or an assignee —
- * OpenProject owns those, and a bridge that owned any of them would be the
- * second plan over the same work that CF-124 is already open about.
+ * **Three are about doing the work.** `adam_pull` saves a ticket and everything
+ * it is linked to as files under `.adam/` in the developer's folder, so Claude
+ * reads what it needs from disk instead of holding it all in the conversation.
+ * `adam_propose` works out a change to a work package — status, % done, a
+ * comment — and sends nothing; `adam_apply` sends it, with the code the proposal
+ * returned, after the person has said yes. The change is made as the person,
+ * with their own OpenProject token. Assignees, dates and the work packages
+ * themselves stay OpenProject's alone (CF-124).
  *
  * Screens come from `journeys`, not from `uiux`. `/api/uiux` is about design
  * boards and frames — how much of the product is drawn — and holds no screen
@@ -37,6 +41,9 @@
  * wrong id is nearly always a wrong *spelling* of a right id, and an agent
  * handed the candidates fixes it in the same turn instead of asking.
  */
+
+import { appendFile, mkdir, readdir, rm, stat, writeFile } from 'node:fs/promises';
+import path from 'node:path';
 
 const MAX_HITS = 25;
 
@@ -92,6 +99,166 @@ function miss(what, want, ids) {
     error: `no ${what} called "${want}"`,
     ...(candidates.length ? { didYouMean: candidates } : { known: ids.length }),
   };
+}
+
+/**
+ * The query string for a work call, carrying the package this connector works
+ * in. Each ADAM project reads its own OpenProject project, so the accounts
+ * service has to be told which one; without it, it assumes the first.
+ */
+async function scoped(client, extra = {}) {
+  const project = await client.projectId();
+  return new URLSearchParams({ ...extra, ...(project ? { project_id: project } : {}) });
+}
+
+// ---- files under .adam/ ------------------------------------------------------
+
+/** A name that is safe as one path segment, whatever an artefact id holds. */
+const safeName = (text) => String(text ?? '').replace(/[^A-Za-z0-9._-]+/g, '_')
+  .replace(/^\.+/, '_').slice(0, 120) || '_';
+
+/**
+ * Where `.adam/` goes: the folder Claude is working in.
+ *
+ * `dir` from the call first, because Claude knows its own working folder and a
+ * server started by Claude Code may not have been started in it. Then
+ * ADAM_WORKDIR, which setup sets for a folder registration. Then the process's
+ * own folder. Never a drive root, and never a folder that does not exist.
+ */
+async function workFolder(dir) {
+  const chosen = path.resolve(String(dir || process.env.ADAM_WORKDIR || process.cwd()));
+  if (path.parse(chosen).root === chosen) {
+    throw new Error(`will not write into ${chosen} — pass dir: the folder you are working in`);
+  }
+  const found = await stat(chosen).catch(() => null);
+  if (!found?.isDirectory()) throw new Error(`there is no folder at ${chosen}`);
+  const base = path.join(chosen, '.adam');
+  await mkdir(base, { recursive: true });
+  // Pulled copies, not source. Kept out of git without touching the repo's own
+  // .gitignore.
+  await writeFile(path.join(base, '.gitignore'),
+    '# Written by the ADAM connector. Local copies only - never commit them.\n*\n');
+  return base;
+}
+
+// Kept across pulls: the developer's own notes and the log of applied changes.
+const KEEP = new Set(['notes.md', 'log.md']);
+
+/** Which tool answers for each kind of linked artefact, and with what. */
+function lookupFor(kind, id) {
+  // operation and schema ids name their contract: `access#listPasses`,
+  // `access:Pass`. Without one there is nothing to aim at but a search.
+  const ref = /^(.+)[#:](.+)$/.exec(String(id));
+  switch (kind) {
+    case 'screen': return ['adam_screen', { id }];
+    case 'flow': return ['adam_journey', { id }];
+    case 'contract': return ['adam_contract', { name: id }];
+    case 'operation': return ref ? ['adam_contract', { name: ref[1], operation: ref[2] }] : ['adam_search', { q: id }];
+    case 'schema': return ref ? ['adam_contract', { name: ref[1], schema: ref[2] }] : ['adam_search', { q: id }];
+    case 'table': return ['adam_table', { name: id }];
+    case 'module': return ['adam_module', { name: id }];
+    case 'service': return ['adam_service', { name: id }];
+    case 'adr': return ['adam_decisions', { id }];
+    default: return ['adam_search', { q: id }];
+  }
+}
+
+const json = (value) => `${JSON.stringify(value, null, 2)}\n`;
+
+function ticketReadme(wp, files, missing, when) {
+  const line = (label, value) => (value || value === 0 ? `- **${label}:** ${value}\n` : '');
+  let out = `# #${wp.key} ${wp.subject}\n\n`;
+  out += line('Project', wp.project) + line('Type', wp.type) + line('Status', wp.status)
+    + line('Milestone', wp.version) + line('Priority', wp.priority) + line('Assignee', wp.assignee)
+    + line('Start', wp.startDate) + line('Due', wp.dueDate)
+    + line('% done', wp.percentDone) + line('OpenProject', wp.url);
+  out += `\nPulled ${when} by the ADAM connector. Status and dates are a copy from then; `
+    + 'run adam_pull again for the current ones.\n\n';
+  out += `## Description\n\n${wp.description || '_No description in OpenProject._'}\n`;
+  if (wp.descriptionTrimmed) out += '\n_Longer in OpenProject - open the link above for the rest._\n';
+  out += `\n## What this touches (${files.length})\n\n`;
+  if (files.length) {
+    for (const f of files) out += `- ${f.kind} \`${f.id}\` - [${f.file}](${f.file})${f.source ? ` and [${f.source}](${f.source})` : ''}\n`;
+  } else {
+    out += 'Nothing is linked to this ticket yet. Find what it is about with adam_search, record it '
+      + 'with adam_link, then run adam_pull again.\n';
+  }
+  if (missing.length) {
+    out += `\nLinked but not found in the package: ${missing.map((m) => `${m.kind} \`${m.id}\``).join(', ')}.\n`;
+  }
+  out += '\n## When you have finished\n\n'
+    + 'Ask Claude to propose the change (adam_propose): the new status, % done, and a comment '
+    + 'saying what was done. Check what it shows you, then say yes to apply it (adam_apply). '
+    + 'Applied changes are listed in [log.md](log.md). Your own notes go in [notes.md](notes.md) - '
+    + 'pulling again keeps both.\n';
+  return out;
+}
+
+async function pullOne(client, key, base, when) {
+  const answer = await client.service(`/api/work-packages/${encodeURIComponent(key)}?${await scoped(client)}`);
+  if (answer.status === 428) return { key, needsSetup: true, error: answer.data?.detail };
+  if (!answer.ok) return { key, error: answer.data?.detail ?? `HTTP ${answer.status}` };
+  const { workPackage: wp, touches = [] } = answer.data;
+
+  const folder = path.join(base, 'work', safeName(wp.key));
+  await mkdir(folder, { recursive: true });
+  // What an earlier pull wrote goes, so an unlinked artefact does not linger.
+  for (const name of await readdir(folder)) {
+    if (!KEEP.has(name)) await rm(path.join(folder, name), { recursive: true, force: true });
+  }
+
+  const files = [];
+  const missing = [];
+  for (const { kind, id } of touches) {
+    const [toolName, args] = lookupFor(kind, id);
+    const result = await BY_NAME.get(toolName).run(client, args).catch((error) => ({ found: false, error: error.message }));
+    const file = `${safeName(kind)}-${safeName(id)}.json`;
+    await writeFile(path.join(folder, file), json({ kind, id, from: toolName, ...result }));
+    const entry = { kind, id, file };
+    if (result.found === false) missing.push({ kind, id });
+    // An ADR's argument is its prose, so its source comes too.
+    const adrFile = kind === 'adr' ? (result.adr?.file ?? result.decision?.file) : null;
+    if (adrFile) {
+      const source = await BY_NAME.get('adam_file').run(client, { path: adrFile, lines: 2000 }).catch(() => null);
+      if (source?.found) {
+        entry.source = `${safeName(kind)}-${safeName(id)}.md`;
+        await writeFile(path.join(folder, entry.source), source.text);
+      }
+    }
+    files.push(entry);
+  }
+
+  await writeFile(path.join(folder, 'ticket.json'), json({ pulledAt: when, workPackage: wp, touches }));
+  await writeFile(path.join(folder, 'README.md'), ticketReadme(wp, files, missing, when));
+  const notes = path.join(folder, 'notes.md');
+  if (!(await stat(notes).catch(() => null))) {
+    await writeFile(notes, `# Notes on #${wp.key}\n\nYours. adam_pull never overwrites this file.\n`);
+  }
+  return {
+    key: wp.key, subject: wp.subject, status: wp.status, milestone: wp.version || null,
+    due: wp.dueDate || null, folder, linked: files.length, notFound: missing.length,
+  };
+}
+
+function boardReadme(pulled, project, when) {
+  const groups = new Map();
+  for (const t of pulled.filter((t) => !t.error)) {
+    const name = t.milestone || 'No milestone';
+    if (!groups.has(name)) groups.set(name, []);
+    groups.get(name).push(t);
+  }
+  let out = `# My board - ${project?.name ?? 'OpenProject'}\n\nPulled ${when}. Open work assigned to you, `
+    + 'grouped by milestone. Each ticket has a folder under work/ with its description and '
+    + 'everything it is linked to.\n';
+  for (const [name, tickets] of groups) {
+    out += `\n## ${name}\n\n| Ticket | Status | Due | Linked | Folder |\n|---|---|---|---|---|\n`;
+    for (const t of tickets) {
+      out += `| #${t.key} ${t.subject.replace(/\|/g, '/')} | ${t.status} | ${t.due ?? ''} | ${t.linked} | [work/${safeName(t.key)}](work/${safeName(t.key)}/README.md) |\n`;
+    }
+  }
+  const failed = pulled.filter((t) => t.error);
+  if (failed.length) out += `\n## Not pulled\n\n${failed.map((t) => `- #${t.key}: ${t.error}`).join('\n')}\n`;
+  return out;
 }
 
 export const TOOLS = [
@@ -527,7 +694,7 @@ export const TOOLS = [
       + 'branch name or a ticket number turns up and you need the context behind it.',
     inputSchema: { type: 'object', properties: {} },
     async run(client) {
-      const answer = await client.service('/api/board/mine');
+      const answer = await client.service(`/api/board/mine?${await scoped(client)}`);
       // 428 is "connect OpenProject first" — a thing to go and do, not a
       // failure. Relayed as the sentence the server wrote rather than flattened
       // into "the tool failed".
@@ -543,6 +710,9 @@ export const TOOLS = [
         // Kept, because an empty board reads as "nothing assigned to me" and
         // the truth may be "nothing has been loaded into the project yet".
         ...(board.note ? { note: board.note } : {}),
+        // Which OpenProject project this board is read from, so "nothing
+        // assigned" is never mistaken for "nothing assigned anywhere".
+        ...(board.openproject ? { openprojectProject: board.openproject } : {}),
         items: board.items,
       };
     },
@@ -563,7 +733,8 @@ export const TOOLS = [
       required: ['key'],
     },
     async run(client, { key }) {
-      const answer = await client.service(`/api/work-packages/${String(key).replace(/^#/, '')}`);
+      const answer = await client.service(
+        `/api/work-packages/${String(key).replace(/^#/, '')}?${await scoped(client)}`);
       if (answer.status === 428) {
         return { found: false, needsSetup: true, error: answer.data?.detail };
       }
@@ -591,7 +762,7 @@ export const TOOLS = [
       required: ['kind', 'id'],
     },
     async run(client, { kind, id }) {
-      const query = new URLSearchParams({ target_kind: String(kind).toLowerCase(), target_id: id });
+      const query = await scoped(client, { target_kind: String(kind).toLowerCase(), target_id: id });
       const answer = await client.service(`/api/links?${query}`);
       if (!answer.ok) return { found: false, error: answer.data?.detail ?? `HTTP ${answer.status}` };
 
@@ -660,6 +831,7 @@ export const TOOLS = [
           target_kind: String(kind).toLowerCase(),
           target_id: id,
           external_key: String(key).replace(/^#/, ''),
+          project_id: (await client.projectId()) ?? '',
         },
       });
 
@@ -798,6 +970,163 @@ export const TOOLS = [
           : {}),
         text: slice.join('\n'),
       };
+    },
+  },
+
+  {
+    name: 'adam_pull',
+    description:
+      'Save a ticket and everything it is linked to as files in the working folder, under '
+      + '.adam/work/<ticket>/: README.md (the ticket, its milestone and description, and a list of '
+      + 'the files), ticket.json, one file per linked screen, journey, contract, table, service, '
+      + 'module and ADR (with the ADR text), plus notes.md for your own notes. With no `key`, pulls '
+      + 'every open ticket assigned to you and writes .adam/board.md grouped by milestone. **Use '
+      + 'this at the start of work on a ticket**, then read the files you need instead of holding '
+      + 'everything in the conversation. Always pass `dir`: the absolute path of the folder you are '
+      + 'working in. .adam/ is git-ignored.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        key: { type: 'string', description: 'Work package number, e.g. 6046. Leave out for your whole board.' },
+        dir: { type: 'string', description: 'Absolute path of the folder you are working in' },
+        limit: { type: 'integer', description: 'Whole board only: at most this many tickets. Default 15, at most 30.' },
+      },
+    },
+    async run(client, { key, dir, limit = 15 }) {
+      const base = await workFolder(dir);
+      const when = new Date().toISOString().replace(/\.\d+Z$/, 'Z');
+
+      if (key) {
+        const one = await pullOne(client, String(key).replace(/^#/, ''), base, when);
+        if (one.needsSetup) return { found: false, needsSetup: true, error: one.error };
+        if (one.error) return { found: false, error: one.error };
+        return {
+          found: true,
+          ...one,
+          read: path.join(one.folder, 'README.md'),
+          next: one.linked
+            ? 'Read README.md first, then the linked files it lists as you need them.'
+            : 'Nothing is linked to this ticket yet. Use adam_search to find what it is about, '
+              + 'adam_link to record it, then adam_pull again.',
+        };
+      }
+
+      const answer = await client.service(`/api/board/mine?${await scoped(client)}`);
+      if (answer.status === 428) return { found: false, needsSetup: true, error: answer.data?.detail };
+      if (!answer.ok) return { found: false, error: answer.data?.detail ?? `HTTP ${answer.status}` };
+      const items = (answer.data.items ?? []).slice(0, Math.max(1, Math.min(Number(limit) || 15, 30)));
+      const pulled = [];
+      for (const item of items) pulled.push(await pullOne(client, item.key, base, when));
+      const board = path.join(base, 'board.md');
+      await writeFile(board, boardReadme(pulled, answer.data.openproject, when));
+      return {
+        found: pulled.length > 0,
+        board,
+        total: answer.data.total,
+        pulled: pulled.map(({ key: k, subject, status, milestone, linked, error }) =>
+          ({ key: k, subject, status, milestone, linked, ...(error ? { error } : {}) })),
+        ...(answer.data.total > items.length
+          ? { more: `${answer.data.total - items.length} more assigned; raise limit or pull them by key` }
+          : {}),
+        ...(answer.data.note ? { note: answer.data.note } : {}),
+      };
+    },
+  },
+
+  {
+    name: 'adam_propose',
+    description:
+      'Propose a change to one of your OpenProject work packages: a new status, a % done, and/or '
+      + 'a comment saying what was done. **Changes nothing.** Returns exactly what would change and '
+      + 'a `proposal` code. Then show the person the changes, ask them to confirm, and call '
+      + 'adam_apply only if they clearly say yes. Call with only `key` to list the status names '
+      + 'there are. Use when work on a ticket is finished or has moved on.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        key: { type: 'string', description: 'Work package number, e.g. 6046' },
+        status: { type: 'string', description: 'New status by name, e.g. "In progress" or "Closed"' },
+        percentDone: { type: 'integer', description: 'New % done, 0 to 100' },
+        comment: { type: 'string', description: 'A comment to add: what was done, where (branch, commit, PR)' },
+      },
+      required: ['key'],
+    },
+    async run(client, { key, status, percentDone, comment }) {
+      const number = String(key ?? '').replace(/^#/, '');
+      if (!status && percentDone === undefined && !comment) {
+        const answer = await client.service('/api/board/statuses');
+        if (answer.status === 428) return { found: false, needsSetup: true, error: answer.data?.detail };
+        if (!answer.ok) return { found: false, error: answer.data?.detail ?? `HTTP ${answer.status}` };
+        return {
+          found: true,
+          statuses: answer.data.statuses.map((st) => st.name),
+          next: 'Call adam_propose again with the key and a status, percentDone or comment.',
+        };
+      }
+      const answer = await client.service(`/api/work-packages/${encodeURIComponent(number)}/proposals`, {
+        method: 'POST',
+        body: {
+          project_id: (await client.projectId()) ?? '',
+          status: status ?? '',
+          percent_done: percentDone ?? null,
+          comment: comment ?? '',
+        },
+      });
+      if (answer.status === 428) return { ok: false, needsSetup: true, error: answer.data?.detail };
+      if (!answer.ok) return { ok: false, error: answer.data?.detail ?? `HTTP ${answer.status}` };
+      return {
+        ok: true,
+        changed: false,
+        ...answer.data,
+        next: `Show the person these changes to #${number} and ask whether to apply them. `
+          + 'Only after a clear yes, call adam_apply with this key and proposal code.',
+      };
+    },
+  },
+
+  {
+    name: 'adam_apply',
+    description:
+      '**Changes OpenProject.** Applies a change made by adam_propose, using its `proposal` code. '
+      + 'Call it only after the person has seen that proposal\'s changes in this conversation and '
+      + 'clearly said yes — never on your own initiative, and never for a proposal they have not '
+      + 'seen. The change is made as the person. Codes work once and for 15 minutes. Also adds a '
+      + 'line to .adam/work/<ticket>/log.md when that folder exists; pass `dir` for it.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        key: { type: 'string', description: 'Work package number, e.g. 6046' },
+        proposal: { type: 'string', description: 'The proposal code adam_propose returned' },
+        dir: { type: 'string', description: 'Absolute path of the folder you are working in' },
+      },
+      required: ['key', 'proposal'],
+    },
+    async run(client, { key, proposal, dir }) {
+      const number = String(key ?? '').replace(/^#/, '');
+      const answer = await client.service(
+        `/api/work-packages/${encodeURIComponent(number)}/proposals/${encodeURIComponent(proposal ?? '')}/apply`,
+        { method: 'POST', body: { project_id: (await client.projectId()) ?? '' } },
+      );
+      if (answer.status === 428) return { ok: false, needsSetup: true, error: answer.data?.detail };
+      if (!answer.ok) return { ok: false, changed: false, error: answer.data?.detail ?? `HTTP ${answer.status}` };
+
+      // The local record, when this ticket was pulled here. A failure to write
+      // it is reported, never allowed to hide that OpenProject did change.
+      let logged = null;
+      try {
+        const folder = path.join(path.resolve(String(dir || process.env.ADAM_WORKDIR || process.cwd())),
+          '.adam', 'work', safeName(number));
+        if (await stat(folder).catch(() => null)) {
+          const when = new Date().toISOString().replace(/\.\d+Z$/, 'Z');
+          const log = path.join(folder, 'log.md');
+          if (!(await stat(log).catch(() => null))) await writeFile(log, `# Changes applied to #${number}\n\n`);
+          await appendFile(log, `- ${when} - ${answer.data.applied}\n`);
+          logged = log;
+        }
+      } catch (error) {
+        logged = `not written: ${error.message}`;
+      }
+      return { ok: true, changed: true, ...answer.data, ...(logged ? { log: logged } : {}) };
     },
   },
 ];

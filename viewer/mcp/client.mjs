@@ -101,6 +101,16 @@ export class ViewerClient {
     }
   }
 
+  /**
+   * The package this connector works in: ADAM_PROJECT when setup chose one,
+   * otherwise the account's default. The accounts service scopes the board,
+   * work packages and links by it, each package to its own OpenProject project.
+   */
+  async projectId() {
+    await this.#resolveProject();
+    return this.project ?? this.#defaultProject;
+  }
+
   async login() {
     if (!this.email || !this.password) {
       throw new Error('set ADAM_EMAIL and ADAM_PASSWORD — the viewer has no anonymous read');

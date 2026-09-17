@@ -114,6 +114,7 @@
             <option value="admin">admin</option>
             <option value="client">client</option>
           </select>
+          <select id="invite-project" class="scope-select" aria-label="Project they get access to"></select>
           <select id="invite-days" class="scope-select">
             <option value="7">7 days</option>
             <option value="1">1 day</option>
@@ -134,6 +135,10 @@
           <code>@softlabsgroup.com</code> rule does not apply, so the address
           can be anywhere; you typing it is what vouches for it. The link
           expires in <strong>three days</strong> whatever is chosen above.
+        </p>
+        <p class="auth-note auth-fine">
+          <b>Project</b> is the ADAM project the link opens. They see that
+          project and no other.
         </p>
         <p class="auth-error" id="invite-error" hidden></p>
 
@@ -181,6 +186,25 @@
         </div>
         <div id="accounts" class="admin-table"></div>
         <p class="auth-error" id="account-error" hidden></p>
+      </section>
+
+      <!-- ── which OpenProject project each package reads ─────────── -->
+      <section class="admin-panel" id="projects">
+        <h2 class="admin-heading">Projects <span id="project-count" class="admin-count"></span></h2>
+        <p class="auth-note">
+          Which OpenProject project each ADAM project reads its work from. A
+          developer's board, a work package lookup and a new link only see work
+          in the project chosen here, so TICVAI tickets never mix with another
+          product's. A project with nothing chosen shows no work at all.
+        </p>
+        <p class="auth-note auth-fine">
+          The list comes from OpenProject using <b>your own token</b>, so it
+          shows the projects you can see there. No token stored yet? Add one on
+          <a href="/settings.html#openproject">your settings page</a>.
+        </p>
+        <div id="projects-list" class="admin-table"></div>
+        <p class="auth-error" id="project-error" hidden></p>
+        <p class="auth-ok" id="project-ok" hidden></p>
       </section>
 
       <!-- ── a date range, as a file ──────────────────────────────── -->
@@ -273,6 +297,7 @@
         authState, listAccounts, setAccountActive, setAccountRole,
         createInvite, listInvites, revokeInvite, logoutAccount,
         makeReset,
+        listPmsProjects, availablePmsProjects, setPmsProject, clearPmsProject,
       } from '/validation.js';
       import { attachSubSearch } from '/subsearch.js';
       import '/theme.js';                      // the saved day/night choice
@@ -332,6 +357,9 @@
         // allSettled rather than all, so one failing still shows the page it
         // failed on rather than leaving the curtain up over it.
         Promise.allSettled([refreshInvites(), refreshAccounts()]).then(hideLoader);
+        // Not awaited with the others: it waits on OpenProject, which is slower
+        // than this service and should not hold the curtain up.
+        refreshProjects();
       }
 
       // ── invites ────────────────────────────────────────────────
@@ -352,7 +380,8 @@
           const row = el('div', `admin-row invite-row-item ${invite.state}`);
           row.append(el('span', 'invite-state', invite.state));
           row.append(el('span', 'invite-who', invite.email));
-          row.append(el('span', 'invite-role', invite.role));
+          row.append(el('span', 'invite-role',
+            `${invite.role} · ${invite.project_name || invite.project_id || '—'}`));
           row.append(el('span', 'admin-when',
             invite.state === 'open' ? `expires ${when(invite.expires_at)}`
               : invite.redeemed_at ? `used ${when(invite.redeemed_at)}`
@@ -394,6 +423,7 @@
             $('invite-email').value.trim(),
             $('invite-role').value,
             Number($('invite-days').value),
+            $('invite-project').value,
           );
           $('invite-link').value = `${location.origin}${invite.link}`;
           $('invite-result').hidden = false;
@@ -417,6 +447,111 @@
         }
         setTimeout(() => { $('invite-copy').textContent = 'Copy'; }, 1600);
       };
+
+      // The invite form's project picker. Open projects only; the choice made
+      // before a refresh is kept.
+      function fillInviteProjects(projects) {
+        const pick = $('invite-project');
+        const was = pick.value;
+        pick.innerHTML = '';
+        for (const project of projects.filter((p) => p.active)) {
+          const option = el('option', null, project.name || project.id);
+          option.value = project.id;
+          pick.append(option);
+        }
+        if (was && [...pick.options].some((o) => o.value === was)) pick.value = was;
+      }
+
+      // ── projects ───────────────────────────────────────────────
+      async function refreshProjects() {
+        const box = $('projects-list');
+        const say = (id, text) => { $(id).textContent = text; $(id).hidden = !text; };
+        box.innerHTML = '';
+        say('project-error', '');
+
+        let projects = [];
+        try { ({ projects } = await listPmsProjects()); }
+        catch (error) { box.append(el('p', 'pane-note', `Could not read the projects: ${error.message}`)); return; }
+        fillInviteProjects(projects);
+        const chosen = projects.filter((p) => p.openproject).length;
+        $('project-count').textContent = `${chosen} of ${projects.length} connected`;
+
+        // The choices. A missing token is a thing to go and fix, not a failure:
+        // the rows still draw, with what is chosen today, and no picker.
+        let options = null;
+        try { ({ projects: options } = await availablePmsProjects()); }
+        catch (error) {
+          say('project-error', error.status === 428
+            ? 'Store your OpenProject token on your settings page to choose projects here.'
+            : `Could not read the OpenProject projects: ${error.message}`);
+        }
+
+        for (const project of projects) {
+          const row = el('div', `admin-row project-row${project.active ? '' : ' disabled'}`);
+          const who = el('span', 'project-who');
+          who.append(el('b', null, project.name || project.id), el('span', 'admin-when', ` ${project.id}`));
+          row.append(who);
+
+          const now = el('span', 'project-now');
+          if (project.openproject) {
+            const link = el('a', null, `${project.openproject.name} (${project.openproject.identifier})`);
+            link.href = project.openproject.url;
+            link.target = '_blank';
+            link.rel = 'noopener';
+            now.append(link);
+          } else {
+            now.append(el('span', 'pane-note', 'nothing chosen'));
+          }
+          row.append(now);
+
+          if (options) {
+            const pick = el('select', 'scope-select project-pick');
+            pick.setAttribute('aria-label', `OpenProject project for ${project.name || project.id}`);
+            const blank = el('option', null, 'Choose an OpenProject project…');
+            blank.value = '';
+            pick.append(blank);
+            for (const option of options) {
+              const item = el('option', null, `${option.name} (${option.identifier})`);
+              item.value = String(option.id);
+              item.selected = option.id === project.openproject?.id;
+              pick.append(item);
+            }
+            const save = el('button', 'chip', 'Save');
+            save.type = 'button';
+            save.onclick = async () => {
+              if (!pick.value) { say('project-error', 'Choose a project first.'); return; }
+              save.disabled = true;
+              say('project-error', ''); say('project-ok', '');
+              try {
+                const { project: saved } = await setPmsProject(project.id, Number(pick.value));
+                say('project-ok', `${saved.name || saved.id} now reads ${saved.openproject.name}.`);
+                refreshProjects();
+              } catch (error) {
+                say('project-error', error.message);
+                save.disabled = false;
+              }
+            };
+            row.append(pick, save);
+          } else {
+            row.append(el('span'), el('span'));
+          }
+
+          const clear = el('button', 'chip', 'Clear');
+          clear.type = 'button';
+          // Kept in the row when there is nothing to clear, so the columns
+          // line up with the rows that have one.
+          if (!project.openproject) { clear.style.visibility = 'hidden'; clear.disabled = true; }
+          clear.onclick = async () => {
+            if (!confirm(`Stop ${project.name || project.id} reading any OpenProject project? Its boards go empty until one is chosen.`)) return;
+            clear.disabled = true;
+            try { await clearPmsProject(project.id); say('project-ok', `${project.name || project.id} reads no OpenProject project now.`); }
+            catch (error) { say('project-error', error.message); }
+            refreshProjects();
+          };
+          row.append(clear);
+          box.append(row);
+        }
+      }
 
       // ── accounts ───────────────────────────────────────────────
       async function refreshAccounts() {

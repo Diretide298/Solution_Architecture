@@ -1946,6 +1946,11 @@ body[data-layer="decisions"] { --layer: var(--accent); --layer-soft: color-mix(i
    onto an implicit second one and reads as a layout bug. */
 .account-row { grid-template-columns: 0.85fr 1.4fr 104px 84px 78px 118px 108px; }
 .account-row.disabled { opacity: .5; }
+/* Five cells: the ADAM project, what it reads today, the picker, Save, Clear. */
+.project-row { grid-template-columns: 1fr 1.2fr minmax(0, 1.6fr) auto auto; }
+.project-row.disabled { opacity: .5; }
+.project-pick { min-width: 0; width: 100%; padding: 3px 6px; font-size: 12px; }
+.project-now a { color: var(--accent); }
 /* The confirm for ending somebody's sessions takes the whole row rather than
    its column. It has to fit a sentence saying which of the two buttons beside
    each other was just pressed, and 108px is not a sentence. */
@@ -1992,7 +1997,7 @@ body[data-layer="decisions"] { --layer: var(--accent); --layer-soft: color-mix(i
 @media (max-width: 760px) {
   .admin-main { padding: 14px 12px 40px; }
   .admin-panel { padding: 14px; }
-  .invite-row-item.admin-row, .account-row {
+  .invite-row-item.admin-row, .account-row, .project-row {
     grid-template-columns: 1fr auto; row-gap: 4px;
   }
   .admin-when { grid-column: 1 / -1; }

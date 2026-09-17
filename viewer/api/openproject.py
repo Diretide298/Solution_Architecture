@@ -6,8 +6,11 @@ account.** That is the whole reason the settings page exists: a shared
 credential would attribute every read — and later every write — to one robot,
 and the audit trail is most of what a PMS is for.
 
-Read-through and nothing else, for now. The bridge does not mint work package
-ids, does not create work packages, and does not own status. OpenProject holds
+Mostly read-through. The bridge does not mint work package ids and does not
+create work packages. It can change three things on one, **only after the person
+has seen the change and said yes** (see the proposals in main.py): the status,
+the % done, and a comment. OpenProject still owns all three; the change is made
+as the person, with their token, so its history says who did it. OpenProject holds
 the schedule — 23 epics, 444 features, 2,173 tasks in the delivery plan — and
 this service holds the one thing OpenProject cannot express: which artefact a
 work package is about. See `artefact_link` in db.py.
@@ -69,33 +72,57 @@ def _looks_like_an_edge(body: str) -> bool:
     return "cloudflare" in lowered or "error_code" in lowered and "1010" in lowered
 
 
+def _openproject_message(body: str) -> str:
+    """The sentence OpenProject put in an error body, when it put one there."""
+    try:
+        parsed = json.loads(body)
+    except ValueError:
+        return ""
+    message = parsed.get("message") or ""
+    # A 422 lists each field's complaint under _embedded.errors.
+    for error in (parsed.get("_embedded") or {}).get("errors") or []:
+        if error.get("message") and error["message"] not in message:
+            message = f"{message} {error['message']}".strip()
+    return message
+
+
 def call(endpoint: str, token: str, path: str,
-         params: Optional[dict] = None) -> Any:
+         params: Optional[dict] = None, method: str = "GET",
+         body: Optional[dict] = None) -> Any:
     """
-    One GET against an OpenProject instance, as `token`.
+    One request against an OpenProject instance, as `token`.
 
     `path` is relative to `/api/v3`. The answer is parsed JSON; anything else
     raises rather than being handed on as a string that a caller will index into
-    and get a character from.
+    and get a character from. A GET is the normal case; `update` and `comment`
+    below are the only callers that send anything else.
     """
     url = f"{endpoint.rstrip('/')}/api/v3/{path.lstrip('/')}"
     if params:
         url = f"{url}?{urllib.parse.urlencode(params)}"
 
     auth = base64.b64encode(f"apikey:{token}".encode("utf-8")).decode("ascii")
-    request = urllib.request.Request(url, headers={
+    headers = {
         "Authorization": f"Basic {auth}",
         "Accept": "application/json",
         "User-Agent": USER_AGENT,
-    })
+    }
+    data = None
+    if body is not None:
+        data = json.dumps(body).encode("utf-8")
+        headers["Content-Type"] = "application/json"
+    request = urllib.request.Request(url, data=data, headers=headers, method=method)
+    writing = method != "GET"
 
     try:
         with urllib.request.urlopen(request, timeout=TIMEOUT) as answer:
-            return json.loads(answer.read().decode("utf-8"))
+            text = answer.read().decode("utf-8")
+            # A write may answer with no body at all; that is success, not a parse error.
+            return json.loads(text) if text.strip() else {}
     except urllib.error.HTTPError as exc:
         body = ""
         try:
-            body = exc.read().decode("utf-8", "replace")[:400]
+            body = exc.read().decode("utf-8", "replace")[:4000]
         except Exception:  # noqa: BLE001 — a body that will not read is not the story
             pass
         if _looks_like_an_edge(body):
@@ -103,6 +130,18 @@ def call(endpoint: str, token: str, path: str,
                 f"{endpoint} is behind a proxy that refused this service before "
                 f"OpenProject saw the request. No credential was tested."
             ) from exc
+        said = _openproject_message(body)
+        # A write refused by OpenProject is about the change, not the token:
+        # the same token just read the work package.
+        if writing and exc.code == 403:
+            raise Refused(
+                f"OpenProject does not let you make that change. {said}".strip(), 403) from exc
+        if writing and exc.code == 409:
+            raise Refused(
+                "Somebody changed this work package in OpenProject since it was read. "
+                "Propose the change again.", 409) from exc
+        if writing and exc.code == 422:
+            raise Refused(f"OpenProject refused the change: {said or 'no reason given'}", 422) from exc
         if exc.code in (401, 403):
             raise Refused("OpenProject would not accept that token.", exc.code) from exc
         if exc.code == 404:
@@ -116,6 +155,12 @@ def _titled(link: Optional[dict]) -> str:
     """The human name off a HAL `_links` entry. HAL gives every association an
     href and a title, and the title is the only part worth showing."""
     return (link or {}).get("title") or ""
+
+
+def _id_from_href(href: Optional[str]) -> Optional[int]:
+    """`/api/v3/projects/153` -> 153. None for anything else."""
+    tail = (href or "").rstrip("/").rsplit("/", 1)[-1]
+    return int(tail) if tail.isdigit() else None
 
 
 def summarise(work_package: dict, endpoint: str) -> dict:
@@ -139,22 +184,103 @@ def summarise(work_package: dict, endpoint: str) -> dict:
         # is the field that answers "which milestone is this in".
         "version": _titled(links.get("version")),
         "project": _titled(links.get("project")),
+        # The number, off the end of the HAL href. What the ADAM project's
+        # choice is compared against — titles can repeat, ids cannot.
+        "projectId": _id_from_href((links.get("project") or {}).get("href")),
         "startDate": work_package.get("startDate"),
         "dueDate": work_package.get("dueDate"),
         "percentDone": work_package.get("percentageDone"),
         "updatedAt": work_package.get("updatedAt"),
+        # What a write has to send back, so OpenProject can refuse one made
+        # against a version somebody has since changed.
+        "lockVersion": work_package.get("lockVersion"),
         # The address a person opens. Built rather than taken from `_links.self`,
         # which is the API path and not the page.
         "url": f"{endpoint.rstrip('/')}/work_packages/{key}" if key else "",
     }
 
 
+# A work package's description can be a whole spec. Enough to work from; the
+# rest is one click away at `url`.
+DESCRIPTION_LIMIT = 20_000
+
+
 def work_package(endpoint: str, token: str, key: str) -> dict:
-    """One, summarised."""
-    return summarise(call(endpoint, token, f"work_packages/{key}"), endpoint)
+    """One, summarised, with its description — the part a developer works from.
+    Lists leave the description out; one ticket keeps it."""
+    raw = call(endpoint, token, f"work_packages/{key}")
+    found = summarise(raw, endpoint)
+    text = ((raw.get("description") or {}).get("raw") or "").strip()
+    found["description"] = text[:DESCRIPTION_LIMIT]
+    if len(text) > DESCRIPTION_LIMIT:
+        found["descriptionTrimmed"] = True
+    return found
 
 
-def mine(endpoint: str, token: str, limit: int = 100) -> list:
+def statuses(endpoint: str, token: str) -> list:
+    """Every status on the instance, as `{id, name, isClosed}`, in OpenProject's order.
+    Whether a given change is *allowed* is OpenProject's call, made when it is sent."""
+    page = call(endpoint, token, "statuses")
+    return [
+        {"id": st.get("id"), "name": st.get("name", ""), "isClosed": bool(st.get("isClosed"))}
+        for st in page.get("_embedded", {}).get("elements", [])
+    ]
+
+
+def update(endpoint: str, token: str, key: str, lock_version: int,
+           status_id: Optional[int] = None, percent_done: Optional[int] = None) -> dict:
+    """
+    Change the status and/or % done, as the owner of `token`.
+
+    `lockVersion` is the version that was read when the change was proposed. If
+    anybody has touched the work package since, OpenProject answers 409 and
+    nothing changes — the person agreed to a change against what they saw.
+    """
+    body: dict = {"lockVersion": lock_version}
+    if percent_done is not None:
+        body["percentageDone"] = percent_done
+    if status_id is not None:
+        body["_links"] = {"status": {"href": f"/api/v3/statuses/{status_id}"}}
+    raw = call(endpoint, token, f"work_packages/{key}", method="PATCH", body=body)
+    return summarise(raw, endpoint)
+
+
+def comment(endpoint: str, token: str, key: str, text: str) -> None:
+    """Add a comment to the work package's activity, as the owner of `token`."""
+    call(endpoint, token, f"work_packages/{key}/activities",
+         method="POST", body={"comment": {"raw": text}})
+
+
+def projects(endpoint: str, token: str) -> list:
+    """
+    Every project this token can see, as `{id, identifier, name}`, by name.
+
+    Paged by hand because nothing guarantees one page holds them all; the loop
+    stops on a short page, and on a page count no real instance reaches.
+    """
+    found, offset, size = {}, 1, 200
+    for _ in range(50):
+        page = call(endpoint, token, "projects", {"pageSize": size, "offset": offset})
+        elements = page.get("_embedded", {}).get("elements", [])
+        before = len(found)
+        for project in elements:
+            found[project.get("id")] = {
+                "id": project.get("id"),
+                "identifier": project.get("identifier", ""),
+                "name": project.get("name", ""),
+            }
+        total = page.get("total")
+        # An instance that ignores paging hands back the same page every time;
+        # a page that adds nothing new ends the walk rather than repeating it.
+        if (len(elements) < size or len(found) == before
+                or (isinstance(total, int) and len(found) >= total)):
+            break
+        offset += 1
+    return sorted(found.values(), key=lambda p: (p["name"] or "").lower())
+
+
+def mine(endpoint: str, token: str, limit: int = 100,
+         project_id: Optional[int] = None) -> list:
     """
     What is assigned to the owner of this token and still open.
 
@@ -164,10 +290,15 @@ def mine(endpoint: str, token: str, limit: int = 100) -> list:
     would return the closed ones too, and a board of finished work is not a
     board.
     """
-    filters = json.dumps([
+    wanted = [
         {"assignee": {"operator": "=", "values": ["me"]}},
         {"status": {"operator": "o", "values": [""]}},
-    ])
+    ]
+    # Only the project the ADAM package is scheduled in. Without it the board
+    # is everything assigned to you anywhere on the instance.
+    if project_id is not None:
+        wanted.append({"project": {"operator": "=", "values": [str(project_id)]}})
+    filters = json.dumps(wanted)
     page = call(endpoint, token, "work_packages", {
         "filters": filters,
         "pageSize": max(1, min(limit, 200)),

@@ -29,6 +29,8 @@
 
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -134,9 +136,9 @@ console.log('\ntools');
 
 const list = await mcp.send('tools/list', {});
 const names = (list.result?.tools ?? []).map((t) => t.name).sort();
-const want = ['adam_board', 'adam_contract', 'adam_decisions', 'adam_file', 'adam_journey',
-  'adam_link', 'adam_links', 'adam_module', 'adam_screen', 'adam_search', 'adam_service',
-  'adam_table', 'adam_work'];
+const want = ['adam_apply', 'adam_board', 'adam_contract', 'adam_decisions', 'adam_file',
+  'adam_journey', 'adam_link', 'adam_links', 'adam_module', 'adam_propose', 'adam_pull',
+  'adam_screen', 'adam_search', 'adam_service', 'adam_table', 'adam_work'];
 if (String(names) === String(want)) pass(`${want.length} tools listed: ${names.join(', ')}`);
 else fail(`${want.length} tools listed`, `got ${names.join(', ') || '(none)'}`);
 
@@ -160,6 +162,19 @@ else {
 const unknown = await mcp.send('tools/call', { name: 'adam_nonesuch', arguments: {} });
 if (unknown.result?.isError && parse(unknown).tools) pass('an unknown tool is an isError result, not a crash');
 else fail('an unknown tool is an isError result, not a crash', JSON.stringify(unknown).slice(0, 200));
+
+// adam_pull writes files, so where it may write is checked before anything is
+// asked of a server: never a drive root, never a folder that is not there.
+const root = parse(await mcp.send('tools/call', {
+  name: 'adam_pull', arguments: { key: '1', dir: path.parse(here).root },
+}));
+if (/will not write/.test(root.error ?? '')) pass('adam_pull refuses to write into a drive root');
+else fail('adam_pull refuses a drive root', JSON.stringify(root).slice(0, 200));
+const nowhere = parse(await mcp.send('tools/call', {
+  name: 'adam_pull', arguments: { key: '1', dir: path.join(here, 'no-such-folder-here') },
+}));
+if (/no folder/.test(nowhere.error ?? '')) pass('adam_pull refuses a folder that does not exist');
+else fail('adam_pull refuses a missing folder', JSON.stringify(nowhere).slice(0, 200));
 
 // ---- the live half ----------------------------------------------------------
 
@@ -374,6 +389,58 @@ if (!viewerUp) {
           } else fail('removing it', JSON.stringify(undo).slice(0, 200));
         } else fail('adam_links reads it back', JSON.stringify(seen).slice(0, 200));
       } else fail('adam_link records a link', JSON.stringify(made).slice(0, 200));
+
+      // Pulling writes only into a scratch folder made for this run, and the
+      // proposal below is never applied: this harness is safe to run against
+      // the live site with your own account, and it must stay that way.
+      const scratch = await mkdtemp(path.join(tmpdir(), 'adam-check-'));
+      try {
+        const pulled = parse(await mcp.send('tools/call', {
+          name: 'adam_pull', arguments: { key: first, dir: scratch },
+        }));
+        const folder = path.join(scratch, '.adam', 'work', String(first));
+        const written = pulled.found ? await readdir(folder).catch(() => []) : [];
+        if (pulled.found && written.includes('README.md') && written.includes('ticket.json')) {
+          pass(`adam_pull(#${first}) wrote ${written.length} files`);
+        } else fail(`adam_pull(#${first})`, JSON.stringify(pulled).slice(0, 200));
+        const ignore = await readFile(path.join(scratch, '.adam', '.gitignore'), 'utf8').catch(() => '');
+        if (/^\*$/m.test(ignore)) pass('.adam/ keeps itself out of git');
+        else fail('.adam/.gitignore ignores everything', ignore);
+
+        await writeFile(path.join(folder, 'notes.md'), 'mine\n');
+        const again = parse(await mcp.send('tools/call', {
+          name: 'adam_pull', arguments: { key: first, dir: scratch },
+        }));
+        const kept = await readFile(path.join(folder, 'notes.md'), 'utf8').catch(() => '');
+        if (again.found && kept === 'mine\n') pass('pulling again keeps notes.md');
+        else fail('pulling again keeps notes.md', kept);
+
+        const whole = parse(await mcp.send('tools/call', {
+          name: 'adam_pull', arguments: { dir: scratch, limit: 3 },
+        }));
+        const boardFile = await readFile(path.join(scratch, '.adam', 'board.md'), 'utf8').catch(() => '');
+        if (whole.found && boardFile.startsWith('# My board')) pass(`adam_pull without a key wrote board.md (${whole.pulled.length} tickets)`);
+        else fail('adam_pull writes board.md', JSON.stringify(whole).slice(0, 200));
+      } finally {
+        await rm(scratch, { recursive: true, force: true });
+      }
+
+      const statuses = parse(await mcp.send('tools/call', { name: 'adam_propose', arguments: { key: first } }));
+      if (statuses.found && statuses.statuses?.length) pass(`adam_propose with only a key lists ${statuses.statuses.length} statuses`);
+      else fail('adam_propose lists statuses', JSON.stringify(statuses).slice(0, 200));
+
+      const proposed = parse(await mcp.send('tools/call', {
+        name: 'adam_propose', arguments: { key: first, comment: 'mcp-check: proposed and never applied' },
+      }));
+      if (proposed.ok && proposed.changed === false && proposed.proposal && proposed.changes?.length) {
+        pass('adam_propose returns the change and a code, and changes nothing');
+      } else fail('adam_propose', JSON.stringify(proposed).slice(0, 200));
+
+      const forged = parse(await mcp.send('tools/call', {
+        name: 'adam_apply', arguments: { key: first, proposal: 'not-a-real-proposal' },
+      }));
+      if (forged.ok === false && forged.changed === false) pass('adam_apply refuses a code nobody proposed');
+      else fail('adam_apply refuses a made-up code', JSON.stringify(forged).slice(0, 200));
     } else {
       skip('adam_work and adam_link', 'nothing is assigned to this account in OpenProject');
     }

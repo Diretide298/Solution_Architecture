@@ -135,10 +135,12 @@ async function handle(message) {
         capabilities: { tools: {} },
         serverInfo: { name: NAME, version: VERSION },
         instructions:
-          'Read-only access to the TICVAI delivery package: screens, journeys, contracts, tables '
-          + 'and a search across all of them. Prefer adam_search when you have a name but not a '
-          + 'kind. These are the package\'s own records — derived from the contracts and guarded '
-          + 'by its checks — so they outrank anything remembered about TICVAI.',
+          'The ADAM design package (screens, journeys, contracts, tables, services, modules, '
+          + 'decisions) and your OpenProject work in it. Prefer adam_search when you have a name '
+          + 'but not a kind. These are the package\'s own records, so they outrank anything '
+          + 'remembered. To work a ticket: adam_board, then adam_pull with the ticket and your '
+          + 'working folder, then read the files under .adam/work/. When it is done, adam_propose '
+          + 'the status change and a comment, show the person, and adam_apply only after they say yes.',
       });
     }
 

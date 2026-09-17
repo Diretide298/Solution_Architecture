@@ -1,7 +1,8 @@
 # ADAM context bridge — MCP server
 
-Thirteen tools for a developer's local Claude: **nine read the TICVAI package**, and **four are
-about the work scheduled against it** in OpenProject. Phases 1 to 3 of
+Sixteen tools for a developer's local Claude: **nine read the TICVAI package**, **four are
+about the work scheduled against it** in OpenProject, and **three are for working a ticket**:
+pulling it to local files, and changing its status once the developer has agreed. Phases 1 to 3 of
 `viewer/HANDOFF-adam-bridge.md`.
 
 ## What a developer runs
@@ -19,12 +20,20 @@ same file works for everyone. A developer unzips it and double-clicks `setup.cmd
 1. checks for Node.js 22+ and Claude Code,
 2. asks for their ADAM email and password (hidden),
 3. **signs in to ADAM with them before changing anything** — a wrong password stops here,
-4. copies the connector to `%USERPROFILE%\.adam\connector`,
-5. registers it with `claude mcp add -s user` in the order that works in PowerShell (see below),
-   reads the registration back, and
-6. optionally runs `mcp-check.mjs` against the live site.
+4. lists the ADAM projects that account can open (`/api/projects`) and asks for one by number,
+5. asks for the code folder it is for, or Enter for every folder,
+6. copies the connector to `%USERPROFILE%\.adam\connector`,
+7. registers it with `claude mcp add` — `-s local` from inside that folder, or `-s user` for
+   every folder — with `ADAM_PROJECT` set, in the order that works in PowerShell (see below),
+   and reads the registration back,
+8. optionally runs `mcp-check.mjs` against the live site, and prints the `claude mcp remove`
+   line for each registration it holds.
 
-Running it again updates the connector or the stored password; `uninstall.cmd` removes both. It refuses
+**One registration per folder.** Claude Code prefers a folder's own (`local`) entry over the
+`user` one, so a developer on two packages runs setup twice, once per checkout. Setup keeps a
+ledger of what it registered in `registrations.txt` beside the installed connector, because
+removing a folder entry has to happen from inside that folder. Running it again for the same
+folder replaces that entry; `uninstall.cmd` removes every one of them and the files. It refuses
 a password containing `"` or ending in `\`, which Windows PowerShell 5.1 cannot pass to a program
 intact. Rebuild the zip whenever anything in `viewer/mcp` changes; the README inside is stamped with
 the commit it was built from. The scripts are kept to plain ASCII on purpose — PowerShell 5.1 reads a
@@ -36,7 +45,7 @@ A viewer must be reachable — the MCP reads through it and has no other source.
 should point at the deployed one and run nothing locally:**
 
 ```bash
-claude mcp add -s user adam -e ADAM_VIEWER_URL=https://adam.ainfinite.ai -e ADAM_EMAIL=you@softlabsgroup.com -e 'ADAM_PASSWORD=YOUR_PASSWORD' '--' node C:/path/to/adam/viewer/mcp/server.mjs
+claude mcp add -s user adam -e ADAM_VIEWER_URL=https://adam.ainfinite.ai -e ADAM_PROJECT=ticvai -e ADAM_EMAIL=you@softlabsgroup.com -e 'ADAM_PASSWORD=YOUR_PASSWORD' '--' node C:/path/to/adam/viewer/mcp/server.mjs
 ```
 
 **Every `-e` goes before the `--`.** Everything after `--` is passed to node as arguments, and
@@ -66,7 +75,7 @@ Working on the viewer itself? Run `./start.ps1` and drop `ADAM_VIEWER_URL` for t
 | `ADAM_EMAIL` | — | your viewer account. Required. |
 | `ADAM_PASSWORD` | — | its password. Required. |
 | `ADAM_VIEWER_URL` | `http://127.0.0.1:4173` | where the viewer is. `https://adam.ainfinite.ai` is the deployed one. |
-| `ADAM_PROJECT` | asked for at startup | only when more than one package is configured |
+| `ADAM_PROJECT` | the account's default package | which package to read. Setup sets it. It also decides which OpenProject project the work tools read — see below. |
 
 Both deployed hostnames work: `adam.ainfinite.ai` sends everything to the viewer, which proxies auth
 onward itself, and `adamapi.ainfinite.ai` splits them in nginx. TLS terminates at nginx on both and
@@ -94,16 +103,43 @@ building.
 | `adam_work` | `key` | one work package, live, plus the artefacts it touches |
 | `adam_links` | `kind`, `id` | what work is scheduled against one artefact |
 | `adam_link` | `kind`, `id`, `key` — or `remove` + `linkId` | **writes**: records that a work package is about an artefact |
+| `adam_pull` | `key` (or nothing, for the whole board), `dir`, `limit` | **writes local files**: `.adam/work/<key>/` and `.adam/board.md` |
+| `adam_propose` | `key`, and `status` / `percentDone` / `comment` | the change that would be made, and a one-use code. **Changes nothing** |
+| `adam_apply` | `key`, `proposal`, `dir` | **changes OpenProject**, as you, with that code — after you said yes |
 
 Start with `adam_search` when you have a name but not a kind. A miss returns candidate spellings
 rather than an empty result — a wrong id is usually a wrong spelling of a right one.
+
+**The four work tools read one OpenProject project, chosen per ADAM project.** An admin picks it
+on the admin page under Projects (`PUT /api/pms/projects/{id}`); TICVAI reads `ticvai`
+(OpenProject project 153), filled in by the migration. The board filters on it, and a work
+package or a new link from any other OpenProject project is refused with the project it is
+actually in. A package with nothing chosen answers 428 and says who can fix it. The connector
+sends `project_id` with every one of these calls, from `ADAM_PROJECT`.
 
 **The four work tools read OpenProject as *you*.** They need a token stored on your settings page —
 without one they say so and name the page, rather than failing. There is no service account,
 deliberately: a shared credential attributes every change to a robot, and the history is most of what
 a PMS is for.
 
-**`adam_link` is the only tool here that writes, and all it writes is one row** — that a work package
+**`adam_pull` keeps the conversation small.** A ticket, its description and milestone, and
+one JSON file per linked artefact (plus the ADR's own text) go to `.adam/work/<key>/` in the
+folder Claude is working in — `dir` from the call, else `ADAM_WORKDIR` (setup sets it for a
+folder registration), else the server's own folder. Claude then reads `README.md` and opens
+only the files it needs. `.adam/` writes its own `.gitignore` of `*`. Pulling again replaces
+everything except `notes.md` (the developer's) and `log.md` (applied changes). It refuses a
+drive root and a folder that does not exist.
+
+**Changing OpenProject takes two calls and a yes in between.** `adam_propose` reads the work
+package, works out the change (status by name, % done, a comment) and stores it in
+`wp_proposal` under a one-use code valid for 15 minutes — nothing is sent. Claude shows the
+person the change. `adam_apply` with the code sends it as that person, with their token, and
+only if the work package's `lockVersion` is still the one they were shown; otherwise it is
+refused and nothing changes. A code works once, for that person and that ticket only. Claude
+Code's own permission prompt stands in front of `adam_apply` as well — do not "always allow"
+it. Assignees, dates and the work packages themselves remain OpenProject's alone.
+
+**`adam_link` writes one row and nothing else** — that a work package
 is about an artefact. It cannot change a status, an assignee or a work package. OpenProject owns
 those. The bridge owns the one thing neither system can hold alone: OpenProject cannot say that
 WP #1841 is about screen `BO-102` and table `access.entitlement`, because it knows nothing about the
@@ -163,7 +199,8 @@ presents as the client hanging. Everything human goes to stderr.
 node viewer/mcp/mcp-check.mjs
 ```
 
-36 checks with a credential stored, 32 without. The handshake and tool-listing ones need nothing running. The live calls need the viewer
+45 checks with a credential stored, 34 without. The live half pulls into a temporary folder,
+proposes a comment it never applies, and tries a made-up code — nothing in OpenProject changes. The handshake and tool-listing ones need nothing running. The live calls need the viewer
 and your credentials, and report as skipped without them — a viewer that is not up is not a broken
 MCP server. The two halves are probed separately, so a live viewer with a dead accounts service says
 so rather than sending you to the wrong log.
@@ -180,10 +217,12 @@ check that lies.
 
 ## What is deliberately not here
 
-The `.adam/` local cache and `/adam propose`. Those are phase 4 — see
-`viewer/HANDOFF-adam-bridge.md`, and note that `propose` has an unresolved problem logged as V-49.
+A background sync of `.adam/`. Pulling is on request, so the files say when they were pulled
+rather than pretending to be current. (The `/adam propose` in `viewer/HANDOFF-adam-bridge.md` is a
+different thing — a change to the *package* — and is still open as V-49.)
 
-Anything that changes a work package. Status, assignee, dates and the work packages themselves are
+Anything that changes a work package without the person agreeing first, or that changes its
+assignee or dates, or creates work packages. Status, assignee, dates and the work packages themselves are
 OpenProject's, and a second system writing them is the failure `delivery-plan-vs-package.md` already
 has open as CF-124: two independent plans over the same work, neither referencing the other.
 

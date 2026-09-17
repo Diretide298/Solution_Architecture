@@ -341,7 +341,7 @@ come back.
 Then, to connect their local Claude:
 
 ```bash
-claude mcp add -s user adam -e ADAM_VIEWER_URL=https://adam.ainfinite.ai -e ADAM_EMAIL=you@softlabsgroup.com -e 'ADAM_PASSWORD=YOUR_PASSWORD' '--' node /path/to/adam/viewer/mcp/server.mjs
+claude mcp add -s user adam -e ADAM_VIEWER_URL=https://adam.ainfinite.ai -e ADAM_PROJECT=ticvai -e ADAM_EMAIL=you@softlabsgroup.com -e 'ADAM_PASSWORD=YOUR_PASSWORD' '--' node /path/to/adam/viewer/mcp/server.mjs
 ```
 
 **Every `-e` before the `--`** — after it they are passed to node and ignored, and the bridge
@@ -350,7 +350,7 @@ npm's `claude.ps1` and the command fails. `claude mcp get adam` should list all 
 `Environment:`.
 
 They need a checkout of this repository for `server.mjs`; everything it reads comes over
-HTTPS from the deployed viewer. Thirteen tools — see `viewer/mcp/README.md`.
+HTTPS from the deployed viewer. Sixteen tools — see `viewer/mcp/README.md`.
 
 **Each developer uses their own account.** The bridge sees exactly what that person can see
 in the viewer, and every OpenProject call is made as them. There is no service account, by

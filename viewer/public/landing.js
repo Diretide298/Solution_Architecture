@@ -51,7 +51,8 @@ const LAYERS = [
 ];
 
 const TOOLS = ['adam_search', 'adam_screen', 'adam_journey', 'adam_contract', 'adam_table', 'adam_service',
-  'adam_module', 'adam_decisions', 'adam_file', 'adam_board', 'adam_work', 'adam_links', 'adam_link'];
+  'adam_module', 'adam_decisions', 'adam_file', 'adam_board', 'adam_work', 'adam_links', 'adam_link',
+  'adam_pull', 'adam_propose', 'adam_apply'];
 
 const $ = (id) => document.getElementById(id);
 

@@ -78,3 +78,12 @@ ticvai/_review-*/
 # --- the connector setup zip, built from viewer/mcp by build-zip.ps1 ---------
 # A build output, rebuilt whenever the connector changes and handed out by hand.
 /adam-connector-setup.zip
+
+# --- design and pitch material kept outside the repository -------------------
+# Worked on locally in Claude Design; not part of the package or of ADAM.
+/Mobile app design brief/
+/pitchdeck/
+# Video is too heavy for git. None is tracked; keep it that way.
+*.mp4
+*.mov
+*.webm

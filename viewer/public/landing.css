@@ -81,14 +81,20 @@ html:has(body.landing) { scroll-behavior: smooth; }
 /* ── hero ───────────────────────────────────────────────────────────── */
 .lp-hero { padding-top: clamp(48px, 7vw, 86px); }
 .lp-hero .lp-eyebrow { letter-spacing: .2em; }
+/* The lockup at hero size. Transparent PNG, drawn at most at half its height. */
+.lp-hero-logo { display: block; height: clamp(56px, 7vw, 96px); width: auto; margin: 0 0 clamp(18px, 2.4vw, 28px) -6px; }
 .lp-hero-grid {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
-  gap: clamp(24px, 4vw, 64px); align-items: end; margin-top: 18px;
+  gap: clamp(24px, 4vw, 64px); align-items: center;
 }
+/* Two lines, broken after the comma. Sized so "one reference graph." stays
+   on its line in its half of the hero. */
+.lp-hero-title .lp-eyebrow { margin-bottom: clamp(12px, 1.6vw, 20px); }
 .lp-h1 {
-  font-size: clamp(38px, 5.4vw, 72px); line-height: 1.02; letter-spacing: -.035em;
+  font-size: clamp(34px, 4.6vw, 64px); line-height: 1.04; letter-spacing: -.035em;
   font-weight: 700; color: var(--ink); text-wrap: balance;
 }
+@media (min-width: 1000px) { .lp-h1 { white-space: nowrap; } }
 .lp-hero-copy { display: flex; flex-direction: column; gap: 18px; padding-bottom: 8px; }
 .lp-lede { font-size: 17.5px; line-height: 1.58; color: var(--body); text-wrap: pretty; max-width: 52ch; }
 .lp-pipeline { font-family: var(--mono); font-size: 12px; line-height: 1.9; letter-spacing: .04em; color: var(--muted); }

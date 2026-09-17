@@ -401,11 +401,20 @@ export async function logoutAll() {
  *  sign back in, and their verdicts are untouched. Answers with how many
  *  sessions it dropped, which is the only way to tell "they had none open"
  *  from "it did nothing". */
+// Which OpenProject project each ADAM project reads. Admin only.
+export const listPmsProjects = () => call('/api/pms/projects');
+export const availablePmsProjects = () => call('/api/pms/available');
+export const setPmsProject = (projectId, pmsProjectId) =>
+  call(`/api/pms/projects/${encodeURIComponent(projectId)}`,
+    { method: 'PUT', body: { pms_project_id: pmsProjectId } });
+export const clearPmsProject = (projectId) =>
+  call(`/api/pms/projects/${encodeURIComponent(projectId)}`, { method: 'DELETE' });
+
 export const logoutAccount = (id) =>
   call(`/api/accounts/${id}/logout-all`, { method: 'POST' });
 
-export const createInvite = (email, role, days) =>
-  call('/api/invites', { method: 'POST', body: { email, role, days } });
+export const createInvite = (email, role, days, projectId = '') =>
+  call('/api/invites', { method: 'POST', body: { email, role, days, project_id: projectId } });
 export const listInvites = () => call('/api/invites');
 export const revokeInvite = (id) => call(`/api/invites/${id}`, { method: 'DELETE' });
 

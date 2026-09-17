@@ -9,12 +9,15 @@
       1. checks that Node.js 22+ and Claude Code are installed,
       2. asks for your ADAM email and password (the password is hidden),
       3. checks that they actually sign in to ADAM - before changing anything,
-      4. copies the connector to %USERPROFILE%\.adam\connector,
-      5. registers it with Claude Code for every project you open,
-      6. and, if you want, runs the full connection test.
+      4. lists the ADAM projects you can open and asks which one to use,
+      5. asks which folder that is for - one code folder, or every folder,
+      6. copies the connector to %USERPROFILE%\.adam\connector,
+      7. registers it with Claude Code for that folder (or for all of them),
+      8. and, if you want, runs the full connection test.
 
-    Running it again is how you update the connector or change the password.
-    uninstall.cmd removes it.
+    Run it once per folder to give each folder its own ADAM project: a folder
+    setting wins over the every-folder one. Running it again for the same
+    folder replaces that folder's setting. uninstall.cmd removes all of them.
 
     ASCII only, on purpose: Windows PowerShell 5.1 reads a script saved without
     a byte-order mark in the machine's ANSI code page, and a dash or a curly
@@ -25,6 +28,12 @@
 
 .PARAMETER Email
     Your ADAM sign-in address. Asked for when not given.
+
+.PARAMETER Project
+    The ADAM project id (for example ticvai). Asked for when not given.
+
+.PARAMETER Folder
+    The code folder this is for. "all" means every folder. Asked for when not given.
 
 .PARAMETER Test
     ask (default), yes or no - whether to run the full connection test at the end.
@@ -47,6 +56,8 @@
 param(
     [string]$ViewerUrl = 'https://adam.ainfinite.ai',
     [string]$Email = '',
+    [string]$Project = '',
+    [string]$Folder = '',
     [ValidateSet('ask', 'yes', 'no')]
     [string]$Test = 'ask',
     [switch]$Uninstall,
@@ -58,6 +69,9 @@ $ErrorActionPreference = 'Stop'
 $Here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Files = @('server.mjs', 'client.mjs', 'tools.mjs', 'mcp-check.mjs')
 $ViewerUrl = $ViewerUrl.TrimEnd('/')
+# One line per registration setup has made: scope|folder|project. Read by the
+# uninstall, which has to stand in each folder to remove that folder's entry.
+$Ledger = Join-Path $InstallDir 'registrations.txt'
 
 function Step([string]$text) { Write-Host ''; Write-Host "== $text" -ForegroundColor Cyan }
 function Good([string]$text) { Write-Host "   ok  $text" -ForegroundColor Green }
@@ -100,6 +114,41 @@ function Test-Registered([string]$claude, [string]$serverName) {
     return ((Invoke-Claude $claude @('mcp', 'get', $serverName)).Code -eq 0)
 }
 
+# A folder registration is stored by Claude Code against the folder it was made
+# in, so adding, reading and removing one all have to run from inside it.
+function Invoke-ClaudeIn([string]$Where, [string]$Exe, [string[]]$ArgList) {
+    if (-not $Where) { return (Invoke-Claude $Exe $ArgList) }
+    Push-Location -LiteralPath $Where
+    try { return (Invoke-Claude $Exe $ArgList) } finally { Pop-Location }
+}
+
+function Read-Ledger {
+    if (-not (Test-Path -LiteralPath $Ledger)) { return @() }
+    return @(Get-Content -LiteralPath $Ledger | Where-Object { $_ -match '\|' } | ForEach-Object {
+        $part = $_ -split '\|', 3
+        [pscustomobject]@{ Scope = $part[0]; Folder = $part[1]; Project = $part[2] }
+    })
+}
+
+function Write-Ledger($entries) {
+    New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
+    $lines = @($entries | ForEach-Object { "$($_.Scope)|$($_.Folder)|$($_.Project)" })
+    Set-Content -LiteralPath $Ledger -Value $lines -Encoding ASCII
+}
+
+function Show-RemoveHelp($entries) {
+    Write-Host '  To remove it from Claude Code later, double-click uninstall.cmd, or run:'
+    foreach ($entry in $entries) {
+        if ($entry.Scope -eq 'user') {
+            Write-Host "     claude mcp remove $Name -s user" -ForegroundColor Gray
+            Write-Host '        (every folder)' -ForegroundColor DarkGray
+        } else {
+            Write-Host "     cd `"$($entry.Folder)`"; claude mcp remove $Name -s local" -ForegroundColor Gray
+            Write-Host '        (that folder only)' -ForegroundColor DarkGray
+        }
+    }
+}
+
 Write-Host ''
 Write-Host 'ADAM connector for Claude Code' -ForegroundColor White
 
@@ -107,12 +156,25 @@ Write-Host 'ADAM connector for Claude Code' -ForegroundColor White
 if ($Uninstall) {
     Step 'Removing the connector'
     $claude = Find-Claude
-    if ($claude -and (Test-Registered $claude $Name)) {
-        $gone = Invoke-Claude $claude @('mcp', 'remove', $Name, '-s', 'user')
-        if ($gone.Code -eq 0) { Good "removed '$Name' from Claude Code" }
-        else { Note "Claude Code would not remove '$Name' - run: claude mcp remove $Name -s user" }
+    if (-not $claude) {
+        Note 'Claude Code is not installed, so there is nothing registered to remove.'
     } else {
-        Note "'$Name' was not registered with Claude Code"
+        # Every folder setup registered, then the every-folder one - which is
+        # removed whether or not the ledger knows about it.
+        foreach ($entry in (Read-Ledger | Where-Object { $_.Scope -eq 'local' })) {
+            if (-not (Test-Path -LiteralPath $entry.Folder)) {
+                Note "skipped $($entry.Folder) - that folder no longer exists"
+                continue
+            }
+            $gone = Invoke-ClaudeIn $entry.Folder $claude @('mcp', 'remove', $Name, '-s', 'local')
+            if ($gone.Code -eq 0) { Good "removed '$Name' from $($entry.Folder)" }
+            else { Note "nothing to remove in $($entry.Folder)" }
+        }
+        $gone = Invoke-Claude $claude @('mcp', 'remove', $Name, '-s', 'user')
+        if ($gone.Code -eq 0) { Good "removed the every-folder '$Name'" }
+        if (Test-Registered $claude $Name) {
+            Note "'$Name' is still registered for this folder. Remove it with:  claude mcp remove $Name"
+        }
     }
     if (Test-Path -LiteralPath $InstallDir) {
         Remove-Item -LiteralPath $InstallDir -Recurse -Force
@@ -213,13 +275,72 @@ $shown = $Email
 if ($who -and $who.name) { $shown = "$($who.name) <$Email>" }
 if ($who -and $who.role) { $shown = "$shown, $($who.role)" }
 Good "signed in as $shown"
+
+# ---- 4. which ADAM project -----------------------------------------------------
+# Asked with the same session, so the list is only what this account may open.
+Step 'Choosing the ADAM project'
+$projects = @()
+try {
+    $listed = Invoke-WebRequest -Uri "$ViewerUrl/api/projects" -UseBasicParsing -WebSession $session -TimeoutSec 30
+    $projects = @(($listed.Content | ConvertFrom-Json).projects)
+} catch { }
+if ($projects.Count -eq 0) {
+    Stop-Setup "Your ADAM account cannot open any project yet. Ask an ADAM admin to give you access, then run setup again."
+}
+$picked = $null
+if ($Project) {
+    $picked = $projects | Where-Object { $_.id -eq $Project } | Select-Object -First 1
+    if (-not $picked) {
+        Stop-Setup "There is no ADAM project '$Project' that your account can open. Yours: $(($projects | ForEach-Object { $_.id }) -join ', ')"
+    }
+} else {
+    for ($i = 0; $i -lt $projects.Count; $i++) {
+        $label = $projects[$i].name
+        if (-not $label) { $label = $projects[$i].id }
+        Write-Host ("     {0}. {1}  ({2})" -f ($i + 1), $label, $projects[$i].id)
+    }
+    while (-not $picked) {
+        $answer = (Read-Host "   Select number for project [1-$($projects.Count)]").Trim()
+        $number = 0
+        if ([int]::TryParse($answer, [ref]$number) -and $number -ge 1 -and $number -le $projects.Count) {
+            $picked = $projects[$number - 1]
+        } else {
+            Note "Type a number from 1 to $($projects.Count)."
+        }
+    }
+}
+$Project = $picked.id
+Good "project: $($picked.name) ($Project)"
+
 # Not left open: this check is the only thing that session was for.
 try {
     $null = Invoke-WebRequest -Uri "$ViewerUrl/api/auth/logout" -Method Post -UseBasicParsing `
         -WebSession $session -TimeoutSec 15
 } catch { }
 
-# ---- 4. put the connector somewhere that stays -------------------------------
+# ---- 5. which folder ------------------------------------------------------------
+Step 'Choosing the folder'
+Note 'Claude Code uses this project when you start it in the folder you give here.'
+Note 'Paste the path of your code folder, or press Enter to use it in every folder.'
+while ($true) {
+    if (-not $Folder) {
+        $Folder = (Read-Host '   Folder (Enter = every folder)').Trim().Trim('"')
+        if (-not $Folder) { $Folder = 'all' }
+    }
+    if ($Folder -eq 'all') { break }
+    if (Test-Path -LiteralPath $Folder -PathType Container) {
+        $Folder = (Resolve-Path -LiteralPath $Folder).ProviderPath.TrimEnd('\')
+        break
+    }
+    Note "There is no folder at $Folder."
+    $Folder = ''
+}
+$scope = 'user'
+$where = ''
+if ($Folder -ne 'all') { $scope = 'local'; $where = $Folder }
+if ($scope -eq 'user') { Good 'every folder' } else { Good $Folder }
+
+# ---- 6. put the connector somewhere that stays -------------------------------
 Step 'Installing the connector'
 New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
 foreach ($file in $Files) {
@@ -229,44 +350,51 @@ $server = Join-Path $InstallDir 'server.mjs'
 Good "copied to $InstallDir"
 Note 'You can delete the downloaded zip now - Claude Code uses this copy.'
 
-# ---- 5. tell Claude Code about it --------------------------------------------
+# ---- 7. tell Claude Code about it --------------------------------------------
 Step 'Registering it with Claude Code'
-if (Test-Registered $claude $Name) {
-    $gone = Invoke-Claude $claude @('mcp', 'remove', $Name, '-s', 'user')
-    if ($gone.Code -eq 0) {
-        Note "replacing the '$Name' connector that was already there"
-    } else {
-        Stop-Setup "A connector called '$Name' already exists outside your user settings. Remove it first with:  claude mcp remove $Name   then run setup again."
-    }
+# Only the entry at this scope is replaced. A folder entry wins over the
+# every-folder one, so the two can hold different projects side by side.
+$gone = Invoke-ClaudeIn $where $claude @('mcp', 'remove', $Name, '-s', $scope)
+if ($gone.Code -eq 0) { Note "replacing the '$Name' connector that was already there" }
+if ($scope -eq 'user' -and (Test-Registered $claude $Name)) {
+    Stop-Setup "A connector called '$Name' already exists outside your user settings. Remove it first with:  claude mcp remove $Name   then run setup again."
 }
 
 # Every -e before the --: anything after it is handed to node, which ignores it.
-$added = Invoke-Claude $claude @(
-    'mcp', 'add', '-s', 'user', $Name,
+# A folder registration also names the folder, which is where adam_pull writes
+# .adam/ when Claude does not say.
+$addArgs = @('mcp', 'add', '-s', $scope, $Name,
     '-e', "ADAM_VIEWER_URL=$ViewerUrl",
-    '-e', "ADAM_EMAIL=$Email",
-    '-e', "ADAM_PASSWORD=$password",
-    '--', 'node', $server)
+    '-e', "ADAM_PROJECT=$Project")
+if ($scope -eq 'local') { $addArgs += @('-e', "ADAM_WORKDIR=$where") }
+$addArgs += @('-e', "ADAM_EMAIL=$Email", '-e', "ADAM_PASSWORD=$password", '--', 'node', $server)
+$added = Invoke-ClaudeIn $where $claude $addArgs
 if ($added.Code -ne 0) {
     Stop-Setup "Claude Code refused the registration: $($added.Text)"
 }
 
 # Read back rather than trusted. `claude mcp get` prints the password, so its
 # output is checked here and never shown.
-$details = (Invoke-Claude $claude @('mcp', 'get', $Name)).Text
-$envOk = ($details -match 'ADAM_EMAIL=') -and ($details -match 'ADAM_PASSWORD=') -and ($details -match 'ADAM_VIEWER_URL=')
+$details = (Invoke-ClaudeIn $where $claude @('mcp', 'get', $Name)).Text
+$envOk = ($details -match 'ADAM_EMAIL=') -and ($details -match 'ADAM_PASSWORD=') -and
+         ($details -match 'ADAM_VIEWER_URL=') -and ($details -match ('ADAM_PROJECT=' + [regex]::Escape($Project)))
 $argsOk = $details -match [regex]::Escape('server.mjs')
 if (-not ($envOk -and $argsOk)) {
     Stop-Setup "The connector was registered but does not read back correctly. Run:  claude mcp get $Name   and send the output (without the password line) to an ADAM admin."
 }
-Good "registered as '$Name', for every project you open"
+$entries = @(Read-Ledger | Where-Object { -not ($_.Scope -eq $scope -and $_.Folder -eq $where) })
+$entries += [pscustomobject]@{ Scope = $scope; Folder = $where; Project = $Project }
+Write-Ledger $entries
+if ($scope -eq 'user') { Good "registered as '$Name' for every folder, reading $Project" }
+else { Good "registered as '$Name' for $where, reading $Project" }
 
-# ---- 6. optionally, the full test --------------------------------------------
+# ---- 8. optionally, the full test --------------------------------------------
 $run = $Test
 if ($run -eq 'ask') {
     Write-Host ''
-    Note 'The full connection test signs in and tries all 13 tools against ADAM (about a minute).'
-    Note 'If you have connected OpenProject, it also links one of your tasks to a screen and removes the link again.'
+    Note 'The full connection test signs in and tries all 16 tools against ADAM (about a minute).'
+    Note 'If you have connected OpenProject, it also links one of your tasks to a screen and removes the link again,'
+    Note 'and proposes a comment on it that it never applies. Nothing in OpenProject changes.'
     $reply = (Read-Host '   Run it now? [y/N]').Trim().ToLower()
     $run = 'no'
     if ($reply -eq 'y' -or $reply -eq 'yes') { $run = 'yes' }
@@ -274,6 +402,7 @@ if ($run -eq 'ask') {
 if ($run -eq 'yes') {
     Step 'Testing the connection'
     $env:ADAM_VIEWER_URL = $ViewerUrl
+    $env:ADAM_PROJECT = $Project
     $env:ADAM_EMAIL = $Email
     $env:ADAM_PASSWORD = $password
     try {
@@ -282,7 +411,7 @@ if ($run -eq 'yes') {
         $testExit = $LASTEXITCODE
     } finally {
         $ErrorActionPreference = 'Stop'
-        Remove-Item Env:ADAM_PASSWORD, Env:ADAM_EMAIL, Env:ADAM_VIEWER_URL -ErrorAction SilentlyContinue
+        Remove-Item Env:ADAM_PASSWORD, Env:ADAM_EMAIL, Env:ADAM_VIEWER_URL, Env:ADAM_PROJECT -ErrorAction SilentlyContinue
     }
     if ($testExit -ne 0) {
         Write-Host ''
@@ -294,11 +423,29 @@ $password = $null
 Write-Host ''
 Write-Host 'Done.' -ForegroundColor White
 Write-Host ''
-Write-Host '  1. Restart Claude Code (or start a new session).'
-Write-Host "  2. Ask it:  What's on my board?"
-Write-Host "  3. To see your OpenProject work too, store your token at:"
+if ($scope -eq 'user') {
+    Write-Host '  1. Restart Claude Code (or start a new session).'
+} else {
+    Write-Host '  1. Start Claude Code in that folder:'
+    Write-Host "     cd `"$where`"; claude" -ForegroundColor Gray
+}
+Write-Host "  2. Store your OpenProject token once, so Claude can see your tickets:"
 Write-Host "     $ViewerUrl/settings.html#openproject"
+Write-Host '  3. Then ask Claude, for example:'
+Write-Host "       What's on my board?" -ForegroundColor Gray
+Write-Host '       Pull ticket 6046 into this folder and tell me what it touches.' -ForegroundColor Gray
+Write-Host '       I have finished 6046 - propose closing it with a comment.' -ForegroundColor Gray
+Write-Host '     Claude shows you any OpenProject change first; nothing changes until you say yes.'
 Write-Host ''
-Write-Host '  Changed your ADAM password? Run setup again.   To remove: uninstall.cmd'
+Write-Host '  Another folder or project? Run setup again.   Changed your ADAM password? Run setup again.'
+Write-Host ''
+Write-Host '  Set up now:'
+foreach ($entry in (Read-Ledger)) {
+    $place = 'every folder'
+    if ($entry.Scope -eq 'local') { $place = $entry.Folder }
+    Write-Host "     $($entry.Project)  ->  $place" -ForegroundColor Gray
+}
+Write-Host ''
+Show-RemoveHelp (Read-Ledger)
 Write-Host ''
 exit 0

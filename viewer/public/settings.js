@@ -21,7 +21,7 @@
 import {
   requireSignIn, account, mySettings, saveGitIdentity,
   saveOpenProjectToken, forgetOpenProjectToken,
-  changePassword, signOut, logoutAll,
+  changePassword, signOut, logoutAll, project,
 } from '/validation.js';
 
 const $ = (id) => document.getElementById(id);
@@ -117,7 +117,10 @@ function drawOpenProject(state) {
  */
 function drawConnector(state) {
   $('mcp-line').textContent =
+    // ADAM_PROJECT picks the package, and so the OpenProject project the
+    // board reads. The one this browser last opened is the likeliest answer.
     `claude mcp add -s user adam -e ADAM_VIEWER_URL=${location.origin} ` +
+    `-e ADAM_PROJECT=${project() ?? 'PROJECT-ID'} ` +
     `-e ADAM_EMAIL=${state.email} -e 'ADAM_PASSWORD=YOUR_PASSWORD' ` +
     "'--' node PATH-TO-REPO/viewer/mcp/server.mjs";
 }

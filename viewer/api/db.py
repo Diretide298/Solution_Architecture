@@ -173,7 +173,18 @@ CREATE TABLE IF NOT EXISTS project (
   -- Off rather than deleted. A closed project still owns its verdicts, and the
   -- people who wrote them are still entitled to read what they wrote.
   active     INTEGER NOT NULL DEFAULT 1,
-  created_at TEXT NOT NULL
+  created_at TEXT NOT NULL,
+  -- Which OpenProject project this package's work is scheduled in. The board,
+  -- a work package lookup and a new link all read inside it and nowhere else,
+  -- so a developer on TICVAI is not shown somebody else's tickets. The id is
+  -- what the API filters on; the identifier and name are what a person reads.
+  -- Chosen by an admin on admin.html. Blank is "not chosen yet", and the work
+  -- routes refuse rather than guess.
+  pms_project_id  INTEGER,
+  pms_identifier  TEXT NOT NULL DEFAULT '',
+  pms_name        TEXT NOT NULL DEFAULT '',
+  pms_set_at      TEXT,
+  pms_set_by      INTEGER
 );
 
 -- Who may read which project, and as what.
@@ -194,6 +205,31 @@ CREATE TABLE IF NOT EXISTS account_project (
   PRIMARY KEY (account_id, project_id)
 );
 CREATE INDEX IF NOT EXISTS account_project_by_project ON account_project(project_id, role);
+
+-- A change to an OpenProject work package that somebody has been shown and has
+-- not yet agreed to. Claude proposes; the person says yes; only then is it sent.
+--
+-- The token is what the apply has to present, and only its hash is kept, like
+-- every other token here. `lock_version` is the version of the work package the
+-- person was shown: if it has moved since, the apply is refused rather than
+-- landing on top of a change they never saw. One use, fifteen minutes.
+CREATE TABLE IF NOT EXISTS wp_proposal (
+  id            INTEGER PRIMARY KEY,
+  token_hash    TEXT    NOT NULL UNIQUE,
+  account_id    INTEGER NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+  project_id    TEXT    NOT NULL,
+  external_key  TEXT    NOT NULL,
+  lock_version  INTEGER,
+  status_id     INTEGER,
+  status_name   TEXT    NOT NULL DEFAULT '',
+  percent_done  INTEGER,
+  comment       TEXT    NOT NULL DEFAULT '',
+  summary       TEXT    NOT NULL DEFAULT '',
+  created_at    TEXT    NOT NULL,
+  expires_at    TEXT    NOT NULL,
+  applied_at    TEXT
+);
+CREATE INDEX IF NOT EXISTS wp_proposal_by_account ON wp_proposal(account_id, created_at);
 
 -- A credential this service holds on somebody's behalf, encrypted.
 --
@@ -285,6 +321,8 @@ CREATE TABLE IF NOT EXISTS account_secret (
 # spelled into six statements below, and used as the column default so the
 # backfill for `verdict` is "the column now exists" rather than an UPDATE.
 FIRST_PROJECT = "ticvai"
+# (OpenProject id, identifier, name) for FIRST_PROJECT. See the migration.
+FIRST_PMS_PROJECT = (153, "ticvai", "TICVAI")
 
 
 def connect() -> sqlite3.Connection:
@@ -458,6 +496,28 @@ def init() -> None:
         cur.execute(
             "INSERT OR IGNORE INTO project (id, name, active, created_at) VALUES (?, ?, 1, ?)",
             (FIRST_PROJECT, "TICVAI", _stamp()),
+        )
+
+        # Which OpenProject project each package reads. Added to stores made
+        # before the columns existed; the fresh schema above already has them.
+        project_columns = {row[1] for row in cur.execute("PRAGMA table_info(project)")}
+        for column, ddl in (
+            ("pms_project_id", "INTEGER"),
+            ("pms_identifier", "TEXT NOT NULL DEFAULT ''"),
+            ("pms_name", "TEXT NOT NULL DEFAULT ''"),
+            ("pms_set_at", "TEXT"),
+            ("pms_set_by", "INTEGER"),
+        ):
+            if column not in project_columns:
+                cur.execute(f"ALTER TABLE project ADD COLUMN {column} {ddl}")
+        # TICVAI's work lives in the `ticvai` project on pms.softlabsgroup.in
+        # (id 153). Filled in only while nobody has chosen, so an admin's later
+        # choice is never put back.
+        cur.execute(
+            "UPDATE project SET pms_project_id = ?, pms_identifier = ?, pms_name = ?, "
+            "pms_set_at = ? WHERE id = ? AND pms_project_id IS NULL AND pms_set_at IS NULL",
+            (FIRST_PMS_PROJECT[0], FIRST_PMS_PROJECT[1], FIRST_PMS_PROJECT[2],
+             _stamp(), FIRST_PROJECT),
         )
 
         # The one backfill in the whole migration: everybody keeps exactly the

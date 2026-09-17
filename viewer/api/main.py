@@ -184,6 +184,9 @@ class InviteRequest(BaseModel):
     email: str
     role: str = "reviewer"
     days: int = Field(default=security.INVITE_DAYS, ge=1, le=90)
+    # The ADAM project the link opens. Blank is the first project, which is
+    # what every invite meant before there was a choice.
+    project_id: str = ""
 
 
 class Bootstrap(BaseModel):
@@ -633,6 +636,11 @@ def create_invite(body: InviteRequest, admin: dict = Depends(require_admin)):
     # for less time. Asking for longer is capped rather than refused.
     days = min(body.days, security.CLIENT_INVITE_DAYS) if body.role == "client" else body.days
 
+    project_id = (body.project_id or db.FIRST_PROJECT).strip()
+    project = db.one("SELECT id, name, active FROM project WHERE id = ?", (project_id,))
+    if not project or not project["active"]:
+        raise HTTPException(400, f"There is no open ADAM project called '{project_id}'.")
+
     folded = db.fold(email)
     if db.one("SELECT id FROM account WHERE email_folded = ?", (folded,)):
         raise HTTPException(409, f"{email} already holds an account.")
@@ -648,10 +656,11 @@ def create_invite(body: InviteRequest, admin: dict = Depends(require_admin)):
     token = security.new_token()
     invite_id = db.write(
         """INSERT INTO invite
-             (email, email_folded, token_hash, role, created_by, created_at, expires_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?)""",
+             (email, email_folded, token_hash, role, project_id, created_by,
+              created_at, expires_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
         (
-            email, folded, security.token_hash(token), body.role,
+            email, folded, security.token_hash(token), body.role, project_id,
             admin["id"], security.stamp(), security.invite_expiry(days),
         ),
     )
@@ -661,6 +670,7 @@ def create_invite(body: InviteRequest, admin: dict = Depends(require_admin)):
         "id": invite_id,
         "email": email,
         "role": body.role,
+        "project": {"id": project["id"], "name": project["name"]},
         "link": f"/invite.html#{token}",
         "token": token,
         "expires_at": db.one("SELECT expires_at FROM invite WHERE id = ?",
@@ -671,8 +681,10 @@ def create_invite(body: InviteRequest, admin: dict = Depends(require_admin)):
 @app.get("/api/invites")
 def list_invites(admin: dict = Depends(require_admin)):
     rows = db.all_rows(
-        """SELECT id, email, role, created_at, expires_at, redeemed_at, revoked_at
-             FROM invite ORDER BY id DESC"""
+        """SELECT i.id, i.email, i.role, i.project_id, p.name AS project_name,
+                  i.created_at, i.expires_at, i.redeemed_at, i.revoked_at
+             FROM invite i LEFT JOIN project p ON p.id = i.project_id
+            ORDER BY i.id DESC"""
     )
     out = []
     for r in rows:
@@ -707,7 +719,7 @@ def check_invite(token: str):
 
 def _live_invite(token: str):
     row = db.one(
-        """SELECT id, email, email_folded, role, expires_at, redeemed_at, revoked_at
+        """SELECT id, email, email_folded, role, project_id, expires_at, redeemed_at, revoked_at
              FROM invite WHERE token_hash = ?""",
         (security.token_hash(token),),
     )
@@ -745,6 +757,16 @@ def redeem(body: Redemption, response: Response, request: Request):
     )
     db.write("UPDATE invite SET redeemed_at = ? WHERE id = ?",
              (security.stamp(), invite["id"]))
+    # The project the invite was for. Without this row the new account can open
+    # nothing until the next restart, when the startup backfill happens to grant
+    # every account the first project. Admin is not a project role (see
+    # projects_for), so an admin invite lands as reviewer here.
+    db.write(
+        "INSERT OR IGNORE INTO account_project (account_id, project_id, role, created_at) "
+        "VALUES (?, ?, ?, ?)",
+        (account_id, invite["project_id"] or db.FIRST_PROJECT,
+         "client" if invite["role"] == "client" else "reviewer", security.stamp()),
+    )
 
     token = security.new_token()
     db.write(
@@ -1147,6 +1169,55 @@ def _link_row(row) -> dict:
     }
 
 
+def _readable_project(account: dict, project_id: str) -> str:
+    """The ADAM project a work call is about, checked against what this account
+    may open. Blank means the first project, which is what every caller meant
+    before the parameter existed."""
+    project = (project_id or db.FIRST_PROJECT).strip()
+    if project not in {p["id"] for p in projects_for(account)}:
+        raise HTTPException(403, f"You do not have access to the ADAM project '{project}'.")
+    return project
+
+
+def _pms_scope(account: dict, project_id: str) -> dict:
+    """
+    Which OpenProject project this ADAM project reads, or the sentence to show.
+
+    **Refused rather than widened when nobody has chosen.** Falling back to the
+    whole instance is what this replaced: a board of every ticket assigned to
+    you anywhere, most of them about other products.
+    """
+    project = _readable_project(account, project_id)
+    row = db.one(
+        "SELECT id, name, pms_project_id, pms_identifier, pms_name FROM project WHERE id = ?",
+        (project,),
+    )
+    if not row or row["pms_project_id"] is None:
+        raise HTTPException(
+            428,
+            f"No OpenProject project has been chosen for the ADAM project "
+            f"'{(row['name'] if row else '') or project}' yet. An admin sets it on "
+            f"the admin page, under Projects.",
+        )
+    return {
+        "project": project,
+        "pmsId": row["pms_project_id"],
+        "pmsIdentifier": row["pms_identifier"],
+        "pmsName": row["pms_name"],
+    }
+
+
+def _in_scope(found: dict, scope: dict, number: str) -> None:
+    """A work package from another OpenProject project is not this one's."""
+    if found.get("projectId") != scope["pmsId"]:
+        raise HTTPException(
+            404,
+            f"#{number} is in the OpenProject project '{found.get('project') or '?'}', "
+            f"not in '{scope['pmsName'] or scope['pmsIdentifier']}', which the ADAM "
+            f"project '{scope['project']}' reads.",
+        )
+
+
 @app.get("/api/links")
 def list_links(
     target_kind: str = Query(default=""),
@@ -1163,7 +1234,7 @@ def list_links(
     it opens a branch. Both are one index away, which is why the table carries
     two.
     """
-    project = project_id or db.FIRST_PROJECT
+    project = _readable_project(account, project_id)
     where = ["project_id = ?"]
     args = [project]
     if target_kind:
@@ -1206,6 +1277,7 @@ def make_link(body: LinkIn, account: dict = Depends(require_account)):
         raise HTTPException(400, "Both an artefact and a work package are needed.")
     key = _work_package_key(body.external_key)
 
+    scope = _pms_scope(account, body.project_id)
     endpoint, token = _pms_for(account["id"])
     try:
         found = openproject.work_package(endpoint, token, key)
@@ -1213,8 +1285,14 @@ def make_link(body: LinkIn, account: dict = Depends(require_account)):
         raise HTTPException(502, str(exc))
     except openproject.Refused as exc:
         raise HTTPException(400 if exc.status == 404 else 502, str(exc))
+    try:
+        _in_scope(found, scope, key)
+    except HTTPException as exc:
+        # A link is a claim about this package; one to another product's
+        # ticket is refused like a number that does not exist.
+        raise HTTPException(400, exc.detail)
 
-    project = body.project_id or db.FIRST_PROJECT
+    project = scope["project"]
     now = security.stamp()
     try:
         db.write(
@@ -1248,13 +1326,19 @@ def drop_link(link_id: int, account: dict = Depends(require_account)):
 
 
 @app.get("/api/work-packages/{key}")
-def read_work_package(key: str, account: dict = Depends(require_account)):
-    """One work package, read live as the caller, with whatever it is linked to."""
+def read_work_package(
+    key: str,
+    project_id: str = Query(default=""),
+    account: dict = Depends(require_account),
+):
+    """One work package, read live as the caller, with whatever it is linked to.
+    Only from the OpenProject project the ADAM project reads."""
     # The number is checked before the credential is looked up, and the order
     # matters: the other way round, asking for `/api/work-packages/banana`
     # without a stored token answers "connect your OpenProject account", which
     # sends somebody to configure a thing that was never the problem.
     number = _work_package_key(key)
+    scope = _pms_scope(account, project_id)
     endpoint, token = _pms_for(account["id"])
     try:
         found = openproject.work_package(endpoint, token, number)
@@ -1262,17 +1346,21 @@ def read_work_package(key: str, account: dict = Depends(require_account)):
         raise HTTPException(502, str(exc))
     except openproject.Refused as exc:
         raise HTTPException(404 if exc.status == 404 else 502, str(exc))
+    _in_scope(found, scope, number)
 
     rows = db.all_rows(
         "SELECT * FROM artefact_link WHERE external_key = ? "
-        "AND external_system = 'openproject'",
-        (number,),
+        "AND external_system = 'openproject' AND project_id = ?",
+        (number, scope["project"]),
     )
     return {"workPackage": found, "touches": [_link_row(r)["target"] for r in rows]}
 
 
 @app.get("/api/board/mine")
-def my_board(account: dict = Depends(require_account)):
+def my_board(
+    project_id: str = Query(default=""),
+    account: dict = Depends(require_account),
+):
     """
     What is open and assigned to this person, with the artefacts each touches.
 
@@ -1281,18 +1369,22 @@ def my_board(account: dict = Depends(require_account)):
     the right cost. The cached columns exist for listings that hang off an
     artefact, where fanning out would be one call per row.
     """
+    scope = _pms_scope(account, project_id)
     endpoint, token = _pms_for(account["id"])
     try:
-        items = openproject.mine(endpoint, token)
+        items = openproject.mine(endpoint, token, project_id=scope["pmsId"])
     except (openproject.Blocked, openproject.Refused) as exc:
         raise HTTPException(502, str(exc))
+    # Checked again here, in case an instance ignores the filter: a board that
+    # quietly shows other products' tickets is the thing this scope prevents.
+    items = [item for item in items if item.get("projectId") == scope["pmsId"]]
 
     # One query for every link, joined in memory. The alternative is a query per
     # work package, and this table is small.
     touching: dict = {}
     for row in db.all_rows(
         "SELECT external_key, target_kind, target_id FROM artefact_link "
-        "WHERE external_system = 'openproject'", ()
+        "WHERE external_system = 'openproject' AND project_id = ?", (scope["project"],)
     ):
         touching.setdefault(row["external_key"], []).append(
             {"kind": row["target_kind"], "id": row["target_id"]})
@@ -1300,13 +1392,287 @@ def my_board(account: dict = Depends(require_account)):
     return {
         "total": len(items),
         "endpoint": endpoint,
+        "project": scope["project"],
+        "openproject": {
+            "id": scope["pmsId"],
+            "identifier": scope["pmsIdentifier"],
+            "name": scope["pmsName"],
+            "url": f"{endpoint}/projects/{scope['pmsIdentifier']}" if scope["pmsIdentifier"] else "",
+        },
         "items": [{**item, "touches": touching.get(item["key"], [])} for item in items],
         # Said out loud when it is the answer. An empty board reads as "nothing
         # assigned to me", and the truth may be "nothing has been loaded yet".
         "note": None if items else
-                "Nothing open is assigned to you in OpenProject. If the delivery "
-                "plan has not been loaded into the TICVAI project yet, that is why.",
+                f"Nothing open is assigned to you in the OpenProject project "
+                f"'{scope['pmsName'] or scope['pmsIdentifier']}'. If its work has not "
+                f"been loaded there yet, that is why.",
     }
+
+
+# ── changing a work package: proposed, shown, then applied ───────────
+#
+# Claude never changes OpenProject in one step. `propose` reads the work package,
+# works out what would change, and keeps that under a one-use token; nothing is
+# sent. The person is shown the change. Only `apply`, with the token, sends it —
+# as that person, with their own OpenProject token, so OpenProject's history
+# names them. The change is refused if the work package has moved since it was
+# shown, because what the person agreed to was a change to what they saw.
+
+PROPOSAL_MINUTES = 15
+
+
+class ProposalIn(BaseModel):
+    project_id: str = ""
+    status: str = ""
+    percent_done: Optional[int] = Field(default=None, ge=0, le=100)
+    comment: str = Field(default="", max_length=5000)
+
+
+class ApplyIn(BaseModel):
+    project_id: str = ""
+
+
+def _pick_status(wanted: str, known: list) -> dict:
+    """A status by name, forgiving of case and spacing. Refuses with the names
+    there are, so the next attempt can be right."""
+    fold = lambda text: re.sub(r"[^a-z0-9]+", "", (text or "").lower())  # noqa: E731
+    for status in known:
+        if fold(status["name"]) == fold(wanted):
+            return status
+    names = ", ".join(st["name"] for st in known)
+    raise HTTPException(400, f"OpenProject has no status called '{wanted}'. It has: {names}.")
+
+
+@app.get("/api/board/statuses")
+def list_statuses(account: dict = Depends(require_account)):
+    """The statuses a work package can be given, by name."""
+    endpoint, token = _pms_for(account["id"])
+    try:
+        found = openproject.statuses(endpoint, token)
+    except (openproject.Blocked, openproject.Refused) as exc:
+        raise HTTPException(502, str(exc))
+    return {"statuses": found}
+
+
+@app.post("/api/work-packages/{key}/proposals")
+def propose_change(key: str, body: ProposalIn, account: dict = Depends(require_account)):
+    """
+    Work out a change and keep it for the person to agree to. **Sends nothing.**
+    """
+    number = _work_package_key(key)
+    wanted_status = body.status.strip()
+    note = body.comment.strip()
+    if not wanted_status and body.percent_done is None and not note:
+        raise HTTPException(400, "Say what should change: a status, a % done, or a comment.")
+
+    scope = _pms_scope(account, body.project_id)
+    endpoint, token = _pms_for(account["id"])
+    try:
+        found = openproject.work_package(endpoint, token, number)
+        status = _pick_status(wanted_status, openproject.statuses(endpoint, token)) \
+            if wanted_status else None
+    except openproject.Blocked as exc:
+        raise HTTPException(502, str(exc))
+    except openproject.Refused as exc:
+        raise HTTPException(404 if exc.status == 404 else 502, str(exc))
+    _in_scope(found, scope, number)
+
+    changes = []
+    if status and status["name"] != found["status"]:
+        changes.append(f"status: {found['status'] or '(none)'} -> {status['name']}")
+    elif status:
+        status = None  # already that; nothing to send
+    percent = body.percent_done
+    if percent is not None and percent != found["percentDone"]:
+        changes.append(f"% done: {found['percentDone'] if found['percentDone'] is not None else '(none)'} -> {percent}")
+    else:
+        percent = None
+    if note:
+        changes.append(f"comment: {note[:200]}{'...' if len(note) > 200 else ''}")
+    if not changes:
+        raise HTTPException(409, f"#{number} is already like that. Nothing to change.")
+
+    proposal = security.new_token()
+    now = security.now()
+    db.write(
+        "INSERT INTO wp_proposal (token_hash, account_id, project_id, external_key, "
+        "lock_version, status_id, status_name, percent_done, comment, summary, "
+        "created_at, expires_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        (security.token_hash(proposal), account["id"], scope["project"], number,
+         found.get("lockVersion"), status["id"] if status else None,
+         status["name"] if status else "", percent, note, "; ".join(changes),
+         security.stamp(now), security.stamp(now + timedelta(minutes=PROPOSAL_MINUTES))),
+    )
+    return {
+        "proposal": proposal,
+        "workPackage": {k: found[k] for k in ("key", "subject", "status", "percentDone", "url")},
+        "changes": changes,
+        "expiresInMinutes": PROPOSAL_MINUTES,
+        "note": "Nothing has changed yet. Show these changes to the person and apply "
+                "only after they say yes.",
+    }
+
+
+@app.post("/api/work-packages/{key}/proposals/{proposal}/apply")
+def apply_change(key: str, proposal: str, body: ApplyIn,
+                 account: dict = Depends(require_account)):
+    """Send a change the person has agreed to. One use; their own token."""
+    number = _work_package_key(key)
+    row = db.one("SELECT * FROM wp_proposal WHERE token_hash = ?", (security.token_hash(proposal),))
+    if not row or row["account_id"] != account["id"] or row["external_key"] != number:
+        raise HTTPException(404, "No such proposal for this work package. Propose the change first.")
+    if row["applied_at"]:
+        raise HTTPException(409, "That change has already been applied.")
+    if security.expired(row["expires_at"]):
+        raise HTTPException(410, f"That proposal is more than {PROPOSAL_MINUTES} minutes old. Propose it again.")
+
+    scope = _pms_scope(account, body.project_id or row["project_id"])
+    if scope["project"] != row["project_id"]:
+        raise HTTPException(400, "That proposal was made for another ADAM project.")
+    endpoint, token = _pms_for(account["id"])
+
+    # Claimed before it is sent, so two quick presses cannot send it twice.
+    if not db.change("UPDATE wp_proposal SET applied_at = ? WHERE id = ? AND applied_at IS NULL",
+                     (security.stamp(), row["id"])):
+        raise HTTPException(409, "That change has already been applied.")
+    try:
+        current = openproject.work_package(endpoint, token, number)
+        _in_scope(current, scope, number)
+        if row["lock_version"] is not None and current.get("lockVersion") != row["lock_version"]:
+            raise HTTPException(
+                409, f"#{number} was changed in OpenProject after this was proposed. "
+                     f"Look at it again and propose the change again.")
+        updated = current
+        if row["status_id"] is not None or row["percent_done"] is not None:
+            updated = openproject.update(
+                endpoint, token, number, current["lockVersion"],
+                status_id=row["status_id"], percent_done=row["percent_done"])
+        if row["comment"]:
+            openproject.comment(endpoint, token, number, row["comment"])
+    except HTTPException:
+        db.change("UPDATE wp_proposal SET applied_at = NULL WHERE id = ?", (row["id"],))
+        raise
+    except openproject.Blocked as exc:
+        db.change("UPDATE wp_proposal SET applied_at = NULL WHERE id = ?", (row["id"],))
+        raise HTTPException(502, str(exc))
+    except openproject.Refused as exc:
+        # Partly sent is possible: the status landed and the comment did not.
+        # The proposal stays used so it is not sent twice; the answer says so.
+        raise HTTPException(
+            409 if exc.status in (409, 422) else 502,
+            f"{exc} (Check #{number} in OpenProject before trying again: part of the "
+            f"change may already be there.)")
+
+    # The cached columns on its links say what OpenProject said last; now it
+    # says something new.
+    db.change(
+        "UPDATE artefact_link SET cached_status = ?, synced_at = ? "
+        "WHERE external_system = 'openproject' AND external_key = ? AND project_id = ?",
+        (updated.get("status", ""), security.stamp(), number, row["project_id"]),
+    )
+    return {
+        "ok": True,
+        "applied": row["summary"],
+        "workPackage": {k: updated.get(k) for k in ("key", "subject", "status", "percentDone", "url")},
+    }
+
+
+# ── which OpenProject project each ADAM project reads ────────────────
+
+class PmsProjectIn(BaseModel):
+    pms_project_id: int
+
+
+_PROJECT_SELECT = (
+    "SELECT p.id, p.name, p.active, p.pms_project_id, p.pms_identifier, p.pms_name, "
+    "p.pms_set_at, a.email AS set_by_email FROM project p "
+    "LEFT JOIN account a ON a.id = p.pms_set_by"
+)
+
+
+def _project_row(row) -> dict:
+    return {
+        "id": row["id"],
+        "name": row["name"],
+        "active": bool(row["active"]),
+        "openproject": None if row["pms_project_id"] is None else {
+            "id": row["pms_project_id"],
+            "identifier": row["pms_identifier"],
+            "name": row["pms_name"],
+            "url": f"{DEFAULT_PMS}/projects/{row['pms_identifier']}" if row["pms_identifier"] else "",
+        },
+        "setAt": row["pms_set_at"],
+        "setBy": row["set_by_email"],
+    }
+
+
+@app.get("/api/pms/projects")
+def list_pms_projects(admin: dict = Depends(require_admin)):
+    """Every ADAM project and the OpenProject project each one reads."""
+    rows = db.all_rows(f"{_PROJECT_SELECT} ORDER BY p.id")
+    return {"endpoint": DEFAULT_PMS, "projects": [_project_row(r) for r in rows]}
+
+
+@app.get("/api/pms/available")
+def available_pms_projects(admin: dict = Depends(require_admin)):
+    """
+    The OpenProject projects there are to choose from, read with the admin's
+    own token, so the list is what that admin can see there.
+    """
+    endpoint, token = _pms_for(admin["id"])
+    try:
+        found = openproject.projects(endpoint, token)
+    except (openproject.Blocked, openproject.Refused) as exc:
+        raise HTTPException(502, str(exc))
+    return {"endpoint": endpoint, "projects": found}
+
+
+@app.put("/api/pms/projects/{project_id}")
+def set_pms_project(project_id: str, body: PmsProjectIn,
+                    admin: dict = Depends(require_admin)):
+    """
+    Choose the OpenProject project an ADAM project reads.
+
+    **Looked up before it is kept**, with the admin's token: the number must be
+    a project that exists and the admin can see, and the identifier and name
+    stored beside it are the ones OpenProject gave, not ones typed in.
+    """
+    if not db.one("SELECT id FROM project WHERE id = ?", (project_id,)):
+        raise HTTPException(404, f"No ADAM project called '{project_id}'.")
+    endpoint, token = _pms_for(admin["id"])
+    try:
+        found = {p["id"]: p for p in openproject.projects(endpoint, token)}
+    except (openproject.Blocked, openproject.Refused) as exc:
+        raise HTTPException(502, str(exc))
+    chosen = found.get(body.pms_project_id)
+    if not chosen:
+        raise HTTPException(
+            400, f"OpenProject has no project #{body.pms_project_id} that your token can see.")
+    db.change(
+        "UPDATE project SET pms_project_id = ?, pms_identifier = ?, pms_name = ?, "
+        "pms_set_at = ?, pms_set_by = ? WHERE id = ?",
+        (chosen["id"], chosen["identifier"], chosen["name"], security.stamp(),
+         admin["id"], project_id),
+    )
+    row = db.one(f"{_PROJECT_SELECT} WHERE p.id = ?", (project_id,))
+    return {"ok": True, "project": _project_row(row)}
+
+
+@app.delete("/api/pms/projects/{project_id}")
+def clear_pms_project(project_id: str, admin: dict = Depends(require_admin)):
+    """
+    Unchoose it. The work routes then refuse for this project until somebody
+    chooses again. `pms_set_at` is kept, so the startup migration knows a
+    person made this choice and does not fill the default back in.
+    """
+    moved = db.change(
+        "UPDATE project SET pms_project_id = NULL, pms_identifier = '', pms_name = '', "
+        "pms_set_at = ?, pms_set_by = ? WHERE id = ?",
+        (security.stamp(), admin["id"], project_id),
+    )
+    if not moved:
+        raise HTTPException(404, f"No ADAM project called '{project_id}'.")
+    return {"ok": True}
 
 
 # ── mentions ────────────────────────────────────────────
