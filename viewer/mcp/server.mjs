@@ -140,7 +140,10 @@ async function handle(message) {
           + 'but not a kind. These are the package\'s own records, so they outrank anything '
           + 'remembered. To work a ticket: adam_board, then adam_pull with the ticket and your '
           + 'working folder, then read the files under .adam/work/. When it is done, adam_propose '
-          + 'the status change and a comment, show the person, and adam_apply only after they say yes.',
+          + 'the status change and a comment, show the person, and adam_apply only after they say yes. '
+          + 'If the package contradicts itself or lacks what the ticket needs, do not settle it in code: '
+          + 'check adam_changes, then adam_draft_change, show the draft, and adam_raise_change only '
+          + 'after they say yes.',
       });
     }
 

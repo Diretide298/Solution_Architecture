@@ -641,7 +641,7 @@ else { Good "registered as '$Name' for $where only, reading $Project" }
 $run = $Test
 if ($run -eq 'ask') {
     Write-Host ''
-    Note 'The full connection test signs in and tries all 16 tools against ADAM (about a minute).'
+    Note 'The full connection test signs in and tries all 19 tools against ADAM (about a minute).'
     Note 'If you have connected OpenProject, it also links one of your tasks to a screen or contract and removes the link again,'
     Note 'and proposes a comment on it that it never applies. Nothing in OpenProject changes.'
     $reply = (Read-Host '   Run it now? [y/N]').Trim().ToLower()

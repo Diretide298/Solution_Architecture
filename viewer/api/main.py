@@ -1577,6 +1577,267 @@ def apply_change(key: str, proposal: str, body: ApplyIn,
     }
 
 
+# ── change requests ──────────────────────────────────────────────────
+#
+# Somebody building from the package found it wrong, contradictory or short of
+# something the work needs. A developer's Claude drafts one and files it only
+# after the developer says yes, the same two steps as an OpenProject change.
+# Internal only; resolved by an admin or a reviewer on the project.
+
+CHANGE_KINDS = ("contract", "operation", "schema", "table", "screen", "flow", "module",
+                "service", "adr", "platform", "state", "event", "other")
+CHANGE_STATUSES = ("open", "accepted", "rejected", "done")
+DRAFT_MINUTES = 30
+
+
+class ChangeIn(BaseModel):
+    project_id: str = ""
+    target_kind: str
+    target_id: str = Field(min_length=1, max_length=300)
+    title: str = Field(min_length=5, max_length=200)
+    problem: str = Field(min_length=10, max_length=8000)
+    evidence: str = Field(default="", max_length=8000)
+    options: List[str] = Field(default_factory=list, max_length=8)
+    recommendation: str = Field(default="", max_length=2000)
+    blocking: bool = False
+    ticket: str = Field(default="", max_length=20)
+
+
+class FileIn(BaseModel):
+    project_id: str = ""
+
+
+class ResolveIn(BaseModel):
+    project_id: str = ""
+    status: str
+    resolution: str = Field(default="", max_length=4000)
+    ref: str = Field(default="", max_length=300)
+
+
+def _change_project(account: dict, project_id: str) -> dict:
+    """The project, and whether this account may act on its change requests.
+    A client account gets nothing: these are the team's own notes."""
+    if account["role"] == "client":
+        raise HTTPException(403, "Change requests are for the delivery team.")
+    project = _readable_project(account, project_id)
+    role = next((p["role"] for p in projects_for(account) if p["id"] == project), "")
+    if role == "client":
+        raise HTTPException(403, "Change requests are for the delivery team.")
+    return {"project": project, "may_resolve": account["role"] == "admin" or role == "reviewer"}
+
+
+def _clean_change(body: ChangeIn) -> dict:
+    kind = body.target_kind.strip().lower()
+    if kind not in CHANGE_KINDS:
+        raise HTTPException(400, f"target_kind is one of {', '.join(CHANGE_KINDS)}.")
+    options = [o.strip() for o in body.options if o and o.strip()]
+    if any(len(o) > 1000 for o in options):
+        raise HTTPException(400, "Keep each option under 1000 characters.")
+    ticket = body.ticket.strip().lstrip("#")
+    if ticket and not ticket.isdigit():
+        raise HTTPException(400, "ticket is an OpenProject work package number.")
+    return {
+        "target_kind": kind, "target_id": body.target_id.strip(),
+        "title": body.title.strip(), "problem": body.problem.strip(),
+        "evidence": body.evidence.strip(), "options": options,
+        "recommendation": body.recommendation.strip(),
+        "blocking": bool(body.blocking), "ticket": ticket,
+    }
+
+
+_CHANGE_SELECT = (
+    "SELECT c.*, r.name AS raised_by_name, r.email AS raised_by_email, "
+    "s.name AS resolved_by_name FROM change_request c "
+    "JOIN account r ON r.id = c.raised_by LEFT JOIN account s ON s.id = c.resolved_by"
+)
+
+
+def _change_row(row) -> dict:
+    return {
+        "id": f"CR-{row['number']:03d}",
+        "number": row["number"],
+        "project": row["project_id"],
+        "target": {"kind": row["target_kind"], "id": row["target_id"]},
+        "title": row["title"],
+        "problem": row["problem"],
+        "evidence": row["evidence"],
+        "options": json.loads(row["options"] or "[]"),
+        "recommendation": row["recommendation"],
+        "blocking": bool(row["blocking"]),
+        "ticket": row["external_key"],
+        "status": row["status"],
+        "raisedBy": row["raised_by_name"] or row["raised_by_email"],
+        "raisedAt": row["raised_at"],
+        "raisedVia": row["raised_via"],
+        "resolution": row["resolution"],
+        "resolvedRef": row["resolved_ref"],
+        "resolvedBy": row["resolved_by_name"],
+        "resolvedAt": row["resolved_at"],
+    }
+
+
+def _open_on_target(project: str, kind: str, target: str) -> list:
+    rows = db.all_rows(
+        _CHANGE_SELECT + " WHERE c.project_id = ? AND c.target_kind = ? AND c.target_id = ? "
+        "AND c.status IN ('open', 'accepted') ORDER BY c.number",
+        (project, kind, target),
+    )
+    return [_change_row(r) for r in rows]
+
+
+def _file_change(project: str, fields: dict, account: dict, via: str) -> dict:
+    # The number and the row in one statement, so two filings at once cannot
+    # take the same number.
+    with db.cursor(commit=True) as cur:
+        cur.execute(
+            "INSERT INTO change_request (project_id, number, target_kind, target_id, title, "
+            "problem, evidence, options, recommendation, blocking, external_key, status, "
+            "raised_by, raised_at, raised_via) "
+            "SELECT ?, COALESCE(MAX(number), 0) + 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'open', ?, ?, ? "
+            "FROM change_request WHERE project_id = ?",
+            (project, fields["target_kind"], fields["target_id"], fields["title"],
+             fields["problem"], fields["evidence"], json.dumps(fields["options"]),
+             fields["recommendation"], int(fields["blocking"]), fields["ticket"],
+             account["id"], security.stamp(), via, project),
+        )
+        new_id = cur.lastrowid
+    return _change_row(db.one(_CHANGE_SELECT + " WHERE c.id = ?", (new_id,)))
+
+
+@app.get("/api/changes")
+def list_changes(project_id: str = Query(default=""), status: str = Query(default=""),
+                 target_kind: str = Query(default=""), target_id: str = Query(default=""),
+                 ticket: str = Query(default=""), account: dict = Depends(require_account)):
+    """The project's change requests, newest first, narrowed by what is given."""
+    scope = _change_project(account, project_id)
+    where, args = ["c.project_id = ?"], [scope["project"]]
+    if status:
+        wanted = [s.strip() for s in status.split(",") if s.strip()]
+        if any(s not in CHANGE_STATUSES for s in wanted):
+            raise HTTPException(400, f"status is one or more of {', '.join(CHANGE_STATUSES)}.")
+        where.append(f"c.status IN ({', '.join('?' for _ in wanted)})")
+        args += wanted
+    if target_kind:
+        where.append("c.target_kind = ?"); args.append(target_kind.strip().lower())
+    if target_id:
+        where.append("c.target_id = ?"); args.append(target_id.strip())
+    if ticket:
+        where.append("c.external_key = ?"); args.append(ticket.strip().lstrip("#"))
+    rows = db.all_rows(_CHANGE_SELECT + " WHERE " + " AND ".join(where) + " ORDER BY c.number DESC",
+                       tuple(args))
+    items = [_change_row(r) for r in rows]
+    counts = {s: 0 for s in CHANGE_STATUSES}
+    for row in db.all_rows("SELECT status, COUNT(*) AS n FROM change_request WHERE project_id = ? "
+                           "GROUP BY status", (scope["project"],)):
+        counts[row["status"]] = row["n"]
+    return {"project": scope["project"], "mayResolve": scope["may_resolve"],
+            "total": len(items), "counts": counts, "items": items}
+
+
+def _change_number(value: str) -> int:
+    text = value.strip().upper().removeprefix("CR-").removeprefix("CR")
+    if not text.isdigit():
+        raise HTTPException(400, "A change request is named CR-<number>.")
+    return int(text)
+
+
+@app.get("/api/changes/{number}")
+def read_change(number: str, project_id: str = Query(default=""),
+                account: dict = Depends(require_account)):
+    scope = _change_project(account, project_id)
+    row = db.one(_CHANGE_SELECT + " WHERE c.project_id = ? AND c.number = ?",
+                 (scope["project"], _change_number(number)))
+    if not row:
+        raise HTTPException(404, f"No {number} in this project.")
+    return {"found": True, "change": _change_row(row), "mayResolve": scope["may_resolve"]}
+
+
+@app.post("/api/changes")
+def raise_change(body: ChangeIn, account: dict = Depends(require_account)):
+    """Raise one from the viewer: the person is the one writing it, so no draft."""
+    scope = _change_project(account, body.project_id)
+    return {"ok": True, "change": _file_change(scope["project"], _clean_change(body), account, "viewer")}
+
+
+@app.post("/api/changes/drafts")
+def draft_change(body: ChangeIn, account: dict = Depends(require_account)):
+    """
+    Keep a change request for the person to agree to. **Files nothing.** Says
+    which open ones already cover the same artefact, so a duplicate is caught
+    before it is filed.
+    """
+    scope = _change_project(account, body.project_id)
+    fields = _clean_change(body)
+    code = security.new_token()
+    now = security.now()
+    db.write(
+        "INSERT INTO change_draft (token_hash, account_id, project_id, payload, created_at, expires_at) "
+        "VALUES (?, ?, ?, ?, ?, ?)",
+        (security.token_hash(code), account["id"], scope["project"], json.dumps(fields),
+         security.stamp(now), security.stamp(now + timedelta(minutes=DRAFT_MINUTES))),
+    )
+    return {
+        "draft": code,
+        "preview": fields,
+        "alreadyOpen": _open_on_target(scope["project"], fields["target_kind"], fields["target_id"]),
+        "expiresInMinutes": DRAFT_MINUTES,
+        "note": "Nothing has been filed. Show this to the person; file it only after they say yes. "
+                "If one of alreadyOpen says the same thing, point to it instead.",
+    }
+
+
+@app.post("/api/changes/drafts/{code}/file")
+def file_draft(code: str, body: FileIn, account: dict = Depends(require_account)):
+    """File a draft the person agreed to. One use."""
+    row = db.one("SELECT * FROM change_draft WHERE token_hash = ?", (security.token_hash(code),))
+    if not row or row["account_id"] != account["id"]:
+        raise HTTPException(404, "No such draft. Draft the change request first.")
+    if row["filed_at"]:
+        raise HTTPException(409, "That draft has already been filed.")
+    if security.expired(row["expires_at"]):
+        raise HTTPException(410, f"That draft is more than {DRAFT_MINUTES} minutes old. Draft it again.")
+    scope = _change_project(account, body.project_id or row["project_id"])
+    if scope["project"] != row["project_id"]:
+        raise HTTPException(400, "That draft was made for another ADAM project.")
+    if not db.change("UPDATE change_draft SET filed_at = ? WHERE id = ? AND filed_at IS NULL",
+                     (security.stamp(), row["id"])):
+        raise HTTPException(409, "That draft has already been filed.")
+    return {"ok": True, "change": _file_change(row["project_id"], json.loads(row["payload"]), account, "claude")}
+
+
+@app.post("/api/changes/{number}/resolve")
+def resolve_change(number: str, body: ResolveIn, account: dict = Depends(require_account)):
+    """
+    Accept, reject, mark done, or reopen. An admin or a reviewer on the
+    project; not the person who raised it, unless they are an admin - somebody
+    else has to agree the package is wrong.
+    """
+    scope = _change_project(account, body.project_id)
+    if not scope["may_resolve"]:
+        raise HTTPException(403, "Only an admin or a reviewer on this project can settle a change request.")
+    status = body.status.strip().lower()
+    if status not in CHANGE_STATUSES:
+        raise HTTPException(400, f"status is one of {', '.join(CHANGE_STATUSES)}.")
+    row = db.one("SELECT * FROM change_request WHERE project_id = ? AND number = ?",
+                 (scope["project"], _change_number(number)))
+    if not row:
+        raise HTTPException(404, f"No {number} in this project.")
+    if row["raised_by"] == account["id"] and account["role"] != "admin" and status in ("accepted", "rejected"):
+        raise HTTPException(403, "Somebody other than the person who raised it has to accept or reject it.")
+    note = body.resolution.strip()
+    if status == "rejected" and not note:
+        raise HTTPException(400, "Say why it is rejected - that is what the person who raised it reads.")
+    if status == "open":
+        db.write("UPDATE change_request SET status = 'open', resolution = ?, resolved_ref = '', "
+                 "resolved_by = NULL, resolved_at = NULL WHERE id = ?", (note, row["id"]))
+    else:
+        db.write("UPDATE change_request SET status = ?, resolution = ?, resolved_ref = ?, "
+                 "resolved_by = ?, resolved_at = ? WHERE id = ?",
+                 (status, note or row["resolution"], body.ref.strip() or row["resolved_ref"],
+                  account["id"], security.stamp(), row["id"]))
+    return {"ok": True, "change": _change_row(db.one(_CHANGE_SELECT + " WHERE c.id = ?", (row["id"],)))}
+
+
 # ── which OpenProject project each ADAM project reads ────────────────
 
 class PmsProjectIn(BaseModel):

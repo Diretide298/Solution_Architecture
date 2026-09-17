@@ -1,8 +1,10 @@
 # ADAM context bridge — MCP server
 
-Sixteen tools for a developer's local Claude: **nine read the TICVAI package**, **four are
-about the work scheduled against it** in OpenProject, and **three are for working a ticket**:
-pulling it to local files, and changing its status once the developer has agreed. Phases 1 to 3 of
+Nineteen tools for a developer's local Claude: **nine read the package**, **four are
+about the work scheduled against it** in OpenProject, **three are for working a ticket**:
+pulling it to local files, and changing its status once the developer has agreed, and **three
+are for change requests**: raising, after the developer has agreed, that the package itself is
+wrong, contradictory or short of something. Phases 1 to 3 of
 `viewer/HANDOFF-adam-bridge.md`.
 
 ## What a developer runs
@@ -126,6 +128,18 @@ building.
 | `adam_pull` | `key` (or nothing, for the whole board), `dir`, `limit` | **writes local files**: `.adam/work/<key>/` and `.adam/board.md` |
 | `adam_propose` | `key`, and `status` / `percentDone` / `comment` | the change that would be made, and a one-use code. **Changes nothing** |
 | `adam_apply` | `key`, `proposal`, `dir` | **changes OpenProject**, as you, with that code — after you said yes |
+| `adam_changes` | none, or `id`, `status`, `kind` + `target`, `ticket` | the project's change requests; one in full |
+| `adam_draft_change` | `kind`, `target`, `title`, `problem`, `evidence`, `options`, `recommendation`, `blocking`, `ticket` | a draft and a `draft` code, plus open requests already on that artefact — **files nothing** |
+| `adam_raise_change` | `draft` | **files the change request in ADAM** (CR-007) — after you said yes |
+
+**Change requests.** When the package contradicts itself, is wrong, or lacks what a ticket needs,
+Claude does not settle it in code: it checks `adam_changes` for one already open on that artefact,
+drafts one with the conflicting passages quoted and the options listed, shows it, and files it only
+after a yes (a one-use code, 30 minutes). A blocking one can put the ticket On hold with "Blocked by
+CR-007". They are internal — a client account neither reads nor files them — and are settled on
+ADAM's **Changes** page (`/changes.html`) by an admin or a reviewer on the project, never by the
+person who raised it unless they are an admin: open → accepted or rejected (a rejection needs a
+reason) → done, with what fixed it. The page exports what it shows as CSV.
 
 Start with `adam_search` when you have a name but not a kind. A miss returns candidate spellings
 rather than an empty result — a wrong id is usually a wrong spelling of a right one.

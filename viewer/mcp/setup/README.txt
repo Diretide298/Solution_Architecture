@@ -165,7 +165,7 @@ WHAT IS IN THIS FOLDER
     setup.ps1      what both of those run
     server.mjs     the connector Claude Code starts
     client.mjs     how it talks to ADAM
-    tools.mjs      the 16 tools
+    tools.mjs      the 19 tools
     mcp-check.mjs  the connection test
     starters\      the backend and frontend skeletons and coding standards
 

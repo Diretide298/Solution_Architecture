@@ -153,9 +153,10 @@ console.log('\ntools');
 
 const list = await mcp.send('tools/list', {});
 const names = (list.result?.tools ?? []).map((t) => t.name).sort();
-const want = ['adam_apply', 'adam_board', 'adam_contract', 'adam_decisions', 'adam_file',
-  'adam_journey', 'adam_link', 'adam_links', 'adam_module', 'adam_propose', 'adam_pull',
-  'adam_screen', 'adam_search', 'adam_service', 'adam_table', 'adam_work'];
+const want = ['adam_apply', 'adam_board', 'adam_changes', 'adam_contract', 'adam_decisions',
+  'adam_draft_change', 'adam_file', 'adam_journey', 'adam_link', 'adam_links', 'adam_module',
+  'adam_propose', 'adam_pull', 'adam_raise_change', 'adam_screen', 'adam_search', 'adam_service',
+  'adam_table', 'adam_work'];
 if (String(names) === String(want)) pass(`${want.length} tools listed: ${names.join(', ')}`);
 else fail(`${want.length} tools listed`, `got ${names.join(', ') || '(none)'}`);
 
@@ -510,6 +511,38 @@ if (!viewerUp) {
     }
   } else {
     fail('adam_board answers', JSON.stringify(board).slice(0, 250));
+  }
+
+  // Change requests need no OpenProject credential. The draft is kept and never
+  // filed, like the proposal above: this harness must stay safe against the
+  // live site.
+  const changes = parse(await mcp.send('tools/call', { name: 'adam_changes', arguments: {} }));
+  if (typeof changes.total === 'number') pass(`adam_changes answers — ${changes.total} change request(s)`);
+  else if (/delivery team/.test(changes.error ?? '')) pass('adam_changes is refused for a client account, and says so');
+  else fail('adam_changes answers', JSON.stringify(changes).slice(0, 200));
+
+  if (typeof changes.total === 'number') {
+    const drafted = parse(await mcp.send('tools/call', {
+      name: 'adam_draft_change',
+      arguments: {
+        kind: 'contract', target: contractName,
+        title: 'mcp-check: drafted and never filed',
+        problem: 'Written by the connection test to prove a draft files nothing.',
+        options: ['ignore it'],
+      },
+    }));
+    if (drafted.ok && drafted.filed === false && drafted.draft && Array.isArray(drafted.alreadyOpen)) {
+      pass('adam_draft_change returns a draft and a code, and files nothing');
+    } else fail('adam_draft_change', JSON.stringify(drafted).slice(0, 200));
+    const after = parse(await mcp.send('tools/call', { name: 'adam_changes', arguments: {} }));
+    if (after.total === changes.total) pass('...and the list is unchanged');
+    else fail('a draft adds nothing to the list', `${changes.total} became ${after.total}`);
+
+    const forgedCr = parse(await mcp.send('tools/call', {
+      name: 'adam_raise_change', arguments: { draft: 'not-a-real-draft' },
+    }));
+    if (forgedCr.ok === false && forgedCr.filed === false) pass('adam_raise_change refuses a code nobody drafted');
+    else fail('adam_raise_change refuses a made-up code', JSON.stringify(forgedCr).slice(0, 200));
   }
 
   // A tool that reads links needs no credential at all, so this holds either way.

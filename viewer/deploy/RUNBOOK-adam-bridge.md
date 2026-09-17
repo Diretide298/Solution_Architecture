@@ -350,7 +350,7 @@ npm's `claude.ps1` and the command fails. `claude mcp get adam` should list all 
 `Environment:`.
 
 They need a checkout of this repository for `server.mjs`; everything it reads comes over
-HTTPS from the deployed viewer. Sixteen tools — see `viewer/mcp/README.md`.
+HTTPS from the deployed viewer. Nineteen tools — see `viewer/mcp/README.md`.
 
 **Each developer uses their own account.** The bridge sees exactly what that person can see
 in the viewer, and every OpenProject call is made as them. There is no service account, by

@@ -402,6 +402,15 @@ export async function logoutAll() {
  *  sessions it dropped, which is the only way to tell "they had none open"
  *  from "it did nothing". */
 // Which OpenProject project each ADAM project reads. Admin only.
+// Change requests: where the package was found wrong. Internal only.
+export const listChanges = (projectId, filters = {}) =>
+  call(`/api/changes?${new URLSearchParams({ project_id: projectId ?? '', ...filters })}`);
+export const raiseChange = (projectId, change) =>
+  call('/api/changes', { method: 'POST', body: { project_id: projectId ?? '', ...change } });
+export const resolveChange = (projectId, id, status, resolution = '', ref = '') =>
+  call(`/api/changes/${encodeURIComponent(id)}/resolve`,
+    { method: 'POST', body: { project_id: projectId ?? '', status, resolution, ref } });
+
 export const listPmsProjects = () => call('/api/pms/projects');
 export const availablePmsProjects = () => call('/api/pms/available');
 export const setPmsProject = (projectId, pmsProjectId) =>

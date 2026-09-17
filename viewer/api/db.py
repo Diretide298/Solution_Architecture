@@ -232,6 +232,59 @@ CREATE TABLE IF NOT EXISTS wp_proposal (
 );
 CREATE INDEX IF NOT EXISTS wp_proposal_by_account ON wp_proposal(account_id, created_at);
 
+-- A change request: somebody building from the package found it wrong,
+-- contradictory or missing something, and says so where the package's owners
+-- will see it. Not a decision - a decision is settled; this is open until an
+-- admin or a reviewer on the project accepts or rejects it, and done when the
+-- package has been fixed (resolved_ref says by what). Internal only: a client
+-- account neither reads nor writes these.
+CREATE TABLE IF NOT EXISTS change_request (
+  id             INTEGER PRIMARY KEY AUTOINCREMENT,
+  project_id     TEXT    NOT NULL,
+  -- CR-<number>, counted per project.
+  number         INTEGER NOT NULL,
+  target_kind    TEXT    NOT NULL,
+  target_id      TEXT    NOT NULL,
+  title          TEXT    NOT NULL,
+  problem        TEXT    NOT NULL,
+  -- The passages that show it, quoted - what makes it checkable.
+  evidence       TEXT    NOT NULL DEFAULT '',
+  -- JSON list of the ways it could be settled.
+  options        TEXT    NOT NULL DEFAULT '[]',
+  recommendation TEXT    NOT NULL DEFAULT '',
+  -- Work cannot go on until it is settled.
+  blocking       INTEGER NOT NULL DEFAULT 0,
+  -- The OpenProject work package it came up in, when there was one.
+  external_key   TEXT    NOT NULL DEFAULT '',
+  status         TEXT    NOT NULL DEFAULT 'open',
+  raised_by      INTEGER NOT NULL REFERENCES account(id),
+  raised_at      TEXT    NOT NULL,
+  -- 'claude' when filed through the connector, 'viewer' from the page.
+  raised_via     TEXT    NOT NULL DEFAULT 'viewer',
+  resolution     TEXT    NOT NULL DEFAULT '',
+  -- What closed it: a commit, an ADR, a contract version.
+  resolved_ref   TEXT    NOT NULL DEFAULT '',
+  resolved_by    INTEGER REFERENCES account(id),
+  resolved_at    TEXT,
+  UNIQUE (project_id, number)
+);
+CREATE INDEX IF NOT EXISTS change_request_by_target
+  ON change_request(project_id, target_kind, target_id, status);
+
+-- A change request drafted by Claude and waiting for the person to agree.
+-- Filing takes the one-use code; the draft expires like a work package
+-- proposal does.
+CREATE TABLE IF NOT EXISTS change_draft (
+  id          INTEGER PRIMARY KEY,
+  token_hash  TEXT    NOT NULL UNIQUE,
+  account_id  INTEGER NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+  project_id  TEXT    NOT NULL,
+  payload     TEXT    NOT NULL,
+  created_at  TEXT    NOT NULL,
+  expires_at  TEXT    NOT NULL,
+  filed_at    TEXT
+);
+
 -- A credential this service holds on somebody's behalf, encrypted.
 --
 -- **Its own table, not a column on `account`.** Every other secret here is a

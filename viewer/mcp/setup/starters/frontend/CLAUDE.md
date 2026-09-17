@@ -64,6 +64,21 @@ ADAM is connected for this folder. It holds the screens, journeys and contracts;
 4. `adam_propose` the ticket: **Closed**, 100% (see the statuses below), and a 2-4 line comment on what was built and
    that the checks pass. Show the proposal and **wait for a yes** before `adam_apply`.
 
+## When the package is wrong
+
+If the contract, table, screen or journey you are building from contradicts itself, is wrong, or
+lacks something the ticket needs, **do not settle it in code** - not even with a sensible guess.
+
+1. `adam_changes` for the artefact: somebody may have raised it already. If so, name that CR.
+2. Otherwise `adam_draft_change`: quote the conflicting passages in `evidence`, list the `options`,
+   say which you would pick in `recommendation`, set `blocking` and the `ticket`.
+3. Show the draft and **wait for a yes** before `adam_raise_change`.
+4. If it blocks the ticket, offer to propose the ticket **On hold** with "Blocked by CR-<n>".
+   Build whatever the question does not touch.
+
+Before building against an artefact, check `adam_changes` for an accepted request on it: the
+package may be about to change.
+
 ## Ticket statuses (OpenProject)
 
 | Status | Use it when |
@@ -71,7 +86,7 @@ ADAM is connected for this folder. It holds the screens, journeys and contracts;
 | **New** | Not started. Never set it yourself. |
 | **In progress** | Work has started but is not finished - a build that stopped part-way, or tests still failing. |
 | **Closed** | Done: built as the ticket and its contract describe, and the tests pass. |
-| **On hold** | Blocked on something outside this repository - a missing contract, an unanswered question. Say what in the comment. |
+| **On hold** | Blocked on something outside this repository - a missing contract, an unanswered question, an open change request. Say what in the comment. |
 | **Rejected** | Only when the person says the ticket will not be done. Never on your own. |
 
 Pair the status with % done: In progress 10-90, Closed 100, On hold unchanged.

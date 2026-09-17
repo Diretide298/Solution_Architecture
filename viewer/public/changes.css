@@ -1,0 +1,71 @@
+/* Change requests page. Colours come from the shared tokens, so day and night follow the viewer. */
+
+.changes-main { max-width: 1180px; }
+.cr-lede { margin: 6px 0 0; color: var(--text-dim); max-width: 78ch; line-height: 1.55; }
+.admin-heading .scope-select { margin-left: 12px; font-size: 13px; }
+
+.cr-filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+.cr-filters .signoff-filter { flex: 1 1 220px; min-width: 0; }
+.cr-check { display: inline-flex; gap: 6px; align-items: center; color: var(--text-dim); font-size: 13px; }
+.cr-new-toggle { margin-left: auto; }
+
+.cr-form {
+  display: grid; gap: 10px; margin: 0 0 16px; padding: 14px;
+  border: 1px solid var(--border); border-radius: 10px; background: var(--bg-raised);
+}
+.cr-form label { display: grid; gap: 4px; font-size: 12px; color: var(--text-dim); }
+.cr-form-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+.cr-form-row .cr-grow { flex: 1 1 260px; }
+.cr-form textarea { resize: vertical; font-family: inherit; }
+.cr-narrow { width: 8ch; }
+
+.cr-card {
+  border: 1px solid var(--border); border-left: 4px solid var(--text-faint);
+  border-radius: 8px; margin: 8px 0; background: var(--bg-panel);
+}
+.cr-card.cr-open { border-left-color: var(--warning); }
+.cr-card.cr-accepted { border-left-color: var(--accent); }
+.cr-card.cr-done { border-left-color: var(--ok); }
+.cr-card.cr-rejected { border-left-color: var(--error); }
+
+.cr-summary {
+  display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: baseline;
+  padding: 10px 14px; cursor: pointer; list-style: none;
+}
+.cr-summary::-webkit-details-marker { display: none; }
+.cr-id { font-family: var(--mono); font-weight: 600; color: var(--text); }
+.cr-title { font-weight: 600; color: var(--text); flex: 1 1 280px; min-width: 0; }
+.cr-meta { flex-basis: 100%; color: var(--text-faint); font-size: 12px; overflow-wrap: anywhere; }
+.cr-meta code { font-family: var(--mono); color: var(--text-dim); }
+
+.cr-badge {
+  font-size: 11px; font-weight: 600; padding: 1px 8px; border-radius: 999px;
+  border: 1px solid currentColor;
+}
+.cr-badge-open { color: var(--warning); }
+.cr-badge-accepted { color: var(--accent); }
+.cr-badge-done { color: var(--ok); }
+.cr-badge-rejected { color: var(--error); }
+.cr-badge-blocking { color: var(--error); background: color-mix(in srgb, var(--error) 12%, transparent); }
+
+.cr-body { padding: 0 14px 12px; display: grid; gap: 10px; }
+.cr-label { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-faint); margin-bottom: 2px; }
+.cr-text { margin: 0; color: var(--text); line-height: 1.55; white-space: pre-wrap; }
+.cr-pre {
+  margin: 0; padding: 8px 10px; border-radius: 6px; background: var(--bg);
+  font-family: var(--mono); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--text-dim);
+}
+.cr-options { margin: 0; padding-left: 20px; color: var(--text); }
+
+.cr-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.cr-actions .auth-input { flex: 1 1 220px; min-width: 0; }
+.cr-accept { border-color: var(--ok); color: var(--ok); }
+.cr-reject { border-color: var(--error); color: var(--error); }
+.cr-hint { color: var(--text-faint); font-size: 12px; }
+.cr-empty { color: var(--text-faint); margin: 16px 0; }
+
+@media (max-width: 640px) {
+  .cr-new-toggle { margin-left: 0; }
+  .cr-summary { padding: 10px; }
+  .cr-body { padding: 0 10px 10px; }
+}

@@ -1,5 +1,5 @@
 /**
- * The sixteen tools, and where each gets its answer.
+ * The nineteen tools, and where each gets its answer.
  *
  * **Nine read the package.** They are selectors over bulk payloads, not
  * proxies: there is no `/api/screen?id=BO-102`, so a layer is fetched whole,
@@ -31,6 +31,12 @@
  * returned, after the person has said yes. The change is made as the person,
  * with their own OpenProject token. Assignees, dates and the work packages
  * themselves stay OpenProject's alone (CF-124).
+ *
+ * **Three are about the package being wrong.** `adam_changes` lists and reads
+ * change requests; `adam_draft_change` drafts one when the package contradicts
+ * itself or lacks what a ticket needs, and files nothing; `adam_raise_change`
+ * files the draft after the person has said yes. Settling one is done by people
+ * on ADAM's Changes page, never from here.
  *
  * Screens come from `journeys`, not from `uiux`. `/api/uiux` is about design
  * boards and frames — how much of the product is drawn — and holds no screen
@@ -1125,6 +1131,141 @@ export const TOOLS = [
         logged = `not written: ${error.message}`;
       }
       return { ok: true, changed: true, ...answer.data, ...(logged ? { log: logged } : {}) };
+    },
+  },
+
+  {
+    name: 'adam_changes',
+    description:
+      'The change requests raised against this ADAM project: places where the package (a contract, '
+      + 'table, screen, journey or decision) was found wrong, contradictory or missing something. '
+      + 'With `id` (CR-007), one in full. Otherwise a list, narrowed by `status`, `kind` + `target`, '
+      + 'or `ticket`. **Check this before drafting a new one** - somebody may have raised it already - '
+      + 'and before building against an artefact that has an open or accepted request.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: 'A change request, e.g. CR-007' },
+        status: { type: 'string', description: 'open, accepted, rejected or done; comma-separated for several' },
+        kind: { type: 'string', description: 'Artefact kind, e.g. operation, schema, table, screen, flow' },
+        target: { type: 'string', description: 'Artefact id, e.g. identity#requestGuestCode' },
+        ticket: { type: 'string', description: 'OpenProject work package number' },
+      },
+    },
+    async run(client, { id, status, kind, target, ticket } = {}) {
+      const project = (await client.projectId()) ?? '';
+      if (id) {
+        const answer = await client.service(
+          `/api/changes/${encodeURIComponent(id)}?${new URLSearchParams({ project_id: project })}`);
+        if (!answer.ok) return { found: false, error: answer.data?.detail ?? `HTTP ${answer.status}` };
+        return answer.data;
+      }
+      const query = new URLSearchParams({ project_id: project });
+      if (status) query.set('status', status);
+      if (kind) query.set('target_kind', kind);
+      if (target) query.set('target_id', target);
+      if (ticket) query.set('ticket', String(ticket).replace(/^#/, ''));
+      const answer = await client.service(`/api/changes?${query}`);
+      if (!answer.ok) return { found: false, error: answer.data?.detail ?? `HTTP ${answer.status}` };
+      const { items, ...rest } = answer.data;
+      return {
+        found: items.length > 0,
+        ...rest,
+        items: items.map((c) => ({
+          id: c.id, status: c.status, title: c.title, target: c.target,
+          blocking: c.blocking, ticket: c.ticket, raisedBy: c.raisedBy, raisedAt: c.raisedAt,
+        })),
+        ...(items.length ? {} : { note: 'No change requests match. Nothing has been raised for this yet.' }),
+      };
+    },
+  },
+
+  {
+    name: 'adam_draft_change',
+    description:
+      'Draft a change request for the package - when the contract, table, screen or decision you are '
+      + 'building from contradicts itself, is wrong, or lacks something the ticket needs. **Do not '
+      + 'resolve such a thing in code; draft this instead.** Files nothing: returns the draft, a '
+      + '`draft` code, and any open requests already on the same artefact. Show the person the '
+      + 'draft; call adam_raise_change only if they clearly say yes. Quote the conflicting passages '
+      + 'in `evidence` and give the ways it could be settled in `options`.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        kind: { type: 'string', description: 'contract, operation, schema, table, screen, flow, module, service, adr, platform, state, event or other' },
+        target: { type: 'string', description: 'The artefact, e.g. identity#requestGuestCode or identity:GuestSession' },
+        title: { type: 'string', description: 'One line: what is wrong' },
+        problem: { type: 'string', description: 'What is wrong and why it matters for the build' },
+        evidence: { type: 'string', description: 'The passages that show it, quoted, with where each is' },
+        options: { type: 'array', items: { type: 'string' }, description: 'The ways it could be settled' },
+        recommendation: { type: 'string', description: 'Which option you would pick and why, if any' },
+        blocking: { type: 'boolean', description: 'true when the ticket cannot be finished until it is settled' },
+        ticket: { type: 'string', description: 'The OpenProject work package it came up in' },
+      },
+      required: ['kind', 'target', 'title', 'problem'],
+    },
+    async run(client, args) {
+      const answer = await client.service('/api/changes/drafts', {
+        method: 'POST',
+        body: {
+          project_id: (await client.projectId()) ?? '',
+          target_kind: args.kind ?? '',
+          target_id: args.target ?? '',
+          title: args.title ?? '',
+          problem: args.problem ?? '',
+          evidence: args.evidence ?? '',
+          options: Array.isArray(args.options) ? args.options : [],
+          recommendation: args.recommendation ?? '',
+          blocking: Boolean(args.blocking),
+          ticket: String(args.ticket ?? '').replace(/^#/, ''),
+        },
+      });
+      if (!answer.ok) {
+        const detail = answer.data?.detail;
+        return { ok: false, filed: false, error: typeof detail === 'string' ? detail : JSON.stringify(detail ?? `HTTP ${answer.status}`) };
+      }
+      return {
+        ok: true,
+        filed: false,
+        ...answer.data,
+        next: answer.data.alreadyOpen?.length
+          ? `Tell the person ${answer.data.alreadyOpen.map((c) => c.id).join(', ')} is already open on this; `
+            + 'ask whether theirs is different before filing.'
+          : 'Show the person this draft and ask whether to file it. Only after a clear yes, call '
+            + 'adam_raise_change with the draft code.',
+      };
+    },
+  },
+
+  {
+    name: 'adam_raise_change',
+    description:
+      '**Files a change request in ADAM**, from a draft made by adam_draft_change. Call it only after '
+      + 'the person has seen that draft in this conversation and clearly said yes. Returns its id '
+      + '(CR-007). If the ticket is blocked by it, offer to propose the ticket On hold with the id in '
+      + 'the comment. Draft codes work once and for 30 minutes.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        draft: { type: 'string', description: 'The draft code adam_draft_change returned' },
+      },
+      required: ['draft'],
+    },
+    async run(client, { draft }) {
+      const answer = await client.service(`/api/changes/drafts/${encodeURIComponent(draft ?? '')}/file`, {
+        method: 'POST',
+        body: { project_id: (await client.projectId()) ?? '' },
+      });
+      if (!answer.ok) return { ok: false, filed: false, error: answer.data?.detail ?? `HTTP ${answer.status}` };
+      const change = answer.data.change;
+      return {
+        ok: true,
+        filed: true,
+        change,
+        next: change.blocking && change.ticket
+          ? `Filed as ${change.id}. Offer to propose #${change.ticket} On hold with "Blocked by ${change.id}" as the comment.`
+          : `Filed as ${change.id}. It shows on ADAM's Changes page for the team to settle.`,
+      };
     },
   },
 ];

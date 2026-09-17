@@ -16,6 +16,8 @@
       "mcp__adam__adam_links",
       "mcp__adam__adam_pull",
       "mcp__adam__adam_propose",
+      "mcp__adam__adam_draft_change",
+      "mcp__adam__adam_changes",
       "Bash(pnpm install)",
       "Bash(pnpm lint:*)",
       "Bash(pnpm typecheck:*)",
@@ -28,6 +30,7 @@
     ],
     "ask": [
       "mcp__adam__adam_apply",
+      "mcp__adam__adam_raise_change",
       "mcp__adam__adam_link",
       "Bash(git push:*)"
     ],
