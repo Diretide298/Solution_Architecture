@@ -1,28 +1,33 @@
 <#
 .SYNOPSIS
-    Connects Claude Code on this computer to ADAM, for one code folder.
+    Creates a fresh backend or frontend project folder and connects Claude Code
+    in it to ADAM.
 
 .DESCRIPTION
-    What a developer runs from the connector setup zip. Run it from the code
-    folder whose Claude Code sessions should use ADAM:
+    What a developer runs from the setup zip. The zip holds setup.cmd at the
+    top and everything else in adam-connector\ beside it. Unzip it into the
+    folder the project should be created in and run setup.cmd from there:
 
-        cd C:\work\ticvai-backend
-        C:\Downloads\adam-connector\setup.cmd
+        C:\work\setup.cmd            (or double-click it)
 
     It:
       1. checks that Node.js 22+ and Claude Code are installed,
       2. asks for your ADAM email and password (the password is hidden),
       3. checks that they actually sign in to ADAM - before changing anything,
       4. lists the ADAM projects you can open and asks which one to use,
-      5. asks which folder it is for - the folder it was started from by default,
-      6. copies the connector to %USERPROFILE%\.adam\connector,
-      7. registers it with Claude Code for that folder only,
-      8. and, if you want, runs the full connection test.
+      5. asks whether you are a backend or a frontend developer,
+      6. creates <project>-<role> beside setup.cmd from the matching starter:
+         the code skeleton, CLAUDE.md, .claude\ (permissions and /ticket,
+         /board, /done) and project-bible\setup\ (the coding standards),
+         renamed for the project, as a new git repository,
+      7. copies the connector to %USERPROFILE%\.adam\connector,
+      8. registers it with Claude Code for that folder only,
+      9. and, if you want, runs the full connection test.
 
     Only Claude Code sessions opened in that folder - in VS Code or a terminal -
-    can use ADAM. Every folder is possible, but only when asked for ("all").
-    Run it again from another folder to add that one; running it again for the
-    same folder replaces that folder's setting. uninstall.cmd removes them all.
+    can use ADAM. Pointed at a folder that already has files, setup changes
+    none of them and only connects ADAM there (after a password change, say).
+    uninstall.cmd removes every registration.
 
     ASCII only, on purpose: Windows PowerShell 5.1 reads a script saved without
     a byte-order mark in the machine's ANSI code page, and a dash or a curly
@@ -37,8 +42,13 @@
 .PARAMETER Project
     The ADAM project id (for example ticvai). Asked for when not given.
 
+.PARAMETER Role
+    backend or frontend - which starter a new folder is made from. Asked for when not given.
+
 .PARAMETER Folder
-    The code folder this is for, or "all" for every folder. Asked for when not given.
+    The project folder. A new or empty one is created from the starter; one
+    with files in it is only connected. Asked for when not given. "all"
+    connects every folder and creates nothing.
 
 .PARAMETER Test
     ask (default), yes or no - whether to run the full connection test at the end.
@@ -56,7 +66,10 @@
     Where the connector files go. Leave it as the default.
 
 .EXAMPLE
-    cd C:\work\ticvai-backend; C:\Downloads\adam-connector\setup.cmd
+    C:\work\setup.cmd
+
+.EXAMPLE
+    C:\work\setup.cmd -Project ticvai -Role backend -Folder C:\work\ticvai-backend
 
 .EXAMPLE
     .\setup.ps1 -RemoveFolder C:\work\ticvai-backend
@@ -68,6 +81,8 @@ param(
     [string]$ViewerUrl = 'https://adam.ainfinite.ai',
     [string]$Email = '',
     [string]$Project = '',
+    [ValidateSet('', 'backend', 'frontend')]
+    [string]$Role = '',
     [string]$Folder = '',
     [ValidateSet('ask', 'yes', 'no')]
     [string]$Test = 'ask',
@@ -78,11 +93,21 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-# Where setup was started from, before anything moves: the folder a developer
-# ran it in is the folder they mean. Double-clicked, it is the zip's own folder,
-# which is never a code folder, so then there is no default.
+# Where setup was started from, before anything moves. The new project folder
+# goes there - which, double-clicked, is the folder setup.cmd sits in.
 $LaunchDir = (Get-Location).ProviderPath
 $Here = Split-Path -Parent $MyInvocation.MyCommand.Path
+# The code skeletons, one per role, and the standards documents they share.
+# Only in the zip: the installed copy can connect a folder but not create one.
+$Starters = Join-Path $Here 'starters'
+$Roles = [ordered]@{
+    backend  = [pscustomobject]@{ Label = 'Backend  (.NET 10 API, clean architecture)'; Check = 'dotnet'; Docs = @(
+        'naming-and-style', 'backend-patterns', 'api-conventions', 'quality-gates', 'git-and-mrs',
+        'llm-conventions', 'data-and-storage', 'config-and-secrets', 'dependencies', 'adding-things', 'quickstart') }
+    frontend = [pscustomobject]@{ Label = 'Frontend (Nx workspace: React Native apps and a web app)'; Check = 'pnpm'; Docs = @(
+        'naming-and-style', 'frontend-patterns', 'api-conventions', 'quality-gates', 'git-and-mrs',
+        'llm-conventions', 'data-and-storage', 'config-and-secrets', 'dependencies', 'adding-things', 'quickstart') }
+}
 $Files = @('server.mjs', 'client.mjs', 'tools.mjs', 'mcp-check.mjs')
 # Kept beside the installed connector, so a folder can be removed later
 # without the zip.
@@ -222,6 +247,97 @@ function Show-RemoveHelp($entries) {
             Write-Host "        ($($entry.Folder) only)" -ForegroundColor DarkGray
         }
     }
+}
+
+# ---- starting a project --------------------------------------------------------
+
+# The starters are written for TICVAI. For another project, TICVAI and Ticvai
+# become its name as a code identifier (Greenleaf Demo -> GreenleafDemo) and
+# ticvai becomes its ADAM id (greenleaf-demo), in file names and contents.
+function Get-CodeName($picked) {
+    if (-not $picked.name) { $words = @(($picked.id -split '[^A-Za-z0-9]+') | Where-Object { $_ }) }
+    else { $words = @(($picked.name -split '[^A-Za-z0-9]+') | Where-Object { $_ }) }
+    $name = ($words | ForEach-Object {
+        if ($_ -ceq $_.ToUpper()) { $_ } else { $_.Substring(0, 1).ToUpper() + $_.Substring(1) }
+    }) -join ''
+    if (-not $name) { $name = 'App' }
+    if ($name -match '^[0-9]') { $name = "App$name" }
+    return $name
+}
+
+function Test-EmptyFolder([string]$Path) {
+    if (-not (Test-Path -LiteralPath $Path)) { return $true }
+    if (-not (Test-Path -LiteralPath $Path -PathType Container)) { return $false }
+    return -not (Get-ChildItem -LiteralPath $Path -Force | Select-Object -First 1)
+}
+
+$TextFiles = @('.cs', '.csproj', '.slnx', '.sln', '.json', '.http', '.md', '.ts', '.tsx', '.js', '.cjs',
+    '.mjs', '.yml', '.yaml', '.props', '.targets', '.txt', '.gitignore', '.editorconfig')
+
+function New-ProjectFolder([string]$Target, [string]$RoleName, $picked) {
+    $source = Join-Path $Starters $RoleName
+    if (-not (Test-Path -LiteralPath $source)) {
+        Stop-Setup "The $RoleName starter is missing next to this script. Run setup.cmd from the unzipped folder, not from the installed copy."
+    }
+    New-Item -ItemType Directory -Force -Path $Target | Out-Null
+    # -Force brings the dot-folders too: .claude and .github matter.
+    Copy-Item -Path (Join-Path $source '*') -Destination $Target -Recurse -Force
+
+    $codeName = Get-CodeName $picked
+    $id = $picked.id
+    if ($id -ne 'ticvai') {
+        $utf8 = New-Object System.Text.UTF8Encoding($false)
+        $utf8Bom = New-Object System.Text.UTF8Encoding($true)
+        foreach ($file in @(Get-ChildItem -LiteralPath $Target -Recurse -File -Force)) {
+            if ($file.FullName -like '*\project-bible\*' -or $file.Name -eq 'pnpm-lock.yaml') { continue }
+            if (-not ($TextFiles -contains $file.Extension.ToLower())) { continue }
+            $bytes = [IO.File]::ReadAllBytes($file.FullName)
+            $bom = $bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF
+            $text = [IO.File]::ReadAllText($file.FullName)
+            $new = $text.Replace('TICVAI', $codeName).Replace('Ticvai', $codeName).Replace('ticvai', $id)
+            if ($new -cne $text) {
+                if ($bom) { [IO.File]::WriteAllText($file.FullName, $new, $utf8Bom) }
+                else { [IO.File]::WriteAllText($file.FullName, $new, $utf8) }
+            }
+        }
+        # Deepest first, so a folder is renamed after what is inside it.
+        $named = @(Get-ChildItem -LiteralPath $Target -Recurse -Force |
+            Where-Object { $_.Name -clike '*TICVAI*' } |
+            Sort-Object { $_.FullName.Length } -Descending)
+        foreach ($item in $named) {
+            Rename-Item -LiteralPath $item.FullName -NewName ($item.Name.Replace('TICVAI', $codeName))
+        }
+    }
+
+    # The standards documents for this role, with an index Claude can start from.
+    $bible = Join-Path $Target 'project-bible\setup'
+    New-Item -ItemType Directory -Force -Path $bible | Out-Null
+    $index = @('# Coding standards', '', "What a $RoleName developer on this project reads. CLAUDE.md says in which order.", '')
+    foreach ($doc in $Roles[$RoleName].Docs) {
+        $from = Join-Path $Starters "docs\$doc.md"
+        if (-not (Test-Path -LiteralPath $from)) { continue }
+        Copy-Item -LiteralPath $from -Destination $bible -Force
+        $title = (Get-Content -LiteralPath $from -TotalCount 1) -replace '^#\s*', ''
+        $index += "- [$doc]($doc.md) - $title"
+    }
+    Set-Content -LiteralPath (Join-Path $bible 'README.md') -Value $index -Encoding UTF8
+
+    # A repository of its own, with the starter as its first commit, so
+    # `git diff` shows exactly what was built on top of it.
+    $git = Get-Command git -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($git) {
+        $ErrorActionPreference = 'Continue'
+        & $git.Source -C $Target init -q 2>$null | Out-Null
+        & $git.Source -C $Target add -A 2>$null | Out-Null
+        & $git.Source -C $Target commit -q -m "Start from the ADAM $RoleName starter" 2>$null | Out-Null
+        $committed = $LASTEXITCODE -eq 0
+        $ErrorActionPreference = 'Stop'
+        if ($committed) { Good 'new git repository, with the starter as the first commit' }
+        else { Note 'git repository created; commit the starter yourself (git has no user.name / user.email yet)' }
+    } else {
+        Note 'git is not installed, so this is not a repository yet'
+    }
+    return $codeName
 }
 
 Write-Host ''
@@ -387,43 +503,84 @@ try {
         -WebSession $session -TimeoutSec 15
 } catch { }
 
-# ---- 5. which folder ------------------------------------------------------------
-Step 'Choosing the folder'
-# The folder setup was started from, unless that is somewhere no code lives.
-$default = ''
-$launch = $LaunchDir.TrimEnd('\')
-$notCode = @($Here, $InstallDir, $env:USERPROFILE, $env:windir) | ForEach-Object { "$_".TrimEnd('\') }
-if ($launch -and -not ($notCode -contains $launch) -and -not $launch.StartsWith("$env:windir\", 'OrdinalIgnoreCase') -and
-        $launch -notmatch '^[A-Za-z]:$') {
-    $default = $launch
-}
-Note 'Only Claude Code sessions opened in this folder - in VS Code or a terminal - will be able to use ADAM.'
-if ($default) { Note 'Press Enter for the folder shown, paste another path, or type all for every folder.' }
-else { Note 'Paste the path of your code folder, or type all for every folder.' }
-while ($true) {
-    if (-not $Folder) {
-        if ($default) {
-            $Folder = (Read-Host "   Folder [$default]").Trim().Trim('"')
-            if (-not $Folder) { $Folder = $default }
-        } else {
-            $Folder = (Read-Host '   Folder').Trim().Trim('"')
-            if (-not $Folder) { continue }
+# ---- 5. backend or frontend -----------------------------------------------------
+if ($Folder -ne 'all') {
+    Step 'What you work on'
+    if (-not $Role) {
+        $names = @($Roles.Keys)
+        for ($i = 0; $i -lt $names.Count; $i++) {
+            Write-Host ("     {0}. {1}" -f ($i + 1), $Roles[$names[$i]].Label)
+        }
+        while (-not $Role) {
+            $answer = (Read-Host "   Enter the number [1-$($names.Count)]").Trim()
+            $number = 0
+            if ([int]::TryParse($answer, [ref]$number) -and $number -ge 1 -and $number -le $names.Count) {
+                $Role = $names[$number - 1]
+            } else {
+                Note "Type a number from 1 to $($names.Count)."
+            }
         }
     }
-    if ($Folder -eq 'all') { break }
-    if (Test-Path -LiteralPath $Folder -PathType Container) {
-        $Folder = Get-TrueCase $Folder
-        break
+    Good $Roles[$Role].Label
+    if (-not (Get-Command $Roles[$Role].Check -ErrorAction SilentlyContinue)) {
+        Note "$($Roles[$Role].Check) is not installed. The folder is still created; install it before building."
     }
-    Note "There is no folder at $Folder."
+}
+
+# ---- 6. the project folder ------------------------------------------------------
+Step 'The project folder'
+# Created where setup was started from a terminal. Double-clicked, that is the
+# unzipped adam-setup folder, which somebody will delete one day - so the
+# project goes beside it instead, and beside the folder Windows' Extract All
+# wraps it in, when there is one.
+$unzipped = Split-Path -Parent $Here
+$besideZip = Split-Path -Parent $unzipped
+if ((Split-Path -Leaf $besideZip) -like 'adam-connector-setup*' -and
+        @(Get-ChildItem -LiteralPath $besideZip -Force).Count -eq 1) {
+    $besideZip = Split-Path -Parent $besideZip
+}
+$parent = $LaunchDir.TrimEnd('\')
+$notHere = @($Here, $unzipped, $InstallDir, $env:USERPROFILE, $env:windir) | ForEach-Object { "$_".TrimEnd('\') }
+if (-not $parent -or ($notHere -contains $parent) -or $parent.StartsWith("$env:windir\", 'OrdinalIgnoreCase') -or
+        $parent -match '^[A-Za-z]:$') {
+    $parent = $besideZip
+}
+$default = Join-Path $parent "$Project-$Role"
+$create = $false
+Note 'Only Claude Code sessions opened in this folder - in VS Code or a terminal - will be able to use ADAM.'
+if ($Folder -ne 'all') { Note 'Press Enter to create the folder shown, or paste another path.' }
+while ($true) {
+    if (-not $Folder) {
+        $Folder = (Read-Host "   Folder [$default]").Trim().Trim('"')
+        if (-not $Folder) { $Folder = $default }
+    }
+    if ($Folder -eq 'all') { break }
+    $Folder = [System.IO.Path]::GetFullPath($Folder).TrimEnd('\')
+    if ($Folder -match '^[A-Za-z]:$') { Note 'Not a whole drive - name a folder.'; $Folder = ''; continue }
+    if (Test-EmptyFolder $Folder) { $create = $true; break }
+    if (-not (Test-Path -LiteralPath $Folder -PathType Container)) {
+        Note "$Folder is a file."; $Folder = ''; continue
+    }
+    Note "$Folder already has files in it. Setup will not change them."
+    $reply = (Read-Host '   Connect ADAM to it as it is? [Y/n]').Trim().ToLower()
+    if ($reply -eq '' -or $reply -eq 'y' -or $reply -eq 'yes') { break }
     $Folder = ''
 }
 $scope = 'user'
 $where = ''
-if ($Folder -ne 'all') { $scope = 'local'; $where = $Folder }
-if ($scope -eq 'user') { Good 'every folder' } else { Good $where }
+if ($Folder -ne 'all') {
+    if ($create) {
+        $codeName = New-ProjectFolder $Folder $Role $picked
+        Good "created $Folder from the $Role starter ($codeName)"
+    }
+    $scope = 'local'
+    $where = Get-TrueCase $Folder
+    if (-not $create) { Good "$where (files left as they are)" }
+} else {
+    Good 'every folder'
+}
 
-# ---- 6. put the connector somewhere that stays -------------------------------
+# ---- 7. put the connector somewhere that stays -------------------------------
 Step 'Installing the connector'
 New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
 foreach ($file in ($Files + $Tools)) {
@@ -436,7 +593,7 @@ $server = Join-Path $InstallDir 'server.mjs'
 Good "copied to $InstallDir"
 Note 'You can delete the downloaded zip now - Claude Code uses this copy.'
 
-# ---- 7. tell Claude Code about it --------------------------------------------
+# ---- 8. tell Claude Code about it --------------------------------------------
 Step 'Registering it with Claude Code'
 # Every -e before the --: anything after it is handed to node, which ignores it.
 $envArgs = @('-e', "ADAM_VIEWER_URL=$ViewerUrl", '-e', "ADAM_PROJECT=$Project")
@@ -480,7 +637,7 @@ Write-Ledger $entries
 if ($scope -eq 'user') { Good "registered as '$Name' for every folder, reading $Project" }
 else { Good "registered as '$Name' for $where only, reading $Project" }
 
-# ---- 8. optionally, the full test --------------------------------------------
+# ---- 9. optionally, the full test --------------------------------------------
 $run = $Test
 if ($run -eq 'ask') {
     Write-Host ''
@@ -522,6 +679,17 @@ if ($scope -eq 'user') {
     Write-Host '     or in a terminal:' -NoNewline
     Write-Host "  cd `"$where`"; claude" -ForegroundColor Gray
     Write-Host '     Claude Code sessions in any other folder, or in a subfolder of it, cannot use ADAM.'
+    if ($create -and $Role -eq 'backend') {
+        Write-Host '     Build it once:' -NoNewline
+        Write-Host '  dotnet test' -ForegroundColor Gray
+    } elseif ($create -and $Role -eq 'frontend') {
+        Write-Host '     Install it once:' -NoNewline
+        Write-Host '  pnpm install' -ForegroundColor Gray
+    }
+    if ($create) {
+        Write-Host '     CLAUDE.md, .claude\ and project-bible\setup\ tell Claude how this project works.'
+        Write-Host '     Shortcuts in Claude Code:  /ticket 6046   /board   /done 6046' -ForegroundColor Gray
+    }
 }
 Write-Host "  2. Store your OpenProject token once, so Claude can see your tickets:"
 Write-Host "     $ViewerUrl/settings.html#openproject"

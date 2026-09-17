@@ -18,6 +18,14 @@
       "contracts": "contracts",
       "active": true,
       "note": "The venue platform delivery package — the one this viewer was written for."
+    },
+    {
+      "id": "greenleaf-demo",
+      "name": "Greenleaf Demo",
+      "root": "../demo/package",
+      "contracts": "contracts",
+      "active": true,
+      "note": "A made-up library lending service for demonstrating ADAM end to end. Not connected to TICVAI."
     }
   ]
 }

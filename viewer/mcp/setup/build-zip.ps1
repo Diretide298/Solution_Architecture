@@ -3,10 +3,19 @@
     Builds adam-connector-setup.zip - the file you hand a developer.
 
 .DESCRIPTION
-    Collects the connector (server.mjs, client.mjs, tools.mjs, mcp-check.mjs)
-    and the setup scripts into one folder, stamps the build into the README,
-    and zips it. The zip contains no passwords, tokens or addresses of anybody
-    in particular - it is the same file for everyone.
+    The zip opens to one folder, adam-setup\:
+
+        adam-setup\
+          setup.cmd          what the developer runs
+          uninstall.cmd
+          README.txt
+          adam-connector\    the connector (server.mjs, client.mjs, tools.mjs,
+                             mcp-check.mjs), setup.ps1, and starters\ - the
+                             backend and frontend skeletons and the coding
+                             standards setup copies into a new project folder
+
+    The build is stamped into the README. The zip contains no passwords, tokens
+    or addresses of anybody in particular - it is the same file for everyone.
 
     Rebuild it whenever anything in viewer/mcp changes, and send the new one
     round: running its setup.cmd replaces the installed copy.
@@ -28,7 +37,8 @@ $Repo = Split-Path -Parent (Split-Path -Parent $Mcp)         # the repository ro
 if (-not $Out) { $Out = Join-Path $Repo 'adam-connector-setup.zip' }
 
 $stage = Join-Path ([IO.Path]::GetTempPath()) ("adam-connector-" + [guid]::NewGuid().ToString('N'))
-$folder = Join-Path $stage 'adam-connector'
+$top = Join-Path $stage 'adam-setup'
+$folder = Join-Path $top 'adam-connector'
 New-Item -ItemType Directory -Force -Path $folder | Out-Null
 
 try {
@@ -36,6 +46,17 @@ try {
         Copy-Item -LiteralPath (Join-Path $Mcp $file) -Destination $folder
     }
     Copy-Item -LiteralPath (Join-Path $Here 'setup.ps1') -Destination $folder
+
+    # The starters, without anything a build or an install left behind.
+    $skip = '\\(bin|obj|node_modules|\.nx|dist|coverage|TestResults|\.vs)(\\|$)'
+    $starters = Join-Path $Here 'starters'
+    foreach ($item in Get-ChildItem -LiteralPath $starters -Recurse -Force -File) {
+        $relative = $item.FullName.Substring($starters.Length)
+        if ($relative -match $skip -or $item.Name -like '*.user') { continue }
+        $target = Join-Path (Join-Path $folder 'starters') $relative
+        New-Item -ItemType Directory -Force -Path (Split-Path -Parent $target) | Out-Null
+        Copy-Item -LiteralPath $item.FullName -Destination $target
+    }
 
     # Which build this is, so "which version do you have" has an answer.
     $commit = ''
@@ -55,12 +76,16 @@ try {
         $text = ($text -replace "`r`n", "`n") -replace "`n", "`r`n"
         [IO.File]::WriteAllText($target, $text, (New-Object System.Text.UTF8Encoding($false)))
     }
-    & $crlf (Join-Path $Here 'setup.cmd') (Join-Path $folder 'setup.cmd') $build
-    & $crlf (Join-Path $Here 'uninstall.cmd') (Join-Path $folder 'uninstall.cmd') $build
-    & $crlf (Join-Path $Here 'README.txt') (Join-Path $folder 'README.txt') $build
+    # The launchers at the top, where the developer looks, and beside setup.ps1,
+    # where setup copies them from when it installs itself.
+    foreach ($place in $top, $folder) {
+        & $crlf (Join-Path $Here 'setup.cmd') (Join-Path $place 'setup.cmd') $build
+        & $crlf (Join-Path $Here 'uninstall.cmd') (Join-Path $place 'uninstall.cmd') $build
+    }
+    & $crlf (Join-Path $Here 'README.txt') (Join-Path $top 'README.txt') $build
 
     # The setup script must be plain ASCII (see its header) - checked, not hoped.
-    foreach ($file in Get-ChildItem -LiteralPath $folder -File) {
+    foreach ($file in @(Get-ChildItem -LiteralPath $top -File) + @(Get-ChildItem -LiteralPath $folder -File)) {
         if ($file.Extension -in '.ps1', '.cmd', '.txt') {
             $bytes = [IO.File]::ReadAllBytes($file.FullName)
             if ($bytes | Where-Object { $_ -gt 127 }) {
@@ -69,8 +94,19 @@ try {
         }
     }
 
+    # Written with forward slashes and every dot-file kept, which
+    # Compress-Archive on Windows PowerShell 5.1 does not promise.
     if (Test-Path -LiteralPath $Out) { Remove-Item -LiteralPath $Out -Force }
-    Compress-Archive -Path $folder -DestinationPath $Out
+    Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
+    $zip = [System.IO.Compression.ZipFile]::Open($Out, 'Create')
+    try {
+        foreach ($item in Get-ChildItem -LiteralPath $top -Recurse -Force -File) {
+            $entry = 'adam-setup/' + $item.FullName.Substring($top.Length + 1).Replace('\', '/')
+            [void][System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $item.FullName, $entry, 'Optimal')
+        }
+    } finally {
+        $zip.Dispose()
+    }
     $size = [math]::Round((Get-Item -LiteralPath $Out).Length / 1KB)
     Write-Host "built $Out ($size KB) - $build"
 } finally {

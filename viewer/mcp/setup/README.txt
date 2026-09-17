@@ -1,13 +1,12 @@
-ADAM connector for Claude Code
-==============================
+ADAM setup for Claude Code
+==========================
 
-Lets Claude Code on your computer read a design package in ADAM - screens,
-journeys, API contracts, tables, services, modules and architecture
-decisions - and your OpenProject work, as you. Nothing to clone, nothing to
-build.
+Creates your project folder - backend or frontend - and connects Claude Code
+in it to ADAM, so Claude can read the design package (screens, journeys, API
+contracts, tables, services) and your OpenProject tickets, as you.
 
-It is set up for ONE code folder at a time. Only Claude Code sessions opened
-in that folder - in VS Code or a terminal - can use ADAM.
+Only Claude Code sessions opened in that project folder - in VS Code or a
+terminal - can use ADAM.
 
 Build: {{BUILD}}
 
@@ -19,42 +18,56 @@ BEFORE YOU START
   * Node.js 22 or newer:       winget install --id OpenJS.NodeJS.LTS -e
   * Claude Code:               npm install -g @anthropic-ai/claude-code
     (open a new window after installing, run "claude" once and sign in)
+  * Git:                       winget install --id Git.Git -e
+  * Backend:  the .NET 10 SDK  winget install --id Microsoft.DotNet.SDK.10 -e
+  * Frontend: pnpm             npm install -g pnpm
 
 
 SET IT UP
 ---------
-  1. Unzip this folder anywhere (right-click -> Extract All), for example
-     to C:\Downloads\adam-connector.
-  2. Open PowerShell (or the VS Code terminal) IN YOUR CODE FOLDER - the
-     folder you open in VS Code - and run setup.cmd from there:
+  1. Make a folder for your work, for example C:\work, and unzip this file
+     into it (right-click -> Extract All). You get:
 
-        cd C:\work\ticvai-backend
-        C:\Downloads\adam-connector\setup.cmd
+        C:\work\adam-setup\setup.cmd
+        C:\work\adam-setup\adam-connector\   (leave this folder alone)
 
+  2. Double-click setup.cmd.
   3. Type your ADAM email and password. The password is hidden as you type.
      Setup checks them against ADAM before changing anything.
   4. Pick the ADAM project by number:
 
         1. TICVAI  (ticvai)
-        2. ...
-     Enter the project number [1-2]: 1
+     Enter the project number [1-1]: 1
 
-  5. Setup shows your code folder:   Folder [C:\work\ticvai-backend]:
-     Press Enter. (You can paste a different folder instead, or type all
-     to let every folder use ADAM.)
+  5. Pick what you work on:
 
-  Setup copies the connector to %USERPROFILE%\.adam\connector and registers
-  it with Claude Code for that folder only. It can also run the full
-  connection test for you at the end.
+        1. Backend  (.NET 10 API, clean architecture)
+        2. Frontend (Nx workspace: React Native apps and a web app)
+     Enter the number [1-2]: 1
 
-  6. Open that folder in VS Code (File -> Open Folder) and start Claude Code,
-     then ask:   What's on my board?
+  6. Setup shows the new project folder:   Folder [C:\work\ticvai-backend]:
+     Press Enter. (Or paste another path - a new or empty folder.)
 
-  Claude Code opened in any other folder - including a subfolder of this
-  one - does not see ADAM. For another code folder, run setup from it too.
+  Setup then creates that folder, ready to work in:
 
-  Double-clicking setup.cmd works as well; it then asks you to paste the
-  folder's path.
+     the code skeleton          renamed for your project
+     CLAUDE.md                  how the project is laid out and how to work a ticket
+     .claude\                   permissions, and the /ticket, /board and /done commands
+     project-bible\setup\       the team's coding standards for your role
+     a git repository           with the skeleton as its first commit
+
+  and registers ADAM with Claude Code for that folder only. It can also run
+  the full connection test for you at the end.
+
+  7. Open the new folder in VS Code (File -> Open Folder).
+     Backend:  dotnet test         Frontend:  pnpm install
+     Start Claude Code and ask:   What's on my board?
+
+  Claude Code opened in any other folder - including a parent or a
+  subfolder of the project folder - does not see ADAM.
+
+  Setup.cmd can also be run from a terminal: the folder is then created
+  inside the folder you ran it from.
 
 
 SEE YOUR OPENPROJECT WORK TOO
@@ -67,41 +80,43 @@ SEE YOUR OPENPROJECT WORK TOO
 
 WORKING A TICKET
 ----------------
-  Start Claude Code in your code folder and ask in plain words:
+  In Claude Code, in your project folder:
 
-    What's on my board?
-        Your open tickets in this project, and what each one touches.
+    /board
+        Your open tickets, pulled into .adam\ and summarised by milestone.
 
-    Pull ticket 6046 into this folder.
-        Saves the ticket and every screen, table, contract and decision it
-        is linked to under .adam\work\6046\ - README.md first. Claude reads
-        those files as it needs them. .adam\ is never committed.
+    /ticket 6046
+        Pulls the ticket and every screen, table and contract it is linked
+        to under .adam\work\6046\, builds it, runs the tests, and proposes
+        the OpenProject update. Nothing changes in OpenProject yet.
 
-    Pull my whole board.
-        Every open ticket, plus .adam\board.md grouped by milestone.
+    Yes, apply it.
+        Claude Code asks before it runs the tool that changes OpenProject
+        (adam_apply) - allow it. OpenProject is updated as you, and the
+        change is noted in .adam\work\6046\log.md.
 
-    I have finished 6046 - propose closing it with a comment.
-        Claude shows you exactly what would change in OpenProject. Nothing
-        changes until you say yes. Then it applies it as you, and notes it
-        in .adam\work\6046\log.md.
+    /done 6046
+        When you built it yourself: proposes closing the ticket with a
+        comment from your changes and the test results.
 
+  Plain words work too: "Pull ticket 6046 and build it."
   Your own notes go in .adam\work\<ticket>\notes.md. Pulling again keeps
-  notes.md and log.md and refreshes everything else.
+  notes.md and log.md. .adam\ is never committed.
 
-  Claude Code asks before it runs the tool that changes OpenProject
-  (adam_apply). Do not choose "always allow" for that one.
+  Never choose "always allow" for adam_apply.
 
 
 LATER
 -----
-  * Changed your ADAM password?      Run setup again from each folder.
-  * Got a newer version of this zip? Run its setup.cmd - it replaces the old one.
-  * Another code folder?             Run setup from that folder.
+  * Changed your ADAM password?      Run setup.cmd again and give the same
+                                     project folder; its files are not touched.
+  * Got a newer version of this zip? Run its setup.cmd the same way.
+  * Another project or role?         Run setup.cmd again and pick it.
   * Remove ADAM from one folder, in PowerShell:
         powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.adam\connector\setup.ps1" -RemoveFolder "C:\work\ticvai-backend"
     Setup prints this line, with your own folder, when it finishes.
-  * Remove it everywhere:            Double-click uninstall.cmd (here, or in
-                                     %USERPROFILE%\.adam\connector).
+  * Remove it everywhere:            Double-click uninstall.cmd. Project
+                                     folders are left as they are.
   * Removing your token from ADAM does not revoke it in OpenProject -
     delete it there too.
 
@@ -122,6 +137,10 @@ IF SOMETHING GOES WRONG
   "Your ADAM account cannot open any project yet"
       Ask an ADAM admin to give you access to the project.
 
+  "The ... starter is missing next to this script"
+      Run setup.cmd from the unzipped adam-setup folder, not from
+      %USERPROFILE%\.adam\connector.
+
   "No OpenProject project has been chosen" (from Claude)
       An ADAM admin has not picked which OpenProject project this ADAM
       project reads. Ask them - it is on the admin page, under Projects.
@@ -130,8 +149,8 @@ IF SOMETHING GOES WRONG
       Use setup.cmd rather than setup.ps1 - it allows this one run.
 
   Claude does not list the ADAM tools
-      Make sure VS Code has the folder you set up open - the same folder,
-      not a parent or a subfolder of it. Restart Claude Code. Then, in that
+      Make sure VS Code has the project folder open - the same folder, not
+      a parent or a subfolder of it. Restart Claude Code. Then, in that
       folder's terminal, run:  claude mcp get adam
       It should show ADAM_VIEWER_URL, ADAM_PROJECT, ADAM_EMAIL and
       ADAM_PASSWORD under "Environment". Do not send that output to anyone -
@@ -140,16 +159,18 @@ IF SOMETHING GOES WRONG
 
 WHAT IS IN THIS FOLDER
 ----------------------
-  setup.cmd       run from your code folder to set it up (or to update)
-  uninstall.cmd   double-click to remove ADAM from every folder
-  setup.ps1       what both of those run
-  server.mjs      the connector Claude Code starts
-  client.mjs      how it talks to ADAM
-  tools.mjs       the 16 tools
-  mcp-check.mjs   the connection test
+  setup.cmd        double-click to create a project folder and connect it
+  uninstall.cmd    double-click to remove ADAM from every folder
+  adam-connector\
+    setup.ps1      what both of those run
+    server.mjs     the connector Claude Code starts
+    client.mjs     how it talks to ADAM
+    tools.mjs      the 16 tools
+    mcp-check.mjs  the connection test
+    starters\      the backend and frontend skeletons and coding standards
 
-Setup keeps a copy of setup.ps1, setup.cmd and uninstall.cmd beside the
-installed connector, so you can delete this folder afterwards.
+Setup keeps a copy of the connector and its scripts in
+%USERPROFILE%\.adam\connector, so you can delete this folder afterwards.
 
 Your password is stored in Claude Code's own settings file
 (%USERPROFILE%\.claude.json) and nowhere else. Use an ADAM password you do

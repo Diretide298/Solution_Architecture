@@ -1,0 +1,56 @@
+# TICVAI backend
+
+.NET 10, ASP.NET Core, EF Core on PostgreSQL. Clean architecture:
+
+| Project | Holds | May reference |
+|---|---|---|
+| `src/TICVAI.Domain` | entities, value objects, domain exceptions | nothing |
+| `src/TICVAI.Contracts` | request, response and event types | nothing |
+| `src/TICVAI.Application` | features (use cases), `Result`/`Error`, abstractions | Domain, Contracts |
+| `src/TICVAI.Infrastructure` | EF Core `DbContext`, repositories, external services | Application |
+| `src/TICVAI.Api` | controllers, middleware, `Program.cs` | Application, Contracts, Infrastructure |
+| `tests/TICVAI.UnitTests` | Domain and Application tests (xUnit) | |
+| `tests/TICVAI.IntegrationTests` | tests through the API | |
+| `tests/TICVAI.ArchitectureTests` | the reference rules above | |
+
+```
+dotnet build TICVAI-Backend.slnx
+dotnet test TICVAI-Backend.slnx
+dotnet run --project src/TICVAI.Api        # needs Database:ConnectionString
+```
+
+## Read before writing code
+
+1. `project-bible/setup/naming-and-style.md` - naming per layer, money, time, banned words
+2. `project-bible/setup/backend-patterns.md` - banned APIs, structure, error handling
+3. `project-bible/setup/api-conventions.md` - contract-first rules, errors, paging, versioning
+4. `project-bible/setup/quality-gates.md` - what CI enforces
+5. `project-bible/setup/git-and-mrs.md` - commits and merge requests
+6. `project-bible/setup/llm-conventions.md` - rules for AI-written code
+7. As needed: `data-and-storage.md`, `config-and-secrets.md`, `dependencies.md`, `adding-things.md`
+
+Those documents were written when the platform targeted .NET 8. **This repository is
+.NET 10**; where a document names a version, use 10. Everything else in them applies.
+
+## Hard rules
+
+- A failed operation returns `Result.Failure(new Error(code, message))`; exceptions are for the unexpected.
+  Errors leave the API as `application/problem+json` (see `ExceptionHandlingMiddleware`).
+- Timestamps are UTC `DateTimeOffset`. Never `DateTime.Now`.
+- No secrets or connection strings in source. `appsettings.json` keeps them empty.
+- Every data path is scoped by `ITenantContext`.
+- A contract comes first: build what the ADAM contract says - status codes, error codes, field names.
+
+## Working a ticket (ADAM)
+
+ADAM is connected for this folder. It holds the contracts, tables and screens; OpenProject holds the tickets.
+
+1. `adam_pull` the ticket with `dir` set to this folder. Read `.adam/work/<ticket>/README.md`,
+   then only the linked files it lists. Ask ADAM (`adam_contract`, `adam_table`, `adam_search`)
+   rather than guessing a name or a shape.
+2. Build exactly what the ticket and its linked artefacts describe. Nothing outside the ticket.
+3. Add tests for the success case and each error the contract lists. `dotnet test` must pass.
+4. `adam_propose` the ticket: the done status, 100%, and a 2-4 line comment on what was built and
+   that the tests pass. Show the proposal and **wait for a yes** before `adam_apply`.
+
+`.adam/` is a local copy and is git-ignored. Never commit it.

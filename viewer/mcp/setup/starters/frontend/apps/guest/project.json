@@ -1,0 +1,30 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "guest",
+  "sourceRoot": "apps/guest/src",
+  "projectType": "application",
+  "tags": [
+    "type:app",
+    "platform:react-native"
+  ],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "eslint {projectRoot}/src --ext .ts,.tsx"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vitest run --root {projectRoot} --passWithNoTests"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p apps/guest/tsconfig.json --noEmit"
+      }
+    }
+  }
+}

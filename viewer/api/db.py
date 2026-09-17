@@ -12,6 +12,7 @@ enough to sign in as anyone.
 
 from __future__ import annotations
 
+import json
 import os
 import sqlite3
 from contextlib import contextmanager
@@ -325,6 +326,25 @@ FIRST_PROJECT = "ticvai"
 FIRST_PMS_PROJECT = (153, "ticvai", "TICVAI")
 
 
+# The viewer's package registry. TICVAI_PROJECTS points somewhere else, for a harness.
+PROJECTS_PATH = Path(os.environ.get(
+    "TICVAI_PROJECTS", Path(__file__).parent.parent / "projects.json"))
+
+
+def registered_projects() -> list:
+    """(id, name) for each active entry in projects.json. Empty when the file is
+    missing or unreadable: the accounts service does not need it to run."""
+    try:
+        entries = json.loads(PROJECTS_PATH.read_text(encoding="utf-8")).get("projects") or []
+    except (OSError, ValueError):
+        return []
+    return [
+        (entry["id"], entry.get("name") or entry["id"])
+        for entry in entries
+        if isinstance(entry, dict) and entry.get("id") and entry.get("active", True)
+    ]
+
+
 def connect() -> sqlite3.Connection:
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(DB_PATH, timeout=10)
@@ -497,6 +517,14 @@ def init() -> None:
             "INSERT OR IGNORE INTO project (id, name, active, created_at) VALUES (?, ?, 1, ?)",
             (FIRST_PROJECT, "TICVAI", _stamp()),
         )
+        # Every other package the viewer serves gets a row too, so registering
+        # one in projects.json and restarting is all it takes for an admin to
+        # see it. Existing rows are left alone, name and active flag included.
+        for project_id, name in registered_projects():
+            cur.execute(
+                "INSERT OR IGNORE INTO project (id, name, active, created_at) VALUES (?, ?, 1, ?)",
+                (project_id, name, _stamp()),
+            )
 
         # Which OpenProject project each package reads. Added to stores made
         # before the columns existed; the fresh schema above already has them.

@@ -1,0 +1,5 @@
+@TICVAI.Api_HostAddress = http://localhost:5042
+
+GET {{TICVAI.Api_HostAddress}}/health
+
+###

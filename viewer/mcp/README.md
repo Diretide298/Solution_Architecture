@@ -13,24 +13,35 @@ pulling it to local files, and changing its status once the developer has agreed
 powershell -ExecutionPolicy Bypass -File viewer\mcp\setup\build-zip.ps1
 ```
 
-That writes `adam-connector-setup.zip` (about 33 KB, gitignored) at the repository root. It holds the
-connector files, `setup.cmd`, `uninstall.cmd`, `setup.ps1` and a README, and nothing personal — the
-same file works for everyone. A developer unzips it and runs `setup.cmd` **from the code folder**
-whose Claude Code sessions should use ADAM (`cd C:\work\repo; C:\Downloads\adam-connector\setup.cmd`),
+That writes `adam-connector-setup.zip` (about 220 KB, gitignored) at the repository root, and nothing
+personal — the same file works for everyone. It opens to `adam-setup\`: `setup.cmd`,
+`uninstall.cmd` and a README on top, and `adam-connector\` beside them with the connector files,
+`setup.ps1` and `starters\` — a backend and a frontend skeleton (`setup/starters/backend`,
+`setup/starters/frontend`) and the coding standards (`setup/starters/docs`, copied from
+`ticvai-docs/setup`). A developer unzips it into their work folder and double-clicks `setup.cmd`,
 which:
 
 1. checks for Node.js 22+ and Claude Code,
 2. asks for their ADAM email and password (hidden),
 3. **signs in to ADAM with them before changing anything** — a wrong password stops here,
 4. lists the ADAM projects that account can open (`/api/projects`) and asks for one by number,
-5. asks for the folder, offering the one it was started from (Enter takes it; `all` means every
-   folder; double-clicked, there is no default and a path must be pasted),
-6. copies the connector to `%USERPROFILE%\.adam\connector`,
-7. registers it with `claude mcp add -s local` for that folder only — or `-s user` for `all` —
-   with `ADAM_PROJECT` and `ADAM_WORKDIR` set, reads it back, and removes any every-folder
-   registration an older setup left, so no other session can use ADAM,
-8. optionally runs `mcp-check.mjs` against the live site, and prints the `claude mcp remove`
+5. asks **backend or frontend**,
+6. offers `<work folder>\<project>-<role>` — beside `adam-setup`, or inside the folder it was run
+   from in a terminal — and **creates it from the starter**: the skeleton with TICVAI renamed to
+   the project (`Greenleaf Demo` → `GreenleafDemo`, `ticvai` → `greenleaf-demo`), `CLAUDE.md`,
+   `.claude\` (permissions with `adam_apply` always asking, and `/ticket`, `/board`, `/done`), the
+   role's standards in `project-bible\setup\` (not renamed), and a git repository with the
+   starter as its first commit. A folder that already has files is only connected, never changed,
+7. copies the connector to `%USERPROFILE%\.adam\connector` (without the starters: the installed
+   copy can reconnect and remove, not create),
+8. registers it with `claude mcp add -s local` for that folder only — or `-s user` for
+   `-Folder all` — with `ADAM_PROJECT` and `ADAM_WORKDIR` set, reads it back, and removes any
+   every-folder registration an older setup left, so no other session can use ADAM,
+9. optionally runs `mcp-check.mjs` against the live site, and prints the `claude mcp remove`
    line for each registration it holds.
+
+The starters are checked, not assumed: the backend builds and passes `dotnet test` on .NET 10,
+renamed or not, and the frontend passes `pnpm install`, `lint`, `typecheck` and `test`.
 
 **One registration per folder, and two spellings of each.** Claude Code files a `local`
 registration under the folder it was run in, *as spelled*: VS Code starts it in `c:\work\repo`
@@ -40,7 +51,7 @@ letter to upper case — and starts Claude Code with `ProcessStartInfo.WorkingDi
 It also starts npm's `bin\claude.exe` directly rather than `claude.cmd`, so Command Prompt never
 sees the password: any character works, including `"`, `&`, `%` and a trailing `\`.
 
-A developer on two packages runs setup from each checkout. Setup keeps a ledger of what it
+A developer on two projects or roles runs setup once for each. Setup keeps a ledger of what it
 registered in `registrations.txt` beside the installed connector, with copies of `setup.ps1`,
 `setup.cmd` and `uninstall.cmd`; `setup.ps1 -RemoveFolder <path>` removes one folder (both
 spellings), and `uninstall.cmd` removes every registration and the files. A session opened on
@@ -132,10 +143,11 @@ deliberately: a shared credential attributes every change to a robot, and the hi
 a PMS is for.
 
 **`adam_pull` keeps the conversation small.** A ticket, its description and milestone, and
-one JSON file per linked artefact (plus the ADR's own text) go to `.adam/work/<key>/` in the
+one JSON file per linked artefact go to `.adam/work/<key>/` in the
 folder Claude is working in — `dir` from the call, else `ADAM_WORKDIR` (setup sets it for a
 folder registration), else the server's own folder. Claude then reads `README.md` and opens
-only the files it needs. `.adam/` writes its own `.gitignore` of `*`. Pulling again replaces
+only the files it needs. Linked decisions are listed, not pulled; `adam_decisions` answers
+them when a build needs one. `.adam/` writes its own `.gitignore` of `*`. Pulling again replaces
 everything except `notes.md` (the developer's) and `log.md` (applied changes). It refuses a
 drive root and a folder that does not exist.
 

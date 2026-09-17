@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/TICVAI.Api/TICVAI.Api.csproj" />
+    <Project Path="src/TICVAI.Application/TICVAI.Application.csproj" />
+    <Project Path="src/TICVAI.Contracts/TICVAI.Contracts.csproj" />
+    <Project Path="src/TICVAI.Domain/TICVAI.Domain.csproj" />
+    <Project Path="src/TICVAI.Infrastructure/TICVAI.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/TICVAI.ArchitectureTests/TICVAI.ArchitectureTests.csproj" />
+    <Project Path="tests/TICVAI.IntegrationTests/TICVAI.IntegrationTests.csproj" />
+    <Project Path="tests/TICVAI.UnitTests/TICVAI.UnitTests.csproj" />
+  </Folder>
+</Solution>

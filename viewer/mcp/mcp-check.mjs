@@ -74,9 +74,21 @@ function open() {
     stderr,
     send(method, params) {
       const id = nextId++;
+      // A tool call can wait on OpenProject, which the accounts service gives
+      // 20 seconds per request. Waiting the same 20 here threw away the very
+      // message that says what went wrong, so a tool call gets well past it.
+      // A call that still never answers is a FAIL line, not a crash that hides
+      // every check after it.
+      const limit = method === 'tools/call' ? 90_000 : 20_000;
       const answer = new Promise((resolve, reject) => {
         waiting.set(id, resolve);
-        setTimeout(() => reject(new Error(`timed out waiting for ${method}`)), 20_000).unref();
+        setTimeout(() => {
+          if (!waiting.delete(id)) return;
+          if (method !== 'tools/call') return reject(new Error(`timed out waiting for ${method}`));
+          const what = `${params?.name ?? 'a tool'} answers within ${limit / 1000} seconds`;
+          fail(what, 'no answer at all; ADAM or OpenProject is very slow or unreachable');
+          resolve({ result: { content: [{ text: JSON.stringify({ timedOut: true }) }] } });
+        }, limit).unref();
       });
       child.stdin.write(`${JSON.stringify({ jsonrpc: '2.0', id, method, params })}\n`);
       return answer;

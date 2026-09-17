@@ -165,7 +165,7 @@ function lookupFor(kind, id) {
 
 const json = (value) => `${JSON.stringify(value, null, 2)}\n`;
 
-function ticketReadme(wp, files, missing, when) {
+function ticketReadme(wp, files, missing, when, decisions = []) {
   const line = (label, value) => (value || value === 0 ? `- **${label}:** ${value}\n` : '');
   let out = `# #${wp.key} ${wp.subject}\n\n`;
   out += line('Project', wp.project) + line('Type', wp.type) + line('Status', wp.status)
@@ -178,10 +178,14 @@ function ticketReadme(wp, files, missing, when) {
   if (wp.descriptionTrimmed) out += '\n_Longer in OpenProject - open the link above for the rest._\n';
   out += `\n## What this touches (${files.length})\n\n`;
   if (files.length) {
-    for (const f of files) out += `- ${f.kind} \`${f.id}\` - [${f.file}](${f.file})${f.source ? ` and [${f.source}](${f.source})` : ''}\n`;
+    for (const f of files) out += `- ${f.kind} \`${f.id}\` - [${f.file}](${f.file})\n`;
   } else {
     out += 'Nothing is linked to this ticket yet. Find what it is about with adam_search, record it '
       + 'with adam_link, then run adam_pull again.\n';
+  }
+  if (decisions.length) {
+    out += `\nDecisions linked but not pulled: ${decisions.map((d) => `\`${d}\``).join(', ')}. `
+      + 'Ask adam_decisions if the build needs one.\n';
   }
   if (missing.length) {
     out += `\nLinked but not found in the package: ${missing.map((m) => `${m.kind} \`${m.id}\``).join(', ')}.\n`;
@@ -209,27 +213,21 @@ async function pullOne(client, key, base, when) {
 
   const files = [];
   const missing = [];
+  // Decisions are not pulled: building a ticket needs the contracts and tables
+  // it touches, and an ADR is background that adam_decisions answers on demand.
+  const decisions = touches.filter((t) => t.kind === 'adr').map((t) => t.id);
   for (const { kind, id } of touches) {
+    if (kind === 'adr') continue;
     const [toolName, args] = lookupFor(kind, id);
     const result = await BY_NAME.get(toolName).run(client, args).catch((error) => ({ found: false, error: error.message }));
     const file = `${safeName(kind)}-${safeName(id)}.json`;
     await writeFile(path.join(folder, file), json({ kind, id, from: toolName, ...result }));
-    const entry = { kind, id, file };
     if (result.found === false) missing.push({ kind, id });
-    // An ADR's argument is its prose, so its source comes too.
-    const adrFile = kind === 'adr' ? (result.adr?.file ?? result.decision?.file) : null;
-    if (adrFile) {
-      const source = await BY_NAME.get('adam_file').run(client, { path: adrFile, lines: 2000 }).catch(() => null);
-      if (source?.found) {
-        entry.source = `${safeName(kind)}-${safeName(id)}.md`;
-        await writeFile(path.join(folder, entry.source), source.text);
-      }
-    }
-    files.push(entry);
+    files.push({ kind, id, file });
   }
 
   await writeFile(path.join(folder, 'ticket.json'), json({ pulledAt: when, workPackage: wp, touches }));
-  await writeFile(path.join(folder, 'README.md'), ticketReadme(wp, files, missing, when));
+  await writeFile(path.join(folder, 'README.md'), ticketReadme(wp, files, missing, when, decisions));
   const notes = path.join(folder, 'notes.md');
   if (!(await stat(notes).catch(() => null))) {
     await writeFile(notes, `# Notes on #${wp.key}\n\nYours. adam_pull never overwrites this file.\n`);
@@ -979,7 +977,7 @@ export const TOOLS = [
       'Save a ticket and everything it is linked to as files in the working folder, under '
       + '.adam/work/<ticket>/: README.md (the ticket, its milestone and description, and a list of '
       + 'the files), ticket.json, one file per linked screen, journey, contract, table, service, '
-      + 'module and ADR (with the ADR text), plus notes.md for your own notes. With no `key`, pulls '
+      + 'and module (linked ADRs are listed, not pulled), plus notes.md for your own notes. With no `key`, pulls '
       + 'every open ticket assigned to you and writes .adam/board.md grouped by milestone. **Use '
       + 'this at the start of work on a ticket**, then read the files you need instead of holding '
       + 'everything in the conversation. Always pass `dir`: the absolute path of the folder you are '
