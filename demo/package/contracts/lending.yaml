@@ -1,0 +1,222 @@
+openapi: 3.1.0
+info:
+  title: Greenleaf Library - Lending
+  version: 1.0.0
+  description: |
+    Lending for Greenleaf, a small community library. Members borrow books and
+    return them. This is the ADAM demo package and has nothing to do with any
+    client project.
+
+    Rules every endpoint follows:
+    - Errors are `application/problem+json` with a `code` a client can switch on.
+    - Dates are ISO 8601 strings in UTC.
+    - Ids are strings: books `bk_…`, members `mb_…`, loans `ln_…`.
+tags:
+  - name: Books
+  - name: Loans
+paths:
+  /books:
+    get:
+      operationId: listBooks
+      tags: [Books]
+      summary: List books with how many copies are on the shelf
+      responses:
+        '200':
+          description: Every book in the catalogue.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Book' }
+  /books/{bookId}:
+    get:
+      operationId: getBook
+      tags: [Books]
+      summary: One book
+      parameters:
+        - $ref: '#/components/parameters/BookId'
+      responses:
+        '200':
+          description: The book.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Book' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /loans:
+    post:
+      operationId: borrowBook
+      tags: [Loans]
+      summary: Borrow a book
+      description: |
+        A member borrows one copy of a book.
+
+        Business rules, checked in this order:
+        1. The member must exist, else 404 `member_not_found`.
+        2. The book must exist, else 404 `book_not_found`.
+        3. A member may hold at most **3** active loans, else 409 `loan_limit_reached`.
+        4. The book must have at least one available copy, else 409 `no_copies_available`.
+
+        On success one copy is taken off the shelf (`availableCopies` goes down by
+        one), and the loan is `active`, due **14 days** after `borrowedAt`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BorrowRequest' }
+      responses:
+        '201':
+          description: The loan that was created.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Loan' }
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: The loan is not allowed right now.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+  /loans/{loanId}/return:
+    post:
+      operationId: returnBook
+      tags: [Loans]
+      summary: Return a borrowed book
+      description: |
+        Marks an active loan `returned`, sets `returnedAt`, and puts the copy
+        back on the shelf. Returning a loan twice is 409 `already_returned`.
+      parameters:
+        - name: loanId
+          in: path
+          required: true
+          schema: { type: string, example: ln_0001 }
+      responses:
+        '200':
+          description: The returned loan.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Loan' }
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Already returned.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+  /members/{memberId}/loans:
+    get:
+      operationId: listMemberLoans
+      tags: [Loans]
+      summary: A member's loans
+      description: |
+        Every loan the member has, newest `borrowedAt` first. `?status=active`
+        or `?status=returned` narrows it; any other value is 400
+        `invalid_request`. An unknown member is 404 `member_not_found`.
+        Each active loan whose `dueAt` is before now carries `overdue: true`.
+      parameters:
+        - name: memberId
+          in: path
+          required: true
+          schema: { type: string, example: mb_0001 }
+        - name: status
+          in: query
+          required: false
+          schema: { type: string, enum: [active, returned] }
+      responses:
+        '200':
+          description: The member's loans.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/Loan' }
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  parameters:
+    BookId:
+      name: bookId
+      in: path
+      required: true
+      schema: { type: string, example: bk_0001 }
+  responses:
+    BadRequest:
+      description: The body is missing a field or has the wrong type. `code` is `invalid_request`.
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+    NotFound:
+      description: Something named in the request does not exist.
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+  schemas:
+    Book:
+      type: object
+      required: [id, title, author, totalCopies, availableCopies]
+      properties:
+        id: { type: string, example: bk_0001 }
+        title: { type: string }
+        author: { type: string }
+        totalCopies: { type: integer, minimum: 0 }
+        availableCopies:
+          type: integer
+          minimum: 0
+          description: Copies on the shelf now. Never above totalCopies, never below 0.
+    BorrowRequest:
+      type: object
+      required: [memberId, bookId]
+      additionalProperties: false
+      properties:
+        memberId: { type: string, example: mb_0001 }
+        bookId: { type: string, example: bk_0001 }
+    Loan:
+      type: object
+      required: [id, memberId, bookId, status, borrowedAt, dueAt]
+      properties:
+        id: { type: string, example: ln_0001 }
+        memberId: { type: string }
+        bookId: { type: string }
+        status:
+          type: string
+          enum: [active, returned]
+        borrowedAt: { type: string, format: date-time }
+        dueAt:
+          type: string
+          format: date-time
+          description: borrowedAt plus 14 days.
+        returnedAt:
+          type: [string, 'null']
+          format: date-time
+        overdue:
+          type: boolean
+          description: Only on listMemberLoans. True for an active loan past dueAt.
+    Problem:
+      type: object
+      required: [status, code, title]
+      properties:
+        status: { type: integer }
+        code:
+          type: string
+          enum:
+            - invalid_request
+            - member_not_found
+            - book_not_found
+            - loan_not_found
+            - loan_limit_reached
+            - no_copies_available
+            - already_returned
+        title: { type: string }
+        detail: { type: string }

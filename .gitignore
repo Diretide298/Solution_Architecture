@@ -83,7 +83,8 @@ ticvai/_review-*/
 # Worked on locally in Claude Design; not part of the package or of ADAM.
 /Mobile app design brief/
 /pitchdeck/
-/demo/
+/demo/*
+!/demo/package/
 /video/
 # Office lock files (~$Name.docx) left behind while a document is open.
 ~$*
