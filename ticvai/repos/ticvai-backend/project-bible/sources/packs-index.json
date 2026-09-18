@@ -1,0 +1,4630 @@
+{
+ "generatedBy": "tools/index-packs.py",
+ "generated": "2026-09-18",
+ "note": "One record per client document under `sources/`, keyed by content hash. **The folder a document sat in was the only record of what it meant** \u2014 this makes that a field. `authority` keeps every rank any location gave it, and `platforms` is derived twice from independent evidence: `platformsConfirmed` is where the contracts and the pack's own screens agree.",
+ "counts": {
+  "documents": 116,
+  "duplicateSets": 30,
+  "redundantBytes": 102011045,
+  "drafted": 17,
+  "undrafted": 99,
+  "withPlatform": 23,
+  "platformConfirmed": 17,
+  "authorityConflicts": 29,
+  "reusedFromCache": 116
+ },
+ "undraftedDocuments": [
+  "526be657-fcbb-4a33-a048-ca1f00c91ac9.png",
+  "ACCREDITATION.pdf",
+  "AI_Configuration_Assistant_Reference.pdf",
+  "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
+  "AI_Governance_Reference.pdf",
+  "Approval_Workflows_and_Governance_Reference.pdf",
+  "Ch01_Executive_Overview_v1_4.docx",
+  "Ch02_Technical_Architecture_v1_4.docx",
+  "Ch03_Functional_Domain_Coverage_v1_4.docx",
+  "Ch04_Finance_and_Commerce_v1_4.docx",
+  "Ch05_AI_and_Intelligence_v1_4.docx",
+  "Ch06_Integrations_and_Infrastructure_v1_4.docx",
+  "Ch07_Security_Offline_Mobile_v1_4.docx",
+  "Ch08_Implementation_and_Delivery_v1_4.docx",
+  "Ch09_Platform_Vision_v1_4.docx",
+  "Dev01_Engineering_Handbook_v1_0.docx",
+  "Dev02_Repository_Structure_and_Contract_Pipeline_v1_0.docx",
+  "Dev03_Local_Development_Environment_v1_0.docx",
+  "Digital Asset Management DAM.pdf",
+  "Email_Attachments_TICVAI.xlsx",
+  "Email_Attachments_TICVAI.xlsx",
+  "Entitlement Lifecycle.pdf",
+  "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
+  "F&B Dashboard Screens v1.0.pdf",
+  "F&B_Backend_Structure_Module Sample Reference v1.0.pdf",
+  "F_B_Backend_Structure_Module_Sample_Reference_v1_0.pdf",
+  "Game_and_Ride_Module.pdf",
+  "Inventory_Procurement_Dashboard_Screens.pdf",
+  "Marketing_CRM_Configuration_Reference v1.0.pdf",
+  "Marketing_CRM_Dashboard_Screens v1.0.pdf",
+  "MoM_FnB_Retail_Procurement_Inventory_18Aug2026.docx",
+  "MultiTenant_Hierarchy_Diagram.png",
+  "Payment_Payment_Orchestration.pdf",
+  "Rental_Management.pdf",
+  "Resource_Management_Configuration_Reference.pdf",
+  "Resource_Management_Configuration_Reference.pdf",
+  "Retail_Backend_Structure_Module_Reference_v1.0.pdf",
+  "Retail_Backend_Structure_Module_Reference_v1_0.pdf",
+  "Retail_Dashboard_Screens_Only.pdf",
+  "Sample - Technical Product Sheet.xlsx",
+  "Sample-Ampitheater Seating.pdf",
+  "Seat_Management_Dashboard_Screens_Reference.pdf",
+  "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+  "Seating Manifest.xlsx",
+  "Seating_Manifest_1.xlsx",
+  "Subscription_Licensing_AI_Self_Service.pdf",
+  "TAIS Platform RFP From Miracle Star Trading.pdf",
+  "TAIS_Product_Planning_and_Delivery_Plan_4_1.xlsx",
+  "Ticketing_Platform_Native_Dashboard_Visualization_Requirements.pdf",
+  "TICVAI Finance Backend Structure Reference v1.0.pdf",
+  "Ticvai matrix 20260621 (2) 2.xlsx",
+  "TICVAI_BackendDeepDive_MoM_07Aug2026.docx",
+  "Ticvai_Design_Vision_Book_v1_1.pdf",
+  "TICVAI_Discry_Wrkshp_Day_1_Jul_28_2026.docx",
+  "TICVAI_Employee_App_UI_Reference_1.pdf",
+  "TICVAI_FnB_POS_Visual_Reference_Revised.pdf",
+  "TICVAI_Followup_MoM_31Jul2026.docx",
+  "TICVAI_Hardware_Integration v1.0.xlsx",
+  "TICVAI_Inventory_and_Procurement_Backend_Structure_Sample v1.0.pdf",
+  "TICVAI_Inventory_and_Procurement_Backend_Structure_Sample_v1_0.pdf",
+  "TICVAI_Kickoff_MoM_12Aug2026.docx",
+  "TICVAI_Kickoff_MoM_2026-08-05.docx",
+  "TICVAI_Kickoff_MoM_2026-08-10.docx",
+  "TICVAI_Kickoff_MoM_30Jul2026__2_.docx",
+  "Ticvai_matrix_20260621_2.xlsx",
+  "TICVAI_MoM_2026-08-14.docx",
+  "TICVAI_MoM_2026-08-19_FnB_Retail_Procurement_Inventory.docx",
+  "TICVAI_MoM_2026-08-20_CRM_Marketing_CMS.docx",
+  "TICVAI_MoM_2026-08-21_Seat_Management_CMS.docx",
+  "TICVAI_MoM_2026-08-24_Infra_Cost_Ticketing.docx",
+  "TICVAI_MoM_2026-08-25_Ticketing_ProductConfig.docx",
+  "TICVAI_MoM_2026-08-26_ResourceManagement.docx",
+  "TICVAI_MoM_2026-08-27_WalletConfiguration.docx",
+  "TICVAI_MoM_2026-08-31_CS_B2B_Groups_Waivers_SalesChannel.docx",
+  "TICVAI_MoM_2026-09-01_Pricing_Upgrades_Media_Reservations_Resale.docx",
+  "TICVAI_MoM_2026-09-02_AccessControl.docx",
+  "TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue.docx",
+  "TICVAI_MoM_2026-09-08_BI_Reporting_ApprovalWorkflow.docx",
+  "TICVAI_MoM_2026-09-09_Rental_POS_Licensing.docx",
+  "TICVAI_MoM_2026-09-10_LicensingSubscription.docx",
+  "TICVAI_MoM_2026-09-11_DAM_Gaming.docx",
+  "TICVAI_MoM_2026-09-15_GuestAppReview_DeviceManagement.docx",
+  "TICVAI_MoM_31Jul2026__1_.docx",
+  "TICVAI_POS_Frontline_Dashboard Screens Reference v1.0.pdf",
+  "TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference.pdf",
+  "TICVAI_Resource_Management_All_Screens v1.0.pdf",
+  "TICVAI_Task_Track_From_Workshops.xlsx",
+  "TICVAI_Task_Track_From_Workshops_1.xlsx",
+  "TICVAI_Task_Tracker.xlsx",
+  "TICVAI_Ticket_Types_Dashboard_Screens_High_Resolution.pdf",
+  "TICVAI_Ticket_Types_Product_Configuration_Scope_of_Work_v1.0.pdf",
+  "TICVAI_Ticketing_Configuration_Reference v1.0.jpeg",
+  "TICVAI_Ticketing_Configuration_Reference_v1_0.jpeg",
+  "TICVAI_UIUX_MoM_03Aug2026.docx",
+  "TICVAI_White_Label_Guest_App_UI_Reference_1.pdf",
+  "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
+  "Upsell,CrossSellEngine.pdf",
+  "Virtual_Queue.pdf",
+  "Wallet_Configuration_Backend_Structure_v1.0.pdf"
+ ],
+ "authorityConflicts": [
+  {
+   "document": "Access Control Module_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "heldIn": [
+    "packs",
+    "workshop"
+   ]
+  },
+  {
+   "document": "Approval_Workflows_and_Governance_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "heldIn": [
+    "packs",
+    "workshop"
+   ]
+  },
+  {
+   "document": "B2B, Reseller & OTA Partner Management_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "heldIn": [
+    "packs",
+    "workshop"
+   ]
+  },
+  {
+   "document": "Communication & Notification Platform Services_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "heldIn": [
+    "packs",
+    "workshop"
+   ]
+  },
+  {
+   "document": "Customer Service_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "heldIn": [
+    "packs",
+    "workshop"
+   ]
+  },
+  {
+   "document": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
+   "authority": [
+    "requirement",
+    "reference"
+   ],
+   "heldIn": [
+    "packs",
+    "requirements"
+   ]
+  },
+  {
+   "document": "F&B Dashboard Screens v1.0.pdf",
+   "authority": [
+    "board",
+    "reference"
+   ],
+   "heldIn": [
+    "boards",
+    "packs"
+   ]
+  },
+  {
+   "document": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "heldIn": [
+    "packs",
+    "workshop"
+   ]
+  },
+  {
+   "document": "Membership___Annual_Pass_Management_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "heldIn": [
+    "packs",
+    "workshop"
+   ]
+  },
+  {
+   "document": "Order___Reservation_Management_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "heldIn": [
+    "packs",
+    "workshop"
+   ]
+  },
+  {
+   "document": "Pricing___Revenue_Management_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "heldIn": [
+    "packs",
+    "workshop"
+   ]
+  },
+  {
+   "document": "Privacy__Consent___Preference_Management_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "heldIn": [
+    "packs",
+    "workshop"
+   ]
+  },
+  {
+   "document": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "heldIn": [
+    "packs",
+    "workshop"
+   ]
+  },
+  {
+   "document": "Promotions___Bundles_Management_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "heldIn": [
+    "packs",
+    "workshop"
+   ]
+  },
+  {
+   "document": "Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "heldIn": [
+    "packs",
+    "workshop"
+   ]
+  },
+  {
+   "document": "Sales_Channel_Management_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "heldIn": [
+    "packs",
+    "workshop"
+   ]
+  },
+  {
+   "document": "Sample - Technical Product Sheet.xlsx",
+   "authority": [
+    "requirement",
+    "reference"
+   ],
+   "heldIn": [
+    "packs",
+    "requirements"
+   ]
+  },
+  {
+   "document": "Sample-Ampitheater Seating.pdf",
+   "authority": [
+    "requirement",
+    "document"
+   ],
+   "heldIn": [
+    "documents",
+    "requirements"
+   ]
+  },
+  {
+   "document": "TAIS Platform RFP From Miracle Star Trading.pdf",
+   "authority": [
+    "rfp",
+    "document"
+   ],
+   "heldIn": [
+    "documents",
+    "rfp"
+   ]
+  },
+  {
+   "document": "Ticket Resale Marketplace_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "heldIn": [
+    "packs",
+    "workshop"
+   ]
+  },
+  {
+   "document": "Ticket Upgrade, Exchange & Conversion_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "heldIn": [
+    "packs",
+    "workshop"
+   ]
+  },
+  {
+   "document": "Ticket_Media___Credential_Management_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "heldIn": [
+    "packs",
+    "workshop"
+   ]
+  },
+  {
+   "document": "Ticvai matrix 20260621 (2) 2.xlsx",
+   "authority": [
+    "requirement",
+    "document"
+   ],
+   "heldIn": [
+    "documents",
+    "requirements"
+   ]
+  },
+  {
+   "document": "TICVAI_POS_Frontline_Dashboard Screens Reference v1.0.pdf",
+   "authority": [
+    "board",
+    "reference"
+   ],
+   "heldIn": [
+    "boards",
+    "packs"
+   ]
+  },
+  {
+   "document": "TICVAI_Resource_Management_All_Screens v1.0.pdf",
+   "authority": [
+    "board",
+    "reference"
+   ],
+   "heldIn": [
+    "boards",
+    "packs"
+   ]
+  },
+  {
+   "document": "TICVAI_Ticket_Types_Dashboard_Screens_High_Resolution.pdf",
+   "authority": [
+    "requirement",
+    "board"
+   ],
+   "heldIn": [
+    "boards",
+    "requirements"
+   ]
+  },
+  {
+   "document": "TICVAI_Ticket_Types_Product_Configuration_Scope_of_Work_v1.0.pdf",
+   "authority": [
+    "requirement",
+    "reference"
+   ],
+   "heldIn": [
+    "packs",
+    "requirements"
+   ]
+  },
+  {
+   "document": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "heldIn": [
+    "packs",
+    "workshop"
+   ]
+  },
+  {
+   "document": "Waiver, Consent & Digital Form Management_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "heldIn": [
+    "packs",
+    "workshop"
+   ]
+  }
+ ],
+ "removed": [
+  "sources/boards/FB_Dashboard_Screens_v1_0.pdf",
+  "sources/boards/Inventory_Procurement_Dashboard_Screens.pdf",
+  "sources/boards/Retail_Dashboard_Screens_Only.pdf",
+  "sources/boards/TICVAI_POS_Frontline_Dashboard_Screens_Reference_v1_0.pdf",
+  "sources/boards/TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference.pdf",
+  "sources/boards/TICVAI_Resource_Management_All_Screens_v1_0.pdf",
+  "sources/boards/TICVAI_Ticket_Types_Dashboard_Screens_High_Resolution.pdf",
+  "sources/designs/526be657-fcbb-4a33-a048-ca1f00c91ac9.png",
+  "sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf",
+  "sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf",
+  "sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf",
+  "sources/diagrams/MultiTenant_Hierarchy_Diagram.png",
+  "sources/documents/Ch01_Executive_Overview_v1_4.docx",
+  "sources/documents/Ch02_Technical_Architecture_v1_4.docx",
+  "sources/documents/Ch03_Functional_Domain_Coverage_v1_4.docx",
+  "sources/documents/Ch04_Finance_and_Commerce_v1_4.docx",
+  "sources/documents/Ch05_AI_and_Intelligence_v1_4.docx",
+  "sources/documents/Ch06_Integrations_and_Infrastructure_v1_4.docx",
+  "sources/documents/Ch07_Security_Offline_Mobile_v1_4.docx",
+  "sources/documents/Ch08_Implementation_and_Delivery_v1_4.docx",
+  "sources/documents/Ch09_Platform_Vision_v1_4.docx",
+  "sources/documents/Dev01_Engineering_Handbook_v1_0.docx",
+  "sources/documents/Dev02_Repository_Structure_and_Contract_Pipeline_v1_0.docx",
+  "sources/documents/Dev03_Local_Development_Environment_v1_0.docx",
+  "sources/documents/Email_Attachments_TICVAI.xlsx",
+  "sources/documents/Sample-Ampitheater Seating.pdf",
+  "sources/documents/Seating Manifest.xlsx",
+  "sources/documents/TAIS Platform RFP From Miracle Star Trading.pdf",
+  "sources/documents/TICVAI_Hardware_Integration v1.0.xlsx",
+  "sources/documents/Ticvai matrix 20260621 (2) 2.xlsx",
+  "sources/mom/MoM_FnB_Retail_Procurement_Inventory_18Aug2026.docx",
+  "sources/mom/TICVAI_BackendDeepDive_MoM_07Aug2026.docx",
+  "sources/mom/TICVAI_Discry_Wrkshp_Day_1_Jul_28_2026.docx",
+  "sources/mom/TICVAI_Followup_MoM_31Jul2026.docx",
+  "sources/mom/TICVAI_Kickoff_MoM_12Aug2026.docx",
+  "sources/mom/TICVAI_Kickoff_MoM_2026-08-05.docx",
+  "sources/mom/TICVAI_Kickoff_MoM_2026-08-10.docx",
+  "sources/mom/TICVAI_Kickoff_MoM_30Jul2026__2_.docx",
+  "sources/mom/TICVAI_MoM_2026-08-14.docx",
+  "sources/mom/TICVAI_MoM_2026-08-19_FnB_Retail_Procurement_Inventory.docx",
+  "sources/mom/TICVAI_MoM_2026-08-20_CRM_Marketing_CMS.docx",
+  "sources/mom/TICVAI_MoM_2026-08-21_Seat_Management_CMS.docx",
+  "sources/mom/TICVAI_MoM_2026-08-24_Infra_Cost_Ticketing.docx",
+  "sources/mom/TICVAI_MoM_2026-08-25_Ticketing_ProductConfig.docx",
+  "sources/mom/TICVAI_MoM_2026-08-26_ResourceManagement.docx",
+  "sources/mom/TICVAI_MoM_2026-08-27_WalletConfiguration.docx",
+  "sources/mom/TICVAI_MoM_2026-08-31_CS_B2B_Groups_Waivers_SalesChannel.docx",
+  "sources/mom/TICVAI_MoM_2026-09-01_Pricing_Upgrades_Media_Reservations_Resale.docx",
+  "sources/mom/TICVAI_MoM_2026-09-02_AccessControl.docx",
+  "sources/mom/TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue.docx",
+  "sources/mom/TICVAI_MoM_2026-09-08_BI_Reporting_ApprovalWorkflow.docx",
+  "sources/mom/TICVAI_MoM_2026-09-09_Rental_POS_Licensing.docx",
+  "sources/mom/TICVAI_MoM_2026-09-10_LicensingSubscription.docx",
+  "sources/mom/TICVAI_MoM_2026-09-11_DAM_Gaming.docx",
+  "sources/mom/TICVAI_MoM_2026-09-15_GuestAppReview_DeviceManagement.docx",
+  "sources/mom/TICVAI_MoM_31Jul2026__1_.docx",
+  "sources/mom/TICVAI_Task_Tracker.xlsx",
+  "sources/mom/TICVAI_UIUX_MoM_03Aug2026.docx",
+  "sources/planning/Email_Attachments_TICVAI.xlsx",
+  "sources/planning/Email_Attachments_TICVAI_1.xlsx",
+  "sources/planning/TAIS_Product_Planning_and_Delivery_Plan_4_1.xlsx",
+  "sources/planning/TICVAI_Task_Track_From_Workshops.xlsx",
+  "sources/planning/TICVAI_Task_Track_From_Workshops_1.xlsx",
+  "sources/requirements/Event_Management_Configuration_Backend_Structure_v1_0.pdf",
+  "sources/requirements/F_B_Backend_Structure_Module_Sample_Reference_v1_0.pdf",
+  "sources/requirements/Resource_Management_Configuration_Reference.pdf",
+  "sources/requirements/Retail_Backend_Structure_Module_Reference_v1_0.pdf",
+  "sources/requirements/SampleAmpitheater_Seating_1.pdf",
+  "sources/requirements/SampleAmpitheater_Seating_2.pdf",
+  "sources/requirements/Sample__Technical_Product_Sheet.xlsx",
+  "sources/requirements/Seating_Manifest_1.xlsx",
+  "sources/requirements/TICVAI_Inventory_and_Procurement_Backend_Structure_Sample_v1_0.pdf",
+  "sources/requirements/TICVAI_Ticket_Types_Dashboard_Screens_High_Resolution.pdf",
+  "sources/requirements/TICVAI_Ticket_Types_Product_Configuration_Scope_of_Work_v1_0.pdf",
+  "sources/requirements/TICVAI_Ticketing_Configuration_Reference_v1_0.jpeg",
+  "sources/requirements/Ticketing_Platform_Native_Dashboard_Visualization_Requirements.pdf",
+  "sources/requirements/Ticvai_matrix_20260621_2.xlsx",
+  "sources/requirements/Ticvai_matrix_20260621_2_2_2.xlsx",
+  "sources/rfp/TAIS_Platform_RFP_From_Miracle_Star_Trading_2.pdf",
+  "sources/workshop/Access Control Module_Reference.pdf",
+  "sources/workshop/Approval_Workflows_and_Governance_Reference.pdf",
+  "sources/workshop/B2B, Reseller & OTA Partner Management_Reference.pdf",
+  "sources/workshop/Communication & Notification Platform Services_Reference.pdf",
+  "sources/workshop/Customer Service_Reference.pdf",
+  "sources/workshop/Digital Asset Management DAM.pdf",
+  "sources/workshop/Game_and_Ride_Module.pdf",
+  "sources/workshop/Group_Sales___Corporate_Booking_Management_Reference.pdf",
+  "sources/workshop/Membership___Annual_Pass_Management_Reference.pdf",
+  "sources/workshop/Order___Reservation_Management_Reference.pdf",
+  "sources/workshop/Pricing___Revenue_Management_Reference.pdf",
+  "sources/workshop/Privacy__Consent___Preference_Management_Reference.pdf",
+  "sources/workshop/Product_Lifecycle___Catalogue_Governance_Reference.pdf",
+  "sources/workshop/Promotions___Bundles_Management_Reference.pdf",
+  "sources/workshop/Rental_Management.pdf",
+  "sources/workshop/Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
+  "sources/workshop/Sales_Channel_Management_Reference.pdf",
+  "sources/workshop/Subscription_Licensing_AI_Self_Service.pdf",
+  "sources/workshop/Ticket Resale Marketplace_Reference.pdf",
+  "sources/workshop/Ticket Upgrade, Exchange & Conversion_Reference.pdf",
+  "sources/workshop/Ticket_Media___Credential_Management_Reference.pdf",
+  "sources/workshop/Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
+  "sources/workshop/Waiver, Consent & Digital Form Management_Reference.pdf"
+ ],
+ "refusedToRemove": [],
+ "records": [
+  {
+   "document": "526be657-fcbb-4a33-a048-ca1f00c91ac9.png",
+   "sha256": "82f46d141c575c31459ac0ae31979b4e172adbe9725fea1d8f6d0cc1f2bca00b",
+   "bytes": 762649,
+   "pages": null,
+   "canonical": "sources/packs/526be657-fcbb-4a33-a048-ca1f00c91ac9.png",
+   "authority": [
+    "design"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "designs"
+   ],
+   "copies": [
+    "sources/designs/526be657-fcbb-4a33-a048-ca1f00c91ac9.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Access Control Module_Reference.pdf",
+   "sha256": "3368bac5f00346ef6a0b1f265d900eae701e370d6bf0e0ecd2946d07b241e1b1",
+   "bytes": 4100208,
+   "pages": 183,
+   "canonical": "sources/packs/Access Control Module_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "packs",
+    "workshop"
+   ],
+   "copies": [
+    "sources/packs/Access Control Module_Reference.pdf",
+    "sources/workshop/Access Control Module_Reference.pdf"
+   ],
+   "duplicated": true,
+   "platforms": [
+    "P04",
+    "P08"
+   ],
+   "platformsConfirmed": [
+    "P08"
+   ],
+   "platformsFromContractsOnly": [
+    "P04"
+   ],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {
+    "P04": "Venue POS \u2014 Terminal and Tablet",
+    "P08": "Venue Management \u2014 Back Office"
+   },
+   "operations": [
+    "approveManualOverrideSupervisor",
+    "listAccess",
+    "listAccessAttributeCatalog",
+    "listAccessExecutiveInsight",
+    "listAccessLocationGrouping",
+    "listAccessMonitoring",
+    "listAccessReportScheduled",
+    "listAccessRiskScoring",
+    "listAccessRule",
+    "listAccessSecurityFraud",
+    "listAccessValidityTime",
+    "listAntiPassbackJourney",
+    "listAttendanceAdmission",
+    "listAuthorizationGovernanceTemporary",
+    "listBiometric",
+    "listBiometricAccess",
+    "listBiometricConsentGuardian",
+    "listBiometricIdentityIntegrity",
+    "listBiometricLifecycleRetention",
+    "listBiometricValidationGate",
+    "listConnectivityFailureDegraded",
+    "listCredentialActivationDisplay",
+    "listCredentialDisableBlacklist",
+    "listCredentialRevocationLifecycle",
+    "listCredentialSecurity",
+    "listCredentialSharingConcurrent",
+    "listCredentialTransferRebinding",
+    "listDeviceBindingSession",
+    "listDeviceGate",
+    "listDeviceTypeHardware",
+    "listDigitalCredentialSecurity",
+    "listDynamicAccessPolicy",
+    "listEdgePackageData",
+    "listEdgeSecurityDeployment",
+    "listEntitlementConsumption",
+    "listEntryExitCrossover",
+    "listEntryExitRule",
+    "listEntryTemporaryExit",
+    "listExternalPartnerCredential",
+    "listFaceChangeEnrollment",
+    "listFaceMatchingVerification",
+    "listFaceTagTemporary",
+    "listFamilyChildPod",
+    "listFastPassAttraction",
+    "listFraudDetectionRule",
+    "listGateModeFree",
+    "listGraphicalAccessMap",
+    "listGroupAdmissionQuantity",
+    "listGroupAttendancePartial",
+    "listGroupLeaderFast",
+    "listGuestCompanionEligibility",
+    "listGuestDwellTime",
+    "listGuestJourney",
+    "listHardwareCompatibilityHealth",
+    "listHotelWalletExternal",
+    "listIdentityMembershipAccreditation",
+    "listLiveAccess",
+    "listLiveGateMode",
+    "listLiveVenueOccupancy",
+    "listMediaCredential",
+    "listMediaIssuanceEncoding",
+    "listMediaSwapReplacement",
+    "listMediaTypeTechnology",
+    "listMultiParkCrossover",
+    "listMultiParkCrossover2",
+    "listOfflineCredentialRevocation",
+    "listOfflineCryptographicValidation",
+    "listOfflineEdge",
+    "listOfflineEntitlementUsage",
+    "listOperatingCalendarSpecial",
+    "listPhysicalDeviceRegistration",
+    "listPodiumConsole",
+    "listPolicyEvaluationArchitecture",
+    "listPolicyScopeHierarchy",
+    "listQueueThroughputLane",
+    "listReconnectionSynchronizationConflict",
+    "listRelationshipCompanionFraud",
+    "listSecurityDetectionGovernance",
+    "listShiftHandoverSummary",
+    "listSpecialEventFree",
+    "listThroughputQueueValidation",
+    "listTicketCredentialInvestigation",
+    "listUnifiedIdentityCredential",
+    "listValidationExceptionReason",
+    "listValidationOutcomeRejection",
+    "listVenueParkAccess",
+    "listVerificationMethodSelection",
+    "listVirtualCredentialMedia",
+    "publishMediaCompatibilityTesting",
+    "publishRuleConflictCheck",
+    "publishTopologyValidation",
+    "setAccessAreaZone",
+    "setAccessGraphicalMap",
+    "setAttractionAccess",
+    "setBiometricVerificationProfile",
+    "setBleBeaconGeofence",
+    "setContextTimeEvent",
+    "setDeviceSoftwareContent",
+    "setDynamicSecurityProfile",
+    "setEdgeNodeLocal",
+    "setEmbeddedEntitlementPayload",
+    "setFacePassEnrollment",
+    "setGateLane",
+    "setGroupAdmissionProfile",
+    "setHandheldMobileAccess",
+    "setOperationalIncidentException",
+    "setReaderScannerPeripheral",
+    "setRealTimeSecurity",
+    "setRfidNfc",
+    "setSecurityInvestigationEvidence",
+    "setTurnstileLaneBehavior",
+    "setValidationOutcomeGuest",
+    "setVisualAccessRule",
+    "setVisualDynamicPolicy",
+    "simulateOfflineResilienceTesting",
+    "simulatePolicyConflictImpact"
+   ],
+   "packScreensMatched": 120,
+   "drafted": true,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "ACCREDITATION.pdf",
+   "sha256": "4d340d59298c22711b288532398b122bcfcc0a78043262162ee79dd670517c63",
+   "bytes": 3664398,
+   "pages": 74,
+   "canonical": "sources/packs/ACCREDITATION.pdf",
+   "authority": [
+    "reference"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "packs"
+   ],
+   "copies": [
+    "sources/packs/ACCREDITATION.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "AI_Configuration_Assistant_Reference.pdf",
+   "sha256": "a90b7370e8a1ab6573e390e0e1f41bae932bed37f8a116f9cd610e392481cf77",
+   "bytes": 1240761,
+   "pages": 63,
+   "canonical": "sources/packs/AI_Configuration_Assistant_Reference.pdf",
+   "authority": [
+    "reference"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "packs"
+   ],
+   "copies": [
+    "sources/packs/AI_Configuration_Assistant_Reference.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
+   "sha256": "92b8c3699803bfc6239ffce75ed889a341298a31a88c45d08f2cf154a1dbdc2c",
+   "bytes": 973347,
+   "pages": 56,
+   "canonical": "sources/packs/AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
+   "authority": [
+    "reference"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "packs"
+   ],
+   "copies": [
+    "sources/packs/AI_Forecasting_and_Predictive_Intelligence_Reference.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "AI_Governance_Reference.pdf",
+   "sha256": "b5330b102621a204f4ce0e3bf4543ea98d6d8b1975884bf68a7c131dee31a8dc",
+   "bytes": 1707526,
+   "pages": 105,
+   "canonical": "sources/packs/AI_Governance_Reference.pdf",
+   "authority": [
+    "reference"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "packs"
+   ],
+   "copies": [
+    "sources/packs/AI_Governance_Reference.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Approval_Workflows_and_Governance_Reference.pdf",
+   "sha256": "a2a71757e0ba4a88144b23e2fb65011fe911953382ff862d4bf18ee8dfe1e308",
+   "bytes": 3752365,
+   "pages": 81,
+   "canonical": "sources/packs/Approval_Workflows_and_Governance_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "packs",
+    "workshop"
+   ],
+   "copies": [
+    "sources/packs/Approval_Workflows_and_Governance_Reference.pdf",
+    "sources/workshop/Approval_Workflows_and_Governance_Reference.pdf"
+   ],
+   "duplicated": true,
+   "platforms": [
+    "P08",
+    "P09"
+   ],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [
+    "P08",
+    "P09"
+   ],
+   "platformNames": {
+    "P08": "Venue Management \u2014 Back Office",
+    "P09": "TICVAI Web \u2014 Platform Console"
+   },
+   "operations": [],
+   "packScreensMatched": 80,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "B2B, Reseller & OTA Partner Management_Reference.pdf",
+   "sha256": "e348bdea64f759dbb0ed4651f575728e8a75485ae00961a2107fc24d06eec556",
+   "bytes": 1973669,
+   "pages": 63,
+   "canonical": "sources/packs/B2B, Reseller & OTA Partner Management_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "packs",
+    "workshop"
+   ],
+   "copies": [
+    "sources/packs/B2B, Reseller & OTA Partner Management_Reference.pdf",
+    "sources/workshop/B2B, Reseller & OTA Partner Management_Reference.pdf"
+   ],
+   "duplicated": true,
+   "platforms": [
+    "P10"
+   ],
+   "platformsConfirmed": [
+    "P10"
+   ],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {
+    "P10": "Partner Web \u2014 Reseller Portal"
+   },
+   "operations": [
+    "approveBookingLimitCommercial",
+    "approvePartnerStatuLifecycle",
+    "listCommercialAgreement",
+    "listCommercialAgreementHealth",
+    "listCommercialAllocationQuota",
+    "listCommissionCalculationSettlement",
+    "listCommissionMarginIncentive",
+    "listCreditLimitExposure",
+    "listDepositGuaranteeFinancial",
+    "listPartner",
+    "listPartner2",
+    "listPartnerAccessRole",
+    "listPartnerCancellationRefund",
+    "listPartnerContactUser",
+    "listPartnerDisputeCase",
+    "listPartnerDocumentationCompliance",
+    "listPartnerOnboardingApplication",
+    "listPartnerOrderBooking",
+    "listPartnerPerformanceScorecard",
+    "listPartnerProfileReadiness",
+    "listPartnerReconciliationException",
+    "listPartnerRelationship",
+    "listPartnerStatementAccount",
+    "listReservationHoldRelease",
+    "listTerritoryMarketDistribution",
+    "setAgreementContractTerm",
+    "setPartnerBrandVenue",
+    "setPartnerProfileOrganization",
+    "setPartnerRateNet",
+    "setPaymentTermBilling"
+   ],
+   "packScreensMatched": 30,
+   "drafted": true,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Ch01_Executive_Overview_v1_4.docx",
+   "sha256": "b204e3726aa04562956ea6b05d02f0d5419586b41b8515ff84d297ff71b149db",
+   "bytes": 49562,
+   "pages": null,
+   "canonical": "sources/packs/Ch01_Executive_Overview_v1_4.docx",
+   "authority": [
+    "document"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "documents"
+   ],
+   "copies": [
+    "sources/documents/Ch01_Executive_Overview_v1_4.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Ch02_Technical_Architecture_v1_4.docx",
+   "sha256": "0dc20bf40a9c8587af1023587905b4111390caa6d0746a556fcec185f01cd282",
+   "bytes": 47604,
+   "pages": null,
+   "canonical": "sources/packs/Ch02_Technical_Architecture_v1_4.docx",
+   "authority": [
+    "document"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "documents"
+   ],
+   "copies": [
+    "sources/documents/Ch02_Technical_Architecture_v1_4.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Ch03_Functional_Domain_Coverage_v1_4.docx",
+   "sha256": "24ae8cf9c86c5c69ff856d770676b2b33127716aa19a2d54ed3973e18b0c4bc1",
+   "bytes": 68801,
+   "pages": null,
+   "canonical": "sources/packs/Ch03_Functional_Domain_Coverage_v1_4.docx",
+   "authority": [
+    "document"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "documents"
+   ],
+   "copies": [
+    "sources/documents/Ch03_Functional_Domain_Coverage_v1_4.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Ch04_Finance_and_Commerce_v1_4.docx",
+   "sha256": "00dec4fcdd0aced83940a937a892eedf5fd5c494eb63fb7833e3c9da4a0d4ec5",
+   "bytes": 50694,
+   "pages": null,
+   "canonical": "sources/packs/Ch04_Finance_and_Commerce_v1_4.docx",
+   "authority": [
+    "document"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "documents"
+   ],
+   "copies": [
+    "sources/documents/Ch04_Finance_and_Commerce_v1_4.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Ch05_AI_and_Intelligence_v1_4.docx",
+   "sha256": "a9c5a3521b1a0d82abe83471b23b93b52f98adbbcf8ace05064c109edba4d479",
+   "bytes": 50522,
+   "pages": null,
+   "canonical": "sources/packs/Ch05_AI_and_Intelligence_v1_4.docx",
+   "authority": [
+    "document"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "documents"
+   ],
+   "copies": [
+    "sources/documents/Ch05_AI_and_Intelligence_v1_4.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Ch06_Integrations_and_Infrastructure_v1_4.docx",
+   "sha256": "8290244e2612a0c014f9d00fe196350a30a8e4f4093dbc44f779c933c767ab2f",
+   "bytes": 53622,
+   "pages": null,
+   "canonical": "sources/packs/Ch06_Integrations_and_Infrastructure_v1_4.docx",
+   "authority": [
+    "document"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "documents"
+   ],
+   "copies": [
+    "sources/documents/Ch06_Integrations_and_Infrastructure_v1_4.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Ch07_Security_Offline_Mobile_v1_4.docx",
+   "sha256": "9a399fb8378b1e26af339ac586a7767ad02c930ff9973ca2476a78aab8e98f91",
+   "bytes": 51410,
+   "pages": null,
+   "canonical": "sources/packs/Ch07_Security_Offline_Mobile_v1_4.docx",
+   "authority": [
+    "document"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "documents"
+   ],
+   "copies": [
+    "sources/documents/Ch07_Security_Offline_Mobile_v1_4.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Ch08_Implementation_and_Delivery_v1_4.docx",
+   "sha256": "4552878fe7032eb11afc71d3d0d94de4eade0fd52bb1da846a3d4746cd303c92",
+   "bytes": 52292,
+   "pages": null,
+   "canonical": "sources/packs/Ch08_Implementation_and_Delivery_v1_4.docx",
+   "authority": [
+    "document"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "documents"
+   ],
+   "copies": [
+    "sources/documents/Ch08_Implementation_and_Delivery_v1_4.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Ch09_Platform_Vision_v1_4.docx",
+   "sha256": "3686834501be49da5aaf9299b270a8561f91f35ee87a59c88bd80064f9eb4127",
+   "bytes": 45404,
+   "pages": null,
+   "canonical": "sources/packs/Ch09_Platform_Vision_v1_4.docx",
+   "authority": [
+    "document"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "documents"
+   ],
+   "copies": [
+    "sources/documents/Ch09_Platform_Vision_v1_4.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Communication & Notification Platform Services_Reference.pdf",
+   "sha256": "0ed54bf3bce4b69fdf954cf253e6e0f2a862e128853f7866d29bebf020adb142",
+   "bytes": 738678,
+   "pages": 22,
+   "canonical": "sources/packs/Communication & Notification Platform Services_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "packs",
+    "workshop"
+   ],
+   "copies": [
+    "sources/packs/Communication & Notification Platform Services_Reference.pdf",
+    "sources/workshop/Communication & Notification Platform Services_Reference.pdf"
+   ],
+   "duplicated": true,
+   "platforms": [
+    "P09"
+   ],
+   "platformsConfirmed": [
+    "P09"
+   ],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {
+    "P09": "TICVAI Web \u2014 Platform Console"
+   },
+   "operations": [
+    "listBusinessEventNotification",
+    "listCommunicationService",
+    "listConsentPreferenceCommunication",
+    "listDeliveryCommunicationPlatform",
+    "listDeliveryQueueFailure",
+    "listProviderHealthUsage",
+    "listRoutingPriorityThrottling",
+    "listSystemTransactionalTemplate",
+    "setChannelProvider",
+    "setSenderIdentityDomain"
+   ],
+   "packScreensMatched": 10,
+   "drafted": true,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Customer Service_Reference.pdf",
+   "sha256": "cf70966d434c240fd5a84e21ce96dceb5150c825308c7afb450a7aba2b8603fc",
+   "bytes": 1419485,
+   "pages": 43,
+   "canonical": "sources/packs/Customer Service_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "packs",
+    "workshop"
+   ],
+   "copies": [
+    "sources/packs/Customer Service_Reference.pdf",
+    "sources/workshop/Customer Service_Reference.pdf"
+   ],
+   "duplicated": true,
+   "platforms": [
+    "P12"
+   ],
+   "platformsConfirmed": [
+    "P12"
+   ],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {
+    "P12": "Venue Support \u2014 Agent Console"
+   },
+   "operations": [
+    "createCaseClassificationIntelligent",
+    "listAgentWorkloadAvailability",
+    "listCaseResolutionClosure",
+    "listContact",
+    "listContactAutomation",
+    "listCustomerSatisfactionFeedback",
+    "listCustomerService",
+    "listCustomerServiceProfile",
+    "listEscalationCollaborationInternal",
+    "listEscalationCriticalCase",
+    "listQualityAgentEvaluation",
+    "listServiceRootCause",
+    "listSlaPolicyService",
+    "listUnifiedInteractionCommunication",
+    "setCaseInvestigationResolution",
+    "setCustomerServiceCopilot",
+    "setIntelligentRoutingSkill",
+    "setOrderBookingTicket",
+    "setRefundCompensationService"
+   ],
+   "packScreensMatched": 20,
+   "drafted": true,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Dev01_Engineering_Handbook_v1_0.docx",
+   "sha256": "a34f26f7746695322d4d91a2e08d40959b8f31a8cde9a3810f85b59acebdd09f",
+   "bytes": 18001,
+   "pages": null,
+   "canonical": "sources/packs/Dev01_Engineering_Handbook_v1_0.docx",
+   "authority": [
+    "document"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "documents"
+   ],
+   "copies": [
+    "sources/documents/Dev01_Engineering_Handbook_v1_0.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Dev02_Repository_Structure_and_Contract_Pipeline_v1_0.docx",
+   "sha256": "c3778feed1ae3e4e7945607adee7338467aa5e4d773e2ef43ce7b798bdaed3fd",
+   "bytes": 17985,
+   "pages": null,
+   "canonical": "sources/packs/Dev02_Repository_Structure_and_Contract_Pipeline_v1_0.docx",
+   "authority": [
+    "document"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "documents"
+   ],
+   "copies": [
+    "sources/documents/Dev02_Repository_Structure_and_Contract_Pipeline_v1_0.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Dev03_Local_Development_Environment_v1_0.docx",
+   "sha256": "33cb75e33d17cf4241657481e1758d91c0ddca92982e68d3fc27d1dbe19b1e93",
+   "bytes": 18153,
+   "pages": null,
+   "canonical": "sources/packs/Dev03_Local_Development_Environment_v1_0.docx",
+   "authority": [
+    "document"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "documents"
+   ],
+   "copies": [
+    "sources/documents/Dev03_Local_Development_Environment_v1_0.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Digital Asset Management DAM.pdf",
+   "sha256": "8832a419bb2d7f1ff2cfe62ed92d7843371e8f423915589c1e2f39b8ab237c01",
+   "bytes": 1615104,
+   "pages": 81,
+   "canonical": "sources/packs/Digital Asset Management DAM.pdf",
+   "authority": [
+    "workshop"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "workshop"
+   ],
+   "copies": [
+    "sources/workshop/Digital Asset Management DAM.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [
+    "P13"
+   ],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [
+    "P13"
+   ],
+   "platformNames": {
+    "P13": "Venue CMS \u2014 White Label"
+   },
+   "operations": [],
+   "packScreensMatched": 40,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Email_Attachments_TICVAI.xlsx",
+   "sha256": "7de3721fd2bbb3133285c46662041dffb4c0e70bd17ff56439db56d907ada78d",
+   "bytes": 7567,
+   "pages": null,
+   "canonical": "sources/packs/Email_Attachments_TICVAI.xlsx",
+   "authority": [
+    "planning"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "planning"
+   ],
+   "copies": [
+    "sources/planning/Email_Attachments_TICVAI.xlsx",
+    "sources/planning/Email_Attachments_TICVAI_1.xlsx"
+   ],
+   "duplicated": true,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Email_Attachments_TICVAI.xlsx",
+   "sha256": "ac787bf495328fa89a65a75321dd8bd4768b4d1ad013ff00e549886c58acc0df",
+   "bytes": 7940,
+   "pages": null,
+   "canonical": "sources/packs/Email_Attachments_TICVAI.xlsx",
+   "authority": [
+    "document"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "documents"
+   ],
+   "copies": [
+    "sources/documents/Email_Attachments_TICVAI.xlsx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Entitlement Lifecycle.pdf",
+   "sha256": "01f83b8696031210b2bd32b106e0e0d054449ccbef59eca00c0f3c49ddf79e78",
+   "bytes": 1128467,
+   "pages": 28,
+   "canonical": "sources/packs/Entitlement Lifecycle.pdf",
+   "authority": [
+    "reference"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "packs"
+   ],
+   "copies": [
+    "sources/packs/Entitlement Lifecycle.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
+   "sha256": "f82cb4c3fbdf283d00da5961629c63ab10db74568ffac16440c666ff9a9aed87",
+   "bytes": 5279691,
+   "pages": 91,
+   "canonical": "sources/packs/Event_Management_Configuration_Backend_Structure_v1.0.pdf",
+   "authority": [
+    "requirement",
+    "reference"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "packs",
+    "requirements"
+   ],
+   "copies": [
+    "sources/packs/Event_Management_Configuration_Backend_Structure_v1.0.pdf",
+    "sources/requirements/Event_Management_Configuration_Backend_Structure_v1_0.pdf"
+   ],
+   "duplicated": true,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "F&B Dashboard Screens v1.0.pdf",
+   "sha256": "baa8f7390c9185acfce172cb329f91fc38c02bd8185a70e3f97264ace774fbe5",
+   "bytes": 10342312,
+   "pages": 6,
+   "canonical": "sources/packs/F&B Dashboard Screens v1.0.pdf",
+   "authority": [
+    "board",
+    "reference"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "boards",
+    "packs"
+   ],
+   "copies": [
+    "sources/boards/FB_Dashboard_Screens_v1_0.pdf",
+    "sources/packs/F&B Dashboard Screens v1.0.pdf"
+   ],
+   "duplicated": true,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "F&B_Backend_Structure_Module Sample Reference v1.0.pdf",
+   "sha256": "0d7e96edf5d32cbda0beffd4b8cd5c774fddb0ec7d35c6a17c9f7eeb49271e99",
+   "bytes": 3587205,
+   "pages": 130,
+   "canonical": "sources/packs/F&B_Backend_Structure_Module Sample Reference v1.0.pdf",
+   "authority": [
+    "reference"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "packs"
+   ],
+   "copies": [
+    "sources/packs/F&B_Backend_Structure_Module Sample Reference v1.0.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "F_B_Backend_Structure_Module_Sample_Reference_v1_0.pdf",
+   "sha256": "0f4ad9ce0a29a04928ce338f855e5a4a377177dfcddddded4c5bc83c5d2379fa",
+   "bytes": 130564,
+   "pages": null,
+   "canonical": "sources/packs/F_B_Backend_Structure_Module_Sample_Reference_v1_0.pdf",
+   "authority": [
+    "requirement"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "requirements"
+   ],
+   "copies": [
+    "sources/requirements/F_B_Backend_Structure_Module_Sample_Reference_v1_0.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Game_and_Ride_Module.pdf",
+   "sha256": "c8efb51697ee9c9deb9599a508251be050966116a0b4dd59acd01412d381f42a",
+   "bytes": 3107538,
+   "pages": 105,
+   "canonical": "sources/packs/Game_and_Ride_Module.pdf",
+   "authority": [
+    "workshop"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "workshop"
+   ],
+   "copies": [
+    "sources/workshop/Game_and_Ride_Module.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [
+    "P08"
+   ],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [
+    "P08"
+   ],
+   "platformNames": {
+    "P08": "Venue Management \u2014 Back Office"
+   },
+   "operations": [],
+   "packScreensMatched": 100,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
+   "sha256": "c2c330d26ce7305debb825e2d1f641f019a53c627dae5cd5c459d0a3f2bdfd8b",
+   "bytes": 1294831,
+   "pages": 37,
+   "canonical": "sources/packs/Group_Sales___Corporate_Booking_Management_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "packs",
+    "workshop"
+   ],
+   "copies": [
+    "sources/packs/Group_Sales___Corporate_Booking_Management_Reference.pdf",
+    "sources/workshop/Group_Sales___Corporate_Booking_Management_Reference.pdf"
+   ],
+   "duplicated": true,
+   "platforms": [
+    "P08"
+   ],
+   "platformsConfirmed": [
+    "P08"
+   ],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {
+    "P08": "Venue Management \u2014 Back Office"
+   },
+   "operations": [
+    "approveGroupDiscountException",
+    "listGroupAmendmentCancellation",
+    "listGroupArrivalCheck",
+    "listGroupBooking",
+    "listGroupBookingReconciliation",
+    "listGroupCustomerOrganization",
+    "listGroupEnquiryOpportunity",
+    "listGroupPaymentDeposit",
+    "listGroupRequirementAvailability",
+    "listGroupSale",
+    "listGroupSale2",
+    "listGroupTicketFulfillment",
+    "listGroupTicketSeat",
+    "listParticipantGuestList",
+    "listQuoteBookingConversion",
+    "listQuoteRevisionNegotiation",
+    "setGroupBookingHandover",
+    "setGroupOperationalPlanning",
+    "setGroupPackageExperience",
+    "setGroupQuotationProposal"
+   ],
+   "packScreensMatched": 20,
+   "drafted": true,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Inventory_Procurement_Dashboard_Screens.pdf",
+   "sha256": "01034ab1711f6fa2ce0036a5205ac4f1ad7f5c1baf0df4203c94494190724608",
+   "bytes": 12683917,
+   "pages": 7,
+   "canonical": "sources/packs/Inventory_Procurement_Dashboard_Screens.pdf",
+   "authority": [
+    "board"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "boards"
+   ],
+   "copies": [
+    "sources/boards/Inventory_Procurement_Dashboard_Screens.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "sha256": "0eeb0b2839fe22b10352707d97e51703dbc67ba35c1074854cf696e20d1ea555",
+   "bytes": 5108425,
+   "pages": 61,
+   "canonical": "sources/packs/Marketing_CRM_Configuration_Reference v1.0.pdf",
+   "authority": [
+    "reference"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "packs"
+   ],
+   "copies": [
+    "sources/packs/Marketing_CRM_Configuration_Reference v1.0.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Marketing_CRM_Dashboard_Screens v1.0.pdf",
+   "sha256": "f22bca68b573011c50bc99f8338a45861efc9bf82fdebb91f463c67c4fb332dc",
+   "bytes": 35027088,
+   "pages": 12,
+   "canonical": "sources/packs/Marketing_CRM_Dashboard_Screens v1.0.pdf",
+   "authority": [
+    "reference"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "packs"
+   ],
+   "copies": [
+    "sources/packs/Marketing_CRM_Dashboard_Screens v1.0.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Membership___Annual_Pass_Management_Reference.pdf",
+   "sha256": "0bcdb177e7cbe91a8f2fd804e65ddc2066390089d624a933c79522f148c6a7b9",
+   "bytes": 1330663,
+   "pages": 38,
+   "canonical": "sources/packs/Membership___Annual_Pass_Management_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "packs",
+    "workshop"
+   ],
+   "copies": [
+    "sources/packs/Membership___Annual_Pass_Management_Reference.pdf",
+    "sources/workshop/Membership___Annual_Pass_Management_Reference.pdf"
+   ],
+   "duplicated": true,
+   "platforms": [
+    "P08"
+   ],
+   "platformsConfirmed": [
+    "P08"
+   ],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {
+    "P08": "Venue Management \u2014 Back Office"
+   },
+   "operations": [
+    "approveMembershipProductValidation",
+    "listMember",
+    "listMemberExceptionOverride",
+    "listMemberLifecycleCase",
+    "listMembershipActivationCredential",
+    "listMembershipAnnualPass",
+    "listMembershipCommercialPricing",
+    "listMembershipFreezeSuspension",
+    "listMembershipRenewalRetention",
+    "listMembershipUpgradeDowngrade",
+    "listMembershipUsageVisit",
+    "listRenewalAuto",
+    "listVisitAdmissionEntitlement",
+    "setFamilyHouseholdDependent",
+    "setMemberMembershipAccount",
+    "setMembershipEligibilityQualification",
+    "setMembershipEntitlementAdmission",
+    "setMembershipProductTier",
+    "setRenewalAutoMembership",
+    "setValidityActivationExpiry"
+   ],
+   "packScreensMatched": 20,
+   "drafted": true,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "MoM_FnB_Retail_Procurement_Inventory_18Aug2026.docx",
+   "sha256": "5d39086e9ef3f3079683093a52722d6ccb30a4576266f5884949b36dcedd3410",
+   "bytes": 60671,
+   "pages": null,
+   "canonical": "sources/packs/MoM_FnB_Retail_Procurement_Inventory_18Aug2026.docx",
+   "authority": [
+    "mom"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "mom"
+   ],
+   "copies": [
+    "sources/mom/MoM_FnB_Retail_Procurement_Inventory_18Aug2026.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "MultiTenant_Hierarchy_Diagram.png",
+   "sha256": "4363453e897f11bc2ee2befa641598f6964b8aee50f009b15d5324497f710d9d",
+   "bytes": 219728,
+   "pages": null,
+   "canonical": "sources/packs/MultiTenant_Hierarchy_Diagram.png",
+   "authority": [
+    "design"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "diagrams"
+   ],
+   "copies": [
+    "sources/diagrams/MultiTenant_Hierarchy_Diagram.png"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Order___Reservation_Management_Reference.pdf",
+   "sha256": "2bf141f1e04ab32cc9b9d99669188a9ffb5091d00b9e325c4e15b7ff8faa0d72",
+   "bytes": 1980873,
+   "pages": 55,
+   "canonical": "sources/packs/Order___Reservation_Management_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "packs",
+    "workshop"
+   ],
+   "copies": [
+    "sources/packs/Order___Reservation_Management_Reference.pdf",
+    "sources/workshop/Order___Reservation_Management_Reference.pdf"
+   ],
+   "duplicated": true,
+   "platforms": [
+    "P08"
+   ],
+   "platformsConfirmed": [
+    "P08"
+   ],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {
+    "P08": "Venue Management \u2014 Back Office"
+   },
+   "operations": [
+    "approveExceptionServiceRecovery",
+    "createOrderSourceChannel",
+    "listAmendmentAfterSale",
+    "listAmendmentAfterSale2",
+    "listCapacityReservationInventory",
+    "listDepositPartialPayment",
+    "listExternalPaymentPartner",
+    "listFinancialTraceability",
+    "listOrderFinancialReconciliation",
+    "listOrderLifecycleTimeline",
+    "listOrderLineProduct",
+    "listOrderPaymentDetail",
+    "listOrderReservation",
+    "listOrderSplitMerge",
+    "listPaymentOrderFinancial",
+    "listPaymentReconciliationException",
+    "listRelatedOrderTransaction",
+    "listReservationConfirmationExpiry",
+    "listTicketReissueFulfillment",
+    "listVoidReversalSame",
+    "setAfterSaleFinancial",
+    "setAmendmentEligibilityPolicy",
+    "setCancellationPartialPolicy",
+    "setCustomerGuestAccount",
+    "setMultiPaymentSplit",
+    "setOrderAmendment",
+    "setOrderDetailTransaction",
+    "setOrderReservationStatus",
+    "setReservationHoldPolicy"
+   ],
+   "packScreensMatched": 30,
+   "drafted": true,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Payment_Payment_Orchestration.pdf",
+   "sha256": "21d8d1f252e09c9804cc13b072ae654b73d7f6a515d1e0f867daca24f975bcb4",
+   "bytes": 5225223,
+   "pages": 190,
+   "canonical": "sources/packs/Payment_Payment_Orchestration.pdf",
+   "authority": [
+    "reference"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "packs"
+   ],
+   "copies": [
+    "sources/packs/Payment_Payment_Orchestration.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Pricing___Revenue_Management_Reference.pdf",
+   "sha256": "a940230ea9dec389ffeffe6d3fb2e255031cd435e029fb39e61e1ced866ab6d8",
+   "bytes": 4263542,
+   "pages": 132,
+   "canonical": "sources/packs/Pricing___Revenue_Management_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "packs",
+    "workshop"
+   ],
+   "copies": [
+    "sources/packs/Pricing___Revenue_Management_Reference.pdf",
+    "sources/workshop/Pricing___Revenue_Management_Reference.pdf"
+   ],
+   "duplicated": true,
+   "platforms": [
+    "P09"
+   ],
+   "platformsConfirmed": [
+    "P09"
+   ],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {
+    "P09": "TICVAI Web \u2014 Platform Console"
+   },
+   "operations": [
+    "approvePricingWorkflowAuthority",
+    "createLiveDynamicPrice",
+    "listAutomationPolicyAutonomous",
+    "listBulkPricingUpdate",
+    "listCalculationValidationReconciliation",
+    "listChannelBasedPricing",
+    "listChannelCustomerSegment",
+    "listCommercialPricing",
+    "listCommercialPricingStructure",
+    "listCompetitorPricingMarket",
+    "listCurrencyPrecisionRounding",
+    "listCustomerSegmentProfile",
+    "listDemandBookingCurve",
+    "listDynamicPriceBand",
+    "listDynamicPricingAutomation",
+    "listDynamicPricingGuardrail",
+    "listDynamicPricingPerformance",
+    "listDynamicPricingStrategy",
+    "listEffectiveDateSeason",
+    "listFeeSurcharge",
+    "listFeeWaiverTax",
+    "listInternalDemandBooking",
+    "listLearningModelPerformance",
+    "listLocationVenueEvent",
+    "listMarketTourismHoliday",
+    "listMarketVenueCurrency",
+    "listMembershipLoyaltyPricing",
+    "listNearbyEventExhibition",
+    "listPackageBundleAdd",
+    "listPriceCalculationSequence",
+    "listPriceCategoryRate",
+    "listPriceElasticityRevenue",
+    "listPriceListTemplate",
+    "listPricing",
+    "listPricingChangeImpact",
+    "listPricingCompliance",
+    "listPricingDistributionSynchronization",
+    "listPricingGovernance",
+    "listPricingRecommendationExplainability",
+    "listPricingRollbackEmergency",
+    "listPricingRule",
+    "listPricingRulePriority",
+    "listPricingVersionBaseline",
+    "listQuantityGroupVolume",
+    "listRecommendationReviewDecision",
+    "listResidencyNationalityMarket",
+    "listRevenue",
+    "listRevenueDemandImpact",
+    "listRulePriorityConflict",
+    "listScenarioModelingWhat",
+    "listSeasonalCalendarDay",
+    "listSignalDataQuality",
+    "listTaxFeeCalculation",
+    "listTimeslotPerformanceTime",
+    "listWeatherDemandImpact",
+    "publishPricingEffectiveDate",
+    "setBookingVelocityTime",
+    "setDemandOccupancyAvailability",
+    "setDynamicPricingStrategy",
+    "setFeeApplicabilityCharging",
+    "setPriceHierarchyInheritance",
+    "setPriceListMaster",
+    "setPricing",
+    "setPricingChangeRequest",
+    "setPricingExperiment",
+    "setProductServicePrice",
+    "setRateStructure",
+    "setTaxProfileJurisdiction",
+    "setTaxRuleTreatment",
+    "simulatePriceBreakdownCalculation"
+   ],
+   "packScreensMatched": 70,
+   "drafted": true,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Privacy__Consent___Preference_Management_Reference.pdf",
+   "sha256": "ab8897ac12480547d31615dc2520f0a92cb68ee33139dc753f1c149585299258",
+   "bytes": 1289956,
+   "pages": 38,
+   "canonical": "sources/packs/Privacy__Consent___Preference_Management_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "packs",
+    "workshop"
+   ],
+   "copies": [
+    "sources/packs/Privacy__Consent___Preference_Management_Reference.pdf",
+    "sources/workshop/Privacy__Consent___Preference_Management_Reference.pdf"
+   ],
+   "duplicated": true,
+   "platforms": [
+    "P13"
+   ],
+   "platformsConfirmed": [
+    "P13"
+   ],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {
+    "P13": "Venue CMS \u2014 White Label"
+   },
+   "operations": [
+    "approvePrivacyTesting",
+    "listConsentEvidenceWithdrawal",
+    "listCookieBannerPreference",
+    "listCookieTrackingDigital",
+    "listCustomerPrivacyConsent",
+    "listDataProcessingPurpose",
+    "listDataRetentionExpiry",
+    "listDataSubjectCustomer",
+    "listDeletionAnonymizationRestriction",
+    "listPrivacy",
+    "listPrivacyCompliance",
+    "listPrivacyConsent",
+    "listPrivacyEvidenceCompliance",
+    "listPrivacyNoticePolicy",
+    "setCommunicationPreferenceMarketing",
+    "setConsentCapturePoint",
+    "setDataDiscoveryAccess",
+    "setMinorGuardianAge",
+    "setPrivacyComplianceException"
+   ],
+   "packScreensMatched": 20,
+   "drafted": true,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
+   "sha256": "0bf03012a5f3c1fd9c5a11d4a5a52af8098f7543cccc261dc8fdbd6b56f27a64",
+   "bytes": 1020503,
+   "pages": 27,
+   "canonical": "sources/packs/Product_Lifecycle___Catalogue_Governance_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "packs",
+    "workshop"
+   ],
+   "copies": [
+    "sources/packs/Product_Lifecycle___Catalogue_Governance_Reference.pdf",
+    "sources/workshop/Product_Lifecycle___Catalogue_Governance_Reference.pdf"
+   ],
+   "duplicated": true,
+   "platforms": [
+    "P09"
+   ],
+   "platformsConfirmed": [
+    "P09"
+   ],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {
+    "P09": "TICVAI Web \u2014 Platform Console"
+   },
+   "operations": [
+    "approveReviewDecision",
+    "approveWorkflow",
+    "createBulkProductCatalogue",
+    "listChangeImpactAnalysis",
+    "listChangePropagationDependency",
+    "listGovernanceRiskMonitoring",
+    "listProductDuplicationTemplate",
+    "listProductGovernance",
+    "listProductImportExport",
+    "listProductLifecycle",
+    "listProductRetirementSuspension",
+    "listProductTrailChange",
+    "listRollbackRecovery",
+    "publishActivationScheduler",
+    "publishChannelAvailability",
+    "setCatalogueReview",
+    "setLifecycleStatuWorkflow",
+    "setProductContextOwnership"
+   ],
+   "packScreensMatched": 20,
+   "drafted": true,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Promotions___Bundles_Management_Reference.pdf",
+   "sha256": "5b084992df96ff061f2b9b8b04c05f3419127f35a2daf0870f71696c4ad1e69b",
+   "bytes": 5023181,
+   "pages": 158,
+   "canonical": "sources/packs/Promotions___Bundles_Management_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "packs",
+    "workshop"
+   ],
+   "copies": [
+    "sources/packs/Promotions___Bundles_Management_Reference.pdf",
+    "sources/workshop/Promotions___Bundles_Management_Reference.pdf"
+   ],
+   "duplicated": true,
+   "platforms": [
+    "P09"
+   ],
+   "platformsConfirmed": [
+    "P09"
+   ],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {
+    "P09": "TICVAI Web \u2014 Platform Console"
+   },
+   "operations": [
+    "approveCampaignWorkflow",
+    "approveDecision",
+    "listAdvancedOffer",
+    "listAdvancedOfferGuardrail",
+    "listAudienceDiscoveryTargeting",
+    "listAudiencePreviewReach",
+    "listBehavioralTransactionTargeting",
+    "listBestOfferCustomer",
+    "listBudgetConsumptionForecast",
+    "listBundleAvailabilityCapacity",
+    "listBundleAvailabilityChannel",
+    "listBundleAvailabilityForecast",
+    "listBundleBogoAdvanced",
+    "listBundleCombo",
+    "listBundlePricingCommercial",
+    "listBundleSellabilityDependency",
+    "listBundleValidityScheduling",
+    "listCampaignCalendarTimeline",
+    "listCampaignExperimentTest",
+    "listCampaignFinancialCommercial",
+    "listCampaignGovernanceBudget",
+    "listCampaignPromotionPerformance",
+    "listCapacityPoolReservation",
+    "listCartTransactionThreshold",
+    "listCheapestLowestValue",
+    "listCodeEligibilityRestriction",
+    "listCodeSecurityFraud",
+    "listComponentInventoryAvailability",
+    "listConflict",
+    "listConflictDetectionResolution",
+    "listContextLocationChannel",
+    "listCrmCustomerSegment",
+    "listCustomerMembershipSegment",
+    "listCustomerSegmentChannel",
+    "listDiscountCalculationApplication",
+    "listDiscountCapMaximum",
+    "listDiscountLimitGuardrail",
+    "listDiscountMarginProfitability",
+    "listDynamicBundle",
+    "listDynamicBundle2",
+    "listDynamicBundleRule",
+    "listDynamicComponentSubstitution",
+    "listExecutivePromotionReporting",
+    "listGovernanceRiskLaunch",
+    "listIncrementalityAttributionCannibalization",
+    "listMembershipLoyaltyGuest",
+    "listMultiBuyQuantity",
+    "listNextBestAction",
+    "listOfferBasketTrace",
+    "listPartnerExternalProduct",
+    "listPartnerPaymentEligibility",
+    "listPaymentMethodBank",
+    "listPercentageFixedDiscount",
+    "listPromotionActivityVersion",
+    "listPromotionAlertException",
+    "listPromotionCampaign",
+    "listPromotionChannel",
+    "listPromotionDecisionTrace",
+    "listPromotionExclusionCompatibility",
+    "listPromotionHealthPerformance",
+    "listPromotionLifecycleStatus",
+    "listPromotionPerformance",
+    "listPromotionPriorityHierarchy",
+    "listRealTimeAvailability",
+    "listRedemption",
+    "listRedemptionCodeLookup",
+    "listRedemptionConversionFunnel",
+    "listRedemptionDiscountExposure",
+    "listRevenueAllocationCost",
+    "listRewardSelectionSubstitution",
+    "listSpecialPriceGuest",
+    "listStackingConflict",
+    "listTargetingConflictFrequency",
+    "listTargetingEligibility",
+    "listThresholdActionAutomatic",
+    "listTimeBasedSeasonal",
+    "listUniqueCodeGeneration",
+    "listUpsellCrossSell",
+    "listUsageCapacityFrequency",
+    "listValidityDateTime",
+    "listVolumeBulkTier",
+    "setBundleComponent",
+    "setBundleDefinition",
+    "setBuyGetBogo",
+    "setCampaignBudgetFinancial",
+    "setCodeDistributionManager",
+    "setCouponPromoCode",
+    "setCrossCategoryPromotion",
+    "setEligibilityRule",
+    "setFixedPriceOffer",
+    "setGiftFreeProduct",
+    "setGuestChoiceBuild",
+    "setPromotionRule",
+    "setPromotionStackingRule",
+    "setRuleTestRecommendation",
+    "simulateBundlePreviewRecommendation"
+   ],
+   "packScreensMatched": 100,
+   "drafted": true,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Rental_Management.pdf",
+   "sha256": "e6c07ac89b8a30bafc742d33d3f01ee438d243b467f5778440531a3d44574665",
+   "bytes": 3335894,
+   "pages": 138,
+   "canonical": "sources/packs/Rental_Management.pdf",
+   "authority": [
+    "workshop"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "workshop"
+   ],
+   "copies": [
+    "sources/workshop/Rental_Management.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [
+    "P06",
+    "P08"
+   ],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [
+    "P06",
+    "P08"
+   ],
+   "platformNames": {
+    "P06": "Venue Staff App \u2014 Operations",
+    "P08": "Venue Management \u2014 Back Office"
+   },
+   "operations": [],
+   "packScreensMatched": 100,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Resource_Management_Configuration_Reference.pdf",
+   "sha256": "54f475840701af9f276d39b5bf827119f7fe50649f3fc3a918711ed6076fdd94",
+   "bytes": 5927029,
+   "pages": 169,
+   "canonical": "sources/packs/Resource_Management_Configuration_Reference.pdf",
+   "authority": [
+    "reference"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "packs"
+   ],
+   "copies": [
+    "sources/packs/Resource_Management_Configuration_Reference.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Resource_Management_Configuration_Reference.pdf",
+   "sha256": "6cfccc0d7aecf3fadc1c0e0c676384aaad322fbe38c9a59cd21943213d1cd36a",
+   "bytes": 188451,
+   "pages": null,
+   "canonical": "sources/packs/Resource_Management_Configuration_Reference.pdf",
+   "authority": [
+    "requirement"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "requirements"
+   ],
+   "copies": [
+    "sources/requirements/Resource_Management_Configuration_Reference.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Retail_Backend_Structure_Module_Reference_v1.0.pdf",
+   "sha256": "79c2653147bb7253fd60e5b0cb0cdc535198e980faf61802f10e233bbc1bf5cd",
+   "bytes": 4512973,
+   "pages": 202,
+   "canonical": "sources/packs/Retail_Backend_Structure_Module_Reference_v1.0.pdf",
+   "authority": [
+    "reference"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "packs"
+   ],
+   "copies": [
+    "sources/packs/Retail_Backend_Structure_Module_Reference_v1.0.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Retail_Backend_Structure_Module_Reference_v1_0.pdf",
+   "sha256": "71f769961877171c783d4873cd2012f54d1734071558221c019cad89b4f30324",
+   "bytes": 152630,
+   "pages": null,
+   "canonical": "sources/packs/Retail_Backend_Structure_Module_Reference_v1_0.pdf",
+   "authority": [
+    "requirement"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "requirements"
+   ],
+   "copies": [
+    "sources/requirements/Retail_Backend_Structure_Module_Reference_v1_0.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Retail_Dashboard_Screens_Only.pdf",
+   "sha256": "5e04311f66a69c2dfcba7a15b4907d51849418f279971e0bac1955023b830c11",
+   "bytes": 10045248,
+   "pages": 6,
+   "canonical": "sources/packs/Retail_Dashboard_Screens_Only.pdf",
+   "authority": [
+    "board"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "boards"
+   ],
+   "copies": [
+    "sources/boards/Retail_Dashboard_Screens_Only.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
+   "sha256": "f1ce9b1d6c3b3e9d559df3c302c2928a6f8541fa3d9983b910c04e99f933e653",
+   "bytes": 1238959,
+   "pages": 41,
+   "canonical": "sources/packs/Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "packs",
+    "workshop"
+   ],
+   "copies": [
+    "sources/packs/Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
+    "sources/workshop/Rules__Workflow__Approval___Automation_Engine_Reference.pdf"
+   ],
+   "duplicated": true,
+   "platforms": [
+    "P09"
+   ],
+   "platformsConfirmed": [
+    "P09"
+   ],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {
+    "P09": "TICVAI Web \u2014 Platform Console"
+   },
+   "operations": [
+    "approveMatrixMultiLevel",
+    "approveRoleAuthorityDelegation",
+    "approveUnifiedDecision",
+    "approveVersioningGovernance",
+    "createAutomationAutonomouAction",
+    "listConditionDecisionLogic",
+    "listCrossModuleOrchestration",
+    "listProcessAutomationOpportunity",
+    "listRuleWorkflow",
+    "listSlaEscalationBottleneck",
+    "listSlaEscalationReminder",
+    "listWorkflow",
+    "listWorkflowAutonomouGovernance",
+    "listWorkflowExceptionFailure",
+    "listWorkflowInstanceProcess",
+    "listWorkflowProcessPerformance",
+    "setTriggerActionCross",
+    "setVisualBusinessRule",
+    "setVisualWorkflow",
+    "simulateWorkflowTestingImpact"
+   ],
+   "packScreensMatched": 20,
+   "drafted": true,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Sales_Channel_Management_Reference.pdf",
+   "sha256": "89e4ef54d82b24d69a3ef5a9532b997a70e34ac473590af81e6f52a91c0da81e",
+   "bytes": 1249144,
+   "pages": 36,
+   "canonical": "sources/packs/Sales_Channel_Management_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "packs",
+    "workshop"
+   ],
+   "copies": [
+    "sources/packs/Sales_Channel_Management_Reference.pdf",
+    "sources/workshop/Sales_Channel_Management_Reference.pdf"
+   ],
+   "duplicated": true,
+   "platforms": [
+    "P09"
+   ],
+   "platformsConfirmed": [
+    "P09"
+   ],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {
+    "P09": "TICVAI Web \u2014 Platform Console"
+   },
+   "operations": [
+    "createChannelProfile",
+    "listChannel",
+    "listChannel2",
+    "listChannelAllocationRebalancing",
+    "listChannelConnectionIntegration",
+    "listChannelExceptionIncident",
+    "listChannelGovernanceSla",
+    "listChannelLogTransaction",
+    "listChannelPerformanceCommercial",
+    "listChannelSaleRule",
+    "listChannelSaleSchedule",
+    "listCustomerEligibilityRule",
+    "listInventoryCapacityChannel",
+    "listProductPriceAvailability",
+    "listRealTimeChannel",
+    "listSaleChannel",
+    "publishChannelReadinessValidation",
+    "setChannelFeePayment",
+    "setChannelPricingCommercial",
+    "setProductCatalogue"
+   ],
+   "packScreensMatched": 20,
+   "drafted": true,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Sample - Technical Product Sheet.xlsx",
+   "sha256": "97891f44ed4b664e0c217337d38dfe8126500f4d74e98e4f7c0c2614837454b5",
+   "bytes": 340923,
+   "pages": null,
+   "canonical": "sources/packs/Sample - Technical Product Sheet.xlsx",
+   "authority": [
+    "requirement",
+    "reference"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "packs",
+    "requirements"
+   ],
+   "copies": [
+    "sources/packs/Sample - Technical Product Sheet.xlsx",
+    "sources/requirements/Sample__Technical_Product_Sheet.xlsx"
+   ],
+   "duplicated": true,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Sample-Ampitheater Seating.pdf",
+   "sha256": "b2cadc4ad32bd2596b339fac7b9de3e9661880d7b3db5db82dc3ce9fb2ae89ef",
+   "bytes": 779018,
+   "pages": 2,
+   "canonical": "sources/packs/Sample-Ampitheater Seating.pdf",
+   "authority": [
+    "requirement",
+    "document"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "documents",
+    "requirements"
+   ],
+   "copies": [
+    "sources/documents/Sample-Ampitheater Seating.pdf",
+    "sources/requirements/SampleAmpitheater_Seating_1.pdf",
+    "sources/requirements/SampleAmpitheater_Seating_2.pdf"
+   ],
+   "duplicated": true,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Seat_Management_Dashboard_Screens_Reference.pdf",
+   "sha256": "b510222e0cd457b2f412946638ad9dbeebd49df99323975c17f4e3bcbe5312d6",
+   "bytes": 37167637,
+   "pages": 13,
+   "canonical": "sources/packs/Seat_Management_Dashboard_Screens_Reference.pdf",
+   "authority": [
+    "reference"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "packs"
+   ],
+   "copies": [
+    "sources/packs/Seat_Management_Dashboard_Screens_Reference.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "sha256": "f6d6c1dbe63b457c2653281904e2f77dfec6e6e292d568d990f9d028dcc3a835",
+   "bytes": 5798440,
+   "pages": 57,
+   "canonical": "sources/packs/Seat_Management_Venue_Mapping_Reference v1.0.pdf",
+   "authority": [
+    "reference"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "packs"
+   ],
+   "copies": [
+    "sources/packs/Seat_Management_Venue_Mapping_Reference v1.0.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Seating Manifest.xlsx",
+   "sha256": "6e766a20d14814cd892239afc0c49bd8e6dd340f4e697b85e54e927858c5e03b",
+   "bytes": 16822,
+   "pages": null,
+   "canonical": "sources/packs/Seating Manifest.xlsx",
+   "authority": [
+    "document"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "documents"
+   ],
+   "copies": [
+    "sources/documents/Seating Manifest.xlsx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Seating_Manifest_1.xlsx",
+   "sha256": "58dad07c5895a418383da088e8c2fc5cca7cf3720505137328f2a12c43f61cff",
+   "bytes": 17924,
+   "pages": null,
+   "canonical": "sources/packs/Seating_Manifest_1.xlsx",
+   "authority": [
+    "requirement"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "requirements"
+   ],
+   "copies": [
+    "sources/requirements/Seating_Manifest_1.xlsx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Subscription_Licensing_AI_Self_Service.pdf",
+   "sha256": "0c34b9ff7e0eb2de7dd09f1663dd561789e9eeaa019a5bcf2bec18529a5b7039",
+   "bytes": 3410587,
+   "pages": 137,
+   "canonical": "sources/packs/Subscription_Licensing_AI_Self_Service.pdf",
+   "authority": [
+    "workshop"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "workshop"
+   ],
+   "copies": [
+    "sources/workshop/Subscription_Licensing_AI_Self_Service.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [
+    "P08",
+    "P09",
+    "P17"
+   ],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [
+    "P08",
+    "P09",
+    "P17"
+   ],
+   "platformNames": {
+    "P08": "Venue Management \u2014 Back Office",
+    "P09": "TICVAI Web \u2014 Platform Console",
+    "P17": "TICVAI Sign-up \u2014 Onboarding & Purchase"
+   },
+   "operations": [],
+   "packScreensMatched": 100,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TAIS Platform RFP From Miracle Star Trading.pdf",
+   "sha256": "386cee217d6e91f921c4ed0fcfcd08348d5675640257ea98dff3d8ebfbc3522e",
+   "bytes": 557861,
+   "pages": 13,
+   "canonical": "sources/packs/TAIS Platform RFP From Miracle Star Trading.pdf",
+   "authority": [
+    "rfp",
+    "document"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "documents",
+    "rfp"
+   ],
+   "copies": [
+    "sources/documents/TAIS Platform RFP From Miracle Star Trading.pdf",
+    "sources/rfp/TAIS_Platform_RFP_From_Miracle_Star_Trading_2.pdf"
+   ],
+   "duplicated": true,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TAIS_Product_Planning_and_Delivery_Plan_4_1.xlsx",
+   "sha256": "a743dcfc7ec00d8fc0c84bbfe2a714977a2b3d21a7b3d1f4ace9d50cba708369",
+   "bytes": 334229,
+   "pages": null,
+   "canonical": "sources/packs/TAIS_Product_Planning_and_Delivery_Plan_4_1.xlsx",
+   "authority": [
+    "planning"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "planning"
+   ],
+   "copies": [
+    "sources/planning/TAIS_Product_Planning_and_Delivery_Plan_4_1.xlsx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Ticket Resale Marketplace_Reference.pdf",
+   "sha256": "4a36197abd339d1b5577d55f25621239ffd548c46066214019bb7e4ee16edd0f",
+   "bytes": 1812873,
+   "pages": 59,
+   "canonical": "sources/packs/Ticket Resale Marketplace_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "packs",
+    "workshop"
+   ],
+   "copies": [
+    "sources/packs/Ticket Resale Marketplace_Reference.pdf",
+    "sources/workshop/Ticket Resale Marketplace_Reference.pdf"
+   ],
+   "duplicated": true,
+   "platforms": [
+    "P09"
+   ],
+   "platformsConfirmed": [
+    "P09"
+   ],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {
+    "P09": "TICVAI Web \u2014 Platform Console"
+   },
+   "operations": [
+    "approveListingModeration",
+    "createListingSeller",
+    "listBuyerCheckoutInventory",
+    "listBuyerPurchaseResale",
+    "listCapacityInventoryReconciliation",
+    "listCreateListingResale",
+    "listCredentialRevocationRegeneration",
+    "listFeeSellerProceed",
+    "listListingLifecycleExpiry",
+    "listOfficialResaleMarketplace",
+    "listRefundDisputeResale",
+    "listResale",
+    "listResale2",
+    "listResaleConfirmationOwnership",
+    "listResaleEligibilityTicket",
+    "listResaleFeeCommission",
+    "listResaleFraudDuplicate",
+    "listResaleInventoryAvailability",
+    "listResaleListingSeller",
+    "listResaleMarketplace",
+    "listResaleOwnership",
+    "listResalePolicyMarketplace",
+    "listResalePricingPrice",
+    "listResaleTicketDetail",
+    "listSellerSettlementPayout",
+    "listTicketOwnershipTransfer",
+    "listTicketResaleMarketplace",
+    "listWhiteLabelMarketplace",
+    "setResaleEligibilityRule",
+    "setResaleMarketplaceRecommendation"
+   ],
+   "packScreensMatched": 30,
+   "drafted": true,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Ticket Upgrade, Exchange & Conversion_Reference.pdf",
+   "sha256": "1db15a7c8be5742bb57371e39f279bf30c584a6609647c3d4e9219583be7458f",
+   "bytes": 668293,
+   "pages": 23,
+   "canonical": "sources/packs/Ticket Upgrade, Exchange & Conversion_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "packs",
+    "workshop"
+   ],
+   "copies": [
+    "sources/packs/Ticket Upgrade, Exchange & Conversion_Reference.pdf",
+    "sources/workshop/Ticket Upgrade, Exchange & Conversion_Reference.pdf"
+   ],
+   "duplicated": true,
+   "platforms": [
+    "P09"
+   ],
+   "platformsConfirmed": [
+    "P09"
+   ],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {
+    "P09": "TICVAI Web \u2014 Platform Console"
+   },
+   "operations": [
+    "createUpgradeCredentialRegeneration",
+    "listBulkGroupAssisted",
+    "listPersonTypeProduct",
+    "listUpgradeConversion",
+    "listUpgradeEligibilityQualification",
+    "listUpgradeException",
+    "listUpgradeFinancialTreatment",
+    "listUpgradeTimingUsage",
+    "setProRataResidual",
+    "setUpgradeConversionPath"
+   ],
+   "packScreensMatched": 10,
+   "drafted": true,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Ticket_Media___Credential_Management_Reference.pdf",
+   "sha256": "578f29517f3b6544190f0eb6b1db6de565e88d767a74d82df94baf1a14dfdaac",
+   "bytes": 2012499,
+   "pages": 59,
+   "canonical": "sources/packs/Ticket_Media___Credential_Management_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "packs",
+    "workshop"
+   ],
+   "copies": [
+    "sources/packs/Ticket_Media___Credential_Management_Reference.pdf",
+    "sources/workshop/Ticket_Media___Credential_Management_Reference.pdf"
+   ],
+   "duplicated": true,
+   "platforms": [
+    "P08"
+   ],
+   "platformsConfirmed": [
+    "P08"
+   ],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {
+    "P08": "Venue Management \u2014 Back Office"
+   },
+   "operations": [
+    "approveMultiMediaPreview",
+    "listBrandingLocalizationTemplate",
+    "listCredential",
+    "listCredentialDeliveryDistribution",
+    "listCredentialGenerationIssuance",
+    "listCredentialIdentityToken",
+    "listCredentialReplacementReissue",
+    "listCredentialSecurityOperational",
+    "listCredentialUsageCross",
+    "listEntitlementCrossMedia",
+    "listFailedGenerationDelivery",
+    "listMediaActivationPriority",
+    "listMediaDesign",
+    "listMediaReplacementRevocation",
+    "listMediaTypeCredential",
+    "listMultiMediaBinding",
+    "listTicketMedia",
+    "listVirtualTicket",
+    "listVirtualTicketArchitecture",
+    "listVirtualTicketStatus",
+    "setAppleWalletPass",
+    "setDigitalBarcodeTicket",
+    "setDigitalCardMembership",
+    "setDynamicFieldData",
+    "setGoogleWalletPass",
+    "setMediaBindingActivation",
+    "setPdfPrintablePos",
+    "setRfidNfcCard",
+    "setVirtualTicketCredential",
+    "setVirtualTicketIdentity"
+   ],
+   "packScreensMatched": 30,
+   "drafted": true,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Ticketing_Platform_Native_Dashboard_Visualization_Requirements.pdf",
+   "sha256": "0be3d172c3d949098d017f34877663b0af5c3716621458ab28e859c5a7f1b00b",
+   "bytes": 320398,
+   "pages": 12,
+   "canonical": "sources/packs/Ticketing_Platform_Native_Dashboard_Visualization_Requirements.pdf",
+   "authority": [
+    "requirement"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "requirements"
+   ],
+   "copies": [
+    "sources/requirements/Ticketing_Platform_Native_Dashboard_Visualization_Requirements.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI Finance Backend Structure Reference v1.0.pdf",
+   "sha256": "ec045537e9639b12fa9655b8df2419506bddc38f129c29ed03d55825310bd473",
+   "bytes": 3839790,
+   "pages": 123,
+   "canonical": "sources/packs/TICVAI Finance Backend Structure Reference v1.0.pdf",
+   "authority": [
+    "reference"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "packs"
+   ],
+   "copies": [
+    "sources/packs/TICVAI Finance Backend Structure Reference v1.0.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Ticvai matrix 20260621 (2) 2.xlsx",
+   "sha256": "c218e62c6b008183023274d18f6e7b127d3131a13abd278c78e0432aa80c2b3e",
+   "bytes": 280488,
+   "pages": null,
+   "canonical": "sources/packs/Ticvai matrix 20260621 (2) 2.xlsx",
+   "authority": [
+    "requirement",
+    "document"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "documents",
+    "requirements"
+   ],
+   "copies": [
+    "sources/documents/Ticvai matrix 20260621 (2) 2.xlsx",
+    "sources/requirements/Ticvai_matrix_20260621_2_2_2.xlsx"
+   ],
+   "duplicated": true,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_BackendDeepDive_MoM_07Aug2026.docx",
+   "sha256": "46cbd91b915d023a40a6bcfb84eba9487ab2c6d4c3cac8fa893da5ba6d3cb46d",
+   "bytes": 37726,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_BackendDeepDive_MoM_07Aug2026.docx",
+   "authority": [
+    "mom"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "mom"
+   ],
+   "copies": [
+    "sources/mom/TICVAI_BackendDeepDive_MoM_07Aug2026.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Ticvai_Design_Vision_Book_v1_1.pdf",
+   "sha256": "e49d55deb1daf827068fc538da7e7d59f77a9edea359abb0ef392aefb92b3c5b",
+   "bytes": 1492863,
+   "pages": 9,
+   "canonical": "sources/packs/Ticvai_Design_Vision_Book_v1_1.pdf",
+   "authority": [
+    "design"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "designs"
+   ],
+   "copies": [
+    "sources/designs/Ticvai_Design_Vision_Book_v1_1.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_Discry_Wrkshp_Day_1_Jul_28_2026.docx",
+   "sha256": "9db7bbb7c85b6de9dc4a1f0ed1bb2d267864665ca9fd521c1fa3c10c7faa8986",
+   "bytes": 63841,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_Discry_Wrkshp_Day_1_Jul_28_2026.docx",
+   "authority": [
+    "mom"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "mom"
+   ],
+   "copies": [
+    "sources/mom/TICVAI_Discry_Wrkshp_Day_1_Jul_28_2026.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_Employee_App_UI_Reference_1.pdf",
+   "sha256": "1c548742c6fc9873288a4259613893f4c8ac3364aa4f34632187f3d03a3f5c93",
+   "bytes": 2425102,
+   "pages": 6,
+   "canonical": "sources/packs/TICVAI_Employee_App_UI_Reference_1.pdf",
+   "authority": [
+    "design"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "designs"
+   ],
+   "copies": [
+    "sources/designs/TICVAI_Employee_App_UI_Reference_1.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_FnB_POS_Visual_Reference_Revised.pdf",
+   "sha256": "b5ad49c655b30753565edbaff4a0bca7cdd8fe739578238cabea5006570ef76d",
+   "bytes": 2295234,
+   "pages": 8,
+   "canonical": "sources/packs/TICVAI_FnB_POS_Visual_Reference_Revised.pdf",
+   "authority": [
+    "reference"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "packs"
+   ],
+   "copies": [
+    "sources/packs/TICVAI_FnB_POS_Visual_Reference_Revised.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_Followup_MoM_31Jul2026.docx",
+   "sha256": "c979216742003bc178da9ae68305e71fdaa66f8f8b279b7635beec53fe541a10",
+   "bytes": 51056,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_Followup_MoM_31Jul2026.docx",
+   "authority": [
+    "mom"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "mom"
+   ],
+   "copies": [
+    "sources/mom/TICVAI_Followup_MoM_31Jul2026.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_Hardware_Integration v1.0.xlsx",
+   "sha256": "7350704efe55f57c4bff59b67ca85e306fa4bb071366f9833d69eb927712c65e",
+   "bytes": 9254,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_Hardware_Integration v1.0.xlsx",
+   "authority": [
+    "document"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "documents"
+   ],
+   "copies": [
+    "sources/documents/TICVAI_Hardware_Integration v1.0.xlsx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_Inventory_and_Procurement_Backend_Structure_Sample v1.0.pdf",
+   "sha256": "fbd2c2dcc20afd502258e1fec44eb5bf789e6a3a191f978e15671afb4c0f9e75",
+   "bytes": 5340586,
+   "pages": 175,
+   "canonical": "sources/packs/TICVAI_Inventory_and_Procurement_Backend_Structure_Sample v1.0.pdf",
+   "authority": [
+    "reference"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "packs"
+   ],
+   "copies": [
+    "sources/packs/TICVAI_Inventory_and_Procurement_Backend_Structure_Sample v1.0.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_Inventory_and_Procurement_Backend_Structure_Sample_v1_0.pdf",
+   "sha256": "1289082527cb5aa73c2b79f0d91b0f6adb9499ea5574cf37834fb90e2a1bad8a",
+   "bytes": 190752,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_Inventory_and_Procurement_Backend_Structure_Sample_v1_0.pdf",
+   "authority": [
+    "requirement"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "requirements"
+   ],
+   "copies": [
+    "sources/requirements/TICVAI_Inventory_and_Procurement_Backend_Structure_Sample_v1_0.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_Kickoff_MoM_12Aug2026.docx",
+   "sha256": "09c552beb6dfb0caa6e9dc09a9b98850a4a819489cfa0443560571c4c569388b",
+   "bytes": 72228,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_Kickoff_MoM_12Aug2026.docx",
+   "authority": [
+    "mom"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "mom"
+   ],
+   "copies": [
+    "sources/mom/TICVAI_Kickoff_MoM_12Aug2026.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_Kickoff_MoM_2026-08-05.docx",
+   "sha256": "db5a620cf6b3341610f424b3afe1d34c5c356ade4edb0dec02021688a4ab9f1f",
+   "bytes": 53923,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_Kickoff_MoM_2026-08-05.docx",
+   "authority": [
+    "mom"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "mom"
+   ],
+   "copies": [
+    "sources/mom/TICVAI_Kickoff_MoM_2026-08-05.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_Kickoff_MoM_2026-08-10.docx",
+   "sha256": "8dbad931f8724ead5eeeae1bd33047222682d3135c4b44b0842653517c698840",
+   "bytes": 74077,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_Kickoff_MoM_2026-08-10.docx",
+   "authority": [
+    "mom"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "mom"
+   ],
+   "copies": [
+    "sources/mom/TICVAI_Kickoff_MoM_2026-08-10.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_Kickoff_MoM_30Jul2026__2_.docx",
+   "sha256": "b0ee57b2dfcf46e0f819e8d5ce34470f8bc0710a067f974a73eb987b8d0b09b0",
+   "bytes": 7313,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_Kickoff_MoM_30Jul2026__2_.docx",
+   "authority": [
+    "mom"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "mom"
+   ],
+   "copies": [
+    "sources/mom/TICVAI_Kickoff_MoM_30Jul2026__2_.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Ticvai_matrix_20260621_2.xlsx",
+   "sha256": "353d104c19b0d847f351575571a39b04f83a097c565cc7bb9a97b0357b3b7a39",
+   "bytes": 279202,
+   "pages": null,
+   "canonical": "sources/packs/Ticvai_matrix_20260621_2.xlsx",
+   "authority": [
+    "requirement"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "requirements"
+   ],
+   "copies": [
+    "sources/requirements/Ticvai_matrix_20260621_2.xlsx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_MoM_2026-08-14.docx",
+   "sha256": "18ac51dda19ccd35a21f9989caf5f6eecd2ea72be7e6ea5f6a13f99dd0d9324b",
+   "bytes": 52577,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_MoM_2026-08-14.docx",
+   "authority": [
+    "mom"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "mom"
+   ],
+   "copies": [
+    "sources/mom/TICVAI_MoM_2026-08-14.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_MoM_2026-08-19_FnB_Retail_Procurement_Inventory.docx",
+   "sha256": "180db02d890c5a9b29034a8a82a8ba26b4ba463aa85d245a89187451ef691e45",
+   "bytes": 50144,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_MoM_2026-08-19_FnB_Retail_Procurement_Inventory.docx",
+   "authority": [
+    "mom"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "mom"
+   ],
+   "copies": [
+    "sources/mom/TICVAI_MoM_2026-08-19_FnB_Retail_Procurement_Inventory.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_MoM_2026-08-20_CRM_Marketing_CMS.docx",
+   "sha256": "8bb4a7a3f10fbf1616f72fc0d1df4d465dbdcaa1ffe75524f5a9565f1f6e2883",
+   "bytes": 43171,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_MoM_2026-08-20_CRM_Marketing_CMS.docx",
+   "authority": [
+    "mom"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "mom"
+   ],
+   "copies": [
+    "sources/mom/TICVAI_MoM_2026-08-20_CRM_Marketing_CMS.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_MoM_2026-08-21_Seat_Management_CMS.docx",
+   "sha256": "f6b8a49c31d98ef74161248484c5b7a494d81d3179d57905c2058d412034690a",
+   "bytes": 43540,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_MoM_2026-08-21_Seat_Management_CMS.docx",
+   "authority": [
+    "mom"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "mom"
+   ],
+   "copies": [
+    "sources/mom/TICVAI_MoM_2026-08-21_Seat_Management_CMS.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_MoM_2026-08-24_Infra_Cost_Ticketing.docx",
+   "sha256": "06989229a0a9334ed4ba82190e6888b8bb6baf45c691616996b99145c4c053c3",
+   "bytes": 60323,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_MoM_2026-08-24_Infra_Cost_Ticketing.docx",
+   "authority": [
+    "mom"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "mom"
+   ],
+   "copies": [
+    "sources/mom/TICVAI_MoM_2026-08-24_Infra_Cost_Ticketing.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_MoM_2026-08-25_Ticketing_ProductConfig.docx",
+   "sha256": "142dd85125deba8a1eb47a83c3b8d4f46cad7942aa8951d88a5c3ecf47b4bca0",
+   "bytes": 46751,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_MoM_2026-08-25_Ticketing_ProductConfig.docx",
+   "authority": [
+    "mom"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "mom"
+   ],
+   "copies": [
+    "sources/mom/TICVAI_MoM_2026-08-25_Ticketing_ProductConfig.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_MoM_2026-08-26_ResourceManagement.docx",
+   "sha256": "508cb5267195d19d253c9959c0d429fc64294c9579280ecfbc42e9ed321b3fa7",
+   "bytes": 56922,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_MoM_2026-08-26_ResourceManagement.docx",
+   "authority": [
+    "mom"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "mom"
+   ],
+   "copies": [
+    "sources/mom/TICVAI_MoM_2026-08-26_ResourceManagement.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_MoM_2026-08-27_WalletConfiguration.docx",
+   "sha256": "172a828a4684bf8f0b6f6dafdfcf6dc611000190aaefc66d1114a8766a62cbbc",
+   "bytes": 63935,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_MoM_2026-08-27_WalletConfiguration.docx",
+   "authority": [
+    "mom"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "mom"
+   ],
+   "copies": [
+    "sources/mom/TICVAI_MoM_2026-08-27_WalletConfiguration.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_MoM_2026-08-31_CS_B2B_Groups_Waivers_SalesChannel.docx",
+   "sha256": "3cd7a87db0ea2c6d2d4e4c062a7fef9367e14cfcc70a95bb64a9ebdb0886a426",
+   "bytes": 59790,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_MoM_2026-08-31_CS_B2B_Groups_Waivers_SalesChannel.docx",
+   "authority": [
+    "mom"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "mom"
+   ],
+   "copies": [
+    "sources/mom/TICVAI_MoM_2026-08-31_CS_B2B_Groups_Waivers_SalesChannel.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_MoM_2026-09-01_Pricing_Upgrades_Media_Reservations_Resale.docx",
+   "sha256": "50e556489f43d03d887102117c39c8d3d3cf86f2bf50ab14db69c50298be6633",
+   "bytes": 59193,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_MoM_2026-09-01_Pricing_Upgrades_Media_Reservations_Resale.docx",
+   "authority": [
+    "mom"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "mom"
+   ],
+   "copies": [
+    "sources/mom/TICVAI_MoM_2026-09-01_Pricing_Upgrades_Media_Reservations_Resale.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_MoM_2026-09-02_AccessControl.docx",
+   "sha256": "d2c4e56ebfa228864de098d03c402c06b1219a46824489df2044b38b0e86c70c",
+   "bytes": 59403,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_MoM_2026-09-02_AccessControl.docx",
+   "authority": [
+    "mom"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "mom"
+   ],
+   "copies": [
+    "sources/mom/TICVAI_MoM_2026-09-02_AccessControl.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue.docx",
+   "sha256": "6b9e992bb565695088236c59ade0455bffa316232aa5dd940c942ffd54260929",
+   "bytes": 60406,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue.docx",
+   "authority": [
+    "mom"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "mom"
+   ],
+   "copies": [
+    "sources/mom/TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_MoM_2026-09-08_BI_Reporting_ApprovalWorkflow.docx",
+   "sha256": "4916e582d76f738e738e6f0867d58abd433b6155b9a3b00f417e3911e86c7f05",
+   "bytes": 59970,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_MoM_2026-09-08_BI_Reporting_ApprovalWorkflow.docx",
+   "authority": [
+    "mom"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "mom"
+   ],
+   "copies": [
+    "sources/mom/TICVAI_MoM_2026-09-08_BI_Reporting_ApprovalWorkflow.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_MoM_2026-09-09_Rental_POS_Licensing.docx",
+   "sha256": "73d3ed7957e3851c405ebf550537e851a0aa3a9ed1e11c93f7626b0c551efff3",
+   "bytes": 67128,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_MoM_2026-09-09_Rental_POS_Licensing.docx",
+   "authority": [
+    "mom"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "mom"
+   ],
+   "copies": [
+    "sources/mom/TICVAI_MoM_2026-09-09_Rental_POS_Licensing.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_MoM_2026-09-10_LicensingSubscription.docx",
+   "sha256": "af95d8eb452871517859e2ac80375cde1be5b9db35e44cedbcd2808f6bea80bb",
+   "bytes": 61747,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_MoM_2026-09-10_LicensingSubscription.docx",
+   "authority": [
+    "mom"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "mom"
+   ],
+   "copies": [
+    "sources/mom/TICVAI_MoM_2026-09-10_LicensingSubscription.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_MoM_2026-09-11_DAM_Gaming.docx",
+   "sha256": "5e63b632f49c041b96b7d165f31dbd639ac8b684a64ca2dfbc8d09d9f071058c",
+   "bytes": 65219,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_MoM_2026-09-11_DAM_Gaming.docx",
+   "authority": [
+    "mom"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "mom"
+   ],
+   "copies": [
+    "sources/mom/TICVAI_MoM_2026-09-11_DAM_Gaming.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_MoM_2026-09-15_GuestAppReview_DeviceManagement.docx",
+   "sha256": "6af4c098a9f842b02bef6876c116451ef821dcf3a96b673635fcd854e9810c74",
+   "bytes": 61385,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_MoM_2026-09-15_GuestAppReview_DeviceManagement.docx",
+   "authority": [
+    "mom"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "mom"
+   ],
+   "copies": [
+    "sources/mom/TICVAI_MoM_2026-09-15_GuestAppReview_DeviceManagement.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_MoM_31Jul2026__1_.docx",
+   "sha256": "bf3129e485dc2e3129d6f8c8d2f3c5d5e857751239099cfa680bba7af2c45110",
+   "bytes": 31462,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_MoM_31Jul2026__1_.docx",
+   "authority": [
+    "mom"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "mom"
+   ],
+   "copies": [
+    "sources/mom/TICVAI_MoM_31Jul2026__1_.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_POS_Frontline_Dashboard Screens Reference v1.0.pdf",
+   "sha256": "e2e55fb91f16ac176cfc46ba66d53e127d7b94a205672aa9bf07a67cdaaf4103",
+   "bytes": 3740961,
+   "pages": 6,
+   "canonical": "sources/packs/TICVAI_POS_Frontline_Dashboard Screens Reference v1.0.pdf",
+   "authority": [
+    "board",
+    "reference"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "boards",
+    "packs"
+   ],
+   "copies": [
+    "sources/boards/TICVAI_POS_Frontline_Dashboard_Screens_Reference_v1_0.pdf",
+    "sources/packs/TICVAI_POS_Frontline_Dashboard Screens Reference v1.0.pdf"
+   ],
+   "duplicated": true,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference.pdf",
+   "sha256": "c6dc0d83ab5cd97f8eba5cdbc4ab5a4095ac419c0ee459d8ef56a0f8094efd0d",
+   "bytes": 7043698,
+   "pages": 45,
+   "canonical": "sources/packs/TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference.pdf",
+   "authority": [
+    "board"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "boards"
+   ],
+   "copies": [
+    "sources/boards/TICVAI_POS_Frontline_Operations_Professional_Dashboard_Reference.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_Resource_Management_All_Screens v1.0.pdf",
+   "sha256": "9d4bf629d38a41d27f0a1b3d8b3efc7a802431c900b6fc98ce8174ffdb4c493e",
+   "bytes": 15686905,
+   "pages": 11,
+   "canonical": "sources/packs/TICVAI_Resource_Management_All_Screens v1.0.pdf",
+   "authority": [
+    "board",
+    "reference"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "boards",
+    "packs"
+   ],
+   "copies": [
+    "sources/boards/TICVAI_Resource_Management_All_Screens_v1_0.pdf",
+    "sources/packs/TICVAI_Resource_Management_All_Screens v1.0.pdf"
+   ],
+   "duplicated": true,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_Task_Track_From_Workshops.xlsx",
+   "sha256": "2008fe7a668f18eaeef330b1a966a1ad7672e7001b96c26dffbceac5ca882f3a",
+   "bytes": 75830,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_Task_Track_From_Workshops.xlsx",
+   "authority": [
+    "planning"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "planning"
+   ],
+   "copies": [
+    "sources/planning/TICVAI_Task_Track_From_Workshops.xlsx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_Task_Track_From_Workshops_1.xlsx",
+   "sha256": "3cdfb2f0c86d57447bd011f0760fce0ab6c305502eba73be154431b9d6949911",
+   "bytes": 30453,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_Task_Track_From_Workshops_1.xlsx",
+   "authority": [
+    "planning"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "planning"
+   ],
+   "copies": [
+    "sources/planning/TICVAI_Task_Track_From_Workshops_1.xlsx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_Task_Tracker.xlsx",
+   "sha256": "f9372eba1a1627f19ce2553cfc1b542b794825a3ebc5a564827d1f88e194e493",
+   "bytes": 25619,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_Task_Tracker.xlsx",
+   "authority": [
+    "mom"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "mom"
+   ],
+   "copies": [
+    "sources/mom/TICVAI_Task_Tracker.xlsx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_Ticket_Types_Dashboard_Screens_High_Resolution.pdf",
+   "sha256": "76e7d494127e3cfeed964d7ac1de3a80d3e221470991b4d93146cef416ad0f6f",
+   "bytes": 19961046,
+   "pages": 12,
+   "canonical": "sources/packs/TICVAI_Ticket_Types_Dashboard_Screens_High_Resolution.pdf",
+   "authority": [
+    "requirement",
+    "board"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "boards",
+    "requirements"
+   ],
+   "copies": [
+    "sources/boards/TICVAI_Ticket_Types_Dashboard_Screens_High_Resolution.pdf",
+    "sources/requirements/TICVAI_Ticket_Types_Dashboard_Screens_High_Resolution.pdf"
+   ],
+   "duplicated": true,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_Ticket_Types_Product_Configuration_Scope_of_Work_v1.0.pdf",
+   "sha256": "6aee7db8319146f6e390234ede22af0b55ac978d45695b34e5ab72d5de6d80d3",
+   "bytes": 4478285,
+   "pages": 46,
+   "canonical": "sources/packs/TICVAI_Ticket_Types_Product_Configuration_Scope_of_Work_v1.0.pdf",
+   "authority": [
+    "requirement",
+    "reference"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "packs",
+    "requirements"
+   ],
+   "copies": [
+    "sources/packs/TICVAI_Ticket_Types_Product_Configuration_Scope_of_Work_v1.0.pdf",
+    "sources/requirements/TICVAI_Ticket_Types_Product_Configuration_Scope_of_Work_v1_0.pdf"
+   ],
+   "duplicated": true,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_Ticketing_Configuration_Reference v1.0.jpeg",
+   "sha256": "85f22733e8fac367f9aa7a899e18860f21e09377321d3a09740e64dacf8caffc",
+   "bytes": 308748,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_Ticketing_Configuration_Reference v1.0.jpeg",
+   "authority": [
+    "reference"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "packs"
+   ],
+   "copies": [
+    "sources/packs/TICVAI_Ticketing_Configuration_Reference v1.0.jpeg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_Ticketing_Configuration_Reference_v1_0.jpeg",
+   "sha256": "ffa3870d87fbb42858b52c5a08aef0bc10446776e98ca35d8f18235d938aacb0",
+   "bytes": 230866,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_Ticketing_Configuration_Reference_v1_0.jpeg",
+   "authority": [
+    "requirement"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "requirements"
+   ],
+   "copies": [
+    "sources/requirements/TICVAI_Ticketing_Configuration_Reference_v1_0.jpeg"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_UIUX_MoM_03Aug2026.docx",
+   "sha256": "d316420c7d519d5c74171e9732f738e5df8301a7bb8da656b2b2c1f4b81550db",
+   "bytes": 67263,
+   "pages": null,
+   "canonical": "sources/packs/TICVAI_UIUX_MoM_03Aug2026.docx",
+   "authority": [
+    "mom"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "mom"
+   ],
+   "copies": [
+    "sources/mom/TICVAI_UIUX_MoM_03Aug2026.docx"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "TICVAI_White_Label_Guest_App_UI_Reference_1.pdf",
+   "sha256": "8e10abae3dba2d8dfb37a481a777e09ca7d08ea2f92ccaff371f59319c6eebe4",
+   "bytes": 3328653,
+   "pages": 8,
+   "canonical": "sources/packs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf",
+   "authority": [
+    "design"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "designs"
+   ],
+   "copies": [
+    "sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
+   "sha256": "fa0c3a9b1db3bb821fc962d0d1543d1911bf2b4656acff3e1e60bdf773f3d14c",
+   "bytes": 3208731,
+   "pages": 136,
+   "canonical": "sources/packs/Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "packs",
+    "workshop"
+   ],
+   "copies": [
+    "sources/packs/Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
+    "sources/workshop/Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf"
+   ],
+   "duplicated": true,
+   "platforms": [
+    "P16"
+   ],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [
+    "P16"
+   ],
+   "platformNames": {
+    "P16": "Venue Analytics \u2014 Cross-Domain Reporting"
+   },
+   "operations": [],
+   "packScreensMatched": 60,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Upsell,CrossSellEngine.pdf",
+   "sha256": "3ee4c6b3571a39b54b8c7beca1c74a7b0c82f48ea645e7217ec6d8615952b292",
+   "bytes": 3462199,
+   "pages": 183,
+   "canonical": "sources/packs/Upsell,CrossSellEngine.pdf",
+   "authority": [
+    "reference"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "packs"
+   ],
+   "copies": [
+    "sources/packs/Upsell,CrossSellEngine.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Virtual_Queue.pdf",
+   "sha256": "68771787d1cba48de3cff895a934657d6b2aa2a42df95e46b82b4e1e9ef80a66",
+   "bytes": 2186868,
+   "pages": 17,
+   "canonical": "sources/packs/Virtual_Queue.pdf",
+   "authority": [
+    "reference"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "packs"
+   ],
+   "copies": [
+    "sources/packs/Virtual_Queue.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Waiver, Consent & Digital Form Management_Reference.pdf",
+   "sha256": "253fd0ea82d70db159b2056e28ebddef2a87649f66d421c06e3f387334dcb58c",
+   "bytes": 1398517,
+   "pages": 44,
+   "canonical": "sources/packs/Waiver, Consent & Digital Form Management_Reference.pdf",
+   "authority": [
+    "workshop",
+    "reference"
+   ],
+   "authorityConflict": true,
+   "heldIn": [
+    "packs",
+    "workshop"
+   ],
+   "copies": [
+    "sources/packs/Waiver, Consent & Digital Form Management_Reference.pdf",
+    "sources/workshop/Waiver, Consent & Digital Form Management_Reference.pdf"
+   ],
+   "duplicated": true,
+   "platforms": [
+    "P13"
+   ],
+   "platformsConfirmed": [
+    "P13"
+   ],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {
+    "P13": "Venue CMS \u2014 White Label"
+   },
+   "operations": [
+    "approveWaiverTesting",
+    "listComplianceEvidenceWaiver",
+    "listDigitalSigningCollection",
+    "listDynamicFieldQuestion",
+    "listMinorGuardianGroup",
+    "listMissingExpiredInvalid",
+    "listParticipantWaiverStatus",
+    "listProductEventExperience",
+    "listSiteWaiverException",
+    "listVersioningEffectiveDate",
+    "listWaiver",
+    "listWaiverComplianceOperational",
+    "listWaiverComplianceRisk",
+    "listWaiverConsent",
+    "listWaiverTemplateMaster",
+    "listWaiverTriggerEligibility",
+    "setDigitalWaiverForm",
+    "setLocalizationBrandingCustomer",
+    "setSignatorySignatureGuardian",
+    "setWaiverVerificationValidation"
+   ],
+   "packScreensMatched": 20,
+   "drafted": true,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  },
+  {
+   "document": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
+   "sha256": "79a641fc2e8c6cc0e0411974b41cfee1888c109fc667a0568caa5bb98213393f",
+   "bytes": 2948151,
+   "pages": 129,
+   "canonical": "sources/packs/Wallet_Configuration_Backend_Structure_v1.0.pdf",
+   "authority": [
+    "reference"
+   ],
+   "authorityConflict": false,
+   "heldIn": [
+    "packs"
+   ],
+   "copies": [
+    "sources/packs/Wallet_Configuration_Backend_Structure_v1.0.pdf"
+   ],
+   "duplicated": false,
+   "platforms": [],
+   "platformsConfirmed": [],
+   "platformsFromContractsOnly": [],
+   "platformsFromPackScreensOnly": [],
+   "platformNames": {},
+   "operations": [],
+   "packScreensMatched": 0,
+   "drafted": false,
+   "firstIndexed": "2026-09-18",
+   "lastSeen": "2026-09-18"
+  }
+ ]
+}

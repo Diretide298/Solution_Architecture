@@ -93,7 +93,12 @@ AREA_LINE = re.compile(r"^Area\s+(\d+)\s*" + DASH + r"\s*(.+)$")
 # list to nothing and made a working extract look like a bullet-parsing failure.
 SECTIONS = ("Purpose", "KPI Cards", "Configuration Directory", "Transaction Types",
             "Fields", "Actions", "Rules", "Validation", "Filters", "Tabs",
-            "Operational Activity", "Governance", "AI Assistance")
+            "Operational Activity", "Governance", "AI Assistance",
+            # The `sources/packs/` family's own vocabulary. **`Key requirements` is the one worth
+            # having**: it carries matrix ids — `Key requirements: 12.1.8–12.1.15` — so a screen
+            # parsed from these packs can be traced to the contracted baseline directly, which no
+            # workshop pack offers.
+            "Scope of Work", "Key requirements", "Board Objective")
 
 # The pack bullets with a private-use Wingdings glyph, not a bullet character.
 BULLET = "•●▪*-–— "
@@ -119,7 +124,16 @@ def toc_block(pages: list[str]) -> tuple[str, int]:
         # A specification page carries a screen heading and then a section heading under it.
         if SCREEN_LINE.match(body.strip().split("\n")[0].strip() if body.strip() else ""):
             continue
-        if any(f"\n{s}\n" in body for s in ("Purpose", "KPI Cards")) and "Table of Contents" not in body:
+        # The workshop family puts the heading on its own line; the `sources/packs/` family writes
+        # `Purpose:` inline. **Only the first form was recognised**, so for the second the contents
+        # block never closed, ran to the last page, and every screen parsed from its own index
+        # entry with no body behind it.
+        if "Table of Contents" in body:
+            continue
+        if any(f"\n{s}\n" in body for s in ("Purpose", "KPI Cards")):
+            end = i
+            break
+        if re.search(r"^(Purpose|Scope of Work):\s+\S", body, re.M):
             end = i
             break
     return "\n".join(pages[start:end]), end
@@ -316,6 +330,13 @@ def sections(body: str, doc_title: str) -> dict:
     redundancy pass compares, and for that purpose the label matters far less than the nouns.
     """
     label = re.compile(r"^([A-Z][A-Za-z0-9 ,&/'-]{2,40}):?$")
+    # **A second pack family writes the label and its content on one line.** The seventeen workshop
+    # documents put `Purpose` alone on a line and the prose beneath it; `ACCREDITATION.pdf` and the
+    # other packs in `sources/packs/` write `Purpose: Executive and operational landing screen.`
+    # Matched only by the label-alone form, every one of those lines fell through to the
+    # continuation branch with no `current` label open, and was dropped — which is why the first
+    # parse of that pack produced 131 screens and 131 empty bodies.
+    inline = re.compile(r"^([A-Z][A-Za-z0-9 ,&/'-]{2,40}):\s+(\S.*)$")
     blocks: dict[str, list[str]] = {}
     current = None
     for raw in body.split(chr(10)):
@@ -328,7 +349,10 @@ def sections(body: str, doc_title: str) -> dict:
         # written that way here rather than as `Page`.
         if (line.startswith("TICVAI") or line == doc_title
                 or re.match(r"^TICVAI\s*[.]\s*\d+$", line)
-                or re.match(r"^\d+\s*\|\s*Pa\s*g\s*e$", line)):
+                or re.match(r"^\d+\s*\|\s*Pa\s*g\s*e$", line)
+                # The `sources/packs/` family's footer: `Accreditation Functional Design • 3`.
+                # Not caught by the `TICVAI` forms above, so it entered `terms` as a field name.
+                or re.match(r"^.{4,60}\s[•·]\s*\d+$", line)):
             continue
         if line[0] in BULLET:
             t = line.lstrip(BULLET).strip()
@@ -339,6 +363,20 @@ def sections(body: str, doc_title: str) -> dict:
         if m and len(line.split()) <= 5:
             current = m.group(1).strip()
             blocks.setdefault(current, [])
+            continue
+        m = inline.match(line)
+        # **Only a known section name may introduce content inline.** Accepting any short
+        # `Word: value` line looked right and was not: across the seventeen workshop packs it
+        # invented 925 labels out of table cells and example rows — `Status: Active`,
+        # `Venue: Dubai`, `Remaining: 12` — while dissolving 275 real ones. Total content was
+        # unchanged, so nothing failed; the vocabulary just quietly became noise.
+        #
+        # Restricted to `SECTIONS`, the rule does what it was added for — `Purpose:`,
+        # `Scope of Work:` and `Key requirements:` in the `sources/packs/` family — and leaves the
+        # workshop packs byte-identical.
+        if m and m.group(1).strip() in SECTIONS:
+            current = m.group(1).strip()
+            blocks.setdefault(current, []).append(m.group(2).strip())
             continue
         # An unbulleted continuation line under a label is still content.
         if current and len(line) < 160:
@@ -358,14 +396,32 @@ def main() -> int:
     ap.add_argument("--check", action="store_true",
                     help="exit non-zero unless the parse reconciles to 59 boards and 590 screens")
     ap.add_argument("--apply", action="store_true", help="write sources/workshop/pack.json")
+    # **A pack becomes screens only if it sits in `sources/workshop/`, and 24 packs never did.**
+    # 1,955 pages in `sources/packs/` have never been through this parser — not because anyone
+    # declined them, but because nothing ever put them where it looks. Copying them in is how the
+    # duplication started, so this reads them where they are instead.
+    ap.add_argument("--from", dest="src", metavar="DIR",
+                    help="parse from this directory instead of sources/workshop")
+    ap.add_argument("--only", metavar="SUBSTRING",
+                    help="parse just the files whose name contains this — one pack at a time, "
+                         "because a pack that does not follow the ten-per-board convention should "
+                         "be read before 24 of them are trusted at once")
     a = ap.parse_args()
 
-    if not SRC.exists():
-        print(f"no {SRC.relative_to(ROOT)} — extract Workshop Docs.zip there first")
+    src = (ROOT / a.src) if a.src else SRC
+    if not src.exists():
+        print(f"no {src} — extract Workshop Docs.zip there first")
         return 1
 
+    pdfs = sorted(src.glob("*.pdf"))
+    if a.only:
+        pdfs = [p for p in pdfs if a.only.lower() in p.name.lower()]
+        if not pdfs:
+            print("no pdf under %s matching %r" % (src, a.only))
+            return 1
+
     records, per_doc, indexed_by_board = [], [], []
-    for pdf in sorted(SRC.glob("*.pdf")):
+    for pdf in pdfs:
         pages = page_texts(pdf)
         toc, body_starts_at = toc_block(pages)
         screens, boards, areas = parse_toc(toc)
@@ -442,8 +498,21 @@ def main() -> int:
               f"somebody will plan against.**")
 
     if a.apply:
-        OUT.write_text(json.dumps(records, indent=1, ensure_ascii=False), encoding="utf-8")
-        print(f"  -> {OUT.relative_to(ROOT)}")
+        # **A partial run must merge, or `--only` silently deletes every other pack.** This writes
+        # the whole file, so parsing one document and applying it would replace 1,110 screens with
+        # that document's 80 — and the result would look like a successful run. When the parse was
+        # scoped, the records for the sources it did *not* read are carried over unchanged and only
+        # the ones it did are replaced.
+        out = records
+        if (a.only or a.src) and OUT.exists():
+            existing = json.loads(OUT.read_text(encoding="utf-8"))
+            touched = {r.get("source") for r in records}
+            kept = [r for r in existing if r.get("source") not in touched]
+            out = kept + records
+            print("  merged: %d screens kept from %d other source(s), %d replaced or added"
+                  % (len(kept), len({r.get('source') for r in kept}), len(records)))
+        OUT.write_text(json.dumps(out, indent=1, ensure_ascii=False), encoding="utf-8")
+        print(f"  -> {OUT.relative_to(ROOT)}  ({len(out)} screens)")
     elif not a.check:
         print("  nothing written — pass --apply")
 
