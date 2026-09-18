@@ -294,16 +294,22 @@ checked against our package. One of the 28, `orders.payment_link`, we already ho
 **Ten are the payment cluster and are already authored.** The real additive backlog is **17
 tables**, not ~110.
 
-**Two claims made earlier in this file do not survive the Change Log, and are withdrawn:**
+**`Table Added` means added *in this round*, not *tables they hold that we do not*.** Reading it as
+the latter produced a wrong correction on 18 September that is now itself withdrawn. The two
+clusters below were briefly marked as absent from their file. **They are in it**, verified by
+reading their sheets directly:
 
-- **The membership cluster is not in the added list.** The claim that the developer team had
-  specified it came from the merge audit's prose, not from the Change Log. **The membership gap is
-  still ours to close** and the decision is still open
-- **Accreditation is not in the added list either.** The earlier note that *"they appear to have
-  specified it"* and that reading it may close CF-21 rests on their sheet carrying `access.
-  accreditation` with 29 columns — which is true — but the Change Log does not record it as added
-  in this round. **Worth reading before the workshop regardless**; CF-21 still calls it the only
-  blocked work on the project. Treat it as a lead, not a delivery
+| cluster | their tables | |
+|---|---|---|
+| **membership** | 7 | `catalogue.membership_plan` (12 cols) · `membership_program` · `membership_benefit` · `plan_benefit` · **`identity.customer_membership` (12 cols)** · `identity.membership_history` · `orders.membership_renewal` |
+| **accreditation** | 6 | **`access.accreditation` (29 cols)** · `accreditation_type` · `accreditation_credential` · `accreditation_document` · `accreditation_access` · `accreditation_status_history` |
+
+`identity.customer_membership` is **exactly the table whose absence blocked `membership_renewal`**.
+They have it. The membership gap closes by taking their cluster, as the merge audit said before the
+Change Log reading narrowed it wrongly.
+
+**Accreditation still matters most.** CF-21 calls it *"the only blocked work left on the project"* —
+58 requirements, no contract, a workshop still owed. **Read their six tables before the workshop.**
 
 ### Decided today, ready to apply
 
