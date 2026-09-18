@@ -103,6 +103,19 @@ Anything above 9 on `check-package` is ours, and it gets fixed before the next c
 new tables on top of unresolved renames means renaming tables that new code already references.
 **Renames land first.** See *Phase 1, reverted* below for how to bring it back.
 
+### Validated, 18 September — [change-log-validation-18-september.md](change-log-validation-18-september.md)
+
+**Their Change Log is internally accurate: 654 of 654 column renames and 12 of 12 table renames land
+correctly in their own workbook, zero errors**, once the five schema prefixes are normalised first.
+
+**But only 22% of it describes our schema** — 143 of 654 renamed columns trace to a column in the
+reference we sent. **That closes clarification 2.2 without asking them**: the workbook is their own
+model, not ours annotated. Their 323 tables correspond to **106** of ours; **268 of our 374 are
+absent from it**.
+
+The same document carries **the delta the response `.docx` needs** — six sections to change, one
+question to withdraw, one to keep verbatim. **Not yet applied to the file.**
+
 ### The workbook has a Change Log sheet, and it changes the whole picture
 
 **Read it before any more inference.** `TICVAI_16_Services_AND_Tables_UPDATED (1).xlsx` carries a
@@ -208,7 +221,24 @@ at 88%, `platform.cash_denomination` ↔ `platform.denomination`, `inventory.sto
       both, so this is the cheapest real work in the list
 - [ ] **Two to union, no rename** — `approvals.request` (**8 inbound FKs**, both sides rich) and
       `approvals.rule` (1 inbound). Column union only
-- [ ] **Send the response document** to the developer team — the three clarifications gate everything
+- [ ] **Update the response document, then send it.** The delta is written up in
+      [change-log-validation-18-september.md](change-log-validation-18-september.md) and **not yet
+      applied to the `.docx`**. Six sections change; §2.2 stops being a question; §2.7 stays
+      verbatim. **One of the three blocking clarifications is now answered by evidence**, so only
+      two still gate the rest: any SQL Server code already written, and the undeclared
+      `wallet` / `venue` / `pricing` schemas
+
+### Source intake, 18 September — nothing new arrived
+
+`Downloads/OneDrive_1_18-9-2026.zip`, 103 files. **Hash-compared against `sources/`: 102 are
+byte-identical to files we already hold.** The 53 design books, all 26 MoMs and the accreditation
+pack are already in. `sources/packs/ACCREDITATION.pdf` was already there, and
+`sources/mom/` holds every MoM including the five parked ones.
+
+**One genuine find.** `sources/mom/TICVAI_Kickoff_MoM_30Jul2026__2_.docx` is **7,313 bytes** against
+the zip's **33,695**. Ours looks truncated and the zip has the full copy — **verify and replace**.
+
+
 - [ ] **Decide the five payroll tables** — `payroll_run`, `payroll_line`, `payslip`, `salary`,
       `salary_component` have no requirement behind them, and matrix 1.2.3 contemplates *integrating*
       with a workforce system rather than becoming one
