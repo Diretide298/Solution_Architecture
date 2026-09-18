@@ -51,7 +51,32 @@ workshop dedicated to the domain on 27 August.
 **Three ranks agree**: the MoM (rank 1), the matrix (rank 2, a `Wallet` sub-domain of 33
 requirements) and the pack. `BO-417` covers none of it specifically and cites none of it.
 
-## The decision
+## The pack settles it: two vocabularies, and gaming is a value in one of them
+
+**`Wallet Type Library` (board 1, page 4)** — *who owns a wallet*:
+
+```
+Guest Wallet · Registered Customer Wallet · Family Wallet · Parent Wallet
+Child Wallet · Corporate Wallet · School Wallet · Employee Wallet
+```
+
+**`Credit & Balance Type Configuration` (board 1, page 8)** — *what value sits inside one*:
+
+```
+Cash Credit · Refund Credit · Bonus Credit · Promotional Credit · Gift Card Credit
+Membership Credit · Loyalty Credit · Ride Credit · Attraction Credit
+```
+
+**Game credit is a credit type, not a wallet system.** The 27 August MoM records Chinmay saying
+*"six wallet types had already been scoped on the Softlabs side (including attraction credit, game
+credit, rental credit, parking credit, and other credit types)"* and asking Allam to send the
+wallet-configuration documentation so they could be cross-checked. **That documentation is this
+pack** — it arrived, and it resolves the six into the second list above. The MoM's open action,
+*"cross-check … pending from Chinmay"*, can close.
+
+**The acceptance condition decides the rest:** *"New wallet credit types can be introduced through
+configuration without development changes."* A per-module wallet configuration screen contradicts
+it — the whole point is one library that gaming, rentals, parking and attractions all draw on.
 
 **Nothing should be collapsed into the gaming screens**, which is what the similarity score
 implies. The question is the reverse, and it splits the nineteen in two.
@@ -88,8 +113,28 @@ triage will flag again.
 **Retire the eight empties.** `BO-417`, `BO-418`, `BO-420`, `BO-423`, `BO-448`, `BO-469`, `BO-488`,
 `BO-399` have nothing in them. An id is never reissued, so retiring costs only the rows.
 
-**Recommended: supersede.** It is the only option that records *why* two screens about the same
-thing exist, and the precedent is already in the package.
+**The pack's acceptance condition chooses for us, and it splits the ten differently than substance
+would.** The line is not *how much is in the screen* but *is this configuring the wallet system, or
+operating one credit type*:
+
+| gaming screen | verdict |
+|---|---|
+| `BO-415` Wallet & Credit Type Configuration | **superseded** — this *is* the type library, and there must be one |
+| `BO-417` Top-Up Configuration | **superseded** — funding rules are the library's, board 2 |
+| `BO-418` Top-Up Bonus Rule Configuration | **superseded** — Bonus Credit is a credit type |
+| `BO-420` Bonus Validity & Expiry Configuration | **superseded** — expiry is a per-credit-type field |
+| `BO-399` Wallet & Credit Acceptance Mapping | **superseded** — channel mapping, board 2 |
+| `BO-414` Wallet & Credit Management Dashboard | **keep** — operating the game credit, 12 components, hub of 19 edges |
+| `BO-416` Wallet Account & Balance View | **keep** — a view of an account, not configuration |
+| `BO-423` Wallet Credit Transaction Ledger & Audit | **keep** — gaming's own ledger view |
+| `BO-469` Wallet & Deduction Transaction Monitor | **keep** — gameplay deduction is gaming |
+| `BO-487` / `BO-488` | **keep** — customer-facing at a gaming counter |
+
+**Five superseded, five kept**, and every one of the five superseded has **zero components** — so
+nothing rendered is lost. The five kept include the hub, so no navigation is re-pointed.
+
+That the substance and the principle agree is worth noting: **the screens that configure the system
+were never built, and the screens that operate it were.**
 
 ## Why this was nearly missed
 
