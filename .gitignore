@@ -1,4 +1,4 @@
-# Aster — the viewer and the delivery packages it reads, in one tree.
+# Adam — the viewer and the delivery packages it reads, in one tree.
 #
 # viewer/ and ticvai/ were separate repositories until 26 August. Their prior
 # histories are not in here: they were moved to Desktop/atlas-prior-git/ intact
@@ -65,6 +65,10 @@ ticvai/Updating old wireframes/
 /*
 !/*/
 !/.gitignore
+# **Ignored by `/*` like every other root file, and it must not be.** `.gitattributes` only does
+# its job where git can read it, so an untracked one protects this working tree and no other. It
+# marks PDFs and Office documents binary; without it `core.autocrlf` rewrites them on checkout.
+!/.gitattributes
 
 # --- superseded screen definitions, and the review scaffolding over them ------
 # The screen layer was rebuilt from the workshop packs on 9 September. The
@@ -92,3 +96,7 @@ ticvai/_review-*/
 *.mp4
 *.mov
 *.webm
+
+# --- screenshot captures for decks and presentations -------------------------
+# Regenerated on demand by viewer/checks/capture-assets.mjs; never part of the package.
+/assets/

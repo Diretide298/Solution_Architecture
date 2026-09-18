@@ -47,6 +47,16 @@ except Exception:
     pass
 
 ROOT = Path(__file__).resolve().parents[1]
+# **Reads `sources/workshop/`, and that is still where the workshop PDFs live.** A change on
+# 18 September pointed this at `sources/packs/` on the assumption that `index-packs.py` had
+# centralised every reference PDF there and removed the duplicates. That centralisation was
+# reverted — it flattened folders whose *placement carries authority*, which `sources/README.md`
+# ranks — so this points back at the folder that still holds the files.
+#
+# **The twenty PDFs here are byte-identical to twenty in `sources/packs/`** and that duplication is
+# real and unresolved. It is recorded in `sources/packs-index.json` and
+# `docs/active/source-integrity-18-september.md`. When the centralisation is redone properly this
+# line moves with it, and not before.
 SRC = ROOT / "sources" / "workshop"
 OUT = SRC / "pack.json"
 

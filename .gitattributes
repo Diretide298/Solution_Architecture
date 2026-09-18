@@ -1,0 +1,36 @@
+# Binary files git must never touch.
+#
+# **`core.autocrlf` is true on this machine and nothing told git these were binary.** Git's own
+# heuristic missed them, so every checkout rewrote PDFs and Office documents with CRLF applied: on
+# 18 September, 21 tracked files under `ticvai/sources/` differed from their own blob, twelve of
+# them PDFs, 141,748 bytes added in total.
+#
+# **The blobs were always correct** — `ACCREDITATION.pdf` in git is byte-identical to the client's
+# original. The damage happened on the way out, which is worse than it sounds: a document that
+# round-trips through a checkout no longer hashes to what the client sent, so "is this the file
+# they gave us" cannot be answered by comparing hashes. That is how four broken PDFs in
+# `sources/requirements/` sat unnoticed in the repository.
+#
+# Adding this file does not repair a working tree. The affected paths must be rewritten from their
+# blobs afterwards; nothing needs recommitting, because the blobs were never wrong.
+
+*.pdf   binary
+*.docx  binary
+*.doc   binary
+*.xlsx  binary
+*.xls   binary
+*.pptx  binary
+*.ppt   binary
+*.zip   binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.ico   binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.otf   binary
+*.mp4   binary
+*.gz    binary
