@@ -100,11 +100,93 @@ Anything above 9 on `check-package` is ours, and it gets fixed before the next c
 ### Now — renames first, then Phase 1
 
 **Sequencing changed 18 September.** Phase 1 was authored and then **reverted on purpose**: adding
-fourteen new tables on top of fourteen unresolved renames means renaming tables that new code
-already references. **Renames land first.** See *Phase 1, reverted* below for how to bring it back.
+new tables on top of unresolved renames means renaming tables that new code already references.
+**Renames land first.** See *Phase 1, reverted* below for how to bring it back.
 
-- [ ] **The five renames we actually owe** — the other nine of the fourteen need no work on our
-      side. Blast radius measured against `handoff/schema-reference.json`, not guessed:
+### The workbook has a Change Log sheet, and it changes the whole picture
+
+**Read it before any more inference.** `TICVAI_16_Services_AND_Tables_UPDATED (1).xlsx` carries a
+**Change Log** sheet, 743 rows, with an explicit `Change Type` column. It was not read during the
+first three identity passes, and it is authoritative in a way column-overlap matching never is.
+
+| change type | rows | |
+|---|---|---|
+| **Column Renamed** | 645 | |
+| Table Added | **28** | |
+| Column Attributes Changed | 23 | |
+| Column Added | 17 | |
+| Table Renamed | 12 | |
+| Column Renamed & Attributes Changed | 9 | |
+| Schema Prefix Renamed | 5 | **covering 43 tables** |
+| Proposed then Rejected | 3 | they added it, then pulled it |
+| Column Removed | 1 | |
+
+**671 of 743 changes are renames — 90%.** Twenty-eight tables were added.
+
+**This corrects the headline number in
+[phase0-identity-pass-all-clusters.md](phase0-identity-pass-all-clusters.md).** That document says
+*165 → 138 → ~110 genuinely new*. **The workbook declares 28 table additions**, of which 27 are new
+to us. The three passes were inferring from names and columns what the sheet states outright.
+
+### One convention explains two thirds of the file
+
+**They prefixed every column with its table name.** `code` → `access_point_code`, `status` →
+`accreditation_status`, `content` → `message_content`, and `id` → `<table>_id` on 193 tables.
+**436 of the 654 column renames are this one rule applied mechanically** — 67%. Add
+`scope_id` → `tenancy_scope_id` (24) and the FK renames (92) and almost nothing is left.
+
+**This is a position to take, not a merge detail.** We do not prefix; `access.access_point.code` is
+already unambiguous and `access.access_point.access_point_code` says the same thing three times.
+**Decide it once, tell them once**, and 654 of their 743 changes resolve in that single answer.
+
+### The 43 schema-prefix renames are them adopting our names
+
+| theirs → ours | tables |
+|---|---|
+| `branding.*` → `whitelabel.*` | 15 |
+| `ticketing.*` → `catalogue.*` | 13 |
+| `tenancy.*` → `platform.*` | 8 |
+| `crosscell.*` → `sync.*` | 4 |
+| `venue_map.*` → `venuemap.*` | 3 |
+
+**Every one of these lands on our name**, confirmed against `schema-reference.json`. No work on our
+side, and worth acknowledging back to them — they moved 43 tables to our convention unprompted.
+
+### Seven renames the Change Log does not declare
+
+Found by stripping their redundant table prefix. **These are certain** — the stem is our exact table:
+
+`approvals.approval_matrix` · `approval_rule` · `approval_request` · `approval_decision` ·
+`approval_delegation` · `approval_escalation` → **`approvals.matrix` / `rule` / `request` /
+`decision` / `delegation` / `escalation`**, plus `resources.resource_booking` →
+`resources.booking`.
+
+**Same redundant-prefix habit as the column renames**, one level up. It is the same conversation.
+
+### What still needs a person, and why the matcher cannot finish it
+
+A column-overlap matcher was run over all 323 of their tables. **It cannot settle table identity**,
+and both failure directions were observed:
+
+- **Scored too loose**, `min()` denominator: `orders.deposit` → `orders.order_discount` at 100%,
+  because both are two-column stubs and any two columns overlap completely
+- **Scored too tight**, Jaccard with a five-column floor: called `identity.otp` *new* — when the
+  Change Log **declares** it as `identity.otp_challenge` → `identity.otp`
+
+**This is the lesson already in the phase-0 doc, confirmed from a third direction: step 3 must be
+human.** The ~23 surviving mid-confidence candidates (`fnb.sold_out_item` ↔ `fnb.eighty_six_event`
+at 88%, `platform.cash_denomination` ↔ `platform.denomination`, `inventory.stock_movement` ↔
+`inventory.movement`) are a worklist for a person, not a result.
+
+- [ ] **Three table renames the Change Log proves we owe** — resolved by normalising their schema
+      prefixes and checking each side against our package:
+      `sync.rejection` → `sync.cross_cell_rejection` · `identity.otp_challenge` → `identity.otp` ·
+      `marketing.segment` → `marketing.customer_segment`.
+      Of the other nine declared table renames, four are **already our name** and five are their
+      own internal churn between two names we do not use
+- [ ] **The five renames from the earlier by-hand pass** — these came from column reading rather
+      than the Change Log, so they stand until someone reconciles the two lists. Blast radius
+      measured against `handoff/schema-reference.json`, not guessed:
 
       | ours → theirs | inbound FK | contract files | note |
       |---|---|---|---|
@@ -196,23 +278,32 @@ it is another additive cluster** — author it with the rest of the additive pas
 | `orders.cash_count_line` | denomination_id, denomination_value, line_total | Straight union |
 | `orders.cash_movement`, `refund`, `refund_policy`, `cart` | small additions | Straight unions |
 
-**New clusters worth taking, largest first** — ~110 genuinely new tables after the three identity
-passes:
+**The 27 tables actually added**, from the Change Log's own `Table Added` list, normalised and
+checked against our package. One of the 28, `orders.payment_link`, we already hold.
 
-| cluster | new | why it matters |
+| cluster | tables | |
 |---|---|---|
-| marketing | ~19 | loyalty points, support cases with SLA, surveys, **waivers** |
-| identity | ~15 | **membership instances** — the gap above, household/family, OTP |
-| orders | 14 | the payment model — **already written, see *Phase 1, reverted*** |
-| workforce | 13 | 8 rostering (take) + **5 payroll (decide)** |
-| catalogue | 9 | rentals, membership benefits, media, upgrade rules |
-| access | 8 | **7 accreditation — read before the workshop, not after** |
-| resources | 5 | rental agreements and inspections |
-| platform / sync / tail | ~17 | |
+| **orders — payments** | 10 | `payment_method` · `payment_method_config` · `payment_policy` · `payment_eligibility_rule` · `payment_fee_rule` · `payment_terminal` · `currency_rule` · `order_fee` · `deposit` · `deposit_activity` — **all ten already written in the reverted Phase 1 patch** |
+| resources — rentals | 5 | `rental_agreement` · `rental_agreement_item` · `rental_inspection` · `rental_inspection_item` · `rental_product_mapping` |
+| catalogue — rentals | 4 | `rental_product_config` · `rental_rate` · `rental_requirement` · `rental_rule` |
+| platform — subscription tiers | 4 | `subscription_tier` · `tenant_subscription` · `tier_allowance` · `tier_module` |
+| identity — custom fields | 3 | `customer_extra_field` · `customer_extra_option` · `customer_extra_value` |
+| maintenance | 1 | `rental_damage_assessment` |
 
-**Accreditation is the one to read first.** CF-21 calls it *"the only blocked work left on the
-project"* — 58 requirements, no contract, a workshop still owed. **They appear to have specified
-it**, `accreditation` alone carrying 29 columns. Reading it before the workshop may close CF-21.
+**Nine of the 27 are the rental cluster**, matching the 9 September workshop almost row for row.
+**Ten are the payment cluster and are already authored.** The real additive backlog is **17
+tables**, not ~110.
+
+**Two claims made earlier in this file do not survive the Change Log, and are withdrawn:**
+
+- **The membership cluster is not in the added list.** The claim that the developer team had
+  specified it came from the merge audit's prose, not from the Change Log. **The membership gap is
+  still ours to close** and the decision is still open
+- **Accreditation is not in the added list either.** The earlier note that *"they appear to have
+  specified it"* and that reading it may close CF-21 rests on their sheet carrying `access.
+  accreditation` with 29 columns — which is true — but the Change Log does not record it as added
+  in this round. **Worth reading before the workshop regardless**; CF-21 still calls it the only
+  blocked work on the project. Treat it as a lead, not a delivery
 
 ### Decided today, ready to apply
 
