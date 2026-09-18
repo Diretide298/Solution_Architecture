@@ -490,6 +490,25 @@ def main() -> int:
         print(f"\n  {len(unspecified)} screen(s) with no specification body found — "
               f"first: {unspecified[0]['title']}")
 
+    # **A title with no purpose and no sections is not a parsed screen, it is a line from a
+    # contents list.** Four packs in `sources/packs/` produce these in bulk — the parser finds
+    # their screen headings and none of their bodies, because their section vocabulary is not one
+    # this tool knows yet. Kept, they become screens downstream with nothing behind them, and a
+    # screen that exists and specifies nothing is worse than one that does not exist: it is
+    # counted, planned against, and only found hollow by whoever tries to build it.
+    #
+    # Dropped here and reported by document, so the gap is a worklist rather than a silent 154.
+    hollow = [r for r in records if not r.get("purpose") and not r.get("sections")]
+    if hollow:
+        by_doc = {}
+        for r in hollow:
+            by_doc[r["source"]] = by_doc.get(r["source"], 0) + 1
+        records = [r for r in records if r.get("purpose") or r.get("sections")]
+        print(f"\n  dropped {len(hollow)} title-only screen(s) — no purpose and no sections. "
+              f"**These packs need their section vocabulary added before they parse:**")
+        for doc, n in sorted(by_doc.items(), key=lambda kv: -kv[1]):
+            print(f"      {n:>4}  {doc}")
+
     ok = (len(records) == EXPECTED_SCREENS and boards_total == EXPECTED_BOARDS
           and not ragged)
     if not ok:
