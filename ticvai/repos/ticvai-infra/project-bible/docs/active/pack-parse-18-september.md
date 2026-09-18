@@ -126,9 +126,54 @@ vocabulary probe of their own.
 `TICVAI Finance` 14 across 3. **Every well-formed pack is ten screens per board**, so these three
 are either genuinely irregular or partly mis-parsed.
 
+## Wired in — 19 September
+
+`derive-pack-screens.py --apply` added **814 screens**. The package goes **1,629 → 2,443**.
+
+| platform | was | now |
+|---|---|---|
+| P08 Venue Management — Back Office | 614 | **1,198** |
+| P09 TICVAI Web — Platform Console | 446 | **676** |
+
+**P08 and P09 now hold 77% of every screen in the package.** That is what the source material says
+— these are configuration references and configuration is back-office work — but a back office of
+1,198 screens is a navigation problem somebody has to answer, and it is worth answering before it
+is built rather than after.
+
+### The thirteen placements, and the three that were decided rather than derived
+
+The placement table maps a module to one platform, a licensed module and a navigation section.
+**For the 23 packs already placed by hand, `sources/packs-index.json` derives the same platforms
+independently from the contracts** — including the splits, `Rental → P06,P08` and
+`Subscription → P08,P09,P17`. The derivation agrees with every hand placement, which is why it can
+be trusted where it fires. It cannot fire for these thirteen: they have no operations yet, so there
+are no citations to follow.
+
+Three were genuine decisions and are recorded as such:
+
+**Accreditation goes to P08, not P11.** P11 is `audience: public` — landing page, registration
+form, status tracking, badge. The pack's eight boards are every one a staff command centre. Putting
+them on P11 would contradict its own declared audience. **Boards 3 and 4 overlap P11's existing
+`ACC-006 Reviewer Queue` and `ACC-008 Credential Register`**, and that overlap is a reconciliation
+item, not something placement should quietly settle. `accreditation` is already a `ModuleKey`, so
+the domain was always meant to be licensable on its own.
+
+**Payment orchestration is P09 and wallet is P08.** The line is who operates it: gateway
+credentials, provider routing and settlement are platform-level, like Pricing and Sales Channel; a
+wallet is a venue's own stored-value scheme its staff administer, like Access Control.
+
+**Marketing CRM is P08.** Privacy and Waiver sit on P13 because they are content and policy the CMS
+publishes. Campaigns, segments and journeys are worked by venue marketing staff.
+
+### 1,291 pack screens carry no operation
+
+**By design.** `derive-pack-screens.py` does not invent operations, and its docstring says why:
+these screens imply roughly three thousand endpoints against 1,032 that exist, and *"authoring
+three thousand endpoints from a PDF is not derivation, it is fabricating an API surface"*. The gap
+is written to `docs/active/workshop-contract-gap.md` as named operations instead.
+
 ## Not yet done
 
-The new screens exist in `sources/workshop/pack.json` and **are not wired into anything**.
-`derive-pack-screens.py`, `derive-pack-linkage.py` and the refresh chain still have to run, and
-1,024 new screens against a package of 1,110 is a large enough jump to look at the diff before
-publishing it.
+`derive-pack-linkage.py` and the refresh chain. **`check-screens` must hold** — it fails a
+guest-callable operation with no guest screen, and 814 new screens is the largest single change the
+screen layer has taken.

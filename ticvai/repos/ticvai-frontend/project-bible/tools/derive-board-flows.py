@@ -242,7 +242,8 @@ def main() -> int:
         doc = yaml.safe_load(text) or {}
         # A board an authored flow already reaches is left alone.
         if not str(doc.get("provenance", "")).startswith("derived"):
-            authored_screens |= set(re.findall(r"\b[A-Z]{2,4}-\d{3}\b", text))
+            # Four digits since 19 September — P08 passed 999 screens.
+            authored_screens |= set(re.findall(r"\b[A-Z]{2,4}-\d{3,4}\b", text))
         elif (doc.get("trigger") or {}).get("entryScreen"):
             derived_hubs[doc["trigger"]["entryScreen"]] = f.name
     nxt = max(used) + 1 if used else 1

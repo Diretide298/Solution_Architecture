@@ -105,6 +105,45 @@ PLACEMENT = {
     "Game and Ride Module": ("P08", "games", "Games & Rides"),
     "Rental Management": ("P08", "resources", "Rentals"),
     "Subscription Licensing AI Self Service": ("P09", "core", "Tenants & Licensing"),
+
+    # **The thirteen packs parsed on 18 September**, from `sources/packs/`. None had ever been
+    # through the parser: it read `sources/workshop/` and nothing put them there.
+    #
+    #   **Accreditation is back office, not P11.** P11 is `audience: public` — a landing page, a
+    #   registration form, status tracking, a badge. The pack's eight boards are every one a staff
+    #   command centre: Holder Directory, Review Queue, Credential Issuance, Executive Dashboard.
+    #   Putting them on a public platform would contradict P11's own declared audience.
+    #   **Boards 3 and 4 overlap P11's existing `ACC-006 Reviewer Queue` and `ACC-008 Credential
+    #   Register`** — recorded as a reconciliation item rather than settled by placement, because
+    #   two screens for one job is a decision somebody should take deliberately.
+    #   `accreditation` is already a `ModuleKey`, so the domain was always meant to be licensable.
+    #
+    #   **The AI trio is platform-level.** Governance, the configuration assistant and forecasting
+    #   configure how TICVAI's own AI behaves across tenants, which is P09's remit. Forecasting is
+    #   filed under `analytics` rather than `ai`: it produces the demand and revenue projections
+    #   P16 reads, and the licence that buys it is the analytics one.
+    #
+    #   **Payment orchestration is P09 and wallet is P08, and the line between them is who
+    #   operates it.** Gateway credentials, provider routing and settlement are platform-level —
+    #   the same category as Pricing and Sales Channel. A wallet is a venue's own stored-value
+    #   scheme, administered by its staff like Access Control and Ticket Media.
+    #
+    #   **Marketing CRM is back office.** Privacy and Waiver sit on P13 because they are content
+    #   and policy the CMS publishes; campaigns, segments and journeys are worked by venue
+    #   marketing staff, which is a different kind of configuration on a different platform.
+    "ACCREDITATION": ("P08", "accreditation", "Access & Venue"),
+    "AI Governance": ("P09", "ai", "Platform"),
+    "AI Configuration Assistant": ("P09", "ai", "Platform"),
+    "AI Forecasting and Predictive Intelligence": ("P09", "analytics", "Analytics"),
+    "Payment Payment Orchestration": ("P09", "core", "Commercial"),
+    "Upsell,CrossSellEngine": ("P09", "marketing", "Commercial"),
+    "Wallet Configuration Backend Structure v1.0": ("P08", "core", "Orders & Money"),
+    "Marketing CRM Configuration Reference v1.0": ("P08", "marketing", "Engagement & Support"),
+    "Seat Management Venue Mapping Reference v1.0": ("P08", "seating", "Access & Venue"),
+    "Resource Management Configuration": ("P08", "resources", "Rentals"),
+    "Event Management Configuration Backend Structure v1.0": ("P08", "ticketing", "Sell"),
+    "F&B Backend Structure Module Sample Reference v1.0": ("P08", "fnb", "Operations"),
+    "TICVAI Finance Backend Structure Reference v1.0": ("P08", "core", "Orders & Money"),
 }
 
 # (module, board) -> placement, or None for a board that is not drawn as screens of its own.

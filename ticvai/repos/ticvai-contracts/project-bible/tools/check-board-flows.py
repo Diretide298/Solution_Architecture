@@ -37,7 +37,9 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import workshop_boards  # noqa: E402  -- WS codes are issued once, not enumerated
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-SCREEN_ID = re.compile(r"\b[A-Z]{2,4}-\d{3}\b")
+# **Four digits since 19 September**, when P08 passed 999 screens. Left at `{3}` this reads
+# `BO-1042` as `BO-104` and matches the wrong screen — quietly, and in a checker.
+SCREEN_ID = re.compile(r"\b[A-Z]{2,4}-\d{3,4}\b")
 
 
 def _utf8() -> None:

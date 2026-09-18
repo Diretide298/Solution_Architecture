@@ -35,6 +35,18 @@ at 1171. Nothing is unwalked.
 | `handoff/traceability.json` | Every matrix row, its verdict, its evidence and why |
 | `sources/README.md` | What client documents exist, which were missing, and what they changed |
 
+### Before ingesting anything
+
+**[`docs/ingestion-runbook.md`](ingestion-runbook.md) — read it first, every time.** Thirteen
+ordered steps from a client zip to a passing refresh, each with the cost of skipping it written
+against it.
+
+**Step 2 is the one that gets skipped.** `check-screen-redundancy.py --pack` is where compression
+is decided — which pack screens are not screens at all, but a filter, a modal or a fold into
+something built. On 19 September 814 screens were parsed, placed and wired with step 2 missed
+entirely. Nothing failed, every count reconciled, `check-screens` passed, and no board was
+collapsed.
+
 ---
 
 ## What the walk found, in one page

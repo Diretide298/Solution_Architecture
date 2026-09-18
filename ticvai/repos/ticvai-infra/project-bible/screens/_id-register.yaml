@@ -16,7 +16,7 @@ _note: '**The issue log for screen ids, and the reason it exists.** On 4 Septemb
   `tools/check-screens.py` fails on a screen issued above the recorded high-water mark. Regenerate with
   `tools/derive-id-register.py --apply` and commit it in the same change.'
 generatedBy: tools/derive-id-register.py
-updated: '2026-09-17'
+updated: '2026-09-19'
 prefixes:
   ACC:
     issued: 8
@@ -25,11 +25,11 @@ prefixes:
     authored: 1-8
     fromClientPack: null
   ADM:
-    issued: 446
-    highWaterMark: 468
-    nextFree: 469
+    issued: 676
+    highWaterMark: 698
+    nextFree: 699
     authored: 1-318
-    fromClientPack: 38-468
+    fromClientPack: 38-698
   ANL:
     issued: 69
     highWaterMark: 70
@@ -37,11 +37,11 @@ prefixes:
     authored: 1-10
     fromClientPack: 12-70
   BO:
-    issued: 614
-    highWaterMark: 614
-    nextFree: 615
+    issued: 1198
+    highWaterMark: 1198
+    nextFree: 1199
     authored: 1-143
-    fromClientPack: 144-614
+    fromClientPack: 144-1198
   CMS:
     issued: 100
     highWaterMark: 100

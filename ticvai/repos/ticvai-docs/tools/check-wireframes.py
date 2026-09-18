@@ -75,7 +75,7 @@ def main() -> int:
     # wrong**, which is the worse of the two failures because it sends somebody to fix a good file.
     anchors = {n: set(re.findall(r'(?<![-\\w])id="([A-Za-z0-9_-]+)"', f.read_text(errors="replace")))
                for n, f in files.items()}
-    screen_anchors = {n: {a.upper() for a in v if re.fullmatch(r"[a-z]{2,5}-\d{3}", a)}
+    screen_anchors = {n: {a.upper() for a in v if re.fullmatch(r"[a-z]{2,5}-\d{3,4}", a)}
                       for n, v in anchors.items()}
 
     defined: dict[str, set[str]] = {}
