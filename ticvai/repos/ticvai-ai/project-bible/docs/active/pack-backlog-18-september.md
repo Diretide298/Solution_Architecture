@@ -10,17 +10,56 @@
 
 ## The count
 
-| | 8 Sept | **18 Sept** |
-|---|---|---|
-| Packs held | 44 | **45** |
-| Packs with at least one operation drafted | 17 | **17** |
-| **Packs with nothing drafted** | 27 | **28** |
-| Undrafted pages | 1,815 | **2,172** |
+| | 8 Sept | before today | **18 Sept** |
+|---|---|---|---|
+| Packs held | **40** | 42 | **45** |
+| Packs with at least one operation drafted | 17 | 17 | **17** |
+| **Packs with nothing drafted** | **23** | 25 | **28** |
+| Undrafted pages | — | 1,948 | **2,172** |
+
+### `sources/packs/README.md` says 44, and there were never 44
+
+Counted from git rather than from the prose:
+
+```
+a387a7a  8 Sept   40 packs   ← README written in this commit, claiming 44
+78d71ba           42 packs   ← +Approval_Workflows, +Unified_BI
+687bc44  18 Sept  45 packs   ← +3 AI packs
+```
+
+**The README overstated by four on the day it was written**, and its derived figures inherit the
+error: *"17 of 44"* and *"27 of the 44 have no operation drafted"* should have read **17 of 40** and
+**23 of 40**. The arithmetic is self-consistent against a number that was wrong.
+
+**This document repeated it** — an earlier revision showed *44 → 45*, implying one net pack arrived
+when three did. **Three docs in, three packs up, 42 → 45.** Count the directory, never the prose.
 
 **584 provisional operations cite 17 packs. Twenty-eight packs are cited by nothing.**
 
 Seventeen packs carried the whole drafting effort and the other twenty-eight have never been opened
 by anyone writing a contract. **This is CF-164 and CF-125 seen from the source side.**
+
+**The seventeen have not grown since 8 September.** Every pack added since — five of them — went
+straight onto the undrafted pile.
+
+## Nothing has been lost, it is just scattered
+
+The client's OneDrive export holds **53 design books, and all 53 are in `sources/`.** None is
+missing. They are spread across five directories, which is why a count of `packs/` alone understates
+what we hold:
+
+| directory | client design books |
+|---|---|
+| `sources/packs/` | 43 |
+| `sources/boards/` | 7 |
+| `sources/workshop/` | 4 — DAM, Game_and_Ride, Rental_Management, Subscription_Licensing |
+| `sources/designs/` | 2 — Employee App UI, White Label Guest App UI |
+| `sources/requirements/` | 1 — Ticketing Platform Native Dashboard |
+
+**Eight design books sit outside `packs/` and are therefore invisible to the pack audit.** Four of
+them — DAM, Game and Ride, Rental Management, Subscription and Licensing — are full reference books
+with MoMs against them, filed as workshop material. **Worth deciding whether they belong in
+`packs/`**, because as it stands no audit counts them either way.
 
 ## Arrived 18 September — the AI workshop
 
