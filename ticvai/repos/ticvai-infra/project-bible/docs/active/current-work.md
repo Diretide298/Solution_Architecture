@@ -228,6 +228,22 @@ at 88%, `platform.cash_denomination` ↔ `platform.denomination`, `inventory.sto
       two still gate the rest: any SQL Server code already written, and the undeclared
       `wallet` / `venue` / `pricing` schemas
 
+### The pack backlog — [pack-backlog-18-september.md](pack-backlog-18-september.md)
+
+**28 of 45 packs have never had an operation drafted from them — 2,172 pages.** 584 provisional
+operations cite just 17 packs. The 8 September audit said 27 of 44; it has not moved, and three new
+AI packs arrived on top.
+
+- [ ] **Read `ACCREDITATION.pdf` (74pp) and close CF-21** — *"the only blocked work left on the
+      project"*, 58 requirements, no contract. **Three sources on it are all already on disk and
+      none are reconciled**: the pack, the 7 September MoM, and the developer team's six
+      accreditation tables with `access.accreditation` at 29 columns. `Virtual_Queue.pdf` (17pp) is
+      the same MoM's other half and nearly free alongside it
+- [ ] **Ask for the AI workshop MoM.** Three AI packs arrived 18 September — Governance (105pp),
+      Configuration Assistant (63pp), Forecasting (56pp). **224 pages with no minutes against
+      them.** Every other pack was read alongside its MoM, and `sources/mom/` covers every workshop
+      from 28 July to 15 September except this one
+
 ### Source intake, 18 September — nothing new arrived
 
 `Downloads/OneDrive_1_18-9-2026.zip`, 103 files. **Hash-compared against `sources/`: 102 are
