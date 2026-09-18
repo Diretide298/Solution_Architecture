@@ -171,6 +171,14 @@ BOARD_PLACEMENT: dict[tuple[str, str], tuple[str, str, str] | None] = {
        for b in ("5", "6", "7", "8")},
     **{("Subscription Licensing AI Self Service", b): ("P08", "core", "Setup & Go-Live")
        for b in ("7", "8")},
+
+    # **F&B board 2 is already built, all ten screens of it.** `EMP-051` to `EMP-060` on P06 carry
+    # its exact titles in order — Restaurant Service Command Center, Floor Plan & Table Map, Table
+    # & Seating Configuration, and so on to Reservation & Table Performance. The book was drafted
+    # into the package before it was ever parsed, so parsing it would draw the board a second time
+    # on a different platform. **Recorded, not dropped**: the entries stay in `pack.json` and this
+    # names the screens that cover them. Found by the 19 September triage.
+    ("F&B Backend Structure Module Sample Reference v1.0", "2"): None,
 }
 
 # (module, board, number) -> placement, for the one screen a board does not share. Subscription 6.10
@@ -187,6 +195,26 @@ SCREEN_PLACEMENT: dict[tuple[str, str, str], tuple[str, str, str]] = {
 COLLAPSED: dict[tuple[str, str, str], str] = {
     ("Approval_Workflows_and_Governance_Reference.pdf", "3", "13"): "ADM-241",
     ("Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf", "1", "3"): "ANL-001",
+
+    # **From the 19 September triage**, which held the 814 newly parsed entries against the 1,629
+    # built screens. Sixteen collided on an exact title; ten of those are F&B board 2 and are
+    # handled as a board above, leaving these six.
+    #
+    # **An exact title match is the one signal strong enough to act on alone.** The TF-IDF score
+    # understates them — `Approval SLA & Workload Monitor` scores 0.38 against the screen of
+    # precisely that name — because a short title shares few terms however identical it is. The
+    # 38 entries scoring between 0.25 and 0.40 are a reading queue, not decisions, and are listed
+    # in `docs/active/workshop-pack-triage.md`.
+    # The key is `(pack, number, page)` — **not `(pack, board, number)`**, which is what these
+    # were written as first. A wrong-shaped key does not fail: it simply never matches, the
+    # collapse silently does not happen, and the count comes out ten short of the sixteen
+    # expected. Caught by checking the number rather than the exit code.
+    ("ACCREDITATION.pdf", "8", "25"): "BO-372",
+    ("F&B_Backend_Structure_Module Sample Reference v1.0.pdf", "8", "10"): "BO-134",
+    ("F&B_Backend_Structure_Module Sample Reference v1.0.pdf", "9", "11"): "BO-135",
+    ("F&B_Backend_Structure_Module Sample Reference v1.0.pdf", "10", "11"): "BO-136",
+    ("Resource_Management_Configuration_Reference.pdf", "07", "27"): "ADM-215",
+    ("Seat_Management_Venue_Mapping_Reference v1.0.pdf", "04", "43"): "ANL-008",
 }
 
 

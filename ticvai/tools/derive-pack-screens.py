@@ -105,6 +105,45 @@ PLACEMENT = {
     "Game and Ride Module": ("P08", "games", "Games & Rides"),
     "Rental Management": ("P08", "resources", "Rentals"),
     "Subscription Licensing AI Self Service": ("P09", "core", "Tenants & Licensing"),
+
+    # **The thirteen packs parsed on 18 September**, from `sources/packs/`. None had ever been
+    # through the parser: it read `sources/workshop/` and nothing put them there.
+    #
+    #   **Accreditation is back office, not P11.** P11 is `audience: public` — a landing page, a
+    #   registration form, status tracking, a badge. The pack's eight boards are every one a staff
+    #   command centre: Holder Directory, Review Queue, Credential Issuance, Executive Dashboard.
+    #   Putting them on a public platform would contradict P11's own declared audience.
+    #   **Boards 3 and 4 overlap P11's existing `ACC-006 Reviewer Queue` and `ACC-008 Credential
+    #   Register`** — recorded as a reconciliation item rather than settled by placement, because
+    #   two screens for one job is a decision somebody should take deliberately.
+    #   `accreditation` is already a `ModuleKey`, so the domain was always meant to be licensable.
+    #
+    #   **The AI trio is platform-level.** Governance, the configuration assistant and forecasting
+    #   configure how TICVAI's own AI behaves across tenants, which is P09's remit. Forecasting is
+    #   filed under `analytics` rather than `ai`: it produces the demand and revenue projections
+    #   P16 reads, and the licence that buys it is the analytics one.
+    #
+    #   **Payment orchestration is P09 and wallet is P08, and the line between them is who
+    #   operates it.** Gateway credentials, provider routing and settlement are platform-level —
+    #   the same category as Pricing and Sales Channel. A wallet is a venue's own stored-value
+    #   scheme, administered by its staff like Access Control and Ticket Media.
+    #
+    #   **Marketing CRM is back office.** Privacy and Waiver sit on P13 because they are content
+    #   and policy the CMS publishes; campaigns, segments and journeys are worked by venue
+    #   marketing staff, which is a different kind of configuration on a different platform.
+    "ACCREDITATION": ("P08", "accreditation", "Access & Venue"),
+    "AI Governance": ("P09", "ai", "Platform"),
+    "AI Configuration Assistant": ("P09", "ai", "Platform"),
+    "AI Forecasting and Predictive Intelligence": ("P09", "analytics", "Analytics"),
+    "Payment Payment Orchestration": ("P09", "core", "Commercial"),
+    "Upsell,CrossSellEngine": ("P09", "marketing", "Commercial"),
+    "Wallet Configuration Backend Structure v1.0": ("P08", "core", "Orders & Money"),
+    "Marketing CRM Configuration Reference v1.0": ("P08", "marketing", "Engagement & Support"),
+    "Seat Management Venue Mapping Reference v1.0": ("P08", "seating", "Access & Venue"),
+    "Resource Management Configuration": ("P08", "resources", "Rentals"),
+    "Event Management Configuration Backend Structure v1.0": ("P08", "ticketing", "Sell"),
+    "F&B Backend Structure Module Sample Reference v1.0": ("P08", "fnb", "Operations"),
+    "TICVAI Finance Backend Structure Reference v1.0": ("P08", "core", "Orders & Money"),
 }
 
 # (module, board) -> placement, or None for a board that is not drawn as screens of its own.
@@ -132,6 +171,14 @@ BOARD_PLACEMENT: dict[tuple[str, str], tuple[str, str, str] | None] = {
        for b in ("5", "6", "7", "8")},
     **{("Subscription Licensing AI Self Service", b): ("P08", "core", "Setup & Go-Live")
        for b in ("7", "8")},
+
+    # **F&B board 2 is already built, all ten screens of it.** `EMP-051` to `EMP-060` on P06 carry
+    # its exact titles in order — Restaurant Service Command Center, Floor Plan & Table Map, Table
+    # & Seating Configuration, and so on to Reservation & Table Performance. The book was drafted
+    # into the package before it was ever parsed, so parsing it would draw the board a second time
+    # on a different platform. **Recorded, not dropped**: the entries stay in `pack.json` and this
+    # names the screens that cover them. Found by the 19 September triage.
+    ("F&B Backend Structure Module Sample Reference v1.0", "2"): None,
 }
 
 # (module, board, number) -> placement, for the one screen a board does not share. Subscription 6.10
@@ -148,6 +195,26 @@ SCREEN_PLACEMENT: dict[tuple[str, str, str], tuple[str, str, str]] = {
 COLLAPSED: dict[tuple[str, str, str], str] = {
     ("Approval_Workflows_and_Governance_Reference.pdf", "3", "13"): "ADM-241",
     ("Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf", "1", "3"): "ANL-001",
+
+    # **From the 19 September triage**, which held the 814 newly parsed entries against the 1,629
+    # built screens. Sixteen collided on an exact title; ten of those are F&B board 2 and are
+    # handled as a board above, leaving these six.
+    #
+    # **An exact title match is the one signal strong enough to act on alone.** The TF-IDF score
+    # understates them — `Approval SLA & Workload Monitor` scores 0.38 against the screen of
+    # precisely that name — because a short title shares few terms however identical it is. The
+    # 38 entries scoring between 0.25 and 0.40 are a reading queue, not decisions, and are listed
+    # in `docs/active/workshop-pack-triage.md`.
+    # The key is `(pack, number, page)` — **not `(pack, board, number)`**, which is what these
+    # were written as first. A wrong-shaped key does not fail: it simply never matches, the
+    # collapse silently does not happen, and the count comes out ten short of the sixteen
+    # expected. Caught by checking the number rather than the exit code.
+    ("ACCREDITATION.pdf", "8", "25"): "BO-372",
+    ("F&B_Backend_Structure_Module Sample Reference v1.0.pdf", "8", "10"): "BO-134",
+    ("F&B_Backend_Structure_Module Sample Reference v1.0.pdf", "9", "11"): "BO-135",
+    ("F&B_Backend_Structure_Module Sample Reference v1.0.pdf", "10", "11"): "BO-136",
+    ("Resource_Management_Configuration_Reference.pdf", "07", "27"): "ADM-215",
+    ("Seat_Management_Venue_Mapping_Reference v1.0.pdf", "04", "43"): "ANL-008",
 }
 
 

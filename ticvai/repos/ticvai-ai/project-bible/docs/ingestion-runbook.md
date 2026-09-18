@@ -90,6 +90,39 @@ Scores every parsed screen against every built one and sorts them **check first 
 
 **Record, never silently drop.** A collapsed screen that only prose remembers comes back on the next run — which is exactly how `ADM-321` and `ANL-011` returned, and why `COLLAPSED` is a table in the tool rather than a sentence in a document.
 
+### Match on exact title too — the score understates a real duplicate
+
+`Approval SLA & Workload Monitor` scored **0.38** against a built screen of precisely that name, because a short title shares few terms however identical it is. TF-IDF ranks a shortlist; it does not find the certainties.
+
+The 19 September run: **0 pairs scored ≥ 0.40, and 16 collided on an exact title.** Ten of the sixteen were one board — F&B board 2, already built in full as `EMP-051`–`EMP-060`, same titles in the same order. **A whole board can already exist and the score will never say so.**
+
+### The score says two screens are alike. It does not say which should survive.
+
+**This is the finding that cost the most to see, and nothing in the tooling carries it.** Of the 38 pairs scoring 0.25–0.40 on 19 September, **none should be collapsed**, and eight say the opposite of what they look like.
+
+Eight pointed at screens sourced from `Game_and_Ride_Module.pdf`, six of which have **zero components and zero operations**. `BO-417 Top-Up Configuration` is one line of purpose and nothing else. The pack screen matched against it — `Top-Up Rule Configuration` — is backed by:
+
+- **MoM §4.5** (27 Aug, rank 1), which names nine distinct funding screens and calls the recurring schedule *"distinct from auto-reload"*
+- **Matrix 4.3.28–4.3.35** (rank 2) — a `Wallet` sub-domain of 33 requirements
+- the pack's own board 2, which is those nine screens one for one
+
+**Collapsing on the score would have folded the MoM-backed, matrix-traceable screen into an empty stub from an unrelated pack.**
+
+The cause is structural: **an earlier pack described a domain incidentally, and its screens were built first.** Game & Ride board 3 is titled *Wallet & Credit* and restates the wallet module in gaming terms; all 19 wallet screens on P08 came from it, before the wallet module itself was ever parsed.
+
+**So before collapsing anything, read both sides:**
+
+| ask | why |
+|---|---|
+| **What is the built screen's `source.pack`?** | A screen from a pack about something else is a weaker claim on the domain than a screen from the pack about it |
+| **How much of it exists** — components, operations? | Zero components is an unbuilt stub, not a screen that covers the ground |
+| **What do the MoMs say?** | Rank 1. A workshop dedicated to the domain outranks a paragraph in a workshop about its neighbour |
+| **What does the matrix say?** | Rank 2. A sub-domain with its own requirement block is the contracted shape |
+
+**Where the pack is the better source, the collapse runs the other way** — and that is a decision for a person, not a table.
+
+A further trap: `COLLAPSED` is keyed **`(pack, number, page)`**, not `(pack, board, number)`. A wrong-shaped key does not fail. It never matches, the collapse silently does not happen, and the count comes out short — ten short, on 19 September, caught only by checking the number rather than the exit code.
+
 ## 3 — Placement
 
 | | |
