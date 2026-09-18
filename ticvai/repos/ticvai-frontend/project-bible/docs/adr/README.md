@@ -40,11 +40,17 @@ and usually enough to predict what an ADR says.
 | [0015](0015-standards-first-device-drivers.md) | Standards-first device drivers — ESC/POS, UnifiedPOS, OSDP | Accepted | — |
 | [0038](0038-cell-is-a-region-database-per-tenant.md) | **A cell is a region, and a database per tenant inside it** | Accepted | **CF-161** |
 | [0039](0039-control-plane-and-tenant-database-lifecycle.md) | The control plane is a database of its own, and a tenant database is the unit | Accepted | — raises **CF-167** |
+| [0040](0040-a-cell-may-hold-more-than-one-instance.md) | A cell is a region; a region may need more than one instance | Accepted | — amends 0038 |
+| [0041](0041-a-command-centre-is-a-saved-dashboard.md) | A command centre is a saved dashboard, not a screen | Accepted | — raises **CF-169** |
+| [0042](0042-when-a-region-grows-and-where-a-tenant-lands.md) | When a region grows, and where a tenant lands | Accepted — one number pending sign-off | **CF-168** |
+| [0043](0043-the-control-plane-splits-on-personal-data.md) | The control plane splits on personal data | Accepted | **CF-167** |
+| [0044](0044-which-tables-partition-by-venue.md) | Which tables partition by venue | **Proposed** — needs sign-off before any DDL | — completes 0005 |
+| [0045](0045-every-order-carries-a-proven-contact.md) | **Every order carries a proven contact, and the gate is the checkout page** | Accepted | **CF-172** |
 
 > **This table is twelve entries short.** 0026 to 0037 are on disk and were never added to it —
 > the index has not kept up since 24 August. 0038 is here because it supersedes two of the rows
 > above it, and a supersession that is not visible in the index is a superseded ADR somebody
-> still reads as current.
+> still reads as current. **0040 to 0045 were added 18 September** — the gap is now 0026–0037 only.
 
 ## Still needed
 

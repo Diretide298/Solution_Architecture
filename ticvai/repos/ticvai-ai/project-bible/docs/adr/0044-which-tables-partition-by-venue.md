@@ -1,6 +1,9 @@
 # ADR-0044: Which tables partition by venue
 
-**Status:** Proposed — **the rule needs Chinmay's sign-off before any DDL is written**
+**Status:** Accepted — signed off by Chinmay, 18 September 2026. **The full rule, not the six-table
+subset**: `venue_id NOT NULL` implies `PARTITION BY LIST (venue_id)`, a leading `venue_id` in the
+primary key, and composite foreign keys into it. The 74 columns are in scope. `V0001__baseline.sql`
+is written against this.
 **Date:** 8 September 2026
 **Amends:** [ADR-0005](0005-venue-isolation-by-partitioning-not-separate-databases.md) — it decided *that* venues are isolated by list partitioning and never said which tables
 **Depends on:** [ADR-0038](0038-cell-is-a-region-database-per-tenant.md), amended by ADR-0040 on instance count, which does not touch what a tenant database is — partitioning happens inside it, which ADR-0038 settled

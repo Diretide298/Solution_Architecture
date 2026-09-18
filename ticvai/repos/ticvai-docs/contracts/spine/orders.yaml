@@ -2019,6 +2019,12 @@ paths:
         mobile the tickets go to with a one-time code. **Kiosk walk-up orders are exempt** — the tickets
         are printed for the person standing there.
 
+        **This operation is the gate, and the cart is not**
+        ([ADR-0045](../../docs/adr/0045-every-order-carries-a-proven-contact.md), 18 September 2026,
+        matrix 2.6.1 §2.4). Anyone may fill a cart. The fork between signing in and supplying guest
+        details belongs to the checkout page — `WEB-011`, `GST-041` — and this call refuses until one
+        of them has completed, keeping the cart so the guest resumes rather than restarts.
+
         '
       tags:
       - cart

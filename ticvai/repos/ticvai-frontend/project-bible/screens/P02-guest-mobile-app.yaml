@@ -5529,13 +5529,14 @@ screens:
     - GST-042
     transitions:
     - to: GST-042
-      trigger: Opens the cart without a verified sign-in
-      precondition: no verified guest session, and the site's guestCheckout is off
+      trigger: Signs in, or proves the contact the tickets go to
+      precondition: no verified guest session. This screen is the checkout page, so the fork sits here
+        rather than in front of the cart (matrix 2.6.1 §2.4)
       carries:
       - cartId
       returnsTo: GST-041
-      provenance: decided 17 September 2026 — no order against an unproven contact; rule on identity verifyGuestEmail,
-        per-site guestCheckout off by default (matrix 2.6.28)
+      provenance: ADR-0045, 18 September 2026, refining the 17 September rule — no order against an
+        unproven contact; per-site guestCheckout off by default (matrix 2.6.28)
     - to: GST-001
       trigger: Home – Default
       carries:
@@ -5599,9 +5600,10 @@ screens:
     emptyFirstRun: —
     emptyNoResults: The filter narrowed it and the checkout entry are still there. Names the active filter
       and offers to clear it.
-    emptyNoAccess: '**Never shown as an empty cart.** With the site''s `guestCheckout` off, a guest who
-      is not signed in, or whose account is unverified, is sent to sign-in before the cart opens, and
-      comes back to this cart with it intact.'
+    emptyNoAccess: '**This is the checkout page, and it is where identity is settled** (ADR-0045,
+      18 September 2026). An unverified or anonymous guest is not turned away — they are offered
+      sign-in or, where the site''s `guestCheckout` is on, the one-time code. The cart stays intact
+      either way; `checkoutCart` is what refuses.'
     offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
@@ -5647,8 +5649,8 @@ screens:
     - name: productId
       from: navigation
     coldEntry: Resolves from the session; a cold arrival is the ordinary case. **A cold arrival without
-      a verified sign-in goes to sign-in first** when the site's `guestCheckout` is off, and returns here
-      with the cart.
+      a verified sign-in is offered the fork here** — sign in, or prove the contact where the site's
+      `guestCheckout` is on — and keeps the cart either way (ADR-0045).
   wireframe:
     status: notStarted
     provenance: generated

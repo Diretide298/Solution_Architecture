@@ -137,12 +137,30 @@ paths:
         (requirement matrix 2.6.28 and 2.6.67 — guest checkout, configurable per site). It is **off by
         default**.
 
-        - **Off:** the guest signs in, verified, before the cart opens. An unverified or anonymous
-        session is sent to sign-in instead of being shown the cart.
+        **The gate is the checkout page, not the cart** ([ADR-0045](../../docs/adr/0045-every-order-carries-a-proven-contact.md),
+        18 September 2026, matrix 2.6.1 §2.4: *"On the check out page, users can log in or manually
+        fill in the following details"*). The cart is open to anyone; `checkoutCart` refuses until one
+        of the two routes has completed.
+
+        - **Off:** the guest signs in, verified, at checkout. `WEB-011` and `GST-041` carry the fork.
 
         - **On:** the guest may check out without an account, and proves the email or mobile the tickets
         go to with a one-time code at checkout (`requestGuestOtp`, purpose `verify`) — the *dual OTP
         validation* of the reference checkout the client walked through.
+
+        **Both routes produce a guest profile**, because the tickets have to go somewhere and the order
+        has to belong to something. **A one-time checkout profile carries no credential** — recalling
+        previous transactions needs access set up separately (matrix 2.6.29), which is what
+        `linkGuestCheckout` does from the other direction.
+
+        **A returning verified contact attaches to the profile already held** (matrix 22.2.8) — the new
+        order, its tickets and its history, automatically, with no duplicate record. **It does not open
+        that profile.** The guest sees the order just placed and nothing earlier until they authenticate
+        as its owner: a code proves someone controls the mailbox today, which is enough to route a ticket
+        there and not enough to hand over a history. **Any match that is not a verified contact** —
+        passport, national id, an unproved phone, a similar name — **is a suggestion for the staff review
+        of matrix 7.3.7**, with its audit log and rollback. A merge takes the narrower of two consents
+        (CF-160).
 
         **The kiosk is exempt.** A walk-up pays at the kiosk and takes printed tickets, so there is no
         address to prove (matrix 2.1.10). An unverified account also cannot *receive a transfer* or
