@@ -1561,6 +1561,11 @@ screens:
     contract: promotions
     purpose: Look up a code
     trigger: onLoad
+  - operationId: createCart
+    contract: orders
+    purpose: Start a cart
+    trigger: onLoad
+    provenance: wiring gap, 19 September 2026 — the screen showed the noun and could not act on it
   entryState:
     params:
     - name: cartId

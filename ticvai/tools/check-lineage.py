@@ -156,14 +156,59 @@ def main():
                           "not separately deployable" % (sch, " and ".join(owners)))
 
     # Coverage — reported, never failed.
+    #
+    # **An operation with `service` or `device` as its only audience is complete without a
+    # screen.** `accrueLoyaltyPoints` is called when an order completes, `submitQueueReading`
+    # by a sensor, `getSignageQueueBoard` by a display on a wall. Counting them as unwired
+    # makes the wiring figure permanently unreachable and hides the operations that really
+    # are missing a surface, so they are reported as their own number rather than folded into
+    # either side.
     no_table = [o for o, e in lin.items() if not (e.get("reads") or e.get("writes"))]
     by_service = collections.Counter(e.get("service") for e in lin.values())
+
+    screened = set()
+    for f in glob.glob(os.path.join(ROOT, "screens", "P*.yaml")):
+        try:
+            d = yaml.safe_load(io.open(f, encoding="utf-8")) or {}
+        except yaml.YAMLError:
+            continue
+        for s in (d.get("screens") or []):
+            for a in (s.get("apis") or []):
+                if a.get("operationId"):
+                    screened.add(a["operationId"])
+    machine = set()
+    for f in sorted(glob.glob(os.path.join(ROOT, "contracts", "*", "*.yaml"))):
+        try:
+            d = yaml.safe_load(io.open(f, encoding="utf-8")) or {}
+        except yaml.YAMLError:
+            continue
+        for _p, m in (d.get("paths") or {}).items():
+            if not isinstance(m, dict):
+                continue
+            for v, op in m.items():
+                if v not in VERBS or not isinstance(op, dict) or not op.get("operationId"):
+                    continue
+                aud = set(op.get("x-ticvai-audience") or [])
+                if aud and aud <= {"service", "device"}:
+                    machine.add(op["operationId"])
+    total = len(ops)
+    wired = len(set(ops) & screened)
+    auto = len(machine - screened)
+    gap = total - wired - auto
 
     if not quiet:
         print("  %d lineage entries · %d contract operations · %d tables"
               % (len(lin), len(ops), len(cols)))
         print("  %d service(s) · %d operation(s) reach no table (%.0f%%)"
               % (len(by_service), len(no_table), 100.0 * len(no_table) / max(1, len(lin))))
+        print()
+        print("  surfaced by a screen   %5d  %5.1f%%" % (wired, 100.0 * wired / max(1, total)))
+        print("  machine-called, no UI  %5d  %5.1f%%   service/device audience — complete"
+              % (auto, 100.0 * auto / max(1, total)))
+        print("  ----------------------------------")
+        print("  accounted for          %5d  %5.1f%%" % (wired + auto,
+                                                         100.0 * (wired + auto) / max(1, total)))
+        print("  no surface yet         %5d  %5.1f%%" % (gap, 100.0 * gap / max(1, total)))
         print()
         for e in ERRORS[:40]:
             print("  FAIL  %s" % e)
