@@ -1,0 +1,134 @@
+id: F229
+name: 'AI Forecasting and Predictive Intelligence board 2: Operational Forecasting Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as AI Forecasting and Predictive Intelligence board 2. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-509
+  entryPoints:
+  - Arrives at Operational Forecasting Command Center
+steps:
+- step: 1
+  screen: ADM-509
+  action: Opens Operational Forecasting Command Center
+  operations: []
+  outcome: Provide operations management with one central view of future operational pressure and predicted
+    resource requirements.
+- step: 2
+  screen: ADM-510
+  action: Works in Capacity & Occupancy Forecast
+  operations: []
+  outcome: Translate forecast attendance into predicted occupancy and capacity pressure across the venue.
+- step: 3
+  screen: ADM-509
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-511
+  action: Works in Attraction Utilization & Queue Forecast
+  operations: []
+  outcome: Predict demand, utilization and queue pressure for rides, attractions, experiences and service
+    points.
+- step: 5
+  screen: ADM-509
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-512
+  action: Works in Entry, Access & Guest Flow Forecast
+  operations: []
+  outcome: Predict guest arrival, admission, exit and movement pressure across gates and venue zones.
+- step: 7
+  screen: ADM-509
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-513
+  action: Works in Workforce Demand & Staffing Forecast
+  operations: []
+  outcome: Translate predicted operational demand into required staffing levels.
+- step: 9
+  screen: ADM-509
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-514
+  action: Works in POS, Kiosk & Frontline Service Forecast
+  operations: []
+  outcome: Predict the number of active selling/service points required to handle expected transaction
+    volume and maintain acceptable service levels.
+- step: 11
+  screen: ADM-509
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-515
+  action: Works in F&B, Retail & Inventory Demand Forecast
+  operations: []
+  outcome: Translate visitor forecasts into expected F&B, retail and stock demand. This screen should
+    forecast operational requirements without replacing the detailed F&B/Retail/Inventory modules already
+    designed.
+- step: 13
+  screen: ADM-509
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-516
+  action: Works in Resource, Equipment & Facility Requirement Forecast
+  operations: []
+  outcome: Predict non-workforce operational resources required to support expected visitor demand.
+- step: 15
+  screen: ADM-509
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-517
+  action: Works in Operational Scenario & Readiness Simulator
+  operations: []
+  outcome: Allow management to test operational alternatives before changing real configurations.
+- step: 17
+  screen: ADM-509
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-518
+  action: Works in Operational Forecast Review, Recommendations & Handover
+  operations: []
+  outcome: Consolidate forecast findings into a controlled operational readiness plan and hand recommendations
+    to the appropriate TICVAI modules. This is the final screen of the Forecasting module.
+branches:
+- at: 1
+  condition: Nothing has been set up on Operational Forecasting Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on AI Forecasting and Predictive Intelligence board 2 visited
+primaryContract: unknown
+contracts:
+- unknown

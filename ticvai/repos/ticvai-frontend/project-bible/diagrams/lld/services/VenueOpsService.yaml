@@ -1201,10 +1201,16 @@ screens:
 - P08:BO-099 Session Manifest
 - P08:BO-108 Venue Operations
 - P08:BO-125 Product & Category Button Configuration
+- P08:BO-406 Reader Profile & Device Setup
+- P08:BO-577 Maintenance Work Order
+- P08:BO-854 Resource Management Command Center
+- P08:BO-923 AI Resource Intelligence Command Center
+- P08:BO-943 Resource Analytics Command Center
 - P12:SUP-020 Queue Configuration & Management
 - P13:CMS-002 Brand Kit
 - P13:CMS-004 Logo & Assets
 - P13:CMS-010 Media Library
+- P13:CMS-071 AI Asset Intelligence Command Center
 flows:
 - F08 Steward works a shift on the employee app
 - F12 Asset fails and closes a queue

@@ -1,0 +1,140 @@
+id: F300
+name: 'Wallet Configuration Backend Structure v1.0 board 8: Wallet Security & Risk Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Wallet Configuration Backend Structure v1.0 board 8. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-1153
+  entryPoints:
+  - Arrives at Wallet Security & Risk Command Center
+steps:
+- step: 1
+  screen: BO-1153
+  action: Opens Wallet Security & Risk Command Center
+  operations: []
+  outcome: Provide Security, Risk, Finance and authorized Operations teams with a real-time overview of
+    wallet security. Dashboard KPIs
+- step: 2
+  screen: BO-1154
+  action: Works in Wallet Risk Policy Configuration
+  operations: []
+  outcome: Create reusable risk policies controlling wallet activities. Risk Policy Types
+- step: 3
+  screen: BO-1153
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-1155
+  action: Works in Transaction Risk Scoring Engine
+  operations: []
+  outcome: Calculate a real-time risk score for sensitive wallet operations. Example Risk Score
+- step: 5
+  screen: BO-1153
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-1156
+  action: Works in Velocity & Behavioral Rule Configuration
+  operations: []
+  outcome: Detect abnormal activity based on frequency, amount and behavioral patterns. Requirement 4.3.31
+    requires controls for suspicious transactions, spending restrictions, transfer restrictions and high-risk
+    activity. Velocity Rules
+- step: 7
+  screen: BO-1153
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-1157
+  action: Works in Device, Credential & Account Security
+  operations: []
+  outcome: Detect compromised accounts, shared credentials and suspicious device behavior. Requirement
+    4.3.32 specifically includes detection of account sharing and unauthorized access patterns. Device
+    Intelligence
+- step: 9
+  screen: BO-1153
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-1158
+  action: Works in AI Fraud & Anomaly Detection Studio
+  operations: []
+  outcome: Configure AI-driven detection of suspicious wallet behavior that fixed rules may not identify.
+    Requirement 4.3.32 explicitly requires AI monitoring for unusual top-ups, abnormal spending, account
+    sharing, rapid transfers, duplicate transact
+- step: 11
+  screen: BO-1153
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-1159
+  action: Works in Automated Security Action Orchestration
+  operations: []
+  outcome: Determine what TICVAI automatically does when a security or fraud condition occurs. Available
+    Actions Low Risk → Approve Medium Risk → Approve + Monitor Elevated Risk → Step-Up Authentication
+    High Risk → Hold Transaction Very High Risk → Re
+- step: 13
+  screen: BO-1153
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-1160
+  action: Works in Fraud Alert & Investigation Case Management
+  operations: []
+  outcome: Provide security teams with a structured investigation workspace. Alert Queue
+- step: 15
+  screen: BO-1153
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-1161
+  action: Works in Security Rules Testing, Simulation & AI Sandbox
+  operations: []
+  outcome: Test new fraud rules and AI configurations before applying them to live transactions. This
+    screen is particularly important because overly aggressive security rules can create large numbers
+    of false declines. Simulation Modes Single Transac
+- step: 17
+  screen: BO-1153
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-1162
+  action: Works in Security Governance, Audit & Rule Publication
+  operations: []
+  outcome: Govern how wallet security policies, fraud models and automated actions are changed and released.
+    Configuration Areas
+branches:
+- at: 1
+  condition: Nothing has been set up on Wallet Security & Risk Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Wallet Configuration Backend Structure v1.0 board 8 visited
+primaryContract: unknown
+contracts:
+- unknown

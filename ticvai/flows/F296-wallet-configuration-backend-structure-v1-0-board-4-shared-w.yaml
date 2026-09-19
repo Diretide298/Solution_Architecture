@@ -1,0 +1,143 @@
+id: F296
+name: 'Wallet Configuration Backend Structure v1.0 board 4: Shared Wallet Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Wallet Configuration Backend Structure v1.0 board 4. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-1113
+  entryPoints:
+  - Arrives at Shared Wallet Command Center
+steps:
+- step: 1
+  screen: BO-1113
+  action: Opens Shared Wallet Command Center
+  operations: []
+  outcome: Provide administrators with a centralized operational view of all Family, Parent–Child and
+    Corporate wallets. Backend Configuration & Monitoring
+- step: 2
+  screen: BO-1114
+  action: Works in Shared Wallet Model Configuration
+  operations: []
+  outcome: 'Define reusable shared-wallet structures. Administrators can create models such as: Family
+    Wallet Parent–Child Wallet Corporate Wallet Employee Wallet School Wallet Student Wallet Tour Group
+    Wallet Event Group Wallet Hospitality Group Walle'
+- step: 3
+  screen: BO-1113
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-1115
+  action: Works in Family & Household Structure Configuration
+  operations: []
+  outcome: Configure family relationships and wallet participation. The source requires customers to register
+    individually or as a family/group, with a designated owner able to allocate budgets to linked accounts
+    and monitor/cancel spending authorizat
+- step: 5
+  screen: BO-1113
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-1116
+  action: Works in Parent–Child Stored Value Distribution
+  operations: []
+  outcome: 'Configure the amusement-park style parent-card/child-card wallet model required specifically
+    by 4.3.38. Example Parent Wallet Available Stored Value: AED 1,000'
+- step: 7
+  screen: BO-1113
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-1117
+  action: Works in Allowance & Budget Allocation Engine
+  operations: []
+  outcome: Configure how wallet owners distribute value to linked members. Allocation Types One-time allowance
+    Daily allowance Weekly allowance Monthly allowance Event allowance Attraction allowance Meal allowance
+    Ride allowance Shopping allowance Cus
+- step: 9
+  screen: BO-1113
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-1118
+  action: Works in Member Spending Controls & Permissions
+  operations: []
+  outcome: Give wallet owners granular control over what each linked member can do. The source explicitly
+    requires family owners to cap expenses and cancel spending authorization at any time. Permission Controls
+- step: 11
+  screen: BO-1113
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-1119
+  action: Works in Corporate Wallet & Organizational Hierarchy
+  operations: []
+  outcome: Configure wallets for companies, schools, partners and other organizations. Requirement 4.3.27
+    calls specifically for corporate wallets with spending limits, user-level permissions, departmental
+    allocation and reporting. Organizational Stru
+- step: 13
+  screen: BO-1113
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-1120
+  action: Works in Corporate Budget, Policy & Approval Rules
+  operations: []
+  outcome: Control how organizational wallet funds may be spent. Budget Configuration
+- step: 15
+  screen: BO-1113
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-1121
+  action: Works in Shared Wallet Transfers & Balance Reallocation
+  operations: []
+  outcome: Manage movement of stored value within a family or corporate wallet structure. Supported Operations
+    Family Parent → Child Child → Parent Parent → Parent Child → Child (if permitted) Corporate Corporate
+    → Department Department → Employee Emp
+- step: 17
+  screen: BO-1113
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-1122
+  action: Works in Shared Wallet Simulator, Monitoring & Audit
+  operations: []
+  outcome: 'Test complex family/corporate wallet policies before publication and provide complete traceability
+    after activation. Simulation Example Family Wallet Balance: AED 1,500 Child A Daily Limit: AED 100
+    Used Today: AED 70 Requested Transaction:'
+branches:
+- at: 1
+  condition: Nothing has been set up on Shared Wallet Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Wallet Configuration Backend Structure v1.0 board 4 visited
+primaryContract: unknown
+contracts:
+- unknown

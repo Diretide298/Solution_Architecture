@@ -1,0 +1,135 @@
+id: F268
+name: 'Resource Management Configuration board 5: Experience Resource Requirement Builder'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Resource Management Configuration board 5. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-893
+  entryPoints:
+  - Arrives at Experience Resource Requirement Builder
+steps:
+- step: 1
+  screen: BO-893
+  action: Opens Experience Resource Requirement Builder
+  operations: []
+  outcome: Define which operational resources are required for each attraction, experience, ticket product,
+    session, or service.
+- step: 2
+  screen: BO-894
+  action: Works in Staff-to-Experience Qualification Mapping
+  operations: []
+  outcome: Define which types of employees are permitted to deliver a specific experience.
+- step: 3
+  screen: BO-893
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-895
+  action: Works in Resource Combination Builder
+  operations: []
+  outcome: Allow experiences to require multiple resources in valid combinations.
+- step: 5
+  screen: BO-893
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-896
+  action: Works in Ticket Demand & Resource Capacity Mapping
+  operations: []
+  outcome: Connect ticket sales and participant quantity directly to resource requirements.
+- step: 7
+  screen: BO-893
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-897
+  action: Works in Customer Resource Selection Configuration
+  operations: []
+  outcome: Control whether customers or cashiers may choose a specific staff member or resource during
+    purchase.
+- step: 9
+  screen: BO-893
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-898
+  action: Works in Skill-Based & Smart Resource Selection
+  operations: []
+  outcome: Allow users to request the type or capability of resource they require without manually choosing
+    an individual resource.
+- step: 11
+  screen: BO-893
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-899
+  action: Works in Customer / Cashier Resource Assignment Experience
+  operations: []
+  outcome: Provide the fast, visual assignment interface shown during ticket or experience purchase. This
+    screen shall be optimized for speed and simplicity.
+- step: 13
+  screen: BO-893
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-900
+  action: Works in Dynamic Resource Allocation Engine
+  operations: []
+  outcome: Configure how TICVAI automatically chooses a resource when a customer or cashier does not make
+    a specific selection.
+- step: 15
+  screen: BO-893
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-901
+  action: Works in Priority, Scoring & Allocation Policy
+  operations: []
+  outcome: Configure how TICVAI ranks eligible resources when several resources could satisfy the same
+    requirement.
+- step: 17
+  screen: BO-893
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-902
+  action: Works in Automatic Replacement & Assignment Recovery
+  operations: []
+  outcome: Automatically detect when an assigned resource becomes unavailable and protect the customer's
+    booking by finding a suitable replacement.
+branches:
+- at: 1
+  condition: Nothing has been set up on Experience Resource Requirement Builder yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Resource Management Configuration board 5 visited
+primaryContract: unknown
+contracts:
+- unknown

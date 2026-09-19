@@ -12387,7 +12387,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   layout:
-    regions: []
+    regions:
+    - components: []
+      name: contentBody
     template: split
   states:
     emptyFirstRun: No voucher scan reservation yet. Carries the create action; distinct from a filter
@@ -12455,7 +12457,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   layout:
-    regions: []
+    regions:
+    - components: []
+      name: contentBody
     template: split
   states:
     emptyFirstRun: No checkout readiness validation yet. Carries the create action; distinct from a filter
@@ -12523,7 +12527,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   layout:
-    regions: []
+    regions:
+    - components: []
+      name: contentBody
     template: split
   states:
     emptyFirstRun: No equipment yet. Carries the create action; distinct from a filter that matched nothing.
@@ -12590,7 +12596,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   layout:
-    regions: []
+    regions:
+    - components: []
+      name: contentBody
     template: split
   states:
     emptyFirstRun: No equipment scan validation yet. Carries the create action; distinct from a filter
@@ -12665,10 +12673,15 @@ screens:
         label: Asset
         provenance: pack Rental_Management.pdf, page 69 §Support
       - kind: secondaryButton
+        label: Reservation
+        provenance: pack Rental_Management.pdf, page 69 §Support
+      - kind: secondaryButton
         label: Checkout inspection
         provenance: pack Rental_Management.pdf, page 69 §Support
       name: actionBar
       slot: rowActions
+    - components: []
+      name: contentBody
     template: split
   states:
     emptyFirstRun: No pre-rental condition inspection yet. Carries the create action; distinct from a
@@ -12684,9 +12697,9 @@ screens:
   gaps:
   - operation: null
     source: pack Rental_Management.pdf, page 69 §Support
-    why: '**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved:
-      Asset, Checkout inspection. Each needs an operation, or needs removing from the screen; this is
-      the Phase 3 reconciliation seen from the screen side rather than the contract side.'
+    why: '**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved:
+      Asset, Reservation, Checkout inspection. Each needs an operation, or needs removing from the screen;
+      this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
   - operation: null
     source: pack Rental_Management.pdf, page 69
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -12699,7 +12712,7 @@ screens:
       a default rather than a reading. It needs a person before it is built.'
   apis: []
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 69. 0 of 0 labels bound to a
-    contract property; 2 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked
+    contract property; 3 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
   navigation:
     entryFrom:
@@ -12745,7 +12758,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   layout:
-    regions: []
+    regions:
+    - components: []
+      name: contentBody
     template: split
   states:
     emptyFirstRun: No safety handover checklist yet. Carries the create action; distinct from a filter
@@ -12814,7 +12829,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   layout:
-    regions: []
+    regions:
+    - components: []
+      name: contentBody
     template: split
   states:
     emptyFirstRun: No deposit financial handover yet. Carries the create action; distinct from a filter
@@ -12883,7 +12900,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   layout:
-    regions: []
+    regions:
+    - components: []
+      name: contentBody
     template: split
   states:
     emptyFirstRun: No group multi-item checkout yet. Carries the create action; distinct from a filter
@@ -13173,7 +13192,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   layout:
-    regions: []
+    regions:
+    - components: []
+      name: contentBody
     template: split
   states:
     emptyFirstRun: No active rental detail yet. Carries the create action; distinct from a filter that
@@ -13242,7 +13263,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   layout:
-    regions: []
+    regions:
+    - components: []
+      name: contentBody
     template: split
   states:
     emptyFirstRun: No rental extension request yet. Carries the create action; distinct from a filter
@@ -13311,7 +13334,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   layout:
-    regions: []
+    regions:
+    - components: []
+      name: contentBody
     template: split
   states:
     emptyFirstRun: No extension pricing confirmation yet. Carries the create action; distinct from a filter
@@ -13380,7 +13405,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   layout:
-    regions: []
+    regions:
+    - components: []
+      name: contentBody
     template: split
   states:
     emptyFirstRun: No equipment swap replacement yet. Carries the create action; distinct from a filter
@@ -13448,7 +13475,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   layout:
-    regions: []
+    regions:
+    - components: []
+      name: contentBody
     template: split
   states:
     emptyFirstRun: No rental incident operational yet. Carries the create action; distinct from a filter
@@ -13517,7 +13546,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   layout:
-    regions: []
+    regions:
+    - components: []
+      name: contentBody
     template: split
   states:
     emptyFirstRun: No due soon customer yet. Carries the create action; distinct from a filter that matched
@@ -13587,7 +13618,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   layout:
-    regions: []
+    regions:
+    - components: []
+      name: contentBody
     template: split
   states:
     emptyFirstRun: No overdue rental yet. Carries the create action; distinct from a filter that matched
@@ -13655,7 +13688,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   layout:
-    regions: []
+    regions:
+    - components: []
+      name: contentBody
     template: split
   states:
     emptyFirstRun: No active group rental yet. Carries the create action; distinct from a filter that
@@ -13990,7 +14025,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   layout:
-    regions: []
+    regions:
+    - components: []
+      name: contentBody
     template: split
   states:
     emptyFirstRun: No return scan rental yet. Carries the create action; distinct from a filter that matched
@@ -14058,7 +14095,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   layout:
-    regions: []
+    regions:
+    - components: []
+      name: contentBody
     template: split
   states:
     emptyFirstRun: No return summary actual yet. Carries the create action; distinct from a filter that
@@ -14126,7 +14165,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   layout:
-    regions: []
+    regions:
+    - components: []
+      name: contentBody
     template: split
   states:
     emptyFirstRun: No post-rental condition inspection yet. Carries the create action; distinct from a
@@ -14195,7 +14236,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   layout:
-    regions: []
+    regions:
+    - components: []
+      name: contentBody
     template: split
   states:
     emptyFirstRun: No before after condition yet. Carries the create action; distinct from a filter that
@@ -14264,7 +14307,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   layout:
-    regions: []
+    regions:
+    - components: []
+      name: contentBody
     template: split
   states:
     emptyFirstRun: No damage assessment charge yet. Carries the create action; distinct from a filter
@@ -14333,7 +14378,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   layout:
-    regions: []
+    regions:
+    - components: []
+      name: contentBody
     template: split
   states:
     emptyFirstRun: No partial return missing yet. Carries the create action; distinct from a filter that
@@ -14402,7 +14449,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   layout:
-    regions: []
+    regions:
+    - components: []
+      name: contentBody
     template: split
   states:
     emptyFirstRun: No late fees damage yet. Carries the create action; distinct from a filter that matched
@@ -14472,7 +14521,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   layout:
-    regions: []
+    regions:
+    - components: []
+      name: contentBody
     template: split
   states:
     emptyFirstRun: No deposit release capture yet. Carries the create action; distinct from a filter that
@@ -14542,7 +14593,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   layout:
-    regions: []
+    regions:
+    - components: []
+      name: contentBody
     template: split
   states:
     emptyFirstRun: No return completion equipment yet. Carries the create action; distinct from a filter

@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS orders.b2b_credit (
 
 -- A cart holds leases; an order holds money. Retained after expiry so a recovery link lands on
 -- something Hangs off: reaches orders.sales_order through its keys; references pii.subject,
--- platform.org_unit. Reached by: 9 operations read it and 6 write it; 2 tables reference it
+-- platform.org_unit. Reached by: 9 operations read it and 6 write it; 2 tables reference it.
 CREATE TABLE IF NOT EXISTS orders.cart (
     id                                uuid PRIMARY KEY NOT NULL,
     token                             text,
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS orders.cart (
 -- One line, with the lease that holds its capacity. Null lease for a product with no capacity
 -- Hangs off: a child of orders.cart; reaches orders.sales_order through its keys; references
 -- catalogue.inventory_hold, catalogue.performance, catalogue.variant. Reached by: 5 operations
--- read it and 4 write it
+-- read it and 4 write it.
 CREATE TABLE IF NOT EXISTS orders.cart_line (
     id                                uuid PRIMARY KEY NOT NULL,
     variant_id                        uuid NOT NULL,
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS orders.cart_line (
 
 -- a denomination and a count from a blind till count Hangs off: reaches orders.sales_order through
 -- its keys; references orders.deposit_box, orders.shift, platform.denomination. Reached by: 5
--- operations read it and 3 write it
+-- operations read it and 3 write it.
 CREATE TABLE IF NOT EXISTS orders.cash_count_line (
     id                                uuid PRIMARY KEY,
     shift_id                          text NOT NULL,
@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS orders.chargeback (
 -- a manual override of a partner credit limit, recorded with who and why. Second table on a marker
 -- the deriver only read the first half of Hangs off: a child of orders.b2b_credit; reaches
 -- orders.sales_order through its keys; references identity.principal, orders.b2b_credit. Reached
--- by: 1 operations read it and 1 write it
+-- by: 1 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS orders.credit_override (
     b2b_credit_id                     uuid NOT NULL,
     order_id                          text,
@@ -149,7 +149,7 @@ CREATE TABLE IF NOT EXISTS orders.deposit_box (
 
 -- A donation within a transaction. A line, not a flag, because one transaction may give to several
 -- campaigns Hangs off: reaches orders.sales_order through its keys; references
--- catalogue.donation_campaign, orders.sales_order
+-- catalogue.donation_campaign, orders.sales_order.
 CREATE TABLE IF NOT EXISTS orders.donation_line (
     id                                uuid PRIMARY KEY NOT NULL,
     campaign_id                       uuid NOT NULL,
@@ -186,7 +186,7 @@ CREATE TABLE IF NOT EXISTS orders.group_booking (
 -- A complimentary entitlement issued outside the order path (8.1.3–8.1.5). No payment is expected,
 -- so nothing waits for one. Hangs off: reaches orders.sales_order through its keys; references
 -- catalogue.performance, catalogue.product, identity.principal. Reached by: 0 operations read it
--- and 1 write it
+-- and 1 write it.
 CREATE TABLE IF NOT EXISTS orders.invitation (
     id                                uuid PRIMARY KEY NOT NULL,
     product_id                        uuid NOT NULL,
@@ -204,7 +204,7 @@ CREATE TABLE IF NOT EXISTS orders.invitation (
 
 -- What a profile may give away and over what period (8.1.5). An unbounded comp right is how a
 -- venue gives away a season. Hangs off: reaches orders.sales_order through its keys; references
--- identity.principal, identity.role. Reached by: 2 operations read it and 1 write it
+-- identity.principal, identity.role. Reached by: 2 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS orders.invitation_allowance (
     id                                uuid PRIMARY KEY,
     principal_id                      uuid NOT NULL,
@@ -218,7 +218,7 @@ CREATE TABLE IF NOT EXISTS orders.invitation_allowance (
 
 -- drawer opened without a sale. Recorded because it is the classic cover for theft Hangs off:
 -- reaches orders.sales_order through its keys; references identity.principal, orders.shift,
--- platform.workstation. Reached by: 1 operations read it and 1 write it
+-- platform.workstation. Reached by: 1 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS orders.no_sale_event (
     id                                text PRIMARY KEY NOT NULL,
     shift_id                          text NOT NULL,
@@ -232,7 +232,7 @@ CREATE TABLE IF NOT EXISTS orders.no_sale_event (
 
 -- manual discount with reason and approver. Posts to a discount account, never as a price change
 -- Hangs off: reaches orders.sales_order through its keys; references orders.sales_order. Reached
--- by: 0 operations read it and 1 write it
+-- by: 0 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS orders.order_discount (
     id                                uuid PRIMARY KEY NOT NULL,
     order_id                          text NOT NULL
@@ -263,7 +263,7 @@ CREATE TABLE IF NOT EXISTS orders.order_line (
 
 -- links an order to the media its entitlements were issued onto. What makes append-to-existing
 -- possible without editing a paid order Hangs off: reaches orders.sales_order through its keys;
--- references orders.sales_order
+-- references orders.sales_order.
 CREATE TABLE IF NOT EXISTS orders.order_media_link (
     id                                uuid PRIMARY KEY NOT NULL,
     order_id                          text NOT NULL
@@ -343,7 +343,7 @@ CREATE TABLE IF NOT EXISTS orders.payment_routing (
 );
 
 -- tips post to a liability, not to sales Hangs off: a child of orders.payment; reaches
--- orders.sales_order through its keys; references orders.payment
+-- orders.sales_order through its keys; references orders.payment.
 CREATE TABLE IF NOT EXISTS orders.payment_tip (
     id                                uuid PRIMARY KEY NOT NULL,
     payment_id                        text NOT NULL
@@ -474,8 +474,8 @@ CREATE TABLE IF NOT EXISTS orders.shift (
 
 -- A hold against any stored-value instrument (CF-126). Two-phase spend for all six, where only the
 -- retail wallet had it — a guest with 200 game credits starting a play the machine then failed had
--- no held balance Hangs off: reaches orders.sales_order through its keys. Reached by: 2 operations
--- read it and 6 write it; written by 3 contracts — marketing-crm, orders, resources
+-- no held balance Hangs off: reaches orders.sales_order through its keys. Reached by: 3 operations
+-- read it and 6 write it; written by 3 contracts — marketing-crm, orders, resources.
 CREATE TABLE IF NOT EXISTS orders.stored_value_authorisation (
     id                                uuid PRIMARY KEY NOT NULL,
     kind                              text NOT NULL,
@@ -490,7 +490,7 @@ CREATE TABLE IF NOT EXISTS orders.stored_value_authorisation (
 
 -- Ticket artwork and media selection (BL-102). A venue changing its artwork had no path that was
 -- not a code change. Hangs off: reaches orders.sales_order through its keys. Reached by: 2
--- operations read it and 0 write it
+-- operations read it and 0 write it.
 CREATE TABLE IF NOT EXISTS orders.ticket_template (
     id                                uuid PRIMARY KEY NOT NULL,
     name                              text NOT NULL,

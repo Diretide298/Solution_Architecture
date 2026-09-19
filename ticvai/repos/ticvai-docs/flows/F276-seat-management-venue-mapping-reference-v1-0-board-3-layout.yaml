@@ -1,0 +1,148 @@
+id: F276
+name: 'Seat Management Venue Mapping Reference v1.0 board 3: Layout Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Seat Management Venue Mapping Reference v1.0 board 3. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-973
+  entryPoints:
+  - Arrives at Layout Command Center
+steps:
+- step: 1
+  screen: BO-973
+  action: Opens Layout Command Center
+  operations: []
+  outcome: Manage layouts, versions and performance assignments from one operational view. Show active
+    layouts, draft versions, total capacity, utilization, upcoming changes, validation issues and approval
+    status. List layouts by venue, template, even
+- step: 2
+  screen: BO-974
+  action: Works in Template Library
+  operations: []
+  outcome: Maintain reusable layouts for common venue configurations. Provide templates for end-stage,
+    center-stage, sports, theatre, banquet, classroom and venue-defined patterns. Store capacity, focal
+    point, production footprint, section availabilit
+- step: 3
+  screen: BO-973
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-975
+  action: Works in Event-Specific Layout
+  operations: []
+  outcome: Create a seating layout tailored to one event or production. Start from the current venue map
+    or approved template and adjust stage, field, sections, rows, seats, aisles and facilities. Display
+    live capacity by section/category and affected
+- step: 5
+  screen: BO-973
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-976
+  action: Works in Clone & Inheritance
+  operations: []
+  outcome: Reuse a layout without losing the relationship to its approved source. Clone a layout for another
+    event, venue or performance and select which settings are inherited, copied or excluded. Show inherited
+    versus overridden geometry, categories
+- step: 7
+  screen: BO-973
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-977
+  action: Works in Version Compare
+  operations: []
+  outcome: Review exact differences between layout versions before approval or rollback. Provide side-by-side
+    and overlay comparisons of added, removed, moved and changed sections, rows, seats and routes. Summarize
+    capacity, accessible inventory, pric
+- step: 9
+  screen: BO-973
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-978
+  action: Works in Multi-Performance Assignment
+  operations: []
+  outcome: Assign approved layouts to one or many event performances. Provide calendar and grid views
+    of event, date, venue, performance, assigned layout/version and status. Support bulk assignment, date
+    range, recurrence, exception dates and differen
+- step: 11
+  screen: BO-973
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-979
+  action: Works in Temporary Seat Blocking
+  operations: []
+  outcome: Temporarily remove seats from sale for production or operational reasons. Select section, row,
+    seat or polygon on the map and define block type, reason, owner and effective period. Preview affected
+    available, held, reserved and sold invento
+- step: 13
+  screen: BO-973
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-980
+  action: Works in Scheduled Seat Release
+  operations: []
+  outcome: Return temporarily blocked inventory to sale at a controlled time. Create release schedules
+    by event, performance, hold/block type, seat set, time before event and condition. Preview release
+    quantity, new capacity, pricing/category mapping
+- step: 15
+  screen: BO-973
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-981
+  action: Works in Conflict & Impact Simulation
+  operations: []
+  outcome: Identify operational and commercial risk before a layout change becomes effective. Simulate
+    seat removal, addition, movement, category change, stage change, route change and block/release actions.
+    Calculate affected sold seats, holds, reser
+- step: 17
+  screen: BO-973
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-982
+  action: Works in Approval, Publish & Rollback
+  operations: []
+  outcome: Govern the complete release lifecycle for layout changes. Configure draft, review, operations,
+    ticketing, finance and final approval stages by impact and venue policy. Schedule publication, notify
+    dependent systems and verify synchronized v
+branches:
+- at: 1
+  condition: Nothing has been set up on Layout Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Seat Management Venue Mapping Reference v1.0 board 3 visited
+primaryContract: unknown
+contracts:
+- unknown

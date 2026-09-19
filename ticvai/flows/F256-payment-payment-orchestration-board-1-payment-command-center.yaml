@@ -1,0 +1,131 @@
+id: F256
+name: 'Payment Payment Orchestration board 1: Payment Command Center\t7'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Payment Payment Orchestration board 1. **This route is read
+    from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-559
+  entryPoints:
+  - Arrives at Payment Command Center\t7
+steps:
+- step: 1
+  screen: ADM-559
+  action: Opens Payment Command Center\t7
+  operations: []
+  outcome: Provide centralized visibility into payment operations and configuration across the tenant.
+- step: 2
+  screen: ADM-560
+  action: Works in Payment Method Catalogue\t8
+  operations: []
+  outcome: Maintain the centralized catalogue of payment/tender types supported by TICVAI.
+- step: 3
+  screen: ADM-559
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-561
+  action: Works in Payment Method Configuration\t9
+  operations: []
+  outcome: Configure detailed behavior for each payment method.
+- step: 5
+  screen: ADM-559
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-562
+  action: Works in Channel & Touchpoint Payment Configuration\t10
+  operations: []
+  outcome: Control which payment methods are available on each sales channel.
+- step: 7
+  screen: ADM-559
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-563
+  action: Works in Venue, Location & Business Unit Payment Assignment\t11
+  operations: []
+  outcome: Allow different venues and business units to operate different payment configurations. This
+    is important for TICVAI's multi-venue architecture.
+- step: 9
+  screen: ADM-559
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-564
+  action: Works in Currency & Payment Currency Configuration\t12
+  operations: []
+  outcome: Define which currencies can be used for payment and how payment currencies interact with TICVAI's
+    selling and accounting currencies.
+- step: 11
+  screen: ADM-559
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-565
+  action: Works in Payment Eligibility & Availability Rule Builder\t13
+  operations: []
+  outcome: Determine whether a payment method should be available for a particular transaction.
+- step: 13
+  screen: ADM-559
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-566
+  action: Works in Payment Fees, Surcharges & Commercial Rules\t14
+  operations: []
+  outcome: Configure payment-related commercial rules where legally and contractually permitted.
+- step: 15
+  screen: ADM-559
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-567
+  action: Works in Payment Policy, Governance & Approval Manager\t15
+  operations: []
+  outcome: Provide governance over sensitive payment configuration changes.
+- step: 17
+  screen: ADM-559
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-568
+  action: Works in Payment Configuration Simulator & Validation Center\t16
+  operations: []
+  outcome: Allow administrators to test payment configuration before publishing it. This is especially
+    important because payment configuration errors can immediately stop sales.
+branches:
+- at: 1
+  condition: Nothing has been set up on Payment Command Center\t7 yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Payment Payment Orchestration board 1 visited
+primaryContract: unknown
+contracts:
+- unknown

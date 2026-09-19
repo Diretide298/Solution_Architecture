@@ -27,7 +27,7 @@ servicesCalled:
 - service: OrderService
   operationCalls: 85
 - service: PlatformService
-  operationCalls: 41
+  operationCalls: 44
 - service: CatalogueService
   operationCalls: 33
 - service: IdentityService
@@ -726,6 +726,7 @@ screens:
   density: compact
   operations:
   - listPartner
+  - listPartner2
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -946,6 +947,7 @@ screens:
   density: compact
   operations:
   - listCommercialAgreement
+  - listCommercialAgreementHealth
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1170,6 +1172,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listPartner
   - listPartner2
   states:
   - emptyFirstRun

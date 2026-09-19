@@ -1,0 +1,148 @@
+id: F285
+name: 'Seat Management Venue Mapping Reference v1.0 board 12: Platform Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Seat Management Venue Mapping Reference v1.0 board 12. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-1061
+  entryPoints:
+  - Arrives at Platform Command Center
+steps:
+- step: 1
+  screen: BO-1061
+  action: Opens Platform Command Center
+  operations: []
+  outcome: Provide a platform-wide view of tenant, venue and environment readiness. Show tenants, brands,
+    venues, environments, active users, pending approvals, deployments and failed jobs. Display service
+    status, API health, capacity, incidents and c
+- step: 2
+  screen: BO-1062
+  action: Works in Tenant & Brand Context
+  operations: []
+  outcome: Configure the hierarchy and isolation boundary for seat management. Maintain tenant, legal
+    entity, brand, region, venue ownership, status and data-residency classification. Configure tenant
+    isolation, encryption context, export restriction,
+- step: 3
+  screen: BO-1061
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-1063
+  action: Works in Venue-Specific Configuration
+  operations: []
+  outcome: Set local defaults without creating separate seat systems. Configure default map, lock/hold
+    duration, naming, accessibility, sales channels, approvals and publishing policy. Map local entrances,
+    devices, price/seat categories, operating cal
+- step: 5
+  screen: BO-1061
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-1064
+  action: Works in Naming, Numbering & Localization
+  operations: []
+  outcome: Control how seat entities and values appear in each venue and language. Configure venue/section/row/seat
+    code formats, numbering direction, padding, prefixes and reserved values. Maintain translated labels,
+    supported languages, text directi
+- step: 7
+  screen: BO-1061
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-1065
+  action: Works in Currency, Timezone & Channels
+  operations: []
+  outcome: Configure regional display and channel availability. Set currency, rounding, date/time/number
+    formats, timezone, week start and daylight-saving behavior. Enable web, mobile, POS, box office, call
+    center, B2B, partner API and marketplace cha
+- step: 9
+  screen: BO-1061
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-1066
+  action: Works in Roles, Permissions & Masking
+  operations: []
+  outcome: Enforce least-privilege access to seat administration and operational data. Configure RBAC/PBAC
+    for maps, layouts, inventory, locks, holds, pricing, reports, integrations and audit. Apply venue/region
+    scope, field masking, temporary/delegat
+- step: 11
+  screen: BO-1061
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-1067
+  action: Works in Seat Approval Workflows
+  operations: []
+  outcome: Configure governance paths for high-impact seat changes. Define workflow by map/layout, capacity,
+    seat kill, hold, accessibility, pricing, integration and override change type. Set stages, approver
+    roles, thresholds, quorum, SLA, escalation
+- step: 13
+  screen: BO-1061
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-1068
+  action: Works in Lifecycle & Environment Promotion
+  operations: []
+  outcome: Move approved configuration safely from draft to production. Provide Draft, Test, Staging and
+    Production contexts with version, owner, status and dependency checks. Promote signed configuration
+    packages through required gates, automated tes
+- step: 15
+  screen: BO-1061
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-1069
+  action: Works in Platform Health & Observability
+  operations: []
+  outcome: Monitor the technical services that protect seat-state correctness. Show API latency/error,
+    event lag, lock service, inventory service, cache, database, queue and webhook health. Configure SLOs,
+    thresholds, alerts, correlation, incident own
+- step: 17
+  screen: BO-1061
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-1070
+  action: Works in Setup, Clone & Inheritance
+  operations: []
+  outcome: Accelerate onboarding while keeping configuration lineage visible. Guide setup of tenant, brand,
+    venue, locale, map, categories, locks/holds, channels, workflows and integrations. Clone an authorized
+    source venue or template and choose whic
+branches:
+- at: 1
+  condition: Nothing has been set up on Platform Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Seat Management Venue Mapping Reference v1.0 board 12 visited
+primaryContract: unknown
+contracts:
+- unknown

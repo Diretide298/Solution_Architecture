@@ -1,0 +1,148 @@
+id: F254
+name: 'Marketing CRM Configuration Reference v1.0 board 11: Digital Experience Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Marketing CRM Configuration Reference v1.0 board 11. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-834
+  entryPoints:
+  - Arrives at Digital Experience Center
+steps:
+- step: 1
+  screen: BO-834
+  action: Opens Digital Experience Center
+  operations: []
+  outcome: Monitor websites, portals, mobile experiences and content health. Show sites, apps, pages,
+    scheduled content, approvals, conversion, accessibility score and SEO health. List digital properties
+    with environment, brand, domain, locale, status
+- step: 2
+  screen: BO-835
+  action: Works in Site, Brand & Domain Setup
+  operations: []
+  outcome: Configure multiple white-label digital properties from one deployment. Create websites, portals,
+    microsites and app experiences by tenant, brand, venue, destination and business unit. Configure domains,
+    environments, logos, colors, typograp
+- step: 3
+  screen: BO-834
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-836
+  action: Works in Design System & Components
+  operations: []
+  outcome: Maintain reusable visual tokens and content components. Configure color, type, spacing, radius,
+    shadow, breakpoint, transition and icon tokens by brand. Configuration Scope of Work | Version 1.0
+    53 Provide banner, event, ticket, membership,
+- step: 5
+  screen: BO-834
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-837
+  action: Works in Page & Landing Builder
+  operations: []
+  outcome: Allow non-technical users to build pages and campaign landing experiences. Provide drag-and-drop
+    sections, layer tree, reusable templates and desktop/tablet/mobile preview. Support content, product
+    widgets, forms, countdowns, personalizatio
+- step: 7
+  screen: BO-834
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-838
+  action: Works in Content, Media & Forms
+  operations: []
+  outcome: Centrally manage reusable content, assets and data-capture forms. Maintain multilingual content
+    entries, metadata, tags, owner, status, schedule and workflow. Manage images, video, PDFs, icons,
+    audio and documents with rights, alt text, ren
+- step: 9
+  screen: BO-834
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-839
+  action: Works in Dynamic Product Pages
+  operations: []
+  outcome: Publish live transactional content directly from TICVAI product services. Configure dynamic
+    pages/widgets for events, attractions, tickets, capacity, pricing and availability. Display membership
+    benefits/prices, loyalty tiers/rewards, walle
+- step: 11
+  screen: BO-834
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-840
+  action: Works in Mobile App CMS
+  operations: []
+  outcome: Manage guest mobile-app content and navigation without releasing code. Configure home-screen
+    layout, menus, banners, announcements, quick actions, widgets and featured content. Define deep links,
+    audience visibility, language, schedule, app
+- step: 13
+  screen: BO-834
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-841
+  action: Works in Personalization & Localization
+  operations: []
+  outcome: Deliver relevant content variants under clear governance. Build visibility and content rules
+    by segment, profile, language, loyalty, membership, geography and behavior. Configure variant priority,
+    conflict resolution, fallback and real-gues
+- step: 15
+  screen: BO-834
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-842
+  action: Works in SEO Management
+  operations: []
+  outcome: Configure technical and content SEO across dynamic and authored pages. Manage titles, descriptions,
+    canonical URLs, Open Graph, keywords, slugs, aliases and 301/302 redirects. Generate XML sitemaps,
+    hreflang and Schema.org markup for events
+- step: 17
+  screen: BO-834
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-843
+  action: Works in Publishing, Analytics & Audit
+  operations: []
+  outcome: Govern content release and measure digital-experience performance. Support draft, review, approval,
+    scheduled publication, expiration, environment promotion and emergency unpublish. Maintain versions,
+    visual/text comparison, rollback, acces
+branches:
+- at: 1
+  condition: Nothing has been set up on Digital Experience Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Marketing CRM Configuration Reference v1.0 board 11 visited
+primaryContract: unknown
+contracts:
+- unknown

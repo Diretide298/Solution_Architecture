@@ -1,0 +1,131 @@
+id: F273
+name: 'Resource Management Configuration board 10: Resource Analytics Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Resource Management Configuration board 10. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-943
+  entryPoints:
+  - Arrives at Resource Analytics Command Center
+steps:
+- step: 1
+  screen: BO-943
+  action: Opens Resource Analytics Command Center
+  operations: []
+  outcome: Provide executives and operational managers with a single enterprise dashboard showing the
+    overall health and performance of Resource Management.
+- step: 2
+  screen: BO-944
+  action: Works in Resource Utilization & Capacity Analytics
+  operations: []
+  outcome: Measure how effectively resources are being utilized and identify overused or underused capacity.
+- step: 3
+  screen: BO-943
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-945
+  action: Works in Resource Cost, Revenue & Efficiency Analytics
+  operations: []
+  outcome: Measure the financial and operational efficiency of resources.
+- step: 5
+  screen: BO-943
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-946
+  action: Works in Demand Forecast Accuracy & Planning Performance
+  operations: []
+  outcome: Measure how accurately TICVAI's forecasting and planning engines predicted actual resource
+    demand.
+- step: 7
+  screen: BO-943
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-947
+  action: Works in Resource KPI, SLA & Performance Framework
+  operations: []
+  outcome: Allow organizations to define measurable Resource Management performance standards.
+- step: 9
+  screen: BO-943
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-948
+  action: Works in Resource Governance & Policy Center
+  operations: []
+  outcome: Centralize the administrative policies controlling how Resource Management behaves.
+- step: 11
+  screen: BO-943
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-949
+  action: Works in Approval, Exception & Override Control Center
+  operations: []
+  outcome: Provide one centralized workspace for governed Resource Management exceptions.
+- step: 13
+  screen: BO-943
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-950
+  action: Works in Audit Trail & Resource Decision History
+  operations: []
+  outcome: Provide immutable traceability of significant Resource Management changes and decisions.
+- step: 15
+  screen: BO-943
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-951
+  action: Works in Resource Integration & System Health Center
+  operations: []
+  outcome: Monitor all technical integrations and synchronization services supporting Resource Management.
+- step: 17
+  screen: BO-943
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-952
+  action: Works in Executive Resource Intelligence & AI Improvement Center
+  operations: []
+  outcome: Complete the Resource Management module with an executive AI workspace that converts operational
+    data into management recommendations. This should be the hero screen of Board 10.
+branches:
+- at: 1
+  condition: Nothing has been set up on Resource Analytics Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Resource Management Configuration board 10 visited
+primaryContract: unknown
+contracts:
+- unknown

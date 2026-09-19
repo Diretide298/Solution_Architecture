@@ -1,0 +1,140 @@
+id: F230
+name: 'AI Governance board 1: AI Governance Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as AI Governance board 1. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-519
+  entryPoints:
+  - Arrives at AI Governance Command Center
+steps:
+- step: 1
+  screen: ADM-519
+  action: Opens AI Governance Command Center
+  operations: []
+  outcome: Provide management with one centralized view of AI governance across the entire TICVAI platform.
+- step: 2
+  screen: ADM-520
+  action: Works in AI Capability Registry & Ownership
+  operations: []
+  outcome: Maintain a controlled registry of every AI capability operating within TICVAI. Nothing should
+    become an operational AI capability without being identifiable and governed.
+- step: 3
+  screen: ADM-519
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-521
+  action: Works in AI Risk Classification & Assessment
+  operations: []
+  outcome: Classify AI capabilities and individual AI action types according to their potential business,
+    customer, financial, operational, security and compliance impact. Risk should not be based only on
+    which AI model is being used.
+- step: 5
+  screen: ADM-519
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-522
+  action: Works in AI Autonomy Level Configuration
+  operations: []
+  outcome: Define exactly how independently AI is permitted to operate. This is one of the most important
+    screens in the governance module. I recommend four controlled levels plus a disabled state. Level
+    0 — Disabled AI capability cannot operate. Leve
+- step: 7
+  screen: ADM-519
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-523
+  action: Works in AI Action & Permission Policy Builder
+  operations: []
+  outcome: Define granular rules controlling what AI is allowed to read, recommend, prepare, modify or
+    execute. This should work alongside TICVAI's existing RBAC/PBAC, not replace it.
+- step: 9
+  screen: ADM-519
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-524
+  action: Works in AI Data Access & Usage Policy
+  operations: []
+  outcome: Control which data categories each AI capability is permitted to access and for what purpose.
+    This complements privacy/consent controls but does not replace TICVAI's core privacy governance.
+- step: 11
+  screen: ADM-519
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-525
+  action: Works in Environment, Tenant & Scope Governance
+  operations: []
+  outcome: Allow different AI governance rules across TICVAI's multi-tenant and multi-environment architecture.
+    A rule suitable for a development sandbox may not be acceptable in production.
+- step: 13
+  screen: ADM-519
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-526
+  action: Works in AI Policy Conflict, Exception & Override Management
+  operations: []
+  outcome: Identify conflicting governance rules and manage legitimate temporary exceptions without bypassing
+    governance silently.
+- step: 15
+  screen: ADM-519
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-527
+  action: Works in AI Policy Testing & Governance Simulation
+  operations: []
+  outcome: 'Allow administrators to test governance policies before activating them. This is extremely
+    important because a policy mistake could either: Allow AI too much authority, or Block legitimate
+    TICVAI operations. Simulation Scenario User Venue A'
+- step: 17
+  screen: ADM-519
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-528
+  action: Works in AI Governance Policy Publication & Effective Policy Map
+  operations: []
+  outcome: Provide the final review, approval, versioning and publication layer for AI governance policies.
+    No material governance policy should become active without a controlled lifecycle.
+branches:
+- at: 1
+  condition: Nothing has been set up on AI Governance Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on AI Governance board 1 visited
+primaryContract: unknown
+contracts:
+- unknown

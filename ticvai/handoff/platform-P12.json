@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-17",
+ "generated": "2026-09-19",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 28,
@@ -72,19 +72,19 @@
    "operations": 7
   },
   {
-   "contract": "white-label",
-   "operations": 1
-  },
-  {
    "contract": "finance",
    "operations": 1
   },
   {
-   "contract": "ai",
+   "contract": "queue",
    "operations": 1
   },
   {
-   "contract": "queue",
+   "contract": "white-label",
+   "operations": 1
+  },
+  {
+   "contract": "ai",
    "operations": 1
   }
  ],
@@ -167,7 +167,7 @@
    "module": "Support",
    "wave": 3,
    "route": "/support/customer-service-command-center-sup-009",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -176,7 +176,7 @@
    "module": "Support",
    "wave": 3,
    "route": "/support/customer-360-service-profile-sup-010",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {

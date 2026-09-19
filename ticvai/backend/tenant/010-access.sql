@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS access.entitlement (
 -- A guest bought parking. Carries the plate where the mode is plateWhitelist — personal data,
 -- since a plate identifies a person Hangs off: reaches access.entitlement through its keys;
 -- references access.parking_facility, orders.sales_order, pii.subject. Reached by: 1 operations
--- read it and 2 write it
+-- read it and 2 write it.
 CREATE TABLE IF NOT EXISTS access.parking_entitlement (
     id                                uuid PRIMARY KEY,
     facility_id                       uuid NOT NULL,
@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS access.parking_entitlement (
 
 -- A car park and its integration mode. Three modes, and the mode decides what happens at sale
 -- (CF-52) Hangs off: reaches access.entitlement through its keys; references platform.org_unit.
--- Reached by: 3 operations read it and 1 write it; 1 tables reference it
+-- Reached by: 3 operations read it and 1 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS access.parking_facility (
     id                                uuid PRIMARY KEY,
     name                              text NOT NULL,

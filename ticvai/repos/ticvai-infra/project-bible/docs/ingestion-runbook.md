@@ -4,13 +4,19 @@
 > because skipping it cost something, and the cost is named against each.
 >
 > **Owner:** Chinmay · **Last run:** 19 September 2026 · **Status:** authoritative
+>
+> **A drop carries three kinds of document and only one of them used to be ingested.**
+> Design books were parsed, MoMs were mined, and the specifications were filed and never
+> opened — twelve technical chapters, the RFP, the hardware sheet and the seat manifest, with
+> **zero citations anywhere in the package.** Step 0 now covers all three, and
+> `tools/index-sources.py` is the ledger that says which have been read.
 
 ---
 
 ## The order
 
 ```
-0  intake        zip -> sources/, dedupe, authority, platform
+0  intake        zip -> sources/, all THREE categories, dedupe, authority, platform
 1  parse         PDFs -> sources/workshop/pack.json          GATED
 2  TRIAGE        every new screen vs every built one          <- decide compression HERE
 3  placement     module -> platform, and what is not a screen
@@ -21,9 +27,37 @@
 8  patterns      regions, components, gaps
 9  linkage       entity x verb -> operations, and the gap doc
 10 refresh       the whole derivation chain
-11 design        export the batches
+11 design        export the batches                          <- ONE export, ONE queue
 12 checks        eighteen checkers
 ```
+
+## The precedence rule — which source wins
+
+```
+MoM  >  boards  >  specifications        and where all three are silent, the matrix
+```
+
+**Decided 19 September.** It replaced six coverage reports that disagreed with each other, and it
+is the rule every step below resolves a conflict with. Full statement in
+[source-precedence-19-september](active/source-precedence-19-september.md).
+
+**The matrix is a real fallback, not a gesture**, and its route is two hops rather than one:
+
+```
+matrix row -> handoff/traceability.json -> contract operation -> generate-screens-from-contracts.py
+```
+
+`check-traceability.py` walks 3,184 rows with 2,647 `CONTRACTED`, so a row that is contracted
+already names an operation that exists. **244 operations are reached by no screen** — that set *is*
+the fallback, and it is bounded and countable. 136 rows (93 `GAP_CONTRACT`, 43
+`CONTRACTED_PARTIAL`) cannot produce a screen by any route; they are contract work first.
+
+## `P04` is final — never regenerate it
+
+**The POS terminal is client-approved and is the fidelity reference every other build is measured
+against.** No step in this runbook touches `screens/P04-point-of-sale.yaml`, and there is no
+`P04-*` batch in `handoff/design-batches/` — the 10–14 September run already excluded it and every
+run since must. Both generators take `--platform`; excluding it means never passing it.
 
 **Steps 1 → 3 look like the whole job and are not.** On 19 September 814 screens were parsed,
 placed and wired into `P08` and `P09` with step 2 skipped entirely. Nothing failed. The screens
@@ -38,10 +72,71 @@ configuration", 9 × "command center"**.
 
 | | |
 |---|---|
-| Tool | `tools/index-packs.py` |
-| Writes | `sources/packs-index.json` |
+| Tools | `tools/index-packs.py` · **`tools/index-sources.py --write`** |
+| Writes | `sources/packs-index.json` · **`sources/SOURCES-INDEX.md`** |
 
-Hash every client document, group by content, record what its folder used to assert. **`sources/README.md` ranks folders by authority** — a file in `requirements/` is contracted scope and the identical file in `packs/` is reference material — so a document held twice is holding two claims that nothing keeps in sync.
+### A drop is three categories, and it is not ingested until all three are
+
+| category | lands in | read by | how you know |
+|---|---|---|---|
+| **Design books** | `packs/`, `workshop/`, `boards/` | `parse-workshop-pack.py` | in `sources/workshop/pack.json` |
+| **MoMs** | `mom/` | `mine-moms.py`, `build-mom-digest.py` | in `sources/mom-corpus.json` |
+| **Specifications** | **`specifications/`** | **nothing, until 19 September** | cited outside `sources/` |
+
+**On 19 September the third category had been filed and never opened** — the RFP, twelve technical
+chapters, the hardware integration sheet and the seat manifest, **zero citations** anywhere in
+`contracts/`, `screens/` or `docs/`, and no tool that so much as listed the folder. The MoM corpus
+was simultaneously eight days stale: 22 of 27 mined, and the five missing were the five most
+recent.
+
+`tools/index-sources.py --write` reports all three with a read status that **cannot be faked** — a
+document counts as read when something outside `sources/` names it. Writing the index does not make
+anything read. Run it at intake and again at the end.
+
+### Where things live now
+
+```
+sources/mom/               rank 1   minutes
+sources/requirements/      rank 2   the matrix
+sources/specifications/    rank 2   rfp/ ; and reference/ planning/ handover/
+sources/packs/ workshop/ boards/    rank 3   the design books
+sources/designs/ diagrams/ rank 3   directional
+sources/legacy/            RETIRED  Ch01-Ch09 - a proposal WE wrote, never scope
+```
+
+**`sources/legacy/` is the trap this section exists to prevent.** Those chapters answer the RFP
+domain for domain, so a coverage check run against them measures our screens against *our own
+reply* and reports that the proposal is self-consistent. They are a useful checklist and they are
+never scope.
+
+**`specifications/handover/`** holds `Dev01`–`Dev03`. They produce **no screens** — nothing in
+`screens/` should cite them and no coverage check should count them. They are the shape of what the
+RFP's IP clause obliges us to hand over.
+
+### Read the specifications, do not just file them
+
+| tool | reads | rank |
+|---|---|---|
+| `tools/check-rfp-coverage.py` | the RFP | **2 — scope** |
+| `tools/check-spec-coverage.py` | `legacy/Ch03` | 3 — ours |
+
+**Both are review queues, not verdicts**, and both had to be built twice. A pooled-text match calls
+`Emirates ID Reader` delivered on the word *reader* from an unrelated gaming screen; a strict
+all-words match calls `Audit Trail & Logging` missing when the screen is called *Governance Audit
+Trail & Compliance Evidence*. **The rule that works is the capability's rarest word, matched against
+one name rather than the pool.**
+
+**A PDF watermark corrupts capability names silently.** The RFP carries a rotated `CONFIDENTIAL` on
+every page and pdfplumber splices its letters into words one at a time — `CrCedit`, `WCishlist`,
+`ManOagement`. Left in, `Credit Memo Management` becomes a capability nothing can ever match. An
+uppercase letter with lowercase on both sides is never legitimate in prose; that is the repair.
+
+### Traps, all paid for
+
+- **`Table Added` in a client changelog means added *this round*,** not *everything they have that we lack*. Reading it the second way produced a wrong correction within the hour.
+- **Never deduplicate by filename.** Four PDFs in `requirements/` were byte-different truncations of the real pack at 3% of the size — a name-based pass would have kept the broken one. Compare hashes, and check the file *parses* before trusting either copy.
+- **A hash-set check does not prove nothing was lost.** Comparing the set of hashes in the drop against the set on disk passes while a *path* disappears, because the same bytes still exist elsewhere. Five files went missing under exactly that check on 19 September. **Verify by path.**
+- **`--apply` scope.** Only `reference`, `workshop` and `board` class documents centralise. `mom`, `requirement`, `design` and `rfp` never move.
 
 **Check for duplicates here, before parsing.** The 18 September scan found **30 byte-identical sets** across five folders, 17 packs duplicated into `workshop/` alone.
 
@@ -141,12 +236,25 @@ Each module needs `(platform, licensed module, nav section)` in `PLACEMENT`. **`
 ## 4–9 — Boards, ids, wire, flows, patterns, linkage
 
 ```
+tools/derive-pack-boards.py                  one board per workshop board
 tools/derive-id-register.py --apply          ids are issued, never reissued
-tools/applied/wire-pack-boards-*.py          hubs off BO-100 / ADM-002 / CMS-001
+tools/applied/wire-pack-boards-<date>.py     hubs off BO-100 / ADM-002 / CMS-001
 tools/derive-board-flows.py --apply          idempotent on the hub, not the filename
 tools/generate-screens-from-pack.py --module <x>    patterns, regions, gaps; --only for a repair
 tools/derive-pack-linkage.py                 entity x verb -> operations
 ```
+
+**Wiring gets a dated sibling, never a re-run.** An `applied/` tool records what was done on a day.
+Re-running an older one over a different screen set promotes different hubs and writes edges nobody
+decided — and the 11 September tool's collapse path is a one-off that already ran.
+
+**Do not name the packs in a literal.** The 11 September sibling listed its four packs by hand; on
+19 September there were 36, and a hand-written list is exactly what silently omits one. **Select
+every pack that still holds a screen with no `entryFrom`** — self-limiting, and idempotent anyway.
+
+**19 September, for scale:** 798 screens placed, 798 wired, 86 flows written and 109 skipped. `P08`
+went 614 → 1,182 and `P09` 446 → 676, taking the package to **2,427 screens**. Screens with no
+`entryFrom` fell from 851 to 90.
 
 **None of this invents operations.** A generated screen declares `apis: []`. The 1,924 pack screens imply roughly three thousand endpoints against the ~1,032 that exist, and *authoring three thousand endpoints from a PDF is not derivation, it is fabricating an API surface.* The gap is written out as named operations instead.
 
@@ -159,12 +267,37 @@ tools/export-design-batch.py
 
 **`refresh.sh` does not run `derive-services.py --apply`, `generate-screens-from-pack.py`, or the one-off `applied/` tools.** Run those by hand.
 
+### One export, one queue — and it comes after generation
+
+**`QUEUE.md` is a numbered running order** — *"never skip, never reorder, never choose your own"* —
+and batches are ~10 screens each. **Cutting batches before the screen set is final means re-cutting
+them.** Placing 798 screens after a batch export would have added ~82 new batches to `P08` and
+`P09`, forced the 28 existing ones to be re-cut because their membership changed, and renumbered
+the queue underneath whatever had already been built.
+
+Placement does **not** cause double *generation* — `derive-pack-screens.py` adds rather than
+rebuilds, and the generators take `--only`. **It is the queue that only wants cutting once.**
+
 **Baselines that must hold:**
 
 | check | at |
 |---|---|
 | `check-package` | **9 errors** — 7 `release*` lineage, `p09-commercial`, `audit-2026-09-07` |
 | `check-screens` · `check-flows` · `check-migrations` · `check-wireframes` | **PASS** |
+
+**Two rules `check-package` enforces that catch a careless edit every time:**
+
+- **An ADR citing an amended ADR must say so within one line of the citation**, and the match is
+  **case-sensitive on the lowercase word**. A `**Amends:**` header does not satisfy it. This is
+  CF-97's rule — ADR-0001 once read *"Accepted — split rule superseded by ADR-0014"*, a reader took
+  the first word, and built a cross-tenant isolation defect on it.
+- **Mirrors drift the moment a root file changes.** Six `repos/*/project-bible` copies go stale
+  together; `tools/derive-mirrors.py` puts them back. Six of the errors on any run straight after
+  an edit are this and nothing else.
+
+**A YAML description is a quoted scalar.** Writing `The RFP's` into one breaks the file — the
+apostrophe has to be doubled. `check-screens` catches it as a parser error, not as a content
+problem, so read the traceback rather than the summary line.
 
 Anything above the baseline is ours and gets fixed before the next cluster.
 

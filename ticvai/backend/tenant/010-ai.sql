@@ -3,7 +3,7 @@
 
 -- Maps a Qdrant point id back to its document and scope. The join between the two stores Hangs
 -- off: reaches ai.index_source through its keys; references ai.knowledge_document. Reached by: 6
--- operations read it and 0 write it
+-- operations read it and 0 write it.
 CREATE TABLE IF NOT EXISTS ai.chunk_ref (
     id                                uuid PRIMARY KEY NOT NULL,
     document_id                       uuid NOT NULL
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS ai.conversation (
 
 -- Maps a source row to its Qdrant point ids, so a deletion in Postgres can be followed into the
 -- vector store. Nothing cascades between the two Hangs off: reaches ai.index_source through its
--- keys; references ai.index_source. Reached by: 1 operations read it and 2 write it
+-- keys; references ai.index_source. Reached by: 1 operations read it and 2 write it.
 CREATE TABLE IF NOT EXISTS ai.index_entry (
     id                                uuid PRIMARY KEY NOT NULL,
     source_id                         uuid NOT NULL
@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS ai.index_failure (
 
 -- A build in flight. recordsFailed is the number to watch — a source failing on 3% of rows is a
 -- search missing 3% of answers Hangs off: reaches ai.index_source through its keys; references
--- ai.index_source. Reached by: 2 operations read it and 1 write it
+-- ai.index_source. Reached by: 2 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS ai.index_job (
     id                                uuid PRIMARY KEY NOT NULL,
     source_id                         uuid NOT NULL,
@@ -67,8 +67,8 @@ CREATE TABLE IF NOT EXISTS ai.index_job (
 
 -- One declaration per indexed table. The owning service does not know it exists — the AI service
 -- consumes the event that service already publishes Hangs off: a root — nothing above it in its
--- schema; references ai.knowledge_collection. Reached by: 3 operations read it and 1 write it; 5
--- tables reference it
+-- schema; references ai.knowledge_collection. Reached by: 3 operations read it and 1 write it; 6
+-- tables reference it.
 CREATE TABLE IF NOT EXISTS ai.index_source (
     id                                uuid PRIMARY KEY,
     "table"                           text NOT NULL,
@@ -117,7 +117,7 @@ CREATE TABLE IF NOT EXISTS ai.interaction (
 -- A collection in the vector store. One per embedding model — a collection carries its own vector
 -- config and a shard cannot, so two models cannot share one (ADR-0021). Carries the shard key,
 -- which is the tenant boundary on shared placement Hangs off: reaches ai.index_source through its
--- keys. Reached by: 4 operations read it and 1 write it; 2 tables reference it
+-- keys. Reached by: 4 operations read it and 1 write it; 2 tables reference it.
 CREATE TABLE IF NOT EXISTS ai.knowledge_collection (
     id                                uuid PRIMARY KEY,
     name                              text NOT NULL,
@@ -135,7 +135,7 @@ CREATE TABLE IF NOT EXISTS ai.knowledge_collection (
 
 -- Source, status and chunk count. The text and its vectors live in Qdrant Hangs off: reaches
 -- ai.index_source through its keys; references ai.knowledge_collection, maintenance.asset. Reached
--- by: 3 operations read it and 1 write it; 1 tables reference it
+-- by: 3 operations read it and 1 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS ai.knowledge_document (
     id                                uuid PRIMARY KEY,
     collection_id                     uuid,
@@ -151,7 +151,7 @@ CREATE TABLE IF NOT EXISTS ai.knowledge_document (
 -- A generated seat layout awaiting review. Ends at previewReady and writes nothing to the seat map
 -- — the draft enters seating.import_job at its existing human commit step (ADR-0020) Hangs off:
 -- reaches ai.index_source through its keys; references assets.media_asset, venuemap.import_job.
--- Reached by: 0 operations read it and 1 write it
+-- Reached by: 0 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS ai.layout_draft (
     id                                uuid PRIMARY KEY,
     import_job_id                     uuid NOT NULL,
@@ -186,8 +186,8 @@ CREATE TABLE IF NOT EXISTS ai.message (
 );
 
 -- What the assistant may do, which roles may use it, what is masked. Resolves tenant then venue
--- (ADR-0018) Hangs off: reaches ai.index_source through its keys; references platform.tenant.
--- Reached by: 12 operations read it and 2 write it
+-- (ADR-0018) Hangs off: reaches ai.index_source through its keys; references ai.provider,
+-- platform.tenant. Reached by: 12 operations read it and 2 write it.
 CREATE TABLE IF NOT EXISTS ai.policy (
     id                                uuid PRIMARY KEY,
     scope_level                       text NOT NULL,
@@ -219,7 +219,7 @@ CREATE TABLE IF NOT EXISTS ai.policy (
 
 -- A draft the assistant produced and a person must approve. Nothing executes from here Hangs off:
 -- reaches ai.index_source through its keys; references ai.interaction, identity.principal. Reached
--- by: 5 operations read it and 6 write it; 1 tables reference it
+-- by: 5 operations read it and 6 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS ai.proposed_action (
     id                                uuid PRIMARY KEY NOT NULL,
     interaction_id                    uuid,
@@ -238,7 +238,7 @@ CREATE TABLE IF NOT EXISTS ai.proposed_action (
 
 -- Configured providers, models and failover order. Credentials are a vault reference, never a key
 -- Hangs off: reaches ai.index_source through its keys; references ai.provider, control.tenant,
--- platform.org_unit. Reached by: 14 operations read it and 3 write it; 5 tables reference it
+-- platform.org_unit. Reached by: 14 operations read it and 3 write it; 6 tables reference it.
 CREATE TABLE IF NOT EXISTS ai.provider (
     id                                uuid PRIMARY KEY,
     kind                              text NOT NULL,
@@ -265,7 +265,7 @@ CREATE TABLE IF NOT EXISTS ai.provider (
 -- learning can be swapped in without touching a screen — a heuristic today, a model when there is
 -- data, and the frontend never changes. A suggestion is never an action. Hangs off: reaches
 -- ai.index_source through its keys. Reached by: 3 operations read it and 1 write it; 2 tables
--- reference it
+-- reference it.
 CREATE TABLE IF NOT EXISTS ai.suggestion (
     id                                uuid PRIMARY KEY NOT NULL,
     kind                              text NOT NULL,

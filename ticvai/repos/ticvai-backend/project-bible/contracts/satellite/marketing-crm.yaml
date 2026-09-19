@@ -82,6 +82,8 @@ paths:
         - "P01 WEB-034 Lost & Found"
         - "P02 GST-034 Lost & Found"
         - "P02 GST-040 Help & Support"
+        - "P08 BO-804 Case Command Center"
+        - "P08 BO-813 Case Analytics & Audit"
       summary: The cases this guest raised
       description: '24 August. **No case operation was guest-callable** — `createCase`, `getCase` and
         `addCaseMessage` all carry staff permissions, so a guest could raise nothing and read nothing.
@@ -1179,6 +1181,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-120 Omnichannel Commerce & Journey Configuration"
         - "P08 BO-223 Journey Simulation, Audit & Publication"
+        - "P08 BO-782 AI Journey Optimization"
+        - "P08 BO-783 Journey Analytics & Audit"
       summary: Automated journeys
       tags:
       - marketing
@@ -3320,6 +3324,7 @@ paths:
         - "P08 BO-005 Queue Monitor"
         - "P08 BO-107 Guests & Marketing"
         - "P08 BO-118 Campaign & Audience Management"
+        - "P08 BO-764 Campaign Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -3930,6 +3935,8 @@ paths:
         - "P02 GST-068 Help & My Cases"
         - "P06 EMP-028 Lost & found"
         - "P06 EMP-029 Guest assistance"
+        - "P08 BO-804 Case Command Center"
+        - "P08 BO-813 Case Analytics & Audit"
         - "P10 PTR-021 Support & Contact"
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-004 Conversation Queue"
@@ -3987,6 +3994,7 @@ paths:
         - "P02 GST-068 Help & My Cases"
         - "P06 EMP-028 Lost & found"
         - "P06 EMP-029 Guest assistance"
+        - "P08 BO-806 Case Creation"
         - "P10 PTR-021 Support & Contact"
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-004 Conversation Queue"
@@ -5560,6 +5568,7 @@ paths:
     get:
       operationId: listCustomerPrivacyConsent
       x-ticvai-consumed-by:
+        - "P13 CMS-021 Privacy & Consent Configuration Command Center"
         - "P13 CMS-032 Customer Privacy, Consent & Preference 360°"
       x-ticvai-audience:
         - staff
@@ -5839,6 +5848,7 @@ paths:
       operationId: listPrivacyEvidenceCompliance
       x-ticvai-consumed-by:
         - "P13 CMS-039 Privacy Audit, Evidence & Compliance Reporting"
+        - "P13 CMS-040 Privacy Analytics & AI Compliance Intelligence"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5965,6 +5975,7 @@ paths:
       operationId: listCustomerService
       x-ticvai-consumed-by:
         - "P12 SUP-009 Customer Service Command Center"
+        - "P12 SUP-010 Customer 360° Service Profile"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6002,6 +6013,8 @@ paths:
     get:
       operationId: listCustomerServiceProfile
       x-ticvai-consumed-by:
+        - "P08 BO-737 Customer 360 Profile"
+        - "P12 SUP-009 Customer Service Command Center"
         - "P12 SUP-010 Customer 360° Service Profile"
       x-ticvai-audience:
         - staff
@@ -7177,6 +7190,7 @@ paths:
     get:
       operationId: listWaiver
       x-ticvai-consumed-by:
+        - "P08 BO-844 Waiver Command Center"
         - "P13 CMS-051 Waiver Operations Command Center"
       x-ticvai-audience:
         - staff

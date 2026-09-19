@@ -1,0 +1,139 @@
+id: F226
+name: 'AI Configuration Assistant board 2: AI Configuration Build Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as AI Configuration Assistant board 2. **This route is read
+    from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-479
+  entryPoints:
+  - Arrives at AI Configuration Build Command Center
+steps:
+- step: 1
+  screen: ADM-479
+  action: Opens AI Configuration Build Command Center
+  operations: []
+  outcome: Provide a central workspace showing how the Board 1 blueprint is being converted into actual
+    TICVAI configuration objects.
+- step: 2
+  screen: ADM-480
+  action: Works in Venue & Organization Configuration
+  operations: []
+  outcome: Convert the discovered business structure into the actual organizational and venue configuration
+    required by TICVAI.
+- step: 3
+  screen: ADM-479
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-481
+  action: Works in Product Configuration Assistant
+  operations: []
+  outcome: Convert Board 1 product requirements into actual proposed TICVAI ticket products and associated
+    product rules. This screen should connect directly to the existing Ticketing module architecture,
+    not create a separate AI product model.
+- step: 5
+  screen: ADM-479
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-482
+  action: Works in Schedule, Capacity & Availability Configuration
+  operations: []
+  outcome: Translate operating requirements into actual schedules, timeslots, reservation windows, and
+    capacity structures.
+- step: 7
+  screen: ADM-479
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-483
+  action: Works in Pricing & Commercial Configuration
+  operations: []
+  outcome: Convert commercial requirements into proposed pricing, tax, fee, and commercial rules using
+    TICVAI's existing Pricing architecture.
+- step: 9
+  screen: ADM-479
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-484
+  action: Works in Promotion, Bundle & Upsell Configuration
+  operations: []
+  outcome: Convert identified commercial opportunities into proposed promotion, package, bundle, upsell,
+    and cross- sell configuration. This screen should only become prominent when relevant.
+- step: 11
+  screen: ADM-479
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-485
+  action: Works in Seating, Access & Operational Configuration
+  operations: []
+  outcome: Configure the operational rules required to fulfill and validate the products. The screen should
+    adapt depending on venue type. For the museum example, seating is irrelevant and should not consume
+    UI attention.
+- step: 13
+  screen: ADM-479
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-486
+  action: Works in Channel, Media & Fulfillment Configuration
+  operations: []
+  outcome: Determine how the proposed products are sold, delivered, and fulfilled across TICVAI channels.
+- step: 15
+  screen: ADM-479
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-487
+  action: Works in Cross-Module Conflict & Dependency Validation
+  operations: []
+  outcome: Perform a comprehensive validation of the proposed configuration across all TICVAI modules
+    before it is presented for approval. This should be one of the most important screens in Board 2.
+- step: 17
+  screen: ADM-479
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-488
+  action: Works in Configuration Preview & Impact Analysis
+  operations: []
+  outcome: Present the complete proposed configuration in business and technical terms before moving to
+    approval and execution in Board 3. This is the final output of Board 2.
+branches:
+- at: 1
+  condition: Nothing has been set up on AI Configuration Build Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on AI Configuration Assistant board 2 visited
+primaryContract: unknown
+contracts:
+- unknown

@@ -1,7 +1,7 @@
 $id: ticvai/roles-by-app.yaml
 title: Permissions each shipped app requires
 generatedBy: tools/derive-app-roles.py
-generated: '2026-09-17'
+generated: '2026-09-19'
 description: '**Derived from what each app''s screens call, not decided here.** For every app, the permissions
   its operations declare in `x-ticvai-permission`, tiered by what the key permits. Role names, headcounts
   and the approval hierarchy are deliberately absent: who at a venue may configure pricing is the client''s
@@ -109,9 +109,9 @@ apps:
     - P11
     - P14
     - P17
-    screens: 537
-    operations: 537
-    permissions: 62
+    screens: 767
+    operations: 540
+    permissions: 63
     tiers:
       read:
       - AI_AUDIT_VIEW
@@ -172,6 +172,7 @@ apps:
       - PLATFORM_TENANT_MANAGE
       - PRICE_CONFIGURE
       - PRODUCT_CONFIGURE
+      - REGION_CONFIGURE
       - REPORT_MANAGE
       - ROLE_MANAGE
       - SCOPE_MANAGE
@@ -199,8 +200,8 @@ apps:
     - P12
     - P13
     - P16
-    screens: 811
-    operations: 809
+    screens: 1379
+    operations: 831
     permissions: 107
     tiers:
       read:
@@ -325,13 +326,14 @@ apps:
     - listDiningOutlets
     - listGuestDevices
     - listMfaMethods
+    - listMyCases
     - listSsoProviders
     - login
     - recordConsent
     - recordDeviceHeartbeat
     - recordGamePlay
     - syncGamePlays
-    operationsWithNoPermissionCount: 17
+    operationsWithNoPermissionCount: 18
   venue-pos:
     name: TICVAI POS
     platforms:

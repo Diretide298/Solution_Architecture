@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-17",
+ "generated": "2026-09-19",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 100,
@@ -15,7 +15,7 @@
   "contracts": 8,
   "modules": 3,
   "undrawn": 0,
-  "operationsWithNoScreen": 110
+  "operationsWithNoScreen": 109
  },
  "waves": {
   "wave2": 20,
@@ -265,7 +265,7 @@
    "module": "Policy",
    "wave": 3,
    "route": "/policy/privacy-consent-configuration-command-center-cms-021",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -436,7 +436,7 @@
    "module": "Policy",
    "wave": 3,
    "route": "/policy/privacy-analytics-ai-compliance-intelligence-cms-040",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -715,7 +715,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/ai-asset-intelligence-command-center-cms-071",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1281,12 +1281,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Issue a complimentary entitlement, with no payment expected"
-   },
-   {
-    "operation": "listAbandonedCarts",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "Carts that lapsed without checking out"
    },
    {
     "operation": "listChargebacks",

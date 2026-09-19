@@ -1,0 +1,133 @@
+id: F260
+name: 'Payment Payment Orchestration board 5: Mixed Tender & Credit Command Center\t93'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Payment Payment Orchestration board 5. **This route is read
+    from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-599
+  entryPoints:
+  - Arrives at Mixed Tender & Credit Command Center\t93
+steps:
+- step: 1
+  screen: ADM-599
+  action: Opens Mixed Tender & Credit Command Center\t93
+  operations: []
+  outcome: Provide centralized operational visibility over mixed-tender and account-credit transactions.
+- step: 2
+  screen: ADM-600
+  action: Works in Mixed Tender Rule & Combination Builder\t93
+  operations: []
+  outcome: Define which payment methods may be combined within a single transaction.
+- step: 3
+  screen: ADM-599
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-601
+  action: Works in Split Payment & Tender Allocation Manager\t94
+  operations: []
+  outcome: Determine how an order total is allocated across several payment methods.
+- step: 5
+  screen: ADM-599
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-602
+  action: Works in B2B Credit Account & Limit Manager\t95
+  operations: []
+  outcome: Manage payment credit facilities granted to authorized B2B customers, resellers, corporate
+    clients or partners. This is not the general B2B customer profile. The B2B/CRM module remains authoritative
+    for the customer/account itself. Board 5
+- step: 7
+  screen: ADM-599
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-603
+  action: Works in B2B Invoice, On-Account & Payment Terms Configuration\t96
+  operations: []
+  outcome: Configure how approved B2B customers can transact without immediate full payment.
+- step: 9
+  screen: ADM-599
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-604
+  action: Works in Stored Value, Gift Card & Voucher Tender Controls\t97
+  operations: []
+  outcome: Manage how stored-value instruments participate in payment without duplicating the Wallet or
+    Voucher modules.
+- step: 11
+  screen: ADM-599
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-605
+  action: Works in Advanced Payment Eligibility, Sequence & Restriction Rules\t98
+  operations: []
+  outcome: Provide advanced transaction-level payment rules beyond the general method availability configured
+    in Board 1.
+- step: 13
+  screen: ADM-599
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-606
+  action: Works in Partial Payment, Failure & Recovery Manager\t100
+  operations: []
+  outcome: Handle situations where some tenders succeed but another tender fails. This is one of the most
+    important screens in Board 5.
+- step: 15
+  screen: ADM-599
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-607
+  action: Works in Mixed Tender Transaction Trace & Allocation Audit\t100
+  operations: []
+  outcome: Provide a complete financial and operational explanation of every multi-tender transaction.
+- step: 17
+  screen: ADM-599
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-608
+  action: Works in Mixed Tender Simulator, Credit Exposure & AI Advisor\t102
+  operations: []
+  outcome: Allow administrators to test complex tender combinations before activating rules.
+branches:
+- at: 1
+  condition: Nothing has been set up on Mixed Tender & Credit Command Center\t93 yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Payment Payment Orchestration board 5 visited
+primaryContract: unknown
+contracts:
+- unknown

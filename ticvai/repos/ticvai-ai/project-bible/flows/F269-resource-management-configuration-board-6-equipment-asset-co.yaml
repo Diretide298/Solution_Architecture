@@ -1,0 +1,130 @@
+id: F269
+name: 'Resource Management Configuration board 6: Equipment & Asset Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Resource Management Configuration board 6. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-903
+  entryPoints:
+  - Arrives at Equipment & Asset Command Center
+steps:
+- step: 1
+  screen: BO-903
+  action: Opens Equipment & Asset Command Center
+  operations: []
+  outcome: Provide operations teams with a real-time overview of all physical resources across the organization.
+- step: 2
+  screen: BO-904
+  action: Works in Rental Resource Configuration
+  operations: []
+  outcome: Define how a physical resource behaves when offered as a customer-rental resource.
+- step: 3
+  screen: BO-903
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-905
+  action: Works in Rental Inventory & Availability Control
+  operations: []
+  outcome: Provide real-time inventory visibility for rental and operational resources.
+- step: 5
+  screen: BO-903
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-906
+  action: Works in Resource Checkout Workspace
+  operations: []
+  outcome: Provide frontline employees with a fast digital interface for issuing physical resources to
+    guests.
+- step: 7
+  screen: BO-903
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-907
+  action: Works in Guest & Resource Assignment
+  operations: []
+  outcome: Maintain a live relationship between every checked-out physical resource and the guest responsible
+    for it.
+- step: 9
+  screen: BO-903
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-908
+  action: Works in Rental Duration, Extension & Return Management
+  operations: []
+  outcome: Control rental periods and manage extensions, overdue items, and returns.
+- step: 11
+  screen: BO-903
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-909
+  action: Works in Deposit & Rental Financial Control
+  operations: []
+  outcome: Configure and manage deposits associated with rental resources.
+- step: 13
+  screen: BO-903
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-910
+  action: Works in Maintenance & Resource Blocking
+  operations: []
+  outcome: Prevent unavailable or unsafe resources from being assigned, rented, or reserved.
+- step: 15
+  screen: BO-903
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-911
+  action: Works in Inspection, Condition & Compliance Management
+  operations: []
+  outcome: Ensure physical resources remain safe, compliant, and operationally fit for use.
+- step: 17
+  screen: BO-903
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-912
+  action: Works in Asset Lifecycle, Depreciation & Retirement
+  operations: []
+  outcome: Manage the physical resource from acquisition through operational use to final retirement.
+branches:
+- at: 1
+  condition: Nothing has been set up on Equipment & Asset Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Resource Management Configuration board 6 visited
+primaryContract: unknown
+contracts:
+- unknown

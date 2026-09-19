@@ -7,25 +7,32 @@
  "audience": "platformAdmin",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-17",
+ "generated": "2026-09-19",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
-  "screens": 446,
-  "operations": 403,
+  "screens": 676,
+  "operations": 406,
   "contracts": 15,
-  "modules": 13,
+  "modules": 14,
   "undrawn": 0,
-  "operationsWithNoScreen": 150
+  "operationsWithNoScreen": 149
  },
  "waves": {
   "wave1": 12,
   "wave2": 16,
-  "wave3": 418
+  "wave3": 648
  },
  "modules": [
   {
    "module": "Commercial",
-   "screens": 230,
+   "screens": 370,
+   "waves": [
+    3
+   ]
+  },
+  {
+   "module": "Platform",
+   "screens": 149,
    "waves": [
     3
    ]
@@ -40,14 +47,14 @@
    ]
   },
   {
-   "module": "Platform",
-   "screens": 79,
+   "module": "Catalogue",
+   "screens": 20,
    "waves": [
     3
    ]
   },
   {
-   "module": "Catalogue",
+   "module": "Analytics",
    "screens": 20,
    "waves": [
     3
@@ -132,11 +139,11 @@
   },
   {
    "contract": "orders",
-   "operations": 40
+   "operations": 41
   },
   {
    "contract": "subscription",
-   "operations": 33
+   "operations": 35
   },
   {
    "contract": "platform-ops",
@@ -163,11 +170,11 @@
    "operations": 5
   },
   {
-   "contract": "public-api",
+   "contract": "reporting",
    "operations": 4
   },
   {
-   "contract": "reporting",
+   "contract": "public-api",
    "operations": 4
   },
   {
@@ -613,7 +620,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/commercial-pricing-command-center-adm-048",
-   "operations": 1,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -703,7 +710,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/pricing-rule-command-center-adm-058",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -919,7 +926,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/pricing-change-impact-analysis-adm-082",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1432,7 +1439,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/promotion-campaign-directory-adm-139",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1495,7 +1502,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/promotion-health-performance-monitor-adm-146",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1513,7 +1520,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/promotion-rule-builder-adm-148",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1693,7 +1700,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/advanced-offer-command-center-adm-168",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1873,7 +1880,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/dynamic-bundle-operations-command-center-adm-188",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -1954,7 +1961,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/dynamic-bundle-simulation-ai-optimization-adm-197",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -1972,7 +1979,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/eligibility-rule-builder-adm-199",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2071,7 +2078,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/promotion-stacking-rule-builder-adm-210",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2233,7 +2240,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/promotion-performance-command-center-adm-228",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -2242,7 +2249,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/campaign-promotion-performance-explorer-adm-229",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -2287,7 +2294,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/customer-segment-channel-partner-analytics-adm-234",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2503,7 +2510,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/sales-channel-command-center-adm-258",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -2593,7 +2600,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/channel-operations-command-center-adm-268",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2620,7 +2627,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/real-time-channel-availability-inventory-monitor-adm-271",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2674,7 +2681,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/ai-channel-optimization-intelligence-center-adm-277",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2683,7 +2690,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/resale-marketplace-command-center-adm-278",
-   "operations": 1,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -2692,7 +2699,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/resale-eligibility-rule-configuration-adm-279",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2728,7 +2735,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/resale-fees-commission-seller-proceeds-adm-283",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2773,7 +2780,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/resale-operations-command-center-adm-288",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2845,7 +2852,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/resale-audit-ownership-history-adm-296",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -2854,7 +2861,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/resale-analytics-ai-intelligence-adm-297",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3052,7 +3059,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/approval-workflow-library-adm-319",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3457,7 +3464,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/risk-governance-analytics-adm-365",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3547,7 +3554,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/renewal-retention-center-adm-375",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3619,7 +3626,7 @@
    "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/tenants-licensing/sales-channel-assessment-adm-383",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -4197,6 +4204,2076 @@
    "route": "/tenants-licensing/renewal-approval-activation-commercial-handoff-adm-468",
    "operations": 0,
    "drawn": true
+  },
+  {
+   "id": "ADM-469",
+   "name": "AI Configuration Home & Start",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-configuration-home-start-adm-469",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-470",
+   "name": "Setup Type & Business Intent Discovery",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/setup-type-business-intent-discovery-adm-470",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-471",
+   "name": "Venue & Business Model Discovery",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/venue-business-model-discovery-adm-471",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-472",
+   "name": "Guided Question & Answer Workspace",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/guided-question-answer-workspace-adm-472",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-473",
+   "name": "Product & Admission Model Discovery",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/product-admission-model-discovery-adm-473",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-474",
+   "name": "Operational Requirement Discovery",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/operational-requirement-discovery-adm-474",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-475",
+   "name": "Commercial Requirement Discovery",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/commercial-requirement-discovery-adm-475",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-476",
+   "name": "Required, Recommended & Optional Decisions",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/required-recommended-optional-decisions-adm-476",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-477",
+   "name": "Missing Information & Clarification Center",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/missing-information-clarification-center-adm-477",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-478",
+   "name": "Configuration Blueprint & Dependency Map",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/configuration-blueprint-dependency-map-adm-478",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-479",
+   "name": "AI Configuration Build Command Center",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-configuration-build-command-center-adm-479",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-480",
+   "name": "Venue & Organization Configuration",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/venue-organization-configuration-adm-480",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-481",
+   "name": "Product Configuration Assistant",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/product-configuration-assistant-adm-481",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-482",
+   "name": "Schedule, Capacity & Availability Configuration",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/schedule-capacity-availability-configuration-adm-482",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-483",
+   "name": "Pricing & Commercial Configuration",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/pricing-commercial-configuration-adm-483",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-484",
+   "name": "Promotion, Bundle & Upsell Configuration",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/promotion-bundle-upsell-configuration-adm-484",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-485",
+   "name": "Seating, Access & Operational Configuration",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/seating-access-operational-configuration-adm-485",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-486",
+   "name": "Channel, Media & Fulfillment Configuration",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/channel-media-fulfillment-configuration-adm-486",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-487",
+   "name": "Cross-Module Conflict & Dependency Validation",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/cross-module-conflict-dependency-validation-adm-487",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-488",
+   "name": "Configuration Preview & Impact Analysis",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/configuration-preview-impact-analysis-adm-488",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-489",
+   "name": "AI Configuration Readiness Center",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-configuration-readiness-center-adm-489",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-490",
+   "name": "Configuration Validation Results",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/configuration-validation-results-adm-490",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-491",
+   "name": "AI Recommendations & Best-Practice Review",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-recommendations-best-practice-review-adm-491",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-492",
+   "name": "Configuration Approval Workflow",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/configuration-approval-workflow-adm-492",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-493",
+   "name": "AI Configuration Execution Center",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-configuration-execution-center-adm-493",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-494",
+   "name": "Execution Progress & Dependency Monitor",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/execution-progress-dependency-monitor-adm-494",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-495",
+   "name": "Configuration Results & Object Mapping",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/configuration-results-object-mapping-adm-495",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-496",
+   "name": "Configuration Change & Modification Assistant",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/configuration-change-modification-assistant-adm-496",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-497",
+   "name": "Configuration History, Versions & Rollback",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/configuration-history-versions-rollback-adm-497",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-498",
+   "name": "AI Configuration Audit & Governance",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-configuration-audit-governance-adm-498",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-499",
+   "name": "Forecasting Command Center",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/forecasting-command-center-adm-499",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-500",
+   "name": "Forecast Configuration & Forecasting Strategy",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/forecast-configuration-forecasting-strategy-adm-500",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-501",
+   "name": "Forecast Data & Signal Configuration",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/forecast-data-signal-configuration-adm-501",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-502",
+   "name": "Attendance & Visitation Forecast",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/attendance-visitation-forecast-adm-502",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-503",
+   "name": "Ticket, Product & Timeslot Demand Forecast",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/ticket-product-timeslot-demand-forecast-adm-503",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-504",
+   "name": "Channel & Booking Pace Forecast",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/channel-booking-pace-forecast-adm-504",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-505",
+   "name": "Revenue & Commercial Forecast",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/revenue-commercial-forecast-adm-505",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-506",
+   "name": "Forecast Drivers, Confidence & Explainability",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/forecast-drivers-confidence-explainability-adm-506",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-507",
+   "name": "Forecast Scenario & What-If Simulator",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/forecast-scenario-what-if-simulator-adm-507",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-508",
+   "name": "Forecast Accuracy, Review & Publication Center",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/forecast-accuracy-review-publication-center-adm-508",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-509",
+   "name": "Operational Forecasting Command Center",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/operational-forecasting-command-center-adm-509",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-510",
+   "name": "Capacity & Occupancy Forecast",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/capacity-occupancy-forecast-adm-510",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-511",
+   "name": "Attraction Utilization & Queue Forecast",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/attraction-utilization-queue-forecast-adm-511",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-512",
+   "name": "Entry, Access & Guest Flow Forecast",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/entry-access-guest-flow-forecast-adm-512",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-513",
+   "name": "Workforce Demand & Staffing Forecast",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/workforce-demand-staffing-forecast-adm-513",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-514",
+   "name": "POS, Kiosk & Frontline Service Forecast",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/pos-kiosk-frontline-service-forecast-adm-514",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-515",
+   "name": "F&B, Retail & Inventory Demand Forecast",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/f-b-retail-inventory-demand-forecast-adm-515",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-516",
+   "name": "Resource, Equipment & Facility Requirement Forecast",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/resource-equipment-facility-requirement-forecast-adm-516",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-517",
+   "name": "Operational Scenario & Readiness Simulator",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/operational-scenario-readiness-simulator-adm-517",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-518",
+   "name": "Operational Forecast Review, Recommendations & Handover",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/operational-forecast-review-recommendations-handover-adm-518",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-519",
+   "name": "AI Governance Command Center",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-governance-command-center-adm-519",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-520",
+   "name": "AI Capability Registry & Ownership",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-capability-registry-ownership-adm-520",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-521",
+   "name": "AI Risk Classification & Assessment",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-risk-classification-assessment-adm-521",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-522",
+   "name": "AI Autonomy Level Configuration",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-autonomy-level-configuration-adm-522",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-523",
+   "name": "AI Action & Permission Policy Builder",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-action-permission-policy-builder-adm-523",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-524",
+   "name": "AI Data Access & Usage Policy",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-data-access-usage-policy-adm-524",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-525",
+   "name": "Environment, Tenant & Scope Governance",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/environment-tenant-scope-governance-adm-525",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-526",
+   "name": "AI Policy Conflict, Exception & Override Management",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-policy-conflict-exception-override-management-adm-526",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-527",
+   "name": "AI Policy Testing & Governance Simulation",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-policy-testing-governance-simulation-adm-527",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-528",
+   "name": "AI Governance Policy Publication & Effective Policy Map",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-governance-policy-publication-effective-policy-map-adm-528",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-529",
+   "name": "AI Human Oversight Command Center",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-human-oversight-command-center-adm-529",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-530",
+   "name": "AI Approval Requirement & Routing Configuration",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-approval-requirement-routing-configuration-adm-530",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-531",
+   "name": "AI Approval Review Workspace",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-approval-review-workspace-adm-531",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-532",
+   "name": "Conditional Approval & Approval Conditions",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/conditional-approval-approval-conditions-adm-532",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-533",
+   "name": "Human Review, Challenge & AI Clarification Workspace",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/human-review-challenge-ai-clarification-workspace-adm-533",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-534",
+   "name": "Escalation, Delegation & Approval SLA Management",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/escalation-delegation-approval-sla-management-adm-534",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-535",
+   "name": "Live AI Execution Oversight & Human Intervention",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/live-ai-execution-oversight-human-intervention-adm-535",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-536",
+   "name": "Human Override & Manual Control Center",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/human-override-manual-control-center-adm-536",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-537",
+   "name": "Approval & Intervention History / Decision Timeline",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/approval-intervention-history-decision-timeline-adm-537",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-538",
+   "name": "Human Oversight Workflow Simulator & Readiness Center",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/human-oversight-workflow-simulator-readiness-center-adm-538",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-539",
+   "name": "AI Explainability & Audit Command Center",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-explainability-audit-command-center-adm-539",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-540",
+   "name": "AI Decision Explorer & Search",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-decision-explorer-search-adm-540",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-541",
+   "name": "AI Decision Explanation Workspace",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-decision-explanation-workspace-adm-541",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-542",
+   "name": "Data, Feature & Evidence Provenance",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/data-feature-evidence-provenance-adm-542",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-543",
+   "name": "Candidate, Rule & Decision Path Trace",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/candidate-rule-decision-path-trace-adm-543",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-544",
+   "name": "Model, Provider & AI Runtime Trace",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/model-provider-ai-runtime-trace-adm-544",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-545",
+   "name": "Governance, Approval & Human Decision Trace",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/governance-approval-human-decision-trace-adm-545",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-546",
+   "name": "Execution & Business Outcome Trace",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/execution-business-outcome-trace-adm-546",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-547",
+   "name": "AI Audit Record & Evidence Package",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-audit-record-evidence-package-adm-547",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-548",
+   "name": "AI Trace Investigation & Replay Simulator",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-trace-investigation-replay-simulator-adm-548",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-549",
+   "name": "AI Governance Monitoring Command Center",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-governance-monitoring-command-center-adm-549",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-550",
+   "name": "AI Risk Register & Risk Exposure Management",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-risk-register-risk-exposure-management-adm-550",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-551",
+   "name": "AI Governance Control Library & Control Effectiveness",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-governance-control-library-control-effectiveness-adm-551",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-552",
+   "name": "AI Policy Compliance & Violation Monitoring",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-policy-compliance-violation-monitoring-adm-552",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-553",
+   "name": "AI Data, Privacy & Usage Compliance Monitoring",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-data-privacy-usage-compliance-monitoring-adm-553",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-554",
+   "name": "AI Quality, Behavior & Governance Drift Monitoring",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-quality-behavior-governance-drift-monitoring-adm-554",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-555",
+   "name": "AI Governance Alert & Detection Center",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-governance-alert-detection-center-adm-555",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-556",
+   "name": "AI Incident & Remediation Management",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-incident-remediation-management-adm-556",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-557",
+   "name": "AI Compliance, Assurance & Governance Reporting",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-compliance-assurance-governance-reporting-adm-557",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-558",
+   "name": "AI Governance Review, Action Plan & Continuous Improvement",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-governance-review-action-plan-continuous-improvement-adm-558",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-559",
+   "name": "Payment Command Center\\t7",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/payment-command-center-t7-adm-559",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-560",
+   "name": "Payment Method Catalogue\\t8",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/payment-method-catalogue-t8-adm-560",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-561",
+   "name": "Payment Method Configuration\\t9",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/payment-method-configuration-t9-adm-561",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-562",
+   "name": "Channel & Touchpoint Payment Configuration\\t10",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/channel-touchpoint-payment-configuration-t10-adm-562",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-563",
+   "name": "Venue, Location & Business Unit Payment Assignment\\t11",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/venue-location-business-unit-payment-assignment-t11-adm-563",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-564",
+   "name": "Currency & Payment Currency Configuration\\t12",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/currency-payment-currency-configuration-t12-adm-564",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-565",
+   "name": "Payment Eligibility & Availability Rule Builder\\t13",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/payment-eligibility-availability-rule-builder-t13-adm-565",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-566",
+   "name": "Payment Fees, Surcharges & Commercial Rules\\t14",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/payment-fees-surcharges-commercial-rules-t14-adm-566",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-567",
+   "name": "Payment Policy, Governance & Approval Manager\\t15",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/payment-policy-governance-approval-manager-t15-adm-567",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-568",
+   "name": "Payment Configuration Simulator & Validation Center\\t16",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/payment-configuration-simulator-validation-center-t16-adm-568",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-569",
+   "name": "Payment Orchestration Command Center\\t27",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/payment-orchestration-command-center-t27-adm-569",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-570",
+   "name": "Gateway, PSP & Acquirer Directory\\t28",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/gateway-psp-acquirer-directory-t28-adm-570",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-571",
+   "name": "Provider Connection & Adapter Configuration\\t29",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/provider-connection-adapter-configuration-t29-adm-571",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-572",
+   "name": "Gateway Capability & Payment Method Mapping\\t30",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/gateway-capability-payment-method-mapping-t30-adm-572",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-573",
+   "name": "Payment Routing Rule Builder\\t31",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/payment-routing-rule-builder-t31-adm-573",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-574",
+   "name": "Routing Strategy, Priority & Load Distribution\\t33",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/routing-strategy-priority-load-distribution-t33-adm-574",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-575",
+   "name": "Failover, Retry & Resilience Manager\\t34",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/failover-retry-resilience-manager-t34-adm-575",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-576",
+   "name": "Provider Health, SLA & Performance Monitor\\t35",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/provider-health-sla-performance-monitor-t35-adm-576",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-577",
+   "name": "Provider Cost, Commercial & Routing Economics\\t36",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/provider-cost-commercial-routing-economics-t36-adm-577",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-578",
+   "name": "Payment Routing Simulator, Decision Trace & AI Advisor\\t37",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/payment-routing-simulator-decision-trace-ai-advisor-t37-adm-578",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-579",
+   "name": "Terminal & Card-Present Command Center\\t48",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/terminal-card-present-command-center-t48-adm-579",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-580",
+   "name": "Payment Terminal & Device Inventory\\t49",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/payment-terminal-device-inventory-t49-adm-580",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-581",
+   "name": "Terminal Provisioning & Device Configuration\\t51",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/terminal-provisioning-device-configuration-t51-adm-581",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-582",
+   "name": "POS, Kiosk & Terminal Assignment Manager\\t52",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/pos-kiosk-terminal-assignment-manager-t52-adm-582",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-583",
+   "name": "EMV & Card-Present Processing Configuration\\t53",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/emv-card-present-processing-configuration-t53-adm-583",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-584",
+   "name": "Payment Server & Terminal Connectivity Manager\\t54",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/payment-server-terminal-connectivity-manager-t54-adm-584",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-585",
+   "name": "Card-Present Transaction Monitor & Operations\\t55",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/card-present-transaction-monitor-operations-t55-adm-585",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-586",
+   "name": "Degraded, Offline & Store-and-Forward Manager\\t56",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/degraded-offline-store-and-forward-manager-t56-adm-586",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-587",
+   "name": "Terminal Health, Maintenance & Incident Center\\t57",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/terminal-health-maintenance-incident-center-t57-adm-587",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-588",
+   "name": "Terminal Simulator, Certification & AI Operations Advisor\\t59",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/terminal-simulator-certification-ai-operations-advisor-t-adm-588",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-589",
+   "name": "Digital Payments Command Center\\t71",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/digital-payments-command-center-t71-adm-589",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-590",
+   "name": "Digital & Alternative Payment Method Manager\\t71",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/digital-alternative-payment-method-manager-t71-adm-590",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-591",
+   "name": "Digital Wallet & Mobile Payment Configuration\\t72",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/digital-wallet-mobile-payment-configuration-t72-adm-591",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-592",
+   "name": "Payment Link Builder & Configuration\\t73",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/payment-link-builder-configuration-t73-adm-592",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-593",
+   "name": "Payment Link Distribution & Customer Journey Manager\\t74",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/payment-link-distribution-customer-journey-manager-t74-adm-593",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-594",
+   "name": "Hosted Checkout, Redirect & Return Flow Configuration\\t75",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/hosted-checkout-redirect-return-flow-configuration-t75-adm-594",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-595",
+   "name": "Digital Payment Session & Transaction Monitor\\t76",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/digital-payment-session-transaction-monitor-t76-adm-595",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-596",
+   "name": "Authentication, Tokenization & Recurring Payment Controls\\t78",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/authentication-tokenization-recurring-payment-controls-t-adm-596",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-597",
+   "name": "Digital Payment Exception, Recovery & Expiry Center\\t79",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/digital-payment-exception-recovery-expiry-center-t79-adm-597",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-598",
+   "name": "Digital Payment Simulator, Conversion & AI Advisor\\t80",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/digital-payment-simulator-conversion-ai-advisor-t80-adm-598",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-599",
+   "name": "Mixed Tender & Credit Command Center\\t93",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/mixed-tender-credit-command-center-t93-adm-599",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-600",
+   "name": "Mixed Tender Rule & Combination Builder\\t93",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/mixed-tender-rule-combination-builder-t93-adm-600",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-601",
+   "name": "Split Payment & Tender Allocation Manager\\t94",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/split-payment-tender-allocation-manager-t94-adm-601",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-602",
+   "name": "B2B Credit Account & Limit Manager\\t95",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/b2b-credit-account-limit-manager-t95-adm-602",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-603",
+   "name": "B2B Invoice, On-Account & Payment Terms Configuration\\t96",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/b2b-invoice-on-account-payment-terms-configuration-t96-adm-603",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-604",
+   "name": "Stored Value, Gift Card & Voucher Tender Controls\\t97",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/stored-value-gift-card-voucher-tender-controls-t97-adm-604",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-605",
+   "name": "Advanced Payment Eligibility, Sequence & Restriction Rules\\t98",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/advanced-payment-eligibility-sequence-restriction-rules--adm-605",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-606",
+   "name": "Partial Payment, Failure & Recovery Manager\\t100",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/partial-payment-failure-recovery-manager-t100-adm-606",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-607",
+   "name": "Mixed Tender Transaction Trace & Allocation Audit\\t100",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/mixed-tender-transaction-trace-allocation-audit-t100-adm-607",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-608",
+   "name": "Mixed Tender Simulator, Credit Exposure & AI Advisor\\t102",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/mixed-tender-simulator-credit-exposure-ai-advisor-t102-adm-608",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-609",
+   "name": "Refund & Payment Adjustment Command Center\\t116",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/refund-payment-adjustment-command-center-t116-adm-609",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-610",
+   "name": "Refund Request & Eligibility Workspace\\t117",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/refund-request-eligibility-workspace-t117-adm-610",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-611",
+   "name": "Refund Policy & Rule Configuration\\t118",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/refund-policy-rule-configuration-t118-adm-611",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-612",
+   "name": "Refund Allocation & Original Tender Manager\\t119",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/refund-allocation-original-tender-manager-t119-adm-612",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-613",
+   "name": "Void, Reversal & Cancellation Manager\\t120",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/void-reversal-cancellation-manager-t120-adm-613",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-614",
+   "name": "Refund Approval & Exception Workflow\\t121",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/refund-approval-exception-workflow-t121-adm-614",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-615",
+   "name": "Refund Processing, Provider Status & Recovery Center\\t122",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/refund-processing-provider-status-recovery-center-t122-adm-615",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-616",
+   "name": "Payment Adjustment & Financial Correction Manager\\t123",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/payment-adjustment-financial-correction-manager-t123-adm-616",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-617",
+   "name": "Refund Transaction Trace & Audit Investigation\\t124",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/refund-transaction-trace-audit-investigation-t124-adm-617",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-618",
+   "name": "Refund Simulator, Risk Analysis & AI Advisor\\t126",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/refund-simulator-risk-analysis-ai-advisor-t126-adm-618",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-619",
+   "name": "Reconciliation & Settlement Command Center\\t139",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/reconciliation-settlement-command-center-t139-adm-619",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-620",
+   "name": "Reconciliation Source & Import Manager\\t141",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/reconciliation-source-import-manager-t141-adm-620",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-621",
+   "name": "Transaction Matching & Reconciliation Engine\\t142",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/transaction-matching-reconciliation-engine-t142-adm-621",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-622",
+   "name": "Reconciliation Exception & Investigation Center\\t143",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/reconciliation-exception-investigation-center-t143-adm-622",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-623",
+   "name": "Settlement & Payout Manager\\t144",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/settlement-payout-manager-t144-adm-623",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-624",
+   "name": "Fees, Commission, FX & Settlement Economics\\t145",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/fees-commission-fx-settlement-economics-t145-adm-624",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-625",
+   "name": "Merchant Account & Settlement Calendar Manager\\t146",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/merchant-account-settlement-calendar-manager-t146-adm-625",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-626",
+   "name": "Settlement Posting, Finance Handoff & Close Manager\\t148",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/settlement-posting-finance-handoff-close-manager-t148-adm-626",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-627",
+   "name": "Reconciliation Audit, Trace & Evidence Center\\t149",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/reconciliation-audit-trace-evidence-center-t149-adm-627",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-628",
+   "name": "Reconciliation Simulator, Forecast & AI Operations Advisor\\t150",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/reconciliation-simulator-forecast-ai-operations-advisor--adm-628",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-629",
+   "name": "Payment Risk & Fraud Command Center\\t166",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/payment-risk-fraud-command-center-t166-adm-629",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-630",
+   "name": "Payment Risk Rule & Decision Engine\\t167",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/payment-risk-rule-decision-engine-t167-adm-630",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-631",
+   "name": "Velocity, Behavioral & Transaction Risk Controls\\t168",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/velocity-behavioral-transaction-risk-controls-t168-adm-631",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-632",
+   "name": "Risk Lists, Signals & Payment Control Center\\t169",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/risk-lists-signals-payment-control-center-t169-adm-632",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-633",
+   "name": "Fraud Alert, Investigation & Case Management\\t170",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/fraud-alert-investigation-case-management-t170-adm-633",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-634",
+   "name": "Chargeback & Dispute Command Center\\t172",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/chargeback-dispute-command-center-t172-adm-634",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-635",
+   "name": "Chargeback Evidence & Representment Workspace\\t173",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/chargeback-evidence-representment-workspace-t173-adm-635",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-636",
+   "name": "Payment Performance & Conversion Analytics\\t174",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/payment-performance-conversion-analytics-t174-adm-636",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-637",
+   "name": "AI Fraud, Anomaly & Payment Intelligence Center\\t175",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/ai-fraud-anomaly-payment-intelligence-center-t175-adm-637",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-638",
+   "name": "Payment Executive Intelligence, Risk Simulator & AI Advisor\\t176",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/payment-executive-intelligence-risk-simulator-ai-advisor-adm-638",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-639",
+   "name": "Recommendation Command Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/recommendation-command-center-adm-639",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-640",
+   "name": "Recommendation Strategy Manager",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/recommendation-strategy-manager-adm-640",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-641",
+   "name": "Recommendation Objective & KPI Configuration",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/recommendation-objective-kpi-configuration-adm-641",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-642",
+   "name": "Recommendation Type & Product Relationship Manager",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/recommendation-type-product-relationship-manager-adm-642",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-643",
+   "name": "Recommendation Placement & Touchpoint Manager",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/recommendation-placement-touchpoint-manager-adm-643",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-644",
+   "name": "Channel & Journey Strategy Manager",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/channel-journey-strategy-manager-adm-644",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-645",
+   "name": "Recommendation Priority, Ranking & Suppression Manager17",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/recommendation-priority-ranking-suppression-manager17-adm-645",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-646",
+   "name": "Recommendation Guardrails & Business Controls",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/recommendation-guardrails-business-controls-adm-646",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-647",
+   "name": "Recommendation Policy, AI Control & Governance",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/recommendation-policy-ai-control-governance-adm-647",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-648",
+   "name": "Recommendation Strategy Simulator & AI Advisor",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/recommendation-strategy-simulator-ai-advisor-adm-648",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-649",
+   "name": "Upsell & Upgrade Command Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/upsell-upgrade-command-center-adm-649",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-650",
+   "name": "Upgrade Path & Product Ladder Builder",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/upgrade-path-product-ladder-builder-adm-650",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-651",
+   "name": "Upsell Eligibility & Qualification Rules",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/upsell-eligibility-qualification-rules-adm-651",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-652",
+   "name": "Upgrade Price Difference & Value Proposition Manager",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/upgrade-price-difference-value-proposition-manager-adm-652",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-653",
+   "name": "Ticket, Experience & Bundle Upgrade Manager",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/ticket-experience-bundle-upgrade-manager-adm-653",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-654",
+   "name": "Membership & Pass Upgrade Engine",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/membership-pass-upgrade-engine-adm-654",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-655",
+   "name": "Pre-Purchase, Cart & Checkout Upsell Manager",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/pre-purchase-cart-checkout-upsell-manager-adm-655",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-656",
+   "name": "Post-Purchase & In-Journey Upgrade Manager",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/post-purchase-in-journey-upgrade-manager-adm-656",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-657",
+   "name": "Upsell Ranking, Propensity & AI Opportunity Engine",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/upsell-ranking-propensity-ai-opportunity-engine-adm-657",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-658",
+   "name": "Upgrade Simulator, Comparison & AI Advisor",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/upgrade-simulator-comparison-ai-advisor-adm-658",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-659",
+   "name": "Cross-Sell Command Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/cross-sell-command-center-adm-659",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-660",
+   "name": "Cross-Sell Relationship Builder",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/cross-sell-relationship-builder-adm-660",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-661",
+   "name": "Product Affinity Matrix & Relationship Map",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/product-affinity-matrix-relationship-map-adm-661",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-662",
+   "name": "Frequently Bought Together & Basket Pattern Engine",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/frequently-bought-together-basket-pattern-engine-adm-662",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-663",
+   "name": "Cross-Category Recommendation Manager",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/cross-category-recommendation-manager-adm-663",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-664",
+   "name": "Multi-Attraction, Destination & Partner Cross-Sell",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/multi-attraction-destination-partner-cross-sell-adm-664",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-665",
+   "name": "Basket-Aware Cross-Sell & Duplicate Prevention",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/basket-aware-cross-sell-duplicate-prevention-adm-665",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-666",
+   "name": "Availability, Inventory & Capacity-Aware Cross-Sell",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/availability-inventory-capacity-aware-cross-sell-adm-666",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-667",
+   "name": "AI Cross-Sell Discovery, Scoring & Ranking Engine",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/ai-cross-sell-discovery-scoring-ranking-engine-adm-667",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-668",
+   "name": "Cross-Sell Simulator & AI Opportunity Advisor",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/cross-sell-simulator-ai-opportunity-advisor-adm-668",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-669",
+   "name": "Journey & Context Command Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/journey-context-command-center-adm-669",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-670",
+   "name": "Customer Journey Map & Touchpoint Designer",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/customer-journey-map-touchpoint-designer-adm-670",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-671",
+   "name": "Real-Time Context Rule Engine",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/real-time-context-rule-engine-adm-671",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-672",
+   "name": "Pre-Purchase & Booking Journey Recommendation Manager",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/pre-purchase-booking-journey-recommendation-manager-adm-672",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-673",
+   "name": "Post-Purchase & Pre-Visit Recommendation Manager",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/post-purchase-pre-visit-recommendation-manager-adm-673",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-674",
+   "name": "In-Venue & Location-Aware Recommendation Engine",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/in-venue-location-aware-recommendation-engine-adm-674",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-675",
+   "name": "Visit State, Itinerary & Time-Aware Recommendation",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/visit-state-itinerary-time-aware-recommendation-adm-675",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-676",
+   "name": "Omnichannel Recommendation Synchronization",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/omnichannel-recommendation-synchronization-adm-676",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-677",
+   "name": "Contextual Trigger, Frequency & Experience Controls",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/contextual-trigger-frequency-experience-controls-adm-677",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-678",
+   "name": "Journey Simulator, Decision Trace & AI Optimization",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/journey-simulator-decision-trace-ai-optimization-adm-678",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-679",
+   "name": "Personalization & NBO Command Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/personalization-nbo-command-center-adm-679",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-680",
+   "name": "Customer Recommendation Profile",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/customer-recommendation-profile-adm-680",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-681",
+   "name": "Customer Feature & Signal Configuration",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/customer-feature-signal-configuration-adm-681",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-682",
+   "name": "Propensity Model & Customer Intent Manager",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/propensity-model-customer-intent-manager-adm-682",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-683",
+   "name": "Next-Best-Offer Decision Studio",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/next-best-offer-decision-studio-adm-683",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-684",
+   "name": "Personalized Ranking & Decision Policy Builder",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/personalized-ranking-decision-policy-builder-adm-684",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-685",
+   "name": "Customer Preference, Fatigue & Suppression Intelligence",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/customer-preference-fatigue-suppression-intelligence-adm-685",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-686",
+   "name": "Anonymous, Known & Identity-Transition Personalization.123",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/anonymous-known-identity-transition-personalization-123-adm-686",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-687",
+   "name": "AI Explainability, Confidence & Model Governance",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/ai-explainability-confidence-model-governance-adm-687",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-688",
+   "name": "Personalization Simulator & Next-Best-Offer Lab",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/personalization-simulator-next-best-offer-lab-adm-688",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-689",
+   "name": "Recommendation Performance Command Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/recommendation-performance-command-center-adm-689",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-690",
+   "name": "Recommendation Strategy & Placement Analytics",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/recommendation-strategy-placement-analytics-adm-690",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-691",
+   "name": "Recommendation Experiment & A/B Test Studio",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/recommendation-experiment-a-b-test-studio-adm-691",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-692",
+   "name": "Experiment Results & Winner Decision Workspace",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/experiment-results-winner-decision-workspace-adm-692",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-693",
+   "name": "Recommendation Attribution & Incrementality Analytics",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/recommendation-attribution-incrementality-analytics-adm-693",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-694",
+   "name": "AI Model Performance & Drift Monitor",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/ai-model-performance-drift-monitor-adm-694",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-695",
+   "name": "Recommendation Governance & Deployment Control",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/recommendation-governance-deployment-control-adm-695",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-696",
+   "name": "AI Risk, Fairness, Explainability & Safety Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/ai-risk-fairness-explainability-safety-center-adm-696",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-697",
+   "name": "Recommendation Audit, Decision Trace & Investigation",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/recommendation-audit-decision-trace-investigation-adm-697",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-698",
+   "name": "AI Optimization & Recommendation Intelligence Lab",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/ai-optimization-recommendation-intelligence-lab-adm-698",
+   "operations": 0,
+   "drawn": true
   }
  ],
  "gaps": {
@@ -4578,12 +6655,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Issue a complimentary entitlement, with no payment expected"
-   },
-   {
-    "operation": "listAbandonedCarts",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "Carts that lapsed without checking out"
    },
    {
     "operation": "listChargebacks",

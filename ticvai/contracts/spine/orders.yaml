@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Order & Payment
   version: 0.1.0
-  x-ticvai-screen-count: 144
+  x-ticvai-screen-count: 145
   x-ticvai-tier: spine
   x-ticvai-module: 2 — Ticketing Sales
   x-ticvai-requirements: 343
@@ -2078,6 +2078,8 @@ paths:
   /carts/abandoned:
     get:
       operationId: listAbandonedCarts
+      x-ticvai-consumed-by:
+        - "P08 BO-778 Abandoned Cart Recovery"
       x-ticvai-audience:
       - staff
       summary: Carts that lapsed without checking out
@@ -3058,7 +3060,9 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-062 Venue Profile"
         - "P08 BO-065 Venue Configuration"
+        - "P08 BO-1146 Refund-to-Wallet Policy Configuration"
         - "P08 BO-318 Refund Policy & Refund Calculation Configuration"
+        - "P09 ADM-611 Refund Policy & Rule Configuration\t118"
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: venue
@@ -4863,6 +4867,7 @@ paths:
       operationId: listGroupSale
       x-ticvai-consumed-by:
         - "P08 BO-264 Group Sales Command Center"
+        - "P08 BO-283 Group Sales Analytics & AI Intelligence Center"
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
@@ -5568,6 +5573,7 @@ paths:
     get:
       operationId: listGroupBookingReconciliation
       x-ticvai-consumed-by:
+        - "P08 BO-274 Group Booking Operations Command Center"
         - "P08 BO-282 Group Booking Reconciliation, Closure & Performance"
       x-ticvai-audience:
       - staff
@@ -5606,6 +5612,7 @@ paths:
     get:
       operationId: listGroupSale2
       x-ticvai-consumed-by:
+        - "P08 BO-264 Group Sales Command Center"
         - "P08 BO-283 Group Sales Analytics & AI Intelligence Center"
       x-ticvai-audience:
       - staff
@@ -6147,6 +6154,7 @@ paths:
       operationId: listAmendmentAfterSale
       x-ticvai-consumed-by:
         - "P08 BO-314 Amendment & After-Sales Command Center"
+        - "P08 BO-323 Amendment History, Audit & After-Sales Analytics"
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
@@ -6517,6 +6525,7 @@ paths:
     get:
       operationId: listAmendmentAfterSale2
       x-ticvai-consumed-by:
+        - "P08 BO-314 Amendment & After-Sales Command Center"
         - "P08 BO-323 Amendment History, Audit & After-Sales Analytics"
       x-ticvai-audience:
       - staff
@@ -7150,6 +7159,7 @@ paths:
     put:
       operationId: setResaleEligibilityRule
       x-ticvai-consumed-by:
+        - "P09 ADM-199 Eligibility Rule Builder"
         - "P09 ADM-279 Resale Eligibility Rule Configuration"
       x-ticvai-audience:
       - staff
@@ -7193,6 +7203,7 @@ paths:
     get:
       operationId: listResalePolicyMarketplace
       x-ticvai-consumed-by:
+        - "P09 ADM-278 Resale Marketplace Command Center"
         - "P09 ADM-280 Resale Policy & Marketplace Settings"
       x-ticvai-audience:
       - staff
@@ -7510,6 +7521,7 @@ paths:
       operationId: listResale
       x-ticvai-consumed-by:
         - "P09 ADM-288 Resale Operations Command Center"
+        - "P09 ADM-297 Resale Analytics & AI Intelligence"
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
@@ -7852,6 +7864,7 @@ paths:
     get:
       operationId: listResale2
       x-ticvai-consumed-by:
+        - "P09 ADM-288 Resale Operations Command Center"
         - "P09 ADM-297 Resale Analytics & AI Intelligence"
       x-ticvai-audience:
       - staff
@@ -7939,6 +7952,7 @@ paths:
     get:
       operationId: listTicketResaleMarketplace
       x-ticvai-consumed-by:
+        - "P09 ADM-278 Resale Marketplace Command Center"
         - "P09 ADM-298 My Tickets & Resale Marketplace Entry"
       x-ticvai-audience:
       - staff
@@ -8055,6 +8069,7 @@ paths:
     get:
       operationId: listFeeSellerProceed
       x-ticvai-consumed-by:
+        - "P09 ADM-283 Resale Fees, Commission & Seller Proceeds"
         - "P09 ADM-301 Fees, Seller Proceeds & Listing Confirmation"
       x-ticvai-audience:
       - staff
@@ -8131,6 +8146,7 @@ paths:
     get:
       operationId: listOfficialResaleMarketplace
       x-ticvai-consumed-by:
+        - "P09 ADM-278 Resale Marketplace Command Center"
         - "P09 ADM-303 Official Resale Marketplace & Buyer Discovery"
       x-ticvai-audience:
       - staff
@@ -8245,6 +8261,7 @@ paths:
     get:
       operationId: listResaleConfirmationOwnership
       x-ticvai-consumed-by:
+        - "P09 ADM-296 Resale Audit & Ownership History"
         - "P09 ADM-306 Resale Confirmation, Ownership Transfer & Ticket Delivery"
       x-ticvai-audience:
       - staff

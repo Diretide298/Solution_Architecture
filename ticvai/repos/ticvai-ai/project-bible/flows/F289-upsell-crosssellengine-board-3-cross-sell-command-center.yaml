@@ -1,0 +1,132 @@
+id: F289
+name: 'Upsell,CrossSellEngine board 3: Cross-Sell Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Upsell,CrossSellEngine board 3. **This route is read from
+    the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-659
+  entryPoints:
+  - Arrives at Cross-Sell Command Center
+steps:
+- step: 1
+  screen: ADM-659
+  action: Opens Cross-Sell Command Center
+  operations: []
+  outcome: Provide centralized visibility into cross-sell relationships, recommendation performance, attach
+    rates and commercial opportunities.
+- step: 2
+  screen: ADM-660
+  action: Works in Cross-Sell Relationship Builder
+  operations: []
+  outcome: Allow administrators to manually define governed complementary-product relationships.
+- step: 3
+  screen: ADM-659
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-661
+  action: Works in Product Affinity Matrix & Relationship Map
+  operations: []
+  outcome: Provide a visual representation of how strongly products and categories relate to one another.
+- step: 5
+  screen: ADM-659
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-662
+  action: Works in Frequently Bought Together & Basket Pattern Engine
+  operations: []
+  outcome: Analyze transaction baskets to discover products commonly purchased together.
+- step: 7
+  screen: ADM-659
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-663
+  action: Works in Cross-Category Recommendation Manager
+  operations: []
+  outcome: Manage recommendations across TICVAI's different commercial modules. This is especially important
+    because TICVAI is not only a ticketing platform.
+- step: 9
+  screen: ADM-659
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-664
+  action: Works in Multi-Attraction, Destination & Partner Cross-Sell
+  operations: []
+  outcome: Support cross-selling beyond the original venue or attraction. This addresses the matrix requirements
+    around multi-destination and external product combinations.
+- step: 11
+  screen: ADM-659
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-665
+  action: Works in Basket-Aware Cross-Sell & Duplicate Prevention
+  operations: []
+  outcome: Make cross-selling aware of the customer's complete current basket. This is critical because
+    basic recommendation engines often recommend something the customer already owns.
+- step: 13
+  screen: ADM-659
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-666
+  action: Works in Availability, Inventory & Capacity-Aware Cross-Sell
+  operations: []
+  outcome: Ensure recommendations reflect actual operational availability.
+- step: 15
+  screen: ADM-659
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-667
+  action: Works in AI Cross-Sell Discovery, Scoring & Ranking Engine
+  operations: []
+  outcome: Use AI to discover and rank the strongest complementary products for the current customer/context.
+- step: 17
+  screen: ADM-659
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-668
+  action: Works in Cross-Sell Simulator & AI Opportunity Advisor
+  operations: []
+  outcome: Allow administrators to test cross-sell strategies and AI recommendations before activation.
+branches:
+- at: 1
+  condition: Nothing has been set up on Cross-Sell Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Upsell,CrossSellEngine board 3 visited
+primaryContract: unknown
+contracts:
+- unknown

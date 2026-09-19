@@ -3,6 +3,10 @@
 **Status:** Accepted — **amended by [ADR-0038](0038-cell-is-a-region-database-per-tenant.md)**:
 the placement table below describes Postgres *instances*, one per region, each holding a database
 per tenant. The four `CellKind` values and every consequence keep their meaning.
+**Further amended by [ADR-0046](0046-on-premise-has-two-configurations.md)**: on-premise is **two**
+configurations, not one. Everything section 4 says is true of `onPremiseIsolated` and **not** of
+`onPremiseConnected`, which keeps an outbound control channel and is therefore reachable, updatable
+and licensable in the ordinary way.
 **Date:** 14 August 2026
 **Consolidates:** the cell-kind material in [ADR-0001](0001-cell-architecture-one-tenant-per-jurisdiction.md), **whose split rule is superseded by ADR-0014**
 and [ADR-0014](0014-cell-per-region.md), both of which have been amended twice. This ADR is
@@ -66,6 +70,12 @@ option as equivalently isolated, and it is the actual difference.
 
 ### 4. On-premise — the client's hardware, and the client's problem
 
+> **Read this section as `onPremiseIsolated`.** [ADR-0046](0046-on-premise-has-two-configurations.md)
+> splits on-premise in two. The seven consequences below are **the price of isolation** and all of
+> them hold — for the site that keeps no channel to TICVAI. For `onPremiseConnected` none of the
+> first five apply: it is reachable, so updates push, licences check in, support sees telemetry and
+> cross-cell entitlements work. Backups remain the client's either way.
+
 **The platform installed on venue hardware. Nothing leaves the site.**
 
 This is the model that changes the most, and none of it was designed for. Seven consequences,
@@ -109,7 +119,8 @@ not run.
 ## Consequences
 
 **`CellKind` gains `onPremise`.** Four values: `shared`, `dedicated`, `onPremise`,
-`controlPlane`.
+`controlPlane`. **Superseded by [ADR-0046](0046-on-premise-has-two-configurations.md)**, which
+replaces `onPremise` with `onPremiseIsolated` and `onPremiseConnected`.
 
 **The Control Plane holds a record it cannot reach.** An on-premise cell is registered for
 licensing and support purposes with `isReachable: false`, and every operation that assumes

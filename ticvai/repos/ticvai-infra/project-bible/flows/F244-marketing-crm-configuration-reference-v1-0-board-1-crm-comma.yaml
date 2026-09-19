@@ -1,0 +1,148 @@
+id: F244
+name: 'Marketing CRM Configuration Reference v1.0 board 1: CRM Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Marketing CRM Configuration Reference v1.0 board 1. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-734
+  entryPoints:
+  - Arrives at CRM Command Center
+steps:
+- step: 1
+  screen: BO-734
+  action: Opens CRM Command Center
+  operations: []
+  outcome: Give authorized users an operational and analytical overview of the customer base. Display
+    total, new, active, inactive, registered and guest-checkout customers with tenant, brand, venue, region
+    and date filters. Show VIP, high-value, famil
+- step: 2
+  screen: BO-735
+  action: Works in Guest Directory
+  operations: []
+  outcome: Provide a permission-controlled directory for locating and managing every guest record. Search
+    by name, email, mobile, guest ID, external ID, ticket, booking, membership or loyalty identifier.
+    Filter by profile status, segment, language, ge
+- step: 3
+  screen: BO-734
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-736
+  action: Works in Guest Master Configuration
+  operations: []
+  outcome: Configure the shared guest data model without software changes. Configuration Scope of Work
+    | Version 1.0 6 Maintain standard and custom attributes, field groups, labels, data types, defaults,
+    required flags and validation rules. Define pri
+- step: 5
+  screen: BO-734
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-737
+  action: Works in Customer 360 Profile
+  operations: []
+  outcome: Present a consolidated, actionable view of one guest. Display identity, contacts, preferences,
+    household, organization, membership, loyalty, wallet, tickets, bookings and visits. Show LTV, engagement,
+    churn risk, communication eligibility,
+- step: 7
+  screen: BO-734
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-738
+  action: Works in Activity Timeline
+  operations: []
+  outcome: Provide a chronological record of guest activity across the connected platform. Ingest purchases,
+    ticket usage, reservations, visits, membership changes, loyalty, wallet, campaigns, messages, cases,
+    surveys and waivers. Filter by date, chan
+- step: 9
+  screen: BO-734
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-739
+  action: Works in Contact & Preferences
+  operations: []
+  outcome: Maintain verified contact information and service preferences for each guest. Manage multiple
+    email addresses, phone numbers, physical addresses, emergency contacts and social identifiers. Record
+    preferred language, channel, contact time, f
+- step: 11
+  screen: BO-734
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-740
+  action: Works in Family & Guardians
+  operations: []
+  outcome: Model households, dependants and guardians while preserving each person's individual identity.
+    Create family groups and link parent, guardian, spouse and dependant relationships with effective
+    dates. Configure purchasing, booking, profile-m
+- step: 13
+  screen: BO-734
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-741
+  action: Works in Corporate & Groups
+  operations: []
+  outcome: Link guests to corporate, school, travel and group structures. Support corporate accounts,
+    schools, tour operators, travel agencies, resellers, clubs, teams and event groups. Define contacts,
+    participant roles, billing relationships, bookin
+- step: 15
+  screen: BO-734
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-742
+  action: Works in Commerce & Documents
+  operations: []
+  outcome: Consolidate the guest's commercial, service and document history. Provide tabs for tickets,
+    reservations, memberships, loyalty, wallet, refunds, exchanges, transfers, upgrades and attendance.
+    Display communications, cases, survey responses,
+- step: 17
+  screen: BO-734
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-743
+  action: Works in AI Guest Intelligence
+  operations: []
+  outcome: Turn the unified record into explainable customer insight and recommended actions. Calculate
+    historical and predicted LTV, engagement, churn, inactivity, cancellation, affinity and upgrade propensity.
+    Classify audiences and recommend the ne
+branches:
+- at: 1
+  condition: Nothing has been set up on CRM Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Marketing CRM Configuration Reference v1.0 board 1 visited
+primaryContract: unknown
+contracts:
+- unknown

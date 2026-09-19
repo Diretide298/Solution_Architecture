@@ -1403,6 +1403,15 @@ screens:
     - to: WEB-011
       trigger: Enters contact details and answers consent
       provenance: flow F01 step 5→6, F02 step 3→4, F55 step 1→2
+    - to: WEB-016
+      trigger: Login / Register
+      carries:
+      - cartId
+      - challengeId
+      - methodId
+      - providerId
+      provenance: derived — WEB-016 declares entryState.params cartId, challengeId, methodId, providerId,
+        so an edge into it must carry them
   density: compact
   pattern: statusTracker
   patternReason: '`getCart` reads one record and nothing reads a population — the screen is about that
@@ -1509,9 +1518,9 @@ screens:
       nothing.
     emptyNoResults: The filter narrowed it and the shopping cart are still there. Names the active filter
       and offers to clear it.
-    emptyNoAccess: '**The cart is open to anyone** — signed in, unverified or anonymous (ADR-0045,
-      18 September 2026). Nobody is turned away from it. The fork between signing in and continuing
-      as a guest waits on `WEB-011`, and `checkoutCart` is what refuses.'
+    emptyNoAccess: '**The cart is open to anyone** — signed in, unverified or anonymous (ADR-0045, 18
+      September 2026). Nobody is turned away from it. The fork between signing in and continuing as a
+      guest waits on `WEB-011`, and `checkoutCart` is what refuses.'
     offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
@@ -1564,8 +1573,8 @@ screens:
       way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
       three weeks late all land here, and the person holding the link did nothing wrong. **The screen
       names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
-      Arrives with `code`, `lineId`. **A cold arrival opens the cart whatever the session is** — the
-      identity fork waits until checkout (ADR-0045).'
+      Arrives with `code`, `lineId`. **A cold arrival opens the cart whatever the session is** — the identity
+      fork waits until checkout (ADR-0045).'
   wireframe:
     status: notStarted
     provenance: generated
@@ -1600,25 +1609,22 @@ screens:
       provenance: flow F55 step 2→3
     - to: WEB-016
       trigger: Chooses to sign in rather than continue as a guest
-      precondition: no verified guest session — this is the fork of matrix 2.6.1 §2.4, offered here
-        rather than in front of the cart
+      precondition: no verified guest session — this is the fork of matrix 2.6.1 §2.4, offered here rather
+        than in front of the cart
       carries:
       - cartId
       returnsTo: WEB-011
-      provenance: ADR-0045, 18 September 2026 — the gate is the checkout page, not the cart; moved
-        from WEB-010 where it was placed on 17 September
-    - to: WEB-012
-      trigger: Pays
-      precondition: a verified guest session, or — where the site's guestCheckout is on — the email
-        or mobile the tickets go to confirmed by one-time code on this screen. checkoutCart refuses
-        otherwise and keeps the cart
-      provenance: flow F01 step 6→7, F02 step 4→5; refusal rule ADR-0045 and orders checkoutCart 403
+      provenance: ADR-0045, 18 September 2026 — the gate is the checkout page, not the cart; moved from
+        WEB-010 where it was placed on 17 September
     - to: WEB-013
       trigger: Booking Confirmation
       carries:
       - orderId
       provenance: derived — WEB-013 declares entryState.params orderId, so an edge into it must carry
         them
+    - to: WEB-012
+      trigger: Pays
+      provenance: flow F01 step 6→7, F02 step 4→5
   notes: '**Wired 24 August from review**: updateMyProfile. **The operations existed and this screen could
     not call them** — reviewers reported them as missing APIs, which is what an unreachable operation
     looks like from a wireframe.'

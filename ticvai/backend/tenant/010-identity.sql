@@ -2,7 +2,7 @@
 -- **Derived. Do not hand-edit.**
 
 -- Written by the authorisation layer on every call, not by an operation Hangs off: reaches
--- identity.principal through its keys; references identity.principal
+-- identity.principal through its keys; references identity.principal.
 CREATE TABLE IF NOT EXISTS identity.authz_audit (
     id                                uuid PRIMARY KEY NOT NULL,
     actor_principal_id                uuid,
@@ -34,9 +34,8 @@ CREATE TABLE IF NOT EXISTS identity.delegated_access (
     scope_id                          uuid NOT NULL
 );
 
--- an issued MFA challenge and its outcome Hangs off: a child of identity.principal; reaches
--- identity.principal through its keys; references identity.principal. Reached by: 1 operations
--- read it and 2 write it
+-- an issued MFA challenge and its outcome Hangs off: reaches identity.principal through its keys;
+-- references identity.principal. Reached by: 1 operations read it and 2 write it.
 CREATE TABLE IF NOT EXISTS identity.mfa_challenge (
     id                                uuid PRIMARY KEY NOT NULL,
     principal_id                      uuid NOT NULL
@@ -55,17 +54,15 @@ CREATE TABLE IF NOT EXISTS identity.mfa_method (
     principal_id                      uuid
 );
 
--- hashed, single-use, never retrievable Hangs off: a child of identity.principal; reaches
--- identity.principal through its keys; references identity.principal. Reached by: 2 operations
--- read it and 2 write it
+-- hashed, single-use, never retrievable Hangs off: reaches identity.principal through its keys;
+-- references identity.principal. Reached by: 2 operations read it and 2 write it.
 CREATE TABLE IF NOT EXISTS identity.mfa_recovery_code (
     id                                uuid PRIMARY KEY NOT NULL,
     principal_id                      uuid
 );
 
--- a one-time code sent to a guest contact point Hangs off: a child of pii.subject; reaches
--- identity.principal through its keys; references pii.subject. Reached by: 2 operations read it
--- and 2 write it
+-- a one-time code sent to a guest contact point Hangs off: reaches identity.principal through its
+-- keys; references pii.subject. Reached by: 2 operations read it and 2 write it.
 CREATE TABLE IF NOT EXISTS identity.otp_challenge (
     id                                uuid PRIMARY KEY NOT NULL,
     subject_id                        uuid NOT NULL
@@ -107,7 +104,7 @@ CREATE TABLE IF NOT EXISTS identity.principal (
 
 -- a credential hash has no response it belongs in Hangs off: a child of identity.principal;
 -- reaches identity.principal through its keys; references identity.principal. Reached by: 1
--- operations read it and 0 write it
+-- operations read it and 0 write it.
 CREATE TABLE IF NOT EXISTS identity.principal_credential (
     id                                uuid PRIMARY KEY NOT NULL,
     principal_id                      uuid
@@ -128,7 +125,7 @@ CREATE TABLE IF NOT EXISTS identity.role (
 
 -- child of role, returned nested Hangs off: a child of identity.role; reaches identity.principal
 -- through its keys; references identity.principal, identity.role. Reached by: 2 operations read it
--- and 1 write it
+-- and 1 write it.
 CREATE TABLE IF NOT EXISTS identity.role_permission (
     role_id                           uuid NOT NULL,
     permission                        text NOT NULL,

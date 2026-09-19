@@ -1,0 +1,148 @@
+id: F274
+name: 'Seat Management Venue Mapping Reference v1.0 board 1: Seat Map Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Seat Management Venue Mapping Reference v1.0 board 1. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-953
+  entryPoints:
+  - Arrives at Seat Map Command Center
+steps:
+- step: 1
+  screen: BO-953
+  action: Opens Seat Map Command Center
+  operations: []
+  outcome: Provide a role-specific overview of every venue map and its operational readiness. Show total
+    venues, active maps, seats, sections, capacity, drafts, approvals, validation errors and upcoming
+    layout changes. Filter and compare by tenant, br
+- step: 2
+  screen: BO-954
+  action: Works in Venue Canvas
+  operations: []
+  outcome: Provide the primary drag-and-drop workspace for constructing a venue map. Offer components
+    for section, row, seat, standing zone, suite, stage, entrance, exit, aisle, facility, obstruction
+    and label. Support zoom, pan, snap-to-grid, rulers,
+- step: 3
+  screen: BO-953
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-955
+  action: Works in Sections & Zones
+  operations: []
+  outcome: Define the commercial and operational hierarchy of the venue. Create, draw and edit section
+    or zone polygons with name, code, level, capacity, color, category and parent hierarchy. Support curved,
+    rectangular, freeform and imported boundari
+- step: 5
+  screen: BO-953
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-956
+  action: Works in Rows & Seats
+  operations: []
+  outcome: Build and maintain numbered rows and individual seat positions at scale. Generate straight,
+    curved, radial or custom rows using seat count, spacing, radius, angle, direction and offset parameters.
+    Configure seat number, label, type, categor
+- step: 7
+  screen: BO-953
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-957
+  action: Works in Standing Zones
+  operations: []
+  outcome: Configure non-assigned areas with controlled capacity and density. Draw standing, general-admission,
+    pit, dance-floor or hospitality zones and assign type, capacity, density and color. Calculate capacity
+    from area and approved density while
+- step: 9
+  screen: BO-953
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-958
+  action: Works in Suites & Boxes
+  operations: []
+  outcome: Model suites, boxes and hospitality spaces as sellable seating inventory. Create suites and
+    boxes with code, capacity, internal seat layout, standing allowance, amenities and accessibility attributes.
+    Support whole-suite, per-seat, shared a
+- step: 11
+  screen: BO-953
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-959
+  action: Works in Stage & Focal Point
+  operations: []
+  outcome: Define the viewing focal point and production footprint used by seating logic. Add stage, field,
+    screen, court, track or custom focal areas with position, dimensions, rotation, height and event-
+    specific variant. Configure one or multiple f
+- step: 13
+  screen: BO-953
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-960
+  action: Works in Entrances, Exits & Aisles
+  operations: []
+  outcome: Map circulation elements used by access, accessibility and safety operations. Create entrances,
+    exits, gates, portals, vomitories, concourses, stairways and aisles with unique identifiers and attributes.
+    Define width, direction, level, conn
+- step: 15
+  screen: BO-953
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-961
+  action: Works in Amenities & Obstructions
+  operations: []
+  outcome: Add guest facilities, service points and view-affecting objects to the venue map. Place restrooms,
+    concessions, bars, first aid, merchandise, lifts, escalators, information, prayer and accessibility
+    facilities. Map pillars, cameras, speaker
+- step: 17
+  screen: BO-953
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-962
+  action: Works in Templates, Validation & Publish
+  operations: []
+  outcome: Govern reusable venue templates and release a map only when it is operationally complete. Create,
+    classify, clone, archive and reuse venue templates while preserving lineage and ownership. Run checks
+    for geometry, capacity, duplicate number
+branches:
+- at: 1
+  condition: Nothing has been set up on Seat Map Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Seat Management Venue Mapping Reference v1.0 board 1 visited
+primaryContract: unknown
+contracts:
+- unknown

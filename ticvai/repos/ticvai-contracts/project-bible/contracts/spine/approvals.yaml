@@ -1211,6 +1211,7 @@ paths:
       operationId: listWorkflow
       x-ticvai-consumed-by:
         - "P09 ADM-248 Workflow Operations Command Center"
+        - "P09 ADM-319 Approval Workflow Library"
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true

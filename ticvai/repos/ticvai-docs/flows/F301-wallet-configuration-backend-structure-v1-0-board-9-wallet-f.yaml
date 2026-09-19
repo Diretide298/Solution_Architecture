@@ -1,0 +1,143 @@
+id: F301
+name: 'Wallet Configuration Backend Structure v1.0 board 9: Wallet Finance & Liability Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Wallet Configuration Backend Structure v1.0 board 9. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-1163
+  entryPoints:
+  - Arrives at Wallet Finance & Liability Command Center
+steps:
+- step: 1
+  screen: BO-1163
+  action: Opens Wallet Finance & Liability Command Center
+  operations: []
+  outcome: Provide Finance and authorized management users with a consolidated financial view of all wallet
+    obligations and movements. Executive KPIs
+- step: 2
+  screen: BO-1164
+  action: Works in Wallet Financial Classification & Accounting Mapping
+  operations: []
+  outcome: Define the financial classification of every wallet credit and transaction type. Credit Mapping
+- step: 3
+  screen: BO-1163
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-1165
+  action: Works in Wallet Sub-Ledger & Balance Control
+  operations: []
+  outcome: Maintain the authoritative financial transaction history behind every wallet balance. Sub-Ledger
+    View
+- step: 5
+  screen: BO-1163
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-1166
+  action: Works in Multi-Source Reconciliation Configuration
+  operations: []
+  outcome: Reconcile wallet financial events across Wallet, Payments, Sales Channels and Finance. The
+    supplied requirements specifically call for reconciliation of payment status between sales channels,
+    the bank/payment gateway and the ticketing syste
+- step: 7
+  screen: BO-1163
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-1167
+  action: Works in Reconciliation Exception & Resolution Workbench
+  operations: []
+  outcome: Provide Finance and Operations with a governed workspace to investigate reconciliation failures.
+    Exception Examples Payment successful / Wallet not funded Wallet funded / Payment failed Wallet debited
+    / POS transaction missing Duplicate wal
+- step: 9
+  screen: BO-1163
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-1168
+  action: Works in Gift Card Liability Management
+  operations: []
+  outcome: Provide detailed financial control of outstanding gift-card obligations. Requirement 4.3.36
+    explicitly requires reporting of outstanding gift-card balances, redeemed value, unredeemed balances,
+    expired balances and liability exposure by ven
+- step: 11
+  screen: BO-1163
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-1169
+  action: Works in Breakage & Revenue Recognition Policy
+  operations: []
+  outcome: Configure the wallet-side business rules for expired/unredeemed gift-card value. Requirement
+    4.3.37 requires configurable expiration policies, gift-card breakage calculation and generation of
+    revenue- recognition entries according to config
+- step: 13
+  screen: BO-1163
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-1170
+  action: Works in Wallet Financial Period & Closing Controls
+  operations: []
+  outcome: Support controlled month-end and financial-period processing for wallet balances. Period Status
+    Open → Closing → Under Review → Closed → Reopened with Authorization Pre-Close Validation Unreconciled
+    transactions Pending refunds Pending reve
+- step: 15
+  screen: BO-1163
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-1171
+  action: Works in Wallet Analytics & Management Reporting
+  operations: []
+  outcome: Provide comprehensive analytics for wallet usage, financial performance and customer behavior.
+    Requirement 4.3.17 requires intensive reporting across wallet credit types, including usage, balance
+    and expiry, while 4.3.33 calls for dashboard
+- step: 17
+  screen: BO-1163
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-1172
+  action: Works in Finance Validation, Reporting & Audit Center
+  operations: []
+  outcome: Provide a final finance-control screen for validating wallet financial integrity and reviewing
+    all financial configuration changes. Finance Health Check
+branches:
+- at: 1
+  condition: Nothing has been set up on Wallet Finance & Liability Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Wallet Configuration Backend Structure v1.0 board 9 visited
+primaryContract: unknown
+contracts:
+- unknown

@@ -1,6 +1,6 @@
 {
  "scope": "platform",
- "generated": "2026-09-17",
+ "generated": "2026-09-19",
  "note": "Derived on every run by tools/build-status.py. A hand-maintained status page is worse than none, because somebody plans against it.",
  "counts": {
   "operations": 1628,
@@ -14,13 +14,13 @@
   "states": 125,
   "events": 29,
   "flows": 96,
-  "flowsDerived": 106,
-  "adrs": 44,
-  "screens": 1629,
+  "flowsDerived": 192,
+  "adrs": 46,
+  "screens": 2427,
   "platforms": 16,
   "frontends": 13,
   "apps": 5,
-  "boards": 22
+  "boards": 218
  },
  "metrics": {
   "design": [
@@ -40,8 +40,8 @@
    },
    {
     "name": "Screens defined, specified and given a purpose",
-    "done": 1629,
-    "total": 1629,
+    "done": 2427,
+    "total": 2427,
     "percent": 100,
     "note": "Loading, empty and error states written for each."
    },
@@ -82,9 +82,9 @@
    },
    {
     "name": "Screens with operations",
-    "done": 1089,
-    "total": 1629,
-    "percent": 67,
+    "done": 1145,
+    "total": 2427,
+    "percent": 47,
     "note": "The remainder are static, workshop-blocked, or navigation shells."
    },
    {
@@ -103,9 +103,9 @@
    },
    {
     "name": "Operations reaching a screen",
-    "done": 1386,
+    "done": 1392,
     "total": 1628,
-    "percent": 85,
+    "percent": 86,
     "note": "Not a defect on its own \u2014 sync, webhook and job operations have no screen."
    },
    {
@@ -172,13 +172,13 @@
   }
  },
  "headline": {
-  "design": 87,
+  "design": 84,
   "build": 33
  },
  "waves": {
   "wave1": 176,
   "wave2": 261,
-  "wave3": 1192
+  "wave3": 1990
  },
  "platformBreakdown": [
   {
@@ -235,7 +235,7 @@
    "app": "venue-management-web",
    "targetApp": "venue-management",
    "operator": "venue",
-   "screens": 614
+   "screens": 1182
   },
   {
    "code": "P09",
@@ -243,7 +243,7 @@
    "app": "ticvai-web",
    "targetApp": "ticvai-control",
    "operator": "ticvai",
-   "screens": 446
+   "screens": 676
   },
   {
    "code": "P10",

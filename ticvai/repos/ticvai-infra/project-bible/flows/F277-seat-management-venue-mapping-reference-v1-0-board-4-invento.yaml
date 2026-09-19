@@ -1,0 +1,148 @@
+id: F277
+name: 'Seat Management Venue Mapping Reference v1.0 board 4: Inventory Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Seat Management Venue Mapping Reference v1.0 board 4. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-983
+  entryPoints:
+  - Arrives at Inventory Command Center
+steps:
+- step: 1
+  screen: BO-983
+  action: Opens Inventory Command Center
+  operations: []
+  outcome: Monitor live seat inventory health across all venues and performances. Show total, available,
+    held, reserved, sold, blocked, out-of-service, accessible and discrepancy counts. Filter by tenant,
+    venue, event, performance, layout, section, ca
+- step: 2
+  screen: BO-984
+  action: Works in Real-Time Seat Map
+  operations: []
+  outcome: Display the current authoritative status of each seat and zone. Render available, locked, held,
+    reserved, sold, blocked, out-of-service and accessible states with an interactive legend. Stream near-real-time
+    state changes with source, trans
+- step: 3
+  screen: BO-983
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-985
+  action: Works in Status Model Configuration
+  operations: []
+  outcome: Define the permitted seat lifecycle and transition rules. Maintain status code, label, color,
+    terminal flag, availability effect, channel visibility and inventory treatment. Configure allowed
+    transitions, required reason, approval, timeout,
+- step: 5
+  screen: BO-983
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-986
+  action: Works in Availability Tracker
+  operations: []
+  outcome: Analyze current and historical seat availability. Show available quantity by venue, performance,
+    section, row, category, price band and sales channel. Graph availability over time and identify material
+    changes caused by locks, holds, reserv
+- step: 7
+  screen: BO-983
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-987
+  action: Works in Hold Tracker
+  operations: []
+  outcome: Track active and historical held inventory regardless of hold type. List hold ID, type, owner,
+    event, section/seat set, quantity, created time, expiry, priority and status. Filter upcoming expiry,
+    extended, converted, released and conflicti
+- step: 9
+  screen: BO-983
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-988
+  action: Works in Reservation Tracker
+  operations: []
+  outcome: Monitor seat reservations and temporary allocations before final sale. List reservation, guest/group,
+    source, seat set, lock/hold reference, expiry, payment state and confirmation status. Identify abandoned,
+    timed-out, payment-pending, orph
+- step: 11
+  screen: BO-983
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-989
+  action: Works in Sales & Allocation Tracker
+  operations: []
+  outcome: Trace sold seats and inventory allocation across channels and partners. Report seats and revenue
+    by web, mobile, POS, call center, box office, B2B reseller and partner API. Show allocation-versus-sold
+    performance, remaining quota, order, ti
+- step: 13
+  screen: BO-983
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-990
+  action: Works in Maintenance & Out of Service
+  operations: []
+  outcome: Control seats unavailable because of defects, inspection or venue work. Create or link work
+    orders with seat/area, issue, severity, status, owner, due date and supporting evidence. Block affected
+    inventory, identify sold/reserved seats and
+- step: 15
+  screen: BO-983
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-991
+  action: Works in Seat History
+  operations: []
+  outcome: Present the complete chronological history of one seat for one performance or physical venue
+    position. Show locks, holds, reservations, sales, releases, refunds, exchanges, scans, blocks and
+    maintenance events. Preserve business timestamp,
+- step: 17
+  screen: BO-983
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-992
+  action: Works in Audit & Reconciliation
+  operations: []
+  outcome: Detect and resolve differences between authoritative inventory and connected systems. Compare
+    state and quantity across Seat Inventory, Cart, Order, Payment, Ticket, Channel and Access systems.
+    Queue discrepancies by severity, age, venue, p
+branches:
+- at: 1
+  condition: Nothing has been set up on Inventory Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Seat Management Venue Mapping Reference v1.0 board 4 visited
+primaryContract: unknown
+contracts:
+- unknown

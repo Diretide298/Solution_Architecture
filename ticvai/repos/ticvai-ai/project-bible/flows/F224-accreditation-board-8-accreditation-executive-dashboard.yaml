@@ -1,0 +1,128 @@
+id: F224
+name: 'ACCREDITATION board 8: Accreditation Executive Dashboard'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as ACCREDITATION board 8. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-684
+  entryPoints:
+  - Arrives at Accreditation Executive Dashboard
+steps:
+- step: 1
+  screen: BO-684
+  action: Opens Accreditation Executive Dashboard
+  operations: []
+  outcome: Provide management with a real-time overview of the complete accreditation operation.
+- step: 2
+  screen: BO-685
+  action: Works in Accreditation Status & Portfolio Reporting
+  operations: []
+  outcome: Report on active, expired, suspended and revoked accreditation records.
+- step: 3
+  screen: BO-684
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-686
+  action: Works in Accreditation Utilization Analytics
+  operations: []
+  outcome: Determine whether issued accreditations are actually being used.
+- step: 5
+  screen: BO-684
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-687
+  action: Works in Accreditation Access Activity Reporting
+  operations: []
+  outcome: Provide detailed reporting of accreditation access activity.
+- step: 7
+  screen: BO-684
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-688
+  action: Works in Accreditation Trend & Comparative Analysis
+  operations: []
+  outcome: Analyze accreditation behavior over time.
+- step: 9
+  screen: BO-684
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-689
+  action: Works in Accreditation Audit Reporting
+  operations: []
+  outcome: Provide compliance and management reporting across accreditation actions.
+- step: 11
+  screen: BO-684
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-690
+  action: Works in Immutable Accreditation Audit Log
+  operations: []
+  outcome: Maintain the authoritative security record of all accreditation actions.
+- step: 13
+  screen: BO-684
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-691
+  action: Works in Accreditation API Management
+  operations: []
+  outcome: Expose accreditation functionality securely to approved external systems.
+- step: 15
+  screen: BO-684
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-692
+  action: Works in Accreditation Webhook Management
+  operations: []
+  outcome: Notify external systems when accreditation events occur.
+- step: 17
+  screen: BO-684
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-693
+  action: Works in Integration & Data Exchange Monitor
+  operations: []
+  outcome: Monitor accreditation APIs, webhooks and external-system synchronization.
+branches:
+- at: 1
+  condition: Nothing has been set up on Accreditation Executive Dashboard yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on ACCREDITATION board 8 visited
+primaryContract: unknown
+contracts:
+- unknown

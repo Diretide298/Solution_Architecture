@@ -1,0 +1,99 @@
+id: F243
+name: 'F&B Backend Structure Module Sample Reference v1.0 board 1: F&B Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as F&B Backend Structure Module Sample Reference v1.0 board
+    1. **This route is read from the screens' own navigation**, and the reason anyone walks it has still
+    to be written.
+  entryScreen: BO-727
+  entryPoints:
+  - Arrives at F&B Command Center
+steps:
+- step: 1
+  screen: BO-727
+  action: Opens F&B Command Center
+  operations: []
+  outcome: F&B Command Center
+- step: 2
+  screen: BO-728
+  action: Works in Outlet Management
+  operations: []
+  outcome: Outlet Management
+- step: 3
+  screen: BO-727
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-729
+  action: Works in Create / Edit Outlet
+  operations: []
+  outcome: Create / Edit Outlet
+- step: 5
+  screen: BO-727
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-730
+  action: Works in Outlet Types & Templates
+  operations: []
+  outcome: Outlet Types & Templates
+- step: 7
+  screen: BO-727
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-731
+  action: Works in Operating Hours & Service Periods
+  operations: []
+  outcome: Operating Hours & Service Periods
+- step: 9
+  screen: BO-727
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-732
+  action: Works in POS & Device Assignment
+  operations: []
+  outcome: POS & Device Assignment
+- step: 11
+  screen: BO-727
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-733
+  action: Works in Service Channel Configuration
+  operations: []
+  outcome: Service Channel Configuration
+branches:
+- at: 1
+  condition: Nothing has been set up on F&B Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on F&B Backend Structure Module Sample Reference v1.0 board 1 visited
+primaryContract: unknown
+contracts:
+- unknown

@@ -52,6 +52,9 @@ paths:
       operationId: listResources
       x-ticvai-consumed-by:
         - "P08 BO-095 Resources"
+        - "P08 BO-854 Resource Management Command Center"
+        - "P08 BO-923 AI Resource Intelligence Command Center"
+        - "P08 BO-943 Resource Analytics Command Center"
       summary: Resources at this venue
       tags:
       - resources

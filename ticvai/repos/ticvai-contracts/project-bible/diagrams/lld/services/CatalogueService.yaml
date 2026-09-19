@@ -29,7 +29,7 @@ schemas:
   tables: 11
   stores:
   - postgres
-  largestTable: seating.seat_map
+  largestTable: seating.seat_hold
 operationsByContract:
 - contract: catalogue
   count: 176
@@ -3182,10 +3182,30 @@ screens:
 - P08:BO-037 Offline Package Status
 - P08:BO-063 Opening Hours & Calendar
 - P08:BO-102 Sell
+- P08:BO-1043 Revenue Command Center
+- P08:BO-1050 Revenue Analytics & Audit
+- P08:BO-1051 Seat Analytics Command Center
+- P08:BO-1055 Revenue by Seat Category
+- P08:BO-1057 Hold Inventory Reporting
 - P08:BO-115 Category, Brand & Merchandise Hierarchy
 - P08:BO-117 Product Import, Governance & AI Configuration Assistant
 - P08:BO-119 Cross-Sell, Upsell & Recommendation Rules
 - P08:BO-125 Product & Category Button Configuration
+- P08:BO-374 Approval Decision Workspace
+- P08:BO-441 Price Priority & Conflict Rules
+- P08:BO-443 Pricing Audit, Approval & Publication
+- P08:BO-444 Redemption Operations Dashboard
+- P08:BO-518 Real-Time Availability Calendar
+- P08:BO-533 Pricing Simulation, Validation & AI Commercial Intelligence
+- P08:BO-637 Approval Workflow Builder
+- P08:BO-642 Approval Decision History
+- P08:BO-737 Customer 360 Profile
+- P08:BO-761 AI Audience Discovery
+- P08:BO-765 Campaign Library & Calendar
+- P08:BO-770 Campaign Approval Workflow
+- P08:BO-953 Seat Map Command Center
+- P08:BO-991 Seat History
+- P08:BO-997 Real-Time Availability & Locking
 - P09:ADM-048 Commercial Pricing Command Center
 - P09:ADM-049 Price List Master Configuration
 - P09:ADM-050 Price Category & Rate Type Library
@@ -3396,12 +3416,21 @@ screens:
 - P09:ADM-275 Channel Audit, Logs & Transaction Traceability
 - P09:ADM-276 Channel Governance, SLA & Partner Control
 - P09:ADM-277 AI Channel Optimization & Intelligence Center
+- P09:ADM-279 Resale Eligibility Rule Configuration
+- P09:ADM-319 Approval Workflow Library
+- P09:ADM-365 Risk & Governance Analytics
+- P09:ADM-383 Sales Channel Assessment
+- P09:ADM-483 Pricing & Commercial Configuration
+- P09:ADM-492 Configuration Approval Workflow
+- P09:ADM-549 AI Governance Monitoring Command Center
+- P09:ADM-659 Cross-Sell Command Center
 - P10:PTR-005 Inventory & Allocation View
 - P10:PTR-006 Product Catalog (B2B Pricing)
 - P10:PTR-007 Availability Search
 - P10:PTR-009 Group / Bulk Booking
 - P10:PTR-010 Cart & Quote
 - P16:ANL-004 Product Performance
+- P16:ANL-018 Alerts & Exception Center
 flows:
 - F01 Guest buys a ticket online
 - F02 Guest buys seated tickets

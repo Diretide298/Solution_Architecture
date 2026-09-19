@@ -1817,6 +1817,7 @@ paths:
     get:
       operationId: listVirtualTicketStatus
       x-ticvai-consumed-by:
+        - "P08 BO-334 Virtual Ticket Command Center"
         - "P08 BO-336 Virtual Ticket Status & Lifecycle Model"
       x-ticvai-audience:
       - staff
@@ -1855,6 +1856,7 @@ paths:
     get:
       operationId: listMediaTypeCredential
       x-ticvai-consumed-by:
+        - "P08 BO-174 Media & Credential Command Center"
         - "P08 BO-337 Media Type & Credential Technology Registry"
       x-ticvai-audience:
       - staff
@@ -2085,6 +2087,7 @@ paths:
     get:
       operationId: listVirtualTicketArchitecture
       x-ticvai-consumed-by:
+        - "P08 BO-334 Virtual Ticket Command Center"
         - "P08 BO-343 Virtual Ticket Architecture Testing, Governance & Audit"
       x-ticvai-audience:
       - staff
@@ -2331,6 +2334,7 @@ paths:
     put:
       operationId: setRfidNfcCard
       x-ticvai-consumed-by:
+        - "P08 BO-180 RFID & NFC Configuration"
         - "P08 BO-349 RFID, NFC, Card & Wristband Media Designer"
       x-ticvai-audience:
       - staff
@@ -2542,6 +2546,7 @@ paths:
       operationId: listCredential
       x-ticvai-consumed-by:
         - "P08 BO-354 Credential Operations Command Center"
+        - "P08 BO-653 Credential Registry & Credential History"
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
@@ -2667,6 +2672,7 @@ paths:
       operationId: listCredentialGenerationIssuance
       x-ticvai-consumed-by:
         - "P08 BO-356 Credential Generation & Issuance Monitor"
+        - "P08 BO-644 Credential Issuance Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
@@ -2785,6 +2791,7 @@ paths:
       operationId: listCredentialReplacementReissue
       x-ticvai-consumed-by:
         - "P08 BO-359 Credential Replacement, Reissue, Revocation & Recovery"
+        - "P08 BO-652 Credential Replacement & Reissue"
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
@@ -2900,6 +2907,7 @@ paths:
     get:
       operationId: listCredentialSecurityOperational
       x-ticvai-consumed-by:
+        - "P08 BO-173 Credential Security Simulation, Audit & Publication"
         - "P08 BO-362 Credential Security, Audit & Operational Evidence"
       x-ticvai-audience:
       - staff
@@ -3623,6 +3631,7 @@ paths:
       operationId: listMultiParkCrossover
       x-ticvai-consumed-by:
         - "P08 BO-160 Multi-Park & Crossover Rules"
+        - "P08 BO-220 Multi-Park & Crossover Journey Orchestrator"
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
@@ -3782,6 +3791,7 @@ paths:
       operationId: listDigitalCredentialSecurity
       x-ticvai-consumed-by:
         - "P08 BO-164 Digital Credential Security Command Center"
+        - "P08 BO-173 Credential Security Simulation, Audit & Publication"
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
@@ -4144,6 +4154,7 @@ paths:
     get:
       operationId: listCredentialSecurity
       x-ticvai-consumed-by:
+        - "P08 BO-164 Digital Credential Security Command Center"
         - "P08 BO-173 Credential Security Simulation, Audit & Publication"
       x-ticvai-audience:
       - staff
@@ -4221,6 +4232,7 @@ paths:
       operationId: listMediaTypeTechnology
       x-ticvai-consumed-by:
         - "P08 BO-175 Media Type & Technology Library"
+        - "P08 BO-337 Media Type & Credential Technology Registry"
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
@@ -4259,6 +4271,7 @@ paths:
     get:
       operationId: listVirtualCredentialMedia
       x-ticvai-consumed-by:
+        - "P08 BO-174 Media & Credential Command Center"
         - "P08 BO-176 Virtual Credential & Media Association"
       x-ticvai-audience:
       - staff
@@ -5782,6 +5795,7 @@ paths:
       operationId: listGuestJourney
       x-ticvai-consumed-by:
         - "P08 BO-214 Guest Journey Command Center"
+        - "P08 BO-780 Guest Engagement Journeys"
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
@@ -6016,6 +6030,7 @@ paths:
     get:
       operationId: listMultiParkCrossover2
       x-ticvai-consumed-by:
+        - "P08 BO-160 Multi-Park & Crossover Rules"
         - "P08 BO-220 Multi-Park & Crossover Journey Orchestrator"
       x-ticvai-audience:
       - staff
@@ -6891,6 +6906,7 @@ paths:
       operationId: simulatePolicyConflictImpact
       x-ticvai-consumed-by:
         - "P08 BO-242 Policy Simulation, Conflict & Impact Analysis"
+        - "P08 BO-981 Conflict & Impact Simulation"
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
@@ -7284,6 +7300,7 @@ paths:
       operationId: listSecurityDetectionGovernance
       x-ticvai-consumed-by:
         - "P08 BO-253 Security Analytics, AI Detection & Governance"
+        - "P16 ANL-070 Analytics Governance, Security & Audit Center"
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true

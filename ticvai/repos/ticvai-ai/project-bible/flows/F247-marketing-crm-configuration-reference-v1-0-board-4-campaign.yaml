@@ -1,0 +1,148 @@
+id: F247
+name: 'Marketing CRM Configuration Reference v1.0 board 4: Campaign Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Marketing CRM Configuration Reference v1.0 board 4. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-764
+  entryPoints:
+  - Arrives at Campaign Command Center
+steps:
+- step: 1
+  screen: BO-764
+  action: Opens Campaign Command Center
+  operations: []
+  outcome: Provide a real-time overview of campaign operations and commercial performance. Show active,
+    scheduled, paused and completed campaigns with sends, reach, conversions, revenue, ROI and budget
+    pacing. Compare email, SMS, WhatsApp, push, in-ap
+- step: 2
+  screen: BO-765
+  action: Works in Campaign Library & Calendar
+  operations: []
+  outcome: Organize campaigns, templates and execution schedules. Provide table, card and calendar views
+    filtered by owner, brand, venue, region, objective, channel and status. Support reusable templates
+    for ticketing, events, membership, loyalty, wal
+- step: 3
+  screen: BO-764
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-766
+  action: Works in Campaign Builder
+  operations: []
+  outcome: Guide authorized users through complete campaign creation. Capture campaign name, objective,
+    brand, venue, owner, products, commercial goal and measurement model. Configuration Scope of Work
+    | Version 1.0 21 Support ticket, event, membershi
+- step: 5
+  screen: BO-764
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-767
+  action: Works in Audience & Offer Selection
+  operations: []
+  outcome: Connect governed audiences with eligible commercial offers. Select one or more segments, exclusions
+    and suppression lists and show reachable, consent-eligible count by channel. Configure discounts,
+    vouchers, promo codes, bundles, loyalty re
+- step: 7
+  screen: BO-764
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-768
+  action: Works in Multichannel Composer
+  operations: []
+  outcome: Create personalized content for every selected communication channel. Provide channel-specific
+    email, SMS, WhatsApp, push, in-app and website-banner editors and previews. Insert approved personalization
+    tokens, products, events, tickets, QR
+- step: 9
+  screen: BO-764
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-769
+  action: Works in Schedule & Trigger Rules
+  operations: []
+  outcome: Configure when and under what conditions a campaign executes. Support immediate, scheduled,
+    recurring, event-triggered and API/webhook execution. Configure timezone, send windows, blackout dates,
+    frequency caps, re-entry, expiry and audienc
+- step: 11
+  screen: BO-764
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-770
+  action: Works in Campaign Approval Workflow
+  operations: []
+  outcome: Enforce configurable review and publishing governance. Support creator, reviewer, approver
+    and publisher stages with role, department, threshold and business-unit rules. Route content, offer,
+    budget, legal, brand and data-privacy approvals
+- step: 13
+  screen: BO-764
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-771
+  action: Works in Budget, Goals & Forecast
+  operations: []
+  outcome: Plan campaign investment and expected commercial results. Capture total and channel budgets,
+    expected revenue, conversion, CPA, margin, break-even and strategic goals. Estimate provider cost,
+    offer cost, reward liability and capacity implic
+- step: 15
+  screen: BO-764
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-772
+  action: Works in A/B & AI Optimization
+  operations: []
+  outcome: Test campaign alternatives and apply AI recommendations safely. Configure A/B or multivariate
+    variants for subject, content, creative, offer, channel and send time. Define audience split, sample
+    size, duration, success metric, statistical c
+- step: 17
+  screen: BO-764
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-773
+  action: Works in Attribution & Audit
+  operations: []
+  outcome: Measure influenced outcomes and preserve a complete campaign record. Provide first, last, linear,
+    position-based and configurable multi-touch attribution across channels. Attribute ticket, membership,
+    loyalty, wallet, reservation and other
+branches:
+- at: 1
+  condition: Nothing has been set up on Campaign Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Marketing CRM Configuration Reference v1.0 board 4 visited
+primaryContract: unknown
+contracts:
+- unknown

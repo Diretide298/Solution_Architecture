@@ -1,0 +1,143 @@
+id: F298
+name: 'Wallet Configuration Backend Structure v1.0 board 6: Wallet Usage & Channel Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Wallet Configuration Backend Structure v1.0 board 6. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-1133
+  entryPoints:
+  - Arrives at Wallet Usage & Channel Command Center
+steps:
+- step: 1
+  screen: BO-1133
+  action: Opens Wallet Usage & Channel Command Center
+  operations: []
+  outcome: Provide a real-time operational view of wallet usage across all TICVAI channels and venue touchpoints.
+    Dashboard KPIs
+- step: 2
+  screen: BO-1134
+  action: Works in Wallet Channel Configuration
+  operations: []
+  outcome: Define which TICVAI channels can use Wallet as a payment or redemption method. Requirement
+    4.3.8 requires multiple wallet payment channels including mobile applications and wearables, with
+    online, onsite POS and in-app payment modes. Suppor
+- step: 3
+  screen: BO-1133
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-1135
+  action: Works in Wallet Payment & Redemption Policy
+  operations: []
+  outcome: Configure the business rules applied when a customer selects Wallet at checkout.
+- step: 5
+  screen: BO-1133
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-1136
+  action: Works in Wearable & Credential Type Configuration
+  operations: []
+  outcome: Define physical and digital credentials that can represent a wallet. The source requires venue-provided
+    wearables to be linked to digital wallets and used to make payments. Credential Types
+- step: 7
+  screen: BO-1133
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-1137
+  action: Works in Wearable Linking & Wallet Association Rules
+  operations: []
+  outcome: Configure how wristbands, cards and other credentials are linked to wallet accounts. Requirement
+    4.3.12 specifically requires guests to link and remove venue-issued wearables from their wallet. Linking
+    Methods Customer Mobile App B2C Portal
+- step: 9
+  screen: BO-1133
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-1138
+  action: Works in NFC, RFID & QR Interaction Rules
+  operations: []
+  outcome: Configure how different proximity/contactless technologies interact with TICVAI Wallet. Requirement
+    4.3.13 specifically requires wallet payments using RFID, NFC and QR code. Configure by Technology
+    RFID Reader type Card/wristband format Ide
+- step: 11
+  screen: BO-1133
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-1139
+  action: Works in Digital Key & Wallet Authentication Policy
+  operations: []
+  outcome: Configure authentication requirements based on transaction risk. Requirement 4.3.10 specifically
+    calls for Digital Key/Digital ID authentication wherever possible to enhance security and credential
+    management. Authentication Methods
+- step: 13
+  screen: BO-1133
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-1140
+  action: Works in Offline Wallet & Degraded Mode Configuration
+  operations: []
+  outcome: Maintain controlled venue operations during temporary network or service interruptions. This
+    is especially important for amusement parks, festivals, stadiums and large attractions where wristband
+    transactions cannot simply stop because conn
+- step: 15
+  screen: BO-1133
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-1141
+  action: Works in Device, Terminal & Acceptance Point Mapping
+  operations: []
+  outcome: Determine exactly which devices and locations are authorized to accept TICVAI Wallet. Hierarchy
+    Tenant → Venue → Business Area → Outlet / Attraction → Terminal → Device Acceptance Points
+- step: 17
+  screen: BO-1133
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-1142
+  action: Works in Wallet Transaction Simulator, Monitoring & Channel Audit
+  operations: []
+  outcome: 'Test the complete channel-to-wallet transaction flow before configuration is published. Simulation
+    Scenario Customer: Family Member / Child Wallet: Family Wallet Credential: RFID Wristband #CH-0045
+    Venue: Theme Park Device: F&B POS #12 Purc'
+branches:
+- at: 1
+  condition: Nothing has been set up on Wallet Usage & Channel Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Wallet Configuration Backend Structure v1.0 board 6 visited
+primaryContract: unknown
+contracts:
+- unknown

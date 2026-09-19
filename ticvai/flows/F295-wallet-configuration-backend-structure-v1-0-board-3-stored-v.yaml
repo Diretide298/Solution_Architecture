@@ -1,0 +1,140 @@
+id: F295
+name: 'Wallet Configuration Backend Structure v1.0 board 3: Stored Value & Credit Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Wallet Configuration Backend Structure v1.0 board 3. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-1103
+  entryPoints:
+  - Arrives at Stored Value & Credit Command Center
+steps:
+- step: 1
+  screen: BO-1103
+  action: Opens Stored Value & Credit Command Center
+  operations: []
+  outcome: Provide administrators with a centralized operational overview of all stored value and digital
+    credits held across TICVAI wallets.
+- step: 2
+  screen: BO-1104
+  action: Works in Credit Type Definition Studio
+  operations: []
+  outcome: Create and maintain the individual value buckets that can exist inside a TICVAI wallet. The
+    source explicitly requires support for different digital wallet credit types such as Cash Credit,
+    Bonus Credit, Redemption Tickets Credit and Rides
+- step: 3
+  screen: BO-1103
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-1105
+  action: Works in Credit Issuance Rule Configuration
+  operations: []
+  outcome: 'Define how credits enter a wallet after the wallet itself has already been funded or as the
+    result of another TICVAI business process. This screen is deliberately different from Board 2: Board
+    2 controls funding/payment into a wallet; this'
+- step: 5
+  screen: BO-1103
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-1106
+  action: Works in Credit Usage & Eligibility Rules
+  operations: []
+  outcome: Define exactly where and under what conditions each wallet credit may be consumed.
+- step: 7
+  screen: BO-1103
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-1107
+  action: Works in Consumption Priority Engine
+  operations: []
+  outcome: Configure which wallet balance TICVAI should consume first when multiple eligible credits can
+    pay for the same transaction. This directly addresses the source requirement that usage priority must
+    be configurable—for example, consuming Cash
+- step: 9
+  screen: BO-1103
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-1108
+  action: Works in Expiry & Validity Policy Configuration
+  operations: []
+  outcome: Configure how long each type of wallet value remains valid. The source requires configurable
+    expiry periods for all credit types, including the ability to configure unlimited validity, particularly
+    for cash credit.
+- step: 11
+  screen: BO-1103
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-1109
+  action: Works in FEFO & Credit Lot Management
+  operations: []
+  outcome: Control consumption when multiple lots of the same credit type have different expiry dates.
+    Requirement 4.3.19 specifically requires TICVAI to support FEFO — First Expiry, First Out.
+- step: 13
+  screen: BO-1103
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-1110
+  action: Works in Split Tender & Multi-Credit Consumption
+  operations: []
+  outcome: Configure transactions where multiple wallet credits and external payment methods are combined.
+- step: 15
+  screen: BO-1103
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-1111
+  action: Works in Credit Expiry, Extension & Forfeiture Operations
+  operations: []
+  outcome: Provide governed administrative management of credits approaching or reaching expiry.
+- step: 17
+  screen: BO-1103
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-1112
+  action: Works in Consumption Simulator, Validation & Rule Publication
+  operations: []
+  outcome: Allow administrators to test the entire credit engine before publishing new rules. This is
+    important because the interaction between eligibility, expiry, FEFO and priority can otherwise create
+    unintended wallet behavior. Test Scenario
+branches:
+- at: 1
+  condition: Nothing has been set up on Stored Value & Credit Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Wallet Configuration Backend Structure v1.0 board 3 visited
+primaryContract: unknown
+contracts:
+- unknown

@@ -1,0 +1,128 @@
+id: F218
+name: 'ACCREDITATION board 2: Accreditation Holder Directory'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as ACCREDITATION board 2. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-625
+  entryPoints:
+  - Arrives at Accreditation Holder Directory
+steps:
+- step: 1
+  screen: BO-625
+  action: Opens Accreditation Holder Directory
+  operations: []
+  outcome: Central searchable directory of all accreditation holders.
+- step: 2
+  screen: BO-626
+  action: Works in Accreditation Holder Profile
+  operations: []
+  outcome: Master profile screen for an accredited person.
+- step: 3
+  screen: BO-625
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-627
+  action: Works in Identity Details & Verification
+  operations: []
+  outcome: Capture identity data and verify the holder before approval.
+- step: 5
+  screen: BO-625
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-628
+  action: Works in Photo Management
+  operations: []
+  outcome: Manage accreditation holder photographs.
+- step: 7
+  screen: BO-625
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-629
+  action: Works in Document Repository
+  operations: []
+  outcome: Store and manage accreditation-related supporting documents.
+- step: 9
+  screen: BO-625
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-630
+  action: Works in Document Verification Queue
+  operations: []
+  outcome: Operational review queue for uploaded accreditation documentation.
+- step: 11
+  screen: BO-625
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-631
+  action: Works in Duplicate & Identity Conflict Detection
+  operations: []
+  outcome: Prevent duplicate holder records and potential identity conflicts.
+- step: 13
+  screen: BO-625
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-632
+  action: Works in Organization & Affiliation Management
+  operations: []
+  outcome: Link holders to their employer, contractor, media organization, government authority or sponsor.
+- step: 15
+  screen: BO-625
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-633
+  action: Works in Profile Completeness & Compliance Monitor
+  operations: []
+  outcome: Show whether a holder profile is ready to proceed to accreditation approval.
+- step: 17
+  screen: BO-625
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-634
+  action: Works in Profile History & Audit Timeline
+  operations: []
+  outcome: Provide a complete historical record of holder profile changes.
+branches:
+- at: 1
+  condition: Nothing has been set up on Accreditation Holder Directory yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on ACCREDITATION board 2 visited
+primaryContract: unknown
+contracts:
+- unknown

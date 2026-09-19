@@ -1,0 +1,148 @@
+id: F275
+name: 'Seat Management Venue Mapping Reference v1.0 board 2: Import Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Seat Management Venue Mapping Reference v1.0 board 2. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-963
+  entryPoints:
+  - Arrives at Import Command Center
+steps:
+- step: 1
+  screen: BO-963
+  action: Opens Import Command Center
+  operations: []
+  outcome: Monitor every seat-map import from submission to publication. Show queued, processing, completed,
+    failed and review-required jobs with source format, venue, owner and elapsed time. Display average
+    confidence, issue counts, model version and
+- step: 2
+  screen: BO-964
+  action: Works in PDF & Image Import
+  operations: []
+  outcome: Ingest PDF, PNG, JPG and supported scanned map sources. Provide drag-and-drop upload, page
+    selection, preview, crop, rotation, de-skew, contrast and noise-reduction controls. Calibrate scale
+    using known distance, dimensions or reference obj
+- step: 3
+  screen: BO-963
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-965
+  action: Works in SVG & CAD Import
+  operations: []
+  outcome: Convert vector and CAD geometry while preserving useful source layers. Support approved SVG,
+    DXF and DWG workflows with unit, scale, origin, coordinate and rotation mapping. Map source layers
+    to sections, rows, seats, aisles, stage, text, a
+- step: 5
+  screen: BO-963
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-966
+  action: Works in CSV & Excel Import
+  operations: []
+  outcome: Build maps or update seat master data from structured rows. Map columns for venue, level, section,
+    row, seat, coordinates, type, category, price band, accessibility and status. Configure delimiter,
+    header, encoding, sheet, data type, defaul
+- step: 7
+  screen: BO-963
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-967
+  action: Works in AI Section Recognition
+  operations: []
+  outcome: Recognize venue levels, sections and standing zones from source geometry. Display detected
+    boundaries, labels, hierarchy, capacity estimate and per-object confidence on the source preview.
+    Allow accept, reject, merge, split, rename and redr
+- step: 9
+  screen: BO-963
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-968
+  action: Works in AI Row & Seat Recognition
+  operations: []
+  outcome: Detect rows and individual seat positions at production scale. Recognize row curves, direction,
+    gaps, seat dots, repeated symbols and wheelchair spaces with confidence heat maps. Allow threshold,
+    gap, snap, spacing and symbol-class controls
+- step: 11
+  screen: BO-963
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-969
+  action: Works in AI Aisle, VIP & Accessibility
+  operations: []
+  outcome: Recognize special geometry and operational attributes that affect seating. Detect aisles, entrances,
+    exits, stages, VIP areas, suites, boxes, wheelchair positions and accessible routes. Show confidence,
+    source evidence and conflicts where a
+- step: 13
+  screen: BO-963
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-970
+  action: Works in AI Numbering & Labeling
+  operations: []
+  outcome: Generate consistent section, row and seat identifiers from recognized geometry. Configure alphabetic,
+    numeric, alphanumeric, odd/even, continuous, reset-by-row and venue-specific numbering patterns. Preview
+    before/after labels, direction, p
+- step: 15
+  screen: BO-963
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-971
+  action: Works in Validation & Correction
+  operations: []
+  outcome: Provide one controlled workspace for resolving AI and import exceptions. Compare the source
+    and generated map side by side with issue list, filters, severity and confidence. Offer manual draw,
+    move, split, merge, add, delete, renumber, rela
+- step: 17
+  screen: BO-963
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-972
+  action: Works in AI Venue Designer & Publish
+  operations: []
+  outcome: Generate or refine a seat map from a natural-language brief and release the approved result.
+    Accept venue type, dimensions, levels, target capacity, stage, section mix, accessibility and circulation
+    requirements. Generate multiple explainab
+branches:
+- at: 1
+  condition: Nothing has been set up on Import Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Seat Management Venue Mapping Reference v1.0 board 2 visited
+primaryContract: unknown
+contracts:
+- unknown

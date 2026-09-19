@@ -830,6 +830,7 @@ paths:
         - "P04 POS-011 Returns, Refunds & Exchanges"
         - "P04 POS-024 Outlet Setup"
         - "P08 BO-044 F&B Outlets"
+        - "P08 BO-728 Outlet Management"
       x-ticvai-audience: [staff]
       summary: List outlets
       description: >

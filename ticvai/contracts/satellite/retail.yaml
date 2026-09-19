@@ -1071,6 +1071,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-011 Wallet Overview"
+        - "P08 BO-469 Wallet & Deduction Transaction Monitor"
       x-ticvai-audience: [staff, guest]
       x-ticvai-read-routing: primary   # reconciling a disputed balance needs the current one
       summary: Wallet transaction history

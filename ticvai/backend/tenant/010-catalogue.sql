@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS catalogue.channel_capacity (
 -- Fixed, free or round-up. Posts to a liability account, not revenue — money collected for a
 -- charity is not the venue’s to recognise Hangs off: reaches catalogue.product through its keys;
 -- references ledger.account, platform.org_unit. Reached by: 2 operations read it and 2 write it; 1
--- tables reference it
+-- tables reference it.
 CREATE TABLE IF NOT EXISTS catalogue.donation_campaign (
     id                                uuid PRIMARY KEY,
     name                              text NOT NULL,
@@ -116,7 +116,7 @@ CREATE TABLE IF NOT EXISTS catalogue.event (
 
 -- Two-phase catalogue import (BL-057), following seating.ImportJob. A job that parses zero
 -- products is not a parsed job. Hangs off: reaches catalogue.product through its keys. Reached by:
--- 1 operations read it and 2 write it
+-- 1 operations read it and 2 write it.
 CREATE TABLE IF NOT EXISTS catalogue.import_job (
     id                                uuid PRIMARY KEY NOT NULL,
     status                            text NOT NULL,
@@ -275,7 +275,7 @@ CREATE TABLE IF NOT EXISTS catalogue.variant_dimension (
 -- Who asked to be told when a sold-out session frees up. Not a queue — a queue is people standing
 -- at a ride Hangs off: reaches catalogue.product through its keys; references
 -- catalogue.performance, catalogue.variant, pii.subject. Reached by: 3 operations read it and 3
--- write it
+-- write it.
 CREATE TABLE IF NOT EXISTS catalogue.waitlist_entry (
     id                                uuid PRIMARY KEY,
     performance_id                    uuid NOT NULL,

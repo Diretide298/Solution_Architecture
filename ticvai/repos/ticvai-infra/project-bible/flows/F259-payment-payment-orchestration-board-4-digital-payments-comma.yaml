@@ -1,0 +1,132 @@
+id: F259
+name: 'Payment Payment Orchestration board 4: Digital Payments Command Center\t71'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Payment Payment Orchestration board 4. **This route is read
+    from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-589
+  entryPoints:
+  - Arrives at Digital Payments Command Center\t71
+steps:
+- step: 1
+  screen: ADM-589
+  action: Opens Digital Payments Command Center\t71
+  operations: []
+  outcome: Provide centralized operational visibility across all digital and alternative payment journeys.
+- step: 2
+  screen: ADM-590
+  action: Works in Digital & Alternative Payment Method Manager\t71
+  operations: []
+  outcome: Configure the digital payment experiences available through TICVAI.
+- step: 3
+  screen: ADM-589
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-591
+  action: Works in Digital Wallet & Mobile Payment Configuration\t72
+  operations: []
+  outcome: Manage wallet-based and mobile digital payment methods.
+- step: 5
+  screen: ADM-589
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-592
+  action: Works in Payment Link Builder & Configuration\t73
+  operations: []
+  outcome: Allow authorized users and systems to generate secure payment requests without requiring the
+    customer to be physically present at a POS.
+- step: 7
+  screen: ADM-589
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-593
+  action: Works in Payment Link Distribution & Customer Journey Manager\t74
+  operations: []
+  outcome: Manage how a generated payment request is delivered and how its lifecycle progresses.
+- step: 9
+  screen: ADM-589
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-594
+  action: Works in Hosted Checkout, Redirect & Return Flow Configuration\t75
+  operations: []
+  outcome: Configure digital payment flows that require provider-hosted payment pages, redirects, SDKs,
+    or asynchronous customer journeys.
+- step: 11
+  screen: ADM-589
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-595
+  action: Works in Digital Payment Session & Transaction Monitor\t76
+  operations: []
+  outcome: Provide operational teams with real-time visibility into digital payment sessions.
+- step: 13
+  screen: ADM-589
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-596
+  action: Works in Authentication, Tokenization & Recurring Payment Controls\t78
+  operations: []
+  outcome: Manage digital-payment security capabilities and reusable payment references without turning
+    TICVAI into a card vault.
+- step: 15
+  screen: ADM-589
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-597
+  action: Works in Digital Payment Exception, Recovery & Expiry Center\t79
+  operations: []
+  outcome: Centralize operational handling of incomplete or abnormal digital-payment journeys.
+- step: 17
+  screen: ADM-589
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-598
+  action: Works in Digital Payment Simulator, Conversion & AI Advisor\t80
+  operations: []
+  outcome: Allow administrators to validate digital payment journeys and identify conversion opportunities
+    before deploying configuration changes.
+branches:
+- at: 1
+  condition: Nothing has been set up on Digital Payments Command Center\t71 yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Payment Payment Orchestration board 4 visited
+primaryContract: unknown
+contracts:
+- unknown

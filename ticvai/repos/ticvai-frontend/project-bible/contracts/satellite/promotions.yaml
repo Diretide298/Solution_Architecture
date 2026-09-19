@@ -1666,6 +1666,7 @@ paths:
       operationId: listPromotionCampaign
       x-ticvai-consumed-by:
         - "P09 ADM-139 Promotion & Campaign Directory"
+        - "P09 ADM-229 Campaign & Promotion Performance Explorer"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -1741,6 +1742,7 @@ paths:
     get:
       operationId: listCampaignCalendarTimeline
       x-ticvai-consumed-by:
+        - "P08 BO-765 Campaign Library & Calendar"
         - "P09 ADM-142 Campaign Calendar & Timeline"
       x-ticvai-audience:
         - staff
@@ -1818,6 +1820,7 @@ paths:
       operationId: listPromotionAlertException
       x-ticvai-consumed-by:
         - "P09 ADM-144 Promotion Alerts & Exception Center"
+        - "P16 ANL-018 Alerts & Exception Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -1856,6 +1859,7 @@ paths:
       operationId: listPromotionHealthPerformance
       x-ticvai-consumed-by:
         - "P09 ADM-146 Promotion Health & Performance Monitor"
+        - "P09 ADM-228 Promotion Performance Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -1932,6 +1936,7 @@ paths:
       operationId: setPromotionRule
       x-ticvai-consumed-by:
         - "P09 ADM-148 Promotion Rule Builder"
+        - "P09 ADM-210 Promotion Stacking Rule Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -2641,6 +2646,7 @@ paths:
     get:
       operationId: listRedemption
       x-ticvai-consumed-by:
+        - "P08 BO-444 Redemption Operations Dashboard"
         - "P09 ADM-167 Redemption Analytics, Audit & AI Optimization"
       x-ticvai-audience:
         - staff
@@ -3101,6 +3107,7 @@ paths:
     get:
       operationId: listAdvancedOfferGuardrail
       x-ticvai-consumed-by:
+        - "P09 ADM-168 Advanced Offer Command Center"
         - "P09 ADM-176 Advanced Offer Guardrails & Conflict Controls"
       x-ticvai-audience:
         - staff
@@ -3394,6 +3401,7 @@ paths:
     get:
       operationId: listBundlePricingCommercial
       x-ticvai-consumed-by:
+        - "P09 ADM-048 Commercial Pricing Command Center"
         - "P09 ADM-182 Bundle Pricing & Commercial Model"
       x-ticvai-audience:
         - staff
@@ -3632,6 +3640,7 @@ paths:
       operationId: listDynamicBundle
       x-ticvai-consumed-by:
         - "P09 ADM-188 Dynamic Bundle Operations Command Center"
+        - "P09 ADM-197 Dynamic Bundle Simulation & AI Optimization"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3822,7 +3831,9 @@ paths:
     get:
       operationId: listDynamicBundleRule
       x-ticvai-consumed-by:
+        - "P09 ADM-188 Dynamic Bundle Operations Command Center"
         - "P09 ADM-193 Dynamic Bundle Rule & Composition Engine"
+        - "P09 ADM-197 Dynamic Bundle Simulation & AI Optimization"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3862,7 +3873,10 @@ paths:
     get:
       operationId: listRealTimeAvailability
       x-ticvai-consumed-by:
+        - "P08 BO-518 Real-Time Availability Calendar"
+        - "P08 BO-997 Real-Time Availability & Locking"
         - "P09 ADM-194 Real-Time Availability & Checkout Validation"
+        - "P09 ADM-271 Real-Time Channel Availability & Inventory Monitor"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3977,6 +3991,7 @@ paths:
     get:
       operationId: listDynamicBundle2
       x-ticvai-consumed-by:
+        - "P09 ADM-188 Dynamic Bundle Operations Command Center"
         - "P09 ADM-197 Dynamic Bundle Simulation & AI Optimization"
       x-ticvai-audience:
         - staff
@@ -4103,6 +4118,7 @@ paths:
       operationId: setEligibilityRule
       x-ticvai-consumed-by:
         - "P09 ADM-199 Eligibility Rule Builder"
+        - "P09 ADM-279 Resale Eligibility Rule Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4411,6 +4427,7 @@ paths:
     get:
       operationId: listAudienceDiscoveryTargeting
       x-ticvai-consumed-by:
+        - "P08 BO-761 AI Audience Discovery"
         - "P09 ADM-207 AI Audience Discovery & Targeting Optimization"
       x-ticvai-audience:
         - staff
@@ -4525,6 +4542,7 @@ paths:
     put:
       operationId: setPromotionStackingRule
       x-ticvai-consumed-by:
+        - "P09 ADM-148 Promotion Rule Builder"
         - "P09 ADM-210 Promotion Stacking Rule Builder"
       x-ticvai-audience:
         - staff
@@ -5029,6 +5047,7 @@ paths:
     put:
       operationId: approveCampaignWorkflow
       x-ticvai-consumed-by:
+        - "P08 BO-770 Campaign Approval Workflow"
         - "P09 ADM-223 Campaign Approval Workflow Designer"
       x-ticvai-audience:
         - staff
@@ -5072,6 +5091,8 @@ paths:
     put:
       operationId: approveDecision
       x-ticvai-consumed-by:
+        - "P08 BO-374 Approval Decision Workspace"
+        - "P08 BO-642 Approval Decision History"
         - "P09 ADM-224 Approval Inbox & Decision Workspace"
       x-ticvai-audience:
         - staff
@@ -5192,6 +5213,7 @@ paths:
       operationId: listGovernanceRiskLaunch
       x-ticvai-consumed-by:
         - "P09 ADM-227 Governance Audit, AI Risk & Launch Readiness"
+        - "P09 ADM-365 Risk & Governance Analytics"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5229,7 +5251,9 @@ paths:
     get:
       operationId: listPromotionPerformance
       x-ticvai-consumed-by:
+        - "P09 ADM-146 Promotion Health & Performance Monitor"
         - "P09 ADM-228 Promotion Performance Command Center"
+        - "P09 ADM-229 Campaign & Promotion Performance Explorer"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5267,6 +5291,8 @@ paths:
     get:
       operationId: listCampaignPromotionPerformance
       x-ticvai-consumed-by:
+        - "P09 ADM-139 Promotion & Campaign Directory"
+        - "P09 ADM-228 Promotion Performance Command Center"
         - "P09 ADM-229 Campaign & Promotion Performance Explorer"
       x-ticvai-audience:
         - staff
@@ -5469,6 +5495,7 @@ paths:
       operationId: listUpsellCrossSell
       x-ticvai-consumed-by:
         - "P09 ADM-233 Upsell, Cross-Sell & Attach-Rate Analytics"
+        - "P09 ADM-659 Cross-Sell Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true

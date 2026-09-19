@@ -106,7 +106,18 @@ properties:
         # `wireframe` block drifted: a schema nothing reads is a document, not a constraint.
         # Widened to describe the prefixes that exist rather than renaming 363 screens, because
         # the id is what `board-data.js`, the traceability map and every board anchor join on.
-        id: { type: string, pattern: '^[A-Z]{2,3}-[0-9]{3}$' }
+        # **Widened to four digits on 19 September, for the same reason as 8 September.** P08
+        # passed 999 screens when 584 pack screens landed on it, and 199 ids from `BO-1000` up
+        # failed a rule that had silently assumed no platform would ever hold a thousand.
+        #
+        # **Splitting P08 does not fix this**, which is worth recording because it was the first
+        # answer tried: the over-999 ids are spread by allocation order, not by module — 102 sit
+        # in `Orders & Money` and 97 in `Access & Venue` — so moving one group out leaves the
+        # other failing. The ceiling is the pattern, and the split is a navigation decision that
+        # stands on its own.
+        #
+        # Three-digit ids stay valid, so nothing is renumbered and no contract reference moves.
+        id: { type: string, pattern: '^[A-Z]{2,3}-[0-9]{3,4}$' }
         name: { type: string }
         module: { type: string }
         requiresModule:

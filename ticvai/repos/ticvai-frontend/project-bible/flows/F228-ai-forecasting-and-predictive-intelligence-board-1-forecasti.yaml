@@ -1,0 +1,139 @@
+id: F228
+name: 'AI Forecasting and Predictive Intelligence board 1: Forecasting Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as AI Forecasting and Predictive Intelligence board 1. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-499
+  entryPoints:
+  - Arrives at Forecasting Command Center
+steps:
+- step: 1
+  screen: ADM-499
+  action: Opens Forecasting Command Center
+  operations: []
+  outcome: Provide management with one central view of expected attendance, demand and revenue across
+    venues and future periods.
+- step: 2
+  screen: ADM-500
+  action: Works in Forecast Configuration & Forecasting Strategy
+  operations: []
+  outcome: Configure what TICVAI should forecast, at what level of detail, for what horizon and how frequently
+    forecasts should be refreshed. This screen establishes the forecasting object.
+- step: 3
+  screen: ADM-499
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-501
+  action: Works in Forecast Data & Signal Configuration
+  operations: []
+  outcome: Define which historical, current and contextual signals may contribute to each forecast.
+- step: 5
+  screen: ADM-499
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-502
+  action: Works in Attendance & Visitation Forecast
+  operations: []
+  outcome: Provide detailed prediction of future venue attendance.
+- step: 7
+  screen: ADM-499
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-503
+  action: Works in Ticket, Product & Timeslot Demand Forecast
+  operations: []
+  outcome: Predict demand at the product and inventory level so TICVAI can understand what customers are
+    likely to buy, not only total attendance.
+- step: 9
+  screen: ADM-499
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-504
+  action: Works in Channel & Booking Pace Forecast
+  operations: []
+  outcome: Predict where and when future sales are expected to arrive. This is particularly useful because
+    a venue with 10,000 current bookings may still receive significant B2C, POS, reseller and walk-in
+    volume.
+- step: 11
+  screen: ADM-499
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-505
+  action: Works in Revenue & Commercial Forecast
+  operations: []
+  outcome: Forecast future revenue based on predicted sales, attendance, product mix, current pricing
+    and other approved commercial signals.
+- step: 13
+  screen: ADM-499
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-506
+  action: Works in Forecast Drivers, Confidence & Explainability
+  operations: []
+  outcome: 'Explain why the forecast changed and how much uncertainty exists. This is essential because
+    management should not receive only: “Tomorrow attendance = 16,120.” They need to understand the basis
+    and uncertainty. Forecast Attendance 16,120 Co'
+- step: 15
+  screen: ADM-499
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-507
+  action: Works in Forecast Scenario & What-If Simulator
+  operations: []
+  outcome: Allow management to test possible future conditions without changing production configuration.
+    This is one of the most important screens.
+- step: 17
+  screen: ADM-499
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-508
+  action: Works in Forecast Accuracy, Review & Publication Center
+  operations: []
+  outcome: 'Measure forecast quality over time and publish approved forecast outputs for use by other
+    TICVAI modules. A forecasting system should continuously answer: How accurate have our forecasts actually
+    been? Forecast vs Actual Example:'
+branches:
+- at: 1
+  condition: Nothing has been set up on Forecasting Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on AI Forecasting and Predictive Intelligence board 1 visited
+primaryContract: unknown
+contracts:
+- unknown

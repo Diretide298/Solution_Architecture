@@ -1,0 +1,139 @@
+id: F227
+name: 'AI Configuration Assistant board 3: AI Configuration Readiness Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as AI Configuration Assistant board 3. **This route is read
+    from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-489
+  entryPoints:
+  - Arrives at AI Configuration Readiness Center
+steps:
+- step: 1
+  screen: ADM-489
+  action: Opens AI Configuration Readiness Center
+  operations: []
+  outcome: Provide a final readiness assessment before the proposed Configuration Plan can enter approval
+    or execution. This is the first governance gate.
+- step: 2
+  screen: ADM-490
+  action: Works in Configuration Validation Results
+  operations: []
+  outcome: Provide detailed evidence that the proposed configuration has passed all required TICVAI validation
+    layers. Screen 1 provides the summary; Screen 2 provides the technical and business evidence.
+- step: 3
+  screen: ADM-489
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-491
+  action: Works in AI Recommendations & Best-Practice Review
+  operations: []
+  outcome: Separate mandatory configuration from AI recommendations so the administrator understands what
+    This is important for trust and governance.
+- step: 5
+  screen: ADM-489
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-492
+  action: Works in Configuration Approval Workflow
+  operations: []
+  outcome: Route the proposed AI configuration through TICVAI's existing RBAC/PBAC and approval governance
+    before execution. The AI Assistant should reuse the central TICVAI approval engine, not create an
+    independent approval system.
+- step: 7
+  screen: ADM-489
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-493
+  action: Works in AI Configuration Execution Center
+  operations: []
+  outcome: Execute the approved Configuration Plan against the appropriate TICVAI modules in a controlled
+    and traceable sequence. This is where proposed configuration becomes real TICVAI configuration.
+- step: 9
+  screen: ADM-489
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-494
+  action: Works in Execution Progress & Dependency Monitor
+  operations: []
+  outcome: Provide a detailed real-time view of execution dependencies, failures, retries, and downstream
+    configuration status.
+- step: 11
+  screen: ADM-489
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-495
+  action: Works in Configuration Results & Object Mapping
+  operations: []
+  outcome: Show exactly what TICVAI objects were created or changed after successful execution.
+- step: 13
+  screen: ADM-489
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-496
+  action: Works in Configuration Change & Modification Assistant
+  operations: []
+  outcome: Allow administrators to return later and modify existing TICVAI configuration through natural-language
+    AI. This is what transforms the feature from an onboarding wizard into a permanent AI configuration
+    capability.
+- step: 15
+  screen: ADM-489
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-497
+  action: Works in Configuration History, Versions & Rollback
+  operations: []
+  outcome: Maintain complete version history for AI-created and AI-modified configuration and provide
+    governed rollback capability where technically possible.
+- step: 17
+  screen: ADM-489
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-498
+  action: Works in AI Configuration Audit & Governance
+  operations: []
+  outcome: Provide an immutable governance record showing how AI participated in every configuration decision
+    and execution. This is essential for an enterprise AI system.
+branches:
+- at: 1
+  condition: Nothing has been set up on AI Configuration Readiness Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on AI Configuration Assistant board 3 visited
+primaryContract: unknown
+contracts:
+- unknown

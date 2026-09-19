@@ -7,15 +7,15 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-17",
+ "generated": "2026-09-19",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 69,
-  "operations": 20,
-  "contracts": 8,
+  "operations": 22,
+  "contracts": 10,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 87
+  "operationsWithNoScreen": 98
  },
  "waves": {
   "wave3": 69
@@ -47,11 +47,11 @@
    "operations": 3
   },
   {
-   "contract": "orders",
+   "contract": "tenancy",
    "operations": 1
   },
   {
-   "contract": "tenancy",
+   "contract": "identity",
    "operations": 1
   },
   {
@@ -59,7 +59,15 @@
    "operations": 1
   },
   {
-   "contract": "identity",
+   "contract": "access",
+   "operations": 1
+  },
+  {
+   "contract": "orders",
+   "operations": 1
+  },
+  {
+   "contract": "promotions",
    "operations": 1
   }
  ],
@@ -214,7 +222,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/alerts-exception-center-anl-018",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -682,7 +690,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/analytics-governance-security-audit-center-anl-070",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   }
  ],
@@ -1037,12 +1045,6 @@
     "summary": "Issue a complimentary entitlement, with no payment expected"
    },
    {
-    "operation": "listAbandonedCarts",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "Carts that lapsed without checking out"
-   },
-   {
     "operation": "listChargebacks",
     "contract": "orders",
     "verb": "GET",
@@ -1131,6 +1133,78 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Release an authorisation before it is captured"
+   },
+   {
+    "operation": "assignCoupon",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Assign a coupon to a named guest"
+   },
+   {
+    "operation": "createUpsellRule",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Create an upsell rule"
+   },
+   {
+    "operation": "createVoucherBatch",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Issue a voucher batch"
+   },
+   {
+    "operation": "deleteUpsellRule",
+    "contract": "promotions",
+    "verb": "DELETE",
+    "summary": "Remove an upsell rule"
+   },
+   {
+    "operation": "listAllocationSplits",
+    "contract": "promotions",
+    "verb": "GET",
+    "summary": "List allocation split definitions"
+   },
+   {
+    "operation": "listBundles",
+    "contract": "promotions",
+    "verb": "GET",
+    "summary": "List bundles"
+   },
+   {
+    "operation": "listVoucherBatches",
+    "contract": "promotions",
+    "verb": "GET",
+    "summary": "List voucher batches"
+   },
+   {
+    "operation": "previewAllocationSplit",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Preview how an amount divides"
+   },
+   {
+    "operation": "redeemVoucher",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Redeem voucher value against an order"
+   },
+   {
+    "operation": "setPromotionVariants",
+    "contract": "promotions",
+    "verb": "PUT",
+    "summary": "A/B test two versions against each other"
+   },
+   {
+    "operation": "updateBundle",
+    "contract": "promotions",
+    "verb": "PATCH",
+    "summary": "Amend a bundle"
+   },
+   {
+    "operation": "voidVoucher",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Cancel a voucher"
    },
    {
     "operation": "cancelReportExecution",

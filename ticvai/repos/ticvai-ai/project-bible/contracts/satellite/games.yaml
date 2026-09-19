@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Games & Redemption
   version: 0.1.0
-  x-ticvai-screen-count: 7
+  x-ticvai-screen-count: 8
   x-ticvai-tier: satellite
   x-ticvai-module: 10 — Games & F&B Integration
   x-ticvai-requirements: 25
@@ -96,6 +96,8 @@ paths:
   /reader-profiles:
     put:
       operationId: setReaderProfile
+      x-ticvai-consumed-by:
+        - "P08 BO-406 Reader Profile & Device Setup"
       summary: How a reader behaves and what it shows
       description: 'BL-153. **A guest at an arcade machine cannot read a message, they can only see a
         light.**

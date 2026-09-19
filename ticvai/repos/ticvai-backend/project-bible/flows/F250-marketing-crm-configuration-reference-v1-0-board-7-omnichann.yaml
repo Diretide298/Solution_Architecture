@@ -1,0 +1,148 @@
+id: F250
+name: 'Marketing CRM Configuration Reference v1.0 board 7: Omnichannel Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Marketing CRM Configuration Reference v1.0 board 7. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-794
+  entryPoints:
+  - Arrives at Omnichannel Command Center
+steps:
+- step: 1
+  screen: BO-794
+  action: Opens Omnichannel Command Center
+  operations: []
+  outcome: Monitor conversation demand, service level and commercial contribution. Show open, waiting,
+    SLA-risk and escalated conversations, bot containment, agent handover, response and resolution time.
+    Display CSAT, conversions, revenue and queue/ch
+- step: 2
+  screen: BO-795
+  action: Works in Unified Inbox
+  operations: []
+  outcome: Consolidate all guest conversations into one manageable queue. Ingest email, SMS, WhatsApp,
+    social, webchat, mobile-app chat and supported voice/messaging channels. Provide queue and channel
+    filters, assignment, priority, unread state, SLA
+- step: 3
+  screen: BO-794
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-796
+  action: Works in Guest Conversation 360
+  operations: []
+  outcome: Combine conversation history with the identified guest's CRM context. Resolve the guest and
+    display profile, value, tickets, reservations, membership, loyalty, wallet and open cases. Configuration
+    Scope of Work | Version 1.0 36 Show all pri
+- step: 5
+  screen: BO-794
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-797
+  action: Works in AI Chatbot Configuration
+  operations: []
+  outcome: Configure the AI assistant's identity, scope and operating controls. Set bot name, personality,
+    tone, supported languages, channels, operating hours and brand/venue context. Configure confidence
+    thresholds, fallback, authentication, guest-d
+- step: 7
+  screen: BO-794
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-798
+  action: Works in Intent & Knowledge Management
+  operations: []
+  outcome: Manage what the assistant understands and the information it may use. Maintain intents, example
+    phrases, entities, synonyms, redirects, confidence and response variants. Connect approved FAQs, product
+    data, policies, manuals and structured
+- step: 9
+  screen: BO-794
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-799
+  action: Works in Agent Workspace
+  operations: []
+  outcome: Give live agents the context and tools required to resolve conversations efficiently. Provide
+    active conversation, transcript, guest context, AI reply suggestion, canned responses and translation.
+    Support rich messages, attachments, interna
+- step: 11
+  screen: BO-794
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-800
+  action: Works in Routing & Queue Management
+  operations: []
+  outcome: Route work to the correct team and balance workload. Create rules by intent, skill, department,
+    venue, attraction, language, guest tier, priority and SLA risk. Configure queues, capacity, operating
+    hours, overflow, assignment method, worklo
+- step: 13
+  screen: BO-794
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-801
+  action: Works in Sales & Service Actions
+  operations: []
+  outcome: Allow agents and AI to perform governed transactional actions. Create or modify tickets and
+    reservations and view capacity, eligibility, price and policy before confirmation. Manage membership
+    information, loyalty rewards and wallet top-ups
+- step: 15
+  screen: BO-794
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-802
+  action: Works in Sentiment, Quality & Escalation
+  operations: []
+  outcome: Detect conversation risk and support consistent service quality. Analyze sentiment, emotion,
+    urgency, intent confidence, compliance and quality score in near real time. Configure thresholds for
+    supervisor alert, priority change, queue trans
+- step: 17
+  screen: BO-794
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-803
+  action: Works in Chat Analytics & Audit
+  operations: []
+  outcome: Measure channel, chatbot and agent performance and preserve conversation evidence. Report volume,
+    response, resolution, abandonment, containment, handover, transfer, conversion, revenue and CSAT.
+    Compare channel, queue, venue, intent, langu
+branches:
+- at: 1
+  condition: Nothing has been set up on Omnichannel Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Marketing CRM Configuration Reference v1.0 board 7 visited
+primaryContract: unknown
+contracts:
+- unknown

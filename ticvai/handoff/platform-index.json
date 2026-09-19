@@ -45,7 +45,7 @@
    "contracts": 19,
    "modules": 4,
    "undrawn": 0,
-   "operationsWithNoScreen": 172
+   "operationsWithNoScreen": 166
   },
   "waves": {
    "wave1": 27,
@@ -78,7 +78,7 @@
    "contracts": 17,
    "modules": 4,
    "undrawn": 0,
-   "operationsWithNoScreen": 125
+   "operationsWithNoScreen": 124
   },
   "waves": {
    "wave1": 25,
@@ -96,7 +96,7 @@
    "contracts": 5,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 32
+   "operationsWithNoScreen": 31
   },
   "waves": {
    "wave1": 11
@@ -107,17 +107,17 @@
   "app": "venue-management-web",
   "operator": "venue",
   "counts": {
-   "screens": 614,
-   "operations": 666,
+   "screens": 1182,
+   "operations": 691,
    "contracts": 27,
-   "modules": 11,
+   "modules": 13,
    "undrawn": 0,
-   "operationsWithNoScreen": 229
+   "operationsWithNoScreen": 223
   },
   "waves": {
    "wave1": 60,
    "wave2": 79,
-   "wave3": 475
+   "wave3": 1043
   }
  },
  "P09": {
@@ -125,17 +125,17 @@
   "app": "ticvai-web",
   "operator": "ticvai",
   "counts": {
-   "screens": 446,
-   "operations": 403,
+   "screens": 676,
+   "operations": 406,
    "contracts": 15,
-   "modules": 13,
+   "modules": 14,
    "undrawn": 0,
-   "operationsWithNoScreen": 150
+   "operationsWithNoScreen": 149
   },
   "waves": {
    "wave1": 12,
    "wave2": 16,
-   "wave3": 418
+   "wave3": 648
   }
  },
  "P10": {
@@ -198,7 +198,7 @@
    "contracts": 8,
    "modules": 3,
    "undrawn": 0,
-   "operationsWithNoScreen": 110
+   "operationsWithNoScreen": 109
   },
   "waves": {
    "wave2": 20,
@@ -244,11 +244,11 @@
   "operator": "venue",
   "counts": {
    "screens": 69,
-   "operations": 20,
-   "contracts": 8,
+   "operations": 22,
+   "contracts": 10,
    "modules": 1,
    "undrawn": 0,
-   "operationsWithNoScreen": 87
+   "operationsWithNoScreen": 98
   },
   "waves": {
    "wave3": 69

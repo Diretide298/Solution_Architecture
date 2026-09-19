@@ -1,0 +1,148 @@
+id: F252
+name: 'Marketing CRM Configuration Reference v1.0 board 9: Voice of Customer Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Marketing CRM Configuration Reference v1.0 board 9. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-814
+  entryPoints:
+  - Arrives at Voice of Customer Center
+steps:
+- step: 1
+  screen: BO-814
+  action: Opens Voice of Customer Center
+  operations: []
+  outcome: Provide a consolidated view of guest feedback and recovery performance. Show surveys sent,
+    response rate, NPS, CSAT, CES, review count, average rating and negative- feedback volume. Visualize
+    metric, rating, sentiment, topic and recovery tr
+- step: 2
+  screen: BO-815
+  action: Works in Survey Builder
+  operations: []
+  outcome: Create multilingual, accessible surveys without development. Provide rating, NPS, single choice,
+    multiple choice, text, matrix, date, media and information- section elements. Support question library,
+    templates, required fields, validation,
+- step: 3
+  screen: BO-814
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-816
+  action: Works in Survey Triggers & Distribution
+  operations: []
+  outcome: Control when, where and to whom a survey is sent. Trigger after purchase, visit, event, reservation,
+    membership interaction, case closure or inactivity. Distribute through email, SMS, WhatsApp, push,
+    mobile app, web, kiosk and QR where supp
+- step: 5
+  screen: BO-814
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-817
+  action: Works in NPS, CSAT & CES Configuration
+  operations: []
+  outcome: Define standardized experience metrics and follow-up thresholds. Configure metric definition,
+    scale, labels, score bands, calculation and rounding. Set targets, benchmarks, venue/category mappings
+    and reporting periods. Define detractor, lo
+- step: 7
+  screen: BO-814
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-818
+  action: Works in Survey Responses & Insights
+  operations: []
+  outcome: Review individual responses and their calculated insight. Show respondent/profile or anonymous
+    status, survey/version, answers, channel, timestamps and incentive outcome. Display NPS, CSAT, CES,
+    sentiment, topics, urgency and linked guest/t
+- step: 9
+  screen: BO-814
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-819
+  action: Works in Review Collection & Rating Rules
+  operations: []
+  outcome: Configure verified review and rating capture. Define review entities including attraction,
+    event, ticket, product, membership, venue, dining and employee/service. Configure overall and category
+    ratings, minimum/maximum scale, required comme
+- step: 11
+  screen: BO-814
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-820
+  action: Works in Moderation & Publishing
+  operations: []
+  outcome: Review and publish guest feedback safely and consistently. Provide moderation queue with channel,
+    rating, text, media, flags, sentiment, topic and SLA. Approve, reject, redact, escalate or request
+    follow-up using reason codes and permission
+- step: 13
+  screen: BO-814
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-821
+  action: Works in AI Sentiment & Topic Analysis
+  operations: []
+  outcome: Analyze feedback at scale using explainable AI. Classify sentiment, emotion, urgency, topics,
+    issue type and intent across survey and review text. Cluster recurring issues and summarize themes
+    by venue, product, event, language and time per
+- step: 15
+  screen: BO-814
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-822
+  action: Works in Service Recovery Automation
+  operations: []
+  outcome: Turn negative feedback into governed service action. Create rules for detractors, low CSAT,
+    high effort, negative review, urgent topic and repeated issue. Create and route a case, select priority,
+    notify the owner and recommend an approved
+- step: 17
+  screen: BO-814
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-823
+  action: Works in VOC Analytics & Audit
+  operations: []
+  outcome: Provide cross-source performance and governance reporting. Combine NPS, CSAT, CES, ratings,
+    sentiment, topics and response rates without double-counting guests. Benchmark venues, products, events,
+    categories, channels and periods and expose
+branches:
+- at: 1
+  condition: Nothing has been set up on Voice of Customer Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Marketing CRM Configuration Reference v1.0 board 9 visited
+primaryContract: unknown
+contracts:
+- unknown

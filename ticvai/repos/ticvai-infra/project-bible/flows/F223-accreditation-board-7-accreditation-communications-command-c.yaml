@@ -1,0 +1,128 @@
+id: F223
+name: 'ACCREDITATION board 7: Accreditation Communications Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as ACCREDITATION board 7. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-674
+  entryPoints:
+  - Arrives at Accreditation Communications Command Center
+steps:
+- step: 1
+  screen: BO-674
+  action: Opens Accreditation Communications Command Center
+  operations: []
+  outcome: Central dashboard for accreditation notifications and operational communications.
+- step: 2
+  screen: BO-675
+  action: Works in Notification Rule Management
+  operations: []
+  outcome: Configure when accreditation notifications are automatically triggered.
+- step: 3
+  screen: BO-674
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-676
+  action: Works in Expiry & Renewal Notification Scheduler
+  operations: []
+  outcome: Configure proactive reminders before accreditation expiry or renewal.
+- step: 5
+  screen: BO-674
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-677
+  action: Works in Communication Template Library
+  operations: []
+  outcome: Manage reusable accreditation communication templates.
+- step: 7
+  screen: BO-674
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-678
+  action: Works in Channel, Language & Branding Configuration
+  operations: []
+  outcome: Control how communications are delivered and branded.
+- step: 9
+  screen: BO-674
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-679
+  action: Works in Manual & Bulk Communication Center
+  operations: []
+  outcome: Allow authorized operators to communicate with selected accreditation populations.
+- step: 11
+  screen: BO-674
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-680
+  action: Works in Accreditation Bulk Import
+  operations: []
+  outcome: Import accreditation records at scale.
+- step: 13
+  screen: BO-674
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-681
+  action: Works in Import Validation & Processing Monitor
+  operations: []
+  outcome: Govern and monitor bulk accreditation imports.
+- step: 15
+  screen: BO-674
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-682
+  action: Works in Accreditation Export & Data Extract Center
+  operations: []
+  outcome: Export authorized accreditation data for operational or reporting purposes.
+- step: 17
+  screen: BO-674
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-683
+  action: Works in Delivery, Batch & Operational History
+  operations: []
+  outcome: Provide a consolidated history of notifications, communications, imports and exports.
+branches:
+- at: 1
+  condition: Nothing has been set up on Accreditation Communications Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on ACCREDITATION board 7 visited
+primaryContract: unknown
+contracts:
+- unknown

@@ -1739,13 +1739,34 @@ screens:
     route: /analytics/live-operations-dashboard-anl-012
     component: apps/venue-management-web/src/routes/analytics/LiveOperationsDashboard.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-001
+    - ANL-020
+    exitTo:
+    - ANL-001
+    - ANL-020
+    transitions:
+    - to: ANL-020
+      trigger: Back to Multi-Site & Performance Comparison
+      provenance: structural — pack board 1 wiring, 9 September 2026
+      back: true
+    - to: ANL-001
+      trigger: Executive Command Center
+      carries:
+      - dashboardId
+      - domain
+      - reportId
+      - venueId
+      provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
+        so an edge into it must carry them
   density: compact
+  purposeNote: Authorized operations users can identify the live status of each site and immediately drill
+    into abnormal conditions.
   pattern: commandCentre
   patternReason: the pack gives this screen a metric directory (§Display) and no per-row directory — measures
     over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's
   purpose: Provide a real-time view of what is happening across all operating locations.
-  purposeNote: Authorized operations users can identify the live status of each site and immediately drill
-    into abnormal conditions.
   layout:
     template: dashboard
     regions:
@@ -1815,10 +1836,26 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-012
+    workshopBoard: wireframes/WS172 Unified BI Reporting and AI Analytics Platform Board 1.dc.html#anl-012
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 4. 0 of 0 labels bound to a contract property; 14 of 21 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+- id: ANL-013
+  name: Revenue Pulse
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  source:
+    pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
+    board: '1'
+    number: '3'
+    page: 5
+  implementation:
+    app: venue-management-web
+    route: /analytics/revenue-pulse-anl-013
+    component: apps/venue-management-web/src/routes/analytics/RevenuePulse.tsx
+    status: notStarted
   navigation:
     entryFrom:
     - ANL-001
@@ -1840,28 +1877,13 @@ screens:
       - venueId
       provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
         so an edge into it must carry them
-- id: ANL-013
-  name: Revenue Pulse
-  module: Analytics
-  requiresModule: analytics
-  wave: 3
-  source:
-    pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
-    board: '1'
-    number: '3'
-    page: 5
-  implementation:
-    app: venue-management-web
-    route: /analytics/revenue-pulse-anl-013
-    component: apps/venue-management-web/src/routes/analytics/RevenuePulse.tsx
-    status: notStarted
   density: compact
+  purposeNote: Management can identify revenue performance and drill down from consolidated revenue to
+    site → business unit → channel → product → transaction level, subject to permissions.
   pattern: commandCentre
   patternReason: the pack gives this screen a metric directory (§Display) and no per-row directory — measures
     over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's
   purpose: Provide real-time visibility into revenue generation across TICVAI.
-  purposeNote: Management can identify revenue performance and drill down from consolidated revenue to
-    site → business unit → channel → product → transaction level, subject to permissions.
   layout:
     template: dashboard
     regions:
@@ -1925,10 +1947,26 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-013
+    workshopBoard: wireframes/WS172 Unified BI Reporting and AI Analytics Platform Board 1.dc.html#anl-013
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 5. 0 of 0 labels bound to a contract property; 12 of 21 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+- id: ANL-014
+  name: Attendance & Footfall Intelligence
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  source:
+    pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
+    board: '1'
+    number: '4'
+    page: 6
+  implementation:
+    app: venue-management-web
+    route: /analytics/attendance-footfall-intelligence-anl-014
+    component: apps/venue-management-web/src/routes/analytics/AttendanceFootfallIntelligence.tsx
+    status: notStarted
   navigation:
     entryFrom:
     - ANL-001
@@ -1950,28 +1988,13 @@ screens:
       - venueId
       provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
         so an edge into it must carry them
-- id: ANL-014
-  name: Attendance & Footfall Intelligence
-  module: Analytics
-  requiresModule: analytics
-  wave: 3
-  source:
-    pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
-    board: '1'
-    number: '4'
-    page: 6
-  implementation:
-    app: venue-management-web
-    route: /analytics/attendance-footfall-intelligence-anl-014
-    component: apps/venue-management-web/src/routes/analytics/AttendanceFootfallIntelligence.tsx
-    status: notStarted
   density: compact
+  purposeNote: Users can understand historical, current and forecast visitor volumes and drill into the
+    underlying attendance data.
   pattern: commandCentre
   patternReason: the pack gives this screen a metric directory (§Display) and no per-row directory — measures
     over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's
   purpose: Monitor visitor movement and attendance across venues.
-  purposeNote: Users can understand historical, current and forecast visitor volumes and drill into the
-    underlying attendance data.
   layout:
     template: dashboard
     regions:
@@ -2044,10 +2067,26 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-014
+    workshopBoard: wireframes/WS172 Unified BI Reporting and AI Analytics Platform Board 1.dc.html#anl-014
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 6. 0 of 0 labels bound to a contract property; 15 of 21 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+- id: ANL-015
+  name: Capacity & Utilization Monitor
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  source:
+    pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
+    board: '1'
+    number: '5'
+    page: 7
+  implementation:
+    app: venue-management-web
+    route: /analytics/capacity-utilization-monitor-anl-015
+    component: apps/venue-management-web/src/routes/analytics/CapacityUtilizationMonitor.tsx
+    status: notStarted
   navigation:
     entryFrom:
     - ANL-001
@@ -2069,28 +2108,13 @@ screens:
       - venueId
       provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
         so an edge into it must carry them
-- id: ANL-015
-  name: Capacity & Utilization Monitor
-  module: Analytics
-  requiresModule: analytics
-  wave: 3
-  source:
-    pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
-    board: '1'
-    number: '5'
-    page: 7
-  implementation:
-    app: venue-management-web
-    route: /analytics/capacity-utilization-monitor-anl-015
-    component: apps/venue-management-web/src/routes/analytics/CapacityUtilizationMonitor.tsx
-    status: notStarted
   density: compact
+  purposeNote: Users can identify underutilized, approaching-capacity and fully utilized locations/resources
+    in real time.
   pattern: commandCentre
   patternReason: the pack gives this screen a metric directory (§KPIs) and no per-row directory — measures
     over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's
   purpose: Provide centralized monitoring of available and consumed capacity.
-  purposeNote: Users can identify underutilized, approaching-capacity and fully utilized locations/resources
-    in real time.
   layout:
     template: dashboard
     regions:
@@ -2142,10 +2166,26 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-015
+    workshopBoard: wireframes/WS172 Unified BI Reporting and AI Analytics Platform Board 1.dc.html#anl-015
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 7. 0 of 0 labels bound to a contract property; 8 of 25 pack bullets carried onto the screen —
     the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the
     contracts rather than here.
+- id: ANL-016
+  name: Sales & Channel Performance
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  source:
+    pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
+    board: '1'
+    number: '6'
+    page: 7
+  implementation:
+    app: venue-management-web
+    route: /analytics/sales-channel-performance-anl-016
+    component: apps/venue-management-web/src/routes/analytics/SalesChannelPerformance.tsx
+    status: notStarted
   navigation:
     entryFrom:
     - ANL-001
@@ -2167,27 +2207,12 @@ screens:
       - venueId
       provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
         so an edge into it must carry them
-- id: ANL-016
-  name: Sales & Channel Performance
-  module: Analytics
-  requiresModule: analytics
-  wave: 3
-  source:
-    pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
-    board: '1'
-    number: '6'
-    page: 7
-  implementation:
-    app: venue-management-web
-    route: /analytics/sales-channel-performance-anl-016
-    component: apps/venue-management-web/src/routes/analytics/SalesChannelPerformance.tsx
-    status: notStarted
   density: compact
+  purposeNote: Management can compare channel profitability and sales performance from one dashboard.
   pattern: commandCentre
   patternReason: the pack gives this screen a metric directory (§KPIs) and no per-row directory — measures
     over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's
   purpose: Provide management with consolidated commercial performance across every sales channel.
-  purposeNote: Management can compare channel profitability and sales performance from one dashboard.
   layout:
     template: dashboard
     regions:
@@ -2251,10 +2276,26 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-016
+    workshopBoard: wireframes/WS172 Unified BI Reporting and AI Analytics Platform Board 1.dc.html#anl-016
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 7. 0 of 0 labels bound to a contract property; 12 of 28 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+- id: ANL-017
+  name: Customer, Membership & Loyalty Pulse
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  source:
+    pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
+    board: '1'
+    number: '7'
+    page: 8
+  implementation:
+    app: venue-management-web
+    route: /analytics/customer-membership-loyalty-pulse-anl-017
+    component: apps/venue-management-web/src/routes/analytics/CustomerMembershipLoyaltyPulse.tsx
+    status: notStarted
   navigation:
     entryFrom:
     - ANL-001
@@ -2276,27 +2317,12 @@ screens:
       - venueId
       provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
         so an edge into it must carry them
-- id: ANL-017
-  name: Customer, Membership & Loyalty Pulse
-  module: Analytics
-  requiresModule: analytics
-  wave: 3
-  source:
-    pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
-    board: '1'
-    number: '7'
-    page: 8
-  implementation:
-    app: venue-management-web
-    route: /analytics/customer-membership-loyalty-pulse-anl-017
-    component: apps/venue-management-web/src/routes/analytics/CustomerMembershipLoyaltyPulse.tsx
-    status: notStarted
   density: compact
+  purposeNote: Authorized users can understand customer acquisition, engagement, retention, membership
+    and loyalty performance without accessing separate CRM dashboards.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Provide a consolidated view of customer health and engagement.
-  purposeNote: Authorized users can understand customer acquisition, engagement, retention, membership
-    and loyalty performance without accessing separate CRM dashboards.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -2397,10 +2423,26 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-017
+    workshopBoard: wireframes/WS172 Unified BI Reporting and AI Analytics Platform Board 1.dc.html#anl-017
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 8. 0 of 22 labels bound to a contract property; 22 of 28 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+- id: ANL-018
+  name: Alerts & Exception Center
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  source:
+    pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
+    board: '1'
+    number: '8'
+    page: 9
+  implementation:
+    app: venue-management-web
+    route: /analytics/alerts-exception-center-anl-018
+    component: apps/venue-management-web/src/routes/analytics/AlertsExceptionCenter.tsx
+    status: notStarted
   navigation:
     entryFrom:
     - ANL-001
@@ -2422,27 +2464,12 @@ screens:
       - venueId
       provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
         so an edge into it must carry them
-- id: ANL-018
-  name: Alerts & Exception Center
-  module: Analytics
-  requiresModule: analytics
-  wave: 3
-  source:
-    pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
-    board: '1'
-    number: '8'
-    page: 9
-  implementation:
-    app: venue-management-web
-    route: /analytics/alerts-exception-center-anl-018
-    component: apps/venue-management-web/src/routes/analytics/AlertsExceptionCenter.tsx
-    status: notStarted
   density: compact
+  purposeNote: Management can identify and manage important business exceptions from a centralized queue.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Each Alert Shall Display) and no metric
     row
   purpose: Create one centralized location for management-level KPI and operational exceptions.
-  purposeNote: Management can identify and manage important business exceptions from a centralized queue.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -2505,7 +2532,11 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listPromotionAlertException
+    contract: promotions
+    purpose: Promotion Alerts & Exception Center
+    trigger: onLoad
   entryState:
     preloaded:
     - Severity
@@ -2517,31 +2548,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-018
+    workshopBoard: wireframes/WS172 Unified BI Reporting and AI Analytics Platform Board 1.dc.html#anl-018
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 9. 0 of 11 labels bound to a contract property; 11 of 33 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-001
-    - ANL-020
-    exitTo:
-    - ANL-001
-    - ANL-020
-    transitions:
-    - to: ANL-020
-      trigger: Back to Multi-Site & Performance Comparison
-      provenance: structural — pack board 1 wiring, 9 September 2026
-      back: true
-    - to: ANL-001
-      trigger: Executive Command Center
-      carries:
-      - dashboardId
-      - domain
-      - reportId
-      - venueId
-      provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
-        so an edge into it must carry them
 - id: ANL-019
   name: AI Management Insights
   module: Analytics
@@ -2557,44 +2568,6 @@ screens:
     route: /analytics/ai-management-insights-anl-019
     component: apps/venue-management-web/src/routes/analytics/AiManagementInsights.tsx
     status: notStarted
-  density: compact
-  pattern: listDetail
-  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
-    display directory, no configuration directory. It falls to the default, and the fallback is recorded
-    rather than passed off as a decision'
-  purpose: Provide management with proactive AI-generated business intelligence rather than requiring
-    users to manually analyze every dashboard.
-  purposeNote: Users receive explainable, traceable AI insights linked to the underlying supporting data.
-  gaps:
-  - operation: null
-    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
-      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
-      in them. The screen has no content region rather than an empty one, and it needs a person before
-      it is built.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 10
-  - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
-    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 10
-  layout:
-    template: split
-    regions: []
-  states:
-    loading: The insights list.
-    error: Could not load. Names which read failed and leaves the insights untouched.
-    emptyFirstRun: No insights yet. Carries the create action; distinct from a filter that matched nothing.
-    emptyNoResults: The filter narrowed it and the insights are still there. Names the active filter and
-      offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
-  apis: []
-  wireframe:
-    status: notStarted
-    board: wireframes/P16 Venue Analytics.dc.html#anl-019
-  apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
-    page 10. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen
-    — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
-    the contracts rather than here.
   navigation:
     entryFrom:
     - ANL-001
@@ -2616,6 +2589,47 @@ screens:
       - venueId
       provenance: derived — ANL-001 declares entryState.params dashboardId, domain, reportId, venueId,
         so an edge into it must carry them
+  density: compact
+  purposeNote: Users receive explainable, traceable AI insights linked to the underlying supporting data.
+  pattern: listDetail
+  patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
+    display directory, no configuration directory. It falls to the default, and the fallback is recorded
+    rather than passed off as a decision'
+  purpose: Provide management with proactive AI-generated business intelligence rather than requiring
+    users to manually analyze every dashboard.
+  gaps:
+  - operation: null
+    why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
+      acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
+      in them. The screen has no content region rather than an empty one, and it needs a person before
+      it is built.'
+    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 10
+  - operation: null
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
+      a default rather than a reading. It needs a person before it is built.'
+    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 10
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components: []
+  states:
+    loading: The insights list.
+    error: Could not load. Names which read failed and leaves the insights untouched.
+    emptyFirstRun: No insights yet. Carries the create action; distinct from a filter that matched nothing.
+    emptyNoResults: The filter narrowed it and the insights are still there. Names the active filter and
+      offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+  apis: []
+  wireframe:
+    status: notStarted
+    board: wireframes/P16 Venue Analytics.dc.html#anl-019
+    workshopBoard: wireframes/WS172 Unified BI Reporting and AI Analytics Platform Board 1.dc.html#anl-019
+  apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
+    page 10. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen
+    — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
+    the contracts rather than here.
 - id: ANL-020
   name: Multi-Site & Performance Comparison
   module: Analytics
@@ -2631,14 +2645,56 @@ screens:
     route: /analytics/multi-site-performance-comparison-anl-020
     component: apps/venue-management-web/src/routes/analytics/MultiSitePerformanceComparison.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-001
+    exitTo:
+    - ANL-001
+    - ANL-012
+    - ANL-013
+    - ANL-014
+    - ANL-015
+    - ANL-016
+    - ANL-017
+    - ANL-018
+    - ANL-019
+    transitions:
+    - to: ANL-001
+      trigger: Back to Executive Command Center
+      provenance: structural — pack board 1 wiring, 9 September 2026
+      back: true
+    - to: ANL-012
+      trigger: Live Operations Dashboard
+      provenance: structural — pack board 1 wiring, 9 September 2026
+    - to: ANL-013
+      trigger: Revenue Pulse
+      provenance: structural — pack board 1 wiring, 9 September 2026
+    - to: ANL-014
+      trigger: Attendance & Footfall Intelligence
+      provenance: structural — pack board 1 wiring, 9 September 2026
+    - to: ANL-015
+      trigger: Capacity & Utilization Monitor
+      provenance: structural — pack board 1 wiring, 9 September 2026
+    - to: ANL-016
+      trigger: Sales & Channel Performance
+      provenance: structural — pack board 1 wiring, 9 September 2026
+    - to: ANL-017
+      trigger: Customer, Membership & Loyalty Pulse
+      provenance: structural — pack board 1 wiring, 9 September 2026
+    - to: ANL-018
+      trigger: Alerts & Exception Center
+      provenance: structural — pack board 1 wiring, 9 September 2026
+    - to: ANL-019
+      trigger: AI Management Insights
+      provenance: structural — pack board 1 wiring, 9 September 2026
   density: compact
+  purposeNote: Management can benchmark operating entities using normalized KPIs and drill into the causes
+    of performance differences.
   pattern: commandCentre
   patternReason: the pack gives this screen a metric directory (§Comparison KPIs) and no per-row directory
     — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant
     licence's
   purpose: Allow enterprise management to compare sites, venues, attractions and business units.
-  purposeNote: Management can benchmark operating entities using normalized KPIs and drill into the causes
-    of performance differences.
   layout:
     template: dashboard
     regions:
@@ -2722,52 +2778,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-020
+    workshopBoard: wireframes/WS172 Unified BI Reporting and AI Analytics Platform Board 1.dc.html#anl-020
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 11. 0 of 0 labels bound to a contract property; 14 of 43 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-001
-    exitTo:
-    - ANL-001
-    - ANL-012
-    - ANL-013
-    - ANL-014
-    - ANL-015
-    - ANL-016
-    - ANL-017
-    - ANL-018
-    - ANL-019
-    transitions:
-    - to: ANL-001
-      trigger: Back to Executive Command Center
-      provenance: structural — pack board 1 wiring, 9 September 2026
-      back: true
-    - to: ANL-012
-      trigger: Live Operations Dashboard
-      provenance: structural — pack board 1 wiring, 9 September 2026
-    - to: ANL-013
-      trigger: Revenue Pulse
-      provenance: structural — pack board 1 wiring, 9 September 2026
-    - to: ANL-014
-      trigger: Attendance & Footfall Intelligence
-      provenance: structural — pack board 1 wiring, 9 September 2026
-    - to: ANL-015
-      trigger: Capacity & Utilization Monitor
-      provenance: structural — pack board 1 wiring, 9 September 2026
-    - to: ANL-016
-      trigger: Sales & Channel Performance
-      provenance: structural — pack board 1 wiring, 9 September 2026
-    - to: ANL-017
-      trigger: Customer, Membership & Loyalty Pulse
-      provenance: structural — pack board 1 wiring, 9 September 2026
-    - to: ANL-018
-      trigger: Alerts & Exception Center
-      provenance: structural — pack board 1 wiring, 9 September 2026
-    - to: ANL-019
-      trigger: AI Management Insights
-      provenance: structural — pack board 1 wiring, 9 September 2026
 - id: ANL-021
   name: Dashboard Library
   module: Analytics
@@ -2783,14 +2798,60 @@ screens:
     route: /analytics/dashboard-library-anl-021
     component: apps/venue-management-web/src/routes/analytics/DashboardLibrary.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-001
+    exitTo:
+    - ANL-001
+    - ANL-022
+    - ANL-023
+    - ANL-024
+    - ANL-025
+    - ANL-026
+    - ANL-027
+    - ANL-028
+    - ANL-029
+    - ANL-030
+    transitions:
+    - to: ANL-001
+      trigger: Back to Executive Command Center
+      provenance: structural — pack board 2 wiring, 9 September 2026
+      back: true
+    - to: ANL-030
+      trigger: Dashboard Preview, Validation & Health
+      provenance: structural — pack board 2 wiring, 9 September 2026
+    - to: ANL-022
+      trigger: Dashboard Creation Wizard
+      provenance: structural — pack board 2 wiring, 9 September 2026
+    - to: ANL-023
+      trigger: Drag-and-Drop Dashboard Canvas
+      provenance: structural — pack board 2 wiring, 9 September 2026
+    - to: ANL-024
+      trigger: Widget & Visualization Library
+      provenance: structural — pack board 2 wiring, 9 September 2026
+    - to: ANL-025
+      trigger: KPI Builder
+      provenance: structural — pack board 2 wiring, 9 September 2026
+    - to: ANL-026
+      trigger: Targets, Thresholds & KPI Status Rules
+      provenance: structural — pack board 2 wiring, 9 September 2026
+    - to: ANL-027
+      trigger: Data & Filter Configuration
+      provenance: structural — pack board 2 wiring, 9 September 2026
+    - to: ANL-028
+      trigger: Drill-Down & Interaction Designer
+      provenance: structural — pack board 2 wiring, 9 September 2026
+    - to: ANL-029
+      trigger: Dashboard Access, Publishing & Versioning
+      provenance: structural — pack board 2 wiring, 9 September 2026
   density: compact
+  purposeNote: Authorized users can search, filter, manage, clone and govern dashboards from one central
+    catalogue.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display dashboard cards/table containing;
     Dashboard Categories; Dashboard Types) and no metric row
   purpose: Provide a centralized catalogue for all standard, custom, AI-generated and embedded TICVAI
     dashboards.
-  purposeNote: Authorized users can search, filter, manage, clone and govern dashboards from one central
-    catalogue.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -2903,56 +2964,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-021
+    workshopBoard: wireframes/WS173 Unified BI Reporting and AI Analytics Platform Board 2.dc.html#anl-021
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 14. 0 of 31 labels bound to a contract property; 31 of 35 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-001
-    exitTo:
-    - ANL-001
-    - ANL-022
-    - ANL-023
-    - ANL-024
-    - ANL-025
-    - ANL-026
-    - ANL-027
-    - ANL-028
-    - ANL-029
-    - ANL-030
-    transitions:
-    - to: ANL-001
-      trigger: Back to Executive Command Center
-      provenance: structural — pack board 2 wiring, 9 September 2026
-      back: true
-    - to: ANL-030
-      trigger: Dashboard Preview, Validation & Health
-      provenance: structural — pack board 2 wiring, 9 September 2026
-    - to: ANL-022
-      trigger: Dashboard Creation Wizard
-      provenance: structural — pack board 2 wiring, 9 September 2026
-    - to: ANL-023
-      trigger: Drag-and-Drop Dashboard Canvas
-      provenance: structural — pack board 2 wiring, 9 September 2026
-    - to: ANL-024
-      trigger: Widget & Visualization Library
-      provenance: structural — pack board 2 wiring, 9 September 2026
-    - to: ANL-025
-      trigger: KPI Builder
-      provenance: structural — pack board 2 wiring, 9 September 2026
-    - to: ANL-026
-      trigger: Targets, Thresholds & KPI Status Rules
-      provenance: structural — pack board 2 wiring, 9 September 2026
-    - to: ANL-027
-      trigger: Data & Filter Configuration
-      provenance: structural — pack board 2 wiring, 9 September 2026
-    - to: ANL-028
-      trigger: Drill-Down & Interaction Designer
-      provenance: structural — pack board 2 wiring, 9 September 2026
-    - to: ANL-029
-      trigger: Dashboard Access, Publishing & Versioning
-      provenance: structural — pack board 2 wiring, 9 September 2026
 - id: ANL-022
   name: Dashboard Creation Wizard
   module: Analytics
@@ -2968,12 +2984,22 @@ screens:
     route: /analytics/dashboard-creation-wizard-anl-022
     component: apps/venue-management-web/src/routes/analytics/DashboardCreationWizard.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-021
+    exitTo:
+    - ANL-021
+    transitions:
+    - to: ANL-021
+      trigger: Back to Dashboard Library
+      provenance: structural — pack board 2 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: Users can create the initial dashboard configuration without technical/database knowledge.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Configure; Select; Select one
     or multiple domains) and no display directory — it is settings, not a population
   purpose: Guide users through creation of a new dashboard.
-  purposeNote: Users can create the initial dashboard configuration without technical/database knowledge.
   gaps:
   - operation: null
     why: '**Dashboard Creation Wizard declares no operation that writes anything** — its only declared
@@ -3053,20 +3079,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-022
+    workshopBoard: wireframes/WS173 Unified BI Reporting and AI Analytics Platform Board 2.dc.html#anl-022
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 15. 0 of 0 labels bound to a contract property; 18 of 31 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-021
-    exitTo:
-    - ANL-021
-    transitions:
-    - to: ANL-021
-      trigger: Back to Dashboard Library
-      provenance: structural — pack board 2 wiring, 9 September 2026
-      back: true
 - id: ANL-023
   name: Drag-and-Drop Dashboard Canvas
   module: Analytics
@@ -3082,13 +3099,23 @@ screens:
     route: /analytics/drag-and-drop-dashboard-canvas-anl-023
     component: apps/venue-management-web/src/routes/analytics/DragAndDropDashboardCanvas.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-021
+    exitTo:
+    - ANL-021
+    transitions:
+    - to: ANL-021
+      trigger: Back to Dashboard Library
+      provenance: structural — pack board 2 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: A business analyst can visually construct a dashboard without coding.
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Provide the main visual workspace for dashboard construction.
-  purposeNote: A business analyst can visually construct a dashboard without coding.
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -3102,7 +3129,9 @@ screens:
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 16
   layout:
     template: split
-    regions: []
+    regions:
+    - name: contentBody
+      components: []
   states:
     loading: The drag-and-drop canvas list.
     error: Could not load. Names which read failed and leaves the drag-and-drop canvas untouched.
@@ -3116,20 +3145,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-023
+    workshopBoard: wireframes/WS173 Unified BI Reporting and AI Analytics Platform Board 2.dc.html#anl-023
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 16. 0 of 0 labels bound to a contract property; 0 of 26 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-021
-    exitTo:
-    - ANL-021
-    transitions:
-    - to: ANL-021
-      trigger: Back to Dashboard Library
-      provenance: structural — pack board 2 wiring, 9 September 2026
-      back: true
 - id: ANL-024
   name: Widget & Visualization Library
   module: Analytics
@@ -3145,12 +3165,22 @@ screens:
     route: /analytics/widget-visualization-library-anl-024
     component: apps/venue-management-web/src/routes/analytics/WidgetVisualizationLibrary.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-021
+    exitTo:
+    - ANL-021
+    transitions:
+    - to: ANL-021
+      trigger: Back to Dashboard Library
+      provenance: structural — pack board 2 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: Authorized users can search the component library and drag supported visualizations directly
+    onto the dashboard canvas.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§KPI Components) and no metric row
   purpose: Provide reusable visual components for dashboard construction.
-  purposeNote: Authorized users can search the component library and drag supported visualizations directly
-    onto the dashboard canvas.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -3212,20 +3242,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-024
+    workshopBoard: wireframes/WS173 Unified BI Reporting and AI Analytics Platform Board 2.dc.html#anl-024
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 17. 0 of 6 labels bound to a contract property; 6 of 33 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-021
-    exitTo:
-    - ANL-021
-    transitions:
-    - to: ANL-021
-      trigger: Back to Dashboard Library
-      provenance: structural — pack board 2 wiring, 9 September 2026
-      back: true
 - id: ANL-025
   name: KPI Builder
   module: Analytics
@@ -3241,13 +3262,23 @@ screens:
     route: /analytics/kpi-builder-anl-025
     component: apps/venue-management-web/src/routes/analytics/KpiBuilder.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-021
+    exitTo:
+    - ANL-021
+    transitions:
+    - to: ANL-021
+      trigger: Back to Dashboard Library
+      provenance: structural — pack board 2 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: Administrators can centrally define reusable KPIs and ensure the same KPI calculation is
+    used across TICVAI dashboards.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Configure; Define whether) and
     no display directory — it is settings, not a population
   purpose: Allow authorized business users to create standardized enterprise KPIs.
-  purposeNote: Administrators can centrally define reusable KPIs and ensure the same KPI calculation is
-    used across TICVAI dashboards.
   gaps:
   - operation: null
     why: '**KPI Builder declares no operation that writes anything** — its only declared call is `none`,
@@ -3341,20 +3372,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-025
+    workshopBoard: wireframes/WS173 Unified BI Reporting and AI Analytics Platform Board 2.dc.html#anl-025
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 18. 0 of 0 labels bound to a contract property; 21 of 35 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-021
-    exitTo:
-    - ANL-021
-    transitions:
-    - to: ANL-021
-      trigger: Back to Dashboard Library
-      provenance: structural — pack board 2 wiring, 9 September 2026
-      back: true
 - id: ANL-026
   name: Targets, Thresholds & KPI Status Rules
   module: Analytics
@@ -3370,18 +3392,28 @@ screens:
     route: /analytics/targets-thresholds-kpi-status-rules-anl-026
     component: apps/venue-management-web/src/routes/analytics/TargetsThresholdsKpiStatusRules.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-021
+    exitTo:
+    - ANL-021
+    transitions:
+    - to: ANL-021
+      trigger: Back to Dashboard Library
+      provenance: structural — pack board 2 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: KPI status and alert behavior are calculated dynamically using centrally configured business
+    thresholds.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§For each KPI) and no metric row
   purpose: Configure how TICVAI determines whether KPI performance is healthy, warning or critical.
-  purposeNote: KPI status and alert behavior are calculated dynamically using centrally configured business
-    thresholds.
   gaps:
   - operation: null
-    why: '**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved:
-      Notify responsible user, Create operational task, Trigger AI analysis. Each needs an operation,
-      or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
-      rather than the contract side.'
+    why: '**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved:
+      If Critical → Generate Alert, Notify responsible user, Create operational task, Trigger AI analysis.
+      Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen
+      from the screen side rather than the contract side.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 19 §Users can configure
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -3431,6 +3463,10 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
+        label: If Critical → Generate Alert
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 19 §Users
+          can configure
+      - kind: secondaryButton
         label: Notify responsible user
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 19 §Users
           can configure
@@ -3463,20 +3499,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-026
+    workshopBoard: wireframes/WS173 Unified BI Reporting and AI Analytics Platform Board 2.dc.html#anl-026
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
-    page 19. 0 of 8 labels bound to a contract property; 11 of 31 pack bullets carried onto the screen
+    page 19. 0 of 8 labels bound to a contract property; 12 of 31 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-021
-    exitTo:
-    - ANL-021
-    transitions:
-    - to: ANL-021
-      trigger: Back to Dashboard Library
-      provenance: structural — pack board 2 wiring, 9 September 2026
-      back: true
 - id: ANL-027
   name: Data & Filter Configuration
   module: Analytics
@@ -3492,13 +3519,23 @@ screens:
     route: /analytics/data-filter-configuration-anl-027
     component: apps/venue-management-web/src/routes/analytics/DataFilterConfiguration.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-021
+    exitTo:
+    - ANL-021
+    transitions:
+    - to: ANL-021
+      trigger: Back to Dashboard Library
+      provenance: structural — pack board 2 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: Users can configure dashboard data and filters without direct access to underlying production
+    databases.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Select; Configure) and no display
     directory — it is settings, not a population
   purpose: Control what data a dashboard/widget uses and how users can filter it.
-  purposeNote: Users can configure dashboard data and filters without direct access to underlying production
-    databases.
   layout:
     template: form
     regions:
@@ -3586,20 +3623,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-027
+    workshopBoard: wireframes/WS173 Unified BI Reporting and AI Analytics Platform Board 2.dc.html#anl-027
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 20. 0 of 6 labels bound to a contract property; 22 of 40 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-021
-    exitTo:
-    - ANL-021
-    transitions:
-    - to: ANL-021
-      trigger: Back to Dashboard Library
-      provenance: structural — pack board 2 wiring, 9 September 2026
-      back: true
 - id: ANL-028
   name: Drill-Down & Interaction Designer
   module: Analytics
@@ -3615,12 +3643,22 @@ screens:
     route: /analytics/drill-down-interaction-designer-anl-028
     component: apps/venue-management-web/src/routes/analytics/DrillDownInteractionDesigner.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-021
+    exitTo:
+    - ANL-021
+    transitions:
+    - to: ANL-021
+      trigger: Back to Dashboard Library
+      provenance: structural — pack board 2 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: Dashboard designers can visually configure analytical navigation without custom development.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Define) and no display directory
     — it is settings, not a population
   purpose: Configure how users move from high-level KPIs into deeper analytics.
-  purposeNote: Dashboard designers can visually configure analytical navigation without custom development.
   gaps:
   - operation: null
     why: '**Drill-Down & Interaction Designer declares no operation that writes anything** — its only
@@ -3671,20 +3709,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-028
+    workshopBoard: wireframes/WS173 Unified BI Reporting and AI Analytics Platform Board 2.dc.html#anl-028
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 22. 0 of 0 labels bound to a contract property; 9 of 24 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-021
-    exitTo:
-    - ANL-021
-    transitions:
-    - to: ANL-021
-      trigger: Back to Dashboard Library
-      provenance: structural — pack board 2 wiring, 9 September 2026
-      back: true
 - id: ANL-029
   name: Dashboard Access, Publishing & Versioning
   module: Analytics
@@ -3700,12 +3729,22 @@ screens:
     route: /analytics/dashboard-access-publishing-versioning-anl-029
     component: apps/venue-management-web/src/routes/analytics/DashboardAccessPublishingVersioning.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-021
+    exitTo:
+    - ANL-021
+    transitions:
+    - to: ANL-021
+      trigger: Back to Dashboard Library
+      provenance: structural — pack board 2 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: Only authorized and approved dashboard configurations become available to production users,
+    with complete version history.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Govern who can access dashboards and how dashboard changes reach production.
-  purposeNote: Only authorized and approved dashboard configurations become available to production users,
-    with complete version history.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -3767,20 +3806,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-029
+    workshopBoard: wireframes/WS173 Unified BI Reporting and AI Analytics Platform Board 2.dc.html#anl-029
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 23. 0 of 6 labels bound to a contract property; 6 of 20 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-021
-    exitTo:
-    - ANL-021
-    transitions:
-    - to: ANL-021
-      trigger: Back to Dashboard Library
-      provenance: structural — pack board 2 wiring, 9 September 2026
-      back: true
 - id: ANL-030
   name: Dashboard Preview, Validation & Health
   module: Analytics
@@ -3796,12 +3826,22 @@ screens:
     route: /analytics/dashboard-preview-validation-health-anl-030
     component: apps/venue-management-web/src/routes/analytics/DashboardPreviewValidationHealth.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-021
+    exitTo:
+    - ANL-021
+    transitions:
+    - to: ANL-021
+      trigger: Back to Dashboard Library
+      provenance: structural — pack board 2 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: The system prevents dashboards containing critical configuration or security errors from
+    being published.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Validate dashboards before publication and monitor their technical/analytical health afterward.
-  purposeNote: The system prevents dashboards containing critical configuration or security errors from
-    being published.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -3869,20 +3909,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-030
+    workshopBoard: wireframes/WS173 Unified BI Reporting and AI Analytics Platform Board 2.dc.html#anl-030
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 23. 0 of 9 labels bound to a contract property; 9 of 47 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-021
-    exitTo:
-    - ANL-021
-    transitions:
-    - to: ANL-021
-      trigger: Back to Dashboard Library
-      provenance: structural — pack board 2 wiring, 9 September 2026
-      back: true
 - id: ANL-031
   name: Report Catalogue & Library
   module: Analytics
@@ -3898,14 +3929,60 @@ screens:
     route: /analytics/report-catalogue-library-anl-031
     component: apps/venue-management-web/src/routes/analytics/ReportCatalogueLibrary.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-001
+    exitTo:
+    - ANL-001
+    - ANL-032
+    - ANL-033
+    - ANL-034
+    - ANL-035
+    - ANL-036
+    - ANL-037
+    - ANL-038
+    - ANL-039
+    - ANL-040
+    transitions:
+    - to: ANL-001
+      trigger: Back to Executive Command Center
+      provenance: structural — pack board 3 wiring, 9 September 2026
+      back: true
+    - to: ANL-040
+      trigger: Save, Run & Report Results Viewer
+      provenance: structural — pack board 3 wiring, 9 September 2026
+    - to: ANL-032
+      trigger: Report Creation Wizard
+      provenance: structural — pack board 3 wiring, 9 September 2026
+    - to: ANL-033
+      trigger: Data Domain & Dataset Selector
+      provenance: structural — pack board 3 wiring, 9 September 2026
+    - to: ANL-034
+      trigger: Field & Column Selector
+      provenance: structural — pack board 3 wiring, 9 September 2026
+    - to: ANL-035
+      trigger: Filter & Parameter Builder
+      provenance: structural — pack board 3 wiring, 9 September 2026
+    - to: ANL-036
+      trigger: Grouping, Aggregation & Calculation Builder
+      provenance: structural — pack board 3 wiring, 9 September 2026
+    - to: ANL-037
+      trigger: Cross-Domain Report Composer
+      provenance: structural — pack board 3 wiring, 9 September 2026
+    - to: ANL-038
+      trigger: Report Layout & Formatting Designer
+      provenance: structural — pack board 3 wiring, 9 September 2026
+    - to: ANL-039
+      trigger: Report Preview, Test & Validation
+      provenance: structural — pack board 3 wiring, 9 September 2026
   density: compact
+  purposeNote: Users can search, filter, organize and access authorized reports from one centralized report
+    library.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Each report shall display) and no metric
     row
   purpose: Provide a centralized repository containing all TICVAI standard, custom, scheduled and AI-generated
     reports.
-  purposeNote: Users can search, filter, organize and access authorized reports from one centralized report
-    library.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -3984,56 +4061,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-031
+    workshopBoard: wireframes/WS174 Unified BI Reporting and AI Analytics Platform Board 3.dc.html#anl-031
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 27. 0 of 13 labels bound to a contract property; 13 of 39 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-001
-    exitTo:
-    - ANL-001
-    - ANL-032
-    - ANL-033
-    - ANL-034
-    - ANL-035
-    - ANL-036
-    - ANL-037
-    - ANL-038
-    - ANL-039
-    - ANL-040
-    transitions:
-    - to: ANL-001
-      trigger: Back to Executive Command Center
-      provenance: structural — pack board 3 wiring, 9 September 2026
-      back: true
-    - to: ANL-040
-      trigger: Save, Run & Report Results Viewer
-      provenance: structural — pack board 3 wiring, 9 September 2026
-    - to: ANL-032
-      trigger: Report Creation Wizard
-      provenance: structural — pack board 3 wiring, 9 September 2026
-    - to: ANL-033
-      trigger: Data Domain & Dataset Selector
-      provenance: structural — pack board 3 wiring, 9 September 2026
-    - to: ANL-034
-      trigger: Field & Column Selector
-      provenance: structural — pack board 3 wiring, 9 September 2026
-    - to: ANL-035
-      trigger: Filter & Parameter Builder
-      provenance: structural — pack board 3 wiring, 9 September 2026
-    - to: ANL-036
-      trigger: Grouping, Aggregation & Calculation Builder
-      provenance: structural — pack board 3 wiring, 9 September 2026
-    - to: ANL-037
-      trigger: Cross-Domain Report Composer
-      provenance: structural — pack board 3 wiring, 9 September 2026
-    - to: ANL-038
-      trigger: Report Layout & Formatting Designer
-      provenance: structural — pack board 3 wiring, 9 September 2026
-    - to: ANL-039
-      trigger: Report Preview, Test & Validation
-      provenance: structural — pack board 3 wiring, 9 September 2026
 - id: ANL-032
   name: Report Creation Wizard
   module: Analytics
@@ -4049,14 +4081,24 @@ screens:
     route: /analytics/report-creation-wizard-anl-032
     component: apps/venue-management-web/src/routes/analytics/ReportCreationWizard.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-031
+    exitTo:
+    - ANL-031
+    transitions:
+    - to: ANL-031
+      trigger: Back to Report Catalogue & Library
+      provenance: structural — pack board 3 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: An authorized business user can create the initial structure of a report without knowing
+    the underlying database schema.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Configure; Select one or multiple
     domains) and no display directory — it is settings, not a population
   purpose: Guide users through creation of a new report without requiring technical knowledge. Step 1
     — Report Information
-  purposeNote: An authorized business user can create the initial structure of a report without knowing
-    the underlying database schema.
   gaps:
   - operation: null
     why: '**Report Creation Wizard declares no operation that writes anything** — its only declared call
@@ -4109,20 +4151,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-032
+    workshopBoard: wireframes/WS174 Unified BI Reporting and AI Analytics Platform Board 3.dc.html#anl-032
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 28. 0 of 0 labels bound to a contract property; 9 of 29 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-031
-    exitTo:
-    - ANL-031
-    transitions:
-    - to: ANL-031
-      trigger: Back to Report Catalogue & Library
-      provenance: structural — pack board 3 wiring, 9 September 2026
-      back: true
 - id: ANL-033
   name: Data Domain & Dataset Selector
   module: Analytics
@@ -4138,12 +4171,22 @@ screens:
     route: /analytics/data-domain-dataset-selector-anl-033
     component: apps/venue-management-web/src/routes/analytics/DataDomainDatasetSelector.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-031
+    exitTo:
+    - ANL-031
+    transitions:
+    - to: ANL-031
+      trigger: Back to Report Catalogue & Library
+      provenance: structural — pack board 3 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: Only approved semantic datasets shall be exposed to report creators; direct production-database
+    access shall not be required.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
   purpose: Allow users to select approved TICVAI data sources for reporting.
-  purposeNote: Only approved semantic datasets shall be exposed to report creators; direct production-database
-    access shall not be required.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -4209,20 +4252,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-033
+    workshopBoard: wireframes/WS174 Unified BI Reporting and AI Analytics Platform Board 3.dc.html#anl-033
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 29. 0 of 8 labels bound to a contract property; 8 of 19 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-031
-    exitTo:
-    - ANL-031
-    transitions:
-    - to: ANL-031
-      trigger: Back to Report Catalogue & Library
-      provenance: structural — pack board 3 wiring, 9 September 2026
-      back: true
 - id: ANL-034
   name: Field & Column Selector
   module: Analytics
@@ -4238,18 +4272,29 @@ screens:
     route: /analytics/field-column-selector-anl-034
     component: apps/venue-management-web/src/routes/analytics/FieldColumnSelector.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-031
+    exitTo:
+    - ANL-031
+    transitions:
+    - to: ANL-031
+      trigger: Back to Report Catalogue & Library
+      provenance: structural — pack board 3 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: Users can construct the report output using approved business-friendly field names.
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Allow users to visually select which information appears in the report.
-  purposeNote: Users can construct the report output using approved business-friendly field names.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved:
-      Configure formatting. Each needs an operation, or needs removing from the screen; this is the Phase
-      3 reconciliation seen from the screen side rather than the contract side.'
+    why: '**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved:
+      Reorder columns, Rename display labels, Set width, Configure formatting. Each needs an operation,
+      or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
+      rather than the contract side.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 30 §Users can
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -4268,9 +4313,23 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
+        label: Reorder columns
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 30 §Users
+          can
+      - kind: secondaryButton
+        label: Rename display labels
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 30 §Users
+          can
+      - kind: secondaryButton
+        label: Set width
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 30 §Users
+          can
+      - kind: secondaryButton
         label: Configure formatting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 30 §Users
           can
+    - name: contentBody
+      components: []
   states:
     loading: The field column selector list.
     error: Could not load. Names which read failed and leaves the field column selector untouched.
@@ -4284,20 +4343,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-034
+    workshopBoard: wireframes/WS174 Unified BI Reporting and AI Analytics Platform Board 3.dc.html#anl-034
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
-    page 30. 0 of 0 labels bound to a contract property; 1 of 34 pack bullets carried onto the screen
+    page 30. 0 of 0 labels bound to a contract property; 4 of 34 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-031
-    exitTo:
-    - ANL-031
-    transitions:
-    - to: ANL-031
-      trigger: Back to Report Catalogue & Library
-      provenance: structural — pack board 3 wiring, 9 September 2026
-      back: true
 - id: ANL-035
   name: Filter & Parameter Builder
   module: Analytics
@@ -4313,13 +4363,23 @@ screens:
     route: /analytics/filter-parameter-builder-anl-035
     component: apps/venue-management-web/src/routes/analytics/FilterParameterBuilder.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-031
+    exitTo:
+    - ANL-031
+    transitions:
+    - to: ANL-031
+      trigger: Back to Report Catalogue & Library
+      provenance: structural — pack board 3 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: Users can create complex report filters without SQL or technical query syntax.
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Allow report creators to define which records are included.
-  purposeNote: Users can create complex report filters without SQL or technical query syntax.
   gaps:
   - operation: null
     why: '**Filter & Parameter Builder declares no operation that writes anything** — its only declared
@@ -4374,20 +4434,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-035
+    workshopBoard: wireframes/WS174 Unified BI Reporting and AI Analytics Platform Board 3.dc.html#anl-035
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 31. 0 of 14 labels bound to a contract property; 14 of 35 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-031
-    exitTo:
-    - ANL-031
-    transitions:
-    - to: ANL-031
-      trigger: Back to Report Catalogue & Library
-      provenance: structural — pack board 3 wiring, 9 September 2026
-      back: true
 - id: ANL-036
   name: Grouping, Aggregation & Calculation Builder
   module: Analytics
@@ -4403,13 +4454,23 @@ screens:
     route: /analytics/grouping-aggregation-calculation-builder-anl-036
     component: apps/venue-management-web/src/routes/analytics/GroupingAggregationCalculationBuilder.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-031
+    exitTo:
+    - ANL-031
+    transitions:
+    - to: ANL-031
+      trigger: Back to Report Catalogue & Library
+      provenance: structural — pack board 3 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: Business users can create summaries and derived metrics using governed calculation tools.
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Turn detailed transactional data into meaningful management reporting.
-  purposeNote: Business users can create summaries and derived metrics using governed calculation tools.
   gaps:
   - operation: null
     why: '**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved:
@@ -4473,20 +4534,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-036
+    workshopBoard: wireframes/WS174 Unified BI Reporting and AI Analytics Platform Board 3.dc.html#anl-036
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 32. 0 of 11 labels bound to a contract property; 12 of 32 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-031
-    exitTo:
-    - ANL-031
-    transitions:
-    - to: ANL-031
-      trigger: Back to Report Catalogue & Library
-      provenance: structural — pack board 3 wiring, 9 September 2026
-      back: true
 - id: ANL-037
   name: Cross-Domain Report Composer
   module: Analytics
@@ -4502,15 +4554,25 @@ screens:
     route: /analytics/cross-domain-report-composer-anl-037
     component: apps/venue-management-web/src/routes/analytics/CrossDomainReportComposer.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-031
+    exitTo:
+    - ANL-031
+    transitions:
+    - to: ANL-031
+      trigger: Back to Report Catalogue & Library
+      provenance: structural — pack board 3 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: Authorized users can create cross-domain analytics while maintaining governed data relationships
+    and security.
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Allow authorized users to combine information across multiple TICVAI modules. This is one of
     the most important capabilities of Board 3.
-  purposeNote: Authorized users can create cross-domain analytics while maintaining governed data relationships
-    and security.
   gaps:
   - operation: null
     why: '**Cross-Domain Report Composer declares no operation that writes anything** — its only declared
@@ -4529,7 +4591,9 @@ screens:
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 34
   layout:
     template: split
-    regions: []
+    regions:
+    - name: contentBody
+      components: []
   states:
     loading: The cross-domain report composer list.
     error: Could not load. Names which read failed and leaves the cross-domain report composer untouched.
@@ -4543,20 +4607,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-037
+    workshopBoard: wireframes/WS174 Unified BI Reporting and AI Analytics Platform Board 3.dc.html#anl-037
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 34. 0 of 0 labels bound to a contract property; 0 of 24 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-031
-    exitTo:
-    - ANL-031
-    transitions:
-    - to: ANL-031
-      trigger: Back to Report Catalogue & Library
-      provenance: structural — pack board 3 wiring, 9 September 2026
-      back: true
 - id: ANL-038
   name: Report Layout & Formatting Designer
   module: Analytics
@@ -4572,14 +4627,29 @@ screens:
     route: /analytics/report-layout-formatting-designer-anl-038
     component: apps/venue-management-web/src/routes/analytics/ReportLayoutFormattingDesigner.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-031
+    exitTo:
+    - ANL-031
+    transitions:
+    - to: ANL-031
+      trigger: Back to Report Catalogue & Library
+      provenance: structural — pack board 3 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: Users can produce professional reports suitable for operational, financial and management
+    use.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Configure) and no display directory
     — it is settings, not a population
   purpose: Control how the final report is displayed.
-  purposeNote: Users can produce professional reports suitable for operational, financial and management
-    use.
   gaps:
+  - operation: null
+    why: '**The pack names 2 actions on this screen and the screen declares 0 operations.** Unserved:
+      TICVAI branding, Report logo. Each needs an operation, or needs removing from the screen; this is
+      the Phase 3 reconciliation seen from the screen side rather than the contract side.'
+    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Support
   - operation: null
     why: '**Report Layout & Formatting Designer declares no operation that writes anything** — its only
       declared call is `none`, a read. The name promises authoring and the contract offers none, so either
@@ -4612,6 +4682,15 @@ screens:
       - kind: selectField
         label: Conditional formatting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Configure
+    - name: actionBar
+      slot: publish
+      components:
+      - kind: primaryButton
+        label: TICVAI branding
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Support
+      - kind: secondaryButton
+        label: Report logo
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Support
   states:
     loading: The report layout formatting configuration as saved.
     error: Could not load. Names which read failed and leaves the report layout formatting untouched.
@@ -4623,20 +4702,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-038
+    workshopBoard: wireframes/WS174 Unified BI Reporting and AI Analytics Platform Board 3.dc.html#anl-038
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
-    page 35. 0 of 0 labels bound to a contract property; 7 of 26 pack bullets carried onto the screen
+    page 35. 0 of 0 labels bound to a contract property; 9 of 26 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-031
-    exitTo:
-    - ANL-031
-    transitions:
-    - to: ANL-031
-      trigger: Back to Report Catalogue & Library
-      provenance: structural — pack board 3 wiring, 9 September 2026
-      back: true
 - id: ANL-039
   name: Report Preview, Test & Validation
   module: Analytics
@@ -4652,11 +4722,21 @@ screens:
     route: /analytics/report-preview-test-validation-anl-039
     component: apps/venue-management-web/src/routes/analytics/ReportPreviewTestValidation.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-031
+    exitTo:
+    - ANL-031
+    transitions:
+    - to: ANL-031
+      trigger: Back to Report Catalogue & Library
+      provenance: structural — pack board 3 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: Critical data, security or calculation issues must be identified before the report is published.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Allow users to verify report accuracy before saving or publishing it.
-  purposeNote: Critical data, security or calculation issues must be identified before the report is published.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -4721,20 +4801,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-039
+    workshopBoard: wireframes/WS174 Unified BI Reporting and AI Analytics Platform Board 3.dc.html#anl-039
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 36. 0 of 8 labels bound to a contract property; 8 of 23 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-031
-    exitTo:
-    - ANL-031
-    transitions:
-    - to: ANL-031
-      trigger: Back to Report Catalogue & Library
-      provenance: structural — pack board 3 wiring, 9 September 2026
-      back: true
 - id: ANL-040
   name: Save, Run & Report Results Viewer
   module: Analytics
@@ -4750,15 +4821,25 @@ screens:
     route: /analytics/save-run-report-results-viewer-anl-040
     component: apps/venue-management-web/src/routes/analytics/SaveRunReportResultsViewer.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-031
+    exitTo:
+    - ANL-031
+    transitions:
+    - to: ANL-031
+      trigger: Back to Report Catalogue & Library
+      provenance: structural — pack board 3 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: Users can execute reports interactively, analyze the results and export authorized data
+    in supported formats. AI — “Ask TICVAI to Build My Report” Board 3 should include AI throughout the
+    report-building process rather than making AI a separate disconnected feature.
   pattern: commandCentre
   patternReason: the pack gives this screen both a metric directory (§Display; Dashboard Designer Report
     Builder) and a per-row directory (§KPI cards/charts Rows, columns, matrices) — counts over a population,
     then the population
   purpose: Provide the final operational interface for executing and consuming reports.
-  purposeNote: Users can execute reports interactively, analyze the results and export authorized data
-    in supported formats. AI — “Ask TICVAI to Build My Report” Board 3 should include AI throughout the
-    report-building process rather than making AI a separate disconnected feature.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -4845,20 +4926,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-040
+    workshopBoard: wireframes/WS174 Unified BI Reporting and AI Analytics Platform Board 3.dc.html#anl-040
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 37. 0 of 2 labels bound to a contract property; 20 of 45 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-031
-    exitTo:
-    - ANL-031
-    transitions:
-    - to: ANL-031
-      trigger: Back to Report Catalogue & Library
-      provenance: structural — pack board 3 wiring, 9 September 2026
-      back: true
 - id: ANL-041
   name: Reporting Governance Command Center
   module: Analytics
@@ -4874,13 +4946,59 @@ screens:
     route: /analytics/reporting-governance-command-center-anl-041
     component: apps/venue-management-web/src/routes/analytics/ReportingGovernanceCommandCenter.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-001
+    exitTo:
+    - ANL-001
+    - ANL-042
+    - ANL-043
+    - ANL-044
+    - ANL-045
+    - ANL-046
+    - ANL-047
+    - ANL-048
+    - ANL-049
+    - ANL-050
+    transitions:
+    - to: ANL-001
+      trigger: Back to Executive Command Center
+      provenance: structural — pack board 4 wiring, 9 September 2026
+      back: true
+    - to: ANL-050
+      trigger: Retention, Archive & Governance Policy
+      provenance: structural — pack board 4 wiring, 9 September 2026
+    - to: ANL-042
+      trigger: Report Scheduler
+      provenance: structural — pack board 4 wiring, 9 September 2026
+    - to: ANL-043
+      trigger: Subscription Manager
+      provenance: structural — pack board 4 wiring, 9 September 2026
+    - to: ANL-044
+      trigger: Distribution & Delivery Configuration
+      provenance: structural — pack board 4 wiring, 9 September 2026
+    - to: ANL-045
+      trigger: Export & Download Center
+      provenance: structural — pack board 4 wiring, 9 September 2026
+    - to: ANL-046
+      trigger: Report API & Data Delivery Manager
+      provenance: structural — pack board 4 wiring, 9 September 2026
+    - to: ANL-047
+      trigger: Report Access & Sharing Control
+      provenance: structural — pack board 4 wiring, 9 September 2026
+    - to: ANL-048
+      trigger: Delivery Monitoring & Failure Management
+      provenance: structural — pack board 4 wiring, 9 September 2026
+    - to: ANL-049
+      trigger: Report Audit Trail & Compliance
+      provenance: structural — pack board 4 wiring, 9 September 2026
   density: compact
+  purposeNote: Administrators can understand overall reporting-platform health and governance from one
+    screen.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Provide administrators with a centralized overview of reporting operations, governance, distribution
     and compliance.
-  purposeNote: Administrators can understand overall reporting-platform health and governance from one
-    screen.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -4965,56 +5083,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-041
+    workshopBoard: wireframes/WS175 Unified BI Reporting and AI Analytics Platform Board 4.dc.html#anl-041
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 40. 0 of 18 labels bound to a contract property; 18 of 31 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-001
-    exitTo:
-    - ANL-001
-    - ANL-042
-    - ANL-043
-    - ANL-044
-    - ANL-045
-    - ANL-046
-    - ANL-047
-    - ANL-048
-    - ANL-049
-    - ANL-050
-    transitions:
-    - to: ANL-001
-      trigger: Back to Executive Command Center
-      provenance: structural — pack board 4 wiring, 9 September 2026
-      back: true
-    - to: ANL-050
-      trigger: Retention, Archive & Governance Policy
-      provenance: structural — pack board 4 wiring, 9 September 2026
-    - to: ANL-042
-      trigger: Report Scheduler
-      provenance: structural — pack board 4 wiring, 9 September 2026
-    - to: ANL-043
-      trigger: Subscription Manager
-      provenance: structural — pack board 4 wiring, 9 September 2026
-    - to: ANL-044
-      trigger: Distribution & Delivery Configuration
-      provenance: structural — pack board 4 wiring, 9 September 2026
-    - to: ANL-045
-      trigger: Export & Download Center
-      provenance: structural — pack board 4 wiring, 9 September 2026
-    - to: ANL-046
-      trigger: Report API & Data Delivery Manager
-      provenance: structural — pack board 4 wiring, 9 September 2026
-    - to: ANL-047
-      trigger: Report Access & Sharing Control
-      provenance: structural — pack board 4 wiring, 9 September 2026
-    - to: ANL-048
-      trigger: Delivery Monitoring & Failure Management
-      provenance: structural — pack board 4 wiring, 9 September 2026
-    - to: ANL-049
-      trigger: Report Audit Trail & Compliance
-      provenance: structural — pack board 4 wiring, 9 September 2026
 - id: ANL-042
   name: Report Scheduler
   module: Analytics
@@ -5030,13 +5103,23 @@ screens:
     route: /analytics/report-scheduler-anl-042
     component: apps/venue-management-web/src/routes/analytics/ReportScheduler.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-041
+    exitTo:
+    - ANL-041
+    transitions:
+    - to: ANL-041
+      trigger: Back to Reporting Governance Command Center
+      provenance: structural — pack board 4 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: Authorized users can create and manage recurring report-generation schedules without technical
+    support.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Configure; Frequency Options)
     and no display directory — it is settings, not a population
   purpose: Allow authorized users to automatically generate reports according to defined schedules.
-  purposeNote: Authorized users can create and manage recurring report-generation schedules without technical
-    support.
   layout:
     template: form
     regions:
@@ -5131,20 +5214,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-042
+    workshopBoard: wireframes/WS175 Unified BI Reporting and AI Analytics Platform Board 4.dc.html#anl-042
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 41. 0 of 0 labels bound to a contract property; 23 of 36 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-041
-    exitTo:
-    - ANL-041
-    transitions:
-    - to: ANL-041
-      trigger: Back to Reporting Governance Command Center
-      provenance: structural — pack board 4 wiring, 9 September 2026
-      back: true
 - id: ANL-043
   name: Subscription Manager
   module: Analytics
@@ -5160,14 +5234,24 @@ screens:
     route: /analytics/subscription-manager-anl-043
     component: apps/venue-management-web/src/routes/analytics/SubscriptionManager.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-041
+    exitTo:
+    - ANL-041
+    transitions:
+    - to: ANL-041
+      trigger: Back to Reporting Governance Command Center
+      provenance: structural — pack board 4 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: Authorized users can manage report subscriptions without modifying the original report
+    definition.
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Allow users and administrators to subscribe recipients to dashboards, reports and KPI summaries.
-  purposeNote: Authorized users can manage report subscriptions without modifying the original report
-    definition.
   gaps:
   - operation: null
     why: '**Subscription Manager declares no operation that writes anything** — its only declared call
@@ -5186,7 +5270,9 @@ screens:
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 43
   layout:
     template: split
-    regions: []
+    regions:
+    - name: contentBody
+      components: []
   states:
     loading: The subscription list.
     error: Could not load. Names which read failed and leaves the subscription untouched.
@@ -5200,20 +5286,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-043
+    workshopBoard: wireframes/WS175 Unified BI Reporting and AI Analytics Platform Board 4.dc.html#anl-043
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 43. 0 of 0 labels bound to a contract property; 0 of 26 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-041
-    exitTo:
-    - ANL-041
-    transitions:
-    - to: ANL-041
-      trigger: Back to Reporting Governance Command Center
-      provenance: structural — pack board 4 wiring, 9 September 2026
-      back: true
 - id: ANL-044
   name: Distribution & Delivery Configuration
   module: Analytics
@@ -5229,11 +5306,29 @@ screens:
     route: /analytics/distribution-delivery-configuration-anl-044
     component: apps/venue-management-web/src/routes/analytics/DistributionDeliveryConfiguration.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-041
+    exitTo:
+    - ANL-041
+    transitions:
+    - to: ANL-041
+      trigger: Back to Reporting Governance Command Center
+      provenance: structural — pack board 4 wiring, 9 September 2026
+      back: true
   density: compact
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Define; Configure) and no display
     directory — it is settings, not a population
   purpose: Configure how generated reporting content reaches approved recipients or destinations.
+  gaps:
+  - operation: null
+    why: '**The pack names 4 actions on this screen and the screen declares 0 operations.** Unserved:
+      TICVAI Notification Center, Secure Download, API, External approved destination. Each needs an operation,
+      or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
+      rather than the contract side.'
+    source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Support configurable
+      channels such as
   layout:
     template: form
     regions:
@@ -5282,6 +5377,25 @@ screens:
       - kind: selectField
         label: Branding
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Configure
+    - name: actionBar
+      slot: publish
+      components:
+      - kind: primaryButton
+        label: TICVAI Notification Center
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Support
+          configurable channels such as
+      - kind: secondaryButton
+        label: Secure Download
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Support
+          configurable channels such as
+      - kind: secondaryButton
+        label: API
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Support
+          configurable channels such as
+      - kind: secondaryButton
+        label: External approved destination
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Support
+          configurable channels such as
   states:
     loading: The distribution delivery configuration as saved.
     error: Could not load. Names which read failed and leaves the distribution delivery untouched.
@@ -5293,20 +5407,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-044
+    workshopBoard: wireframes/WS175 Unified BI Reporting and AI Analytics Platform Board 4.dc.html#anl-044
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
-    page 44. 0 of 0 labels bound to a contract property; 14 of 28 pack bullets carried onto the screen
+    page 44. 0 of 0 labels bound to a contract property; 18 of 28 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-041
-    exitTo:
-    - ANL-041
-    transitions:
-    - to: ANL-041
-      trigger: Back to Reporting Governance Command Center
-      provenance: structural — pack board 4 wiring, 9 September 2026
-      back: true
 - id: ANL-045
   name: Export & Download Center
   module: Analytics
@@ -5322,13 +5427,23 @@ screens:
     route: /analytics/export-download-center-anl-045
     component: apps/venue-management-web/src/routes/analytics/ExportDownloadCenter.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-041
+    exitTo:
+    - ANL-041
+    transitions:
+    - to: ANL-041
+      trigger: Back to Reporting Governance Command Center
+      provenance: structural — pack board 4 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: Users can export authorized information while TICVAI maintains control and auditability
+    over data extraction.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Provide centralized management of report and dashboard exports. The source matrix requires
     reporting export to multiple formats, including PDF, Excel, delimited text and XML.
-  purposeNote: Users can export authorized information while TICVAI maintains control and auditability
-    over data extraction.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -5400,20 +5515,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-045
+    workshopBoard: wireframes/WS175 Unified BI Reporting and AI Analytics Platform Board 4.dc.html#anl-045
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 45. 0 of 11 labels bound to a contract property; 19 of 30 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-041
-    exitTo:
-    - ANL-041
-    transitions:
-    - to: ANL-041
-      trigger: Back to Reporting Governance Command Center
-      provenance: structural — pack board 4 wiring, 9 September 2026
-      back: true
 - id: ANL-046
   name: Report API & Data Delivery Manager
   module: Analytics
@@ -5429,14 +5535,24 @@ screens:
     route: /analytics/report-api-data-delivery-manager-anl-046
     component: apps/venue-management-web/src/routes/analytics/ReportApiDataDeliveryManager.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-041
+    exitTo:
+    - ANL-041
+    transitions:
+    - to: ANL-041
+      trigger: Back to Reporting Governance Command Center
+      provenance: structural — pack board 4 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: External approved systems can consume governed reporting data without receiving unrestricted
+    access to TICVAI's operational database.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Configure) and no display directory
     — it is settings, not a population
   purpose: Allow approved systems to receive reporting information programmatically. This supports the
     requirement for report export/access through APIs.
-  purposeNote: External approved systems can consume governed reporting data without receiving unrestricted
-    access to TICVAI's operational database.
   gaps:
   - operation: null
     why: '**Report API & Data Delivery Manager declares no operation that writes anything** — its only
@@ -5498,20 +5614,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-046
+    workshopBoard: wireframes/WS175 Unified BI Reporting and AI Analytics Platform Board 4.dc.html#anl-046
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 46. 0 of 0 labels bound to a contract property; 17 of 28 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-041
-    exitTo:
-    - ANL-041
-    transitions:
-    - to: ANL-041
-      trigger: Back to Reporting Governance Command Center
-      provenance: structural — pack board 4 wiring, 9 September 2026
-      back: true
 - id: ANL-047
   name: Report Access & Sharing Control
   module: Analytics
@@ -5527,7 +5634,19 @@ screens:
     route: /analytics/report-access-sharing-control-anl-047
     component: apps/venue-management-web/src/routes/analytics/ReportAccessSharingControl.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-041
+    exitTo:
+    - ANL-041
+    transitions:
+    - to: ANL-041
+      trigger: Back to Reporting Governance Command Center
+      provenance: structural — pack board 4 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: Sharing, export and subscription cannot be used to bypass the underlying TICVAI permission
+    model.
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
@@ -5535,8 +5654,6 @@ screens:
   purpose: Provide centralized security for reports, dashboards and analytical information. The matrix
     specifically requires reporting access based on group rights, operating-area rights and user access
     rights.
-  purposeNote: Sharing, export and subscription cannot be used to bypass the underlying TICVAI permission
-    model.
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -5550,7 +5667,9 @@ screens:
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 47
   layout:
     template: split
-    regions: []
+    regions:
+    - name: contentBody
+      components: []
   states:
     loading: The report access sharing list.
     error: Could not load. Names which read failed and leaves the report access sharing untouched.
@@ -5564,20 +5683,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-047
+    workshopBoard: wireframes/WS175 Unified BI Reporting and AI Analytics Platform Board 4.dc.html#anl-047
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 47. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-041
-    exitTo:
-    - ANL-041
-    transitions:
-    - to: ANL-041
-      trigger: Back to Reporting Governance Command Center
-      provenance: structural — pack board 4 wiring, 9 September 2026
-      back: true
 - id: ANL-048
   name: Delivery Monitoring & Failure Management
   module: Analytics
@@ -5593,12 +5703,22 @@ screens:
     route: /analytics/delivery-monitoring-failure-management-anl-048
     component: apps/venue-management-web/src/routes/analytics/DeliveryMonitoringFailureManagement.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-041
+    exitTo:
+    - ANL-041
+    transitions:
+    - to: ANL-041
+      trigger: Back to Reporting Governance Command Center
+      provenance: structural — pack board 4 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: Administrators can identify and resolve report-generation and distribution failures without
+    reviewing technical server logs.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Monitor scheduled report execution and distribution and provide operational management of failures.
-  purposeNote: Administrators can identify and resolve report-generation and distribution failures without
-    reviewing technical server logs.
   gaps:
   - operation: null
     why: '**The pack names 6 actions on this screen and the screen declares 0 operations.** Unserved:
@@ -5702,20 +5822,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-048
+    workshopBoard: wireframes/WS175 Unified BI Reporting and AI Analytics Platform Board 4.dc.html#anl-048
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 48. 0 of 10 labels bound to a contract property; 22 of 35 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-041
-    exitTo:
-    - ANL-041
-    transitions:
-    - to: ANL-041
-      trigger: Back to Reporting Governance Command Center
-      provenance: structural — pack board 4 wiring, 9 September 2026
-      back: true
 - id: ANL-049
   name: Report Audit Trail & Compliance
   module: Analytics
@@ -5731,14 +5842,24 @@ screens:
     route: /analytics/report-audit-trail-compliance-anl-049
     component: apps/venue-management-web/src/routes/analytics/ReportAuditTrailCompliance.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-041
+    exitTo:
+    - ANL-041
+    transitions:
+    - to: ANL-041
+      trigger: Back to Reporting Governance Command Center
+      provenance: structural — pack board 4 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: Authorized administrators and auditors can reconstruct the history of relevant reporting
+    activity.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Capture) and no display directory
     — it is settings, not a population
   purpose: Maintain complete traceability of reporting activity. The source matrix requires report logs
     and audit reporting for sales history.
-  purposeNote: Authorized administrators and auditors can reconstruct the history of relevant reporting
-    activity.
   layout:
     template: form
     regions:
@@ -5822,20 +5943,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-049
+    workshopBoard: wireframes/WS175 Unified BI Reporting and AI Analytics Platform Board 4.dc.html#anl-049
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 49. 0 of 8 labels bound to a contract property; 22 of 41 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-041
-    exitTo:
-    - ANL-041
-    transitions:
-    - to: ANL-041
-      trigger: Back to Reporting Governance Command Center
-      provenance: structural — pack board 4 wiring, 9 September 2026
-      back: true
 - id: ANL-050
   name: Retention, Archive & Governance Policy
   module: Analytics
@@ -5851,14 +5963,24 @@ screens:
     route: /analytics/retention-archive-governance-policy-anl-050
     component: apps/venue-management-web/src/routes/analytics/RetentionArchiveGovernancePolicy.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-041
+    exitTo:
+    - ANL-041
+    transitions:
+    - to: ANL-041
+      trigger: Back to Reporting Governance Command Center
+      provenance: structural — pack board 4 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: Historical reporting content can be governed, archived and retrieved according to configured
+    organizational and regulatory policies.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Configure retention separately
     for; Define) and no display directory — it is settings, not a population
   purpose: Control the lifecycle of reports, generated files and historical analytical data. The reporting-platform
     specification requires long-term reporting history together with archival and retrieval capability.
-  purposeNote: Historical reporting content can be governed, archived and retrieved according to configured
-    organizational and regulatory policies.
   layout:
     template: form
     regions:
@@ -5926,20 +6048,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-050
+    workshopBoard: wireframes/WS175 Unified BI Reporting and AI Analytics Platform Board 4.dc.html#anl-050
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 50. 0 of 0 labels bound to a contract property; 14 of 47 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-041
-    exitTo:
-    - ANL-041
-    transitions:
-    - to: ANL-041
-      trigger: Back to Reporting Governance Command Center
-      provenance: structural — pack board 4 wiring, 9 September 2026
-      back: true
 - id: ANL-051
   name: AI Analytics Command Center
   module: Analytics
@@ -5955,12 +6068,58 @@ screens:
     route: /analytics/ai-analytics-command-center-anl-051
     component: apps/venue-management-web/src/routes/analytics/AiAnalyticsCommandCenter.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-001
+    exitTo:
+    - ANL-001
+    - ANL-052
+    - ANL-053
+    - ANL-054
+    - ANL-055
+    - ANL-056
+    - ANL-057
+    - ANL-058
+    - ANL-059
+    - ANL-060
+    transitions:
+    - to: ANL-001
+      trigger: Back to Executive Command Center
+      provenance: structural — pack board 9 wiring, 9 September 2026
+      back: true
+    - to: ANL-060
+      trigger: AI Analytics Governance & Model Control
+      provenance: structural — pack board 9 wiring, 9 September 2026
+    - to: ANL-052
+      trigger: Ask TICVAI — Natural Language Analytics
+      provenance: structural — pack board 9 wiring, 9 September 2026
+    - to: ANL-053
+      trigger: AI-Generated Dashboard Studio
+      provenance: structural — pack board 9 wiring, 9 September 2026
+    - to: ANL-054
+      trigger: AI Report Generator
+      provenance: structural — pack board 9 wiring, 9 September 2026
+    - to: ANL-055
+      trigger: Anomaly Detection Center
+      provenance: structural — pack board 9 wiring, 9 September 2026
+    - to: ANL-056
+      trigger: Root-Cause Analysis Explorer
+      provenance: structural — pack board 9 wiring, 9 September 2026
+    - to: ANL-057
+      trigger: Forecasting & Predictive Analytics Studio
+      provenance: structural — pack board 9 wiring, 9 September 2026
+    - to: ANL-058
+      trigger: AI Recommendation & Next-Best-Action Center
+      provenance: structural — pack board 9 wiring, 9 September 2026
+    - to: ANL-059
+      trigger: AI Insight History, Evidence & Explainability
+      provenance: structural — pack board 9 wiring, 9 September 2026
   density: compact
+  purposeNote: Management can review prioritized AI intelligence across all authorized business domains
+    from one screen.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display; Show) and no metric row
   purpose: Provide a centralized landing page for all AI-generated analytical intelligence across TICVAI.
-  purposeNote: Management can review prioritized AI intelligence across all authorized business domains
-    from one screen.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -6048,56 +6207,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-051
+    workshopBoard: wireframes/WS176 Unified BI Reporting and AI Analytics Platform Board 9.dc.html#anl-051
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 109. 0 of 20 labels bound to a contract property; 20 of 27 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-001
-    exitTo:
-    - ANL-001
-    - ANL-052
-    - ANL-053
-    - ANL-054
-    - ANL-055
-    - ANL-056
-    - ANL-057
-    - ANL-058
-    - ANL-059
-    - ANL-060
-    transitions:
-    - to: ANL-001
-      trigger: Back to Executive Command Center
-      provenance: structural — pack board 9 wiring, 9 September 2026
-      back: true
-    - to: ANL-060
-      trigger: AI Analytics Governance & Model Control
-      provenance: structural — pack board 9 wiring, 9 September 2026
-    - to: ANL-052
-      trigger: Ask TICVAI — Natural Language Analytics
-      provenance: structural — pack board 9 wiring, 9 September 2026
-    - to: ANL-053
-      trigger: AI-Generated Dashboard Studio
-      provenance: structural — pack board 9 wiring, 9 September 2026
-    - to: ANL-054
-      trigger: AI Report Generator
-      provenance: structural — pack board 9 wiring, 9 September 2026
-    - to: ANL-055
-      trigger: Anomaly Detection Center
-      provenance: structural — pack board 9 wiring, 9 September 2026
-    - to: ANL-056
-      trigger: Root-Cause Analysis Explorer
-      provenance: structural — pack board 9 wiring, 9 September 2026
-    - to: ANL-057
-      trigger: Forecasting & Predictive Analytics Studio
-      provenance: structural — pack board 9 wiring, 9 September 2026
-    - to: ANL-058
-      trigger: AI Recommendation & Next-Best-Action Center
-      provenance: structural — pack board 9 wiring, 9 September 2026
-    - to: ANL-059
-      trigger: AI Insight History, Evidence & Explainability
-      provenance: structural — pack board 9 wiring, 9 September 2026
 - id: ANL-052
   name: Ask TICVAI — Natural Language Analytics
   module: Analytics
@@ -6113,15 +6227,25 @@ screens:
     route: /analytics/ask-ticvai-natural-language-analytics-anl-052
     component: apps/venue-management-web/src/routes/analytics/AskTicvaiNaturalLanguageAnalytics.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-051
+    exitTo:
+    - ANL-051
+    transitions:
+    - to: ANL-051
+      trigger: Back to AI Analytics Command Center
+      provenance: structural — pack board 9 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: Authorized business users can obtain governed analytics without knowing report names, database
+    fields, SQL, or Power BI.
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Allow users to query TICVAI business information using normal language instead of manually
     building reports.
-  purposeNote: Authorized business users can obtain governed analytics without knowing report names, database
-    fields, SQL, or Power BI.
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -6135,7 +6259,9 @@ screens:
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 110
   layout:
     template: split
-    regions: []
+    regions:
+    - name: contentBody
+      components: []
   states:
     loading: The ask ticvai natural list.
     error: Could not load. Names which read failed and leaves the ask ticvai natural untouched.
@@ -6149,20 +6275,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-052
+    workshopBoard: wireframes/WS176 Unified BI Reporting and AI Analytics Platform Board 9.dc.html#anl-052
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 110. 0 of 0 labels bound to a contract property; 0 of 16 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-051
-    exitTo:
-    - ANL-051
-    transitions:
-    - to: ANL-051
-      trigger: Back to AI Analytics Command Center
-      provenance: structural — pack board 9 wiring, 9 September 2026
-      back: true
 - id: ANL-053
   name: AI-Generated Dashboard Studio
   module: Analytics
@@ -6178,13 +6295,23 @@ screens:
     route: /analytics/ai-generated-dashboard-studio-anl-053
     component: apps/venue-management-web/src/routes/analytics/AiGeneratedDashboardStudio.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-051
+    exitTo:
+    - ANL-051
+    transitions:
+    - to: ANL-051
+      trigger: Back to AI Analytics Command Center
+      provenance: structural — pack board 9 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: Users can convert natural-language analytical requirements into governed dashboard configurations.
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Allow users to generate dashboards from natural-language requests.
-  purposeNote: Users can convert natural-language analytical requirements into governed dashboard configurations.
   gaps:
   - operation: null
     why: '**AI-Generated Dashboard Studio declares no operation that writes anything** — its only declared
@@ -6203,7 +6330,9 @@ screens:
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 111
   layout:
     template: split
-    regions: []
+    regions:
+    - name: contentBody
+      components: []
   states:
     loading: The ai-generated list.
     error: Could not load. Names which read failed and leaves the ai-generated untouched.
@@ -6217,20 +6346,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-053
+    workshopBoard: wireframes/WS176 Unified BI Reporting and AI Analytics Platform Board 9.dc.html#anl-053
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 111. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-051
-    exitTo:
-    - ANL-051
-    transitions:
-    - to: ANL-051
-      trigger: Back to AI Analytics Command Center
-      provenance: structural — pack board 9 wiring, 9 September 2026
-      back: true
 - id: ANL-054
   name: AI Report Generator
   module: Analytics
@@ -6246,12 +6366,22 @@ screens:
     route: /analytics/ai-report-generator-anl-054
     component: apps/venue-management-web/src/routes/analytics/AiReportGenerator.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-051
+    exitTo:
+    - ANL-051
+    transitions:
+    - to: ANL-051
+      trigger: Back to AI Analytics Command Center
+      provenance: structural — pack board 9 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: AI-generated reports use the same approved semantic model, permissions, calculations and
+    governance rules as manually created reports.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
   purpose: Generate detailed reports from natural-language instructions.
-  purposeNote: AI-generated reports use the same approved semantic model, permissions, calculations and
-    governance rules as manually created reports.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -6315,20 +6445,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-054
+    workshopBoard: wireframes/WS176 Unified BI Reporting and AI Analytics Platform Board 9.dc.html#anl-054
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 112. 0 of 7 labels bound to a contract property; 7 of 25 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-051
-    exitTo:
-    - ANL-051
-    transitions:
-    - to: ANL-051
-      trigger: Back to AI Analytics Command Center
-      provenance: structural — pack board 9 wiring, 9 September 2026
-      back: true
 - id: ANL-055
   name: Anomaly Detection Center
   module: Analytics
@@ -6344,6 +6465,16 @@ screens:
     route: /analytics/anomaly-detection-center-anl-055
     component: apps/venue-management-web/src/routes/analytics/AnomalyDetectionCenter.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-051
+    exitTo:
+    - ANL-051
+    transitions:
+    - to: ANL-051
+      trigger: Back to AI Analytics Command Center
+      provenance: structural — pack board 9 wiring, 9 September 2026
+      back: true
   density: compact
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Each Anomaly Displays) and no metric
@@ -6422,20 +6553,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-055
+    workshopBoard: wireframes/WS176 Unified BI Reporting and AI Analytics Platform Board 9.dc.html#anl-055
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 113. 0 of 10 labels bound to a contract property; 10 of 38 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-051
-    exitTo:
-    - ANL-051
-    transitions:
-    - to: ANL-051
-      trigger: Back to AI Analytics Command Center
-      provenance: structural — pack board 9 wiring, 9 September 2026
-      back: true
 - id: ANL-056
   name: Root-Cause Analysis Explorer
   module: Analytics
@@ -6451,15 +6573,25 @@ screens:
     route: /analytics/root-cause-analysis-explorer-anl-056
     component: apps/venue-management-web/src/routes/analytics/RootCauseAnalysisExplorer.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-051
+    exitTo:
+    - ANL-051
+    transitions:
+    - to: ANL-051
+      trigger: Back to AI Analytics Command Center
+      provenance: structural — pack board 9 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: Users can move from detecting a KPI change to understanding the strongest supported contributing
+    factors.
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Help users understand why a KPI changed. This is one of the most important AI capabilities
     in the entire platform.
-  purposeNote: Users can move from detecting a KPI change to understanding the strongest supported contributing
-    factors.
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -6473,7 +6605,9 @@ screens:
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 114
   layout:
     template: split
-    regions: []
+    regions:
+    - name: contentBody
+      components: []
   states:
     loading: The root-cause analysis list.
     error: Could not load. Names which read failed and leaves the root-cause analysis untouched.
@@ -6487,20 +6621,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-056
+    workshopBoard: wireframes/WS176 Unified BI Reporting and AI Analytics Platform Board 9.dc.html#anl-056
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 114. 0 of 0 labels bound to a contract property; 0 of 30 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-051
-    exitTo:
-    - ANL-051
-    transitions:
-    - to: ANL-051
-      trigger: Back to AI Analytics Command Center
-      provenance: structural — pack board 9 wiring, 9 September 2026
-      back: true
 - id: ANL-057
   name: Forecasting & Predictive Analytics Studio
   module: Analytics
@@ -6516,6 +6641,16 @@ screens:
     route: /analytics/forecasting-predictive-analytics-studio-anl-057
     component: apps/venue-management-web/src/routes/analytics/ForecastingPredictiveAnalyticsStudio.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-051
+    exitTo:
+    - ANL-051
+    transitions:
+    - to: ANL-051
+      trigger: Back to AI Analytics Command Center
+      provenance: structural — pack board 9 wiring, 9 September 2026
+      back: true
   density: compact
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Configure) and no display directory
@@ -6523,10 +6658,10 @@ screens:
   purpose: Provide configurable forward-looking analytics across business domains.
   gaps:
   - operation: null
-    why: '**The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved:
-      Ticket Sales, Membership Renewals, Customer Churn. Each needs an operation, or needs removing from
-      the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
-      side.'
+    why: '**The pack names 11 actions on this screen and the screen declares 0 operations.** Unserved:
+      Revenue, Ticket Sales, Attendance, Capacity, Queue Demand, Cash Collection, Membership Renewals,
+      Customer Churn …. Each needs an operation, or needs removing from the screen; this is the Phase
+      3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Support forecasts
       for
   - operation: null
@@ -6566,7 +6701,27 @@ screens:
       slot: publish
       components:
       - kind: primaryButton
+        label: Revenue
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Support
+          forecasts for
+      - kind: secondaryButton
         label: Ticket Sales
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Support
+          forecasts for
+      - kind: secondaryButton
+        label: Attendance
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Support
+          forecasts for
+      - kind: secondaryButton
+        label: Capacity
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Support
+          forecasts for
+      - kind: secondaryButton
+        label: Queue Demand
+        provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Support
+          forecasts for
+      - kind: secondaryButton
+        label: Cash Collection
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Support
           forecasts for
       - kind: secondaryButton
@@ -6588,20 +6743,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-057
+    workshopBoard: wireframes/WS176 Unified BI Reporting and AI Analytics Platform Board 9.dc.html#anl-057
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
-    page 116. 0 of 0 labels bound to a contract property; 10 of 32 pack bullets carried onto the screen
+    page 116. 0 of 0 labels bound to a contract property; 18 of 32 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-051
-    exitTo:
-    - ANL-051
-    transitions:
-    - to: ANL-051
-      trigger: Back to AI Analytics Command Center
-      provenance: structural — pack board 9 wiring, 9 September 2026
-      back: true
 - id: ANL-058
   name: AI Recommendation & Next-Best-Action Center
   module: Analytics
@@ -6617,14 +6763,24 @@ screens:
     route: /analytics/ai-recommendation-next-best-action-center-anl-058
     component: apps/venue-management-web/src/routes/analytics/AiRecommendationNextBestActionCenter.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-051
+    exitTo:
+    - ANL-051
+    transitions:
+    - to: ANL-051
+      trigger: Back to AI Analytics Command Center
+      provenance: structural — pack board 9 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: Recommendations are prioritized, explainable and measurable rather than presented as generic
+    AI suggestions.
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Convert analytical insights into prioritized business recommendations.
-  purposeNote: Recommendations are prioritized, explainable and measurable rather than presented as generic
-    AI suggestions.
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -6638,7 +6794,14 @@ screens:
     source: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 117
   layout:
     template: split
-    regions: []
+    regions:
+    - name: contentBody
+      components:
+      - kind: dataTable
+        derived: true
+        impliedBy: listNextBestAction
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
   states:
     loading: The recommendation next-best-action list.
     error: Could not load. Names which read failed and leaves the recommendation next-best-action untouched.
@@ -6652,20 +6815,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-058
+    workshopBoard: wireframes/WS176 Unified BI Reporting and AI Analytics Platform Board 9.dc.html#anl-058
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 117. 0 of 0 labels bound to a contract property; 0 of 23 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-051
-    exitTo:
-    - ANL-051
-    transitions:
-    - to: ANL-051
-      trigger: Back to AI Analytics Command Center
-      provenance: structural — pack board 9 wiring, 9 September 2026
-      back: true
 - id: ANL-059
   name: AI Insight History, Evidence & Explainability
   module: Analytics
@@ -6681,12 +6835,22 @@ screens:
     route: /analytics/ai-insight-history-evidence-explainability-anl-059
     component: apps/venue-management-web/src/routes/analytics/AiInsightHistoryEvidenceExplainability.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-051
+    exitTo:
+    - ANL-051
+    transitions:
+    - to: ANL-051
+      trigger: Back to AI Analytics Command Center
+      provenance: structural — pack board 9 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: AI analytics remain auditable and traceable to supporting TICVAI data.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Capture) and no display directory
     — it is settings, not a population
   purpose: Create a full governance trail for AI-generated analytics and recommendations.
-  purposeNote: AI analytics remain auditable and traceable to supporting TICVAI data.
   layout:
     template: form
     regions:
@@ -6719,20 +6883,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-059
+    workshopBoard: wireframes/WS176 Unified BI Reporting and AI Analytics Platform Board 9.dc.html#anl-059
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 118. 0 of 0 labels bound to a contract property; 5 of 28 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-051
-    exitTo:
-    - ANL-051
-    transitions:
-    - to: ANL-051
-      trigger: Back to AI Analytics Command Center
-      provenance: structural — pack board 9 wiring, 9 September 2026
-      back: true
 - id: ANL-060
   name: AI Analytics Governance & Model Control
   module: Analytics
@@ -6748,6 +6903,16 @@ screens:
     route: /analytics/ai-analytics-governance-model-control-anl-060
     component: apps/venue-management-web/src/routes/analytics/AiAnalyticsGovernanceModelControl.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-051
+    exitTo:
+    - ANL-051
+    transitions:
+    - to: ANL-051
+      trigger: Back to AI Analytics Command Center
+      provenance: structural — pack board 9 wiring, 9 September 2026
+      back: true
   density: compact
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display; Track) and no metric row
@@ -6837,20 +7002,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-060
+    workshopBoard: wireframes/WS176 Unified BI Reporting and AI Analytics Platform Board 9.dc.html#anl-060
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 119. 0 of 13 labels bound to a contract property; 31 of 84 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-051
-    exitTo:
-    - ANL-051
-    transitions:
-    - to: ANL-051
-      trigger: Back to AI Analytics Command Center
-      provenance: structural — pack board 9 wiring, 9 September 2026
-      back: true
 - id: ANL-061
   name: BI & Analytics Administration Command Center
   module: Analytics
@@ -6866,14 +7022,60 @@ screens:
     route: /analytics/bi-analytics-administration-command-center-anl-061
     component: apps/venue-management-web/src/routes/analytics/BiAnalyticsAdministrationCommandCenter.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-001
+    exitTo:
+    - ANL-001
+    - ANL-062
+    - ANL-063
+    - ANL-064
+    - ANL-065
+    - ANL-066
+    - ANL-067
+    - ANL-068
+    - ANL-069
+    - ANL-070
+    transitions:
+    - to: ANL-001
+      trigger: Back to Executive Command Center
+      provenance: structural — pack board 10 wiring, 9 September 2026
+      back: true
+    - to: ANL-070
+      trigger: Analytics Governance, Security & Audit Center
+      provenance: structural — pack board 10 wiring, 9 September 2026
+    - to: ANL-062
+      trigger: Enterprise KPI Library
+      provenance: structural — pack board 10 wiring, 9 September 2026
+    - to: ANL-063
+      trigger: KPI Targets, Thresholds & Scorecards
+      provenance: structural — pack board 10 wiring, 9 September 2026
+    - to: ANL-064
+      trigger: Benchmark & Comparative Analytics Configuration
+      provenance: structural — pack board 10 wiring, 9 September 2026
+    - to: ANL-065
+      trigger: Data Source & Integration Registry
+      provenance: structural — pack board 10 wiring, 9 September 2026
+    - to: ANL-066
+      trigger: Semantic Model & Business Data Catalogue
+      provenance: structural — pack board 10 wiring, 9 September 2026
+    - to: ANL-067
+      trigger: Data Refresh, Pipeline & Data Health Monitor
+      provenance: structural — pack board 10 wiring, 9 September 2026
+    - to: ANL-068
+      trigger: Embedded BI, Workspace & Tenant Administration
+      provenance: structural — pack board 10 wiring, 9 September 2026
+    - to: ANL-069
+      trigger: Analytics Performance, Usage & Cost Monitor
+      provenance: structural — pack board 10 wiring, 9 September 2026
   density: compact
+  purposeNote: Administrators can determine overall analytics-platform health without reviewing multiple
+    technical systems.
   pattern: commandCentre
   patternReason: the pack gives this screen both a metric directory (§Display) and a per-row directory
     (§Each component shall show) — counts over a population, then the population
   purpose: Provide administrators with one consolidated view of the health and governance of the TICVAI
     analytics platform.
-  purposeNote: Administrators can determine overall analytics-platform health without reviewing multiple
-    technical systems.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -6958,56 +7160,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-061
+    workshopBoard: wireframes/WS177 Unified BI Reporting and AI Analytics Platform Board 10.dc.html#anl-061
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 123. 0 of 1 labels bound to a contract property; 13 of 17 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-001
-    exitTo:
-    - ANL-001
-    - ANL-062
-    - ANL-063
-    - ANL-064
-    - ANL-065
-    - ANL-066
-    - ANL-067
-    - ANL-068
-    - ANL-069
-    - ANL-070
-    transitions:
-    - to: ANL-001
-      trigger: Back to Executive Command Center
-      provenance: structural — pack board 10 wiring, 9 September 2026
-      back: true
-    - to: ANL-070
-      trigger: Analytics Governance, Security & Audit Center
-      provenance: structural — pack board 10 wiring, 9 September 2026
-    - to: ANL-062
-      trigger: Enterprise KPI Library
-      provenance: structural — pack board 10 wiring, 9 September 2026
-    - to: ANL-063
-      trigger: KPI Targets, Thresholds & Scorecards
-      provenance: structural — pack board 10 wiring, 9 September 2026
-    - to: ANL-064
-      trigger: Benchmark & Comparative Analytics Configuration
-      provenance: structural — pack board 10 wiring, 9 September 2026
-    - to: ANL-065
-      trigger: Data Source & Integration Registry
-      provenance: structural — pack board 10 wiring, 9 September 2026
-    - to: ANL-066
-      trigger: Semantic Model & Business Data Catalogue
-      provenance: structural — pack board 10 wiring, 9 September 2026
-    - to: ANL-067
-      trigger: Data Refresh, Pipeline & Data Health Monitor
-      provenance: structural — pack board 10 wiring, 9 September 2026
-    - to: ANL-068
-      trigger: Embedded BI, Workspace & Tenant Administration
-      provenance: structural — pack board 10 wiring, 9 September 2026
-    - to: ANL-069
-      trigger: Analytics Performance, Usage & Cost Monitor
-      provenance: structural — pack board 10 wiring, 9 September 2026
 - id: ANL-062
   name: Enterprise KPI Library
   module: Analytics
@@ -7023,6 +7180,16 @@ screens:
     route: /analytics/enterprise-kpi-library-anl-062
     component: apps/venue-management-web/src/routes/analytics/EnterpriseKpiLibrary.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-061
+    exitTo:
+    - ANL-061
+    transitions:
+    - to: ANL-061
+      trigger: Back to BI & Analytics Administration Command Center
+      provenance: structural — pack board 10 wiring, 9 September 2026
+      back: true
   density: compact
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§KPI Categories; KPI Status) and no metric
@@ -7105,20 +7272,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-062
+    workshopBoard: wireframes/WS177 Unified BI Reporting and AI Analytics Platform Board 10.dc.html#anl-062
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 124. 0 of 14 labels bound to a contract property; 30 of 35 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-061
-    exitTo:
-    - ANL-061
-    transitions:
-    - to: ANL-061
-      trigger: Back to BI & Analytics Administration Command Center
-      provenance: structural — pack board 10 wiring, 9 September 2026
-      back: true
 - id: ANL-063
   name: KPI Targets, Thresholds & Scorecards
   module: Analytics
@@ -7134,6 +7292,16 @@ screens:
     route: /analytics/kpi-targets-thresholds-scorecards-anl-063
     component: apps/venue-management-web/src/routes/analytics/KpiTargetsThresholdsScorecards.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-061
+    exitTo:
+    - ANL-061
+    transitions:
+    - to: ANL-061
+      trigger: Back to BI & Analytics Administration Command Center
+      provenance: structural — pack board 10 wiring, 9 September 2026
+      back: true
   density: compact
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Targets may be configured by)
@@ -7188,20 +7356,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-063
+    workshopBoard: wireframes/WS177 Unified BI Reporting and AI Analytics Platform Board 10.dc.html#anl-063
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 125. 0 of 0 labels bound to a contract property; 8 of 16 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-061
-    exitTo:
-    - ANL-061
-    transitions:
-    - to: ANL-061
-      trigger: Back to BI & Analytics Administration Command Center
-      provenance: structural — pack board 10 wiring, 9 September 2026
-      back: true
 - id: ANL-064
   name: Benchmark & Comparative Analytics Configuration
   module: Analytics
@@ -7217,6 +7376,16 @@ screens:
     route: /analytics/benchmark-comparative-analytics-configuration-anl-064
     component: apps/venue-management-web/src/routes/analytics/BenchmarkComparativeAnalyticsConfiguration.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-061
+    exitTo:
+    - ANL-061
+    transitions:
+    - to: ANL-061
+      trigger: Back to BI & Analytics Administration Command Center
+      provenance: structural — pack board 10 wiring, 9 September 2026
+      back: true
   density: compact
   pattern: commandCentre
   patternReason: the pack gives this screen a metric directory (§Support metrics such as) and no per-row
@@ -7278,20 +7447,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-064
+    workshopBoard: wireframes/WS177 Unified BI Reporting and AI Analytics Platform Board 10.dc.html#anl-064
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 127. 0 of 0 labels bound to a contract property; 7 of 16 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-061
-    exitTo:
-    - ANL-061
-    transitions:
-    - to: ANL-061
-      trigger: Back to BI & Analytics Administration Command Center
-      provenance: structural — pack board 10 wiring, 9 September 2026
-      back: true
 - id: ANL-065
   name: Data Source & Integration Registry
   module: Analytics
@@ -7307,12 +7467,22 @@ screens:
     route: /analytics/data-source-integration-registry-anl-065
     component: apps/venue-management-web/src/routes/analytics/DataSourceIntegrationRegistry.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-061
+    exitTo:
+    - ANL-061
+    transitions:
+    - to: ANL-061
+      trigger: Back to BI & Analytics Administration Command Center
+      provenance: structural — pack board 10 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: Administrators can identify every source feeding BI and understand its current status and
+    ownership.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Maintain a centralized catalogue of data sources feeding the analytics platform.
-  purposeNote: Administrators can identify every source feeding BI and understand its current status and
-    ownership.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -7381,20 +7551,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-065
+    workshopBoard: wireframes/WS177 Unified BI Reporting and AI Analytics Platform Board 10.dc.html#anl-065
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 128. 0 of 10 labels bound to a contract property; 10 of 34 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-061
-    exitTo:
-    - ANL-061
-    transitions:
-    - to: ANL-061
-      trigger: Back to BI & Analytics Administration Command Center
-      provenance: structural — pack board 10 wiring, 9 September 2026
-      back: true
 - id: ANL-066
   name: Semantic Model & Business Data Catalogue
   module: Analytics
@@ -7410,13 +7571,23 @@ screens:
     route: /analytics/semantic-model-business-data-catalogue-anl-066
     component: apps/venue-management-web/src/routes/analytics/SemanticModelBusinessDataCatalogue.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-061
+    exitTo:
+    - ANL-061
+    transitions:
+    - to: ANL-061
+      trigger: Back to BI & Analytics Administration Command Center
+      provenance: structural — pack board 10 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: Dashboards, reports and AI operate against a consistent governed business-data model rather
+    than independently querying raw tables.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Detect) and no metric row
   purpose: Create the governed business layer between raw data and dashboards/AI. This is one of the most
     important technical screens in Board 10.
-  purposeNote: Dashboards, reports and AI operate against a consistent governed business-data model rather
-    than independently querying raw tables.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -7475,20 +7646,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-066
+    workshopBoard: wireframes/WS177 Unified BI Reporting and AI Analytics Platform Board 10.dc.html#anl-066
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 129. 0 of 5 labels bound to a contract property; 13 of 30 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-061
-    exitTo:
-    - ANL-061
-    transitions:
-    - to: ANL-061
-      trigger: Back to BI & Analytics Administration Command Center
-      provenance: structural — pack board 10 wiring, 9 September 2026
-      back: true
 - id: ANL-067
   name: Data Refresh, Pipeline & Data Health Monitor
   module: Analytics
@@ -7608,6 +7770,7 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-067
+    workshopBoard: wireframes/WS177 Unified BI Reporting and AI Analytics Platform Board 10.dc.html#anl-067
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 130. 0 of 7 labels bound to a contract property; 14 of 32 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
@@ -7627,12 +7790,22 @@ screens:
     route: /analytics/embedded-bi-workspace-tenant-administration-anl-068
     component: apps/venue-management-web/src/routes/analytics/EmbeddedBiWorkspaceTenantAdministration.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-061
+    exitTo:
+    - ANL-061
+    transitions:
+    - to: ANL-061
+      trigger: Back to BI & Analytics Administration Command Center
+      provenance: structural — pack board 10 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: BI content can be securely embedded and governed across TICVAI tenants and environments.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Configure) and no display directory
     — it is settings, not a population
   purpose: Configure how BI technology is embedded inside TICVAI and separated across clients/tenants.
-  purposeNote: BI content can be securely embedded and governed across TICVAI tenants and environments.
   layout:
     template: form
     regions:
@@ -7671,20 +7844,11 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-068
+    workshopBoard: wireframes/WS177 Unified BI Reporting and AI Analytics Platform Board 10.dc.html#anl-068
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 131. 0 of 0 labels bound to a contract property; 7 of 23 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-061
-    exitTo:
-    - ANL-061
-    transitions:
-    - to: ANL-061
-      trigger: Back to BI & Analytics Administration Command Center
-      provenance: structural — pack board 10 wiring, 9 September 2026
-      back: true
 - id: ANL-069
   name: Analytics Performance, Usage & Cost Monitor
   module: Analytics
@@ -7835,6 +7999,7 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-069
+    workshopBoard: wireframes/WS177 Unified BI Reporting and AI Analytics Platform Board 10.dc.html#anl-069
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 132. 0 of 6 labels bound to a contract property; 20 of 34 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
@@ -7854,12 +8019,22 @@ screens:
     route: /analytics/analytics-governance-security-audit-center-anl-070
     component: apps/venue-management-web/src/routes/analytics/AnalyticsGovernanceSecurityAuditCenter.tsx
     status: notStarted
+  navigation:
+    entryFrom:
+    - ANL-061
+    exitTo:
+    - ANL-061
+    transitions:
+    - to: ANL-061
+      trigger: Back to BI & Analytics Administration Command Center
+      provenance: structural — pack board 10 wiring, 9 September 2026
+      back: true
   density: compact
+  purposeNote: Critical Data Architecture for the Complete Module Board 10 should make the underlying
+    architecture clear to Soft Labs.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Monitor; Show) and no metric row
   purpose: Provide final governance over the entire BI and analytics environment.
-  purposeNote: Critical Data Architecture for the Complete Module Board 10 should make the underlying
-    architecture clear to Soft Labs.
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -7931,7 +8106,11 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listSecurityDetectionGovernance
+    contract: access
+    purpose: Security Analytics, AI Detection & Governance
+    trigger: onLoad
   entryState:
     preloaded:
     - Dashboard Permissions
@@ -7943,17 +8122,8 @@ screens:
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-070
+    workshopBoard: wireframes/WS177 Unified BI Reporting and AI Analytics Platform Board 10.dc.html#anl-070
   apisNote: Regenerated 9 September 2026 from Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     page 133. 0 of 17 labels bound to a contract property; 24 of 56 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  navigation:
-    entryFrom:
-    - ANL-061
-    exitTo:
-    - ANL-061
-    transitions:
-    - to: ANL-061
-      trigger: Back to BI & Analytics Administration Command Center
-      provenance: structural — pack board 10 wiring, 9 September 2026
-      back: true

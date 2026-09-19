@@ -1,0 +1,148 @@
+id: F280
+name: 'Seat Management Venue Mapping Reference v1.0 board 7: Rules Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Seat Management Venue Mapping Reference v1.0 board 7. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-1013
+  entryPoints:
+  - Arrives at Rules Command Center
+steps:
+- step: 1
+  screen: BO-1013
+  action: Opens Rules Command Center
+  operations: []
+  outcome: Monitor seating-rule coverage, violations and compliance across venues. Show total and active
+    rules, affected seats, open violations, capacity impact and venue compliance score. Filter by rule
+    category, tenant, venue, event, layout, effecti
+- step: 2
+  screen: BO-1014
+  action: Works in Seat Kill Rules
+  operations: []
+  outcome: Remove seats from sale based on permanent or conditional unusability. Configure sightline,
+    stage, production, obstruction, equipment, safety, maintenance and venue-defined kill reasons. Apply
+    by seat list, section, row, polygon, obstruction
+- step: 3
+  screen: BO-1013
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-1015
+  action: Works in Buffer Seat Rules
+  operations: []
+  outcome: Create controlled unsold spacing around seats, zones or production objects. Define left/right,
+    radial, row, perimeter, alternating or custom buffer patterns and minimum distance. Apply dynamically
+    around selected seats, wheelchair spaces, c
+- step: 5
+  screen: BO-1013
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-1016
+  action: Works in Companion Seat Rules
+  operations: []
+  outcome: Keep appropriate companion inventory linked to designated seats. Configure eligible seat types,
+    adjacency, ratio, maximum companions and same-row or nearby rules. Control whether companions must
+    be selected together and when unneeded compan
+- step: 7
+  screen: BO-1013
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-1017
+  action: Works in Wheelchair Companion Rules
+  operations: []
+  outcome: Manage wheelchair-space and companion-seat pairing. Define one-to-one or configurable ratios,
+    adjacency, transfer-seat eligibility and alternative companion locations. Require wheelchair space
+    selection before companion inventory where poli
+- step: 9
+  screen: BO-1013
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-1018
+  action: Works in Accessible Seating Master
+  operations: []
+  outcome: Maintain a standard catalog of accessible seat and space attributes. Configure wheelchair,
+    companion, ambulatory, transfer, hearing, vision, service-animal and other supported types. Store
+    dimensions, capacity treatment, route requirements,
+- step: 11
+  screen: BO-1013
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-1019
+  action: Works in Accessible Route Mapping
+  operations: []
+  outcome: Identify accessible journeys from entry to seats and facilities. Create routes through accessible
+    entrances, lifts, ramps, concourses, restrooms and designated seating. Store distance, slope, level
+    changes, width, surface, assistance requir
+- step: 13
+  screen: BO-1013
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-1020
+  action: Works in Accessible Filters & Eligibility
+  operations: []
+  outcome: Configure inclusive discovery without exposing sensitive guest information. Define filters
+    and labels for wheelchair, companion, aisle, step-free, transfer, hearing, vision and service-animal
+    needs. Configure eligibility attestation, docume
+- step: 15
+  screen: BO-1013
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-1021
+  action: Works in Flexible Spacing Rules
+  operations: []
+  outcome: Support temporary public-health or operational spacing requirements. Configure distance, seat
+    count, checkerboard, blocked-row, household-group and custom patterns. Apply by event, venue, zone,
+    seat type or time window and preview capacity
+- step: 17
+  screen: BO-1013
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-1022
+  action: Works in Compliance Validation & Audit
+  operations: []
+  outcome: Demonstrate that seating rules and accessibility configuration are complete and enforced. Run
+    validations for accessible quantities, companion ratios, route continuity, conflicts, labels and customer-channel
+    parity. Provide issue severity,
+branches:
+- at: 1
+  condition: Nothing has been set up on Rules Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Seat Management Venue Mapping Reference v1.0 board 7 visited
+primaryContract: unknown
+contracts:
+- unknown

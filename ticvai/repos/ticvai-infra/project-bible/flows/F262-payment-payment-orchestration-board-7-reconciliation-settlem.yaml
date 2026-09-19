@@ -1,0 +1,133 @@
+id: F262
+name: 'Payment Payment Orchestration board 7: Reconciliation & Settlement Command Center\t139'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Payment Payment Orchestration board 7. **This route is read
+    from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-619
+  entryPoints:
+  - Arrives at Reconciliation & Settlement Command Center\t139
+steps:
+- step: 1
+  screen: ADM-619
+  action: Opens Reconciliation & Settlement Command Center\t139
+  operations: []
+  outcome: Provide an executive and operational overview of payment reconciliation and settlement health.
+- step: 2
+  screen: ADM-620
+  action: Works in Reconciliation Source & Import Manager\t141
+  operations: []
+  outcome: Manage all sources used to compare TICVAI payment records with external financial processing
+    records.
+- step: 3
+  screen: ADM-619
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-621
+  action: Works in Transaction Matching & Reconciliation Engine\t142
+  operations: []
+  outcome: Automatically match TICVAI payment transactions against provider/acquirer records.
+- step: 5
+  screen: ADM-619
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-622
+  action: Works in Reconciliation Exception & Investigation Center\t143
+  operations: []
+  outcome: Centralize all payment discrepancies requiring operational or financial investigation.
+- step: 7
+  screen: ADM-619
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-623
+  action: Works in Settlement & Payout Manager\t144
+  operations: []
+  outcome: Track expected and actual settlements from payment providers/acquirers.
+- step: 9
+  screen: ADM-619
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-624
+  action: Works in Fees, Commission, FX & Settlement Economics\t145
+  operations: []
+  outcome: Provide visibility into the financial deductions and differences between gross payment value
+    and net settlement.
+- step: 11
+  screen: ADM-619
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-625
+  action: Works in Merchant Account & Settlement Calendar Manager\t146
+  operations: []
+  outcome: Manage operational settlement expectations across providers, merchant accounts and legal entities.
+- step: 13
+  screen: ADM-619
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-626
+  action: Works in Settlement Posting, Finance Handoff & Close Manager\t148
+  operations: []
+  outcome: Control when reconciled payment information becomes ready for downstream financial posting
+    and period close.
+- step: 15
+  screen: ADM-619
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-627
+  action: Works in Reconciliation Audit, Trace & Evidence Center\t149
+  operations: []
+  outcome: Provide a complete audit trail explaining how any payment became reconciled and financially
+    closed.
+- step: 17
+  screen: ADM-619
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-628
+  action: Works in Reconciliation Simulator, Forecast & AI Operations Advisor\t150
+  operations: []
+  outcome: Provide simulation, forecasting and AI-assisted analysis across reconciliation and settlement
+    operations.
+branches:
+- at: 1
+  condition: Nothing has been set up on Reconciliation & Settlement Command Center\t139 yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Payment Payment Orchestration board 7 visited
+primaryContract: unknown
+contracts:
+- unknown

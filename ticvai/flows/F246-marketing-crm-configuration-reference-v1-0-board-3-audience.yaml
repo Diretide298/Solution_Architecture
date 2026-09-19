@@ -1,0 +1,148 @@
+id: F246
+name: 'Marketing CRM Configuration Reference v1.0 board 3: Audience Intelligence'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Marketing CRM Configuration Reference v1.0 board 3. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-754
+  entryPoints:
+  - Arrives at Audience Intelligence
+steps:
+- step: 1
+  screen: BO-754
+  action: Opens Audience Intelligence
+  operations: []
+  outcome: Give marketers and CRM teams an overview of addressable audience health. Show total guests,
+    reachable guests, active segments, consent-eligible audience, high-value and churn-risk populations.
+    Visualize growth, overlap, duplication, suppres
+- step: 2
+  screen: BO-755
+  action: Works in Dynamic Segment Builder
+  operations: []
+  outcome: Allow authorized users to create automatically refreshed rule-based audiences. Provide nested
+    AND/OR/NOT logic across profile, behavior, transaction, membership, loyalty, wallet and custom attributes.
+    Show live audience count, reachable cou
+- step: 3
+  screen: BO-754
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-756
+  action: Works in Static Lists & Imports
+  operations: []
+  outcome: Manage governed fixed audiences and externally supplied lists. Create lists manually or through
+    secure file import with field mapping, validation, deduplication and error handling. Configuration
+    Scope of Work | Version 1.0 16 Match imported
+- step: 5
+  screen: BO-754
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-757
+  action: Works in Behavioral Segmentation
+  operations: []
+  outcome: Build audiences from observable guest activity. Use purchase, visit, ticket scan, reservation,
+    cart, app, web, campaign, chatbot, survey and review events. Support recency, frequency, count, value,
+    sequence, absence-of-event and time-window
+- step: 7
+  screen: BO-754
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-758
+  action: Works in Membership & Loyalty Segments
+  operations: []
+  outcome: Create audiences using membership, loyalty and wallet state. Filter by membership type, status,
+    start, expiry, renewal, freeze, benefit use and upgrade eligibility. Filter by loyalty tier, points,
+    earn/redemption history, reward use, milest
+- step: 9
+  screen: BO-754
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-759
+  action: Works in Demographic & Geographic
+  operations: []
+  outcome: Configure demographic and location-based audiences responsibly. Use age band, household, language,
+    country, city, postcode, visitor type, nationality where lawful and custom demographics. Support location
+    radius, venue proximity, travel mar
+- step: 11
+  screen: BO-754
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-760
+  action: Works in Revenue & Engagement Segments
+  operations: []
+  outcome: Create value- and engagement-based audiences. Configuration Scope of Work | Version 1.0 17
+    Use total revenue, LTV, average order value, purchase frequency, category spend, refund behavior and
+    propensity. Use engagement score, campaign inter
+- step: 13
+  screen: BO-754
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-761
+  action: Works in AI Audience Discovery
+  operations: []
+  outcome: Discover meaningful customer clusters using explainable AI. Present suggested clusters with
+    dominant traits, size, reachability, value, engagement and observed opportunity. Show contributing
+    variables, confidence, stability, bias/fairness c
+- step: 15
+  screen: BO-754
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-762
+  action: Works in Predictive Audiences
+  operations: []
+  outcome: Create model-based audiences for future behavior and opportunity. Support lookalike, churn,
+    reactivation, membership upgrade, next purchase and high-value propensity audiences. Display prediction
+    window, threshold, audience size, confidence
+- step: 17
+  screen: BO-754
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-763
+  action: Works in Activation & Governance
+  operations: []
+  outcome: Control where audiences are used and how they remain compliant. Activate to campaigns, journeys,
+    website, mobile app and approved external platforms through secured connectors. Configure suppression,
+    consent enforcement, frequency limits, d
+branches:
+- at: 1
+  condition: Nothing has been set up on Audience Intelligence yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Marketing CRM Configuration Reference v1.0 board 3 visited
+primaryContract: unknown
+contracts:
+- unknown

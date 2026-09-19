@@ -109,6 +109,7 @@ paths:
         - "P08 BO-069 Asset Register"
         - "P08 BO-108 Venue Operations"
         - "P13 CMS-004 Logo & Assets"
+        - "P13 CMS-071 AI Asset Intelligence Command Center"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List assets
@@ -382,6 +383,7 @@ paths:
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Work Order Verification"
         - "P08 BO-108 Venue Operations"
+        - "P08 BO-577 Maintenance Work Order"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List work orders

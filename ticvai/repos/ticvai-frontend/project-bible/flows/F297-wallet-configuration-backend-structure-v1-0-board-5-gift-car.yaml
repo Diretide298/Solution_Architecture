@@ -1,0 +1,144 @@
+id: F297
+name: 'Wallet Configuration Backend Structure v1.0 board 5: Gift Card & Digital Benefit Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Wallet Configuration Backend Structure v1.0 board 5. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-1123
+  entryPoints:
+  - Arrives at Gift Card & Digital Benefit Command Center
+steps:
+- step: 1
+  screen: BO-1123
+  action: Opens Gift Card & Digital Benefit Command Center
+  operations: []
+  outcome: Provide administrators with a consolidated operational view of gift cards, vouchers and digital
+    benefits across all tenants and venues. Dashboard KPIs
+- step: 2
+  screen: BO-1124
+  action: Works in Gift Card Product Configuration
+  operations: []
+  outcome: Create reusable gift-card products that can be sold or issued across TICVAI. The source specifically
+    requires gift-card balances including activation, redemption, partial usage, expiry, balance inquiry
+    and transaction history. Gift Card Typ
+- step: 3
+  screen: BO-1123
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-1125
+  action: Works in Gift Card Issuance, Activation & Distribution
+  operations: []
+  outcome: Configure how gift cards are created, sold, activated and delivered. Issuance Sources B2C Website
+    Mobile App POS Kiosk Customer Service Corporate Portal B2B/Reseller Campaign Administrative issuance
+    API Activation Methods Activate on sale A
+- step: 5
+  screen: BO-1123
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-1126
+  action: Works in Voucher & Coupon Type Configuration
+  operations: []
+  outcome: Create and manage digital vouchers and non-cash redemption instruments. The source requires
+    the wallet to store and manage digital vouchers, coupons, meal vouchers, parking vouchers, attraction
+    credits and campaign rewards. Voucher Types Mo
+- step: 7
+  screen: BO-1123
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-1127
+  action: Works in Voucher Eligibility & Redemption Rule Studio
+  operations: []
+  outcome: Define precisely when, where and by whom a voucher may be redeemed. Eligibility Rules
+- step: 9
+  screen: BO-1123
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-1128
+  action: Works in Membership Benefits & Entitlement Mapping
+  operations: []
+  outcome: Connect Membership & Loyalty benefits into the Wallet without making Wallet responsible for
+    membership logic. Requirement 4.3.25 requires membership-related benefits, credits, entitlements,
+    guest passes, reservation quotas and included bene
+- step: 11
+  screen: BO-1123
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-1129
+  action: Works in Benefit Packaging & Digital Wallet Presentation
+  operations: []
+  outcome: 'Configure how different instruments appear to customers in B2C and mobile wallet experiences.
+    Wallet Sections Administrators can define presentation categories: Money Cash Balance Refund Credit
+    Gift Cards Gift Card Balance Vouchers Meal Vou'
+- step: 13
+  screen: BO-1123
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-1130
+  action: Works in Gift Card & Voucher Expiry Management
+  operations: []
+  outcome: Control validity, expiration, extension and customer notification. Expiry Models Never expires
+    Fixed date X days after purchase X days after activation X days after issuance End of campaign End
+    of event Membership expiry
+- step: 15
+  screen: BO-1123
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-1131
+  action: Works in Gift Card Balance, Liability & Breakage Control
+  operations: []
+  outcome: Connect gift-card operations to financial liability management without duplicating the Finance
+    module. The source explicitly requires Gift Card Liability Reporting and Gift Card Breakage & Revenue
+    Recognition. Liability Dashboard
+- step: 17
+  screen: BO-1123
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-1132
+  action: Works in Gift Card & Voucher Simulator, Validation & Publication
+  operations: []
+  outcome: 'Allow administrators to test complete gift-card, voucher and benefit configurations before
+    activation. Scenario Example Customer: Gold Member Venue: Theme Park'
+branches:
+- at: 1
+  condition: Nothing has been set up on Gift Card & Digital Benefit Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Wallet Configuration Backend Structure v1.0 board 5 visited
+primaryContract: unknown
+contracts:
+- unknown

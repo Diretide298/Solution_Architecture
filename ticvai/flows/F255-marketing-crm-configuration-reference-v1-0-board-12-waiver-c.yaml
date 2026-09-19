@@ -1,0 +1,148 @@
+id: F255
+name: 'Marketing CRM Configuration Reference v1.0 board 12: Waiver Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Marketing CRM Configuration Reference v1.0 board 12. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-844
+  entryPoints:
+  - Arrives at Waiver Command Center
+steps:
+- step: 1
+  screen: BO-844
+  action: Opens Waiver Command Center
+  operations: []
+  outcome: Monitor waiver completion, expiry and operational access risk. Show required, completed, pending,
+    expired and expiring waivers, blocked entries and guardian signatures. Analyze completion by venue,
+    activity, event, product, channel, guest t
+- step: 2
+  screen: BO-845
+  action: Works in Waiver Template Builder
+  operations: []
+  outcome: Create legal waiver and declaration templates without development. Support liability release,
+    general consent, parental consent, medical declaration, risk acknowledgement and activity agreement
+    types. Provide sections, clauses, variables, c
+- step: 3
+  screen: BO-844
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-846
+  action: Works in Assignment Rules
+  operations: []
+  outcome: Determine which waiver or form each guest must complete. Build rules using product, attraction,
+    event, activity, venue, age, membership, risk category and jurisdiction. Configuration Scope of Work
+    | Version 1.0 58 Assign one or multiple req
+- step: 5
+  screen: BO-844
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-847
+  action: Works in Version, Expiry & Renewal
+  operations: []
+  outcome: Control legal-document lifecycle and re-sign requirements. Maintain version history, effective
+    dates, changed clauses, approver, status and expiry period. Configure whether a change or elapsed
+    period requires all, selected or future guests
+- step: 7
+  screen: BO-844
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-848
+  action: Works in Signature Experience Setup
+  operations: []
+  outcome: Configure secure signing across supported guest touchpoints. Support website, mobile app, kiosk,
+    tablet, POS and dedicated waiver-station channels. Configure identity verification, signature, initials,
+    witness, review-before-submit and comp
+- step: 9
+  screen: BO-844
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-849
+  action: Works in Guardian & Group Signing
+  operations: []
+  outcome: Manage authority and multi-participant signing for minors and groups. Use Customer Master family/guardian
+    relationships and record the authority basis for each dependant. Support one authorized signer for
+    multiple family members, students o
+- step: 11
+  screen: BO-844
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-850
+  action: Works in Pre-Arrival Completion
+  operations: []
+  outcome: Collect required waivers before the guest reaches the venue. Link the request to booking, ticket,
+    event, activity, participants and scheduled arrival. Configuration Scope of Work | Version 1.0 59
+    Send secure email, SMS or WhatsApp link/QR i
+- step: 13
+  screen: BO-844
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-851
+  action: Works in Verification & Access Control
+  operations: []
+  outcome: Enforce waiver requirements during check-in and access validation. Return real-time valid,
+    missing, expired or wrong-version status during ticket scan or check-in. Show required documents and
+    participant while minimizing sensitive content a
+- step: 15
+  screen: BO-844
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-852
+  action: Works in Documents, Search & Retention
+  operations: []
+  outcome: Securely store and retrieve signed waiver evidence. Search by guest, guardian, participant,
+    booking, ticket, activity, event, date, version and status. Store signed PDF/evidence package, metadata,
+    relationships, status and authorized view/d
+- step: 17
+  screen: BO-844
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-853
+  action: Works in Legal Evidence & Audit
+  operations: []
+  outcome: Provide a defensible record of signing and subsequent operational use. Record signer and participant
+    identity, authority, timestamp, timezone, IP/device, channel and verification method. Store consent/template
+    version, content hash, signatu
+branches:
+- at: 1
+  condition: Nothing has been set up on Waiver Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Marketing CRM Configuration Reference v1.0 board 12 visited
+primaryContract: unknown
+contracts:
+- unknown

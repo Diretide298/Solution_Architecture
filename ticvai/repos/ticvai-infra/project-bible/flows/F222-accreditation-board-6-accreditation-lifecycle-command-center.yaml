@@ -1,0 +1,128 @@
+id: F222
+name: 'ACCREDITATION board 6: Accreditation Lifecycle Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as ACCREDITATION board 6. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-664
+  entryPoints:
+  - Arrives at Accreditation Lifecycle Command Center
+steps:
+- step: 1
+  screen: BO-664
+  action: Opens Accreditation Lifecycle Command Center
+  operations: []
+  outcome: Central operational dashboard for accreditation lifecycle status.
+- step: 2
+  screen: BO-665
+  action: Works in Accreditation Status Workflow
+  operations: []
+  outcome: Configure and manage the accreditation lifecycle statuses.
+- step: 3
+  screen: BO-664
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-666
+  action: Works in Validity Period Configuration
+  operations: []
+  outcome: Configure how long an accreditation remains valid.
+- step: 5
+  screen: BO-664
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-667
+  action: Works in Event & Venue Accreditation Assignment
+  operations: []
+  outcome: Determine the event and venue scope of an accreditation.
+- step: 7
+  screen: BO-664
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-668
+  action: Works in Multi-Venue Accreditation Management
+  operations: []
+  outcome: Allow one accreditation to operate across multiple approved venues.
+- step: 9
+  screen: BO-664
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-669
+  action: Works in Temporary & Seasonal Accreditation
+  operations: []
+  outcome: Manage short-duration and recurring accreditation programs.
+- step: 11
+  screen: BO-664
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-670
+  action: Works in Suspension & Reactivation Management
+  operations: []
+  outcome: Temporarily disable accreditation without permanently terminating it.
+- step: 13
+  screen: BO-664
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-671
+  action: Works in Accreditation Revocation Management
+  operations: []
+  outcome: Permanently terminate an accreditation.
+- step: 15
+  screen: BO-664
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-672
+  action: Works in Expiry Monitor & Expiration Rules
+  operations: []
+  outcome: Proactively manage accreditations approaching expiry.
+- step: 17
+  screen: BO-664
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-673
+  action: Works in Accreditation Renewal Workspace
+  operations: []
+  outcome: Manage accreditation renewal without unnecessarily recreating the holder or application.
+branches:
+- at: 1
+  condition: Nothing has been set up on Accreditation Lifecycle Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on ACCREDITATION board 6 visited
+primaryContract: unknown
+contracts:
+- unknown

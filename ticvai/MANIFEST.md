@@ -4,8 +4,8 @@
 
 ```
 1628 operations · 28 contracts · 388 tables · 978 relationships
-125 state models · 29 events · 96 flows · 44 ADRs
-1629 screens · 16 platforms · 13 frontends · 5 apps · 22 boards
+125 state models · 29 events · 96 flows · 46 ADRs
+2427 screens · 16 platforms · 13 frontends · 5 apps · 218 boards
 ```
 
 **`96 flows` counts authored journeys.** 106 more are derived from the client boards and carry
@@ -76,7 +76,7 @@ decision somebody has to make, and the register says which.
 
 ```
 contracts/      28 OpenAPI files — the source of truth. Everything else derives from here.
-screens/        1629 screens across 16 platforms
+screens/        2427 screens across 16 platforms
 flows/          203 journey files · 106 derived from the client boards, one per board but B2B board 1
 states/         125 state models
 events/         29 declared events
@@ -89,7 +89,7 @@ services/       16 FastAPI skeletons for topology benchmarking
 deploy/         four deployment configurations plus three burst variants
 tools/          the generators and the checks
 handoff/        derived artefacts for consumers — lineage, schema, burst scope, sizing
-wireframes/     22 boards · 16 per platform, 5 per shipped app, 1 index. All
+wireframes/     218 boards · 16 per platform, 5 per shipped app, 1 index. All
                 generated. The 65 client-pack boards were archived on 10 September, and
                 every screen that pointed at one was repointed rather than orphaned.
                 frames/ holds what a designer drew, one file per screen; the boards
@@ -102,7 +102,7 @@ sources/        every client file — MoMs, RFP, board PDFs, requirements
 
 ## Where the screen design stands
 
-**46 of 1629 screens are drawn.** 13 batches of P01 Guest Web came back on 10 September,
+**46 of 2427 screens are drawn.** 13 batches of P01 Guest Web came back on 10 September,
 passed the import with nothing refused, and 45 of the 46 carry seeded values rather than
 blank rows. Those frames are now the house style: a later batch that re-derives the look
 instead of matching them produces a second product, not more of this one.
@@ -156,7 +156,7 @@ selected gate mode" and nothing else. **These are placeholders to be replaced, a
 sets them in type has published a generator's shrug.** The 83% that remain were written by a
 person and should be kept.
 
-**719 of the 1629 screens cannot be drawn faithfully from what they declare.** They carry fewer
+**719 of the 2427 screens cannot be drawn faithfully from what they declare.** They carry fewer
 than four components, 224 carry none, and `purpose` runs to a median of 84 characters (measured
 11 September). The bundle says
 so where a designer will see it. Drawing over that gap invents requirements; the gap is a

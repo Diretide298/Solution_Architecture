@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS approvals.accreditation_badge (
 
 -- Every decision at every level. Immutable once the request completes — an approval is evidence
 -- Hangs off: reaches approvals.request through its keys; references approvals.request,
--- identity.principal. Reached by: 2 operations read it and 1 write it
+-- identity.principal. Reached by: 2 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS approvals.decision (
     id                                uuid PRIMARY KEY,
     level                             integer NOT NULL,
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS approvals.decision (
 
 -- Standing in for an approver. Always time-bounded — an open-ended delegation is one nobody
 -- remembers Hangs off: reaches approvals.request through its keys; references identity.principal.
--- Reached by: 4 operations read it and 2 write it
+-- Reached by: 4 operations read it and 2 write it.
 CREATE TABLE IF NOT EXISTS approvals.delegation (
     id                                uuid PRIMARY KEY,
     delegator_principal_id            uuid NOT NULL,
@@ -51,9 +51,9 @@ CREATE TABLE IF NOT EXISTS approvals.delegation (
     scope_path                        text
 );
 
--- Who was asked, when, and why it moved up. The original approver stays in the record Hangs off: a
--- child of approvals.request; reaches approvals.request through its keys; references
--- approvals.request. Reached by: 1 operations read it and 1 write it
+-- Who was asked, when, and why it moved up. The original approver stays in the record Hangs off:
+-- reaches approvals.request through its keys; references approvals.request. Reached by: 1
+-- operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS approvals.escalation (
     id                                uuid PRIMARY KEY NOT NULL,
     request_id                        text NOT NULL
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS approvals.escalation (
 
 -- What requires approval where. Versioned, because a request must be decided by the rules it was
 -- raised under Hangs off: reaches approvals.request through its keys. Reached by: 4 operations
--- read it and 1 write it; 1 tables reference it
+-- read it and 1 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS approvals.matrix (
     id                                uuid PRIMARY KEY,
     kind                              text NOT NULL,
@@ -73,8 +73,8 @@ CREATE TABLE IF NOT EXISTS approvals.matrix (
 
 -- One request per action needing authorisation. The subject is a reference, never a copy Hangs
 -- off: a root — nothing above it in its schema; references identity.principal, pii.subject.
--- Reached by: 6 operations read it and 8 write it; 7 tables reference it; written by 3 contracts —
--- approvals, subscription, workforce
+-- Reached by: 6 operations read it and 8 write it; 8 tables reference it; written by 3 contracts —
+-- approvals, subscription, workforce.
 CREATE TABLE IF NOT EXISTS approvals.request (
     id                                text PRIMARY KEY NOT NULL,
     kind                              text NOT NULL,
@@ -106,7 +106,7 @@ CREATE TABLE IF NOT EXISTS approvals.request (
 
 -- Ordered within a matrix. First match wins, so adding a rule cannot silently change another Hangs
 -- off: reaches approvals.request through its keys; references approvals.matrix. Reached by: 5
--- operations read it and 1 write it; 1 tables reference it
+-- operations read it and 1 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS approvals.rule (
     id                                uuid PRIMARY KEY,
     "order"                           integer NOT NULL,
@@ -128,7 +128,7 @@ CREATE TABLE IF NOT EXISTS approvals.rule (
 );
 
 -- Holds 8 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it; 1 tables reference it
+-- saying what it is
 CREATE TABLE IF NOT EXISTS approvals.step_up_policy (
     operation_id                      text NOT NULL,
     required                          text NOT NULL,

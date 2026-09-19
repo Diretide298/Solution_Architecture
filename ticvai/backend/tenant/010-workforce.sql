@@ -3,7 +3,7 @@
 
 -- Targeted by venue, department or role. emergency is not a louder operational Hangs off: reaches
 -- workforce.rota_assignment through its keys; references identity.principal, platform.org_unit.
--- Reached by: 2 operations read it and 2 write it; 1 tables reference it
+-- Reached by: 2 operations read it and 2 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS workforce.announcement (
     id                                uuid PRIMARY KEY,
     title                             text NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS workforce.announcement (
 
 -- Delivered and acknowledged, per principal. The outstanding list is the roll call Hangs off: a
 -- child of workforce.announcement; reaches workforce.rota_assignment through its keys; references
--- identity.principal, workforce.announcement. Reached by: 2 operations read it and 2 write it
+-- identity.principal, workforce.announcement. Reached by: 2 operations read it and 2 write it.
 CREATE TABLE IF NOT EXISTS workforce.announcement_receipt (
     id                                uuid PRIMARY KEY NOT NULL,
     announcement_id                   uuid NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS workforce.announcement_receipt (
 -- Who actually turned up. occurredAt and recordedAt are both kept — a steward clocking in offline
 -- is not late because the sync was Hangs off: reaches workforce.rota_assignment through its keys;
 -- references access.access_point, identity.principal, workforce.rota_assignment. Reached by: 2
--- operations read it and 2 write it
+-- operations read it and 2 write it.
 CREATE TABLE IF NOT EXISTS workforce.attendance (
     id                                uuid PRIMARY KEY NOT NULL,
     principal_id                      uuid NOT NULL,
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS workforce.attendance (
 -- A person expected somewhere at a time. Not a shift — a shift is a cash session, and most people
 -- on a rota never touch a till Hangs off: a root — nothing above it in its schema; references
 -- identity.principal, identity.role, platform.org_unit. Reached by: 6 operations read it and 2
--- write it; 2 tables reference it
+-- write it; 2 tables reference it.
 CREATE TABLE IF NOT EXISTS workforce.rota_assignment (
     overtime_minutes                  integer,
     rest_period_before                integer,
@@ -77,8 +77,8 @@ CREATE TABLE IF NOT EXISTS workforce.rota_assignment (
 
 -- Both parties agree before the supervisor sees it. Routed through approvals rather than a second
 -- mechanism Hangs off: reaches workforce.rota_assignment through its keys; references
--- approvals.request, identity.principal, workforce.rota_assignment. Reached by: 0 operations read
--- it and 1 write it
+-- approvals.request, identity.principal, workforce.rota_assignment. Reached by: 1 operations read
+-- it and 1 write it.
 CREATE TABLE IF NOT EXISTS workforce.shift_swap (
     id                                uuid PRIMARY KEY NOT NULL,
     assignment_id                     uuid NOT NULL,

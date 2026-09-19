@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Seating & Venue Mapping
   version: 0.1.0
-  x-ticvai-screen-count: 10
+  x-ticvai-screen-count: 14
   x-ticvai-tier: satellite
   x-ticvai-module: 21 — Seat Management & Venue Mapping
   x-ticvai-requirements: 112
@@ -226,6 +226,8 @@ paths:
   /seat-maps:
     get:
       operationId: listSeatMaps
+      x-ticvai-consumed-by:
+        - "P08 BO-953 Seat Map Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -477,6 +479,9 @@ paths:
         format: uuid
     get:
       operationId: listSeats
+      x-ticvai-consumed-by:
+        - "P08 BO-1051 Seat Analytics Command Center"
+        - "P08 BO-991 Seat History"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -760,6 +765,8 @@ paths:
   /seat-map-templates:
     get:
       operationId: listSeatMapTemplates
+      x-ticvai-consumed-by:
+        - "P08 BO-953 Seat Map Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -822,6 +829,8 @@ paths:
   /seat-categories:
     get:
       operationId: listSeatCategories
+      x-ticvai-consumed-by:
+        - "P08 BO-1055 Revenue by Seat Category"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica

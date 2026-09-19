@@ -1,0 +1,130 @@
+id: F257
+name: 'Payment Payment Orchestration board 2: Payment Orchestration Command Center\t27'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Payment Payment Orchestration board 2. **This route is read
+    from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-569
+  entryPoints:
+  - Arrives at Payment Orchestration Command Center\t27
+steps:
+- step: 1
+  screen: ADM-569
+  action: Opens Payment Orchestration Command Center\t27
+  operations: []
+  outcome: Provide real-time operational visibility across all payment gateways, PSPs and acquirers.
+- step: 2
+  screen: ADM-570
+  action: Works in Gateway, PSP & Acquirer Directory\t28
+  operations: []
+  outcome: Maintain the centralized directory of payment-processing providers connected to TICVAI.
+- step: 3
+  screen: ADM-569
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-571
+  action: Works in Provider Connection & Adapter Configuration\t29
+  operations: []
+  outcome: Configure how TICVAI technically connects to each payment provider.
+- step: 5
+  screen: ADM-569
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-572
+  action: Works in Gateway Capability & Payment Method Mapping\t30
+  operations: []
+  outcome: Map Board 1 payment methods to providers capable of processing them.
+- step: 7
+  screen: ADM-569
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-573
+  action: Works in Payment Routing Rule Builder\t31
+  operations: []
+  outcome: Configure the rules that determine which provider should receive each payment transaction.
+- step: 9
+  screen: ADM-569
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-574
+  action: Works in Routing Strategy, Priority & Load Distribution\t33
+  operations: []
+  outcome: Manage how payment traffic is distributed when several valid providers are available.
+- step: 11
+  screen: ADM-569
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-575
+  action: Works in Failover, Retry & Resilience Manager\t34
+  operations: []
+  outcome: Maintain payment availability when a provider experiences a technical problem. This is one
+    of the most important screens in the Payment Orchestration module.
+- step: 13
+  screen: ADM-569
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-576
+  action: Works in Provider Health, SLA & Performance Monitor\t35
+  operations: []
+  outcome: Monitor each provider's technical and transactional health.
+- step: 15
+  screen: ADM-569
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-577
+  action: Works in Provider Cost, Commercial & Routing Economics\t36
+  operations: []
+  outcome: Allow TICVAI to understand the commercial cost of routing transactions through different providers.
+- step: 17
+  screen: ADM-569
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-578
+  action: Works in Payment Routing Simulator, Decision Trace & AI Advisor\t37
+  operations: []
+  outcome: Allow administrators to test exactly how a payment will be routed before deploying routing
+    changes.
+branches:
+- at: 1
+  condition: Nothing has been set up on Payment Orchestration Command Center\t27 yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Payment Payment Orchestration board 2 visited
+primaryContract: unknown
+contracts:
+- unknown

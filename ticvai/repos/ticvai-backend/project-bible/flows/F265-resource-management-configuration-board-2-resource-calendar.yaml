@@ -1,0 +1,124 @@
+id: F265
+name: 'Resource Management Configuration board 2: Resource Calendar Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Resource Management Configuration board 2. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-864
+  entryPoints:
+  - Arrives at Resource Calendar Command Center
+steps:
+- step: 1
+  screen: BO-864
+  action: Opens Resource Calendar Command Center
+  operations: []
+  outcome: Provide the main operational calendar from which users can see and manage resource availability,
+    reservations, assignments and operational blocks.
+- step: 2
+  screen: BO-865
+  action: Works in Calendar Filters, Search & Smart Discovery
+  operations: []
+  outcome: Allow users to quickly locate the correct resource instead of manually searching through hundreds
+    or thousands of resources.
+- step: 3
+  screen: BO-864
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-866
+  action: Works in Resource Availability Schedule Configuration
+  operations: []
+  outcome: Define the baseline schedule controlling when each resource can be used.
+- step: 5
+  screen: BO-864
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-867
+  action: Works in Resource Time-Slot Configuration
+  operations: []
+  outcome: Control how available resource time is converted into reservable or assignable time slots.
+- step: 7
+  screen: BO-864
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-868
+  action: Works in Advance Reservation Management
+  operations: []
+  outcome: Allow resources to be reserved before final operational assignment or ticket transaction.
+- step: 9
+  screen: BO-864
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-869
+  action: Works in Recurring Reservation Configuration
+  operations: []
+  outcome: Allow resources to be reserved repeatedly without creating each reservation individually.
+- step: 11
+  screen: BO-864
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-870
+  action: Works in Operational Time & Resource Blocking
+  operations: []
+  outcome: Protect non-customer-facing time required for preparation, movement, maintenance and operational
+    activities.
+- step: 13
+  screen: BO-864
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-871
+  action: Works in Multi-Event Resource Planning
+  operations: []
+  outcome: Allow operations teams to manage shared resources across multiple simultaneous events, experiences
+    and operational activities.
+- step: 15
+  screen: BO-864
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-872
+  action: Works in Smart Assignment & Drag-and-Drop Reallocation
+  operations: []
+  outcome: Provide the fast, visual assignment experience that operational users and cashiers can use
+    when assigning or changing resources. This should become one of the signature TICVAI Resource Management
+    experiences.
+branches:
+- at: 1
+  condition: Nothing has been set up on Resource Calendar Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Resource Management Configuration board 2 visited
+primaryContract: unknown
+contracts:
+- unknown

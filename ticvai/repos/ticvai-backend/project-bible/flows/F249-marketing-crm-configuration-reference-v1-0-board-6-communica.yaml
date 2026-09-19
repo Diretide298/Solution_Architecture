@@ -1,0 +1,148 @@
+id: F249
+name: 'Marketing CRM Configuration Reference v1.0 board 6: Communications Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Marketing CRM Configuration Reference v1.0 board 6. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-784
+  entryPoints:
+  - Arrives at Communications Center
+steps:
+- step: 1
+  screen: BO-784
+  action: Opens Communications Center
+  operations: []
+  outcome: Monitor outbound communication volume, delivery and engagement. Show messages sent, delivered,
+    failed, opened, clicked, converted and unsubscribed with attributed revenue. Compare email, SMS, WhatsApp,
+    push, in-app, web and operational chan
+- step: 2
+  screen: BO-785
+  action: Works in Template Library
+  operations: []
+  outcome: Centrally manage reusable message templates. Organize marketing, ticketing, reservation, membership,
+    loyalty, wallet and operational templates by channel and purpose. Maintain brand, venue, language,
+    version, owner, approval, validity and a
+- step: 3
+  screen: BO-784
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-786
+  action: Works in Newsletter Builder
+  operations: []
+  outcome: Create responsive, branded newsletters without coding. Provide drag-and-drop header, text,
+    image, event, ticket, membership, loyalty, CTA, divider and footer blocks. Configuration Scope of
+    Work | Version 1.0 31 Support personalization, dyna
+- step: 5
+  screen: BO-784
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-787
+  action: Works in Content Blocks & Product Feed
+  operations: []
+  outcome: Connect communications to reusable content and live products. Maintain approved content blocks
+    for banners, copy, events, tickets, memberships, loyalty, promotions, CTAs and footers. Configure
+    live feeds from events, products, ticket invent
+- step: 7
+  screen: BO-784
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-788
+  action: Works in Subscriptions & Preferences
+  operations: []
+  outcome: Manage newsletter subscriptions and messaging eligibility. Configure subscription categories,
+    topics, channels, frequency, consent mapping, suppression and do-not-contact status. Search subscribers
+    and view preferred channels, verification,
+- step: 9
+  screen: BO-784
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-789
+  action: Works in Transactional Notification Rules
+  operations: []
+  outcome: Map operational events to the correct notification behavior. Configure rules for purchase,
+    reservation, check-in, membership, loyalty, wallet, refund, cancellation, waitlist and operational
+    events. Select template, channel, recipients, timi
+- step: 11
+  screen: BO-784
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-790
+  action: Works in Scheduling, Priority & Approval
+  operations: []
+  outcome: Control message timing, urgency and governance. Support immediate, scheduled, recurring and
+    event-relative delivery with timezone, windows and blackout periods. Configure Critical, High, Medium
+    and Low priority, queue treatment, escalation
+- step: 13
+  screen: BO-784
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-791
+  action: Works in Delivery, Retry & Failover
+  operations: []
+  outcome: Configure reliable routing across communication providers and channels. Maintain primary, secondary
+    and tertiary providers per channel, tenant, region and message category. Define retry count, delay,
+    backoff, retryable errors, expiration an
+- step: 15
+  screen: BO-784
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-792
+  action: Works in Deliverability & Analytics
+  operations: []
+  outcome: Monitor technical delivery quality and commercial outcomes. Report sender reputation, inbox
+    placement, hard/soft bounce, complaints, blocks, opens, clicks and conversions. Compare providers,
+    domains, channels, templates, languages, brands a
+- step: 17
+  screen: BO-784
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-793
+  action: Works in AI Content, Translation & Audit
+  operations: []
+  outcome: Use governed AI for communication creation and localization. Generate subject lines, titles,
+    summaries and message variants by objective, tone, audience and channel. Translate content using approved
+    languages, terminology glossary, brand ru
+branches:
+- at: 1
+  condition: Nothing has been set up on Communications Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Marketing CRM Configuration Reference v1.0 board 6 visited
+primaryContract: unknown
+contracts:
+- unknown

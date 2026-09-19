@@ -88,9 +88,21 @@ share a database with logical isolation, and sharing a Qdrant instance with per-
 collections is the same trade. **It is a cost decision, and the collection boundary already
 provides the isolation** — this ADR does not force one instance per tenant.
 
-**Whether the on-premise model gets AI at all** (CF-61). An on-premise venue has no route to a
-hosted provider and no local model unless one is shipped. **The honest default is no assistant
-on-premise**, and that should be said in the contract rather than discovered at install.
+**Whether the on-premise model gets AI at all** (CF-61). **Closed by
+[ADR-0046](0046-on-premise-has-two-configurations.md), and the answer is four-way rather than the
+two it looks like.** The line is not connectivity, it is data egress: **AI inference is data
+traffic, not control traffic**, so a connected site does not get the assistant merely by being
+connected.
+
+| configuration | AI |
+|---|---|
+| `onPremiseIsolated`, no model shipped | **none** — the honest default, said in the contract rather than discovered at install |
+| `onPremiseIsolated` + client-hosted local model | **yes, locally.** Its own Qdrant collection, forced by vector dimensionality — see [ADR-0021](0021-qdrant-partitioning.md) |
+| `onPremiseConnected`, control channel only | **none.** The channel is PII-free by construction ([ADR-0043](0043-the-control-plane-splits-on-personal-data.md)); inference is not |
+| `onPremiseConnected` + explicit inference-egress consent | **yes, hosted.** A separate consent, subject to [ADR-0009](0009-ai-data-residency.md) |
+
+**An isolated site with its own GPU gets a better assistant than a connected site whose client will
+not let content leave.** Counter-intuitive, and correct.
 
 ---
 

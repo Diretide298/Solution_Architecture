@@ -374,6 +374,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-015 Memberships"
+        - "P08 BO-385 Delegation Management"
       summary: Who may act for this guest, and for whom they may act
       description: 'CF-132. **Both directions, because a guest is usually in both.** A parent holds authority
         over two children and is a member of a corporate account — one screen, one question.

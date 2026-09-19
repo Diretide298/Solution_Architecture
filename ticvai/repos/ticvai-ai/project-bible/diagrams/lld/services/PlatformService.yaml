@@ -1780,6 +1780,8 @@ screens:
 - P08:BO-301 Member Exceptions, Overrides & Service Recovery
 - P08:BO-302 Member Lifecycle History, Audit & Case Timeline
 - P08:BO-303 Membership Analytics, Renewal Intelligence & AI Retention Center
+- P08:BO-503 Product Validation, Approval & Publication
+- P08:BO-949 Approval, Exception & Override Control Center
 - P09:ADM-002 Platform Dashboard
 - P09:ADM-003 Cross-Tenant Health Dashboard
 - P09:ADM-005 Tenant Directory
@@ -1808,7 +1810,9 @@ screens:
 - P09:ADM-034 Archival Job Monitor
 - P09:ADM-035 Support & Escalation Console
 - P09:ADM-036 Platform Notification Broadcast
+- P09:ADM-048 Commercial Pricing Command Center
 - P09:ADM-318 Dead Letters
+- P09:ADM-375 Renewal & Retention Center
 - P10:PTR-001 Partner Login / MFA
 - P10:PTR-011 Quote Management
 - P10:PTR-017 Commission Statement

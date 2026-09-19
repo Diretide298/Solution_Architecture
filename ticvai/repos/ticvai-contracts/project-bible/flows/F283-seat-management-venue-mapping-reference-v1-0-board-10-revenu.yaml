@@ -1,0 +1,124 @@
+id: F283
+name: 'Seat Management Venue Mapping Reference v1.0 board 10: Revenue Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Seat Management Venue Mapping Reference v1.0 board 10. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-1043
+  entryPoints:
+  - Arrives at Revenue Command Center
+steps:
+- step: 1
+  screen: BO-1043
+  action: Opens Revenue Command Center
+  operations: []
+  outcome: Provide a live executive and revenue-management view of seat performance. Show revenue, yield,
+    occupancy, sales pace, average ticket price, remaining inventory and forecast variance. Analyze by
+    tenant, venue, event, performance, section, ca
+- step: 2
+  screen: BO-1044
+  action: Works in Dynamic Seat Pricing
+  operations: []
+  outcome: Configure rules that adjust assigned-seat prices within controlled boundaries. Apply rules
+    by section, row, seat, category, event, performance, sales pace, demand, remaining inventory and time
+    to event. Set base price, adjustment type, floo
+- step: 3
+  screen: BO-1043
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-1045
+  action: Works in Price Bands & Categories
+  operations: []
+  outcome: Maintain the commercial hierarchy applied to seat inventory. Configure price band, seat category,
+    display label, color, currency, channel, customer segment and effective period. Map bands to venue
+    sections, rows or seats and support event/p
+- step: 5
+  screen: BO-1043
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-1046
+  action: Works in Inventory Forecasting
+  operations: []
+  outcome: Predict remaining inventory and sell-through by event day. Forecast seats remaining, sell-through,
+    sold-out probability and over/under supply by section and category. Account for active locks, holds,
+    scheduled releases, blocks, expected can
+- step: 7
+  screen: BO-1043
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-1047
+  action: Works in Section Revenue Forecast
+  operations: []
+  outcome: Plan expected revenue at the venue-section level. Show capacity, sold, held, available, average
+    price, forecast occupancy, forecast revenue and variance. Provide map heat view and ranking by revenue
+    opportunity, yield gap and risk. Reconcil
+- step: 9
+  screen: BO-1043
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-1048
+  action: Works in Seat Upsell Recommendations
+  operations: []
+  outcome: Configure revenue-positive seat offers that remain fair and eligible. Rank upgrade pairs by
+    view improvement, distance, amenities, price delta, availability and customer eligibility. Set channels,
+    offer window, frequency, minimum improvemen
+- step: 11
+  screen: BO-1043
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-1049
+  action: Works in Scenario & What-If Planning
+  operations: []
+  outcome: Compare alternative price, demand and inventory decisions before publication. Adjust capacity,
+    price, discount, holdback, release timing, demand uplift and sales pace assumptions. Calculate seats
+    sold, occupancy, revenue, yield, gross margi
+- step: 13
+  screen: BO-1043
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-1050
+  action: Works in Revenue Analytics & Audit
+  operations: []
+  outcome: Measure actual financial outcomes and preserve decision evidence. Compare realized versus forecast
+    revenue, occupancy, yield, average price and sell-through by section/category. Attribute change to
+    price actions, holds/releases, promotions,
+branches:
+- at: 1
+  condition: Nothing has been set up on Revenue Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Seat Management Venue Mapping Reference v1.0 board 10 visited
+primaryContract: unknown
+contracts:
+- unknown

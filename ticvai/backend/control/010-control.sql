@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS control.api_licence (
 
 -- Rate limits per client (13.1.36). A quota protects the venue, not the developer. Hangs off:
 -- reaches control.cell through its keys; references control.api_client. Reached by: 0 operations
--- read it and 1 write it
+-- read it and 1 write it.
 CREATE TABLE IF NOT EXISTS control.api_quota (
     id                                uuid PRIMARY KEY,
     client_id                         uuid NOT NULL,
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS control.api_quota (
 
 -- API versions and sunset dates (13.1.31–35, ADR-0031). With third parties a breaking change with
 -- no window breaks somebody else business. Hangs off: reaches control.cell through its keys.
--- Reached by: 3 operations read it and 1 write it
+-- Reached by: 3 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS control.api_version (
     version                           text NOT NULL,
     status                            text NOT NULL,
@@ -145,7 +145,7 @@ CREATE TABLE IF NOT EXISTS control.cell (
 
 -- identical cells serving a region. Scaling out is launching another, not growing one Hangs off: a
 -- child of control.cell; reaches control.cell through its keys; references control.cell,
--- platform.org_unit. Reached by: 2 operations read it and 1 write it; 1 tables reference it
+-- platform.org_unit. Reached by: 2 operations read it and 1 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS control.cell_cluster (
     id                                uuid PRIMARY KEY NOT NULL,
     name                              text,
@@ -161,7 +161,7 @@ CREATE TABLE IF NOT EXISTS control.cell_cluster (
 );
 
 -- Holds 7 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 tables reference it
+-- saying what it is
 CREATE TABLE IF NOT EXISTS control.cell_instance (
     id                                uuid PRIMARY KEY NOT NULL,
     cell_id                           uuid NOT NULL,
@@ -448,7 +448,8 @@ CREATE TABLE IF NOT EXISTS control.onboarding_application (
 
 -- Net rate or commission, credit terms, validity. Versioned — an order placed last week used last
 -- week’s rate Hangs off: reaches control.cell through its keys; references approvals.request,
--- identity.principal, maintenance.asset. Reached by: 6 operations read it and 3 write it
+-- identity.principal, maintenance.asset. Reached by: 6 operations read it and 3 write it; 1 tables
+-- reference it.
 CREATE TABLE IF NOT EXISTS control.partner_agreement (
     id                                uuid PRIMARY KEY,
     partner_id                        uuid NOT NULL,
@@ -493,8 +494,8 @@ CREATE TABLE IF NOT EXISTS control.partner_user (
 );
 
 -- a shipped version. Promoted through dev, staging and production; superseded by a later one Hangs
--- off: reaches control.cell through its keys; references control.subscription_plan. Reached by: 5
--- operations read it and 3 write it; 2 tables reference it
+-- off: reaches control.cell through its keys; references control.subscription_plan,
+-- identity.principal. Reached by: 5 operations read it and 3 write it; 3 tables reference it.
 CREATE TABLE IF NOT EXISTS control.release (
     version                           text,
     required_migrations               text[],
@@ -603,7 +604,7 @@ CREATE TABLE IF NOT EXISTS control.scaling_policy (
 
 -- Titles, canonicals, hreflang and schema markup (22.11). An attraction that does not appear in
 -- search sells through OTAs at OTA commission. Hangs off: reaches control.cell through its keys;
--- references ledger.legal_entity. Reached by: 0 operations read it and 1 write it
+-- references ledger.legal_entity. Reached by: 0 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS control.seo_metadata (
     id                                uuid PRIMARY KEY NOT NULL,
     entity_kind                       text NOT NULL,
@@ -691,7 +692,7 @@ CREATE TABLE IF NOT EXISTS control.tenant (
 
 -- a tenant moving between cells — shared to dedicated, or rebalancing Hangs off: a child of
 -- control.tenant; reaches control.cell through its keys; references control.cell, control.tenant,
--- control.tenant_migration_plan. Reached by: 3 operations read it and 2 write it
+-- control.tenant_migration_plan. Reached by: 3 operations read it and 2 write it.
 CREATE TABLE IF NOT EXISTS control.tenant_migration (
     id                                uuid PRIMARY KEY NOT NULL,
     plan_id                           uuid NOT NULL,
@@ -713,7 +714,7 @@ CREATE TABLE IF NOT EXISTS control.tenant_migration (
 -- computed against cell state; expires, because a plan made for a different world is not a plan
 -- Hangs off: a child of control.tenant; reaches control.cell through its keys; references
 -- control.cell, control.tenant. Reached by: 1 operations read it and 1 write it; 1 tables
--- reference it
+-- reference it.
 CREATE TABLE IF NOT EXISTS control.tenant_migration_plan (
     id                                uuid PRIMARY KEY NOT NULL,
     tenant_id                         uuid NOT NULL,
@@ -809,7 +810,7 @@ CREATE TABLE IF NOT EXISTS control.webhook_delivery (
 
 -- An external subscriber to business events (13.1.26, 13.3.18). The 29 events existed and nothing
 -- outside could receive one. Hangs off: reaches control.cell through its keys; references
--- control.api_client. Reached by: 2 operations read it and 1 write it
+-- control.api_client. Reached by: 2 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS control.webhook_subscription (
     id                                uuid PRIMARY KEY NOT NULL,
     client_id                         uuid NOT NULL,

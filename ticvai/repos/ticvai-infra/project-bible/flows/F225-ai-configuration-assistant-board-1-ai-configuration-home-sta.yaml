@@ -1,0 +1,136 @@
+id: F225
+name: 'AI Configuration Assistant board 1: AI Configuration Home & Start'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as AI Configuration Assistant board 1. **This route is read
+    from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-469
+  entryPoints:
+  - Arrives at AI Configuration Home & Start
+steps:
+- step: 1
+  screen: ADM-469
+  action: Opens AI Configuration Home & Start
+  operations: []
+  outcome: Provide one intelligent starting point for creating or modifying TICVAI configuration through
+    AI.
+- step: 2
+  screen: ADM-470
+  action: Works in Setup Type & Business Intent Discovery
+  operations: []
+  outcome: Understand what the administrator is actually trying to accomplish before asking detailed configuration
+    questions. This is the first AI interview screen.
+- step: 3
+  screen: ADM-469
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-471
+  action: Works in Venue & Business Model Discovery
+  operations: []
+  outcome: Understand how the business operates so TICVAI can determine which configuration branches are
+    relevant.
+- step: 5
+  screen: ADM-469
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-472
+  action: Works in Guided Question & Answer Workspace
+  operations: []
+  outcome: Provide the main adaptive AI interview workspace. This is the core screen of Board 1. It should
+    feel conversational but remain structured and controlled.
+- step: 7
+  screen: ADM-469
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-473
+  action: Works in Product & Admission Model Discovery
+  operations: []
+  outcome: Determine what the venue sells and how each product provides admission or entitlement.
+- step: 9
+  screen: ADM-469
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-474
+  action: Works in Operational Requirement Discovery
+  operations: []
+  outcome: Understand the operational rules needed to deliver the configured products.
+- step: 11
+  screen: ADM-469
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-475
+  action: Works in Commercial Requirement Discovery
+  operations: []
+  outcome: Understand how the venue intends to sell and commercially manage its products without actually
+    configuring pricing yet.
+- step: 13
+  screen: ADM-469
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-476
+  action: Works in Required, Recommended & Optional Decisions
+  operations: []
+  outcome: Prevent the administrator from forgetting important configuration while also preventing unnecessary
+    questions from blocking setup. This screen is fundamental to making the AI genuinely useful.
+- step: 15
+  screen: ADM-469
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-477
+  action: Works in Missing Information & Clarification Center
+  operations: []
+  outcome: Allow AI to identify incomplete, contradictory, ambiguous, or logically inconsistent requirements
+    before producing the final blueprint.
+- step: 17
+  screen: ADM-469
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-478
+  action: Works in Configuration Blueprint & Dependency Map
+  operations: []
+  outcome: Convert the entire AI conversation into a structured configuration blueprint that can be reviewed
+    before moving to Board 2. This is the final output of Board 1. Nothing should yet be created in production.
+branches:
+- at: 1
+  condition: Nothing has been set up on AI Configuration Home & Start yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on AI Configuration Assistant board 1 visited
+primaryContract: unknown
+contracts:
+- unknown

@@ -1,0 +1,133 @@
+id: F217
+name: 'ACCREDITATION board 1: Accreditation Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as ACCREDITATION board 1. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-615
+  entryPoints:
+  - Arrives at Accreditation Command Center
+steps:
+- step: 1
+  screen: BO-615
+  action: Opens Accreditation Command Center
+  operations: []
+  outcome: Executive and operational landing screen for the accreditation module.
+- step: 2
+  screen: BO-616
+  action: Works in Accreditation Application Directory
+  operations: []
+  outcome: Central repository of all accreditation applications.
+- step: 3
+  screen: BO-615
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-617
+  action: Works in New Accreditation Application
+  operations: []
+  outcome: Allow authorized backend personnel to manually create accreditation applications.
+- step: 5
+  screen: BO-615
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-618
+  action: Works in Accreditation Form Builder
+  operations: []
+  outcome: Configure applicant-facing registration forms without software development.
+- step: 7
+  screen: BO-615
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-619
+  action: Works in Accreditation Category Management
+  operations: []
+  outcome: Configure reusable accreditation categories.
+- step: 9
+  screen: BO-615
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-620
+  action: Works in Accreditation Program Setup
+  operations: []
+  outcome: Create the accreditation program governing a particular event, venue, season or organization.
+- step: 11
+  screen: BO-615
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-621
+  action: Works in Applicant Type Configuration
+  operations: []
+  outcome: Configure operational rules according to the type of person being accredited. Rather than building
+    completely separate systems for staff, contractors, media, VIPs, etc., TICVAI should provide one accreditation
+    engine with configurable appli
+- step: 13
+  screen: BO-615
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-622
+  action: Works in Application Requirements Matrix
+  operations: []
+  outcome: 'Configure what an applicant must provide before an application can progress. The system shall
+    allow administrators to configure requirements by: Program × Category × Applicant Type'
+- step: 15
+  screen: BO-615
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-623
+  action: Works in Accreditation Intake Monitor
+  operations: []
+  outcome: Give operations teams visibility into incoming accreditation demand.
+- step: 17
+  screen: BO-615
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-624
+  action: Works in Registration Rules & Publication
+  operations: []
+  outcome: 'Final governance screen before opening an accreditation program for applications. The system
+    shall provide a validation checklist covering: Registration form configured Categories configured
+    Required documents configured Approval workflow a'
+branches:
+- at: 1
+  condition: Nothing has been set up on Accreditation Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on ACCREDITATION board 1 visited
+primaryContract: unknown
+contracts:
+- unknown

@@ -1,0 +1,148 @@
+id: F281
+name: 'Seat Management Venue Mapping Reference v1.0 board 8: Group Reservation Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Seat Management Venue Mapping Reference v1.0 board 8. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-1023
+  entryPoints:
+  - Arrives at Group Reservation Center
+steps:
+- step: 1
+  screen: BO-1023
+  action: Opens Group Reservation Center
+  operations: []
+  outcome: Provide a pipeline view of all group inquiries and reservations. Show new requests, quoted,
+    held, awaiting deposit, confirmed, expired, cancelled and completed groups. Display seats, value,
+    conversion, deadline, outstanding payment and inve
+- step: 2
+  screen: BO-1024
+  action: Works in Group Type Configuration
+  operations: []
+  outcome: Define reusable rules for corporate, school, tour and custom groups. Maintain minimum/maximum
+    size, default hold days, deposit, payment schedule, release timing and cancellation policy. Configure
+    auto-allocation, contiguity, split allowance
+- step: 3
+  screen: BO-1023
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-1025
+  action: Works in Group Request Intake
+  operations: []
+  outcome: Capture a complete group seating requirement from any authorized channel. Record account/contact,
+    event, performance, expected size, age mix, budget, zone, accessibility and seating preferences. Capture
+    arrival, transport, guide, invoice, t
+- step: 5
+  screen: BO-1023
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-1026
+  action: Works in Availability & Best-Fit Search
+  operations: []
+  outcome: Find the strongest seating options for a group request. Search live inventory by group size,
+    contiguous requirement, split limit, price, zone, view and accessibility. Rank sections or seat groups
+    by fit score, average price, distance, fragm
+- step: 7
+  screen: BO-1023
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-1027
+  action: Works in Bulk Seat Allocation
+  operations: []
+  outcome: Allocate large quantities without compromising seat-state integrity. Select section, row, seat
+    range, polygon or recommended group and validate all inventory atomically. Configure contiguous groups,
+    aisle breaks, split sections, wheelchair/
+- step: 9
+  screen: BO-1023
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-1028
+  action: Works in Roster & Participant Assignment
+  operations: []
+  outcome: Assign named or placeholder participants to allocated seats. Import or enter participant name,
+    type, age band, accessibility need, ticket type and external reference. Assign manually or automatically
+    while preserving family, class, coach, g
+- step: 11
+  screen: BO-1023
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-1029
+  action: Works in Quote, Deposit & Payment
+  operations: []
+  outcome: Manage the commercial proposal and collection schedule for the group. Build quote lines for
+    seats, fees, add-ons, discounts, tax, complimentary inventory and optional services. Apply shared
+    discount authority, price validity, deposit percen
+- step: 13
+  screen: BO-1023
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-1030
+  action: Works in Modify, Release & Cancel
+  operations: []
+  outcome: Control changes to confirmed or pending group reservations. Increase, reduce, reseat, change
+    performance, release selected seats or cancel all/part of the group. Preview price, fee, deposit,
+    refund, cancellation charge, participant and tick
+- step: 15
+  screen: BO-1023
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-1031
+  action: Works in Contracts & Approval Workflow
+  operations: []
+  outcome: Manage documents and approval stages required for group business. Attach or generate proposal,
+    contract, purchase order, roster, waiver requirement and supporting documents. Route pricing, credit,
+    deposit, allocation, complimentary seats an
+- step: 17
+  screen: BO-1023
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-1032
+  action: Works in Group Reporting & Audit
+  operations: []
+  outcome: Measure group-sales performance and preserve transaction accountability. Report pipeline, conversion,
+    seats, revenue, yield, discount, outstanding payment, cancellation and utilization. Compare corporate,
+    school, tour, account, sales owner,
+branches:
+- at: 1
+  condition: Nothing has been set up on Group Reservation Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Seat Management Venue Mapping Reference v1.0 board 8 visited
+primaryContract: unknown
+contracts:
+- unknown

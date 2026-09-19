@@ -9,12 +9,12 @@
 | Contracts | 5 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 32 |
+| Operations with no screen | 31 |
 | Waves | wave1 11 |
 
 ## Gaps
 
-### 32 operations with no screen here
+### 31 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -36,7 +36,6 @@
 | `createReservation` | orders | POST | Hold without payment |
 | `extendReservation` | orders | POST | Extend a reservation |
 | `issueInvitation` | orders | POST | Issue a complimentary entitlement, with no payment expected |
-| `listAbandonedCarts` | orders | GET | Carts that lapsed without checking out |
 | `listChargebacks` | orders | GET | Open disputes, by deadline |
 | `listFraudRules` | orders | GET |  |
 | `listInvitationAllowances` | orders | GET | Who may issue comps, and how many are left |

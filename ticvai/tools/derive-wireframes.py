@@ -949,7 +949,7 @@ display:inline-block;padding:2px 7px;border-radius:4px}}
         #
         # **31 August**: a consumer counting `wireframes/` reported 811 unclaimed frames against a
         # real 359. The difference was eight boards superseded by a rename on 26 August and nine
-        # belonging to other products entirely — `Aster *`, `Park_POS`, `Viewer Redesign`. **A
+        # belonging to other products entirely — `Adam *`, `Park_POS`, `Viewer Redesign`. **A
         # worklist wrong by 55% is worse than no worklist**, because somebody plans against it.
         #
         # Four categories now, and a consumer can act on each: `generated` is ours to rewrite,

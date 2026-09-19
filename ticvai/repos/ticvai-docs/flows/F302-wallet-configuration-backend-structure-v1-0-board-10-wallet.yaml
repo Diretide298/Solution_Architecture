@@ -1,0 +1,133 @@
+id: F302
+name: 'Wallet Configuration Backend Structure v1.0 board 10: Wallet Integration Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Wallet Configuration Backend Structure v1.0 board 10. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-1173
+  entryPoints:
+  - Arrives at Wallet Integration Command Center
+steps:
+- step: 1
+  screen: BO-1173
+  action: Opens Wallet Integration Command Center
+  operations: []
+  outcome: Provide administrators and technical operations teams with a centralized view of all Wallet
+    integrations and API activity.
+- step: 2
+  screen: BO-1174
+  action: Works in Wallet API Catalogue & Endpoint Configuration
+  operations: []
+  outcome: Define and govern the API services exposed by the TICVAI Wallet Engine. Requirement 4.3.34
+    explicitly requires APIs supporting wallet operations. Core Wallet APIs
+- step: 3
+  screen: BO-1173
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-1175
+  action: Works in Integration Profile & System Mapping
+  operations: []
+  outcome: Configure how TICVAI Wallet communicates with internal modules and approved external systems.
+    Requirement 4.3.20 requires wallet integration with both internal and external systems through APIs.
+- step: 5
+  screen: BO-1173
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-1176
+  action: Works in Wallet Events, Webhooks & Notification Orchestration
+  operations: []
+  outcome: Configure event-driven communication when something changes in Wallet.
+- step: 7
+  screen: BO-1173
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-1177
+  action: Works in API Security, Access & Integration Permissions
+  operations: []
+  outcome: Ensure integrations receive only the wallet permissions and data required for their function.
+- step: 9
+  screen: BO-1173
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-1178
+  action: Works in Synchronization, Retry & Resilience Configuration
+  operations: []
+  outcome: Configure how Wallet behaves when dependent services or external systems are temporarily unavailable.
+- step: 11
+  screen: BO-1173
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-1179
+  action: Works in Integration Monitoring & Exception Workbench
+  operations: []
+  outcome: Give technical and operational teams a dedicated workspace for failed integrations.
+- step: 13
+  screen: BO-1173
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-1180
+  action: Works in Wallet Configuration Governance & Version Control
+  operations: []
+  outcome: Provide centralized governance for configuration changes across all ten Wallet boards. This
+    screen becomes the master configuration governance layer for the entire Wallet module.
+- step: 15
+  screen: BO-1173
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-1181
+  action: Works in Approval, Publication & Change Management
+  operations: []
+  outcome: Control how Wallet configuration moves safely from draft into production.
+- step: 17
+  screen: BO-1173
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-1182
+  action: Works in Wallet Platform Health, Audit & Administration Center
+  operations: []
+  outcome: Provide the final master-administration screen for the entire TICVAI Wallet ecosystem. This
+    should become the control tower for all ten Wallet boards.
+branches:
+- at: 1
+  condition: Nothing has been set up on Wallet Integration Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Wallet Configuration Backend Structure v1.0 board 10 visited
+primaryContract: unknown
+contracts:
+- unknown

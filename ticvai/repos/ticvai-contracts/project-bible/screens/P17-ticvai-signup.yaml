@@ -161,7 +161,9 @@ screens:
     rather than passed off as a decision'
   layout:
     template: split
-    regions: []
+    regions:
+    - name: contentBody
+      components: []
   states:
     loading: The customer organization registration list.
     error: Could not load. Names which read failed and leaves the customer organization registration untouched.
@@ -350,7 +352,9 @@ screens:
     rather than passed off as a decision'
   layout:
     template: split
-    regions: []
+    regions:
+    - name: contentBody
+      components: []
   states:
     loading: The visitor capacity operational list.
     error: Could not load. Names which read failed and leaves the visitor capacity operational untouched.
@@ -629,7 +633,9 @@ screens:
     rather than passed off as a decision'
   layout:
     template: split
-    regions: []
+    regions:
+    - name: contentBody
+      components: []
   states:
     loading: The access queue visitor list.
     error: Could not load. Names which read failed and leaves the access queue visitor untouched.
@@ -702,7 +708,9 @@ screens:
     rather than passed off as a decision'
   layout:
     template: split
-    regions: []
+    regions:
+    - name: contentBody
+      components: []
   states:
     loading: The additional business module list.
     error: Could not load. Names which read failed and leaves the additional business module untouched.
@@ -776,7 +784,9 @@ screens:
     rather than passed off as a decision'
   layout:
     template: split
-    regions: []
+    regions:
+    - name: contentBody
+      components: []
   states:
     loading: The integration payment technical list.
     error: Could not load. Names which read failed and leaves the integration payment technical untouched.
@@ -850,7 +860,9 @@ screens:
     rather than passed off as a decision'
   layout:
     template: split
-    regions: []
+    regions:
+    - name: contentBody
+      components: []
   states:
     loading: The assessment summary handoff list.
     error: Could not load. Names which read failed and leaves the assessment summary handoff untouched.
@@ -925,7 +937,9 @@ screens:
     rather than passed off as a decision'
   layout:
     template: split
-    regions: []
+    regions:
+    - name: contentBody
+      components: []
   states:
     loading: The recommended package overview list.
     error: Could not load. Names which read failed and leaves the recommended package overview untouched.
@@ -1030,7 +1044,9 @@ screens:
     rather than passed off as a decision'
   layout:
     template: split
-    regions: []
+    regions:
+    - name: contentBody
+      components: []
   states:
     loading: The commercial model tier list.
     error: Could not load. Names which read failed and leaves the commercial model tier untouched.
@@ -1309,7 +1325,9 @@ screens:
     rather than passed off as a decision'
   layout:
     template: split
-    regions: []
+    regions:
+    - name: contentBody
+      components: []
   states:
     loading: The module detail commercial list.
     error: Could not load. Names which read failed and leaves the module detail commercial untouched.
@@ -1377,7 +1395,9 @@ screens:
     rather than passed off as a decision'
   layout:
     template: split
-    regions: []
+    regions:
+    - name: contentBody
+      components: []
   states:
     loading: The module dependency compatibility list.
     error: Could not load. Names which read failed and leaves the module dependency compatibility untouched.
@@ -1452,7 +1472,9 @@ screens:
     rather than passed off as a decision'
   layout:
     template: split
-    regions: []
+    regions:
+    - name: contentBody
+      components: []
   states:
     loading: The add-ons capacity commercial list.
     error: Could not load. Names which read failed and leaves the add-ons capacity commercial untouched.
@@ -1520,7 +1542,9 @@ screens:
     rather than passed off as a decision'
   layout:
     template: split
-    regions: []
+    regions:
+    - name: contentBody
+      components: []
   states:
     loading: The purchase trial journey list.
     error: Could not load. Names which read failed and leaves the purchase trial journey untouched.
@@ -1600,6 +1624,8 @@ screens:
       - kind: primaryButton
         label: Custom Term
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 59 §Support
+    - name: contentBody
+      components: []
   states:
     loading: The contract billing cycle list.
     error: Could not load. Names which read failed and leaves the contract billing cycle untouched.
@@ -1687,6 +1713,8 @@ screens:
       - kind: secondaryButton
         label: Validate Entity / Save / Continue
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 60 §Actions
+    - name: contentBody
+      components: []
   states:
     loading: The billing legal entity list.
     error: Could not load. Names which read failed and leaves the billing legal entity untouched.
@@ -1778,6 +1806,8 @@ screens:
       - kind: secondaryButton
         label: Other Approved Method
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 61 §Support
+    - name: contentBody
+      components: []
   states:
     loading: The payment method settlement list.
     error: Could not load. Names which read failed and leaves the payment method settlement untouched.
@@ -2073,7 +2103,9 @@ screens:
     rather than passed off as a decision'
   layout:
     template: split
-    regions: []
+    regions:
+    - name: contentBody
+      components: []
   states:
     loading: The subscription confirmation commercial list.
     error: Could not load. Names which read failed and leaves the subscription confirmation commercial

@@ -1,0 +1,61 @@
+id: F236
+name: 'Event Management Configuration Backend Structure v1.0 board 3: Venue & Space Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Event Management Configuration Backend Structure v1.0 board
+    3. **This route is read from the screens' own navigation**, and the reason anyone walks it has still
+    to be written.
+  entryScreen: BO-700
+  entryPoints:
+  - Arrives at Venue & Space Command Center
+steps:
+- step: 1
+  screen: BO-700
+  action: Opens Venue & Space Command Center
+  operations: []
+  outcome: Provide management with a consolidated backend view of the financial, commercial, sponsorship,
+    attendance and operational performance of events.
+- step: 2
+  screen: BO-701
+  action: Works in Venue Master Configuration
+  operations: []
+  outcome: Configure the financial plan and budget against which event performance will be measured.
+- step: 3
+  screen: BO-700
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-702
+  action: Works in Space Access Rules Configuration
+  operations: []
+  outcome: Allow authorized administrators to use AI to accelerate creation of event configuration from
+    natural-language instructions or existing templates.
+branches:
+- at: 1
+  condition: Nothing has been set up on Venue & Space Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Event Management Configuration Backend Structure v1.0 board 3 visited
+primaryContract: unknown
+contracts:
+- unknown

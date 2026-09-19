@@ -2,7 +2,7 @@
 
 Generated 17 August 2026
 
-**1628 operations · 388 tables · 1629 screens · 125 state models · 29 events · 96 flows · 44 ADRs**
+**1628 operations · 388 tables · 2427 screens · 125 state models · 29 events · 96 flows · 46 ADRs**
 
 **Conflicts: 92 raised, 0 blocking.** See `conflict-status.md`.
 
@@ -17,7 +17,7 @@ provenance and what each one rules out — including the six that were wrong fir
 |---|---|
 | **`COVERAGE.md`** | What is here and what is not, against the whole build |
 | **`conflict-status.md`** | Every conflict and its state, one line each |
-| **`wireframes/TICVAI Wireframe Boards.dc.html`** | 22 boards, 1629 screens. Open in a browser |
+| **`wireframes/TICVAI Wireframe Boards.dc.html`** | 218 boards, 2427 screens. Open in a browser |
 | **`handoff/platforms-and-apps.md`** | Twelve platforms, ten apps, named by who operates them |
 | **`handoff/build-order.md`** | Which apps can be built, and in what order |
 | **`handoff/TICVAI_Schema_Reference.xlsx`** | 388 tables, 3,911 columns, nine sheets |
@@ -34,9 +34,9 @@ provenance and what each one rules out — including the six that were wrong fir
 | `states/` · `events/` | 125 state models · 29 events, cross-checked |
 | `flows/` | 23 user journeys with 137 unhappy paths |
 | `handoff/` | Registers240 indexes and the schema workbook |
-| `docs/` | Architecture, 44 ADRs, the conflict register |
+| `docs/` | Architecture, 46 ADRs, the conflict register |
 | `tools/` | **7 validators** and two generators |
-| `wireframes/` | 22 boards from Claude Code, linked to every definition |
+| `wireframes/` | 218 boards from Claude Code, linked to every definition |
 | `sources/` | The matrix, the minutes, the client design references |
 
 ## Validating
@@ -52,7 +52,7 @@ fixed**, and they are under-specified rather than wrong.
 
 ## What this is
 
-A design package. **1628 operations, 388 tables and 1629 screens are specified and none of it
+A design package. **1628 operations, 388 tables and 2427 screens are specified and none of it
 has been executed** — no SQL is written, no code is built, and every number above is an
 assertion until something runs.
 

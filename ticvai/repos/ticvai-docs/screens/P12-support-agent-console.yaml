@@ -1,3 +1,4 @@
+
 platform:
   code: P12
   audience: staff
@@ -102,15 +103,15 @@ screens:
       trigger: Executive Command Center
       provenance: structural — SUP-001 is P12's home screen and its exits are its launcher
   notes: '**Generalised on 10 September 2026 from `Agent Login`.** It was the only door into an application
-    of 550 screens - P08 back office, P13 CMS, P16 analytics and this console - and it was named for one
-    of the four. A venue manager signing in through a screen called *Agent Login* is being told they are
-    in the wrong place.
+    of 550 screens - P08 back office, P13 CMS, P16 analytics and this console - and it was named for
+    one of the four. A venue manager signing in through a screen called *Agent Login* is being told
+    they are in the wrong place.
 
 
     **Nothing about the screen changed except what it admits to.** It already called the whole identity
     set - `login`, `forceLogout`, `listSsoProviders`, `revokeAllSessions`, `listMfaMethods` - and its
-    purpose already read *get someone into the app, fast, on a device that may be shared*. The work was
-    the name and the exits.
+    purpose already read *get someone into the app, fast, on a device that may be shared*. The work
+    was the name and the exits.
 
 
     **`implementation.app` stays `venue-support-web`.** That is the build unit, one of twelve frontends
@@ -119,14 +120,14 @@ screens:
 
 
     **It keeps `listMfaMethods` where `POS-000` does not**, and the difference is the point: this signs
-    somebody into the ledger, the pricing and the tenant''s own content from a desk, while a till is bounded
-    by the terminal it is bolted to.'
+    somebody into the ledger, the pricing and the tenant''s own content from a desk, while a till is
+    bounded by the terminal it is bolted to.'
   density: compact
   pattern: listDetail
   patternReason: '`listActiveSessions` reads the population and `getCurrentSession` reads one of them
     — list, select, act'
-  purpose: Get someone into venue management, fast, on a device that may be shared, and resolve the session
-    the back office, the CMS and analytics all read.
+  purpose: Get someone into venue management, fast, on a device that may be shared, and resolve the
+    session the back office, the CMS and analytics all read.
   gaps:
   - operation: listMfaMethods
     why: '**2 declared operations reach no component on this screen**: listMfaMethods, listSsoProviders.
@@ -195,8 +196,8 @@ screens:
   - id: confirmForceLogout
     component: confirmDialog
     trigger: Force
-    body: '**Names what `forceLogout` changes and what it leaves alone**, in the consequence rather than
-      the verb. A agent login this affects should be identified in the dialog, not just counted.'
+    body: '**Names what `forceLogout` changes and what it leaves alone**, in the consequence rather
+      than the verb. A agent login this affects should be identified in the dialog, not just counted.'
     provenance: contract identity.yaml POST /auth/sessions/{sessionId}/force-logout
   - id: confirmRevokeAllSessions
     component: confirmDialog
@@ -211,8 +212,8 @@ screens:
       nothing.
     emptyNoResults: The filter narrowed it and the agent login are still there. Names the active filter
       and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: login
     contract: identity
@@ -259,9 +260,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-001
-  apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
+    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
+    them to the ones that matter is work a person still owes this screen.
 - id: SUP-002
   name: Agent Dashboard
   module: Overview
@@ -298,8 +299,8 @@ screens:
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August**
-    — `Dashboards Board` frame `sup-002`. **One board draws five dashboards across five platforms** —
-    platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather
+    — `Dashboards Board` frame `sup-002`. **One board draws five dashboards across five platforms**
+    — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather
     than a domain, and the pack recognised that before the package did.
   density: compact
   boardFrames:
@@ -309,8 +310,8 @@ screens:
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   gaps:
   - operation: listConversations
-    why: '**1 declared operation reach no component on this screen**: listConversations. Either the screen
-      is missing what calls them, or the declaration is residue.'
+    why: '**1 declared operation reach no component on this screen**: listConversations. Either the
+      screen is missing what calls them, or the declaration is residue.'
     source: the screen's own declarations
   layout:
     template: split
@@ -394,8 +395,8 @@ screens:
     emptyFirstRun: No agent yet. Carries the create action; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the agent are still there. Names the active filter and
       offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listCases
     contract: marketing-crm
@@ -449,11 +450,11 @@ screens:
     params:
     - name: caseId
       from: deepLink
-    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
-      redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
-      or never existed, because those are three different next actions. **The scope is resolved from the
-      session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives
-      with `caseId`.'
+    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No
+      silent redirect — a supervisor following a link from an alert needs to know whether the record
+      moved, closed or never existed, because those are three different next actions. **The scope is
+      resolved from the session, never from the link**: a link cannot move somebody to a venue they
+      do not hold. Arrives with `caseId`.'
     preloaded:
     - CaseDetail.id
     - CaseDetail.caseNumber
@@ -465,11 +466,11 @@ screens:
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-002
     note: '**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
-      The frame it points at now is the generated one. This screen has been designed once and is not starting
-      from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+      The frame it points at now is the generated one. This screen has been designed once and is not
+      starting from nothing.'
+  apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
+    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
+    them to the ones that matter is work a person still owes this screen.
 - id: SUP-003
   name: Availability & Routing Settings
   module: Access & Availability
@@ -499,7 +500,8 @@ screens:
       trigger: Agent Dashboard
       carries:
       - caseId
-      provenance: derived — SUP-002 declares entryState.params caseId, so an edge into it must carry them
+      provenance: derived — SUP-002 declares entryState.params caseId, so an edge into it must carry
+        them
     - to: SUP-004
       trigger: Conversation Queue
       carries:
@@ -544,8 +546,8 @@ screens:
     error: Could not load. Names which read failed and leaves the availability routing settings untouched.
     emptyFirstRun: No availability routing settings configured. Carries the create action and says what
       the platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: setAgentAvailability
     contract: marketing-crm
@@ -555,9 +557,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-003
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop
+    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
+    them to the ones that matter is work a person still owes this screen.
 - id: SUP-004
   name: Conversation Queue
   module: Conversations
@@ -592,7 +594,8 @@ screens:
       trigger: Agent Dashboard
       carries:
       - caseId
-      provenance: derived — SUP-002 declares entryState.params caseId, so an edge into it must carry them
+      provenance: derived — SUP-002 declares entryState.params caseId, so an edge into it must carry
+        them
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101).
@@ -604,8 +607,8 @@ screens:
   purpose: Find the right one quickly, and act on it without opening it.
   gaps:
   - operation: listConversations
-    why: '**1 declared operation reach no component on this screen**: listConversations. Either the screen
-      is missing what calls them, or the declaration is residue.'
+    why: '**1 declared operation reach no component on this screen**: listConversations. Either the
+      screen is missing what calls them, or the declaration is residue.'
     source: the screen's own declarations
   layout:
     template: split
@@ -690,12 +693,12 @@ screens:
   states:
     loading: The conversation queue list.
     error: Could not load. Names which read failed and leaves the conversation queue untouched.
-    emptyFirstRun: No conversation queue yet. Carries the create action; distinct from a filter that matched
-      nothing.
+    emptyFirstRun: No conversation queue yet. Carries the create action; distinct from a filter that
+      matched nothing.
     emptyNoResults: The filter narrowed it and the conversation queue are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listCases
     contract: marketing-crm
@@ -805,7 +808,8 @@ screens:
       trigger: Agent Dashboard
       carries:
       - caseId
-      provenance: derived — SUP-002 declares entryState.params caseId, so an edge into it must carry them
+      provenance: derived — SUP-002 declares entryState.params caseId, so an edge into it must carry
+        them
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101)
@@ -934,11 +938,12 @@ screens:
   states:
     loading: The live chat list.
     error: Could not load. Names which read failed and leaves the live chat untouched.
-    emptyFirstRun: No live chat yet. Carries the create action; distinct from a filter that matched nothing.
+    emptyFirstRun: No live chat yet. Carries the create action; distinct from a filter that matched
+      nothing.
     emptyNoResults: The filter narrowed it and the live chat are still there. Names the active filter
       and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: addCaseMessage
     contract: marketing-crm
@@ -1045,7 +1050,8 @@ screens:
       trigger: Agent Dashboard
       carries:
       - caseId
-      provenance: derived — SUP-002 declares entryState.params caseId, so an edge into it must carry them
+      provenance: derived — SUP-002 declares entryState.params caseId, so an edge into it must carry
+        them
     - to: SUP-005
       trigger: Live Chat Workspace
       carries:
@@ -1067,8 +1073,8 @@ screens:
   purpose: Find something when the guest does not know what it is called.
   gaps:
   - operation: listFaqs
-    why: '**1 declared operation reach no component on this screen**: listFaqs. Either the screen is missing
-      what calls them, or the declaration is residue.'
+    why: '**1 declared operation reach no component on this screen**: listFaqs. Either the screen is
+      missing what calls them, or the declaration is residue.'
     source: the screen's own declarations
   layout:
     template: split
@@ -1120,10 +1126,10 @@ screens:
     error: Could not load. Names which read failed and leaves the knowledge base search untouched.
     emptyFirstRun: No knowledge base search yet. Carries the create action; distinct from a filter that
       matched nothing.
-    emptyNoResults: The filter narrowed it and the knowledge base search are still there. Names the active
-      filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the knowledge base search are still there. Names the
+      active filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listKnowledgeCollections
     contract: ai
@@ -1144,8 +1150,8 @@ screens:
     - name: version
       from: deepLink
     coldEntry: '**A version link is expected to point at something superseded — that is what versions
-      are for.** The screen opens the requested version read-only, says it is not current, and links to
-      the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`,
+      are for.** The screen opens the requested version read-only, says it is not current, and links
+      to the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`,
       `policyKind`.'
     preloaded:
     - KnowledgeCollection.id
@@ -1157,9 +1163,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-006
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
+    them to the ones that matter is work a person still owes this screen.
 - id: SUP-007
   name: Canned Response Management
   module: Knowledge & Responses
@@ -1190,7 +1196,8 @@ screens:
       trigger: Agent Dashboard
       carries:
       - caseId
-      provenance: derived — SUP-002 declares entryState.params caseId, so an edge into it must carry them
+      provenance: derived — SUP-002 declares entryState.params caseId, so an edge into it must carry
+        them
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
@@ -1250,10 +1257,10 @@ screens:
     error: Could not load. Names which read failed and leaves the canned response untouched.
     emptyFirstRun: No canned response yet. Carries the create action; distinct from a filter that matched
       nothing.
-    emptyNoResults: The filter narrowed it and the canned response are still there. Names the active filter
-      and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the canned response are still there. Names the active
+      filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listMessageTemplates
     contract: marketing-crm
@@ -1276,9 +1283,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-007
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
+    them to the ones that matter is work a person still owes this screen.
 - id: SUP-008
   name: Agent Performance & SLA View
   module: Overview
@@ -1309,7 +1316,8 @@ screens:
       trigger: Agent Dashboard
       carries:
       - caseId
-      provenance: derived — SUP-002 declares entryState.params caseId, so an edge into it must carry them
+      provenance: derived — SUP-002 declares entryState.params caseId, so an edge into it must carry
+        them
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
@@ -1320,8 +1328,8 @@ screens:
   purpose: Produce agent performance & sla view for this venue.
   gaps:
   - operation: getReport
-    why: '**2 declared operations reach no component on this screen**: getReport, listConversations. Either
-      the screen is missing what calls them, or the declaration is residue.'
+    why: '**2 declared operations reach no component on this screen**: getReport, listConversations.
+      Either the screen is missing what calls them, or the declaration is residue.'
     source: the screen's own declarations
   layout:
     template: split
@@ -1394,18 +1402,19 @@ screens:
   - id: confirmDeleteReport
     component: confirmDialog
     trigger: Delete
-    body: '**Names what `deleteReport` changes and what it leaves alone**, in the consequence rather than
-      the verb. A agent performance sla this affects should be identified in the dialog, not just counted.'
+    body: '**Names what `deleteReport` changes and what it leaves alone**, in the consequence rather
+      than the verb. A agent performance sla this affects should be identified in the dialog, not just
+      counted.'
     provenance: contract reporting.yaml DELETE /reports/{reportId}
   states:
     loading: The agent performance sla list.
     error: Could not load. Names which read failed and leaves the agent performance sla untouched.
     emptyFirstRun: No agent performance sla yet. Carries the create action; distinct from a filter that
       matched nothing.
-    emptyNoResults: The filter narrowed it and the agent performance sla are still there. Names the active
-      filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the agent performance sla are still there. Names the
+      active filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: runReport
     contract: reporting
@@ -1555,18 +1564,18 @@ screens:
       provenance: flow F134 step 17→18
       operation: listCustomerService
   density: compact
+  purposeNote: An agent can immediately understand their workload, priorities, SLA exposure and required
+    actions without navigating multiple TICVAI modules.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display; Show) and no metric row
   purpose: Provide every customer-service agent with a personalized operational workspace showing customers,
     cases, tasks, SLAs, alerts and workload.
-  purposeNote: An agent can immediately understand their workload, priorities, SLA exposure and required
-    actions without navigating multiple TICVAI modules.
   gaps:
   - operation: null
-    why: '**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved: New
-      Case, Find Customer, Find Order, Find Ticket, Find Booking, Assign Case, Escalate, Open AI Assistant.
-      Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen
-      from the screen side rather than the contract side.'
+    why: '**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved:
+      New Case, Find Customer, Find Order, Find Ticket, Find Booking, Assign Case, Escalate, Open AI
+      Assistant. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
+      seen from the screen side rather than the contract side.'
     source: pack Customer Service_Reference.pdf, page 3 §Quick Actions
   layout:
     template: split
@@ -1677,12 +1686,16 @@ screens:
       nothing.
     emptyNoResults: The filter narrowed it and the customer service are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listCustomerService
     contract: marketing-crm
     purpose: Customer Service Command Center
+    trigger: onLoad
+  - operationId: listCustomerServiceProfile
+    contract: marketing-crm
+    purpose: Customer 360° Service Profile
     trigger: onLoad
   entryState:
     preloaded:
@@ -1696,9 +1709,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-009
-  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 3. 25 of 27 labels bound
-    to a contract property; 35 of 53 pack bullets carried onto the screen — the rest are acceptance prose,
-    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+    workshopBoard: wireframes/WS42 Customer Service Board 1.dc.html#sup-009
+  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 3. 25 of 27 labels
+    bound to a contract property; 35 of 53 pack bullets carried onto the screen — the rest are acceptance
+    prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
+    here.
 - id: SUP-010
   name: Customer 360° Service Profile
   module: Support
@@ -1720,20 +1735,20 @@ screens:
     exitTo:
     - SUP-009
     inferred: false
-    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-009
       trigger: Returns to the board's landing screen
       provenance: flow F134 step 2→3
       operation: listCustomerServiceProfile
   density: compact
+  purposeNote: Agents can understand the customer's complete TICVAI relationship and relevant service
+    context from one screen.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display; Show) and no metric row
   purpose: Provide the agent with a complete customer-service view of the customer. This should be one
     of the most important screens in the entire Customer Service module.
-  purposeNote: Agents can understand the customer's complete TICVAI relationship and relevant service
-    context from one screen.
   layout:
     template: split
     regions:
@@ -1791,23 +1806,27 @@ screens:
         - Customer360ServiceProfileView.activeReservations
         - Customer360ServiceProfileView.futureGroupBookingWhereApplicable
         - Open Orders
-        notes: 'The pack groups this record''s detail under its own headings: “Today”, “Yesterday”, “Last
-          Month”, “Display permitted information such as”, “Sensitive information should be”, “Customer
-          Summary”.'
+        notes: 'The pack groups this record''s detail under its own headings: “Today”, “Yesterday”,
+          “Last Month”, “Display permitted information such as”, “Sensitive information should be”,
+          “Customer Summary”.'
         provenance: pack Customer Service_Reference.pdf, page 5 §Display
   states:
     loading: The customer 360° service list.
     error: Could not load. Names which read failed and leaves the customer 360° service untouched.
     emptyFirstRun: No customer 360° service yet. Carries the create action; distinct from a filter that
       matched nothing.
-    emptyNoResults: The filter narrowed it and the customer 360° service are still there. Names the active
-      filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the customer 360° service are still there. Names the
+      active filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listCustomerServiceProfile
     contract: marketing-crm
     purpose: Customer 360° Service Profile
+    trigger: onLoad
+  - operationId: listCustomerService
+    contract: marketing-crm
+    purpose: Customer Service Command Center
     trigger: onLoad
   entryState:
     preloaded:
@@ -1821,9 +1840,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-010
-  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 5. 16 of 19 labels bound
-    to a contract property; 19 of 42 pack bullets carried onto the screen — the rest are acceptance prose,
-    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+    workshopBoard: wireframes/WS42 Customer Service Board 1.dc.html#sup-010
+  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 5. 16 of 19 labels
+    bound to a contract property; 19 of 42 pack bullets carried onto the screen — the rest are acceptance
+    prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
+    here.
 - id: SUP-011
   name: Unified Interaction & Communication History
   module: Support
@@ -1845,20 +1866,20 @@ screens:
     exitTo:
     - SUP-009
     inferred: false
-    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-009
       trigger: Returns to the board's landing screen
       provenance: flow F134 step 4→5
       operation: listUnifiedInteractionCommunication
   density: compact
+  purposeNote: Agents can see the complete relevant conversation history without searching separate
+    communication systems.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Capture) and no display directory
     — it is settings, not a population
   purpose: Provide one chronological timeline of customer interactions across supported service channels.
-  purposeNote: Agents can see the complete relevant conversation history without searching separate communication
-    systems.
   layout:
     template: form
     regions:
@@ -1900,11 +1921,12 @@ screens:
         provenance: pack Customer Service_Reference.pdf, page 7 §Capture
   states:
     loading: The unified interaction communication configuration as saved.
-    error: Could not load. Names which read failed and leaves the unified interaction communication untouched.
+    error: Could not load. Names which read failed and leaves the unified interaction communication
+      untouched.
     emptyFirstRun: No unified interaction communication configured yet. Carries the create action and
       says what the platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listUnifiedInteractionCommunication
     contract: marketing-crm
@@ -1914,9 +1936,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-011
+    workshopBoard: wireframes/WS42 Customer Service Board 1.dc.html#sup-011
   apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 7. 0 of 0 labels bound
-    to a contract property; 11 of 43 pack bullets carried onto the screen — the rest are acceptance prose,
-    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+    to a contract property; 11 of 43 pack bullets carried onto the screen — the rest are acceptance
+    prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
+    here.
 - id: SUP-012
   name: Case Creation, Classification & Intelligent Routing
   module: Support
@@ -1938,20 +1962,20 @@ screens:
     exitTo:
     - SUP-009
     inferred: false
-    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-009
       trigger: Returns to the board's landing screen
       provenance: flow F134 step 6→7
       operation: createCaseClassificationIntelligent
   density: compact
+  purposeNote: Every service request becomes a properly categorized, prioritized and routed case with
+    the appropriate business context attached.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Capture) and no display directory
     — it is settings, not a population
   purpose: Create structured customer-service cases and ensure they reach the correct team.
-  purposeNote: Every service request becomes a properly categorized, prioritized and routed case with
-    the appropriate business context attached.
   layout:
     template: form
     regions:
@@ -2011,22 +2035,22 @@ screens:
     error: Could not load. Names which read failed and leaves the case creation classification untouched.
     emptyFirstRun: No case creation classification configured yet. Carries the create action and says
       what the platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: createCaseClassificationIntelligent
     contract: marketing-crm
     purpose: Case Creation, Classification & Intelligent Routing
     trigger: onAction
-    invalidates:
-    - createCaseClassificationIntelligent
   wireframe:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-012
+    workshopBoard: wireframes/WS42 Customer Service Board 1.dc.html#sup-012
   apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 9. 0 of 0 labels bound
-    to a contract property; 14 of 48 pack bullets carried onto the screen — the rest are acceptance prose,
-    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+    to a contract property; 14 of 48 pack bullets carried onto the screen — the rest are acceptance
+    prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
+    here.
 - id: SUP-013
   name: Case Investigation & Resolution Workspace
   module: Support
@@ -2048,19 +2072,25 @@ screens:
     exitTo:
     - SUP-009
     inferred: false
-    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-009
       trigger: Returns to the board's landing screen
       provenance: flow F134 step 8→9
       operation: setCaseInvestigationResolution
   density: compact
+  purposeNote: An agent can investigate and progress a customer case from one workspace with all required
+    customer, transaction, policy and communication context visible.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Provide the primary workspace in which an agent investigates and resolves a case.
-  purposeNote: An agent can investigate and progress a customer case from one workspace with all required
-    customer, transaction, policy and communication context visible.
+  gaps:
+  - operation: null
+    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved:
+      Action history. Each needs an operation, or needs removing from the screen; this is the Phase
+      3 reconciliation seen from the screen side rather than the contract side.'
+    source: pack Customer Service_Reference.pdf, page 11 §Support
   layout:
     template: split
     regions:
@@ -2109,24 +2139,22 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
-        label: Save changes
-        provenance: contract operation setCaseInvestigationResolution
+        label: Action history
+        provenance: pack Customer Service_Reference.pdf, page 11 §Support
   states:
     loading: The case investigation resolution list.
     error: Could not load. Names which read failed and leaves the case investigation resolution untouched.
-    emptyFirstRun: No case investigation resolution yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No case investigation resolution yet. Carries the create action; distinct from a
+      filter that matched nothing.
     emptyNoResults: The filter narrowed it and the case investigation resolution are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: setCaseInvestigationResolution
     contract: marketing-crm
     purpose: Case Investigation & Resolution Workspace
     trigger: onAction
-    invalidates:
-    - setCaseInvestigationResolution
   entryState:
     preloaded:
     - CaseInvestigationResolutionWorkspaceView.caseId
@@ -2139,8 +2167,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-013
+    workshopBoard: wireframes/WS42 Customer Service Board 1.dc.html#sup-013
   apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 11. 11 of 11 labels
-    bound to a contract property; 11 of 48 pack bullets carried onto the screen — the rest are acceptance
+    bound to a contract property; 12 of 48 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
 - id: SUP-014
@@ -2164,20 +2193,20 @@ screens:
     exitTo:
     - SUP-009
     inferred: false
-    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-009
       trigger: Returns to the board's landing screen
       provenance: flow F134 step 10→11
       operation: setOrderBookingTicket
   density: compact
+  purposeNote: Agents can perform authorized ticket and booking service actions through one customer-service
+    interface while underlying TICVAI services remain authoritative.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Allow customer-service agents to perform permitted ticket/order servicing without entering
     the underlying technical modules.
-  purposeNote: Agents can perform authorized ticket and booking service actions through one customer-service
-    interface while underlying TICVAI services remain authoritative.
   layout:
     template: split
     regions:
@@ -2258,15 +2287,13 @@ screens:
       matched nothing.
     emptyNoResults: The filter narrowed it and the order booking ticket are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: setOrderBookingTicket
     contract: marketing-crm
     purpose: Order, Booking & Ticket Service Workspace
     trigger: onAction
-    invalidates:
-    - setOrderBookingTicket
   entryState:
     preloaded:
     - OrderBookingTicketServiceWorkspaceView.order
@@ -2279,6 +2306,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-014
+    workshopBoard: wireframes/WS42 Customer Service Board 1.dc.html#sup-014
   apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 13. 10 of 21 labels
     bound to a contract property; 21 of 42 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
@@ -2304,24 +2332,25 @@ screens:
     exitTo:
     - SUP-009
     inferred: false
-    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-009
       trigger: Returns to the board's landing screen
       provenance: flow F134 step 12→13
       operation: setRefundCompensationService
   density: compact
+  purposeNote: Refunds, compensation and service exceptions are governed by applicable policies, financial
+    limits and approval authorities.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Manage cases requiring money, compensation, goodwill or policy exceptions.
-  purposeNote: Refunds, compensation and service exceptions are governed by applicable policies, financial
-    limits and approval authorities.
   gaps:
   - operation: null
-    why: '**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Complimentary
-      Ticket, Fee Waiver, Policy Exception. Each needs an operation, or needs removing from the screen;
-      this is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
+    why: '**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved:
+      Full Refund, Partial Refund, Wallet Credit, Voucher, Complimentary Ticket, Fee Waiver, Policy
+      Exception. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
+      seen from the screen side rather than the contract side.'
     source: pack Customer Service_Reference.pdf, page 15 §Support
   layout:
     template: split
@@ -2358,13 +2387,28 @@ screens:
         - RefundCompensationServiceExceptionWorkspaceView.fees
         - RefundCompensationServiceExceptionWorkspaceView.proposedRefund
         - RefundCompensationServiceExceptionWorkspaceView.proposedCompensation
-        notes: 'The pack groups this record''s detail under its own headings: “Requested Exception”, “Up
-          to AED 200”, “Above AED 1,000”, “Compensation Budget”.'
+        notes: 'The pack groups this record''s detail under its own headings: “Requested Exception”,
+          “Up to AED 200”, “Above AED 1,000”, “Compensation Budget”.'
         provenance: pack Customer Service_Reference.pdf, page 15 §Display
     - name: actionBar
       slot: rowActions
       components:
       - kind: primaryButton
+        label: Full Refund
+        provenance: pack Customer Service_Reference.pdf, page 15 §Support
+      - kind: secondaryButton
+        label: Partial Refund
+        provenance: pack Customer Service_Reference.pdf, page 15 §Support
+      - kind: secondaryButton
+        label: Service Credit
+        provenance: pack Customer Service_Reference.pdf, page 15 §Support
+      - kind: secondaryButton
+        label: Wallet Credit
+        provenance: pack Customer Service_Reference.pdf, page 15 §Support
+      - kind: secondaryButton
+        label: Voucher
+        provenance: pack Customer Service_Reference.pdf, page 15 §Support
+      - kind: secondaryButton
         label: Complimentary Ticket
         provenance: pack Customer Service_Reference.pdf, page 15 §Support
       - kind: secondaryButton
@@ -2380,15 +2424,13 @@ screens:
       that matched nothing.
     emptyNoResults: The filter narrowed it and the refund compensation service are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: setRefundCompensationService
     contract: marketing-crm
     purpose: Refund, Compensation & Service Exception Workspace
     trigger: onAction
-    invalidates:
-    - setRefundCompensationService
   entryState:
     preloaded:
     - RefundCompensationServiceExceptionWorkspaceView.originalTransaction
@@ -2401,9 +2443,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-015
-  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 15. 8 of 8 labels bound
-    to a contract property; 11 of 34 pack bullets carried onto the screen — the rest are acceptance prose,
-    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+    workshopBoard: wireframes/WS42 Customer Service Board 1.dc.html#sup-015
+  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 15. 8 of 8 labels
+    bound to a contract property; 16 of 34 pack bullets carried onto the screen — the rest are acceptance
+    prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
+    here.
 - id: SUP-016
   name: Escalation, Collaboration & Internal Resolution
   module: Support
@@ -2425,21 +2469,21 @@ screens:
     exitTo:
     - SUP-009
     inferred: false
-    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-009
       trigger: Returns to the board's landing screen
       provenance: flow F134 step 14→15
       operation: listEscalationCollaborationInternal
   density: compact
+  purposeNote: Agents can obtain assistance from internal departments while retaining one customer-facing
+    case, owner and audit trail.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Capture) and no display directory
     — it is settings, not a population
   purpose: Allow Customer Service to collaborate with other TICVAI departments without losing ownership
     of the customer case.
-  purposeNote: Agents can obtain assistance from internal departments while retaining one customer-facing
-    case, owner and audit trail.
   layout:
     template: form
     regions:
@@ -2472,11 +2516,12 @@ screens:
         provenance: pack Customer Service_Reference.pdf, page 16 §Capture
   states:
     loading: The escalation collaboration internal configuration as saved.
-    error: Could not load. Names which read failed and leaves the escalation collaboration internal untouched.
+    error: Could not load. Names which read failed and leaves the escalation collaboration internal
+      untouched.
     emptyFirstRun: No escalation collaboration internal configured yet. Carries the create action and
       says what the platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listEscalationCollaborationInternal
     contract: marketing-crm
@@ -2486,9 +2531,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-016
-  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 16. 0 of 0 labels bound
-    to a contract property; 8 of 36 pack bullets carried onto the screen — the rest are acceptance prose,
-    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+    workshopBoard: wireframes/WS42 Customer Service Board 1.dc.html#sup-016
+  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 16. 0 of 0 labels
+    bound to a contract property; 8 of 36 pack bullets carried onto the screen — the rest are acceptance
+    prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
+    here.
 - id: SUP-017
   name: Case Resolution, Closure & Customer Feedback
   module: Support
@@ -2510,20 +2557,20 @@ screens:
     exitTo:
     - SUP-009
     inferred: false
-    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-009
       trigger: Returns to the board's landing screen
       provenance: flow F134 step 16→17
       operation: listCaseResolutionClosure
   density: compact
+  purposeNote: Every closed case has a clear resolution, root cause, customer communication and auditable
+    outcome.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Capture; Where configured, send)
     and no display directory — it is settings, not a population
   purpose: Govern how cases are resolved and formally closed.
-  purposeNote: Every closed case has a clear resolution, root cause, customer communication and auditable
-    outcome.
   layout:
     template: form
     regions:
@@ -2601,8 +2648,8 @@ screens:
     error: Could not load. Names which read failed and leaves the case resolution closure untouched.
     emptyFirstRun: No case resolution closure configured yet. Carries the create action and says what
       the platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listCaseResolutionClosure
     contract: marketing-crm
@@ -2612,9 +2659,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-017
-  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 17. 0 of 0 labels bound
-    to a contract property; 22 of 45 pack bullets carried onto the screen — the rest are acceptance prose,
-    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+    workshopBoard: wireframes/WS42 Customer Service Board 1.dc.html#sup-017
+  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 17. 0 of 0 labels
+    bound to a contract property; 22 of 45 pack bullets carried onto the screen — the rest are acceptance
+    prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
+    here.
 - id: SUP-018
   name: AI Customer Service Copilot & Knowledge Workspace
   module: Support
@@ -2636,26 +2685,26 @@ screens:
     exitTo:
     - SUP-009
     inferred: false
-    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
   density: compact
+  purposeNote: Agents receive explainable, context-aware AI assistance that reduces handling time and
+    improves consistency without bypassing TICVAI's policies, permissions or transactional systems.
+    Board 1 — Final Screen Register
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Create the AI intelligence layer assisting agents throughout the service journey. This should
     not be a simple chatbot added to the side of the screen. It should understand the customer + transaction
-    + policy + case context. Board 1 focused on the individual customer-service agent and individual customer
-    case. Board 2 moves one level higher and provides the supervisor, contact-center manager, operations
-    manager and service leadership layer.
-  purposeNote: Agents receive explainable, context-aware AI assistance that reduces handling time and
-    improves consistency without bypassing TICVAI's policies, permissions or transactional systems. Board
-    1 — Final Screen Register
+    + policy + case context. Board 1 focused on the individual customer-service agent and individual
+    customer case. Board 2 moves one level higher and provides the supervisor, contact-center manager,
+    operations manager and service leadership layer.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Review
-      → Execute. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
-      seen from the screen side rather than the contract side.'
+    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved:
+      Review → Execute. Each needs an operation, or needs removing from the screen; this is the Phase
+      3 reconciliation seen from the screen side rather than the contract side.'
     source: pack Customer Service_Reference.pdf, page 19 §Actions
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -2664,8 +2713,8 @@ screens:
       it is built.'
     source: pack Customer Service_Reference.pdf, page 19
   - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape
+      is a default rather than a reading. It needs a person before it is built.'
     source: pack Customer Service_Reference.pdf, page 19
   layout:
     template: split
@@ -2690,22 +2739,22 @@ screens:
       that matched nothing.
     emptyNoResults: The filter narrowed it and the customer service copilot are still there. Names the
       active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: setCustomerServiceCopilot
     contract: marketing-crm
     purpose: AI Customer Service Copilot & Knowledge Workspace
     trigger: onAction
-    invalidates:
-    - setCustomerServiceCopilot
   wireframe:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-018
-  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 19. 0 of 0 labels bound
-    to a contract property; 1 of 96 pack bullets carried onto the screen — the rest are acceptance prose,
-    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+    workshopBoard: wireframes/WS42 Customer Service Board 1.dc.html#sup-018
+  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 19. 0 of 0 labels
+    bound to a contract property; 1 of 96 pack bullets carried onto the screen — the rest are acceptance
+    prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
+    here.
 - id: SUP-019
   name: Contact Center Operations Command Center
   module: Support
@@ -2783,12 +2832,13 @@ screens:
       provenance: flow F135 step 17→18
       operation: listContact
   density: compact
-  pattern: commandCentre
-  patternReason: the pack gives this screen a metric directory (§Display) and no per-row directory — measures
-    over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's
-  purpose: Provide supervisors and management with a real-time view of customer-service operations across
   purposeNote: Supervisors can understand the real-time operational state of Customer Service and identify
     the queues, channels and issues requiring immediate intervention.
+  pattern: commandCentre
+  patternReason: the pack gives this screen a metric directory (§Display) and no per-row directory —
+    measures over a population the screen does not itself list. The tiles are the pack's, not a tenant
+    licence's
+  purpose: Provide supervisors and management with a real-time view of customer-service operations across
   layout:
     template: dashboard
     regions:
@@ -2802,8 +2852,8 @@ screens:
         label: Filter by
         columns:
         - Channel → Queue → Agent → Case
-        notes: The pack filters this screen by channel → queue → agent → case — which are present is a
-          decision the pack already made.
+        notes: The pack filters this screen by channel → queue → agent → case — which are present is
+          a decision the pack already made.
         provenance: pack Customer Service_Reference.pdf, page 24 §Drill-Down
     - name: contentBody
       slot: headline
@@ -2866,12 +2916,12 @@ screens:
   states:
     loading: The contact operations list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the contact operations untouched.
-    emptyFirstRun: No contact operations yet. Carries the create action; distinct from a filter that matched
-      nothing.
+    emptyFirstRun: No contact operations yet. Carries the create action; distinct from a filter that
+      matched nothing.
     emptyNoResults: The filter narrowed it and the contact operations are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listContact
     contract: marketing-crm
@@ -2889,6 +2939,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-019
+    workshopBoard: wireframes/WS43 Customer Service Board 2.dc.html#sup-019
   apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 24. 13 of 14 labels
     bound to a contract property; 15 of 43 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
@@ -2914,25 +2965,26 @@ screens:
     exitTo:
     - SUP-019
     inferred: false
-    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-019
       trigger: Returns to the board's landing screen
       provenance: flow F135 step 2→3
       operation: listQueues
   density: compact
+  purposeNote: Administrators can configure specialized service queues and supervisors can operationally
+    adjust them without changing application code.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Configure) and no display directory
     — it is settings, not a population
   purpose: Configure and operate the queues through which customer-service cases are organized.
-  purposeNote: Administrators can configure specialized service queues and supervisors can operationally
-    adjust them without changing application code.
   gaps:
   - operation: null
-    why: '**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved: Membership,
-      Group Sales Support. Each needs an operation, or needs removing from the screen; this is the Phase
-      3 reconciliation seen from the screen side rather than the contract side.'
+    why: '**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved:
+      Payments, Membership, Wallet, Group Sales Support, Access Control. Each needs an operation, or
+      needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side rather
+      than the contract side.'
     source: pack Customer Service_Reference.pdf, page 25 §Support configurable queues such as
   layout:
     template: form
@@ -3004,18 +3056,27 @@ screens:
       slot: publish
       components:
       - kind: primaryButton
+        label: Payments
+        provenance: pack Customer Service_Reference.pdf, page 25 §Support configurable queues such as
+      - kind: secondaryButton
         label: Membership
         provenance: pack Customer Service_Reference.pdf, page 25 §Support configurable queues such as
       - kind: secondaryButton
+        label: Wallet
+        provenance: pack Customer Service_Reference.pdf, page 25 §Support configurable queues such as
+      - kind: secondaryButton
         label: Group Sales Support
+        provenance: pack Customer Service_Reference.pdf, page 25 §Support configurable queues such as
+      - kind: secondaryButton
+        label: Access Control
         provenance: pack Customer Service_Reference.pdf, page 25 §Support configurable queues such as
   states:
     loading: The queue configuration as saved.
     error: Could not load. Names which read failed and leaves the queue untouched.
     emptyFirstRun: No queue configured yet. Carries the create action and says what the platform does
       in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listQueues
     contract: queue
@@ -3025,9 +3086,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-020
-  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 25. 0 of 0 labels bound
-    to a contract property; 22 of 52 pack bullets carried onto the screen — the rest are acceptance prose,
-    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+    workshopBoard: wireframes/WS43 Customer Service Board 2.dc.html#sup-020
+  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 25. 0 of 0 labels
+    bound to a contract property; 25 of 52 pack bullets carried onto the screen — the rest are acceptance
+    prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
+    here.
 - id: SUP-021
   name: Intelligent Routing, Skills & Assignment Engine
   module: Support
@@ -3049,21 +3112,21 @@ screens:
     exitTo:
     - SUP-019
     inferred: false
-    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-019
       trigger: Returns to the board's landing screen
       provenance: flow F135 step 4→5
       operation: setIntelligentRoutingSkill
   density: compact
+  purposeNote: Customer cases are routed to appropriately skilled and available agents using governed
+    routing rules with transparent assignment logic.
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Determine the best agent or team to handle each customer request.
-  purposeNote: Customer cases are routed to appropriately skilled and available agents using governed
-    routing rules with transparent assignment logic.
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -3072,8 +3135,8 @@ screens:
       it is built.'
     source: pack Customer Service_Reference.pdf, page 27
   - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape
+      is a default rather than a reading. It needs a person before it is built.'
     source: pack Customer Service_Reference.pdf, page 27
   layout:
     template: split
@@ -3096,24 +3159,24 @@ screens:
     error: Could not load. Names which read failed and leaves the intelligent routing skills untouched.
     emptyFirstRun: No intelligent routing skills yet. Carries the create action; distinct from a filter
       that matched nothing.
-    emptyNoResults: The filter narrowed it and the intelligent routing skills are still there. Names the
-      active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the intelligent routing skills are still there. Names
+      the active filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: setIntelligentRoutingSkill
     contract: marketing-crm
     purpose: Intelligent Routing, Skills & Assignment Engine
     trigger: onAction
-    invalidates:
-    - setIntelligentRoutingSkill
   wireframe:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-021
-  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 27. 0 of 0 labels bound
-    to a contract property; 0 of 39 pack bullets carried onto the screen — the rest are acceptance prose,
-    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+    workshopBoard: wireframes/WS43 Customer Service Board 2.dc.html#sup-021
+  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 27. 0 of 0 labels
+    bound to a contract property; 0 of 39 pack bullets carried onto the screen — the rest are acceptance
+    prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
+    here.
 - id: SUP-022
   name: SLA Policy & Service-Level Management
   module: Support
@@ -3135,19 +3198,25 @@ screens:
     exitTo:
     - SUP-019
     inferred: false
-    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-019
       trigger: Returns to the board's landing screen
       provenance: flow F135 step 6→7
       operation: listSlaPolicyService
   density: compact
+  purposeNote: cases likely to breach.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Configure) and no display directory
     — it is settings, not a population
   purpose: Define and monitor service-level commitments for different customer-service scenarios.
-  purposeNote: cases likely to breach.
+  gaps:
+  - operation: null
+    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved:
+      Venue operating hours. Each needs an operation, or needs removing from the screen; this is the
+      Phase 3 reconciliation seen from the screen side rather than the contract side.'
+    source: pack Customer Service_Reference.pdf, page 29 §Support
   layout:
     template: form
     regions:
@@ -3172,13 +3241,19 @@ screens:
       - kind: selectField
         label: Complaint Resolution SLA
         provenance: pack Customer Service_Reference.pdf, page 29 §Configure
+    - name: actionBar
+      slot: publish
+      components:
+      - kind: primaryButton
+        label: Venue operating hours
+        provenance: pack Customer Service_Reference.pdf, page 29 §Support
   states:
     loading: The sla policy service-level configuration as saved.
     error: Could not load. Names which read failed and leaves the sla policy service-level untouched.
     emptyFirstRun: No sla policy service-level configured yet. Carries the create action and says what
       the platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listSlaPolicyService
     contract: marketing-crm
@@ -3196,9 +3271,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-022
-  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 29. 0 of 0 labels bound
-    to a contract property; 12 of 41 pack bullets carried onto the screen — the rest are acceptance prose,
-    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+    workshopBoard: wireframes/WS43 Customer Service Board 2.dc.html#sup-022
+  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 29. 0 of 0 labels
+    bound to a contract property; 13 of 41 pack bullets carried onto the screen — the rest are acceptance
+    prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
+    here.
 - id: SUP-023
   name: Agent Workload, Availability & Workforce Control
   module: Support
@@ -3220,19 +3297,19 @@ screens:
     exitTo:
     - SUP-019
     inferred: false
-    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-019
       trigger: Returns to the board's landing screen
       provenance: flow F135 step 8→9
       operation: listAgentWorkloadAvailability
   density: compact
+  purposeNote: Supervisors can understand workload distribution and rebalance service resources before
+    queue or SLA performance deteriorates.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Give supervisors visibility and control over active customer-service resources.
-  purposeNote: Supervisors can understand workload distribution and rebalance service resources before
-    queue or SLA performance deteriorates.
   layout:
     template: split
     regions:
@@ -3288,8 +3365,8 @@ screens:
       that matched nothing.
     emptyNoResults: The filter narrowed it and the agent workload availability are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listAgentWorkloadAvailability
     contract: marketing-crm
@@ -3307,6 +3384,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-023
+    workshopBoard: wireframes/WS43 Customer Service Board 2.dc.html#sup-023
   apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 31. 13 of 13 labels
     bound to a contract property; 13 of 37 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
@@ -3332,19 +3410,19 @@ screens:
     exitTo:
     - SUP-019
     inferred: false
-    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-019
       trigger: Returns to the board's landing screen
       provenance: flow F135 step 10→11
       operation: listEscalationCriticalCase
   density: compact
+  purposeNote: Supervisors can identify, coordinate and resolve critical escalations and systemic service
+    incidents from one central workspace.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Provide supervisors with one workspace for cases requiring elevated attention.
-  purposeNote: Supervisors can identify, coordinate and resolve critical escalations and systemic service
-    incidents from one central workspace.
   layout:
     template: split
     regions:
@@ -3412,8 +3490,8 @@ screens:
       that matched nothing.
     emptyNoResults: The filter narrowed it and the escalation critical case are still there. Names the
       active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listEscalationCriticalCase
     contract: marketing-crm
@@ -3431,6 +3509,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-024
+    workshopBoard: wireframes/WS43 Customer Service Board 2.dc.html#sup-024
   apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 32. 19 of 19 labels
     bound to a contract property; 19 of 38 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
@@ -3456,25 +3535,25 @@ screens:
     exitTo:
     - SUP-019
     inferred: false
-    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-019
       trigger: Returns to the board's landing screen
       provenance: flow F135 step 12→13
       operation: listQualityAgentEvaluation
   density: compact
+  purposeNote: findings into measurable coaching actions.
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Measure whether customer-service interactions meet TICVAI's defined service-quality standards.
-  purposeNote: findings into measurable coaching actions.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Case.
-      Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen
-      from the screen side rather than the contract side.'
+    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved:
+      Case. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
+      seen from the screen side rather than the contract side.'
     source: pack Customer Service_Reference.pdf, page 34 §Support
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -3483,8 +3562,8 @@ screens:
       it is built.'
     source: pack Customer Service_Reference.pdf, page 34
   - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape
+      is a default rather than a reading. It needs a person before it is built.'
     source: pack Customer Service_Reference.pdf, page 34
   layout:
     template: split
@@ -3509,8 +3588,8 @@ screens:
       that matched nothing.
     emptyNoResults: The filter narrowed it and the quality agent evaluation are still there. Names the
       active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listQualityAgentEvaluation
     contract: marketing-crm
@@ -3527,9 +3606,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-025
-  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 34. 0 of 0 labels bound
-    to a contract property; 1 of 43 pack bullets carried onto the screen — the rest are acceptance prose,
-    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+    workshopBoard: wireframes/WS43 Customer Service Board 2.dc.html#sup-025
+  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 34. 0 of 0 labels
+    bound to a contract property; 1 of 43 pack bullets carried onto the screen — the rest are acceptance
+    prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
+    here.
 - id: SUP-026
   name: Customer Satisfaction, Feedback & Voice of Customer
   module: Support
@@ -3551,25 +3632,28 @@ screens:
     exitTo:
     - SUP-019
     inferred: false
-    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-019
       trigger: Returns to the board's landing screen
       provenance: flow F135 step 14→15
       operation: listCustomerSatisfactionFeedback
   density: compact
+  purposeNote: Management can understand what customers think about the service experience and trace
+    negative trends back to their underlying operational causes.
   pattern: commandCentre
-  patternReason: the pack gives this screen a metric directory (§Display) and no per-row directory — measures
-    over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's
-  purpose: Measure customer perception of TICVAI's support experience and identify recurring service problems.
-  purposeNote: Management can understand what customers think about the service experience and trace negative
-    trends back to their underlying operational causes.
+  patternReason: the pack gives this screen a metric directory (§Display) and no per-row directory —
+    measures over a population the screen does not itself list. The tiles are the pack's, not a tenant
+    licence's
+  purpose: Measure customer perception of TICVAI's support experience and identify recurring service
+    problems.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Direct
-      Customer Comment. Each needs an operation, or needs removing from the screen; this is the Phase
-      3 reconciliation seen from the screen side rather than the contract side.'
+    why: '**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved:
+      Service Rating, NPS where used, Direct Customer Comment. Each needs an operation, or needs removing
+      from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the
+      contract side.'
     source: pack Customer Service_Reference.pdf, page 35 §Support
   layout:
     template: dashboard
@@ -3613,17 +3697,23 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
+        label: Service Rating
+        provenance: pack Customer Service_Reference.pdf, page 35 §Support
+      - kind: secondaryButton
+        label: NPS where used
+        provenance: pack Customer Service_Reference.pdf, page 35 §Support
+      - kind: secondaryButton
         label: Direct Customer Comment
         provenance: pack Customer Service_Reference.pdf, page 35 §Support
   states:
     loading: The customer satisfaction feedback list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the customer satisfaction feedback untouched.
-    emptyFirstRun: No customer satisfaction feedback yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No customer satisfaction feedback yet. Carries the create action; distinct from a
+      filter that matched nothing.
     emptyNoResults: The filter narrowed it and the customer satisfaction feedback are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listCustomerSatisfactionFeedback
     contract: marketing-crm
@@ -3641,9 +3731,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-026
-  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 35. 8 of 8 labels bound
-    to a contract property; 9 of 46 pack bullets carried onto the screen — the rest are acceptance prose,
-    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+    workshopBoard: wireframes/WS43 Customer Service Board 2.dc.html#sup-026
+  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 35. 8 of 8 labels
+    bound to a contract property; 11 of 46 pack bullets carried onto the screen — the rest are acceptance
+    prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
+    here.
 - id: SUP-027
   name: Service Analytics & Root-Cause Intelligence
   module: Support
@@ -3665,22 +3757,22 @@ screens:
     exitTo:
     - SUP-019
     inferred: false
-    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: SUP-019
       trigger: Returns to the board's landing screen
       provenance: flow F135 step 16→17
       operation: listServiceRootCause
   density: compact
+  purposeNote: Management can move beyond reporting case volumes and identify the actual product, process
+    and technology issues generating customer demand.
   pattern: commandCentre
   patternReason: the pack gives this screen a metric directory (§Analyze; Compare) and no per-row directory
     — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant
     licence's
   purpose: Provide comprehensive analytics explaining why customers contact TICVAI and what is driving
     service demand.
-  purposeNote: Management can move beyond reporting case volumes and identify the actual product, process
-    and technology issues generating customer demand.
   layout:
     template: dashboard
     regions:
@@ -3765,8 +3857,8 @@ screens:
       that matched nothing.
     emptyNoResults: The filter narrowed it and the service analytics root-cause are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listServiceRootCause
     contract: marketing-crm
@@ -3783,6 +3875,7 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-027
+    workshopBoard: wireframes/WS43 Customer Service Board 2.dc.html#sup-027
   apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 37. 17 of 17 labels
     bound to a contract property; 18 of 39 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
@@ -3808,16 +3901,16 @@ screens:
     exitTo:
     - SUP-019
     inferred: false
-    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
   density: compact
-  pattern: listDetail
-  patternReason: the pack gives this screen a display directory (§Forecast) and no metric row
-  purpose: Create the management-level AI intelligence layer for Customer Service. This is different from
-    10.1.10 AI Customer Service Copilot. Board 1 Copilot = helps one agent resolve one case. Board 2 AI
-    Intelligence = improves the entire service operation.
   purposeNote: approved low-risk workflows without removing governance over customer-impacting decisions.
     Board 2 — Final Screen Register
+  pattern: listDetail
+  patternReason: the pack gives this screen a display directory (§Forecast) and no metric row
+  purpose: Create the management-level AI intelligence layer for Customer Service. This is different
+    from 10.1.10 AI Customer Service Copilot. Board 1 Copilot = helps one agent resolve one case. Board
+    2 AI Intelligence = improves the entire service operation.
   gaps:
   - operation: null
     why: '**AI Contact Center Intelligence & Automation Studio declares no operation that writes anything**
@@ -3863,12 +3956,12 @@ screens:
   states:
     loading: The contact intelligence automation list.
     error: Could not load. Names which read failed and leaves the contact intelligence automation untouched.
-    emptyFirstRun: No contact intelligence automation yet. Carries the create action; distinct from a
-      filter that matched nothing.
-    emptyNoResults: The filter narrowed it and the contact intelligence automation are still there. Names
-      the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No contact intelligence automation yet. Carries the create action; distinct from
+      a filter that matched nothing.
+    emptyNoResults: The filter narrowed it and the contact intelligence automation are still there.
+      Names the active filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listContactAutomation
     contract: marketing-crm
@@ -3886,6 +3979,8 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-028
-  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 39. 6 of 6 labels bound
-    to a contract property; 6 of 95 pack bullets carried onto the screen — the rest are acceptance prose,
-    worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+    workshopBoard: wireframes/WS43 Customer Service Board 2.dc.html#sup-028
+  apisNote: Regenerated 9 September 2026 from Customer Service_Reference.pdf page 39. 6 of 6 labels
+    bound to a contract property; 6 of 95 pack bullets carried onto the screen — the rest are acceptance
+    prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
+    here.

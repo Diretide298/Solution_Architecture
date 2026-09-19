@@ -1,5 +1,5 @@
 id: LLD-P09
-title: P09 TICVAI Web — Platform Console — 446 screens
+title: P09 TICVAI Web — Platform Console — 676 screens
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 audience: platformAdmin
@@ -20,26 +20,26 @@ deployment:
 why: null
 modulesUsed:
 - module: core
-  screens: 164
+  screens: 244
+- module: marketing
+  screens: 170
 - module: ticketing
   screens: 150
-- module: marketing
-  screens: 110
+- module: ai
+  screens: 72
+- module: analytics
+  screens: 21
 - module: membership
   screens: 19
-- module: ai
-  screens: 2
-- module: analytics
-  screens: 1
 servicesCalled:
 - service: CatalogueService
-  operationCalls: 211
+  operationCalls: 243
 - service: PlatformService
-  operationCalls: 197
+  operationCalls: 199
 - service: OrderService
-  operationCalls: 40
+  operationCalls: 49
 - service: TenancyService
-  operationCalls: 28
+  operationCalls: 29
 - service: IdentityService
   operationCalls: 25
 - service: WhiteLabelService
@@ -53,9 +53,9 @@ servicesCalled:
 - service: CrossRegionService
   operationCalls: 3
 coverage:
-  screens: 446
-  inAFlow: 431
-  drawn: 446
+  screens: 676
+  inAFlow: 661
+  drawn: 676
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
@@ -136,6 +136,29 @@ screens:
   - ADM-419
   - ADM-449
   - ADM-459
+  - ADM-469
+  - ADM-479
+  - ADM-489
+  - ADM-499
+  - ADM-509
+  - ADM-519
+  - ADM-529
+  - ADM-539
+  - ADM-549
+  - ADM-559
+  - ADM-569
+  - ADM-579
+  - ADM-589
+  - ADM-599
+  - ADM-609
+  - ADM-619
+  - ADM-629
+  - ADM-639
+  - ADM-649
+  - ADM-659
+  - ADM-669
+  - ADM-679
+  - ADM-689
   boardFrames:
   - Dashboards Board.dc.html#adm-002
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-002
@@ -1471,7 +1494,10 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listBundlePricingCommercial
   - listCommercialPricing
+  - listCommercialPricingStructure
+  - listMembershipCommercialPricing
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1696,6 +1722,7 @@ screens:
   density: compact
   operations:
   - listPricingRule
+  - listPricingRulePriority
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2238,6 +2265,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listChangeImpactAnalysis
   - listPricingChangeImpact
   states:
   - emptyFirstRun
@@ -3538,6 +3566,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listCampaignPromotionPerformance
   - listPromotionCampaign
   states:
   - emptyFirstRun
@@ -3695,6 +3724,7 @@ screens:
   density: compact
   operations:
   - listPromotionHealthPerformance
+  - listPromotionPerformance
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -3739,6 +3769,7 @@ screens:
   density: compact
   operations:
   - setPromotionRule
+  - setPromotionStackingRule
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -4192,6 +4223,7 @@ screens:
   density: compact
   operations:
   - listAdvancedOffer
+  - listAdvancedOfferGuardrail
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -4639,6 +4671,8 @@ screens:
   density: compact
   operations:
   - listDynamicBundle
+  - listDynamicBundle2
+  - listDynamicBundleRule
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -4841,7 +4875,9 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listDynamicBundle
   - listDynamicBundle2
+  - listDynamicBundleRule
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -4895,6 +4931,7 @@ screens:
   density: compact
   operations:
   - setEligibilityRule
+  - setResaleEligibilityRule
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -5143,6 +5180,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - setPromotionRule
   - setPromotionStackingRule
   states:
   - emptyFirstRun
@@ -5543,6 +5581,8 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listCampaignPromotionPerformance
+  - listPromotionHealthPerformance
   - listPromotionPerformance
   states:
   - emptyFirstRun
@@ -5575,6 +5615,8 @@ screens:
   density: compact
   operations:
   - listCampaignPromotionPerformance
+  - listPromotionCampaign
+  - listPromotionPerformance
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -5684,6 +5726,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listChannelCustomerSegment
   - listCustomerSegmentChannel
   states:
   - emptyFirstRun
@@ -6225,6 +6268,8 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listChannelSaleRule
+  - listChannelSaleSchedule
   - listSaleChannel
   states:
   - emptyFirstRun
@@ -6450,6 +6495,7 @@ screens:
   density: compact
   operations:
   - listChannel
+  - listChannel2
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -6523,6 +6569,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listRealTimeAvailability
   - listRealTimeChannel
   states:
   - emptyFirstRun
@@ -6653,6 +6700,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listChannel
   - listChannel2
   states:
   - emptyFirstRun
@@ -6675,7 +6723,10 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listOfficialResaleMarketplace
   - listResaleMarketplace
+  - listResalePolicyMarketplace
+  - listTicketResaleMarketplace
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -6706,6 +6757,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - setEligibilityRule
   - setResaleEligibilityRule
   states:
   - emptyFirstRun
@@ -6790,6 +6842,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listFeeSellerProceed
   - listResaleFeeCommission
   states:
   - emptyFirstRun
@@ -6898,6 +6951,7 @@ screens:
   density: compact
   operations:
   - listResale
+  - listResale2
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -7080,6 +7134,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listResaleConfirmationOwnership
   - listResaleOwnership
   states:
   - emptyFirstRun
@@ -7102,6 +7157,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listResale
   - listResale2
   states:
   - emptyFirstRun
@@ -7596,7 +7652,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - approveWorkflow
+  - listWorkflow
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8576,7 +8634,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listGovernanceRiskLaunch
+  - listGovernanceRiskMonitoring
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8795,7 +8855,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listMembershipRenewalRetention
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -8972,7 +9033,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listSaleChannel
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -10384,3 +10446,5046 @@ screens:
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-468
   inFlows:
   - 'F216 Subscription Licensing AI Self Service board 10: Billing & Commercial Command Center'
+- screen: ADM-469
+  name: AI Configuration Home & Start
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-470
+  - ADM-471
+  - ADM-472
+  - ADM-473
+  - ADM-474
+  - ADM-475
+  - ADM-476
+  - ADM-477
+  - ADM-478
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-469
+  inFlows:
+  - 'F225 AI Configuration Assistant board 1: AI Configuration Home & Start'
+- screen: ADM-470
+  name: Setup Type & Business Intent Discovery
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-469
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-470
+  inFlows:
+  - 'F225 AI Configuration Assistant board 1: AI Configuration Home & Start'
+- screen: ADM-471
+  name: Venue & Business Model Discovery
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-469
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-471
+  inFlows:
+  - 'F225 AI Configuration Assistant board 1: AI Configuration Home & Start'
+- screen: ADM-472
+  name: Guided Question & Answer Workspace
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-469
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-472
+  inFlows:
+  - 'F225 AI Configuration Assistant board 1: AI Configuration Home & Start'
+- screen: ADM-473
+  name: Product & Admission Model Discovery
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-469
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-473
+  inFlows:
+  - 'F225 AI Configuration Assistant board 1: AI Configuration Home & Start'
+- screen: ADM-474
+  name: Operational Requirement Discovery
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-469
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-474
+  inFlows:
+  - 'F225 AI Configuration Assistant board 1: AI Configuration Home & Start'
+- screen: ADM-475
+  name: Commercial Requirement Discovery
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-469
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-475
+  inFlows:
+  - 'F225 AI Configuration Assistant board 1: AI Configuration Home & Start'
+- screen: ADM-476
+  name: Required, Recommended & Optional Decisions
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-469
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-476
+  inFlows:
+  - 'F225 AI Configuration Assistant board 1: AI Configuration Home & Start'
+- screen: ADM-477
+  name: Missing Information & Clarification Center
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-469
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-477
+  inFlows:
+  - 'F225 AI Configuration Assistant board 1: AI Configuration Home & Start'
+- screen: ADM-478
+  name: Configuration Blueprint & Dependency Map
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-469
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-478
+  inFlows:
+  - 'F225 AI Configuration Assistant board 1: AI Configuration Home & Start'
+- screen: ADM-479
+  name: AI Configuration Build Command Center
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-480
+  - ADM-481
+  - ADM-482
+  - ADM-483
+  - ADM-484
+  - ADM-485
+  - ADM-486
+  - ADM-487
+  - ADM-488
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-479
+  inFlows:
+  - 'F226 AI Configuration Assistant board 2: AI Configuration Build Command Center'
+- screen: ADM-480
+  name: Venue & Organization Configuration
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-479
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-480
+  inFlows:
+  - 'F226 AI Configuration Assistant board 2: AI Configuration Build Command Center'
+- screen: ADM-481
+  name: Product Configuration Assistant
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-479
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-481
+  inFlows:
+  - 'F226 AI Configuration Assistant board 2: AI Configuration Build Command Center'
+- screen: ADM-482
+  name: Schedule, Capacity & Availability Configuration
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-479
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-482
+  inFlows:
+  - 'F226 AI Configuration Assistant board 2: AI Configuration Build Command Center'
+- screen: ADM-483
+  name: Pricing & Commercial Configuration
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations:
+  - setChannelPricingCommercial
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-479
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-483
+  inFlows:
+  - 'F226 AI Configuration Assistant board 2: AI Configuration Build Command Center'
+- screen: ADM-484
+  name: Promotion, Bundle & Upsell Configuration
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-479
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-484
+  inFlows:
+  - 'F226 AI Configuration Assistant board 2: AI Configuration Build Command Center'
+- screen: ADM-485
+  name: Seating, Access & Operational Configuration
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-479
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-485
+  inFlows:
+  - 'F226 AI Configuration Assistant board 2: AI Configuration Build Command Center'
+- screen: ADM-486
+  name: Channel, Media & Fulfillment Configuration
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-479
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-486
+  inFlows:
+  - 'F226 AI Configuration Assistant board 2: AI Configuration Build Command Center'
+- screen: ADM-487
+  name: Cross-Module Conflict & Dependency Validation
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-479
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-487
+  inFlows:
+  - 'F226 AI Configuration Assistant board 2: AI Configuration Build Command Center'
+- screen: ADM-488
+  name: Configuration Preview & Impact Analysis
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-479
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-488
+  inFlows:
+  - 'F226 AI Configuration Assistant board 2: AI Configuration Build Command Center'
+- screen: ADM-489
+  name: AI Configuration Readiness Center
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-490
+  - ADM-491
+  - ADM-492
+  - ADM-493
+  - ADM-494
+  - ADM-495
+  - ADM-496
+  - ADM-497
+  - ADM-498
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-489
+  inFlows:
+  - 'F227 AI Configuration Assistant board 3: AI Configuration Readiness Center'
+- screen: ADM-490
+  name: Configuration Validation Results
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-489
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-490
+  inFlows:
+  - 'F227 AI Configuration Assistant board 3: AI Configuration Readiness Center'
+- screen: ADM-491
+  name: AI Recommendations & Best-Practice Review
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-489
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-491
+  inFlows:
+  - 'F227 AI Configuration Assistant board 3: AI Configuration Readiness Center'
+- screen: ADM-492
+  name: Configuration Approval Workflow
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations:
+  - approveWorkflow
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-489
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-492
+  inFlows:
+  - 'F227 AI Configuration Assistant board 3: AI Configuration Readiness Center'
+- screen: ADM-493
+  name: AI Configuration Execution Center
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-489
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-493
+  inFlows:
+  - 'F227 AI Configuration Assistant board 3: AI Configuration Readiness Center'
+- screen: ADM-494
+  name: Execution Progress & Dependency Monitor
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-489
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-494
+  inFlows:
+  - 'F227 AI Configuration Assistant board 3: AI Configuration Readiness Center'
+- screen: ADM-495
+  name: Configuration Results & Object Mapping
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-489
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-495
+  inFlows:
+  - 'F227 AI Configuration Assistant board 3: AI Configuration Readiness Center'
+- screen: ADM-496
+  name: Configuration Change & Modification Assistant
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-489
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-496
+  inFlows:
+  - 'F227 AI Configuration Assistant board 3: AI Configuration Readiness Center'
+- screen: ADM-497
+  name: Configuration History, Versions & Rollback
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-489
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-497
+  inFlows:
+  - 'F227 AI Configuration Assistant board 3: AI Configuration Readiness Center'
+- screen: ADM-498
+  name: AI Configuration Audit & Governance
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-489
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-498
+  inFlows:
+  - 'F227 AI Configuration Assistant board 3: AI Configuration Readiness Center'
+- screen: ADM-499
+  name: Forecasting Command Center
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-500
+  - ADM-501
+  - ADM-502
+  - ADM-503
+  - ADM-504
+  - ADM-505
+  - ADM-506
+  - ADM-507
+  - ADM-508
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-499
+  inFlows:
+  - 'F228 AI Forecasting and Predictive Intelligence board 1: Forecasting Command Center'
+- screen: ADM-500
+  name: Forecast Configuration & Forecasting Strategy
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-499
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-500
+  inFlows:
+  - 'F228 AI Forecasting and Predictive Intelligence board 1: Forecasting Command Center'
+- screen: ADM-501
+  name: Forecast Data & Signal Configuration
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-499
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-501
+  inFlows:
+  - 'F228 AI Forecasting and Predictive Intelligence board 1: Forecasting Command Center'
+- screen: ADM-502
+  name: Attendance & Visitation Forecast
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-499
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-502
+  inFlows:
+  - 'F228 AI Forecasting and Predictive Intelligence board 1: Forecasting Command Center'
+- screen: ADM-503
+  name: Ticket, Product & Timeslot Demand Forecast
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-499
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-503
+  inFlows:
+  - 'F228 AI Forecasting and Predictive Intelligence board 1: Forecasting Command Center'
+- screen: ADM-504
+  name: Channel & Booking Pace Forecast
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-499
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-504
+  inFlows:
+  - 'F228 AI Forecasting and Predictive Intelligence board 1: Forecasting Command Center'
+- screen: ADM-505
+  name: Revenue & Commercial Forecast
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-499
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-505
+  inFlows:
+  - 'F228 AI Forecasting and Predictive Intelligence board 1: Forecasting Command Center'
+- screen: ADM-506
+  name: Forecast Drivers, Confidence & Explainability
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-499
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-506
+  inFlows:
+  - 'F228 AI Forecasting and Predictive Intelligence board 1: Forecasting Command Center'
+- screen: ADM-507
+  name: Forecast Scenario & What-If Simulator
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-499
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-507
+  inFlows:
+  - 'F228 AI Forecasting and Predictive Intelligence board 1: Forecasting Command Center'
+- screen: ADM-508
+  name: Forecast Accuracy, Review & Publication Center
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-499
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-508
+  inFlows:
+  - 'F228 AI Forecasting and Predictive Intelligence board 1: Forecasting Command Center'
+- screen: ADM-509
+  name: Operational Forecasting Command Center
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-510
+  - ADM-511
+  - ADM-512
+  - ADM-513
+  - ADM-514
+  - ADM-515
+  - ADM-516
+  - ADM-517
+  - ADM-518
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-509
+  inFlows:
+  - 'F229 AI Forecasting and Predictive Intelligence board 2: Operational Forecasting Command Center'
+- screen: ADM-510
+  name: Capacity & Occupancy Forecast
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-509
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-510
+  inFlows:
+  - 'F229 AI Forecasting and Predictive Intelligence board 2: Operational Forecasting Command Center'
+- screen: ADM-511
+  name: Attraction Utilization & Queue Forecast
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-509
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-511
+  inFlows:
+  - 'F229 AI Forecasting and Predictive Intelligence board 2: Operational Forecasting Command Center'
+- screen: ADM-512
+  name: Entry, Access & Guest Flow Forecast
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-509
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-512
+  inFlows:
+  - 'F229 AI Forecasting and Predictive Intelligence board 2: Operational Forecasting Command Center'
+- screen: ADM-513
+  name: Workforce Demand & Staffing Forecast
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-509
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-513
+  inFlows:
+  - 'F229 AI Forecasting and Predictive Intelligence board 2: Operational Forecasting Command Center'
+- screen: ADM-514
+  name: POS, Kiosk & Frontline Service Forecast
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-509
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-514
+  inFlows:
+  - 'F229 AI Forecasting and Predictive Intelligence board 2: Operational Forecasting Command Center'
+- screen: ADM-515
+  name: F&B, Retail & Inventory Demand Forecast
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-509
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-515
+  inFlows:
+  - 'F229 AI Forecasting and Predictive Intelligence board 2: Operational Forecasting Command Center'
+- screen: ADM-516
+  name: Resource, Equipment & Facility Requirement Forecast
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-509
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-516
+  inFlows:
+  - 'F229 AI Forecasting and Predictive Intelligence board 2: Operational Forecasting Command Center'
+- screen: ADM-517
+  name: Operational Scenario & Readiness Simulator
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-509
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-517
+  inFlows:
+  - 'F229 AI Forecasting and Predictive Intelligence board 2: Operational Forecasting Command Center'
+- screen: ADM-518
+  name: Operational Forecast Review, Recommendations & Handover
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-509
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-518
+  inFlows:
+  - 'F229 AI Forecasting and Predictive Intelligence board 2: Operational Forecasting Command Center'
+- screen: ADM-519
+  name: AI Governance Command Center
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-520
+  - ADM-521
+  - ADM-522
+  - ADM-523
+  - ADM-524
+  - ADM-525
+  - ADM-526
+  - ADM-527
+  - ADM-528
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-519
+  inFlows:
+  - 'F230 AI Governance board 1: AI Governance Command Center'
+- screen: ADM-520
+  name: AI Capability Registry & Ownership
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-519
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-520
+  inFlows:
+  - 'F230 AI Governance board 1: AI Governance Command Center'
+- screen: ADM-521
+  name: AI Risk Classification & Assessment
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-519
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-521
+  inFlows:
+  - 'F230 AI Governance board 1: AI Governance Command Center'
+- screen: ADM-522
+  name: AI Autonomy Level Configuration
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-519
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-522
+  inFlows:
+  - 'F230 AI Governance board 1: AI Governance Command Center'
+- screen: ADM-523
+  name: AI Action & Permission Policy Builder
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-519
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-523
+  inFlows:
+  - 'F230 AI Governance board 1: AI Governance Command Center'
+- screen: ADM-524
+  name: AI Data Access & Usage Policy
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-519
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-524
+  inFlows:
+  - 'F230 AI Governance board 1: AI Governance Command Center'
+- screen: ADM-525
+  name: Environment, Tenant & Scope Governance
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-519
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-525
+  inFlows:
+  - 'F230 AI Governance board 1: AI Governance Command Center'
+- screen: ADM-526
+  name: AI Policy Conflict, Exception & Override Management
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-519
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-526
+  inFlows:
+  - 'F230 AI Governance board 1: AI Governance Command Center'
+- screen: ADM-527
+  name: AI Policy Testing & Governance Simulation
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-519
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-527
+  inFlows:
+  - 'F230 AI Governance board 1: AI Governance Command Center'
+- screen: ADM-528
+  name: AI Governance Policy Publication & Effective Policy Map
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-519
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-528
+  inFlows:
+  - 'F230 AI Governance board 1: AI Governance Command Center'
+- screen: ADM-529
+  name: AI Human Oversight Command Center
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-530
+  - ADM-531
+  - ADM-532
+  - ADM-533
+  - ADM-534
+  - ADM-535
+  - ADM-536
+  - ADM-537
+  - ADM-538
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-529
+  inFlows:
+  - 'F231 AI Governance board 2: AI Human Oversight Command Center'
+- screen: ADM-530
+  name: AI Approval Requirement & Routing Configuration
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-529
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-530
+  inFlows:
+  - 'F231 AI Governance board 2: AI Human Oversight Command Center'
+- screen: ADM-531
+  name: AI Approval Review Workspace
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-529
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-531
+  inFlows:
+  - 'F231 AI Governance board 2: AI Human Oversight Command Center'
+- screen: ADM-532
+  name: Conditional Approval & Approval Conditions
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-529
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-532
+  inFlows:
+  - 'F231 AI Governance board 2: AI Human Oversight Command Center'
+- screen: ADM-533
+  name: Human Review, Challenge & AI Clarification Workspace
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-529
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-533
+  inFlows:
+  - 'F231 AI Governance board 2: AI Human Oversight Command Center'
+- screen: ADM-534
+  name: Escalation, Delegation & Approval SLA Management
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-529
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-534
+  inFlows:
+  - 'F231 AI Governance board 2: AI Human Oversight Command Center'
+- screen: ADM-535
+  name: Live AI Execution Oversight & Human Intervention
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-529
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-535
+  inFlows:
+  - 'F231 AI Governance board 2: AI Human Oversight Command Center'
+- screen: ADM-536
+  name: Human Override & Manual Control Center
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-529
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-536
+  inFlows:
+  - 'F231 AI Governance board 2: AI Human Oversight Command Center'
+- screen: ADM-537
+  name: Approval & Intervention History / Decision Timeline
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-529
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-537
+  inFlows:
+  - 'F231 AI Governance board 2: AI Human Oversight Command Center'
+- screen: ADM-538
+  name: Human Oversight Workflow Simulator & Readiness Center
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-529
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-538
+  inFlows:
+  - 'F231 AI Governance board 2: AI Human Oversight Command Center'
+- screen: ADM-539
+  name: AI Explainability & Audit Command Center
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-540
+  - ADM-541
+  - ADM-542
+  - ADM-543
+  - ADM-544
+  - ADM-545
+  - ADM-546
+  - ADM-547
+  - ADM-548
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-539
+  inFlows:
+  - 'F232 AI Governance board 3: AI Explainability & Audit Command Center'
+- screen: ADM-540
+  name: AI Decision Explorer & Search
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-539
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-540
+  inFlows:
+  - 'F232 AI Governance board 3: AI Explainability & Audit Command Center'
+- screen: ADM-541
+  name: AI Decision Explanation Workspace
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-539
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-541
+  inFlows:
+  - 'F232 AI Governance board 3: AI Explainability & Audit Command Center'
+- screen: ADM-542
+  name: Data, Feature & Evidence Provenance
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-539
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-542
+  inFlows:
+  - 'F232 AI Governance board 3: AI Explainability & Audit Command Center'
+- screen: ADM-543
+  name: Candidate, Rule & Decision Path Trace
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-539
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-543
+  inFlows:
+  - 'F232 AI Governance board 3: AI Explainability & Audit Command Center'
+- screen: ADM-544
+  name: Model, Provider & AI Runtime Trace
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-539
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-544
+  inFlows:
+  - 'F232 AI Governance board 3: AI Explainability & Audit Command Center'
+- screen: ADM-545
+  name: Governance, Approval & Human Decision Trace
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-539
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-545
+  inFlows:
+  - 'F232 AI Governance board 3: AI Explainability & Audit Command Center'
+- screen: ADM-546
+  name: Execution & Business Outcome Trace
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-539
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-546
+  inFlows:
+  - 'F232 AI Governance board 3: AI Explainability & Audit Command Center'
+- screen: ADM-547
+  name: AI Audit Record & Evidence Package
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-539
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-547
+  inFlows:
+  - 'F232 AI Governance board 3: AI Explainability & Audit Command Center'
+- screen: ADM-548
+  name: AI Trace Investigation & Replay Simulator
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-539
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-548
+  inFlows:
+  - 'F232 AI Governance board 3: AI Explainability & Audit Command Center'
+- screen: ADM-549
+  name: AI Governance Monitoring Command Center
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations:
+  - listGovernanceRiskMonitoring
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-550
+  - ADM-551
+  - ADM-552
+  - ADM-553
+  - ADM-554
+  - ADM-555
+  - ADM-556
+  - ADM-557
+  - ADM-558
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-549
+  inFlows:
+  - 'F233 AI Governance board 4: AI Governance Monitoring Command Center'
+- screen: ADM-550
+  name: AI Risk Register & Risk Exposure Management
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-549
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-550
+  inFlows:
+  - 'F233 AI Governance board 4: AI Governance Monitoring Command Center'
+- screen: ADM-551
+  name: AI Governance Control Library & Control Effectiveness
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-549
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-551
+  inFlows:
+  - 'F233 AI Governance board 4: AI Governance Monitoring Command Center'
+- screen: ADM-552
+  name: AI Policy Compliance & Violation Monitoring
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-549
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-552
+  inFlows:
+  - 'F233 AI Governance board 4: AI Governance Monitoring Command Center'
+- screen: ADM-553
+  name: AI Data, Privacy & Usage Compliance Monitoring
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-549
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-553
+  inFlows:
+  - 'F233 AI Governance board 4: AI Governance Monitoring Command Center'
+- screen: ADM-554
+  name: AI Quality, Behavior & Governance Drift Monitoring
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-549
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-554
+  inFlows:
+  - 'F233 AI Governance board 4: AI Governance Monitoring Command Center'
+- screen: ADM-555
+  name: AI Governance Alert & Detection Center
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-549
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-555
+  inFlows:
+  - 'F233 AI Governance board 4: AI Governance Monitoring Command Center'
+- screen: ADM-556
+  name: AI Incident & Remediation Management
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-549
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-556
+  inFlows:
+  - 'F233 AI Governance board 4: AI Governance Monitoring Command Center'
+- screen: ADM-557
+  name: AI Compliance, Assurance & Governance Reporting
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-549
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-557
+  inFlows:
+  - 'F233 AI Governance board 4: AI Governance Monitoring Command Center'
+- screen: ADM-558
+  name: AI Governance Review, Action Plan & Continuous Improvement
+  module: Platform
+  requiresModule: ai
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-549
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-558
+  inFlows:
+  - 'F233 AI Governance board 4: AI Governance Monitoring Command Center'
+- screen: ADM-559
+  name: Payment Command Center\t7
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-560
+  - ADM-561
+  - ADM-562
+  - ADM-563
+  - ADM-564
+  - ADM-565
+  - ADM-566
+  - ADM-567
+  - ADM-568
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-559
+  inFlows:
+  - 'F256 Payment Payment Orchestration board 1: Payment Command Center\t7'
+- screen: ADM-560
+  name: Payment Method Catalogue\t8
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-559
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-560
+  inFlows:
+  - 'F256 Payment Payment Orchestration board 1: Payment Command Center\t7'
+- screen: ADM-561
+  name: Payment Method Configuration\t9
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-559
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-561
+  inFlows:
+  - 'F256 Payment Payment Orchestration board 1: Payment Command Center\t7'
+- screen: ADM-562
+  name: Channel & Touchpoint Payment Configuration\t10
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-559
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-562
+  inFlows:
+  - 'F256 Payment Payment Orchestration board 1: Payment Command Center\t7'
+- screen: ADM-563
+  name: Venue, Location & Business Unit Payment Assignment\t11
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-559
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-563
+  inFlows:
+  - 'F256 Payment Payment Orchestration board 1: Payment Command Center\t7'
+- screen: ADM-564
+  name: Currency & Payment Currency Configuration\t12
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-559
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-564
+  inFlows:
+  - 'F256 Payment Payment Orchestration board 1: Payment Command Center\t7'
+- screen: ADM-565
+  name: Payment Eligibility & Availability Rule Builder\t13
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-559
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-565
+  inFlows:
+  - 'F256 Payment Payment Orchestration board 1: Payment Command Center\t7'
+- screen: ADM-566
+  name: Payment Fees, Surcharges & Commercial Rules\t14
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-559
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-566
+  inFlows:
+  - 'F256 Payment Payment Orchestration board 1: Payment Command Center\t7'
+- screen: ADM-567
+  name: Payment Policy, Governance & Approval Manager\t15
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-559
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-567
+  inFlows:
+  - 'F256 Payment Payment Orchestration board 1: Payment Command Center\t7'
+- screen: ADM-568
+  name: Payment Configuration Simulator & Validation Center\t16
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-559
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-568
+  inFlows:
+  - 'F256 Payment Payment Orchestration board 1: Payment Command Center\t7'
+- screen: ADM-569
+  name: Payment Orchestration Command Center\t27
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-570
+  - ADM-571
+  - ADM-572
+  - ADM-573
+  - ADM-574
+  - ADM-575
+  - ADM-576
+  - ADM-577
+  - ADM-578
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-569
+  inFlows:
+  - 'F257 Payment Payment Orchestration board 2: Payment Orchestration Command Center\t27'
+- screen: ADM-570
+  name: Gateway, PSP & Acquirer Directory\t28
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-569
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-570
+  inFlows:
+  - 'F257 Payment Payment Orchestration board 2: Payment Orchestration Command Center\t27'
+- screen: ADM-571
+  name: Provider Connection & Adapter Configuration\t29
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-569
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-571
+  inFlows:
+  - 'F257 Payment Payment Orchestration board 2: Payment Orchestration Command Center\t27'
+- screen: ADM-572
+  name: Gateway Capability & Payment Method Mapping\t30
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-569
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-572
+  inFlows:
+  - 'F257 Payment Payment Orchestration board 2: Payment Orchestration Command Center\t27'
+- screen: ADM-573
+  name: Payment Routing Rule Builder\t31
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-569
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-573
+  inFlows:
+  - 'F257 Payment Payment Orchestration board 2: Payment Orchestration Command Center\t27'
+- screen: ADM-574
+  name: Routing Strategy, Priority & Load Distribution\t33
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-569
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-574
+  inFlows:
+  - 'F257 Payment Payment Orchestration board 2: Payment Orchestration Command Center\t27'
+- screen: ADM-575
+  name: Failover, Retry & Resilience Manager\t34
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-569
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-575
+  inFlows:
+  - 'F257 Payment Payment Orchestration board 2: Payment Orchestration Command Center\t27'
+- screen: ADM-576
+  name: Provider Health, SLA & Performance Monitor\t35
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-569
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-576
+  inFlows:
+  - 'F257 Payment Payment Orchestration board 2: Payment Orchestration Command Center\t27'
+- screen: ADM-577
+  name: Provider Cost, Commercial & Routing Economics\t36
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-569
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-577
+  inFlows:
+  - 'F257 Payment Payment Orchestration board 2: Payment Orchestration Command Center\t27'
+- screen: ADM-578
+  name: Payment Routing Simulator, Decision Trace & AI Advisor\t37
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-569
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-578
+  inFlows:
+  - 'F257 Payment Payment Orchestration board 2: Payment Orchestration Command Center\t27'
+- screen: ADM-579
+  name: Terminal & Card-Present Command Center\t48
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-580
+  - ADM-581
+  - ADM-582
+  - ADM-583
+  - ADM-584
+  - ADM-585
+  - ADM-586
+  - ADM-587
+  - ADM-588
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-579
+  inFlows:
+  - 'F258 Payment Payment Orchestration board 3: Terminal & Card-Present Command Center\t48'
+- screen: ADM-580
+  name: Payment Terminal & Device Inventory\t49
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-579
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-580
+  inFlows:
+  - 'F258 Payment Payment Orchestration board 3: Terminal & Card-Present Command Center\t48'
+- screen: ADM-581
+  name: Terminal Provisioning & Device Configuration\t51
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-579
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-581
+  inFlows:
+  - 'F258 Payment Payment Orchestration board 3: Terminal & Card-Present Command Center\t48'
+- screen: ADM-582
+  name: POS, Kiosk & Terminal Assignment Manager\t52
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-579
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-582
+  inFlows:
+  - 'F258 Payment Payment Orchestration board 3: Terminal & Card-Present Command Center\t48'
+- screen: ADM-583
+  name: EMV & Card-Present Processing Configuration\t53
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-579
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-583
+  inFlows:
+  - 'F258 Payment Payment Orchestration board 3: Terminal & Card-Present Command Center\t48'
+- screen: ADM-584
+  name: Payment Server & Terminal Connectivity Manager\t54
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-579
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-584
+  inFlows:
+  - 'F258 Payment Payment Orchestration board 3: Terminal & Card-Present Command Center\t48'
+- screen: ADM-585
+  name: Card-Present Transaction Monitor & Operations\t55
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-579
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-585
+  inFlows:
+  - 'F258 Payment Payment Orchestration board 3: Terminal & Card-Present Command Center\t48'
+- screen: ADM-586
+  name: Degraded, Offline & Store-and-Forward Manager\t56
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-579
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-586
+  inFlows:
+  - 'F258 Payment Payment Orchestration board 3: Terminal & Card-Present Command Center\t48'
+- screen: ADM-587
+  name: Terminal Health, Maintenance & Incident Center\t57
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-579
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-587
+  inFlows:
+  - 'F258 Payment Payment Orchestration board 3: Terminal & Card-Present Command Center\t48'
+- screen: ADM-588
+  name: Terminal Simulator, Certification & AI Operations Advisor\t59
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-579
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-588
+  inFlows:
+  - 'F258 Payment Payment Orchestration board 3: Terminal & Card-Present Command Center\t48'
+- screen: ADM-589
+  name: Digital Payments Command Center\t71
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-590
+  - ADM-591
+  - ADM-592
+  - ADM-593
+  - ADM-594
+  - ADM-595
+  - ADM-596
+  - ADM-597
+  - ADM-598
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-589
+  inFlows:
+  - 'F259 Payment Payment Orchestration board 4: Digital Payments Command Center\t71'
+- screen: ADM-590
+  name: Digital & Alternative Payment Method Manager\t71
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-589
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-590
+  inFlows:
+  - 'F259 Payment Payment Orchestration board 4: Digital Payments Command Center\t71'
+- screen: ADM-591
+  name: Digital Wallet & Mobile Payment Configuration\t72
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-589
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-591
+  inFlows:
+  - 'F259 Payment Payment Orchestration board 4: Digital Payments Command Center\t71'
+- screen: ADM-592
+  name: Payment Link Builder & Configuration\t73
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-589
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-592
+  inFlows:
+  - 'F259 Payment Payment Orchestration board 4: Digital Payments Command Center\t71'
+- screen: ADM-593
+  name: Payment Link Distribution & Customer Journey Manager\t74
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-589
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-593
+  inFlows:
+  - 'F259 Payment Payment Orchestration board 4: Digital Payments Command Center\t71'
+- screen: ADM-594
+  name: Hosted Checkout, Redirect & Return Flow Configuration\t75
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-589
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-594
+  inFlows:
+  - 'F259 Payment Payment Orchestration board 4: Digital Payments Command Center\t71'
+- screen: ADM-595
+  name: Digital Payment Session & Transaction Monitor\t76
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-589
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-595
+  inFlows:
+  - 'F259 Payment Payment Orchestration board 4: Digital Payments Command Center\t71'
+- screen: ADM-596
+  name: Authentication, Tokenization & Recurring Payment Controls\t78
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-589
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-596
+  inFlows:
+  - 'F259 Payment Payment Orchestration board 4: Digital Payments Command Center\t71'
+- screen: ADM-597
+  name: Digital Payment Exception, Recovery & Expiry Center\t79
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-589
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-597
+  inFlows:
+  - 'F259 Payment Payment Orchestration board 4: Digital Payments Command Center\t71'
+- screen: ADM-598
+  name: Digital Payment Simulator, Conversion & AI Advisor\t80
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-589
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-598
+  inFlows:
+  - 'F259 Payment Payment Orchestration board 4: Digital Payments Command Center\t71'
+- screen: ADM-599
+  name: Mixed Tender & Credit Command Center\t93
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-600
+  - ADM-601
+  - ADM-602
+  - ADM-603
+  - ADM-604
+  - ADM-605
+  - ADM-606
+  - ADM-607
+  - ADM-608
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-599
+  inFlows:
+  - 'F260 Payment Payment Orchestration board 5: Mixed Tender & Credit Command Center\t93'
+- screen: ADM-600
+  name: Mixed Tender Rule & Combination Builder\t93
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-599
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-600
+  inFlows:
+  - 'F260 Payment Payment Orchestration board 5: Mixed Tender & Credit Command Center\t93'
+- screen: ADM-601
+  name: Split Payment & Tender Allocation Manager\t94
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-599
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-601
+  inFlows:
+  - 'F260 Payment Payment Orchestration board 5: Mixed Tender & Credit Command Center\t93'
+- screen: ADM-602
+  name: B2B Credit Account & Limit Manager\t95
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-599
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-602
+  inFlows:
+  - 'F260 Payment Payment Orchestration board 5: Mixed Tender & Credit Command Center\t93'
+- screen: ADM-603
+  name: B2B Invoice, On-Account & Payment Terms Configuration\t96
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-599
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-603
+  inFlows:
+  - 'F260 Payment Payment Orchestration board 5: Mixed Tender & Credit Command Center\t93'
+- screen: ADM-604
+  name: Stored Value, Gift Card & Voucher Tender Controls\t97
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-599
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-604
+  inFlows:
+  - 'F260 Payment Payment Orchestration board 5: Mixed Tender & Credit Command Center\t93'
+- screen: ADM-605
+  name: Advanced Payment Eligibility, Sequence & Restriction Rules\t98
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-599
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-605
+  inFlows:
+  - 'F260 Payment Payment Orchestration board 5: Mixed Tender & Credit Command Center\t93'
+- screen: ADM-606
+  name: Partial Payment, Failure & Recovery Manager\t100
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-599
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-606
+  inFlows:
+  - 'F260 Payment Payment Orchestration board 5: Mixed Tender & Credit Command Center\t93'
+- screen: ADM-607
+  name: Mixed Tender Transaction Trace & Allocation Audit\t100
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-599
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-607
+  inFlows:
+  - 'F260 Payment Payment Orchestration board 5: Mixed Tender & Credit Command Center\t93'
+- screen: ADM-608
+  name: Mixed Tender Simulator, Credit Exposure & AI Advisor\t102
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-599
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-608
+  inFlows:
+  - 'F260 Payment Payment Orchestration board 5: Mixed Tender & Credit Command Center\t93'
+- screen: ADM-609
+  name: Refund & Payment Adjustment Command Center\t116
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-610
+  - ADM-611
+  - ADM-612
+  - ADM-613
+  - ADM-614
+  - ADM-615
+  - ADM-616
+  - ADM-617
+  - ADM-618
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-609
+  inFlows:
+  - 'F261 Payment Payment Orchestration board 6: Refund & Payment Adjustment Command Center\t116'
+- screen: ADM-610
+  name: Refund Request & Eligibility Workspace\t117
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-609
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-610
+  inFlows:
+  - 'F261 Payment Payment Orchestration board 6: Refund & Payment Adjustment Command Center\t116'
+- screen: ADM-611
+  name: Refund Policy & Rule Configuration\t118
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - setRefundPolicy
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - venueId<-navigation
+  goesTo:
+  - ADM-609
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-611
+  inFlows:
+  - 'F261 Payment Payment Orchestration board 6: Refund & Payment Adjustment Command Center\t116'
+- screen: ADM-612
+  name: Refund Allocation & Original Tender Manager\t119
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-609
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-612
+  inFlows:
+  - 'F261 Payment Payment Orchestration board 6: Refund & Payment Adjustment Command Center\t116'
+- screen: ADM-613
+  name: Void, Reversal & Cancellation Manager\t120
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-609
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-613
+  inFlows:
+  - 'F261 Payment Payment Orchestration board 6: Refund & Payment Adjustment Command Center\t116'
+- screen: ADM-614
+  name: Refund Approval & Exception Workflow\t121
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-609
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-614
+  inFlows:
+  - 'F261 Payment Payment Orchestration board 6: Refund & Payment Adjustment Command Center\t116'
+- screen: ADM-615
+  name: Refund Processing, Provider Status & Recovery Center\t122
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-609
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-615
+  inFlows:
+  - 'F261 Payment Payment Orchestration board 6: Refund & Payment Adjustment Command Center\t116'
+- screen: ADM-616
+  name: Payment Adjustment & Financial Correction Manager\t123
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-609
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-616
+  inFlows:
+  - 'F261 Payment Payment Orchestration board 6: Refund & Payment Adjustment Command Center\t116'
+- screen: ADM-617
+  name: Refund Transaction Trace & Audit Investigation\t124
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-609
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-617
+  inFlows:
+  - 'F261 Payment Payment Orchestration board 6: Refund & Payment Adjustment Command Center\t116'
+- screen: ADM-618
+  name: Refund Simulator, Risk Analysis & AI Advisor\t126
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-609
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-618
+  inFlows:
+  - 'F261 Payment Payment Orchestration board 6: Refund & Payment Adjustment Command Center\t116'
+- screen: ADM-619
+  name: Reconciliation & Settlement Command Center\t139
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-620
+  - ADM-621
+  - ADM-622
+  - ADM-623
+  - ADM-624
+  - ADM-625
+  - ADM-626
+  - ADM-627
+  - ADM-628
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-619
+  inFlows:
+  - 'F262 Payment Payment Orchestration board 7: Reconciliation & Settlement Command Center\t139'
+- screen: ADM-620
+  name: Reconciliation Source & Import Manager\t141
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-619
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-620
+  inFlows:
+  - 'F262 Payment Payment Orchestration board 7: Reconciliation & Settlement Command Center\t139'
+- screen: ADM-621
+  name: Transaction Matching & Reconciliation Engine\t142
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-619
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-621
+  inFlows:
+  - 'F262 Payment Payment Orchestration board 7: Reconciliation & Settlement Command Center\t139'
+- screen: ADM-622
+  name: Reconciliation Exception & Investigation Center\t143
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-619
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-622
+  inFlows:
+  - 'F262 Payment Payment Orchestration board 7: Reconciliation & Settlement Command Center\t139'
+- screen: ADM-623
+  name: Settlement & Payout Manager\t144
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-619
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-623
+  inFlows:
+  - 'F262 Payment Payment Orchestration board 7: Reconciliation & Settlement Command Center\t139'
+- screen: ADM-624
+  name: Fees, Commission, FX & Settlement Economics\t145
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-619
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-624
+  inFlows:
+  - 'F262 Payment Payment Orchestration board 7: Reconciliation & Settlement Command Center\t139'
+- screen: ADM-625
+  name: Merchant Account & Settlement Calendar Manager\t146
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-619
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-625
+  inFlows:
+  - 'F262 Payment Payment Orchestration board 7: Reconciliation & Settlement Command Center\t139'
+- screen: ADM-626
+  name: Settlement Posting, Finance Handoff & Close Manager\t148
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-619
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-626
+  inFlows:
+  - 'F262 Payment Payment Orchestration board 7: Reconciliation & Settlement Command Center\t139'
+- screen: ADM-627
+  name: Reconciliation Audit, Trace & Evidence Center\t149
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-619
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-627
+  inFlows:
+  - 'F262 Payment Payment Orchestration board 7: Reconciliation & Settlement Command Center\t139'
+- screen: ADM-628
+  name: Reconciliation Simulator, Forecast & AI Operations Advisor\t150
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-619
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-628
+  inFlows:
+  - 'F262 Payment Payment Orchestration board 7: Reconciliation & Settlement Command Center\t139'
+- screen: ADM-629
+  name: Payment Risk & Fraud Command Center\t166
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-630
+  - ADM-631
+  - ADM-632
+  - ADM-633
+  - ADM-634
+  - ADM-635
+  - ADM-636
+  - ADM-637
+  - ADM-638
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-629
+  inFlows:
+  - 'F263 Payment Payment Orchestration board 8: Payment Risk & Fraud Command Center\t166'
+- screen: ADM-630
+  name: Payment Risk Rule & Decision Engine\t167
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-629
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-630
+  inFlows:
+  - 'F263 Payment Payment Orchestration board 8: Payment Risk & Fraud Command Center\t166'
+- screen: ADM-631
+  name: Velocity, Behavioral & Transaction Risk Controls\t168
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-629
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-631
+  inFlows:
+  - 'F263 Payment Payment Orchestration board 8: Payment Risk & Fraud Command Center\t166'
+- screen: ADM-632
+  name: Risk Lists, Signals & Payment Control Center\t169
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-629
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-632
+  inFlows:
+  - 'F263 Payment Payment Orchestration board 8: Payment Risk & Fraud Command Center\t166'
+- screen: ADM-633
+  name: Fraud Alert, Investigation & Case Management\t170
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-629
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-633
+  inFlows:
+  - 'F263 Payment Payment Orchestration board 8: Payment Risk & Fraud Command Center\t166'
+- screen: ADM-634
+  name: Chargeback & Dispute Command Center\t172
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-629
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-634
+  inFlows:
+  - 'F263 Payment Payment Orchestration board 8: Payment Risk & Fraud Command Center\t166'
+- screen: ADM-635
+  name: Chargeback Evidence & Representment Workspace\t173
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-629
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-635
+  inFlows:
+  - 'F263 Payment Payment Orchestration board 8: Payment Risk & Fraud Command Center\t166'
+- screen: ADM-636
+  name: Payment Performance & Conversion Analytics\t174
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-629
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-636
+  inFlows:
+  - 'F263 Payment Payment Orchestration board 8: Payment Risk & Fraud Command Center\t166'
+- screen: ADM-637
+  name: AI Fraud, Anomaly & Payment Intelligence Center\t175
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-629
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-637
+  inFlows:
+  - 'F263 Payment Payment Orchestration board 8: Payment Risk & Fraud Command Center\t166'
+- screen: ADM-638
+  name: Payment Executive Intelligence, Risk Simulator & AI Advisor\t176
+  module: Commercial
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-629
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-638
+  inFlows:
+  - 'F263 Payment Payment Orchestration board 8: Payment Risk & Fraud Command Center\t166'
+- screen: ADM-639
+  name: Recommendation Command Center
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-640
+  - ADM-641
+  - ADM-642
+  - ADM-643
+  - ADM-644
+  - ADM-645
+  - ADM-646
+  - ADM-647
+  - ADM-648
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-639
+  inFlows:
+  - 'F287 Upsell,CrossSellEngine board 1: Recommendation Command Center'
+- screen: ADM-640
+  name: Recommendation Strategy Manager
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-639
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-640
+  inFlows:
+  - 'F287 Upsell,CrossSellEngine board 1: Recommendation Command Center'
+- screen: ADM-641
+  name: Recommendation Objective & KPI Configuration
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-639
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-641
+  inFlows:
+  - 'F287 Upsell,CrossSellEngine board 1: Recommendation Command Center'
+- screen: ADM-642
+  name: Recommendation Type & Product Relationship Manager
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-639
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-642
+  inFlows:
+  - 'F287 Upsell,CrossSellEngine board 1: Recommendation Command Center'
+- screen: ADM-643
+  name: Recommendation Placement & Touchpoint Manager
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-639
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-643
+  inFlows:
+  - 'F287 Upsell,CrossSellEngine board 1: Recommendation Command Center'
+- screen: ADM-644
+  name: Channel & Journey Strategy Manager
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-639
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-644
+  inFlows:
+  - 'F287 Upsell,CrossSellEngine board 1: Recommendation Command Center'
+- screen: ADM-645
+  name: Recommendation Priority, Ranking & Suppression Manager17
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-639
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-645
+  inFlows:
+  - 'F287 Upsell,CrossSellEngine board 1: Recommendation Command Center'
+- screen: ADM-646
+  name: Recommendation Guardrails & Business Controls
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-639
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-646
+  inFlows:
+  - 'F287 Upsell,CrossSellEngine board 1: Recommendation Command Center'
+- screen: ADM-647
+  name: Recommendation Policy, AI Control & Governance
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-639
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-647
+  inFlows:
+  - 'F287 Upsell,CrossSellEngine board 1: Recommendation Command Center'
+- screen: ADM-648
+  name: Recommendation Strategy Simulator & AI Advisor
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-639
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-648
+  inFlows:
+  - 'F287 Upsell,CrossSellEngine board 1: Recommendation Command Center'
+- screen: ADM-649
+  name: Upsell & Upgrade Command Center
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-650
+  - ADM-651
+  - ADM-652
+  - ADM-653
+  - ADM-654
+  - ADM-655
+  - ADM-656
+  - ADM-657
+  - ADM-658
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-649
+  inFlows:
+  - 'F288 Upsell,CrossSellEngine board 2: Upsell & Upgrade Command Center'
+- screen: ADM-650
+  name: Upgrade Path & Product Ladder Builder
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-649
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-650
+  inFlows:
+  - 'F288 Upsell,CrossSellEngine board 2: Upsell & Upgrade Command Center'
+- screen: ADM-651
+  name: Upsell Eligibility & Qualification Rules
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-649
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-651
+  inFlows:
+  - 'F288 Upsell,CrossSellEngine board 2: Upsell & Upgrade Command Center'
+- screen: ADM-652
+  name: Upgrade Price Difference & Value Proposition Manager
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-649
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-652
+  inFlows:
+  - 'F288 Upsell,CrossSellEngine board 2: Upsell & Upgrade Command Center'
+- screen: ADM-653
+  name: Ticket, Experience & Bundle Upgrade Manager
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-649
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-653
+  inFlows:
+  - 'F288 Upsell,CrossSellEngine board 2: Upsell & Upgrade Command Center'
+- screen: ADM-654
+  name: Membership & Pass Upgrade Engine
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-649
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-654
+  inFlows:
+  - 'F288 Upsell,CrossSellEngine board 2: Upsell & Upgrade Command Center'
+- screen: ADM-655
+  name: Pre-Purchase, Cart & Checkout Upsell Manager
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-649
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-655
+  inFlows:
+  - 'F288 Upsell,CrossSellEngine board 2: Upsell & Upgrade Command Center'
+- screen: ADM-656
+  name: Post-Purchase & In-Journey Upgrade Manager
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-649
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-656
+  inFlows:
+  - 'F288 Upsell,CrossSellEngine board 2: Upsell & Upgrade Command Center'
+- screen: ADM-657
+  name: Upsell Ranking, Propensity & AI Opportunity Engine
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-649
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-657
+  inFlows:
+  - 'F288 Upsell,CrossSellEngine board 2: Upsell & Upgrade Command Center'
+- screen: ADM-658
+  name: Upgrade Simulator, Comparison & AI Advisor
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-649
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-658
+  inFlows:
+  - 'F288 Upsell,CrossSellEngine board 2: Upsell & Upgrade Command Center'
+- screen: ADM-659
+  name: Cross-Sell Command Center
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listUpsellCrossSell
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-660
+  - ADM-661
+  - ADM-662
+  - ADM-663
+  - ADM-664
+  - ADM-665
+  - ADM-666
+  - ADM-667
+  - ADM-668
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-659
+  inFlows:
+  - 'F289 Upsell,CrossSellEngine board 3: Cross-Sell Command Center'
+- screen: ADM-660
+  name: Cross-Sell Relationship Builder
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-659
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-660
+  inFlows:
+  - 'F289 Upsell,CrossSellEngine board 3: Cross-Sell Command Center'
+- screen: ADM-661
+  name: Product Affinity Matrix & Relationship Map
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-659
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-661
+  inFlows:
+  - 'F289 Upsell,CrossSellEngine board 3: Cross-Sell Command Center'
+- screen: ADM-662
+  name: Frequently Bought Together & Basket Pattern Engine
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-659
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-662
+  inFlows:
+  - 'F289 Upsell,CrossSellEngine board 3: Cross-Sell Command Center'
+- screen: ADM-663
+  name: Cross-Category Recommendation Manager
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-659
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-663
+  inFlows:
+  - 'F289 Upsell,CrossSellEngine board 3: Cross-Sell Command Center'
+- screen: ADM-664
+  name: Multi-Attraction, Destination & Partner Cross-Sell
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-659
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-664
+  inFlows:
+  - 'F289 Upsell,CrossSellEngine board 3: Cross-Sell Command Center'
+- screen: ADM-665
+  name: Basket-Aware Cross-Sell & Duplicate Prevention
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-659
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-665
+  inFlows:
+  - 'F289 Upsell,CrossSellEngine board 3: Cross-Sell Command Center'
+- screen: ADM-666
+  name: Availability, Inventory & Capacity-Aware Cross-Sell
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-659
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-666
+  inFlows:
+  - 'F289 Upsell,CrossSellEngine board 3: Cross-Sell Command Center'
+- screen: ADM-667
+  name: AI Cross-Sell Discovery, Scoring & Ranking Engine
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-659
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-667
+  inFlows:
+  - 'F289 Upsell,CrossSellEngine board 3: Cross-Sell Command Center'
+- screen: ADM-668
+  name: Cross-Sell Simulator & AI Opportunity Advisor
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-659
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-668
+  inFlows:
+  - 'F289 Upsell,CrossSellEngine board 3: Cross-Sell Command Center'
+- screen: ADM-669
+  name: Journey & Context Command Center
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-670
+  - ADM-671
+  - ADM-672
+  - ADM-673
+  - ADM-674
+  - ADM-675
+  - ADM-676
+  - ADM-677
+  - ADM-678
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-669
+  inFlows:
+  - 'F290 Upsell,CrossSellEngine board 4: Journey & Context Command Center'
+- screen: ADM-670
+  name: Customer Journey Map & Touchpoint Designer
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-669
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-670
+  inFlows:
+  - 'F290 Upsell,CrossSellEngine board 4: Journey & Context Command Center'
+- screen: ADM-671
+  name: Real-Time Context Rule Engine
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-669
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-671
+  inFlows:
+  - 'F290 Upsell,CrossSellEngine board 4: Journey & Context Command Center'
+- screen: ADM-672
+  name: Pre-Purchase & Booking Journey Recommendation Manager
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-669
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-672
+  inFlows:
+  - 'F290 Upsell,CrossSellEngine board 4: Journey & Context Command Center'
+- screen: ADM-673
+  name: Post-Purchase & Pre-Visit Recommendation Manager
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-669
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-673
+  inFlows:
+  - 'F290 Upsell,CrossSellEngine board 4: Journey & Context Command Center'
+- screen: ADM-674
+  name: In-Venue & Location-Aware Recommendation Engine
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-669
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-674
+  inFlows:
+  - 'F290 Upsell,CrossSellEngine board 4: Journey & Context Command Center'
+- screen: ADM-675
+  name: Visit State, Itinerary & Time-Aware Recommendation
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-669
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-675
+  inFlows:
+  - 'F290 Upsell,CrossSellEngine board 4: Journey & Context Command Center'
+- screen: ADM-676
+  name: Omnichannel Recommendation Synchronization
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-669
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-676
+  inFlows:
+  - 'F290 Upsell,CrossSellEngine board 4: Journey & Context Command Center'
+- screen: ADM-677
+  name: Contextual Trigger, Frequency & Experience Controls
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-669
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-677
+  inFlows:
+  - 'F290 Upsell,CrossSellEngine board 4: Journey & Context Command Center'
+- screen: ADM-678
+  name: Journey Simulator, Decision Trace & AI Optimization
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-669
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-678
+  inFlows:
+  - 'F290 Upsell,CrossSellEngine board 4: Journey & Context Command Center'
+- screen: ADM-679
+  name: Personalization & NBO Command Center
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-680
+  - ADM-681
+  - ADM-682
+  - ADM-683
+  - ADM-684
+  - ADM-685
+  - ADM-686
+  - ADM-687
+  - ADM-688
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-679
+  inFlows:
+  - 'F291 Upsell,CrossSellEngine board 5: Personalization & NBO Command Center'
+- screen: ADM-680
+  name: Customer Recommendation Profile
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-679
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-680
+  inFlows:
+  - 'F291 Upsell,CrossSellEngine board 5: Personalization & NBO Command Center'
+- screen: ADM-681
+  name: Customer Feature & Signal Configuration
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-679
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-681
+  inFlows:
+  - 'F291 Upsell,CrossSellEngine board 5: Personalization & NBO Command Center'
+- screen: ADM-682
+  name: Propensity Model & Customer Intent Manager
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-679
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-682
+  inFlows:
+  - 'F291 Upsell,CrossSellEngine board 5: Personalization & NBO Command Center'
+- screen: ADM-683
+  name: Next-Best-Offer Decision Studio
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-679
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-683
+  inFlows:
+  - 'F291 Upsell,CrossSellEngine board 5: Personalization & NBO Command Center'
+- screen: ADM-684
+  name: Personalized Ranking & Decision Policy Builder
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-679
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-684
+  inFlows:
+  - 'F291 Upsell,CrossSellEngine board 5: Personalization & NBO Command Center'
+- screen: ADM-685
+  name: Customer Preference, Fatigue & Suppression Intelligence
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-679
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-685
+  inFlows:
+  - 'F291 Upsell,CrossSellEngine board 5: Personalization & NBO Command Center'
+- screen: ADM-686
+  name: Anonymous, Known & Identity-Transition Personalization.123
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-679
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-686
+  inFlows:
+  - 'F291 Upsell,CrossSellEngine board 5: Personalization & NBO Command Center'
+- screen: ADM-687
+  name: AI Explainability, Confidence & Model Governance
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-679
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-687
+  inFlows:
+  - 'F291 Upsell,CrossSellEngine board 5: Personalization & NBO Command Center'
+- screen: ADM-688
+  name: Personalization Simulator & Next-Best-Offer Lab
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-679
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-688
+  inFlows:
+  - 'F291 Upsell,CrossSellEngine board 5: Personalization & NBO Command Center'
+- screen: ADM-689
+  name: Recommendation Performance Command Center
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-690
+  - ADM-691
+  - ADM-692
+  - ADM-693
+  - ADM-694
+  - ADM-695
+  - ADM-696
+  - ADM-697
+  - ADM-698
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-689
+  inFlows:
+  - 'F292 Upsell,CrossSellEngine board 6: Recommendation Performance Command Center'
+- screen: ADM-690
+  name: Recommendation Strategy & Placement Analytics
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-689
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-690
+  inFlows:
+  - 'F292 Upsell,CrossSellEngine board 6: Recommendation Performance Command Center'
+- screen: ADM-691
+  name: Recommendation Experiment & A/B Test Studio
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-689
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-691
+  inFlows:
+  - 'F292 Upsell,CrossSellEngine board 6: Recommendation Performance Command Center'
+- screen: ADM-692
+  name: Experiment Results & Winner Decision Workspace
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-689
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-692
+  inFlows:
+  - 'F292 Upsell,CrossSellEngine board 6: Recommendation Performance Command Center'
+- screen: ADM-693
+  name: Recommendation Attribution & Incrementality Analytics
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-689
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-693
+  inFlows:
+  - 'F292 Upsell,CrossSellEngine board 6: Recommendation Performance Command Center'
+- screen: ADM-694
+  name: AI Model Performance & Drift Monitor
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-689
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-694
+  inFlows:
+  - 'F292 Upsell,CrossSellEngine board 6: Recommendation Performance Command Center'
+- screen: ADM-695
+  name: Recommendation Governance & Deployment Control
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-689
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-695
+  inFlows:
+  - 'F292 Upsell,CrossSellEngine board 6: Recommendation Performance Command Center'
+- screen: ADM-696
+  name: AI Risk, Fairness, Explainability & Safety Center
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-689
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-696
+  inFlows:
+  - 'F292 Upsell,CrossSellEngine board 6: Recommendation Performance Command Center'
+- screen: ADM-697
+  name: Recommendation Audit, Decision Trace & Investigation
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-689
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-697
+  inFlows:
+  - 'F292 Upsell,CrossSellEngine board 6: Recommendation Performance Command Center'
+- screen: ADM-698
+  name: AI Optimization & Recommendation Intelligence Lab
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-689
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-698
+  inFlows:
+  - 'F292 Upsell,CrossSellEngine board 6: Recommendation Performance Command Center'

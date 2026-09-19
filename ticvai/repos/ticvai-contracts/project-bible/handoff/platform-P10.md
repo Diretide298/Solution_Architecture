@@ -72,7 +72,7 @@
 | `PTR-019` | API Credentials & Integration | Access & Account | 3 | 4 | yes |
 | `PTR-020` | Sub-Agent Management | Access & Account | 3 | 3 | yes |
 | `PTR-021` | Support & Contact | Support | 3 | 7 | yes |
-| `PTR-022` | Partner Management Command Center | Partners | 3 | 1 | yes |
+| `PTR-022` | Partner Management Command Center | Partners | 3 | 2 | yes |
 | `PTR-023` | Partner Profile & Organization Setup | Partners | 3 | 1 | yes |
 | `PTR-024` | Partner Onboarding & Application Workflow | Partners | 3 | 1 | yes |
 | `PTR-025` | Partner Contacts & User Administration | Partners | 3 | 1 | yes |
@@ -82,7 +82,7 @@
 | `PTR-029` | Partner Access, Roles & Permission Profile | Partners | 3 | 1 | yes |
 | `PTR-030` | Partner Approval, Status & Lifecycle Management | Partners | 3 | 1 | yes |
 | `PTR-031` | Partner 360° Profile, Readiness & AI Review | Partners | 3 | 1 | yes |
-| `PTR-032` | Commercial Agreement Command Center | Partners | 3 | 1 | yes |
+| `PTR-032` | Commercial Agreement Command Center | Partners | 3 | 2 | yes |
 | `PTR-033` | Agreement & Contract Terms Builder | Partners | 3 | 1 | yes |
 | `PTR-034` | Partner Rate & Net Pricing Configuration | Partners | 3 | 1 | yes |
 | `PTR-035` | Commission, Margin & Incentive Management | Partners | 3 | 1 | yes |
@@ -92,7 +92,7 @@
 | `PTR-039` | Commercial Allocation, Quota & Commitment Management | Partners | 3 | 1 | yes |
 | `PTR-040` | Booking Limits, Commercial Exceptions & Approval | Partners | 3 | 1 | yes |
 | `PTR-041` | Commercial Agreement 360°, Health & AI Review | Partners | 3 | 1 | yes |
-| `PTR-042` | Partner Operations Command Center | Partners | 3 | 1 | yes |
+| `PTR-042` | Partner Operations Command Center | Partners | 3 | 2 | yes |
 | `PTR-043` | Partner Orders & Booking Management | Partners | 3 | 1 | yes |
 | `PTR-044` | Reservations, Holds & Release Management | Partners | 3 | 1 | yes |
 | `PTR-045` | Partner Cancellations, Refunds & Amendments | Partners | 3 | 1 | yes |

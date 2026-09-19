@@ -1,0 +1,148 @@
+id: F286
+name: 'Seat Management Venue Mapping Reference v1.0 board 13: Integration Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Seat Management Venue Mapping Reference v1.0 board 13. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-1071
+  entryPoints:
+  - Arrives at Integration Command Center
+steps:
+- step: 1
+  screen: BO-1071
+  action: Opens Integration Command Center
+  operations: []
+  outcome: Monitor all seat API and webhook consumers from one place. Show request volume, success, latency,
+    failures, retries, active consumers, versions and security alerts. Compare tenant, venue, application,
+    endpoint, event, environment and time p
+- step: 2
+  screen: BO-1072
+  action: Works in Seat Management APIs
+  operations: []
+  outcome: Publish a governed catalog of supported seat endpoints. Document APIs for maps/layouts, availability,
+    locks, holds, reservations, allocations, sales and seat history. Show method, path, version, scope,
+    request/response schema, errors, examp
+- step: 3
+  screen: BO-1071
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-1073
+  action: Works in API Access & OAuth
+  operations: []
+  outcome: Manage machine and delegated access to seat services. Register confidential/public clients
+    with tenant, environment, owner, redirect/callback and application purpose. Configure OAuth grant,
+    scopes, token lifetime, mTLS/IP restriction, secre
+- step: 5
+  screen: BO-1071
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-1074
+  action: Works in Webhook Configuration
+  operations: []
+  outcome: Allow approved consumers to subscribe to seat lifecycle events. Select events, tenant/venue
+    scope, destination, method, content type, version and filtering conditions. Configure HMAC signature,
+    signing-key rotation, timeout, retry, ordering
+- step: 7
+  screen: BO-1071
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-1075
+  action: Works in Seat Event Catalog
+  operations: []
+  outcome: Define the versioned events emitted by the seat platform. Catalog map/layout published, availability
+    changed, seat locked/unlocked, held/released, reserved, sold and blocked events. Show schema, required
+    tenant/venue/performance/seat identi
+- step: 9
+  screen: BO-1071
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-1076
+  action: Works in Concurrency, Idempotency & Limits
+  operations: []
+  outcome: Configure technical controls that prevent duplicate or conflicting inventory actions. Define
+    expected version/ETag, lock token, conflict response and retry boundary for write operations. Require
+    idempotency key, retention window and duplica
+- step: 11
+  screen: BO-1071
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-1077
+  action: Works in Mapping & Transformation
+  operations: []
+  outcome: Map external partner fields and codes to TICVAI canonical seat entities. Configure source-to-target
+    identifiers, status/category code mapping, value transformation and defaults. Validate data type,
+    required field, tenant/venue context, refe
+- step: 13
+  screen: BO-1071
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-1078
+  action: Works in Monitoring, Retry & Reconciliation
+  operations: []
+  outcome: Operate API and event delivery reliably through failure. Trace request or webhook by correlation
+    ID with attempts, response, latency, signature and processing outcome. Configure retry/backoff, retryable
+    errors, expiry, dead-letter queue, re
+- step: 15
+  screen: BO-1071
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-1079
+  action: Works in Immutable Seat Audit Logs
+  operations: []
+  outcome: Provide searchable tamper-evident evidence for seat data and administrative actions. Record
+    actor/client, tenant, venue, event, entity, action, before/after, reason, source IP/device and timestamp.
+    Store API request/event correlation, rule/
+- step: 17
+  screen: BO-1071
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-1080
+  action: Works in Integration Approval & Compliance
+  operations: []
+  outcome: Govern production activation and ongoing compliance of each integration. Route security review,
+    data classification, privacy, architecture, performance and business-owner approval. Attach sandbox
+    results, contract tests, load/security tests
+branches:
+- at: 1
+  condition: Nothing has been set up on Integration Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Seat Management Venue Mapping Reference v1.0 board 13 visited
+primaryContract: unknown
+contracts:
+- unknown

@@ -1,0 +1,135 @@
+id: F287
+name: 'Upsell,CrossSellEngine board 1: Recommendation Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Upsell,CrossSellEngine board 1. **This route is read from
+    the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-639
+  entryPoints:
+  - Arrives at Recommendation Command Center
+steps:
+- step: 1
+  screen: ADM-639
+  action: Opens Recommendation Command Center
+  operations: []
+  outcome: Provide the central operational dashboard for the complete TICVAI Recommendation Engine. This
+    becomes the entry point for Marketing, Commercial, Revenue, CRM and authorized operational users.
+- step: 2
+  screen: ADM-640
+  action: Works in Recommendation Strategy Manager
+  operations: []
+  outcome: Define the commercial strategy TICVAI should use when generating recommendations. Instead of
+    hard-coding recommendation behavior into B2C or POS, administrators configure reusable strategies
+    centrally.
+- step: 3
+  screen: ADM-639
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-641
+  action: Works in Recommendation Objective & KPI Configuration
+  operations: []
+  outcome: Define exactly what the recommendation engine should optimize. This is important because the
+    "best" recommendation depends on the business objective.
+- step: 5
+  screen: ADM-639
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-642
+  action: Works in Recommendation Type & Product Relationship Manager
+  operations: []
+  outcome: Define the commercial relationships from which recommendations can be generated.
+- step: 7
+  screen: ADM-639
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-643
+  action: Works in Recommendation Placement & Touchpoint Manager
+  operations: []
+  outcome: Define where in the customer journey recommendations are permitted to appear. This is a major
+    requirement for the engine.
+- step: 9
+  screen: ADM-639
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-644
+  action: Works in Channel & Journey Strategy Manager
+  operations: []
+  outcome: Control recommendation behavior across TICVAI's omnichannel environment.
+- step: 11
+  screen: ADM-639
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-645
+  action: Works in Recommendation Priority, Ranking & Suppression Manager17
+  operations: []
+  outcome: Define how multiple eligible recommendations are ranked before being presented. This is different
+    from Promotion Board 8.
+- step: 13
+  screen: ADM-639
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-646
+  action: Works in Recommendation Guardrails & Business Controls
+  operations: []
+  outcome: Protect the business and customer experience from inappropriate AI or rule- generated recommendations.
+- step: 15
+  screen: ADM-639
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-647
+  action: Works in Recommendation Policy, AI Control & Governance
+  operations: []
+  outcome: Define how much authority the TICVAI AI layer has over recommendation decisions.
+- step: 17
+  screen: ADM-639
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-648
+  action: Works in Recommendation Strategy Simulator & AI Advisor
+  operations: []
+  outcome: Allow administrators to test recommendation strategies before activating them. This should
+    become the final validation screen for Board 1.
+branches:
+- at: 1
+  condition: Nothing has been set up on Recommendation Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Upsell,CrossSellEngine board 1 visited
+primaryContract: unknown
+contracts:
+- unknown

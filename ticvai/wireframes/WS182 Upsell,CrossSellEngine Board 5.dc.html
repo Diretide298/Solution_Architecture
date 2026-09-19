@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WS182 Upsell,CrossSellEngine board 5 — workshop board</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* **The Claude Design system, applied to the generated boards on 24 August.**
+   Three client packs render at 1280x700 in this system and 385 screens rendered as
+   dashed-box wireframes — and **a client reviewing both reads the difference as *those screens
+   are not done*.** The information is identical either way; the fidelity is what was being
+   judged.
+
+   Tokens are the packs': #0B1324 rail, #0D6EFD primary, #00B8FF accent, Manrope for UI,
+   IBM Plex Mono for figures and codes. */
+:root{--ink:#0B1324;--mut:#5A6577;--dim:#9AA5B6;--line:#E8ECF3;--edge:#E3E8F0;
+--brand:#0D6EFD;--accent:#00B8FF;--rail:#0B1324;--paper:#FFF;--wash:#F7F9FC;
+--ok:#0E9F6E;--okbg:#E8F6F0;--okline:#BFE3D2;--warn:#8A6D00;--warnbg:#FFF7E6;
+--bad:#A81E1E;--badbg:#FDECEC}
+*{box-sizing:border-box}
+body{margin:0;background:#F2F5F9;color:var(--ink);
+font-family:Manrope,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;line-height:1.55}
+a{color:inherit}
+.wrap{max-width:1420px;margin:0 auto;padding:22px 34px 90px}
+.home{font-size:11.5px;color:var(--mut);text-decoration:none;letter-spacing:.02em}
+.head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;
+margin:14px 0 6px;padding-bottom:16px;border-bottom:2px solid var(--ink)}
+.mark{font-size:13px;font-weight:800;letter-spacing:.16em;
+background:linear-gradient(90deg,var(--brand),var(--accent));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+h1{font-size:19px;font-weight:800;letter-spacing:-.015em;margin:0}
+.meta{font-size:11px;color:var(--mut);font-family:'IBM Plex Mono',ui-monospace,monospace;line-height:1.7}
+.lede{font-size:12.5px;color:var(--mut);max-width:82ch;margin:16px 0 0;line-height:1.65}
+.grp{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;font-weight:600;
+letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin:52px 0 18px;
+padding-bottom:9px;border-bottom:1px solid var(--line)}
+.stack{display:flex;flex-direction:column;gap:52px}
+.scr{display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px}
+.hdr{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8}
+.ttl{font-size:16.5px;font-weight:800;letter-spacing:-.015em}
+.pur{font-size:12px;color:#6B7280;margin-top:3px;max-width:96ch}
+.pill{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+padding:2px 7px;border-radius:5px;background:#EEF3FA;color:#4A5A70}
+.pill.named{background:var(--warnbg);color:var(--warn)}
+.pill.off{background:var(--okbg);color:var(--ok)}
+
+/* the frame — 1280x700, the packs' dimension */
+.frame{width:1280px;height:700px;display:flex;background:var(--wash);border:1px solid var(--edge);
+border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)}
+.rail{flex:none;width:180px;background:var(--rail);display:flex;flex-direction:column;position:relative}
+.rail::before{content:'';position:absolute;inset:0;
+background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none}
+.brand{position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)}
+.brand b{display:block;font-size:14px;font-weight:800;letter-spacing:.1em;
+background:linear-gradient(90deg,#4DA3FF,var(--accent));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+.brand span{display:block;font-size:9.5px;color:#7FA3C9;margin-top:5px}
+.nav{position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px}
+.nav i{display:block;padding:8px 10px;border-radius:9px;font-size:11.5px;font-style:normal;color:#8FA8C4}
+.nav i.on{background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));
+color:#fff;font-weight:700}
+.body{flex:1;display:flex;flex-direction:column;min-width:0}
+.top{flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;
+background:var(--paper);border-bottom:1px solid var(--line)}
+.top h2{font-size:13.5px;font-weight:800;letter-spacing:-.01em;margin:0}
+.top small{display:block;font-size:10px;color:var(--dim);font-weight:500}
+.acts{margin-left:auto;display:flex;gap:6px}
+.chip{height:32px;display:flex;align-items:center;gap:6px;padding:0 11px;border:1px solid var(--edge);
+border-radius:8px;font-size:11px;font-weight:700;color:var(--mut);background:var(--paper)}
+.chip.live{background:var(--okbg);border-color:var(--okline);color:var(--ok)}
+.chip.live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--ok)}
+.chip.cta{background:var(--brand);border-color:var(--brand);color:#fff}
+.canvas{flex:1;display:flex;flex-direction:column;gap:12px;padding:14px 16px;min-height:0;overflow:hidden}
+.kpis{flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.kpi{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:11px 13px;
+display:flex;flex-direction:column;gap:4px}
+.kpi b{font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
+.kpi span{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;letter-spacing:-.02em}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 14px;
+display:flex;flex-direction:column;gap:8px;min-height:0}
+.panel > b{font-size:11px;font-weight:800;letter-spacing:-.005em}
+.panel .why{font-size:10px;color:#7C8899;font-style:italic;line-height:1.5}
+.kind{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--dim);
+letter-spacing:.06em;text-transform:uppercase}
+.rows{display:flex;flex-direction:column;gap:6px}
+.row{display:grid;grid-template-columns:1.6fr 1fr 1fr .7fr;gap:10px;align-items:center;
+padding:7px 0;border-top:1px solid #F0F3F8}
+.row:first-child{border-top:0;font-size:9.5px;font-weight:700;letter-spacing:.06em;
+text-transform:uppercase;color:var(--dim)}
+.bar{height:7px;border-radius:4px;background:#EDF1F7}
+.bar i{display:block;height:100%;border-radius:4px;
+background:linear-gradient(90deg,var(--brand),var(--accent))}
+.side{flex:none;width:250px;display:flex;flex-direction:column;gap:10px}
+.two{flex:1;display:flex;gap:12px;min-height:0}
+.grow{flex:1;min-width:0}
+.strip{flex:none;height:26px;display:flex;align-items:center;gap:8px;padding:0 18px;
+background:var(--warnbg);color:var(--warn);font-size:10px;font-weight:700;
+letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid #F0E0B8}
+.dark .frame{background:#0A1524}
+.dark .top{background:#0E2A4C;border-color:#1E3A5F;color:#E6F0FA}
+.dark .top small{color:#7FA3C9}
+.dark .canvas{background:#0A1524}
+.dark .kpi,.dark .panel{background:#0E2A4C;border-color:#1E3A5F;color:#E6F0FA}
+.dark .row{border-color:#193353}
+.dark .chip{background:#0E2A4C;border-color:#1E3A5F;color:#9FC0E0}
+
+.drawnb{margin-left:6px;font:600 10px/1.6 'IBM Plex Mono',monospace;color:#0F766E;background:#ECFDF5;border:1px solid #A7F3D0;padding:1px 7px;border-radius:999px}
+.frame.drawn{padding:0;background:#FFF}
+.wsb{margin-left:8px;font:600 10px/1.6 'IBM Plex Mono',monospace;color:#5B21B6;background:#F5F3FF;border:1px solid #DDD6FE;padding:1px 7px;border-radius:999px;white-space:nowrap}
+.wsbar{position:sticky;top:0;z-index:20;display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 18px;padding:10px 14px;background:#FFF;border:1px solid #E5E7EB;border-radius:10px;font:600 12px/1.4 'IBM Plex Mono',monospace}
+.wsbar label{color:#6B7280;font-weight:600}
+.wsbar select{font:600 12px 'IBM Plex Mono',monospace;padding:5px 8px;border:1px solid #D1D5DB;border-radius:7px;background:#FFF;color:#111827;max-width:min(520px,60vw)}
+.wsbar .n{color:#6B7280;font-weight:400}
+.scr[hidden],.grp[hidden],.stack[hidden]{display:none!important}
+.foot a{color:#2563EB;text-decoration:none;border-bottom:1px solid rgba(37,99,235,.3)}
+.foot a:hover{border-bottom-color:#2563EB}
+.foot .car{font-family:var(--mono,monospace);font-size:9.5px;color:#0F766E;background:#ECFDF5;padding:1px 5px;border-radius:4px}
+.foot .dis{font-family:var(--mono,monospace);font-size:9.5px;color:#B45309}
+.foot .away{font-size:9px;color:#9AA5B6}
+.foot .hand{font-size:9.5px;color:#7C3AED;background:#F5F3FF;padding:1px 5px;border-radius:4px}
+.foot .mac{margin-top:3px;font-size:10px;color:#4A5566;line-height:1.7}
+.foot .ov{margin-top:3px;font-size:10px;color:#4A5566}
+.foot{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;line-height:1.85;color:#7C8899}
+.foot b{color:#4A5566;font-weight:600}
+.foot .warn{color:var(--warn)}
+.bottom{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);
+display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
+
+.ws-home{margin:-6px 0 18px;font:600 12px/1 'IBM Plex Mono',monospace}.ws-home a{color:#6B7280;text-decoration:none;border-bottom:1px solid #D1D5DB}.ws-home a:hover{color:#111827}</style></head><body>
+<div class="wrap">
+  <a class="home" href="TICVAI%20Workshop%20Boards.dc.html">&larr; All workshop boards</a>
+  <div class="head">
+    <div><span class="mark">TICVAI</span>
+      <h1>WS182 · Upsell,CrossSellEngine <span style="font-weight:600;color:#6B7280">board 5 (10 screens)</span></h1></div>
+    <div class="meta">P09 TICVAI Web</div>
+  </div>
+  <p class="lede"><strong>A workshop board, as the client specified it</strong> — ten screens
+  named in Upsell,CrossSellEngine. The cards are the ones the platform board renders; only the grouping
+  differs, so the two cannot disagree.</p>
+  <div class="stack">
+      <div id="adm-679" class="scr" data-ws="WS184">
+        <div>
+          <div class="hdr"><span class="code">ADM-679</span>
+            <span class="ttl">Personalization &amp; NBO Command Center</span><span class="wsb" title="Upsell,CrossSellEngine board 5">WS184 &middot; Upsell,CrossSellEngine board 5</span></div>
+          <div class="pur">Provide centralized visibility into the operation and commercial impact of personalized recommendations.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Commercial</span></div><nav class="nav"><i class="">Tenants</i><i class="on">Cells</i><i class="">Releases</i><i class="">Health</i><i class="">Audit</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Personalization &amp; NBO Command Center</h2>
+                <small>TICVAI Web &middot; wave 3 &middot; compact</small></div>
+              <div class="acts"><div class="chip">All tenants &#9662;</div><div class="chip cta">Deploy</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Tenants</b><span>184</span></div><div class="kpi"><b>Cells</b><span>3</span></div><div class="kpi"><b>Incidents</b><span>2</span></div><div class="kpi"><b>Releases</b><span>11</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">Headline figure</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">The records behind the figures</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; <a href="P09%20TICVAI%20Web.dc.html#adm-002">ADM-002</a> <span class="away">other board</span>  &mdash; <i>Back to Platform Dashboard</i><br><a href="P09%20TICVAI%20Web.dc.html#adm-680">ADM-680</a> <span class="away">other board</span>  &mdash; <i>Customer Recommendation Profile</i><br><a href="P09%20TICVAI%20Web.dc.html#adm-681">ADM-681</a> <span class="away">other board</span>  &mdash; <i>Customer Feature &amp; Signal Configuration</i><br><a href="P09%20TICVAI%20Web.dc.html#adm-682">ADM-682</a> <span class="away">other board</span>  &mdash; <i>Propensity Model &amp; Customer Intent Manager</i><br><a href="P09%20TICVAI%20Web.dc.html#adm-683">ADM-683</a> <span class="away">other board</span>  &mdash; <i>Next-Best-Offer Decision Studio</i><br><a href="P09%20TICVAI%20Web.dc.html#adm-684">ADM-684</a> <span class="away">other board</span>  &mdash; <i>Personalized Ranking &amp; Decision Policy Build</i><br><a href="P09%20TICVAI%20Web.dc.html#adm-685">ADM-685</a> <span class="away">other board</span>  &mdash; <i>Customer Preference, Fatigue &amp; Suppression I</i><br><a href="P09%20TICVAI%20Web.dc.html#adm-686">ADM-686</a> <span class="away">other board</span>  &mdash; <i>Anonymous, Known &amp; Identity-Transition Perso</i><br><a href="P09%20TICVAI%20Web.dc.html#adm-687">ADM-687</a> <span class="away">other board</span>  &mdash; <i>AI Explainability, Confidence &amp; Model Govern</i><br><a href="P09%20TICVAI%20Web.dc.html#adm-688">ADM-688</a> <span class="away">other board</span>  &mdash; <i>Personalization Simulator &amp; Next-Best-Offer </i></div>
+          
+          
+        </div>
+      </div><div class="ws-home"><a href="P09%20TICVAI%20Web.dc.html#adm-679">P09 TICVAI Web &rarr;</a></div>
+      <div id="adm-680" class="scr" data-ws="WS184">
+        <div>
+          <div class="hdr"><span class="code">ADM-680</span>
+            <span class="ttl">Customer Recommendation Profile</span><span class="wsb" title="Upsell,CrossSellEngine board 5">WS184 &middot; Upsell,CrossSellEngine board 5</span></div>
+          <div class="pur">Provide the recommendation engine&#x27;s commercially relevant customer context used for personalization. This should not become another CRM profile s</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Commercial</span></div><nav class="nav"><i class="">Tenants</i><i class="on">Cells</i><i class="">Releases</i><i class="">Health</i><i class="">Audit</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Customer Recommendation Profile</h2>
+                <small>TICVAI Web &middot; wave 3 &middot; compact</small></div>
+              <div class="acts"><div class="chip">All tenants &#9662;</div><div class="chip cta">Deploy</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Tenants</b><span>184</span></div><div class="kpi"><b>Cells</b><span>3</span></div><div class="kpi"><b>Incidents</b><span>2</span></div><div class="kpi"><b>Releases</b><span>11</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Find a record</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Every record with its status</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The selected record</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; <a href="P09%20TICVAI%20Web.dc.html#adm-679">ADM-679</a> <span class="away">other board</span>  &mdash; <i>Back to Personalization &amp; NBO Command Center</i></div>
+          
+          
+        </div>
+      </div><div class="ws-home"><a href="P09%20TICVAI%20Web.dc.html#adm-680">P09 TICVAI Web &rarr;</a></div>
+      <div id="adm-681" class="scr" data-ws="WS184">
+        <div>
+          <div class="hdr"><span class="code">ADM-681</span>
+            <span class="ttl">Customer Feature &amp; Signal Configuration</span><span class="wsb" title="Upsell,CrossSellEngine board 5">WS184 &middot; Upsell,CrossSellEngine board 5</span></div>
+          <div class="pur">Control which approved data signals the AI may use when calculating personalized recommendations. This is critical for governance and explainability.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Commercial</span></div><nav class="nav"><i class="">Tenants</i><i class="on">Cells</i><i class="">Releases</i><i class="">Health</i><i class="">Audit</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Customer Feature &amp; Signal Configuration</h2>
+                <small>TICVAI Web &middot; wave 3 &middot; compact</small></div>
+              <div class="acts"><div class="chip">All tenants &#9662;</div><div class="chip cta">Deploy</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Tenants</b><span>184</span></div><div class="kpi"><b>Cells</b><span>3</span></div><div class="kpi"><b>Incidents</b><span>2</span></div><div class="kpi"><b>Releases</b><span>11</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The configuration being edited</span></div><div class="panel"><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Scope this applies at</span></div><div class="panel"><span class="kind">toggle</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Active</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; <a href="P09%20TICVAI%20Web.dc.html#adm-679">ADM-679</a> <span class="away">other board</span>  &mdash; <i>Back to Personalization &amp; NBO Command Center</i></div>
+          
+          
+        </div>
+      </div><div class="ws-home"><a href="P09%20TICVAI%20Web.dc.html#adm-681">P09 TICVAI Web &rarr;</a></div>
+      <div id="adm-682" class="scr" data-ws="WS184">
+        <div>
+          <div class="hdr"><span class="code">ADM-682</span>
+            <span class="ttl">Propensity Model &amp; Customer Intent Manager</span><span class="wsb" title="Upsell,CrossSellEngine board 5">WS184 &middot; Upsell,CrossSellEngine board 5</span></div>
+          <div class="pur">Calculate the likelihood that a guest will take specific commercial actions.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Commercial</span></div><nav class="nav"><i class="">Tenants</i><i class="on">Cells</i><i class="">Releases</i><i class="">Health</i><i class="">Audit</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Propensity Model &amp; Customer Intent Manag</h2>
+                <small>TICVAI Web &middot; wave 3 &middot; compact</small></div>
+              <div class="acts"><div class="chip">All tenants &#9662;</div><div class="chip cta">Deploy</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Tenants</b><span>184</span></div><div class="kpi"><b>Cells</b><span>3</span></div><div class="kpi"><b>Incidents</b><span>2</span></div><div class="kpi"><b>Releases</b><span>11</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Find a record</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Every record with its status</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The selected record</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; <a href="P09%20TICVAI%20Web.dc.html#adm-679">ADM-679</a> <span class="away">other board</span>  &mdash; <i>Back to Personalization &amp; NBO Command Center</i></div>
+          
+          
+        </div>
+      </div><div class="ws-home"><a href="P09%20TICVAI%20Web.dc.html#adm-682">P09 TICVAI Web &rarr;</a></div>
+      <div id="adm-683" class="scr" data-ws="WS184">
+        <div>
+          <div class="hdr"><span class="code">ADM-683</span>
+            <span class="ttl">Next-Best-Offer Decision Studio</span><span class="wsb" title="Upsell,CrossSellEngine board 5">WS184 &middot; Upsell,CrossSellEngine board 5</span></div>
+          <div class="pur">This is the core screen of Board 5. Combine all eligible candidates and determine the strongest personalized recommendation.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Commercial</span></div><nav class="nav"><i class="">Tenants</i><i class="on">Cells</i><i class="">Releases</i><i class="">Health</i><i class="">Audit</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Next-Best-Offer Decision Studio</h2>
+                <small>TICVAI Web &middot; wave 3 &middot; compact</small></div>
+              <div class="acts"><div class="chip">All tenants &#9662;</div><div class="chip cta">Deploy</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Tenants</b><span>184</span></div><div class="kpi"><b>Cells</b><span>3</span></div><div class="kpi"><b>Incidents</b><span>2</span></div><div class="kpi"><b>Releases</b><span>11</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The configuration being edited</span></div><div class="panel"><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Scope this applies at</span></div><div class="panel"><span class="kind">toggle</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Active</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; <a href="P09%20TICVAI%20Web.dc.html#adm-679">ADM-679</a> <span class="away">other board</span>  &mdash; <i>Back to Personalization &amp; NBO Command Center</i></div>
+          
+          
+        </div>
+      </div><div class="ws-home"><a href="P09%20TICVAI%20Web.dc.html#adm-683">P09 TICVAI Web &rarr;</a></div>
+      <div id="adm-684" class="scr" data-ws="WS184">
+        <div>
+          <div class="hdr"><span class="code">ADM-684</span>
+            <span class="ttl">Personalized Ranking &amp; Decision Policy Builder</span><span class="wsb" title="Upsell,CrossSellEngine board 5">WS184 &middot; Upsell,CrossSellEngine board 5</span></div>
+          <div class="pur">Configure how TICVAI converts AI scores and commercial factors into the final recommendation ranking.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Commercial</span></div><nav class="nav"><i class="">Tenants</i><i class="on">Cells</i><i class="">Releases</i><i class="">Health</i><i class="">Audit</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Personalized Ranking &amp; Decision Policy B</h2>
+                <small>TICVAI Web &middot; wave 3 &middot; compact</small></div>
+              <div class="acts"><div class="chip">All tenants &#9662;</div><div class="chip cta">Deploy</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Tenants</b><span>184</span></div><div class="kpi"><b>Cells</b><span>3</span></div><div class="kpi"><b>Incidents</b><span>2</span></div><div class="kpi"><b>Releases</b><span>11</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The configuration being edited</span></div><div class="panel"><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Scope this applies at</span></div><div class="panel"><span class="kind">toggle</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Active</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; <a href="P09%20TICVAI%20Web.dc.html#adm-679">ADM-679</a> <span class="away">other board</span>  &mdash; <i>Back to Personalization &amp; NBO Command Center</i></div>
+          
+          
+        </div>
+      </div><div class="ws-home"><a href="P09%20TICVAI%20Web.dc.html#adm-684">P09 TICVAI Web &rarr;</a></div>
+      <div id="adm-685" class="scr" data-ws="WS184">
+        <div>
+          <div class="hdr"><span class="code">ADM-685</span>
+            <span class="ttl">Customer Preference, Fatigue &amp; Suppression Intelligence</span><span class="wsb" title="Upsell,CrossSellEngine board 5">WS184 &middot; Upsell,CrossSellEngine board 5</span></div>
+          <div class="pur">Prevent personalization from becoming repetitive or intrusive. Board 4 provides general journey frequency controls. Board 5 adds customer-specific beh</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Commercial</span></div><nav class="nav"><i class="">Tenants</i><i class="on">Cells</i><i class="">Releases</i><i class="">Health</i><i class="">Audit</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Customer Preference, Fatigue &amp; Suppressi</h2>
+                <small>TICVAI Web &middot; wave 3 &middot; compact</small></div>
+              <div class="acts"><div class="chip">All tenants &#9662;</div><div class="chip cta">Deploy</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Tenants</b><span>184</span></div><div class="kpi"><b>Cells</b><span>3</span></div><div class="kpi"><b>Incidents</b><span>2</span></div><div class="kpi"><b>Releases</b><span>11</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">Headline figure</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">The records behind the figures</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; <a href="P09%20TICVAI%20Web.dc.html#adm-679">ADM-679</a> <span class="away">other board</span>  &mdash; <i>Back to Personalization &amp; NBO Command Center</i></div>
+          
+          
+        </div>
+      </div><div class="ws-home"><a href="P09%20TICVAI%20Web.dc.html#adm-685">P09 TICVAI Web &rarr;</a></div>
+      <div id="adm-686" class="scr" data-ws="WS184">
+        <div>
+          <div class="hdr"><span class="code">ADM-686</span>
+            <span class="ttl">Anonymous, Known &amp; Identity-Transition Personalization.123</span><span class="wsb" title="Upsell,CrossSellEngine board 5">WS184 &middot; Upsell,CrossSellEngine board 5</span></div>
+          <div class="pur">Allow useful recommendations even when TICVAI does not yet know the customer&#x27;s identity.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Commercial</span></div><nav class="nav"><i class="">Tenants</i><i class="on">Cells</i><i class="">Releases</i><i class="">Health</i><i class="">Audit</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Anonymous, Known &amp; Identity-Transition P</h2>
+                <small>TICVAI Web &middot; wave 3 &middot; compact</small></div>
+              <div class="acts"><div class="chip">All tenants &#9662;</div><div class="chip cta">Deploy</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Tenants</b><span>184</span></div><div class="kpi"><b>Cells</b><span>3</span></div><div class="kpi"><b>Incidents</b><span>2</span></div><div class="kpi"><b>Releases</b><span>11</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Find a record</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Every record with its status</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The selected record</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; <a href="P09%20TICVAI%20Web.dc.html#adm-679">ADM-679</a> <span class="away">other board</span>  &mdash; <i>Back to Personalization &amp; NBO Command Center</i></div>
+          
+          
+        </div>
+      </div><div class="ws-home"><a href="P09%20TICVAI%20Web.dc.html#adm-686">P09 TICVAI Web &rarr;</a></div>
+      <div id="adm-687" class="scr" data-ws="WS184">
+        <div>
+          <div class="hdr"><span class="code">ADM-687</span>
+            <span class="ttl">AI Explainability, Confidence &amp; Model Governance</span><span class="wsb" title="Upsell,CrossSellEngine board 5">WS184 &middot; Upsell,CrossSellEngine board 5</span></div>
+          <div class="pur">Make personalized AI decisions understandable and governable.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Commercial</span></div><nav class="nav"><i class="">Tenants</i><i class="on">Cells</i><i class="">Releases</i><i class="">Health</i><i class="">Audit</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>AI Explainability, Confidence &amp; Model Go</h2>
+                <small>TICVAI Web &middot; wave 3 &middot; compact</small></div>
+              <div class="acts"><div class="chip">All tenants &#9662;</div><div class="chip cta">Deploy</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Tenants</b><span>184</span></div><div class="kpi"><b>Cells</b><span>3</span></div><div class="kpi"><b>Incidents</b><span>2</span></div><div class="kpi"><b>Releases</b><span>11</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Find a record</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Every record with its status</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The selected record</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; <a href="P09%20TICVAI%20Web.dc.html#adm-679">ADM-679</a> <span class="away">other board</span>  &mdash; <i>Back to Personalization &amp; NBO Command Center</i></div>
+          
+          
+        </div>
+      </div><div class="ws-home"><a href="P09%20TICVAI%20Web.dc.html#adm-687">P09 TICVAI Web &rarr;</a></div>
+      <div id="adm-688" class="scr" data-ws="WS184">
+        <div>
+          <div class="hdr"><span class="code">ADM-688</span>
+            <span class="ttl">Personalization Simulator &amp; Next-Best-Offer Lab</span><span class="wsb" title="Upsell,CrossSellEngine board 5">WS184 &middot; Upsell,CrossSellEngine board 5</span></div>
+          <div class="pur">Allow administrators to simulate how TICVAI would personalize recommendations for different customers before deploying changes.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI</b><span>Commercial</span></div><nav class="nav"><i class="">Tenants</i><i class="on">Cells</i><i class="">Releases</i><i class="">Health</i><i class="">Audit</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Personalization Simulator &amp; Next-Best-Of</h2>
+                <small>TICVAI Web &middot; wave 3 &middot; compact</small></div>
+              <div class="acts"><div class="chip">All tenants &#9662;</div><div class="chip cta">Deploy</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Tenants</b><span>184</span></div><div class="kpi"><b>Cells</b><span>3</span></div><div class="kpi"><b>Incidents</b><span>2</span></div><div class="kpi"><b>Releases</b><span>11</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Find a record</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Every record with its status</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The selected record</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; <a href="P09%20TICVAI%20Web.dc.html#adm-679">ADM-679</a> <span class="away">other board</span>  &mdash; <i>Back to Personalization &amp; NBO Command Center</i></div>
+          
+          
+        </div>
+      </div><div class="ws-home"><a href="P09%20TICVAI%20Web.dc.html#adm-688">P09 TICVAI Web &rarr;</a></div></div>
+  <div class="bottom">
+    <span>Generated by tools/derive-pack-boards.py from screens/P*.yaml — do not hand-edit</span>
+    <span>WS182 · 10 screens</span>
+  </div>
+</div></body></html>

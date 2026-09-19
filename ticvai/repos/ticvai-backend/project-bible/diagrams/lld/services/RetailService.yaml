@@ -471,6 +471,7 @@ screens:
 - P08:BO-114 Variants, Attributes, Barcode & RFID Management
 - P08:BO-116 Merchandising & Product Presentation
 - P08:BO-142 Store Rules, Controls & Permissions
+- P08:BO-469 Wallet & Deduction Transaction Monitor
 flows:
 - F17 A guest buys merchandise and collects later
 - F34 A retail sale, from scan to return

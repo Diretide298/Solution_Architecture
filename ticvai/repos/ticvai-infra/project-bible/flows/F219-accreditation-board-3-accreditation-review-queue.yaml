@@ -1,0 +1,118 @@
+id: F219
+name: 'ACCREDITATION board 3: Accreditation Review Queue'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as ACCREDITATION board 3. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-635
+  entryPoints:
+  - Arrives at Accreditation Review Queue
+steps:
+- step: 1
+  screen: BO-635
+  action: Opens Accreditation Review Queue
+  operations: []
+  outcome: Central operational queue for applications requiring review.
+- step: 2
+  screen: BO-636
+  action: Works in Application Review Workspace
+  operations: []
+  outcome: Give reviewers a complete decision workspace.
+- step: 3
+  screen: BO-635
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-637
+  action: Works in Approval Workflow Builder
+  operations: []
+  outcome: Configure reusable accreditation approval workflows.
+- step: 5
+  screen: BO-635
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-638
+  action: Works in Approval Rules & Conditions
+  operations: []
+  outcome: Define when a particular approval workflow is applied.
+- step: 7
+  screen: BO-635
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-639
+  action: Works in Reviewer Assignment & Delegation
+  operations: []
+  outcome: Manage reviewers and approval responsibilities.
+- step: 9
+  screen: BO-635
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-640
+  action: Works in Rejection & Resubmission Management
+  operations: []
+  outcome: Control rejected applications and resubmission workflows.
+- step: 11
+  screen: BO-635
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-641
+  action: Works in Escalation & Exception Management
+  operations: []
+  outcome: Handle applications requiring special review.
+- step: 13
+  screen: BO-635
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-642
+  action: Works in Approval Decision History
+  operations: []
+  outcome: Maintain a complete record of every approval decision.
+- step: 15
+  screen: BO-635
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-643
+  action: Works in Approval Policy Validation & Publication
+  operations: []
+  outcome: Validate and publish approval workflow configurations.
+branches:
+- at: 1
+  condition: Nothing has been set up on Accreditation Review Queue yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on ACCREDITATION board 3 visited
+primaryContract: unknown
+contracts:
+- unknown

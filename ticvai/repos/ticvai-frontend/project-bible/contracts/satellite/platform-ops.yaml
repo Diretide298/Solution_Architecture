@@ -94,7 +94,8 @@ paths:
                 reason:
                   type: string
                   enum:
-                  - onPremise
+                  - onPremiseIsolated
+                  - onPremiseConnected
                   - blackoutWindow
                   - tenantRequested
                   - unreachable

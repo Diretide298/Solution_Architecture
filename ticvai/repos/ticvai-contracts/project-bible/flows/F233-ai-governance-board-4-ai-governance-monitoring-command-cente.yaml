@@ -1,0 +1,138 @@
+id: F233
+name: 'AI Governance board 4: AI Governance Monitoring Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as AI Governance board 4. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-549
+  entryPoints:
+  - Arrives at AI Governance Monitoring Command Center
+steps:
+- step: 1
+  screen: ADM-549
+  action: Opens AI Governance Monitoring Command Center
+  operations: []
+  outcome: Provide executives, governance teams and authorized administrators with one centralized real-time
+    view of AI governance health across TICVAI.
+- step: 2
+  screen: ADM-550
+  action: Works in AI Risk Register & Risk Exposure Management
+  operations: []
+  outcome: Maintain the enterprise risk register specifically for TICVAI AI capabilities. Board 1 classifies
+    individual capabilities/actions. Board 4 manages the ongoing risk exposure after those capabilities
+    are operational.
+- step: 3
+  screen: ADM-549
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-551
+  action: Works in AI Governance Control Library & Control Effectiveness
+  operations: []
+  outcome: Define and continuously test whether the controls designed to govern AI are actually working.
+    A policy existing on paper does not mean the control is effective.
+- step: 5
+  screen: ADM-549
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-552
+  action: Works in AI Policy Compliance & Violation Monitoring
+  operations: []
+  outcome: Continuously detect AI activity that violates or attempts to violate Board 1 governance policies.
+- step: 7
+  screen: ADM-549
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-553
+  action: Works in AI Data, Privacy & Usage Compliance Monitoring
+  operations: []
+  outcome: Monitor whether AI capabilities are actually using data according to the policies configured
+    in Board 1. This screen is monitoring—not the configuration of the data policies themselves.
+- step: 9
+  screen: ADM-549
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-554
+  action: Works in AI Quality, Behavior & Governance Drift Monitoring
+  operations: []
+  outcome: Detect meaningful changes in AI behavior that may increase governance risk. This is not the
+    full model monitoring platform. Board 4 focuses specifically on governance-relevant behavioral changes.
+- step: 11
+  screen: ADM-549
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-555
+  action: Works in AI Governance Alert & Detection Center
+  operations: []
+  outcome: Centralize governance-related alerts generated from policy, control, data, behavior and operational
+    monitoring.
+- step: 13
+  screen: ADM-549
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-556
+  action: Works in AI Incident & Remediation Management
+  operations: []
+  outcome: Manage significant AI governance failures from detection through containment, investigation,
+    remediation and closure.
+- step: 15
+  screen: ADM-549
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-557
+  action: Works in AI Compliance, Assurance & Governance Reporting
+  operations: []
+  outcome: Provide structured governance evidence and management reporting without duplicating TICVAI's
+    generic BI platform.
+- step: 17
+  screen: ADM-549
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-558
+  action: Works in AI Governance Review, Action Plan & Continuous Improvement
+  operations: []
+  outcome: Bring all governance monitoring together into a structured periodic review and improvement
+    cycle. This is the final screen of the entire AI Governance module.
+branches:
+- at: 1
+  condition: Nothing has been set up on AI Governance Monitoring Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on AI Governance board 4 visited
+primaryContract: unknown
+contracts:
+- unknown

@@ -13,7 +13,7 @@
 | **Tables** | 51 |
 | **Screens** | 34 |
 | **Flows** | 11 |
-| **Documents** | 23 |
+| **Documents** | 27 |
 | **Open conflicts** | 1 |
 
 ## Reached outside the contract
@@ -225,6 +225,8 @@
 | Document | Status | Mentions |
 |---|---|---|
 | [AI scope — for confirmation](..\docs\active\ai-scope-for-confirmation.md) |  | 1 |
+| [Validating the developer team's Change Log](..\docs\active\change-log-validation-18-september.md) |  | 1 |
+| [Current work](..\docs\active\current-work.md) |  | 2 |
 | [Deep audit — ten invariants, run adversarially](..\docs\active\deep-audit-24-august.md) |  | 4 |
 | [Deployment architecture — four configurations, costed on AWS and GCP](..\docs\active\deployment-configs-costed.md) |  | 7 |
 | [Audit — the 3 September dump, its checks, and what trickles down](..\docs\active\dump-audit-3-september.md) |  | 2 |
@@ -232,11 +234,12 @@
 | [TICVAI — Hierarchy, Data Segregation and Services](..\docs\active\hierarchy-segregation-services.md) |  | 1 |
 | [Optimisation assessment — RAG, caching, backend, frontend](..\docs\active\optimisation-assessment.md) |  | 4 |
 | [Optimisation adoption plan](..\docs\active\optimisation-plan.md) |  | 3 |
+| [Phase 0 — identity pass, all clusters](..\docs\active\phase0-identity-pass-all-clusters.md) |  | 2 |
 | [Identical operation sets — what each cluster actually is](..\docs\active\screen-duplicate-triage.md) |  | 5 |
 | [Screen estate audit — duplication, connectivity, and stranded capability](..\docs\active\screen-estate-audit.md) |  | 3 |
 | [Regenerating the screen layer — plan](..\docs\active\screen-regeneration-plan.md) |  | 1 |
+| [Ch03 capability coverage - the client's list against our screens](..\docs\active\spec-coverage-19-september.md) |  | 1 |
 | [Viewer — what changed in the package on 20 August](..\docs\active\viewer-update-brief-20aug.md) |  | 1 |
-| [Workshop pack — what the new screens need from the contracts](..\docs\active\workshop-contract-gap.md) |  | 1 |
 | [Workshop pack — what was done, and how to re-verify it](..\docs\active\workshop-pack-log.md) |  | 3 |
 | [ADR-0007: Hybrid repository topology](..\docs\adr\0007-hybrid-repository-topology.md) | Accepted | 1 |
 | [ADR-0020 — Where AI runs, and what it is isolated from](..\docs\adr\0020-ai-isolation-boundary.md) | Proposed · 17 August 2026 | 14 |
@@ -245,6 +248,7 @@
 | [ADR-0028: Sixteen services, and the data boundary decides where they split](..\docs\adr\0028-service-decomposition.md) | Accepted. The data topology reopened by CF-161 on 24 August  | 1 |
 | [ADR-0033: Every asynchronous handoff has an outbox and a place to fail](..\docs\adr\0033-outbox-and-dead-letters.md) | Accepted | 3 |
 | [ADR-0034: The cheapest AI call is the one that never reaches a provider](..\docs\adr\0034-ai-retrieval-and-cost.md) | Accepted | 7 |
+| [ADR-0046: On-premise has two configurations, and the difference is a control channel](..\docs\adr\0046-on-premise-has-two-configurations.md) | Accepted | 1 |
 | [AI provider credentials — where the key lives and who can reach it](..\docs\architecture\ai-credentials.md) |  | 4 |
 | [Architecture](..\docs\architecture\README.md) |  | 1 |
 

@@ -1,0 +1,129 @@
+id: F270
+name: 'Resource Management Configuration board 7: Event Resource Planning Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Resource Management Configuration board 7. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-913
+  entryPoints:
+  - Arrives at Event Resource Planning Command Center
+steps:
+- step: 1
+  screen: BO-913
+  action: Opens Event Resource Planning Command Center
+  operations: []
+  outcome: Provide event and operations managers with a single workspace for understanding the resource
+    readiness of upcoming events.
+- step: 2
+  screen: BO-914
+  action: Works in Event Resource Requirement Builder
+  operations: []
+  outcome: Define every resource required to deliver a specific event.
+- step: 3
+  screen: BO-913
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-915
+  action: Works in Venue & Space Allocation
+  operations: []
+  outcome: Assign suitable physical spaces to an event and its operational components.
+- step: 5
+  screen: BO-913
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-916
+  action: Works in Equipment & Asset Allocation
+  operations: []
+  outcome: Allocate physical equipment and operational assets required for events.
+- step: 7
+  screen: BO-913
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-917
+  action: Works in Event Staff & Personnel Allocation
+  operations: []
+  outcome: Assign qualified staff resources to event roles.
+- step: 9
+  screen: BO-913
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-918
+  action: Works in Event Resource Template Library
+  operations: []
+  outcome: Allow frequently used event-resource configurations to be saved as reusable templates.
+- step: 11
+  screen: BO-913
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-919
+  action: Works in AI Event Resource Forecasting
+  operations: []
+  outcome: Predict the resources required for an event before final allocation.
+- step: 13
+  screen: BO-913
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-920
+  action: Works in Event Resource Cost Estimator
+  operations: []
+  outcome: Calculate the expected resource cost of delivering an event.
+- step: 15
+  screen: BO-913
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-921
+  action: Works in Multi-Event Allocation & Conflict Optimizer
+  operations: []
+  outcome: Manage scarce resources across simultaneous or overlapping events.
+- step: 17
+  screen: BO-913
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-922
+  action: Works in Event Resource Approval & Readiness Gate
+  operations: []
+  outcome: Provide the final governance checkpoint before an event resource plan becomes operational.
+branches:
+- at: 1
+  condition: Nothing has been set up on Event Resource Planning Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Resource Management Configuration board 7 visited
+primaryContract: unknown
+contracts:
+- unknown

@@ -1,0 +1,139 @@
+id: F294
+name: 'Wallet Configuration Backend Structure v1.0 board 2: Funding Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Wallet Configuration Backend Structure v1.0 board 2. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-1093
+  entryPoints:
+  - Arrives at Funding Command Center
+steps:
+- step: 1
+  screen: BO-1093
+  action: Opens Funding Command Center
+  operations: []
+  outcome: Provide administrators and finance/operations teams with a centralized view of all wallet funding
+    activity.
+- step: 2
+  screen: BO-1094
+  action: Works in Funding Method Configuration
+  operations: []
+  outcome: Configure which funding methods TICVAI wallets can accept. The source requires multiple methods
+    for funding wallet value, including bank-linked funding, credit/debit cards through digital channels,
+    and cash/cards through physical channels.
+- step: 3
+  screen: BO-1093
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-1095
+  action: Works in Top-Up Rule Configuration
+  operations: []
+  outcome: Control the business rules governing individual wallet top-up transactions.
+- step: 5
+  screen: BO-1093
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-1096
+  action: Works in Channel & Funding Source Mapping
+  operations: []
+  outcome: Determine where each funding method may be used.
+- step: 7
+  screen: BO-1093
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-1097
+  action: Works in Auto-Reload Configuration
+  operations: []
+  outcome: Configure automatic wallet replenishment when balances fall below predefined thresholds. The
+    attached scope specifically requires automatic top-up when a wallet balance falls below a configurable
+    threshold.
+- step: 9
+  screen: BO-1093
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-1098
+  action: Works in Recurring Funding Schedule
+  operations: []
+  outcome: Configure scheduled wallet funding independent of the wallet's current balance. The source
+    specifically requires scheduled or recurring top-ups based on date, frequency, amount, payment method
+    and customer authorization.
+- step: 11
+  screen: BO-1093
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-1099
+  action: Works in Funding Authorization & Approval Rules
+  operations: []
+  outcome: Apply governance and approval controls to wallet funding operations.
+- step: 13
+  screen: BO-1093
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-1100
+  action: Works in Funding Reversal & Correction Management
+  operations: []
+  outcome: Provide controlled correction of incorrectly funded wallet transactions without deleting financial
+    history.
+- step: 15
+  screen: BO-1093
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-1101
+  action: Works in Funding Limits & Velocity Controls
+  operations: []
+  outcome: Protect wallets against excessive or suspicious funding activity. The source specifically requires
+    configurable maximum balance, daily top-up limit, single-transaction limit and user- specific limits.
+- step: 17
+  screen: BO-1093
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-1102
+  action: Works in Funding Transaction Audit & Reconciliation
+  operations: []
+  outcome: Provide a complete administrative record of every value entering a wallet. The source requires
+    a complete audit trail for wallet top-ups, payments, refunds, transfers, adjustments, expirations,
+    reversals and administrative actions.
+branches:
+- at: 1
+  condition: Nothing has been set up on Funding Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Wallet Configuration Backend Structure v1.0 board 2 visited
+primaryContract: unknown
+contracts:
+- unknown

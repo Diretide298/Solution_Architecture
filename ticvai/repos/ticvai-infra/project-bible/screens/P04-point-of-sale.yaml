@@ -32,8 +32,8 @@ platform:
     releaseCadence: monthly, never during trading
   designReferences:
   - path: sources/designs/TICVAI_POS_Terminal_client_approved.html
-    note: Client-approved POS build, 30 screens, and the fidelity reference for every other platform. It
-      replaced the two early Park_POS explorations, removed on purpose 11 September; screen notes that
+    note: Client-approved POS build, 30 screens, and the fidelity reference for every other platform.
+      It replaced the two early Park_POS explorations, removed on purpose 11 September; screen notes that
       cite Park_POS_dc.html record where a decision came from, not a file to open.
   operator: venue
   wireframeBoard: wireframes/P04 Venue POS.dc.html

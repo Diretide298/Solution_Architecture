@@ -38,7 +38,7 @@
   "redis": 4,
   "qdrant": 1
  },
- "generated": "2026-09-17",
+ "generated": "2026-09-19",
  "note": "Derived by closure from the contract, not listed. See handoff/README.md \u2014 the hand-maintained version of this drifted four times in one day.",
  "counts": {
   "operations": 33,
@@ -48,7 +48,7 @@
   "tables": 51,
   "screens": 34,
   "flows": 11,
-  "documents": 23,
+  "documents": 27,
   "openConflicts": 1
  },
  "metrics": {
@@ -182,6 +182,16 @@
    "status": ""
   },
   {
+   "file": "docs\\active\\change-log-validation-18-september.md",
+   "title": "Validating the developer team's Change Log",
+   "status": ""
+  },
+  {
+   "file": "docs\\active\\current-work.md",
+   "title": "Current work",
+   "status": ""
+  },
+  {
    "file": "docs\\active\\deep-audit-24-august.md",
    "title": "Deep audit \u2014 ten invariants, run adversarially",
    "status": ""
@@ -217,6 +227,11 @@
    "status": ""
   },
   {
+   "file": "docs\\active\\phase0-identity-pass-all-clusters.md",
+   "title": "Phase 0 \u2014 identity pass, all clusters",
+   "status": ""
+  },
+  {
    "file": "docs\\active\\screen-duplicate-triage.md",
    "title": "Identical operation sets \u2014 what each cluster actually is",
    "status": ""
@@ -232,13 +247,13 @@
    "status": ""
   },
   {
-   "file": "docs\\active\\viewer-update-brief-20aug.md",
-   "title": "Viewer \u2014 what changed in the package on 20 August",
+   "file": "docs\\active\\spec-coverage-19-september.md",
+   "title": "Ch03 capability coverage - the client's list against our screens",
    "status": ""
   },
   {
-   "file": "docs\\active\\workshop-contract-gap.md",
-   "title": "Workshop pack \u2014 what the new screens need from the contracts",
+   "file": "docs\\active\\viewer-update-brief-20aug.md",
+   "title": "Viewer \u2014 what changed in the package on 20 August",
    "status": ""
   },
   {
@@ -279,6 +294,11 @@
   {
    "file": "docs\\adr\\0034-ai-retrieval-and-cost.md",
    "title": "ADR-0034: The cheapest AI call is the one that never reaches a provider",
+   "status": "Accepted"
+  },
+  {
+   "file": "docs\\adr\\0046-on-premise-has-two-configurations.md",
+   "title": "ADR-0046: On-premise has two configurations, and the difference is a control channel",
    "status": "Accepted"
   },
   {

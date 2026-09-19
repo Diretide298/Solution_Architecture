@@ -1,0 +1,148 @@
+id: F278
+name: 'Seat Management Venue Mapping Reference v1.0 board 5: Experience Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Seat Management Venue Mapping Reference v1.0 board 5. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-993
+  entryPoints:
+  - Arrives at Experience Command Center
+steps:
+- step: 1
+  screen: BO-993
+  action: Opens Experience Command Center
+  operations: []
+  outcome: Monitor seat-selection performance, availability quality and conversion across channels. Show
+    map loads, searches, selections, locks, expiries, carts, checkout conversion, abandonment and revenue.
+    Compare web, mobile, POS, call center, box
+- step: 2
+  screen: BO-994
+  action: Works in Choose My Seats
+  operations: []
+  outcome: Allow a guest or authorized agent to select exact seats from an interactive map. Display section,
+    row, seat, price, fees, type, view quality, accessibility, amenity and live availability. Support
+    zoom, pan, section drill-down, keyboard navi
+- step: 3
+  screen: BO-993
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-995
+  action: Works in Find Seats For Me
+  operations: []
+  outcome: Return best-available seat groups from stated customer preferences. Capture quantity, zone,
+    level, price range, accessibility, aisle, view, amenity and proximity preferences. Rank valid contiguous
+    or near-contiguous groups with total price,
+- step: 5
+  screen: BO-993
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-996
+  action: Works in Filters & Interactive Legend
+  operations: []
+  outcome: Make large and complex seat maps understandable and searchable. Provide zone, price, group
+    size, amenities, seat type, accessibility, view quality, level and availability filters. Update results,
+    counts, map emphasis and legend in real time
+- step: 7
+  screen: BO-993
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-997
+  action: Works in Real-Time Availability & Locking
+  operations: []
+  outcome: Show and control atomic seat locks during selection. Display lock owner class, channel, transaction,
+    acquisition time, expiry and current authoritative state to permitted roles. Broadcast lock, unlock,
+    sale, hold, block and availability eve
+- step: 9
+  screen: BO-993
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-998
+  action: Works in Lock Timeout & Concurrency
+  operations: []
+  outcome: Configure fair timeout and collision behavior under concurrent demand. Set default lock duration,
+    warning, grace period, extension policy, maximum extension and auto-release by channel or event. Configure
+    optimistic concurrency, version che
+- step: 11
+  screen: BO-993
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-999
+  action: Works in Cart & Multi-Seat Management
+  operations: []
+  outcome: Manage several seats as one controlled cart allocation. List each seat, assigned guest, ticket
+    type, price, fee, promotion, lock expiry and eligibility status. Support add, remove, replace, reassign,
+    save-for-later where permitted and clear
+- step: 13
+  screen: BO-993
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-1000
+  action: Works in Mobile & Accessible Selection
+  operations: []
+  outcome: Deliver an equivalent and WCAG-aligned selection flow on supported devices. Provide responsive
+    map/list modes, large targets, screen-reader labels, logical focus order, keyboard and switch access.
+    Support high contrast, text scaling, reduce
+- step: 15
+  screen: BO-993
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-1001
+  action: Works in View Preview, Compare & Heat Map
+  operations: []
+  outcome: Help customers understand qualitative and demand differences before choosing. Show approved
+    seat-view previews or representative section views with source, freshness and obstruction disclosure.
+    Compare seats by price, distance, view, level,
+- step: 17
+  screen: BO-993
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-1002
+  action: Works in AI Conversational Seat Assistant
+  operations: []
+  outcome: Allow natural-language seat discovery through governed AI. Understand requests such as family
+    size, budget, view, aisle, stage proximity, accessibility and preferred level. Return only currently
+    valid seat groups with match score, rationale
+branches:
+- at: 1
+  condition: Nothing has been set up on Experience Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Seat Management Venue Mapping Reference v1.0 board 5 visited
+primaryContract: unknown
+contracts:
+- unknown

@@ -1,0 +1,148 @@
+id: F279
+name: 'Seat Management Venue Mapping Reference v1.0 board 6: Hold Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Seat Management Venue Mapping Reference v1.0 board 6. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-1003
+  entryPoints:
+  - Arrives at Hold Command Center
+steps:
+- step: 1
+  screen: BO-1003
+  action: Opens Hold Command Center
+  operations: []
+  outcome: Provide a complete operational view of held inventory and its risk. Show held seats, hold value,
+    utilization, conversion, upcoming expiry, overdue decisions and inventory at risk. Analyze by tenant,
+    venue, event, performance, hold type, own
+- step: 2
+  screen: BO-1004
+  action: Works in Hold Type Master
+  operations: []
+  outcome: Configure reusable hold categories and their default behavior. Maintain VIP, Sponsor, Artist,
+    Media, Corporate, Internal and custom types with code, color and description. Set default duration,
+    priority, approval, reminder, maximum quantity
+- step: 3
+  screen: BO-1003
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-1005
+  action: Works in Hold Pool Creation
+  operations: []
+  outcome: Select and create an explicit pool of held seats or capacity. Choose inventory by map, section,
+    row, seat list, zone quantity or uploaded allocation with current-state validation. Capture event/performance,
+    type, owner, stakeholder, value,
+- step: 5
+  screen: BO-1003
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-1006
+  action: Works in Hold Rule Assignment
+  operations: []
+  outcome: Automatically apply approved hold policies to eligible performances. Build conditions by tenant,
+    venue, event, product, date, performance, section, category, stakeholder and channel. Define seat
+    set or quantity, type, owner, priority, durat
+- step: 7
+  screen: BO-1003
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-1007
+  action: Works in Expiration Rules
+  operations: []
+  outcome: Control when held inventory must be reviewed or released. Set fixed timestamp, time-before-performance,
+    contract milestone, payment condition or manual approval expiry. Configure reminder sequence, grace
+    period, escalation, extension eligib
+- step: 9
+  screen: BO-1003
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-1008
+  action: Works in Automatic Hold Release
+  operations: []
+  outcome: Release eligible held inventory reliably and in controlled batches. Schedule releases by type,
+    rule, event, performance, stakeholder, age and remaining time. Preview seats, price bands, channel
+    availability, sold-out status and exceptions b
+- step: 11
+  screen: BO-1003
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-1009
+  action: Works in Release, Convert & Reassign
+  operations: []
+  outcome: Allow authorized users to change the outcome of an active hold. Release all or selected inventory,
+    convert it to reservation/order, reassign owner/stakeholder or extend expiry. Revalidate state, price,
+    eligibility, payment or contract condi
+- step: 13
+  screen: BO-1003
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-1010
+  action: Works in Hold Approval Workflow
+  operations: []
+  outcome: Route hold requests and sensitive changes to the correct approvers. Configure requester, venue
+    operations, ticketing, commercial, finance and executive stages by policy. Configuration Scope of
+    Work | Version 1.0 27 Display request details,
+- step: 15
+  screen: BO-1003
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-1011
+  action: Works in Priority & Conflict Resolution
+  operations: []
+  outcome: Resolve overlapping or competing hold requests predictably. Maintain priority matrix by hold
+    type, event, stakeholder, contract, quantity, value and time before performance. List exact conflicting
+    seats and compare current and proposed owne
+- step: 17
+  screen: BO-1003
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-1012
+  action: Works in Hold Utilization & Audit
+  operations: []
+  outcome: Measure whether held inventory creates value or suppresses sale unnecessarily. Report held-to-sold
+    conversion, released and sold, expired unused, average age, value and revenue opportunity. Compare
+    hold type, owner, stakeholder, event, sect
+branches:
+- at: 1
+  condition: Nothing has been set up on Hold Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Seat Management Venue Mapping Reference v1.0 board 6 visited
+primaryContract: unknown
+contracts:
+- unknown

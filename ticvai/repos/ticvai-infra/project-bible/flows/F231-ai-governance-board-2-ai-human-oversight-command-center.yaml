@@ -1,0 +1,137 @@
+id: F231
+name: 'AI Governance board 2: AI Human Oversight Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as AI Governance board 2. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-529
+  entryPoints:
+  - Arrives at AI Human Oversight Command Center
+steps:
+- step: 1
+  screen: ADM-529
+  action: Opens AI Human Oversight Command Center
+  operations: []
+  outcome: Provide one central operational view of all AI activities requiring human oversight across
+    TICVAI. This should become the control room for AI actions waiting for human intervention.
+- step: 2
+  screen: ADM-530
+  action: Works in AI Approval Requirement & Routing Configuration
+  operations: []
+  outcome: Translate Board 1 governance decisions into the correct human approval workflow.
+- step: 3
+  screen: ADM-529
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-531
+  action: Works in AI Approval Review Workspace
+  operations: []
+  outcome: Give the human approver enough information to make an informed decision without having to navigate
+    across many TICVAI modules. This should be one of the strongest screens in the board.
+- step: 5
+  screen: ADM-529
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-532
+  action: Works in Conditional Approval & Approval Conditions
+  operations: []
+  outcome: Allow humans to approve an AI action subject to explicit conditions rather than treating approval
+    as simply Yes/No.
+- step: 7
+  screen: ADM-529
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-533
+  action: Works in Human Review, Challenge & AI Clarification Workspace
+  operations: []
+  outcome: Allow the approver to question the AI proposal before making a decision. Human oversight should
+    not mean simply clicking Approve.
+- step: 9
+  screen: ADM-529
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-534
+  action: Works in Escalation, Delegation & Approval SLA Management
+  operations: []
+  outcome: Ensure AI approvals do not remain indefinitely pending and provide controlled routing when
+    approvers are unavailable or additional authority is required.
+- step: 11
+  screen: ADM-529
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-535
+  action: Works in Live AI Execution Oversight & Human Intervention
+  operations: []
+  outcome: Allow authorized humans to monitor and intervene after an AI-driven action has been approved
+    and entered execution. This is different from approval.
+- step: 13
+  screen: ADM-529
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-536
+  action: Works in Human Override & Manual Control Center
+  operations: []
+  outcome: Provide controlled mechanisms for humans to override an AI recommendation or take control when
+    AI output is inappropriate. Human override should always be possible where governance requires it.
+- step: 15
+  screen: ADM-529
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-537
+  action: Works in Approval & Intervention History / Decision Timeline
+  operations: []
+  outcome: Provide complete operational history of human involvement in AI activity. This is the human-oversight
+    timeline; Board 3 will later provide deeper enterprise AI explainability and audit.
+- step: 17
+  screen: ADM-529
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-538
+  action: Works in Human Oversight Workflow Simulator & Readiness Center
+  operations: []
+  outcome: Allow Soft Labs/TICVAI administrators to test the entire human-in-the-loop workflow before
+    activating it in production.
+branches:
+- at: 1
+  condition: Nothing has been set up on AI Human Oversight Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on AI Governance board 2 visited
+primaryContract: unknown
+contracts:
+- unknown

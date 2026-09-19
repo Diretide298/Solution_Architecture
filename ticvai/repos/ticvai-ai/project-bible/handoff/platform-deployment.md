@@ -6,7 +6,7 @@ This table was maintained by hand until 26 August and held **twelve rows against
 
 **A figure typed once is correct once.** `platform-P01.md` claimed 35 screens against a live 46; the viewer carried *654 operations* in 25 places against a live 1,023. This file is now derived for the same reason both of those were fixed.
 
-**16 platforms · 1629 screens · 0 drawn.**
+**16 platforms · 2427 screens · 0 drawn.**
 
 | | Short | Purpose | Audience | Form factor | App | Offline | Screens | Drawn |
 |---|---|---|---|---|---|---|---:|---:|
@@ -16,8 +16,8 @@ This table was maintained by hand until 26 August and held **twelve rows against
 | P05 | **Guest Kiosk** | Guest Kiosk — Self-Service | guest | kiosk | `guest-app` | no | 17 | 0 |
 | P06 | **Venue Staff App** | Venue Staff App — Operations | staff | mobileApp | `venue-staff-app` | yes | 96 | 0 |
 | P07 | **Venue Scanner** | Venue Scanner — Access Control | staff | handheld | `venue-scanner` | yes | 11 | 0 |
-| P08 | **Venue Management** | Venue Management — Back Office | staff | web | `venue-management-web` | no | 614 | 0 |
-| P09 | **TICVAI Web** | TICVAI Web — Platform Console | platformAdmin | web | `ticvai-web` | no | 446 | 0 |
+| P08 | **Venue Management** | Venue Management — Back Office | staff | web | `venue-management-web` | no | 1182 | 0 |
+| P09 | **TICVAI Web** | TICVAI Web — Platform Console | platformAdmin | web | `ticvai-web` | no | 676 | 0 |
 | P10 | **Partner Web** | Partner Web — Reseller Portal | partner | web | `partner-web` | no | 51 | 0 |
 | P11 | **Accreditation Web** | Accreditation Web — Applications | public | web | `accreditation-web` | no | 8 | 0 |
 | P12 | **Venue Support** | Venue Support — Agent Console | staff | web | `venue-support-web` | no | 28 | 0 |

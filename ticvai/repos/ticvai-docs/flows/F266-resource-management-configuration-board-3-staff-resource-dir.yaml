@@ -1,0 +1,135 @@
+id: F266
+name: 'Resource Management Configuration board 3: Staff Resource Directory'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Resource Management Configuration board 3. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-873
+  entryPoints:
+  - Arrives at Staff Resource Directory
+steps:
+- step: 1
+  screen: BO-873
+  action: Opens Staff Resource Directory
+  operations: []
+  outcome: Provide the centralized master directory for all personnel who may be assigned as operational
+    resources within TICVAI.
+- step: 2
+  screen: BO-874
+  action: Works in Staff Resource Profile
+  operations: []
+  outcome: Maintain the operational resource profile for an individual employee or contractor. This profile
+    shall complement the organization's HR employee record rather than unnecessarily duplicate an HR system.
+- step: 3
+  screen: BO-873
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-875
+  action: Works in Skills & Competency Management
+  operations: []
+  outcome: Define what each staff resource is capable of performing.
+- step: 5
+  screen: BO-873
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-876
+  action: Works in Certification & Expiry Management
+  operations: []
+  outcome: Manage certifications, licenses and credentials required for staff assignments.
+- step: 7
+  screen: BO-873
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-877
+  action: Works in Qualification & Assignment Rule Engine
+  operations: []
+  outcome: Convert skills, certifications and operational policies into machine-enforceable assignment
+    rules.
+- step: 9
+  screen: BO-873
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-878
+  action: Works in Staff Availability & Working Pattern
+  operations: []
+  outcome: Define when an individual staff resource is normally available to work.
+- step: 11
+  screen: BO-873
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-879
+  action: Works in Shift Template & Assignment Configuration
+  operations: []
+  outcome: Configure reusable workforce shift structures that can later be used by the operational roster
+    engine.
+- step: 13
+  screen: BO-873
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-880
+  action: Works in Break, Leave & Absence Configuration
+  operations: []
+  outcome: Ensure employee availability reflects breaks, approved leave, absences and other workforce
+    exceptions.
+- step: 15
+  screen: BO-873
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-881
+  action: Works in Overtime & Working-Hour Rules
+  operations: []
+  outcome: Configure workforce rules controlling employee working hours and overtime eligibility before
+    operational rostering occurs.
+- step: 17
+  screen: BO-873
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-882
+  action: Works in Workforce Integration & Synchronization Center
+  operations: []
+  outcome: Connect TICVAI Resource Management with external HR, workforce management, payroll, identity,
+    and employee systems where applicable.
+branches:
+- at: 1
+  condition: Nothing has been set up on Staff Resource Directory yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Resource Management Configuration board 3 visited
+primaryContract: unknown
+contracts:
+- unknown

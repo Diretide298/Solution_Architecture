@@ -33,12 +33,12 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: MarketingService
-  operationCalls: 52
+  operationCalls: 54
 - service: WhiteLabelService
   operationCalls: 32
-- service: PlatformService
-  operationCalls: 19
 - service: VenueOpsService
+  operationCalls: 20
+- service: PlatformService
   operationCalls: 19
 - service: FnbService
   operationCalls: 5
@@ -629,6 +629,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listCustomerPrivacyConsent
   - listPrivacyConsent
   states:
   - emptyFirstRun
@@ -1069,6 +1070,7 @@ screens:
   density: compact
   operations:
   - listPrivacyCompliance
+  - listPrivacyEvidenceCompliance
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1759,7 +1761,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listAssets
   states:
   - emptyFirstRun
   - emptyNoAccess

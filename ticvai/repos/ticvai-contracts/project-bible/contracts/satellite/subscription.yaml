@@ -3177,6 +3177,7 @@ paths:
       operationId: listMembershipCommercialPricing
       x-ticvai-consumed-by:
         - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
+        - "P09 ADM-048 Commercial Pricing Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
@@ -3257,6 +3258,7 @@ paths:
       operationId: approveMembershipProductValidation
       x-ticvai-consumed-by:
         - "P08 BO-293 Membership Product Validation, Approval, Publication & Versioning"
+        - "P08 BO-503 Product Validation, Approval & Publication"
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
@@ -3621,6 +3623,7 @@ paths:
       operationId: listMemberExceptionOverride
       x-ticvai-consumed-by:
         - "P08 BO-301 Member Exceptions, Overrides & Service Recovery"
+        - "P08 BO-949 Approval, Exception & Override Control Center"
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
@@ -3697,6 +3700,7 @@ paths:
       operationId: listMembershipRenewalRetention
       x-ticvai-consumed-by:
         - "P08 BO-303 Membership Analytics, Renewal Intelligence & AI Retention Center"
+        - "P09 ADM-375 Renewal & Retention Center"
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
@@ -3784,6 +3788,7 @@ paths:
       operationId: listPartner
       x-ticvai-consumed-by:
         - "P10 PTR-022 Partner Management Command Center"
+        - "P10 PTR-042 Partner Operations Command Center"
       x-ticvai-audience:
       - partner
       x-ticvai-provisional: true
@@ -4627,6 +4632,7 @@ paths:
     get:
       operationId: listCommercialAgreementHealth
       x-ticvai-consumed-by:
+        - "P10 PTR-032 Commercial Agreement Command Center"
         - "P10 PTR-041 Commercial Agreement 360°, Health & AI Review"
       x-ticvai-audience:
       - partner
@@ -4665,6 +4671,7 @@ paths:
     get:
       operationId: listPartner2
       x-ticvai-consumed-by:
+        - "P10 PTR-022 Partner Management Command Center"
         - "P10 PTR-042 Partner Operations Command Center"
       x-ticvai-audience:
       - partner
@@ -6425,7 +6432,7 @@ components:
         isReachable:
           type: boolean
           default: true
-          description: 'False for `onPremise`. The Control Plane holds the record for licensing and support
+          description: 'False for `onPremiseIsolated`, true for `onPremiseConnected` (ADR-0046). When false, the Control Plane holds the record for licensing and support
             and **cannot reach the installation** — it may sit behind a firewall with no inbound route.
             Every operation assuming reachability must handle absence rather than timing out, and a cell
             that has not called home for a month is not necessarily broken.
@@ -6452,7 +6459,7 @@ components:
         participatesInCrossCell:
           type: boolean
           default: true
-          description: 'False by default for `onPremise`. Redeeming a pass issued elsewhere requires reaching
+          description: 'False by default for `onPremiseIsolated`, available for `onPremiseConnected` (ADR-0046). Redeeming a pass issued elsewhere requires reaching
             the issuing cell at that moment, and an on-premise site may not be able to. Exclusion is the
             honest default; local-then-reconcile carries a double-redemption risk that needs a decision
             rather than an assumption.
@@ -6654,8 +6661,20 @@ components:
               $ref: '#/components/schemas/CellJob'
     CellKind:
       type: string
-      description: 'Four deployment models (ADR-0017). `shared` is the default; the others exist because
-        a client asked or a law requires it.
+      description: 'Two deployment locations (ADR-0017, amended by ADR-0046). `shared` is the default;
+        the others exist because a client asked or a law requires it.
+
+
+        **On-premise is two configurations, not one (ADR-0046).** `onPremiseIsolated` keeps no
+        channel to TICVAI — updates are pull-initiated or physically delivered, licensing is a
+        signed file, support is blind. `onPremiseConnected` keeps an outbound control channel and
+        is reachable, updatable and licensable in the ordinary way. The channel carries control
+        traffic only and no natural person (ADR-0043); **AI inference is data, not control**, so
+        connectivity alone does not grant the assistant.
+
+
+        There is no `hybrid`. The RFP''s third model is answered by `onPremiseConnected`; a genuine
+        split workload has never been asked for and would be a new decision.
 
 
 
@@ -6669,7 +6688,8 @@ components:
       enum:
       - shared
       - dedicated
-      - onPremise
+      - onPremiseIsolated
+      - onPremiseConnected
       - controlPlane
       - burst
     CellCapacity:

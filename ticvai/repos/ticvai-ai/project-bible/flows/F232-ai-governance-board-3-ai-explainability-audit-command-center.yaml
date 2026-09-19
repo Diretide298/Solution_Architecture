@@ -1,0 +1,139 @@
+id: F232
+name: 'AI Governance board 3: AI Explainability & Audit Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as AI Governance board 3. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-539
+  entryPoints:
+  - Arrives at AI Explainability & Audit Command Center
+steps:
+- step: 1
+  screen: ADM-539
+  action: Opens AI Explainability & Audit Command Center
+  operations: []
+  outcome: Provide management, governance teams and authorized auditors with one central view of AI decisions,
+    explanations, trace completeness and audit status across TICVAI.
+- step: 2
+  screen: ADM-540
+  action: Works in AI Decision Explorer & Search
+  operations: []
+  outcome: 'Allow authorized users to locate any AI decision or AI-driven action across TICVAI. This becomes
+    the entry point when someone asks: “Why did TICVAI do this?” Search By Support: Decision ID Trace
+    ID Approval ID Execution ID Transaction ID Cu'
+- step: 3
+  screen: ADM-539
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-541
+  action: Works in AI Decision Explanation Workspace
+  operations: []
+  outcome: Explain a selected AI decision in a clear business-readable format.
+- step: 5
+  screen: ADM-539
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-542
+  action: Works in Data, Feature & Evidence Provenance
+  operations: []
+  outcome: Show exactly which data and evidence contributed to an AI decision and where each item originated.
+    This is critical for trust.
+- step: 7
+  screen: ADM-539
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-543
+  action: Works in Candidate, Rule & Decision Path Trace
+  operations: []
+  outcome: Explain how TICVAI moved from all possible options to the final AI decision. This is particularly
+    important for recommendation, fraud, pricing and configuration decisions. Example — Recommendation
+    48 Potential Products ↓ 42 Active 6 removed
+- step: 9
+  screen: ADM-539
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-544
+  action: Works in Model, Provider & AI Runtime Trace
+  operations: []
+  outcome: Record which AI technology produced or contributed to the decision. This gives TICVAI provider
+    and model traceability without duplicating AI Platform configuration.
+- step: 11
+  screen: ADM-539
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-545
+  action: Works in Governance, Approval & Human Decision Trace
+  operations: []
+  outcome: Connect Board 1 and Board 2 governance activity to the AI decision.
+- step: 13
+  screen: ADM-539
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-546
+  action: Works in Execution & Business Outcome Trace
+  operations: []
+  outcome: 'Connect the AI decision to what actually happened in TICVAI. A good AI audit cannot stop at:
+    “AI recommended X.” It needs to know: Was X actually executed, and what was the outcome? Execution
+    Trace Example: AI Proposal Change Adult Weekend'
+- step: 15
+  screen: ADM-539
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-547
+  action: Works in AI Audit Record & Evidence Package
+  operations: []
+  outcome: Create a complete, tamper-evident audit package for an AI decision or group of decisions.
+- step: 17
+  screen: ADM-539
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-548
+  action: Works in AI Trace Investigation & Replay Simulator
+  operations: []
+  outcome: Allow authorized governance/technical teams to reconstruct an AI decision and understand whether
+    the same conditions would produce the same or a different outcome. This should be a powerful investigation
+    tool.
+branches:
+- at: 1
+  condition: Nothing has been set up on AI Explainability & Audit Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on AI Governance board 3 visited
+primaryContract: unknown
+contracts:
+- unknown

@@ -1,0 +1,134 @@
+id: F288
+name: 'Upsell,CrossSellEngine board 2: Upsell & Upgrade Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Upsell,CrossSellEngine board 2. **This route is read from
+    the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-649
+  entryPoints:
+  - Arrives at Upsell & Upgrade Command Center
+steps:
+- step: 1
+  screen: ADM-649
+  action: Opens Upsell & Upgrade Command Center
+  operations: []
+  outcome: Provide centralized operational and commercial visibility into all upsell and upgrade activities.
+- step: 2
+  screen: ADM-650
+  action: Works in Upgrade Path & Product Ladder Builder
+  operations: []
+  outcome: Define valid upgrade relationships between products. governed product relationships.
+- step: 3
+  screen: ADM-649
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-651
+  action: Works in Upsell Eligibility & Qualification Rules
+  operations: []
+  outcome: Determine whether an upsell opportunity is valid for the current customer and transaction.
+    This screen provides upgrade-specific qualification, while the reusable customer targeting capabilities
+    remain centralized in the recommendation/CRM
+- step: 5
+  screen: ADM-649
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-652
+  action: Works in Upgrade Price Difference & Value Proposition Manager
+  operations: []
+  outcome: Configure how TICVAI calculates and communicates the commercial difference between the current
+    product and the recommended upgrade. The Recommendation Engine should not become the authoritative
+    pricing engine. It should consume the authorit
+- step: 7
+  screen: ADM-649
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-653
+  action: Works in Ticket, Experience & Bundle Upgrade Manager
+  operations: []
+  outcome: Configure detailed upsell relationships for ticketing and experience products.
+- step: 9
+  screen: ADM-649
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-654
+  action: Works in Membership & Pass Upgrade Engine
+  operations: []
+  outcome: 'Handle one of the most commercially valuable upgrade scenarios: Converting visitors into members/pass
+    holders.'
+- step: 11
+  screen: ADM-649
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-655
+  action: Works in Pre-Purchase, Cart & Checkout Upsell Manager
+  operations: []
+  outcome: Control upselling during the active purchase journey.
+- step: 13
+  screen: ADM-649
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-656
+  action: Works in Post-Purchase & In-Journey Upgrade Manager
+  operations: []
+  outcome: Support upgrades after the initial transaction where the product and operational rules permit
+    them. This is explicitly important because upselling should not stop at checkout.
+- step: 15
+  screen: ADM-649
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-657
+  action: Works in Upsell Ranking, Propensity & AI Opportunity Engine
+  operations: []
+  outcome: Use AI and commercial logic to identify the strongest upgrade opportunity for each customer/context.
+- step: 17
+  screen: ADM-649
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-658
+  action: Works in Upgrade Simulator, Comparison & AI Advisor
+  operations: []
+  outcome: Allow business users to simulate an upsell strategy before activation.
+branches:
+- at: 1
+  condition: Nothing has been set up on Upsell & Upgrade Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Upsell,CrossSellEngine board 2 visited
+primaryContract: unknown
+contracts:
+- unknown

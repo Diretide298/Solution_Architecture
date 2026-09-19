@@ -17,14 +17,14 @@ Every number below is counted from the files in this package, not from memory.
 | **Tables designed** | **388** | 3,911 columns |
 | **Tables written as DDL** | **388** | `backend/*.sql`, 569 foreign keys. Never executed |
 | Relationships | 978 | 362 of 388 tables carry one; the twelve that do not are correct |
-| Screens defined | **1,629** | Across 16 platforms, all linked to a board |
+| Screens defined | **2,427** | Across 16 platforms, all linked to a board |
 | **Screens specified — states written** | **500** | Of 500 |
 | Screens with operations declared | 486 | Of 500 |
 | Operations reaching a screen | 779 | Of 1,032 |
 | State models | **125** | Every one carries transitions — **all modelled** |
 | Domain events | 29 | Publisher, consumers, idempotency keys |
 | User flows | **96** | 284 branches. Every contract and platform touched |
-| ADRs | 44 | |
+| ADRs | 46 | |
 | **Requirements covered by a contract** | **2,778 of 2,990 (93%)** | The remaining 212 are workshop-blocked |
 | **Requirements with an artefact** | **1,848 of 2,072 (89%)** | 12 of 15 classes closed |
 | Configuration levels decided | 321 of 321 | |

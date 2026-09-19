@@ -1,6 +1,6 @@
 # Guest web and guest app — parity audit
 
-**Derived.** `python3 tools/audit-guest-parity.py`, 2026-09-17. Reads only.
+**Derived.** `python3 tools/audit-guest-parity.py`, 2026-09-19. Reads only.
 
 **The rule, decided 12 September 2026: guest web (P01) and guest app (P02) are identical.** Every difference below either has a reason recorded against it or is a defect waiting for a decision. Which web screen is which app screen is `screens/_guest-pairs.yaml`.
 
@@ -113,7 +113,7 @@
 | design | Claude Design | web 13/13 batches drawn, app 0/18 — the web is designed and the app is generated boxes, and the only app reference (TICVAI_Mobile.dc.html) uses a different design system from the drawn web frames | draw the app batches against the web's house style, or decide which system is the guest's |
 | design bundles | P01-cart-checkout-01 | 1 of 5 screens differ from the YAML (WEB-010) | python3 tools/export-design-batch.py P01-cart-checkout-01 |
 | design bundles | P02-cart-checkout-01 | 1 of 3 screens differ from the YAML (GST-041) | python3 tools/export-design-batch.py P02-cart-checkout-01 |
-| documents | docs/active/mom-digest.md:3830 | "can differ in functionality" — a client minute says web and app may differ — the 12 September rule says they do not; worth confirming with the client | confirm with the client |
+| documents | docs/active/mom-digest.md:3903 | "can differ in functionality" — a client minute says web and app may differ — the 12 September rule says they do not; worth confirming with the client | confirm with the client |
 | entry parameters | ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033) | web opens with ['conversationId', 'outletId'], app with ['cartId', 'conversationId', 'orderId', 'outletId'] — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | cart (WEB-010 ↔ GST-041) | web opens with ['cartId', 'code', 'lineId'], app with ['cartId', 'lineId', 'productId'] — one shared link cannot open both | one deep-link shape per capability |
 | entry parameters | checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009) | web opens with ['deviceId', 'itemId', 'orderId', 'paymentId', 'subjectId', 'token'], app with ['cartId', 'orderId', 'paymentId', 'token'] — one shared link cannot open both | one deep-link shape per capability |
@@ -319,7 +319,7 @@
 | navigation | ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033) | leads on to — on the web only and ['browse'] on the app only |  |
 | navigation | browse (WEB-002 ↔ GST-002/GST-003/GST-005) | leads on to ['search'] on the web only and — on the app only |  |
 | navigation | cart (WEB-010 ↔ GST-041) | leads on to ['checkout-and-payment', 'confirmation', 'ticket-transfer'] on the web only and ['browse'] on the app only |  |
-| navigation | checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009) | leads on to ['cart', 'confirmation'] on the web only and ['browse'] on the app only |  |
+| navigation | checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009) | leads on to ['cart', 'confirmation', 'sign-in'] on the web only and ['browse'] on the app only |  |
 | navigation | confirmation (WEB-013 ↔ GST-010) | leads on to ['cart', 'checkout-and-payment', 'tickets'] on the web only and ['browse'] on the app only |  |
 | navigation | date-and-session (WEB-006 ↔ GST-007) | leads on to ['add-ons', 'cart', 'seat-selection', 'ticket-selection'] on the web only and ['browse'] on the app only |  |
 | navigation | detail (WEB-004 ↔ GST-004/GST-006) | leads on to ['search', 'ticket-selection'] on the web only and — on the app only |  |
@@ -370,7 +370,7 @@
 | state wording | add-ons (WEB-008 ↔ GST-048/GST-056) | 4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading | one copy per state — the 12 September offline sync is the model |
 | state wording | ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033) | 5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading | one copy per state — the 12 September offline sync is the model |
 | state wording | browse (WEB-002 ↔ GST-002/GST-003/GST-005) | 4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading | one copy per state — the 12 September offline sync is the model |
-| state wording | cart (WEB-010 ↔ GST-041) | 4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading | one copy per state — the 12 September offline sync is the model |
+| state wording | cart (WEB-010 ↔ GST-041) | 5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading | one copy per state — the 12 September offline sync is the model |
 | state wording | checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009) | 5 state(s) worded differently: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading | one copy per state — the 12 September offline sync is the model |
 | state wording | date-and-session (WEB-006 ↔ GST-007) | 4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading | one copy per state — the 12 September offline sync is the model |
 | state wording | detail (WEB-004 ↔ GST-004/GST-006) | 4 state(s) worded differently: emptyFirstRun, emptyNoResults, error, loading | one copy per state — the 12 September offline sync is the model |

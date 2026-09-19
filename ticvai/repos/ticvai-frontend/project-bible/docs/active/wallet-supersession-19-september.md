@@ -123,7 +123,7 @@ operating one credit type*:
 | `BO-417` Top-Up Configuration | **superseded** — funding rules are the library's, board 2 |
 | `BO-418` Top-Up Bonus Rule Configuration | **superseded** — Bonus Credit is a credit type |
 | `BO-420` Bonus Validity & Expiry Configuration | **superseded** — expiry is a per-credit-type field |
-| `BO-399` Wallet & Credit Acceptance Mapping | **superseded** — channel mapping, board 2 |
+| `BO-399` Wallet & Credit Acceptance Mapping | **superseded** by `BO-1106` Credit Usage & Eligibility Rules — *acceptance* is where credit may be **spent**, not where it is loaded from, so board 3 rather than board 2 |
 | `BO-414` Wallet & Credit Management Dashboard | **keep** — operating the game credit, 12 components, hub of 19 edges |
 | `BO-416` Wallet Account & Balance View | **keep** — a view of an account, not configuration |
 | `BO-423` Wallet Credit Transaction Ledger & Audit | **keep** — gaming's own ledger view |

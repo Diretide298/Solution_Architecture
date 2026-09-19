@@ -1713,6 +1713,14 @@ screens:
 - P08:BO-120 Omnichannel Commerce & Journey Configuration
 - P08:BO-121 Personalized Offers & Guest Engagement
 - P08:BO-223 Journey Simulation, Audit & Publication
+- P08:BO-737 Customer 360 Profile
+- P08:BO-764 Campaign Command Center
+- P08:BO-782 AI Journey Optimization
+- P08:BO-783 Journey Analytics & Audit
+- P08:BO-804 Case Command Center
+- P08:BO-806 Case Creation
+- P08:BO-813 Case Analytics & Audit
+- P08:BO-844 Waiver Command Center
 - P09:ADM-038 Communication Service Command Center
 - P09:ADM-039 Channel & Provider Configuration
 - P09:ADM-040 Sender Identity, Domain & Brand Configuration

@@ -1,0 +1,133 @@
+id: F263
+name: 'Payment Payment Orchestration board 8: Payment Risk & Fraud Command Center\t166'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Payment Payment Orchestration board 8. **This route is read
+    from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-629
+  entryPoints:
+  - Arrives at Payment Risk & Fraud Command Center\t166
+steps:
+- step: 1
+  screen: ADM-629
+  action: Opens Payment Risk & Fraud Command Center\t166
+  operations: []
+  outcome: Provide real-time operational visibility over fraud, suspicious transactions, payment risk
+    and chargebacks across the TICVAI ecosystem.
+- step: 2
+  screen: ADM-630
+  action: Works in Payment Risk Rule & Decision Engine\t167
+  operations: []
+  outcome: Allow administrators to configure deterministic payment risk rules and actions.
+- step: 3
+  screen: ADM-629
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-631
+  action: Works in Velocity, Behavioral & Transaction Risk Controls\t168
+  operations: []
+  outcome: Manage high-frequency and abnormal payment activity.
+- step: 5
+  screen: ADM-629
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-632
+  action: Works in Risk Lists, Signals & Payment Control Center\t169
+  operations: []
+  outcome: Provide centralized management of approved payment risk lists and signals.
+- step: 7
+  screen: ADM-629
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-633
+  action: Works in Fraud Alert, Investigation & Case Management\t170
+  operations: []
+  outcome: Convert suspicious activity into controlled investigation cases.
+- step: 9
+  screen: ADM-629
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-634
+  action: Works in Chargeback & Dispute Command Center\t172
+  operations: []
+  outcome: Provide centralized operational management for provider/acquirer chargebacks and payment disputes.
+- step: 11
+  screen: ADM-629
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-635
+  action: Works in Chargeback Evidence & Representment Workspace\t173
+  operations: []
+  outcome: Help Payment Operations collect, review and submit the evidence needed to respond to disputes.
+    This is particularly important for TICVAI because ticketing transactions generate strong operational
+    evidence.
+- step: 13
+  screen: ADM-629
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-636
+  action: Works in Payment Performance & Conversion Analytics\t174
+  operations: []
+  outcome: Provide comprehensive analytics across the complete Payment & Payment Orchestration module.
+    This screen is not only fraud analytics. It provides payment-business performance intelligence.
+- step: 15
+  screen: ADM-629
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-637
+  action: Works in AI Fraud, Anomaly & Payment Intelligence Center\t175
+  operations: []
+  outcome: Provide governed AI/ML capabilities for fraud detection and payment anomaly identification.
+- step: 17
+  screen: ADM-629
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-638
+  action: Works in Payment Executive Intelligence, Risk Simulator & AI Advisor\t176
+  operations: []
+  outcome: Provide executive-level intelligence and a safe simulation environment for payment, fraud and
+    risk strategies.
+branches:
+- at: 1
+  condition: Nothing has been set up on Payment Risk & Fraud Command Center\t166 yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Payment Payment Orchestration board 8 visited
+primaryContract: unknown
+contracts:
+- unknown

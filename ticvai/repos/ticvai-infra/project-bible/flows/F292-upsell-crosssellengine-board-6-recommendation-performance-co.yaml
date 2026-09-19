@@ -1,0 +1,135 @@
+id: F292
+name: 'Upsell,CrossSellEngine board 6: Recommendation Performance Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Upsell,CrossSellEngine board 6. **This route is read from
+    the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-689
+  entryPoints:
+  - Arrives at Recommendation Performance Command Center
+steps:
+- step: 1
+  screen: ADM-689
+  action: Opens Recommendation Performance Command Center
+  operations: []
+  outcome: Provide executive and operational visibility across the complete Recommendation Engine.
+- step: 2
+  screen: ADM-690
+  action: Works in Recommendation Strategy & Placement Analytics
+  operations: []
+  outcome: Determine which recommendation strategies, placements, channels and journey stages perform
+    best.
+- step: 3
+  screen: ADM-689
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-691
+  action: Works in Recommendation Experiment & A/B Test Studio
+  operations: []
+  outcome: Allow TICVAI to scientifically test recommendation strategies rather than relying only on assumptions.
+- step: 5
+  screen: ADM-689
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-692
+  action: Works in Experiment Results & Winner Decision Workspace
+  operations: []
+  outcome: Evaluate experiments and decide whether a recommendation strategy should be deployed.
+- step: 7
+  screen: ADM-689
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-693
+  action: Works in Recommendation Attribution & Incrementality Analytics
+  operations: []
+  outcome: Determine whether a recommendation genuinely created additional commercial value. This is essential.
+    A customer purchasing a recommended product does not automatically mean the recommendation caused
+    the purchase.
+- step: 9
+  screen: ADM-689
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-694
+  action: Works in AI Model Performance & Drift Monitor
+  operations: []
+  outcome: Monitor whether recommendation and propensity models continue performing correctly after deployment.
+    This screen is critical if TICVAI wants a serious AI architecture.
+- step: 11
+  screen: ADM-689
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-695
+  action: Works in Recommendation Governance & Deployment Control
+  operations: []
+  outcome: Control how new strategies, rules, models and AI changes move into production.
+- step: 13
+  screen: ADM-689
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-696
+  action: Works in AI Risk, Fairness, Explainability & Safety Center
+  operations: []
+  outcome: Provide governance over how AI recommendation decisions behave across customer populations
+    and business contexts.
+- step: 15
+  screen: ADM-689
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-697
+  action: Works in Recommendation Audit, Decision Trace & Investigation
+  operations: []
+  outcome: Provide transaction-level explainability for Customer Service, Commercial, Audit, and technical
+    investigation.
+- step: 17
+  screen: ADM-689
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-698
+  action: Works in AI Optimization & Recommendation Intelligence Lab
+  operations: []
+  outcome: Turn all Recommendation Engine data into actionable improvement opportunities. This is the
+    final optimization screen for Module 2.
+branches:
+- at: 1
+  condition: Nothing has been set up on Recommendation Performance Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Upsell,CrossSellEngine board 6 visited
+primaryContract: unknown
+contracts:
+- unknown

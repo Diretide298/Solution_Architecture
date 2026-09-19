@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "posTerminal",
  "offlineCapable": true,
- "generated": "2026-09-17",
+ "generated": "2026-09-19",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 30,
@@ -15,7 +15,7 @@
   "contracts": 19,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 172
+  "operationsWithNoScreen": 166
  },
  "waves": {
   "wave1": 27,
@@ -83,11 +83,11 @@
    "operations": 7
   },
   {
-   "contract": "identity",
+   "contract": "seating",
    "operations": 6
   },
   {
-   "contract": "seating",
+   "contract": "identity",
    "operations": 6
   },
   {
@@ -99,11 +99,11 @@
    "operations": 4
   },
   {
-   "contract": "access",
+   "contract": "approvals",
    "operations": 3
   },
   {
-   "contract": "approvals",
+   "contract": "access",
    "operations": 3
   },
   {
@@ -111,11 +111,11 @@
    "operations": 3
   },
   {
-   "contract": "games",
+   "contract": "workforce",
    "operations": 2
   },
   {
-   "contract": "workforce",
+   "contract": "games",
    "operations": 2
   },
   {
@@ -123,11 +123,11 @@
    "operations": 1
   },
   {
-   "contract": "finance",
+   "contract": "inventory",
    "operations": 1
   },
   {
-   "contract": "inventory",
+   "contract": "finance",
    "operations": 1
   }
  ],
@@ -706,12 +706,6 @@
     "summary": "Redeem points for a prize"
    },
    {
-    "operation": "setReaderProfile",
-    "contract": "games",
-    "verb": "PUT",
-    "summary": "How a reader behaves and what it shows"
-   },
-   {
     "operation": "transferGameCard",
     "contract": "games",
     "verb": "POST",
@@ -914,12 +908,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Issue a complimentary entitlement, with no payment expected"
-   },
-   {
-    "operation": "listAbandonedCarts",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "Carts that lapsed without checking out"
    },
    {
     "operation": "listChargebacks",
@@ -1346,30 +1334,6 @@
     "contract": "seating",
     "verb": "POST",
     "summary": "Import a seat map from a plan or a manifest"
-   },
-   {
-    "operation": "listSeatCategories",
-    "contract": "seating",
-    "verb": "GET",
-    "summary": "List seat categories"
-   },
-   {
-    "operation": "listSeatMapTemplates",
-    "contract": "seating",
-    "verb": "GET",
-    "summary": "List reusable layout templates"
-   },
-   {
-    "operation": "listSeatMaps",
-    "contract": "seating",
-    "verb": "GET",
-    "summary": "List seat maps"
-   },
-   {
-    "operation": "listSeats",
-    "contract": "seating",
-    "verb": "GET",
-    "summary": "List seats in a map"
    },
    {
     "operation": "publishSeatMap",

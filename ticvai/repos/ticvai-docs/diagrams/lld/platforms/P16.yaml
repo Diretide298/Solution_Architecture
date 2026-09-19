@@ -47,13 +47,15 @@ servicesCalled:
   operationCalls: 3
 - service: MarketingService
   operationCalls: 3
+- service: CatalogueService
+  operationCalls: 2
 - service: TenancyService
   operationCalls: 1
 - service: IdentityService
   operationCalls: 1
-- service: CatalogueService
-  operationCalls: 1
 - service: OrderService
+  operationCalls: 1
+- service: AccessService
   operationCalls: 1
 coverage:
   screens: 69
@@ -536,7 +538,8 @@ screens:
   requiresModule: analytics
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listPromotionAlertException
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1679,7 +1682,8 @@ screens:
   requiresModule: analytics
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listSecurityDetectionGovernance
   states:
   - emptyFirstRun
   - emptyNoAccess

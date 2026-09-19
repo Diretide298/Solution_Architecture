@@ -2,9 +2,8 @@
 -- **Derived. Do not hand-edit.**
 
 -- PII reads only, written by the platform. Who looked at a passport number is the question a
--- regulator asks Hangs off: a child of identity.principal; reaches platform.org_unit through its
--- keys; references identity.principal, pii.subject. Reached by: 0 operations read it and 1 write
--- it
+-- regulator asks Hangs off: reaches platform.org_unit through its keys; references
+-- identity.principal, pii.subject. Reached by: 0 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS platform.audit_read (
     id                                uuid PRIMARY KEY NOT NULL,
     principal_id                      uuid NOT NULL,
@@ -12,9 +11,9 @@ CREATE TABLE IF NOT EXISTS platform.audit_read (
 );
 
 -- Written by the platform on every write, not by any one operation (ADR-0022 sits above this).
--- Naming it on 431 lineage rows would say nothing Hangs off: a child of identity.principal;
--- reaches platform.org_unit through its keys; references identity.principal, platform.org_unit.
--- Reached by: 1 operations read it and 2 write it; written by 2 contracts — inventory, tenancy
+-- Naming it on 431 lineage rows would say nothing Hangs off: reaches platform.org_unit through its
+-- keys; references identity.principal, platform.org_unit. Reached by: 1 operations read it and 2
+-- write it; written by 2 contracts — inventory, tenancy.
 CREATE TABLE IF NOT EXISTS platform.audit_record (
     id                                uuid PRIMARY KEY NOT NULL,
     principal_id                      uuid NOT NULL,
@@ -129,7 +128,7 @@ CREATE TABLE IF NOT EXISTS platform.device (
 
 -- high-volume, short-lived. Trimmed by retention Hangs off: a child of platform.device; reaches
 -- platform.org_unit through its keys; references platform.device. Reached by: 1 operations read it
--- and 0 write it
+-- and 0 write it.
 CREATE TABLE IF NOT EXISTS platform.device_heartbeat (
     id                                uuid PRIMARY KEY NOT NULL,
     device_id                         uuid
@@ -157,7 +156,7 @@ CREATE TABLE IF NOT EXISTS platform.guest_link (
 
 -- What a workstation may do with no network, and for how long (Board 5). A till three days offline
 -- holding 900 unsynced sales is a reconciliation nobody can do. Hangs off: reaches
--- platform.org_unit through its keys. Reached by: 1 operations read it and 1 write it
+-- platform.org_unit through its keys. Reached by: 1 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS platform.offline_policy (
     id                                uuid PRIMARY KEY NOT NULL,
     scope_path                        text NOT NULL,
@@ -188,7 +187,7 @@ CREATE TABLE IF NOT EXISTS platform.org_unit (
 -- Written in the same transaction as the state change, by the platform, not by an operation. That
 -- is what makes it exactly-once Hangs off: reaches platform.org_unit through its keys. Reached by:
 -- 2 operations read it and 22 write it; 1 tables reference it; written by 13 contracts — access,
--- approvals, catalogue, finance
+-- approvals, catalogue, finance.
 CREATE TABLE IF NOT EXISTS platform.outbox (
     id                                uuid PRIMARY KEY NOT NULL,
     event_name                        text NOT NULL,
@@ -269,7 +268,7 @@ CREATE TABLE IF NOT EXISTS platform.sale_board_page (
 );
 
 -- Child of sale_board_page, which is a child of sale_board. Two levels down, returned nested Hangs
--- off: reaches platform.org_unit through its keys; references platform.sale_board_page
+-- off: reaches platform.org_unit through its keys; references platform.sale_board_page.
 CREATE TABLE IF NOT EXISTS platform.sale_board_tile (
     id                                uuid PRIMARY KEY NOT NULL,
     page_id                           uuid
@@ -277,14 +276,14 @@ CREATE TABLE IF NOT EXISTS platform.sale_board_tile (
 
 -- read-only projection of control.tenant, outside every cell Hangs off: reaches platform.org_unit
 -- through its keys; references platform.org_unit. Reached by: 2 operations read it and 0 write it;
--- 10 tables reference it
+-- 13 tables reference it.
 CREATE TABLE IF NOT EXISTS platform.tenant (
     id                                uuid PRIMARY KEY NOT NULL,
     home_region_id                    uuid
 );
 
 -- read through composed tenancy operations Hangs off: reaches platform.org_unit through its keys;
--- references platform.org_unit. Reached by: 4 operations read it and 1 write it
+-- references platform.org_unit. Reached by: 4 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS platform.venue_settings (
     id                                uuid PRIMARY KEY,
     venue_id                          uuid,

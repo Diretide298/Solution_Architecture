@@ -9,12 +9,12 @@
 | Contracts | 19 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 172 |
+| Operations with no screen | 166 |
 | Waves | wave1 27 · wave2 3 |
 
 ## Gaps
 
-### 172 operations with no screen here
+### 166 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `requestBill` | fnb | POST | The party asked to pay |
 | `resolveBookingConflict` | fnb | GET | Two bookings, one table — and what to do about it |
 | `sendBookingConfirmation` | fnb | POST | Confirm a booking, and ask them to confirm back |
-| … | | | 132 more |
+| … | | | 126 more |
 
 ### 2 modules split across waves
 

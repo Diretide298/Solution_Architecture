@@ -9,12 +9,12 @@
 | Contracts | 8 |
 | Modules | 3 |
 | Undrawn | 0 |
-| Operations with no screen | 110 |
+| Operations with no screen | 109 |
 | Waves | wave2 20 · wave3 80 |
 
 ## Gaps
 
-### 110 operations with no screen here
+### 109 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `retryMessageDispatch` | marketing-crm | POST | Send it again, or by another channel |
 | `setCallDisposition` | marketing-crm | POST | Why the conversation ended, and any callback |
 | `setMessageTrigger` | marketing-crm | POST | Fire a message from a platform event |
-| … | | | 70 more |
+| … | | | 69 more |
 
 ## Modules
 
@@ -94,7 +94,7 @@
 | `CMS-018` | Consent & Legal | White Label | 2 | 11 | yes |
 | `CMS-019` | User Access | White Label | 2 | 2 | yes |
 | `CMS-020` | Change Log | White Label | 2 | 1 | yes |
-| `CMS-021` | Privacy & Consent Configuration Command Center | Policy | 3 | 1 | yes |
+| `CMS-021` | Privacy & Consent Configuration Command Center | Policy | 3 | 2 | yes |
 | `CMS-022` | Data Processing Purpose & Lawful Basis Registry | Policy | 3 | 1 | yes |
 | `CMS-023` | Consent Purpose & Consent Type Builder | Policy | 3 | 1 | yes |
 | `CMS-024` | Communication Preference & Marketing Permission Configuration | Policy | 3 | 1 | yes |
@@ -113,7 +113,7 @@
 | `CMS-037` | Data Retention, Expiry & Legal Hold Operations | Policy | 3 | 1 | yes |
 | `CMS-038` | Privacy Compliance, Exception & Investigation Workspace | Policy | 3 | 1 | yes |
 | `CMS-039` | Privacy Audit, Evidence & Compliance Reporting | Policy | 3 | 1 | yes |
-| `CMS-040` | Privacy Analytics & AI Compliance Intelligence | Policy | 3 | 1 | yes |
+| `CMS-040` | Privacy Analytics & AI Compliance Intelligence | Policy | 3 | 2 | yes |
 | `CMS-041` | Waiver & Consent Command Center | Policy | 3 | 1 | yes |
 | `CMS-042` | Waiver Template Library & Master Setup | Policy | 3 | 1 | yes |
 | `CMS-043` | Digital Waiver & Form Builder | Policy | 3 | 1 | yes |
@@ -144,7 +144,7 @@
 | `CMS-068` | Digital Asset 360° Profile | Media Library | 3 | 0 | yes |
 | `CMS-069` | Bulk Asset Management Workspace | Media Library | 3 | 0 | yes |
 | `CMS-070` | Asset Activity, Recent Assets & Library Health | Media Library | 3 | 0 | yes |
-| `CMS-071` | AI Asset Intelligence Command Center | Media Library | 3 | 0 | yes |
+| `CMS-071` | AI Asset Intelligence Command Center | Media Library | 3 | 1 | yes |
 | `CMS-072` | AI Auto-Tagging & Content Understanding | Media Library | 3 | 0 | yes |
 | `CMS-073` | Semantic & Natural-Language Asset Search | Media Library | 3 | 0 | yes |
 | `CMS-074` | Visual Similarity & Related Asset Discovery | Media Library | 3 | 0 | yes |

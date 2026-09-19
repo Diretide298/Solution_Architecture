@@ -1,0 +1,148 @@
+id: F253
+name: 'Marketing CRM Configuration Reference v1.0 board 10: Gamification Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Marketing CRM Configuration Reference v1.0 board 10. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-824
+  entryPoints:
+  - Arrives at Gamification Command Center
+steps:
+- step: 1
+  screen: BO-824
+  action: Opens Gamification Command Center
+  operations: []
+  outcome: Monitor engagement programs and their financial and behavioral impact. Show active challenges,
+    participants, completion, points issued, rewards claimed, streaks and referrals. Report engagement
+    lift, repeat visits, revenue impact and unrede
+- step: 2
+  screen: BO-825
+  action: Works in Challenge Builder
+  operations: []
+  outcome: Create a governed challenge from objective through publication. Configure challenge name, objective,
+    audience, actions, progress logic, start/end, recurrence and capacity. Define eligibility, terms,
+    visibility, multilingual content, image,
+- step: 3
+  screen: BO-824
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-826
+  action: Works in Achievement & Badge Engine
+  operations: []
+  outcome: Manage achievements and digital badges. Define achievement type, badge name, tier, rarity,
+    unlock criteria, points value, visibility and validity. Maintain an approved visual badge library
+    and multilingual name/description and accessible al
+- step: 5
+  screen: BO-824
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-827
+  action: Works in Points & Activity Rules
+  operations: []
+  outcome: Translate qualifying guest actions into controlled loyalty points. Configure rules for visits,
+    purchases, ticket scans, activities, referrals, surveys and other approved events. Set base points,
+    multiplier, daily/monthly limit, validity, ro
+- step: 7
+  screen: BO-824
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-828
+  action: Works in Milestones & Reward Rules
+  operations: []
+  outcome: Reward cumulative progress consistently. Define thresholds, tiers and immediate or delayed
+    reward fulfillment. Support loyalty points, wallet credit, voucher, product offer, badge and membership
+    benefit rewards. Configure eligibility, inven
+- step: 9
+  screen: BO-824
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-829
+  action: Works in Family, Team & Event Challenges
+  operations: []
+  outcome: Support collaborative and competitive engagement formats. Configure family/household, team,
+    group and event membership and joining rules. Define individual versus shared contribution, group
+    scoring, maximum members and visibility. Configure
+- step: 11
+  screen: BO-824
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-830
+  action: Works in Referral & Streak Management
+  operations: []
+  outcome: Configure repeat-behavior and referral mechanics. Define streak frequency, qualifying event,
+    grace period, reset, maximum, milestone and reward. Configure referral code/link, attribution window,
+    qualifying action, inviter/invitee reward and
+- step: 13
+  screen: BO-824
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-831
+  action: Works in Progress, Leaderboards & Hub
+  operations: []
+  outcome: Control how participants see progress and rankings. Show progress, points, milestones, next
+    reward, streak and challenge status by participant. Configure leaderboard metric, scope, season, filters,
+    dense ranking, privacy display and opt-out
+- step: 15
+  screen: BO-824
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-832
+  action: Works in AI Engagement Optimization
+  operations: []
+  outcome: Recommend relevant, sustainable engagement programs. Recommend challenge type, audience, difficulty,
+    actions, reward and timing using historical behavior. Predict participation, completion, engagement
+    uplift, cost and liability with confide
+- step: 17
+  screen: BO-824
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-833
+  action: Works in Gamification Analytics & Audit
+  operations: []
+  outcome: Measure challenge performance, cost and long-term effect. Report participant funnel, completion,
+    points, rewards, redemption, cost, revenue and repeat visits. Compare challenges, audiences, venues,
+    events, seasons, reward types and membersh
+branches:
+- at: 1
+  condition: Nothing has been set up on Gamification Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Marketing CRM Configuration Reference v1.0 board 10 visited
+primaryContract: unknown
+contracts:
+- unknown

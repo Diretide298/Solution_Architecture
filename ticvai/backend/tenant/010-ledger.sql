@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS ledger.fiscal_period (
 
 -- configured rates with effective windows. A rate change is a new row; the old is never edited
 -- Hangs off: reaches ledger.account through its keys; references identity.principal,
--- platform.org_unit. Reached by: 14 operations read it and 2 write it; 1 tables reference it
+-- platform.org_unit. Reached by: 14 operations read it and 2 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS ledger.fx_rate (
     id                                uuid PRIMARY KEY,
     from_currency                     text NOT NULL,
@@ -101,8 +101,8 @@ CREATE TABLE IF NOT EXISTS ledger.fx_rate (
 );
 
 -- what one legal entity owes another after a cross-region redemption Hangs off: reaches
--- ledger.account through its keys; references catalogue.entitlement_template, ledger.legal_entity.
--- Reached by: 5 operations read it and 3 write it
+-- ledger.account through its keys; references access.entitlement, ledger.legal_entity. Reached by:
+-- 5 operations read it and 3 write it.
 CREATE TABLE IF NOT EXISTS ledger.inter_entity_obligation (
     id                                text PRIMARY KEY NOT NULL,
     from_legal_entity_id              uuid NOT NULL,

@@ -2,9 +2,8 @@
 -- **Derived. Do not hand-edit.**
 
 -- Available, busy, away or offline, with a concurrency limit. Expires — an agent who forgets to go
--- offline is one conversations queue for Hangs off: a child of identity.principal; reaches
--- marketing.guest_profile through its keys; references identity.principal. Reached by: 2
--- operations read it and 1 write it
+-- offline is one conversations queue for Hangs off: reaches marketing.guest_profile through its
+-- keys; references identity.principal. Reached by: 2 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS marketing.agent_availability (
     id                                uuid PRIMARY KEY NOT NULL,
     principal_id                      uuid NOT NULL
@@ -13,7 +12,7 @@ CREATE TABLE IF NOT EXISTS marketing.agent_availability (
 -- Every marketing touch, not just the converting one (BL-177). A platform storing only its chosen
 -- attribution model cannot answer a question asked in a different one. Hangs off: reaches
 -- marketing.guest_profile through its keys; references marketing.campaign, marketing.journey,
--- pii.subject. Reached by: 2 operations read it and 0 write it
+-- pii.subject. Reached by: 2 operations read it and 0 write it.
 CREATE TABLE IF NOT EXISTS marketing.attribution_touch (
     id                                uuid PRIMARY KEY NOT NULL,
     subject_id                        uuid NOT NULL,
@@ -148,7 +147,7 @@ CREATE TABLE IF NOT EXISTS marketing.consent_record (
 -- measured in seconds. A conversation may create a case; it is not one Hangs off: reaches
 -- marketing.guest_profile through its keys; references identity.principal, marketing.case,
 -- marketing.kiosk_assist_session. Reached by: 8 operations read it and 6 write it; 1 tables
--- reference it
+-- reference it.
 CREATE TABLE IF NOT EXISTS marketing.conversation (
     id                                uuid PRIMARY KEY NOT NULL,
     telephony                         jsonb,
@@ -177,7 +176,7 @@ CREATE TABLE IF NOT EXISTS marketing.conversation (
 -- guest talking to a bot that presents as a person is a complaint waiting to happen Hangs off: a
 -- child of marketing.conversation; reaches marketing.guest_profile through its keys; references
 -- ai.interaction, identity.principal, marketing.conversation. Reached by: 1 operations read it and
--- 1 write it
+-- 1 write it.
 CREATE TABLE IF NOT EXISTS marketing.conversation_message (
     id                                uuid PRIMARY KEY NOT NULL,
     sender                            text NOT NULL,
@@ -211,7 +210,7 @@ CREATE TABLE IF NOT EXISTS marketing.form_definition (
 
 -- The acceptance record, and it is evidence (2.15.13). Bound to the version accepted, not to the
 -- form. Hangs off: reaches marketing.guest_profile through its keys; references maintenance.asset,
--- pii.subject. Reached by: 2 operations read it and 1 write it
+-- pii.subject. Reached by: 2 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS marketing.form_submission (
     id                                uuid PRIMARY KEY NOT NULL,
     form_id                           uuid NOT NULL,
@@ -288,7 +287,7 @@ CREATE TABLE IF NOT EXISTS marketing.guest_profile (
 -- One addressed invitation with a single-use token (BL-150). A link forwarded to a group chat is
 -- the failure mode. Hangs off: reaches marketing.guest_profile through its keys; references
 -- catalogue.performance, catalogue.product, identity.principal. Reached by: 1 operations read it
--- and 1 write it
+-- and 1 write it.
 CREATE TABLE IF NOT EXISTS marketing.invitation (
     id                                uuid PRIMARY KEY NOT NULL,
     product_id                        uuid NOT NULL,
@@ -353,7 +352,7 @@ CREATE TABLE IF NOT EXISTS marketing.journey_entrant (
 -- A staff member acting on a kiosk session remotely (2.1.25). The guest can always see it and
 -- always end it — assistance a guest cannot stop is surveillance Hangs off: reaches
 -- marketing.guest_profile through its keys; references identity.principal, orders.cart,
--- platform.device. Reached by: 1 operations read it and 2 write it; 1 tables reference it
+-- platform.device. Reached by: 1 operations read it and 2 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS marketing.kiosk_assist_session (
     id                                uuid PRIMARY KEY NOT NULL,
     device_id                         uuid NOT NULL,
@@ -421,9 +420,9 @@ CREATE TABLE IF NOT EXISTS marketing.loyalty_tier (
     id                                uuid PRIMARY KEY NOT NULL
 );
 
--- one row per recipient per send. Delivery, bounce and engagement Hangs off: a child of
--- marketing.campaign; reaches marketing.guest_profile through its keys; references
--- marketing.campaign. Reached by: 1 operations read it and 0 write it
+-- one row per recipient per send. Delivery, bounce and engagement Hangs off: reaches
+-- marketing.guest_profile through its keys; references marketing.campaign. Reached by: 1
+-- operations read it and 0 write it.
 CREATE TABLE IF NOT EXISTS marketing.message_delivery (
     id                                uuid PRIMARY KEY NOT NULL,
     campaign_id                       uuid NOT NULL

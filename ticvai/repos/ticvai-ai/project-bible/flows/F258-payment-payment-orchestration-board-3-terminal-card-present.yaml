@@ -1,0 +1,131 @@
+id: F258
+name: 'Payment Payment Orchestration board 3: Terminal & Card-Present Command Center\t48'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Payment Payment Orchestration board 3. **This route is read
+    from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-579
+  entryPoints:
+  - Arrives at Terminal & Card-Present Command Center\t48
+steps:
+- step: 1
+  screen: ADM-579
+  action: Opens Terminal & Card-Present Command Center\t48
+  operations: []
+  outcome: Provide real-time operational visibility over all card-present payment infrastructure.
+- step: 2
+  screen: ADM-580
+  action: Works in Payment Terminal & Device Inventory\t49
+  operations: []
+  outcome: Maintain the centralized inventory of all payment terminals connected to TICVAI.
+- step: 3
+  screen: ADM-579
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-581
+  action: Works in Terminal Provisioning & Device Configuration\t51
+  operations: []
+  outcome: Configure and activate a physical terminal for TICVAI use.
+- step: 5
+  screen: ADM-579
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-582
+  action: Works in POS, Kiosk & Terminal Assignment Manager\t52
+  operations: []
+  outcome: Control which terminal is connected or assigned to each TICVAI selling device.
+- step: 7
+  screen: ADM-579
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-583
+  action: Works in EMV & Card-Present Processing Configuration\t53
+  operations: []
+  outcome: Configure card-present transaction capabilities without exposing sensitive cardholder data.
+- step: 9
+  screen: ADM-579
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-584
+  action: Works in Payment Server & Terminal Connectivity Manager\t54
+  operations: []
+  outcome: Monitor and configure the communication path between TICVAI POS, payment terminal, payment
+    server and payment provider.
+- step: 11
+  screen: ADM-579
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-585
+  action: Works in Card-Present Transaction Monitor & Operations\t55
+  operations: []
+  outcome: Provide operations teams with real-time visibility into card-present payment attempts.
+- step: 13
+  screen: ADM-579
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-586
+  action: Works in Degraded, Offline & Store-and-Forward Manager\t56
+  operations: []
+  outcome: Manage card-present operations when normal connectivity is unavailable. This directly addresses
+    the degraded-mode requirement in the payment matrix.
+- step: 15
+  screen: ADM-579
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-587
+  action: Works in Terminal Health, Maintenance & Incident Center\t57
+  operations: []
+  outcome: Provide centralized lifecycle monitoring and operational maintenance of terminal hardware.
+- step: 17
+  screen: ADM-579
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-588
+  action: Works in Terminal Simulator, Certification & AI Operations Advisor\t59
+  operations: []
+  outcome: Provide a controlled environment to validate terminal configuration and payment flows before
+    production activation.
+branches:
+- at: 1
+  condition: Nothing has been set up on Terminal & Card-Present Command Center\t48 yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Payment Payment Orchestration board 3 visited
+primaryContract: unknown
+contracts:
+- unknown

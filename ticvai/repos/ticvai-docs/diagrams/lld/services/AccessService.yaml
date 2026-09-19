@@ -1717,6 +1717,12 @@ screens:
 - P08:BO-361 Credential Usage & Cross-Media Traceability
 - P08:BO-362 Credential Security, Audit & Operational Evidence
 - P08:BO-363 Ticket Media Analytics & AI Operations Intelligence
+- P08:BO-644 Credential Issuance Command Center
+- P08:BO-652 Credential Replacement & Reissue
+- P08:BO-653 Credential Registry & Credential History
+- P08:BO-780 Guest Engagement Journeys
+- P08:BO-981 Conflict & Impact Simulation
+- P16:ANL-070 Analytics Governance, Security & Audit Center
 flows:
 - F06 Guest enters the venue
 - F10 Partner books, uses and settles

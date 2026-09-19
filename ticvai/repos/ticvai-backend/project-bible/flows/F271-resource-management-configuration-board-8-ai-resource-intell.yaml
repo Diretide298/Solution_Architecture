@@ -1,0 +1,132 @@
+id: F271
+name: 'Resource Management Configuration board 8: AI Resource Intelligence Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Resource Management Configuration board 8. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-923
+  entryPoints:
+  - Arrives at AI Resource Intelligence Command Center
+steps:
+- step: 1
+  screen: BO-923
+  action: Opens AI Resource Intelligence Command Center
+  operations: []
+  outcome: Provide management with a centralized AI-generated overview of current and future resource
+    conditions across the organization.
+- step: 2
+  screen: BO-924
+  action: Works in Optimal Resource Recommendation Engine
+  operations: []
+  outcome: Recommend the best available resource for any operational requirement.
+- step: 3
+  screen: BO-923
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-925
+  action: Works in AI Staff Recommendation & Workforce Matching
+  operations: []
+  outcome: Provide advanced AI-assisted selection specifically for human resources. This screen consumes
+    the staff rules established in Boards 3 and 4.
+- step: 5
+  screen: BO-923
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-926
+  action: Works in Resource Demand Forecasting
+  operations: []
+  outcome: Predict future demand for resources before shortages occur.
+- step: 7
+  screen: BO-923
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-927
+  action: Works in AI Staffing Requirement Forecast
+  operations: []
+  outcome: Translate forecast operational demand into specific workforce requirements.
+- step: 9
+  screen: BO-923
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-928
+  action: Works in AI Conflict Resolution Assistant
+  operations: []
+  outcome: Automatically analyze resource conflicts and recommend the most operationally appropriate resolution.
+- step: 11
+  screen: BO-923
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-929
+  action: Works in Automatic Schedule Optimization
+  operations: []
+  outcome: Optimize resource schedules across multiple assignments while respecting operational constraints.
+- step: 13
+  screen: BO-923
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-930
+  action: Works in Alternative & Replacement Resource
+  operations: []
+  outcome: Provide intelligent alternatives when the preferred resource cannot be used.
+- step: 15
+  screen: BO-923
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-931
+  action: Works in Operational Scenario Simulator & Digital Twin
+  operations: []
+  outcome: Allow managers to test operational scenarios before changing the live resource plan. This should
+    be one of Board 8's signature AI capabilities.
+- step: 17
+  screen: BO-923
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-932
+  action: Works in Conversational AI Resource Copilot
+  operations: []
+  outcome: Allow managers to interact with the complete Resource Management module using natural- language
+    questions and commands.
+branches:
+- at: 1
+  condition: Nothing has been set up on AI Resource Intelligence Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Resource Management Configuration board 8 visited
+primaryContract: unknown
+contracts:
+- unknown

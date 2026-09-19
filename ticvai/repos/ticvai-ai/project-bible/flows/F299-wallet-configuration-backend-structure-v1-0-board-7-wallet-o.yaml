@@ -1,0 +1,143 @@
+id: F299
+name: 'Wallet Configuration Backend Structure v1.0 board 7: Wallet Operations Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Wallet Configuration Backend Structure v1.0 board 7. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-1143
+  entryPoints:
+  - Arrives at Wallet Operations Command Center
+steps:
+- step: 1
+  screen: BO-1143
+  action: Opens Wallet Operations Command Center
+  operations: []
+  outcome: Provide operations, finance and customer-service administrators with a centralized view of
+    wallet operational activity and exceptions. Dashboard KPIs
+- step: 2
+  screen: BO-1144
+  action: Works in Peer-to-Peer Transfer Configuration
+  operations: []
+  outcome: Configure direct value transfers between independent TICVAI wallet accounts. Requirement 4.3.16
+    specifically requires guests to transfer money from their wallet to another guest's wallet. Transfer
+    Methods
+- step: 3
+  screen: BO-1143
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-1145
+  action: Works in Transfer Eligibility, Limits & Approval Rules
+  operations: []
+  outcome: Apply governance controls to wallet-to-wallet transfers. Eligibility
+- step: 5
+  screen: BO-1143
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-1146
+  action: Works in Refund-to-Wallet Policy Configuration
+  operations: []
+  outcome: Configure when refunds from TICVAI transactions may be returned directly to a digital wallet.
+    Requirement 4.3.15 specifically requires instant refund to the digital wallet with customer notification.
+    Refund Sources Ticket cancellation Event
+- step: 7
+  screen: BO-1143
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-1147
+  action: Works in Refund Routing & Credit Restoration Engine
+  operations: []
+  outcome: Determine exactly where returned value goes when the original transaction consumed multiple
+    wallet credits. This is important because a simple “+AED 200 to Cash Credit” can corrupt wallet economics.
+    Example
+- step: 9
+  screen: BO-1143
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-1148
+  action: Works in Reversal & Transaction Correction Management
+  operations: []
+  outcome: Correct operational wallet transactions while maintaining an immutable ledger. Supported Operations
+    Payment reversal Transfer reversal Refund reversal Duplicate debit correction Duplicate credit correction
+    Failed transaction correction Offl
+- step: 11
+  screen: BO-1143
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-1149
+  action: Works in Administrative Balance Adjustment Studio
+  operations: []
+  outcome: Allow authorized personnel to perform governed wallet balance adjustments. Adjustment Types
+    Credit Customer compensation Service recovery Promotional correction Migration adjustment Balance
+    correction Manual award Debit Incorrect credit rec
+- step: 13
+  screen: BO-1143
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-1150
+  action: Works in Wallet Block, Freeze & Restriction Management
+  operations: []
+  outcome: Protect wallet accounts and individual balances without necessarily closing the wallet. Requirement
+    4.3.21 explicitly states that it must be possible to block a wallet account.
+- step: 15
+  screen: BO-1143
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-1151
+  action: Works in Wallet Disputes & Operational Exception Queue
+  operations: []
+  outcome: Provide a controlled workflow for wallet transaction problems requiring investigation. Exception
+    Types Customer disputes transaction Duplicate wallet debit Wallet charged but service failed Transfer
+    recipient not received Refund missing Off
+- step: 17
+  screen: BO-1143
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-1152
+  action: Works in Operations Simulator, Approval & Audit Trail
+  operations: []
+  outcome: Provide administrators with a final controlled workspace for testing sensitive wallet operations
+    and reviewing the immutable operational history. Simulation Example — Refund
+branches:
+- at: 1
+  condition: Nothing has been set up on Wallet Operations Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Wallet Configuration Backend Structure v1.0 board 7 visited
+primaryContract: unknown
+contracts:
+- unknown

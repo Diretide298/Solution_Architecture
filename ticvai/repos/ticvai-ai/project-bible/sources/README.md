@@ -18,7 +18,11 @@ important thing to understand about this folder:
 |---|---|---|
 | **1** | `mom/` | **Scope + binding.** Later decisions supersede earlier ones |
 | **2** | `requirements/` | **Scope.** The contracted requirement baseline |
+| **2** | `specifications/rfp/` | **Scope.** What the client asked for, and what we are scored against |
+| **3** | `packs/`, `workshop/`, `boards/` | The design books. A board-and-screen specification, not scope |
 | **3** | `designs/`, `diagrams/` | Directional. Enhance, do not copy |
+| — | `specifications/reference/`, `specifications/planning/` | Supporting data — hardware choices, seat manifests, delivery plan |
+| **retired** | `legacy/` | **Ours, not theirs.** The proposal chapters — **never cite as scope** — see below |
 | 4 | *(not held here)* | Reference-system material is **not scope** and is deliberately not stored in this repo — see below |
 
 A capability, page or endpoint that cannot be traced to rank 1 or rank 2 **is not scope**.
@@ -335,3 +339,65 @@ pack to 23 books, 111 boards and 1,110 screens.
 settle: nothing yet.** No MoM has adopted them, so a conflict with a settled position is a CF item,
 not a correction. The run and its six defects are in
 [workshop-pack-log](../docs/active/workshop-pack-log.md).
+
+---
+
+## Added 19 September — `specifications/`, and the third category nobody read
+
+**A client drop carries three kinds of document and only two were ever ingested.** The design
+books are parsed by `parse-workshop-pack.py`; the minutes are mined by `mine-moms.py`. The
+specifications were filed on arrival and opened by nothing — **zero citations anywhere in
+`contracts/`, `screens/` or `docs/`**, and no tool that so much as listed the folder.
+
+They are now one section instead of three scattered ones:
+
+```
+specifications/rfp/          TAIS Platform RFP           what we are answering
+specifications/reference/    hardware, seat manifest, matrix, amphitheatre, email registers
+specifications/planning/     delivery plan, workshop task track
+legacy/                      Ch01-Ch09, Dev01-Dev03      retired - see below
+```
+
+`documents/`, `rfp/` and `planning/` are gone as top-level folders; nothing read them, so nothing
+broke. `requirements/` and `workshop/` were left where they are because tools do read them.
+
+### Why the chapters are in `legacy/` and not in a rank
+
+**They are ours.** The chapters say *"TAIS provides all of this"* — a proposal **we** wrote, not a
+specification the client handed us. A document that asserts our own coverage cannot also be the
+thing that verifies it, and leaving it beside `mom/` and `requirements/` invites exactly the
+failure the rank table exists to prevent: our own claim read back as the client's requirement.
+
+So they are retired, on the same principle as the VivaTicket manuals below — **available, never
+scope**. Retiring is not deleting: `tools/check-spec-coverage.py` still reads Ch03 out of
+`legacy/`, because a proposal makes a perfectly good checklist as long as nobody mistakes it for a
+contract. **Anything found in them becomes scope only by appearing in a MoM or the matrix first.**
+
+### What reading them found
+
+| | |
+|---|---|
+| Ch03 capability rows | **117** across 12 domains |
+| carried by a screen we have | 80 |
+| **thin — module built, capability not named** | **37** |
+| matched nothing at all | **2** — `Seatmap Management`, `Gamification` |
+
+Full list in [spec-coverage-19-september](../docs/active/spec-coverage-19-september.md), and it is
+a review queue rather than a verdict: the match is lexical, so a capability we named differently
+reads as thin when it is drawn.
+
+**Ch04 carries an architecture commitment that is not in any ADR** — *"the Finance Service uses
+.NET (C#) with PostgreSQL exclusively… the only domain in the TAIS stack with a hard language
+constraint"* — and a §4.9 on stored-value wallets that the 19 September wallet decision was settled
+without.
+
+**`reference/` is screen input, not background.** `TICVAI_Hardware_Integration v1.0.xlsx` names
+fourteen integrations with the vendor chosen for each — Zebra, Boca, HID/Suprema, Chainway C66,
+Epson TM-T88VII, BlueRhine, Emirates ID. **Not one of those names appears in any screen.**
+
+### The rule this leaves behind
+
+`tools/index-sources.py` writes [`SOURCES-INDEX.md`](SOURCES-INDEX.md): every document in all three
+categories with its read status, where read means *something outside `sources/` names it*. Run it
+at intake. **A drop is not ingested when its boards are parsed — it is ingested when all three
+categories are.**

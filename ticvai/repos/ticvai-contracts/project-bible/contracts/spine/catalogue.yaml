@@ -2211,6 +2211,7 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-003 Sell — Timed Entry"
         - "P08 BO-018 Allocation & Holds"
+        - "P08 BO-1057 Hold Inventory Reporting"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: primary
@@ -3842,7 +3843,10 @@ paths:
     put:
       operationId: approveWorkflow
       x-ticvai-consumed-by:
+        - "P08 BO-637 Approval Workflow Builder"
         - "P09 ADM-129 Approval Workflow Designer"
+        - "P09 ADM-319 Approval Workflow Library"
+        - "P09 ADM-492 Configuration Approval Workflow"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3964,6 +3968,7 @@ paths:
     get:
       operationId: listChangeImpactAnalysis
       x-ticvai-consumed-by:
+        - "P09 ADM-082 Pricing Change Impact Analysis"
         - "P09 ADM-133 Change Impact Analysis"
       x-ticvai-audience:
         - staff
@@ -4146,6 +4151,8 @@ paths:
       operationId: listGovernanceRiskMonitoring
       x-ticvai-consumed-by:
         - "P09 ADM-137 Governance Risk, AI Monitoring & Control Center"
+        - "P09 ADM-365 Risk & Governance Analytics"
+        - "P09 ADM-549 AI Governance Monitoring Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4185,6 +4192,7 @@ paths:
       operationId: listSaleChannel
       x-ticvai-consumed-by:
         - "P09 ADM-258 Sales Channel Command Center"
+        - "P09 ADM-383 Sales Channel Assessment"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4307,6 +4315,7 @@ paths:
       operationId: setChannelPricingCommercial
       x-ticvai-consumed-by:
         - "P09 ADM-261 Channel Pricing & Commercial Profile Assignment"
+        - "P09 ADM-483 Pricing & Commercial Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4386,6 +4395,7 @@ paths:
     get:
       operationId: listChannelSaleSchedule
       x-ticvai-consumed-by:
+        - "P09 ADM-258 Sales Channel Command Center"
         - "P09 ADM-263 Channel Sales Schedule & Availability Windows"
       x-ticvai-audience:
         - staff
@@ -4462,6 +4472,7 @@ paths:
     get:
       operationId: listChannelSaleRule
       x-ticvai-consumed-by:
+        - "P09 ADM-258 Sales Channel Command Center"
         - "P09 ADM-265 Channel Sales Rules, Limits & Restrictions"
       x-ticvai-audience:
         - staff
@@ -4585,6 +4596,7 @@ paths:
       operationId: listChannel
       x-ticvai-consumed-by:
         - "P09 ADM-268 Channel Operations Command Center"
+        - "P09 ADM-277 AI Channel Optimization & Intelligence Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5025,6 +5037,7 @@ paths:
     get:
       operationId: listChannel2
       x-ticvai-consumed-by:
+        - "P09 ADM-268 Channel Operations Command Center"
         - "P09 ADM-277 AI Channel Optimization & Intelligence Center"
       x-ticvai-audience:
         - staff
@@ -5063,6 +5076,7 @@ paths:
     get:
       operationId: listCommercialPricing
       x-ticvai-consumed-by:
+        - "P08 BO-533 Pricing Simulation, Validation & AI Commercial Intelligence"
         - "P09 ADM-048 Commercial Pricing Command Center"
       x-ticvai-audience:
         - staff
@@ -5444,6 +5458,7 @@ paths:
     get:
       operationId: listCommercialPricingStructure
       x-ticvai-consumed-by:
+        - "P09 ADM-048 Commercial Pricing Command Center"
         - "P09 ADM-057 Commercial Pricing Structure Validation"
       x-ticvai-audience:
         - staff
@@ -5521,6 +5536,7 @@ paths:
     get:
       operationId: listCustomerSegmentProfile
       x-ticvai-consumed-by:
+        - "P08 BO-737 Customer 360 Profile"
         - "P09 ADM-059 Customer Segment & Profile Pricing Rules"
       x-ticvai-audience:
         - staff
@@ -5825,6 +5841,7 @@ paths:
     get:
       operationId: listPricingRulePriority
       x-ticvai-consumed-by:
+        - "P09 ADM-058 Pricing Rule Command Center"
         - "P09 ADM-067 Pricing Rule Priority, Conflict Resolution & Testing"
       x-ticvai-audience:
         - staff
@@ -7001,6 +7018,7 @@ paths:
       operationId: listChannelCustomerSegment
       x-ticvai-consumed-by:
         - "P09 ADM-093 Channel, Customer Segment & Location Dynamic Rules"
+        - "P09 ADM-234 Customer, Segment, Channel & Partner Analytics"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7154,6 +7172,7 @@ paths:
     get:
       operationId: listRulePriorityConflict
       x-ticvai-consumed-by:
+        - "P08 BO-441 Price Priority & Conflict Rules"
         - "P09 ADM-097 Rule Priority, Conflict Resolution & Dynamic Pricing Test Console"
       x-ticvai-audience:
         - staff
@@ -7193,6 +7212,7 @@ paths:
     get:
       operationId: listPricing
       x-ticvai-consumed-by:
+        - "P08 BO-443 Pricing Audit, Approval & Publication"
         - "P09 ADM-098 AI Pricing Intelligence Command Center"
       x-ticvai-audience:
         - staff
@@ -7608,6 +7628,8 @@ paths:
     get:
       operationId: listRevenue
       x-ticvai-consumed-by:
+        - "P08 BO-1043 Revenue Command Center"
+        - "P08 BO-1050 Revenue Analytics & Audit"
         - "P09 ADM-108 Revenue Optimization Command Center"
       x-ticvai-audience:
         - staff

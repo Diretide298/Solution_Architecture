@@ -27,11 +27,11 @@ scale:
   services: 16
   platforms: 16
   apps: 13
-  screens: 1629
-  flows: 202
+  screens: 2427
+  flows: 288
   stateModels: 125
   events: 29
-  decisions: 46
+  decisions: 47
   requirements: 3184
   buildPercent: 0
 actors:
@@ -256,9 +256,10 @@ surfaces:
   app: venue-management-web
   formFactor: web
   offlineCapable: false
-  screens: 614
+  screens: 1182
   modules:
   - access
+  - accreditation
   - ai
   - analytics
   - core
@@ -297,7 +298,7 @@ surfaces:
   app: ticvai-web
   formFactor: web
   offlineCapable: false
-  screens: 446
+  screens: 676
   modules:
   - ai
   - analytics
@@ -435,6 +436,7 @@ surfaces:
   - ai
   - analytics
   callsServices:
+  - AccessService
   - AiService
   - CatalogueService
   - IdentityService

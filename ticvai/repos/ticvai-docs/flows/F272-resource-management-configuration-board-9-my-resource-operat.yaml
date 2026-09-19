@@ -1,0 +1,134 @@
+id: F272
+name: 'Resource Management Configuration board 9: My Resource Operations Home'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Resource Management Configuration board 9. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-933
+  entryPoints:
+  - Arrives at My Resource Operations Home
+steps:
+- step: 1
+  screen: BO-933
+  action: Opens My Resource Operations Home
+  operations: []
+  outcome: Provide each employee with a personalized operational landing screen showing what requires
+    their attention now and next.
+- step: 2
+  screen: BO-934
+  action: Works in My Schedule & Assignment Calendar
+  operations: []
+  outcome: Provide employees with a mobile view of their working schedule and operational assignments.
+- step: 3
+  screen: BO-933
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-935
+  action: Works in Assignment Detail & Operational Brief
+  operations: []
+  outcome: Give the employee all information required to execute a specific assignment.
+- step: 5
+  screen: BO-933
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-936
+  action: Works in Mobile Staff Check-In & Check-Out
+  operations: []
+  outcome: Allow employees to record attendance and assignment presence from the Employee App.
+- step: 7
+  screen: BO-933
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-937
+  action: Works in Resource Collection, Handover & Return
+  operations: []
+  outcome: Digitally manage physical resources transferred between employees, departments, or operational
+    locations.
+- step: 9
+  screen: BO-933
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-938
+  action: Works in Employee Requests & Resource Support
+  operations: []
+  outcome: Allow frontline employees to submit operational resource-related requests directly from the
+    Employee App.
+- step: 11
+  screen: BO-933
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-939
+  action: Works in Shift Change, Swap, Pickup & Release
+  operations: []
+  outcome: Expose the Board 4 Shift Marketplace capabilities through the Employee App. This screen does
+    not recreate shift rules; it consumes the workforce rules already configured in Board 4.
+- step: 13
+  screen: BO-933
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-940
+  action: Works in Manager Mobile Approval Center
+  operations: []
+  outcome: Allow authorized supervisors and managers to approve operational requests without requiring
+    access to the desktop backend.
+- step: 15
+  screen: BO-933
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-941
+  action: Works in Operational Notifications & Live Alerts
+  operations: []
+  outcome: Provide employees and managers with timely, prioritized operational notifications.
+- step: 17
+  screen: BO-933
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-942
+  action: Works in Mobile Operations Control & Offline Sync
+  operations: []
+  outcome: Configure and monitor how Resource Management operates on mobile devices, particularly where
+    connectivity is unreliable.
+branches:
+- at: 1
+  condition: Nothing has been set up on My Resource Operations Home yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Resource Management Configuration board 9 visited
+primaryContract: unknown
+contracts:
+- unknown

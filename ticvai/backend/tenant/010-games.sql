@@ -18,9 +18,8 @@ CREATE TABLE IF NOT EXISTS games.card (
     expires_at                        timestamptz
 );
 
--- credits bought, played and won. The arcade equivalent of a wallet Hangs off: a child of
--- games.card; reaches games.prize through its keys; references games.card. Reached by: 1
--- operations read it and 1 write it
+-- credits bought, played and won. The arcade equivalent of a wallet Hangs off: reaches games.play
+-- through its keys; references games.card. Reached by: 1 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS games.credit_ledger (
     id                                uuid PRIMARY KEY NOT NULL,
     card_id                           text NOT NULL
@@ -74,8 +73,8 @@ CREATE TABLE IF NOT EXISTS games.prize (
 );
 
 -- How a game reader behaves and what it shows (BL-153). A guest at an arcade machine cannot read a
--- message, they can only see a light. Hangs off: reaches games.prize through its keys. Reached by:
--- 1 operations read it and 1 write it
+-- message, they can only see a light. Hangs off: reaches games.play through its keys. Reached by:
+-- 1 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS games.reader_profile (
     id                                uuid PRIMARY KEY NOT NULL,
     name                              text NOT NULL,

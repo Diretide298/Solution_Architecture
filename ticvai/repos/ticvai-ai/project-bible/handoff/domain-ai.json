@@ -1121,6 +1121,18 @@
    "mentions": 1
   },
   {
+   "file": "docs\\active\\change-log-validation-18-september.md",
+   "title": "Validating the developer team's Change Log",
+   "status": "",
+   "mentions": 1
+  },
+  {
+   "file": "docs\\active\\current-work.md",
+   "title": "Current work",
+   "status": "",
+   "mentions": 2
+  },
+  {
    "file": "docs\\active\\deep-audit-24-august.md",
    "title": "Deep audit \u2014 ten invariants, run adversarially",
    "status": "",
@@ -1163,6 +1175,12 @@
    "mentions": 3
   },
   {
+   "file": "docs\\active\\phase0-identity-pass-all-clusters.md",
+   "title": "Phase 0 \u2014 identity pass, all clusters",
+   "status": "",
+   "mentions": 2
+  },
+  {
    "file": "docs\\active\\screen-duplicate-triage.md",
    "title": "Identical operation sets \u2014 what each cluster actually is",
    "status": "",
@@ -1181,14 +1199,14 @@
    "mentions": 1
   },
   {
-   "file": "docs\\active\\viewer-update-brief-20aug.md",
-   "title": "Viewer \u2014 what changed in the package on 20 August",
+   "file": "docs\\active\\spec-coverage-19-september.md",
+   "title": "Ch03 capability coverage - the client's list against our screens",
    "status": "",
    "mentions": 1
   },
   {
-   "file": "docs\\active\\workshop-contract-gap.md",
-   "title": "Workshop pack \u2014 what the new screens need from the contracts",
+   "file": "docs\\active\\viewer-update-brief-20aug.md",
+   "title": "Viewer \u2014 what changed in the package on 20 August",
    "status": "",
    "mentions": 1
   },
@@ -1239,6 +1257,12 @@
    "title": "ADR-0034: The cheapest AI call is the one that never reaches a provider",
    "status": "Accepted",
    "mentions": 7
+  },
+  {
+   "file": "docs\\adr\\0046-on-premise-has-two-configurations.md",
+   "title": "ADR-0046: On-premise has two configurations, and the difference is a control channel",
+   "status": "Accepted",
+   "mentions": 1
   },
   {
    "file": "docs\\architecture\\ai-credentials.md",
@@ -1433,7 +1457,7 @@
   "tables": 51,
   "screens": 34,
   "flows": 11,
-  "documents": 23,
+  "documents": 27,
   "openConflicts": 1
  }
 }

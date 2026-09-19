@@ -7,7 +7,7 @@
  "audience": "partner",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-17",
+ "generated": "2026-09-19",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 51,
@@ -326,7 +326,7 @@
    "module": "Partners",
    "wave": 3,
    "route": "/partners/partner-management-command-center-ptr-022",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -416,7 +416,7 @@
    "module": "Partners",
    "wave": 3,
    "route": "/partners/commercial-agreement-command-center-ptr-032",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -506,7 +506,7 @@
    "module": "Partners",
    "wave": 3,
    "route": "/partners/partner-operations-command-center-ptr-042",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {

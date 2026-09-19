@@ -4,9 +4,9 @@ A multi-tenant platform for ticketing, access control, point of sale and venue o
 **This package is the design of it** — the contracts, the data model, the screens, the
 journeys through them, and the reasoning behind every decision that was not obvious.
 
-**1628 operations · 28 contracts · 388 tables · 1629 screens · 125 state models · 96 flows · 44 ADRs**
+**1628 operations · 28 contracts · 388 tables · 2427 screens · 125 state models · 96 flows · 46 ADRs**
 
-**Design 87% · Build 33%.**
+**Design 84% · Build 33%.**
 
 ---
 
@@ -33,10 +33,10 @@ package has been bitten by that three times.
 | | | |
 |---|---:|---|
 | Requirements contracted | **2,647** of 3,184 | **95% of what is in scope** |
-| Operations reaching a screen | 1386 of 1635 | 85% |
-| Screens reachable from an entry point | 1628 of 1629 | 100% |
-| Screens drawn on a board | 1629 of 1629 | 100% |
-| Screens in a journey | 1330 of 1629 | 82% |
+| Operations reaching a screen | 1392 of 1635 | 85% |
+| Screens reachable from an entry point | 2426 of 2427 | 100% |
+| Screens drawn on a board | 2427 of 2427 | 100% |
+| Screens in a journey | 2126 of 2427 | 88% |
 | Conflicts | 149 closed | 17 open, none blocking |
 | **Tables written** | **0** of 388 | **build has not started** |
 
@@ -71,8 +71,8 @@ cd viewer && npm start        →  http://localhost:4173
 | `P05` | Guest Kiosk — Self-Service | guest | 17 |
 | `P06` | Venue Staff App — Operations | staff | 96 |
 | `P07` | Venue Scanner — Access Control | staff | 11 |
-| `P08` | Venue Management — Back Office | staff | 614 |
-| `P09` | TICVAI Web — Platform Console | platformAdmin | 446 |
+| `P08` | Venue Management — Back Office | staff | 1182 |
+| `P09` | TICVAI Web — Platform Console | platformAdmin | 676 |
 | `P10` | Partner Web — Reseller Portal | partner | 51 |
 | `P11` | Accreditation Web — Applications | public | 8 |
 | `P12` | Venue Support — Agent Console | staff | 28 |
@@ -109,7 +109,7 @@ cd viewer && npm start        →  http://localhost:4173
 
 **96 journeys of a target 60.** Seventeen contracts have exactly one — `subscription` has one over 1628 operations. **Every journey written so far has found a defect**, which is the argument for writing more.
 
-**1629 screens cannot be reached** from their platform's entry point, and navigation is still inferred rather than designed on most of the estate.
+**2427 screens cannot be reached** from their platform's entry point, and navigation is still inferred rather than designed on most of the estate.
 
 **17 conflicts are open.** None blocks build; four need an email and one needs a workshop.
 

@@ -1081,6 +1081,7 @@ screens:
 - P08:BO-142 Store Rules, Controls & Permissions
 - P08:BO-143 Retail Global Settings & Controls
 - P08:BO-206 Offline Validation Policy Builder
+- P08:BO-728 Outlet Management
 - P09:ADM-006 Tenant Hierarchy Explorer
 - P09:ADM-036 Platform Notification Broadcast
 - P09:ADM-145 Promotion Approval Inbox
@@ -1104,6 +1105,7 @@ screens:
 - P09:ADM-255 Workflow Analytics & Process Performance
 - P09:ADM-256 Process Optimization & Automation Opportunity Center
 - P09:ADM-257 AI Workflow Intelligence & Autonomous Governance Center
+- P09:ADM-319 Approval Workflow Library
 - P09:ADM-342 Authentication & MFA Policy Manager
 - P11:ACC-005 Accreditation Badge
 - P11:ACC-006 Reviewer Queue

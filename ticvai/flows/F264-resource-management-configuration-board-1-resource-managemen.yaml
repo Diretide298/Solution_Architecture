@@ -1,0 +1,135 @@
+id: F264
+name: 'Resource Management Configuration board 1: Resource Management Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Resource Management Configuration board 1. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-854
+  entryPoints:
+  - Arrives at Resource Management Command Center
+steps:
+- step: 1
+  screen: BO-854
+  action: Opens Resource Management Command Center
+  operations: []
+  outcome: Provide administrators and operational managers with the main entry point for Resource Management
+    and an instant overview of the organization's complete resource inventory.
+- step: 2
+  screen: BO-855
+  action: Works in Resource Type Configuration
+  operations: []
+  outcome: Allow administrators to define the different classes of resources supported by the organization
+    without requiring software development.
+- step: 3
+  screen: BO-854
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-856
+  action: Works in Resource Category Management
+  operations: []
+  outcome: Provide a flexible classification structure beneath resource types so resources can be organized,
+    searched, reported, and governed consistently.
+- step: 5
+  screen: BO-854
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-857
+  action: Works in Resource Creation & Profile
+  operations: []
+  outcome: Provide the principal workspace for creating and maintaining an individual resource.
+- step: 7
+  screen: BO-854
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-858
+  action: Works in Configurable Attribute Builder
+  operations: []
+  outcome: Allow customers to extend resource records with their own attributes without changing the core
+    application.
+- step: 9
+  screen: BO-854
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-859
+  action: Works in Resource Hierarchy & Parent–Child Relationships
+  operations: []
+  outcome: Represent physical and operational relationships between resources.
+- step: 11
+  screen: BO-854
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-860
+  action: Works in Resource Dependency Rules
+  operations: []
+  outcome: Define operational relationships where one resource requires, depends upon, conflicts with,
+    or influences another resource.
+- step: 13
+  screen: BO-854
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-861
+  action: Works in Resource Package & Bundle Configuration
+  operations: []
+  outcome: Allow commonly used combinations of resources to be predefined and assigned as a single operational
+    package.
+- step: 15
+  screen: BO-854
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-862
+  action: Works in Multi-Venue Resource Assignment
+  operations: []
+  outcome: Control where resources may operate and whether they can be shared across venues.
+- step: 17
+  screen: BO-854
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-863
+  action: Works in Resource Lifecycle, Governance & Audit
+  operations: []
+  outcome: Manage the entire operational lifecycle of a resource from creation through retirement while
+    maintaining full traceability.
+branches:
+- at: 1
+  condition: Nothing has been set up on Resource Management Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Resource Management Configuration board 1 visited
+primaryContract: unknown
+contracts:
+- unknown

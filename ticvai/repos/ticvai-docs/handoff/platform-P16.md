@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 69 |
-| Operations | 20 |
-| Contracts | 8 |
+| Operations | 22 |
+| Contracts | 10 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 87 |
+| Operations with no screen | 98 |
 | Waves | wave3 69 |
 
 ## Gaps
 
-### 87 operations with no screen here
+### 98 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `getLostItemMatches` | marketing-crm | GET | Candidate matches, scored |
 | `getSuppressionList` | marketing-crm | GET | Addresses suppressed from all sending |
 | `listMessageTriggers` | marketing-crm | GET | What fires a message, and when |
-| … | | | 47 more |
+| … | | | 58 more |
 
 ## Modules
 
@@ -88,7 +88,7 @@
 | `ANL-015` | Capacity & Utilization Monitor | Analytics | 3 | 0 | yes |
 | `ANL-016` | Sales & Channel Performance | Analytics | 3 | 0 | yes |
 | `ANL-017` | Customer, Membership & Loyalty Pulse | Analytics | 3 | 0 | yes |
-| `ANL-018` | Alerts & Exception Center | Analytics | 3 | 0 | yes |
+| `ANL-018` | Alerts & Exception Center | Analytics | 3 | 1 | yes |
 | `ANL-019` | AI Management Insights | Analytics | 3 | 0 | yes |
 | `ANL-020` | Multi-Site & Performance Comparison | Analytics | 3 | 0 | yes |
 | `ANL-021` | Dashboard Library | Analytics | 3 | 0 | yes |
@@ -140,5 +140,5 @@
 | `ANL-067` | Data Refresh, Pipeline & Data Health Monitor | Analytics | 3 | 0 | yes |
 | `ANL-068` | Embedded BI, Workspace & Tenant Administration | Analytics | 3 | 0 | yes |
 | `ANL-069` | Analytics Performance, Usage & Cost Monitor | Analytics | 3 | 0 | yes |
-| `ANL-070` | Analytics Governance, Security & Audit Center | Analytics | 3 | 0 | yes |
+| `ANL-070` | Analytics Governance, Security & Audit Center | Analytics | 3 | 1 | yes |
 

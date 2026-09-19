@@ -1,0 +1,148 @@
+id: F284
+name: 'Seat Management Venue Mapping Reference v1.0 board 11: Seat Analytics Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Seat Management Venue Mapping Reference v1.0 board 11. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-1051
+  entryPoints:
+  - Arrives at Seat Analytics Command Center
+steps:
+- step: 1
+  screen: BO-1051
+  action: Opens Seat Analytics Command Center
+  operations: []
+  outcome: Provide a consolidated view of seat commercial and operational performance. Show occupancy,
+    revenue, utilization, average ticket price, held inventory, release yield and forecast variance. Present
+    trend, benchmark, target and prior-period c
+- step: 2
+  screen: BO-1052
+  action: Works in Occupancy Reporting
+  operations: []
+  outcome: Report sold and attended occupancy against configured capacity. Calculate sold, issued, scanned,
+    no-show, blocked, available and effective capacity with clear metric definitions. Analyze by event,
+    performance, venue, section, category, chan
+- step: 3
+  screen: BO-1051
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-1053
+  action: Works in Zone Performance Reporting
+  operations: []
+  outcome: Compare capacity, demand and yield across venue zones. Show zone capacity, sold, occupancy,
+    average price, revenue, utilization, holds and release conversion. Rank zones and compare target,
+    forecast, prior period and venue benchmark. Drill
+- step: 5
+  screen: BO-1051
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-1054
+  action: Works in Revenue by Section
+  operations: []
+  outcome: Analyze financial contribution from each seating section. Report gross/net revenue, tax, fees,
+    discounts, refunds, average ticket price and percentage of performance total. Compare section revenue,
+    yield, occupancy, price band and prior-yea
+- step: 7
+  screen: BO-1051
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-1055
+  action: Works in Revenue by Seat Category
+  operations: []
+  outcome: Measure performance of Premium, Standard, Value, Accessible and configured categories. Show
+    revenue mix, seats sold, average price, discount, refund, yield and sell-through by category. Compare
+    venue, event, performance, channel, customer s
+- step: 9
+  screen: BO-1051
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-1056
+  action: Works in Seat Utilization Analytics
+  operations: []
+  outcome: Measure how effectively physical and sellable seating capacity is used. Calculate booked, sold,
+    scanned, occupied estimate, idle and unavailable hours or performances as applicable. Analyze utilization
+    by venue, map, section, seat type, day
+- step: 11
+  screen: BO-1051
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-1057
+  action: Works in Hold Inventory Reporting
+  operations: []
+  outcome: Report the size, age and outcome of seat holds. Show held quantity/value, capacity percentage,
+    active age, upcoming release, conversion and expired unused. Compare VIP, Sponsor, Artist, Media,
+    Corporate, Internal and custom types by owner/s
+- step: 13
+  screen: BO-1051
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-1058
+  action: Works in Sales Pace & Pick Curves
+  operations: []
+  outcome: Analyze when seats sell and which inventory customers select first. Plot cumulative sales by
+    days/hours to event against target, forecast and comparable events. Configuration Scope of Work |
+    Version 1.0 47 Show seat-pick sequence by section
+- step: 15
+  screen: BO-1051
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-1059
+  action: Works in Heat Maps & Drill-Down
+  operations: []
+  outcome: Visualize spatial performance directly on the approved seat map. Display occupancy, revenue,
+    average price, demand, availability, holds, scan and utilization heat maps. Switch level, section,
+    row and seat granularity and synchronize filters
+- step: 17
+  screen: BO-1051
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-1060
+  action: Works in Report Builder, Export & Audit
+  operations: []
+  outcome: Allow authorized users to assemble and distribute controlled seat reports. Select approved
+    dimensions, measures, filters, grouping, sorting, chart/map and date context. Save personal/team views
+    and schedule email or in-app delivery with rec
+branches:
+- at: 1
+  condition: Nothing has been set up on Seat Analytics Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Seat Management Venue Mapping Reference v1.0 board 11 visited
+primaryContract: unknown
+contracts:
+- unknown

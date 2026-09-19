@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "mobileApp",
  "offlineCapable": true,
- "generated": "2026-09-17",
+ "generated": "2026-09-19",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 96,
@@ -15,7 +15,7 @@
   "contracts": 17,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 125
+  "operationsWithNoScreen": 124
  },
  "waves": {
   "wave1": 25,
@@ -92,11 +92,11 @@
    "operations": 7
   },
   {
-   "contract": "access",
+   "contract": "queue",
    "operations": 7
   },
   {
-   "contract": "queue",
+   "contract": "access",
    "operations": 7
   },
   {
@@ -104,11 +104,11 @@
    "operations": 4
   },
   {
-   "contract": "retail",
+   "contract": "venue-map",
    "operations": 2
   },
   {
-   "contract": "reporting",
+   "contract": "retail",
    "operations": 2
   },
   {
@@ -116,7 +116,7 @@
    "operations": 2
   },
   {
-   "contract": "venue-map",
+   "contract": "reporting",
    "operations": 2
   },
   {
@@ -1447,12 +1447,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Issue a complimentary entitlement, with no payment expected"
-   },
-   {
-    "operation": "listAbandonedCarts",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "Carts that lapsed without checking out"
    },
    {
     "operation": "listChargebacks",

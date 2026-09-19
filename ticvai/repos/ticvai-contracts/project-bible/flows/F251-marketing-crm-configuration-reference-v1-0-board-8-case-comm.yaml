@@ -1,0 +1,148 @@
+id: F251
+name: 'Marketing CRM Configuration Reference v1.0 board 8: Case Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Marketing CRM Configuration Reference v1.0 board 8. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-804
+  entryPoints:
+  - Arrives at Case Command Center
+steps:
+- step: 1
+  screen: BO-804
+  action: Opens Case Command Center
+  operations: []
+  outcome: Provide a role-specific overview of service operations. Show new, open, pending, resolved,
+    overdue and SLA-risk cases with escalations, response time, resolution time and CSAT. Visualize volume,
+    priority, category, channel, venue, owner, ag
+- step: 2
+  screen: BO-805
+  action: Works in Case Queue & Search
+  operations: []
+  outcome: Provide a complete, searchable work queue for service cases. Search by case, guest, contact,
+    transaction, ticket, booking, keyword or external reference. Filter by category, subcategory, priority,
+    channel, venue, status, owner, SLA, date an
+- step: 3
+  screen: BO-804
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-806
+  action: Works in Case Creation
+  operations: []
+  outcome: Create a complete case from any service touchpoint. Create manually or from chatbot, conversation,
+    survey, review, transaction, incident or API event. Capture guest, category, priority, channel, venue,
+    subject, details, attachments and link
+- step: 5
+  screen: BO-804
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-807
+  action: Works in Classification & Workflow
+  operations: []
+  outcome: Configure case taxonomies and lifecycle states. Maintain categories, subcategories, reason
+    codes, outcomes, severity, priority and applicable business units. Configure status model, stage transitions,
+    mandatory fields, validation and condit
+- step: 7
+  screen: BO-804
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-808
+  action: Works in Assignment & Workload
+  operations: []
+  outcome: Assign cases to the best available team or agent. Route by skill, department, venue, language,
+    category, guest tier, priority and operating hours. Configure round robin, least load, ownership continuity,
+    named team and manual assignment met
+- step: 9
+  screen: BO-804
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-809
+  action: Works in SLA Policy Configuration
+  operations: []
+  outcome: Define measurable service commitments and pause rules. Configure first-response and resolution
+    targets by case type, priority, venue, channel and guest tier. Apply operating calendars, holidays,
+    24/7 rules, pause conditions, dependency stat
+- step: 11
+  screen: BO-804
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-810
+  action: Works in Escalation Rules
+  operations: []
+  outcome: Automate tiered escalation before or after service risk materializes. Create time-based and
+    condition-based triggers for response, resolution, priority, sentiment, repeat contact and compliance
+    risk. Define escalation level, recipients, not
+- step: 13
+  screen: BO-804
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-811
+  action: Works in Case Workspace
+  operations: []
+  outcome: Provide one place to investigate, communicate and resolve a case. Display guest 360, case details,
+    SLA, timeline, messages, notes, tasks, attachments and linked transactions. Support email, SMS, WhatsApp
+    and chat responses using approved te
+- step: 15
+  screen: BO-804
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-812
+  action: Works in Service Recovery
+  operations: []
+  outcome: Configure and approve fair, consistent recovery actions. Maintain compensation matrices by
+    issue, severity, guest tier, value and business unit. Support refund, voucher, loyalty points, wallet
+    credit, upgrade, replacement and follow-up jour
+- step: 17
+  screen: BO-804
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-813
+  action: Works in Case Analytics & Audit
+  operations: []
+  outcome: Measure service quality, root causes and operational accountability. Report case volume, SLA
+    achievement, aging, backlog, escalation, resolution, CSAT and recovery cost. Analyze category, root
+    cause, channel, venue, product, guest tier, tea
+branches:
+- at: 1
+  condition: Nothing has been set up on Case Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Marketing CRM Configuration Reference v1.0 board 8 visited
+primaryContract: unknown
+contracts:
+- unknown

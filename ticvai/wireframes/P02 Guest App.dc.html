@@ -1,0 +1,2273 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P02 Guest App — wireframe board</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* **The Claude Design system, applied to the generated boards on 24 August.**
+   Three client packs render at 1280x700 in this system and 385 screens rendered as
+   dashed-box wireframes — and **a client reviewing both reads the difference as *those screens
+   are not done*.** The information is identical either way; the fidelity is what was being
+   judged.
+
+   Tokens are the packs': #0B1324 rail, #0D6EFD primary, #00B8FF accent, Manrope for UI,
+   IBM Plex Mono for figures and codes. */
+:root{--ink:#0B1324;--mut:#5A6577;--dim:#9AA5B6;--line:#E8ECF3;--edge:#E3E8F0;
+--brand:#0D6EFD;--accent:#00B8FF;--rail:#0B1324;--paper:#FFF;--wash:#F7F9FC;
+--ok:#0E9F6E;--okbg:#E8F6F0;--okline:#BFE3D2;--warn:#8A6D00;--warnbg:#FFF7E6;
+--bad:#A81E1E;--badbg:#FDECEC}
+*{box-sizing:border-box}
+body{margin:0;background:#F2F5F9;color:var(--ink);
+font-family:Manrope,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;line-height:1.55}
+a{color:inherit}
+.wrap{max-width:1420px;margin:0 auto;padding:22px 34px 90px}
+.home{font-size:11.5px;color:var(--mut);text-decoration:none;letter-spacing:.02em}
+.head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;
+margin:14px 0 6px;padding-bottom:16px;border-bottom:2px solid var(--ink)}
+.mark{font-size:13px;font-weight:800;letter-spacing:.16em;
+background:linear-gradient(90deg,var(--brand),var(--accent));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+h1{font-size:19px;font-weight:800;letter-spacing:-.015em;margin:0}
+.meta{font-size:11px;color:var(--mut);font-family:'IBM Plex Mono',ui-monospace,monospace;line-height:1.7}
+.lede{font-size:12.5px;color:var(--mut);max-width:82ch;margin:16px 0 0;line-height:1.65}
+.grp{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;font-weight:600;
+letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin:52px 0 18px;
+padding-bottom:9px;border-bottom:1px solid var(--line)}
+.stack{display:flex;flex-direction:column;gap:52px}
+.scr{display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px}
+.hdr{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8}
+.ttl{font-size:16.5px;font-weight:800;letter-spacing:-.015em}
+.pur{font-size:12px;color:#6B7280;margin-top:3px;max-width:96ch}
+.pill{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+padding:2px 7px;border-radius:5px;background:#EEF3FA;color:#4A5A70}
+.pill.named{background:var(--warnbg);color:var(--warn)}
+.pill.off{background:var(--okbg);color:var(--ok)}
+
+/* the frame — 1280x700, the packs' dimension */
+.frame{width:1280px;height:700px;display:flex;background:var(--wash);border:1px solid var(--edge);
+border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)}
+.rail{flex:none;width:180px;background:var(--rail);display:flex;flex-direction:column;position:relative}
+.rail::before{content:'';position:absolute;inset:0;
+background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none}
+.brand{position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)}
+.brand b{display:block;font-size:14px;font-weight:800;letter-spacing:.1em;
+background:linear-gradient(90deg,#4DA3FF,var(--accent));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+.brand span{display:block;font-size:9.5px;color:#7FA3C9;margin-top:5px}
+.nav{position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px}
+.nav i{display:block;padding:8px 10px;border-radius:9px;font-size:11.5px;font-style:normal;color:#8FA8C4}
+.nav i.on{background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));
+color:#fff;font-weight:700}
+.body{flex:1;display:flex;flex-direction:column;min-width:0}
+.top{flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;
+background:var(--paper);border-bottom:1px solid var(--line)}
+.top h2{font-size:13.5px;font-weight:800;letter-spacing:-.01em;margin:0}
+.top small{display:block;font-size:10px;color:var(--dim);font-weight:500}
+.acts{margin-left:auto;display:flex;gap:6px}
+.chip{height:32px;display:flex;align-items:center;gap:6px;padding:0 11px;border:1px solid var(--edge);
+border-radius:8px;font-size:11px;font-weight:700;color:var(--mut);background:var(--paper)}
+.chip.live{background:var(--okbg);border-color:var(--okline);color:var(--ok)}
+.chip.live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--ok)}
+.chip.cta{background:var(--brand);border-color:var(--brand);color:#fff}
+.canvas{flex:1;display:flex;flex-direction:column;gap:12px;padding:14px 16px;min-height:0;overflow:hidden}
+.kpis{flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.kpi{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:11px 13px;
+display:flex;flex-direction:column;gap:4px}
+.kpi b{font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
+.kpi span{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;letter-spacing:-.02em}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 14px;
+display:flex;flex-direction:column;gap:8px;min-height:0}
+.panel > b{font-size:11px;font-weight:800;letter-spacing:-.005em}
+.panel .why{font-size:10px;color:#7C8899;font-style:italic;line-height:1.5}
+.kind{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--dim);
+letter-spacing:.06em;text-transform:uppercase}
+.rows{display:flex;flex-direction:column;gap:6px}
+.row{display:grid;grid-template-columns:1.6fr 1fr 1fr .7fr;gap:10px;align-items:center;
+padding:7px 0;border-top:1px solid #F0F3F8}
+.row:first-child{border-top:0;font-size:9.5px;font-weight:700;letter-spacing:.06em;
+text-transform:uppercase;color:var(--dim)}
+.bar{height:7px;border-radius:4px;background:#EDF1F7}
+.bar i{display:block;height:100%;border-radius:4px;
+background:linear-gradient(90deg,var(--brand),var(--accent))}
+.side{flex:none;width:250px;display:flex;flex-direction:column;gap:10px}
+.two{flex:1;display:flex;gap:12px;min-height:0}
+.grow{flex:1;min-width:0}
+.strip{flex:none;height:26px;display:flex;align-items:center;gap:8px;padding:0 18px;
+background:var(--warnbg);color:var(--warn);font-size:10px;font-weight:700;
+letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid #F0E0B8}
+.dark .frame{background:#0A1524}
+.dark .top{background:#0E2A4C;border-color:#1E3A5F;color:#E6F0FA}
+.dark .top small{color:#7FA3C9}
+.dark .canvas{background:#0A1524}
+.dark .kpi,.dark .panel{background:#0E2A4C;border-color:#1E3A5F;color:#E6F0FA}
+.dark .row{border-color:#193353}
+.dark .chip{background:#0E2A4C;border-color:#1E3A5F;color:#9FC0E0}
+
+.drawnb{margin-left:6px;font:600 10px/1.6 'IBM Plex Mono',monospace;color:#0F766E;background:#ECFDF5;border:1px solid #A7F3D0;padding:1px 7px;border-radius:999px}
+.frame.drawn{padding:0;background:#FFF}
+.wsb{margin-left:8px;font:600 10px/1.6 'IBM Plex Mono',monospace;color:#5B21B6;background:#F5F3FF;border:1px solid #DDD6FE;padding:1px 7px;border-radius:999px;white-space:nowrap}
+.wsbar{position:sticky;top:0;z-index:20;display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 18px;padding:10px 14px;background:#FFF;border:1px solid #E5E7EB;border-radius:10px;font:600 12px/1.4 'IBM Plex Mono',monospace}
+.wsbar label{color:#6B7280;font-weight:600}
+.wsbar select{font:600 12px 'IBM Plex Mono',monospace;padding:5px 8px;border:1px solid #D1D5DB;border-radius:7px;background:#FFF;color:#111827;max-width:min(520px,60vw)}
+.wsbar .n{color:#6B7280;font-weight:400}
+.scr[hidden],.grp[hidden],.stack[hidden]{display:none!important}
+.foot a{color:#2563EB;text-decoration:none;border-bottom:1px solid rgba(37,99,235,.3)}
+.foot a:hover{border-bottom-color:#2563EB}
+.foot .car{font-family:var(--mono,monospace);font-size:9.5px;color:#0F766E;background:#ECFDF5;padding:1px 5px;border-radius:4px}
+.foot .dis{font-family:var(--mono,monospace);font-size:9.5px;color:#B45309}
+.foot .away{font-size:9px;color:#9AA5B6}
+.foot .hand{font-size:9.5px;color:#7C3AED;background:#F5F3FF;padding:1px 5px;border-radius:4px}
+.foot .mac{margin-top:3px;font-size:10px;color:#4A5566;line-height:1.7}
+.foot .ov{margin-top:3px;font-size:10px;color:#4A5566}
+.foot{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;line-height:1.85;color:#7C8899}
+.foot b{color:#4A5566;font-weight:600}
+.foot .warn{color:var(--warn)}
+.bottom{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);
+display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
+</style></head><body>
+<div class="wrap">
+  <a class="home" href="TICVAI%20Wireframe%20Boards.dc.html">&larr; All boards</a>
+  <div class="head">
+    <div><span class="mark">TICVAI</span>
+      <h1>P02 · Guest App — Mobile <span style="font-weight:600;color:#6B7280">(71 screens)</span></h1></div>
+    <div class="meta">guest · mobileApp · guest-app</div>
+  </div>
+  <p class="lede"></p>
+  
+  <div class="grp">01 — Discovery &amp; Browse · 7 screens</div><div class="stack">
+      <div id="gst-001" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-001</span>
+            <span class="ttl">Home – Default</span><span class="pill off">offline</span></div>
+          <div class="pur">The screen this app sits on. Everything else is entered from here and returns to it.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Discovery &amp; Browse</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Home – Default</h2>
+                <small>Guest App &middot; wave 1 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every home default</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getTenantAppStatus · getGuestProfile · listMyEntitlements · searchCatalogue +1</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session</div>
+          <div><b>GOES TO</b> &middot; entry point · <a href="#gst-002">GST-002</a>  &mdash; <i>Explore Categories</i><br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i><br><a href="#gst-004">GST-004</a>  &mdash; <i>Attraction Details</i></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-002" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-002</span>
+            <span class="ttl">Explore Categories</span><span class="pill off">offline</span></div>
+          <div class="pur">Find explore categories for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Discovery &amp; Browse</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Explore Categories</h2>
+                <small>Guest App &middot; wave 1 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every explore categories</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listProducts</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-004">GST-004</a>  &mdash; <i>Attraction Details</i> <span class="car">eventId · productId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-003" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-003</span>
+            <span class="ttl">Event &amp; Attraction Listing</span><span class="pill off">offline</span></div>
+          <div class="pur">Find the right one quickly, and act on it without opening it.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Discovery &amp; Browse</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Event &amp; Attraction Listing</h2>
+                <small>Guest App &middot; wave 1 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every event attraction listing</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listProducts · getWaitTimes · listPerformances · searchCatalogue</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; eventId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-004">GST-004</a>  &mdash; <i>Attraction Details</i> <span class="car">eventId · productId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-004" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-004</span>
+            <span class="ttl">Attraction Details</span><span class="pill off">offline</span></div>
+          <div class="pur">See attraction details for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Discovery &amp; Browse</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Attraction Details</h2>
+                <small>Guest App &middot; wave 1 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every attraction</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getProduct · getAvailability · getWaitTimes · listPerformances</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; productId&larr;deepLink, eventId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-005" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-005</span>
+            <span class="ttl">What&#x27;s On</span><span class="pill off">offline</span><span class="pill">Guest Mobile Board 1.dc.html#gm-1b</span></div>
+          <div class="pur">Find what&#x27;s on for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Discovery &amp; Browse</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>What&#x27;s On</h2>
+                <small>Guest App &middot; wave 1 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every what&#x27;s</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listPerformances · listProducts</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; eventId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-006" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-006</span>
+            <span class="ttl">Event / Exhibition Details</span><span class="pill off">offline</span></div>
+          <div class="pur">See event / exhibition details for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Discovery &amp; Browse</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Event / Exhibition Details</h2>
+                <small>Guest App &middot; wave 1 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>The selected event exhibition</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getPerformance · getProduct</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; performanceId&larr;deepLink, productId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-057" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-057</span>
+            <span class="ttl">Accessibility Information</span><span class="pill off">offline</span></div>
+          <div class="pur">Step-free routes, facilities and what to expect.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Discovery &amp; Browse</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Accessibility Information</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every accessibility information</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listContentPages</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div></div><div class="grp">02 — Booking &amp; Selection · 8 screens</div><div class="stack">
+      <div id="gst-007" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-007</span>
+            <span class="ttl">Select Date &amp; Time</span><span class="pill off">offline</span></div>
+          <div class="pur">See select date &amp; time for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Booking &amp; Selection</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Select Date &amp; Time</h2>
+                <small>Guest App &middot; wave 1 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every select date time</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listPerformances · getAvailability</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; eventId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-008" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-008</span>
+            <span class="ttl">Tickets &amp; Add-ons</span><span class="pill off">offline</span></div>
+          <div class="pur">Find tickets &amp; add-ons for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Booking &amp; Selection</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Tickets &amp; Add-ons</h2>
+                <small>Guest App &middot; wave 1 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><span class="kind">textField</span><div class="chip">Search</div><span class="why">Implied by the form template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; transferOrderTickets</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-048" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-048</span>
+            <span class="ttl">Upsell / Cross-Sell</span><span class="pill off">offline</span></div>
+          <div class="pur">See upsell / cross-sell for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Booking &amp; Selection</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Upsell / Cross-Sell</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>The selected upsell cross-sell</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; addCartLine · getUpsellSuggestions</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; cartId&larr;session</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-049" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-049</span>
+            <span class="ttl">Interactive Seat Selection</span><span class="pill off">offline</span><span class="pill">Seat Board 4.dc.html#seat-4a</span></div>
+          <div class="pur">See interactive seat selection for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Booking &amp; Selection</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Interactive Seat Selection</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">One record, read-only.</span></div><div class="panel"><b>Create seat hold</b><div class="chip cta">Create seat hold</div></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div><div class="side"><div class="panel"><b>Choose seats</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**A seat selection screen with no seat map.** `noGeometry` is the state that matters: a map imported from a manifest alone can be sold from a list and not rendered, and t</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getSeatAvailability · createSeatHold · recommendSeats</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; performanceId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-050" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-050</span>
+            <span class="ttl">Resource Booking – Cabana</span><span class="pill off">offline</span></div>
+          <div class="pur">Book a cabana or other capacity-based resource.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Booking &amp; Selection</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Resource Booking – Cabana</h2>
+                <small>Guest App &middot; wave 3 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every resource booking cabana</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; addCartLine · listProducts · getAvailability</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; cartId&larr;session</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-016">GST-016</a>  &mdash; <i>They see it in their reservations</i></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-056" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-056</span>
+            <span class="ttl">Bundle Package</span><span class="pill off">offline</span></div>
+          <div class="pur">See bundle package for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Booking &amp; Selection</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Bundle Package</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every bundle package</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listCatalogueBundles · getBundle · addCartLine</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; bundleId&larr;deepLink, cartId&larr;session</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-058" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-058</span>
+            <span class="ttl">Resource Availability (Cabana)</span><span class="pill off">offline</span></div>
+          <div class="pur">See which cabanas are free, by area and date, before choosing one.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Booking &amp; Selection</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Resource Availability (Cabana)</h2>
+                <small>Guest App &middot; wave 3 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every resource availability (cabana)</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getAvailability · listProducts</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-050">GST-050</a>  &mdash; <i>They book and pay</i></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-072" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-072</span>
+            <span class="ttl">Share &amp; Group Booking</span><span class="pill off">offline</span></div>
+          <div class="pur">**A guest buying eight tickets could not give seven of them away.** `shareEntitlement`, `getGroupBooking` and `respondToInvitation` had no surface, so</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Booking &amp; Selection</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Share &amp; Group Booking</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>The selected share group booking</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; shareEntitlement · getGroupBooking · respondToInvitation · createReferral +1</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; entitlementId&larr;deepLink, groupBookingId&larr;deepLink, subjectId&larr;session</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-039">GST-039</a>  &mdash; <i>Profile</i> <span class="car">subjectId</span></div>
+          
+          
+        </div>
+      </div></div><div class="grp">03 — Cart &amp; Checkout · 3 screens</div><div class="stack">
+      <div id="gst-009" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-009</span>
+            <span class="ttl">Review &amp; Payment</span><span class="pill off">offline</span></div>
+          <div class="pur">Check what you are buying and pay for it.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Cart &amp; Checkout</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Review &amp; Payment</h2>
+                <small>Guest App &middot; wave 1 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>The selected review payment</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; transferOrderTickets · createPayment · inquirePaymentStatus · checkoutCart +5</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; cartId&larr;session, orderId&larr;deepLink, paymentId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-010" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-010</span>
+            <span class="ttl">Booking Confirmation</span><span class="pill off">offline</span></div>
+          <div class="pur">Confirm it worked, and give them what they need to prove it.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Cart &amp; Checkout</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Booking Confirmation</h2>
+                <small>Guest App &middot; wave 1 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>The selected booking confirmation</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; transferOrderTickets · getOrder · reprintOrder</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-041" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-041</span>
+            <span class="ttl">Checkout Entry</span><span class="pill off">offline</span></div>
+          <div class="pur">Take the money, and be unambiguous about whether it worked.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Cart &amp; Checkout</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Checkout Entry</h2>
+                <small>Guest App &middot; wave 1 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>The selected checkout entry</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getCart · checkoutCart · abandonCart · claimCart +4</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; cartId&larr;session, lineId&larr;navigation, productId&larr;navigation</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-042">GST-042</a>  &mdash; <i>Signs in, or proves the contact the tickets </i> <span class="car">cartId</span></div>
+          
+          
+        </div>
+      </div></div><div class="grp">04 — Membership, Loyalty &amp; Value · 3 screens</div><div class="stack">
+      <div id="gst-011" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-011</span>
+            <span class="ttl">Wallet Overview</span><span class="pill off">offline</span></div>
+          <div class="pur">The screen this app sits on. Everything else is entered from here and returns to it.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Membership, Loyalty &amp; Value</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Wallet Overview</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every wallet overview</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getWallet · listWalletTransactions</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;GST-001</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-020">GST-020</a>  &mdash; <i>Saved items carry across sessions</i></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-015" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-015</span>
+            <span class="ttl">Memberships</span><span class="pill off">offline</span></div>
+          <div class="pur">Find memberships for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Membership, Loyalty &amp; Value</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Memberships</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every memberships</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getMyMemberships · listDelegations · grantDelegation · listProducts +1</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; guestLinkId&larr;deepLink, subjectId&larr;GST-001</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-036" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-036</span>
+            <span class="ttl">Loyalty &amp; Rewards</span><span class="pill off">offline</span></div>
+          <div class="pur">Your points, your tier, and what is within reach.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Membership, Loyalty &amp; Value</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Loyalty &amp; Rewards</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every loyalty rewards</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getLoyaltyPosition · listLoyaltyProgrammes · evaluatePromotions · listPromotions</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div></div><div class="grp">05 — Account &amp; Self-Service · 14 screens</div><div class="stack">
+      <div id="gst-012" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-012</span>
+            <span class="ttl">My Tickets</span><span class="pill off">offline</span></div>
+          <div class="pur">Find my tickets for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Account &amp; Self-Service</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>My Tickets</h2>
+                <small>Guest App &middot; wave 1 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every tickets</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listMyEntitlements · getEntitlement · transferOrderTickets · getEntitlementCredential +2</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; entitlementId&larr;deepLink, orderId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-013">GST-013</a>  &mdash; <i>They open the one for now</i></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-013" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-013</span>
+            <span class="ttl">Ticket Details</span><span class="pill off">offline</span></div>
+          <div class="pur">Find ticket details for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Account &amp; Self-Service</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Ticket Details</h2>
+                <small>Guest App &middot; wave 1 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>The selected ticket</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getEntitlement · getEntitlementCredential · getEntitlementHistory · transferOrderTickets</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; entitlementId&larr;deepLink, orderId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-055">GST-055</a>  &mdash; <i>The QR rotates as they walk to the gate</i></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-018" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-018</span>
+            <span class="ttl">Add to Calendar / Reminders</span><span class="pill off">offline</span></div>
+          <div class="pur">Find add to calendar / reminders for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Account &amp; Self-Service</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Add to Calendar / Reminders</h2>
+                <small>Guest App &middot; wave 3 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every add calendar reminders</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getOrder · listOrders · issueWalletPass</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-019" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-019</span>
+            <span class="ttl">Order History</span><span class="pill off">offline</span></div>
+          <div class="pur">Find order history (wallet) for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Account &amp; Self-Service</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Order History</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every order history</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listOrders · getOrder · listMyOrders · transferOrderTickets</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-020" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-020</span>
+            <span class="ttl">Saved Items / Wishlist</span><span class="pill off">offline</span></div>
+          <div class="pur">Find the right one quickly, and act on it without opening it.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Account &amp; Self-Service</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Saved Items / Wishlist</h2>
+                <small>Guest App &middot; wave 3 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>The selected saved items wishlist</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getWishlist · addToWishlist · removeFromWishlist</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; itemId&larr;deepLink, subjectId&larr;GST-001</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmRemoveFromWishlist &middot; <i>Remove</i></div></div>
+        </div>
+      </div>
+      <div id="gst-039" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-039</span>
+            <span class="ttl">Profile</span><span class="pill off">offline</span></div>
+          <div class="pur">What we hold about a guest, and what they can change.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Account &amp; Self-Service</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Profile</h2>
+                <small>Guest App &middot; wave 1 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>purpose</b><div class="chip">purpose</div></div><div class="panel"><b>decision</b><div class="chip">decision</div></div><div class="panel"><b>channels</b><div class="chip">channels</div></div></div><div class="side"><div class="panel"><b>noticeVersion</b><div class="chip">noticeVersion</div></div><div class="panel"><b>source</b><div class="chip">source</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; recordConsent · updateMyProfile</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;GST-001</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-065">GST-065</a>  &mdash; <i>And their marketing preferences</i></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-042" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-042</span>
+            <span class="ttl">Simple Registration &amp; OTP</span><span class="pill off">offline</span></div>
+          <div class="pur">Work with simple registration &amp; otp for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Account &amp; Self-Service</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Simple Registration &amp; OTP</h2>
+                <small>Guest App &middot; wave 1 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every simple registration otp</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; requestGuestOtp · completeSsoAuthorization · enrolMfaMethod · getGuestSession +14</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; challengeId&larr;deepLink, methodId&larr;deepLink, providerId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-041">GST-041</a>  &mdash; <i>Signed in and verified — back to the cart</i> <span class="car">cartId</span></div>
+          
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmRemoveMfaMethod &middot; <i>Remove</i></div></div>
+        </div>
+      </div>
+      <div id="gst-045" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-045</span>
+            <span class="ttl">Ticket Delivery &amp; Sharing</span><span class="pill off">offline</span></div>
+          <div class="pur">Find ticket delivery &amp; sharing for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Account &amp; Self-Service</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Ticket Delivery &amp; Sharing</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><span class="kind">textField</span><div class="chip">Search</div><span class="why">Implied by the form template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; transferOrderTickets</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-055" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-055</span>
+            <span class="ttl">Dynamic QR Ticket</span><span class="pill off">offline</span></div>
+          <div class="pur">Find dynamic qr ticket for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Account &amp; Self-Service</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Dynamic QR Ticket</h2>
+                <small>Guest App &middot; wave 1 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><span class="kind">textField</span><div class="chip">Search</div><span class="why">Implied by the form template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; transferOrderTickets</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-066" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-066</span>
+            <span class="ttl">Privacy &amp; My Data</span><span class="pill off">offline</span></div>
+          <div class="pur">**A guest can legally demand their data and its erasure, and had nowhere to ask.** `exportSubjectData` and `deleteGuestAccount` existed as guest-calla</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Account &amp; Self-Service</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Privacy &amp; My Data</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>The selected privacy data</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; exportSubjectData · deleteGuestAccount · getGuestConsents · updateGuestPreferences +1</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-039">GST-039</a>  &mdash; <i>Profile</i> <span class="car">subjectId</span></div>
+          
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmDeleteGuestAccount &middot; <i>Delete</i></div></div>
+        </div>
+      </div>
+      <div id="gst-067" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-067</span>
+            <span class="ttl">Refunds &amp; Resale</span><span class="pill off">offline</span></div>
+          <div class="pur">**A guest could buy a ticket and not ask for their money back.** `createRefundRequest` and `createResaleListing` were back-office only, so every refun</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Account &amp; Self-Service</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Refunds &amp; Resale</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; createRefundRequest · createResaleListing · getWaiverStatus</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-039">GST-039</a>  &mdash; <i>Profile</i> <span class="car">subjectId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-069" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-069</span>
+            <span class="ttl">Face Pass</span><span class="pill off">offline</span></div>
+          <div class="pur">🔴 **Biometric enrolment had no guest-facing consent step.** `enrolFacePass` was callable by a guest and reachable from nowhere, which means enrolment </div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Account &amp; Self-Service</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Face Pass</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>The selected face pass</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; enrolFacePass · getFacePassEnrolment · revokeFacePass</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; enrolmentId&larr;deepLink, subjectId&larr;session</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-039">GST-039</a>  &mdash; <i>Profile</i> <span class="car">subjectId</span></div>
+          
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmRevokeFacePass &middot; <i>Revoke</i></div></div>
+        </div>
+      </div>
+      <div id="gst-071" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-071</span>
+            <span class="ttl">Payment Methods</span><span class="pill off">offline</span></div>
+          <div class="pur">**A stored card a guest cannot see is a stored card they cannot remove.** `listPaymentTokens` and `storePaymentToken` were guest-callable with no gues</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Account &amp; Self-Service</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Payment Methods</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every payment methods</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listPaymentTokens · storePaymentToken · transferWalletBalance · redeemLoyaltyPoints +1</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session, walletId&larr;deepLink, cardCode&larr;navigation</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-039">GST-039</a>  &mdash; <i>Profile</i> <span class="car">subjectId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-073" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-073</span>
+            <span class="ttl">Security &amp; Sign-in</span><span class="pill off">offline</span></div>
+          <div class="pur">**A guest could enrol a second factor and not manage it.** Small screen, and it is the one a guest reaches after losing a phone.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Account &amp; Self-Service</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Security &amp; Sign-in</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div><div class="panel"><b>Revoke guest device</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">**Always confirms, never the default focus.** The consequence goes in the body — *cancel 3 orders worth AED 480* is a confirmation, *are you sure* is not.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; createMfaChallenge · listGuestDevices · registerGuestDevice · revokeGuestDevice +1</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session, deviceId&larr;session</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-039">GST-039</a>  &mdash; <i>Profile</i> <span class="car">subjectId</span></div>
+          
+          
+        </div>
+      </div></div><div class="grp">06 — Ticketing · 4 screens</div><div class="stack">
+      <div id="gst-014" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-014</span>
+            <span class="ttl">Ticket Transfer</span><span class="pill off">offline</span></div>
+          <div class="pur">Work with ticket transfer for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Ticketing</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Ticket Transfer</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every ticket transfer</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; transferOrderTickets · claimTicketTransfer · listOrders</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink, transferId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-016" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-016</span>
+            <span class="ttl">My Reservations</span><span class="pill off">offline</span></div>
+          <div class="pur">Find my reservations for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Ticketing</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>My Reservations</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every reservations</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listReservations · getReservation · cancelReservation</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; reservationId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-017">GST-017</a>  &mdash; <i>On the day, they arrive</i></div>
+          
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmCancelReservation &middot; <i>Cancel</i></div></div>
+        </div>
+      </div>
+      <div id="gst-017" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-017</span>
+            <span class="ttl">Reservation Details</span><span class="pill off">offline</span></div>
+          <div class="pur">See reservation details for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Ticketing</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Reservation Details</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>The selected reservation</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getReservation · cancelReservation</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; reservationId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmCancelReservation &middot; <i>Cancel</i></div></div>
+        </div>
+      </div>
+      <div id="gst-044" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-044</span>
+            <span class="ttl">Multi-Currency &amp; Pricing</span><span class="pill off">offline</span></div>
+          <div class="pur">See prices in your own currency, in the app, before and during the visit.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Ticketing</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Multi-Currency &amp; Pricing</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every multi-currency pricing</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listFxRates · listProducts</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div></div><div class="grp">07 — In-venue Services · 10 screens</div><div class="stack">
+      <div id="gst-021" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-021</span>
+            <span class="ttl">Interactive Map</span><span class="pill off">offline</span><span class="pill">Seat Board 4.dc.html#seat-4b</span></div>
+          <div class="pur">See where things are in relation to each other.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>In-venue Services</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Interactive Map</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">One record, read-only.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listProducts · getWaitTimes · getVenueMap · getVenueMapGraph</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; mapId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-022">GST-022</a>  &mdash; <i>They compare waits across attractions</i></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-022" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-022</span>
+            <span class="ttl">Attraction Wait Times</span><span class="pill off">offline</span></div>
+          <div class="pur">See attraction wait times for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>In-venue Services</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Attraction Wait Times</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>The selected attraction wait times</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getWaitTimes</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Picks something shorter from the attractions</i><br><a href="#gst-023">GST-023</a>  &mdash; <i>They join a virtual queue rather than stand </i><br><a href="#gst-059">GST-059</a>  &mdash; <i>Plan My Day – In Progress</i> <span class="car">suggestionId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-023" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-023</span>
+            <span class="ttl">Virtual Queue</span><span class="pill off">offline</span></div>
+          <div class="pur">Find the right one quickly, and act on it without opening it.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>In-venue Services</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Virtual Queue</h2>
+                <small>Guest App &middot; wave 3 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>The selected virtual queue</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; joinQueue · getWaitingGuest · leaveQueue · getWaitTimes +1</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; entryId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-024">GST-024</a>  &mdash; <i>While waiting, they order food to where they</i></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-024" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-024</span>
+            <span class="ttl">F&amp;B – Browse &amp; Order</span><span class="pill off">offline</span></div>
+          <div class="pur">Order food to where the guest is sitting, or for collection.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>In-venue Services</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>F&amp;B – Browse &amp; Order</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every browse order</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listDiningOutlets · getGuestMenu · claimLocationSession · createGuestFnbOrder +4</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink, outletId&larr;deepLink, venueId&larr;session</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-009">GST-009</a>  &mdash; <i>Pays</i><br><a href="#gst-025">GST-025</a>  &mdash; <i>They watch the order progress</i></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-025" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-025</span>
+            <span class="ttl">F&amp;B – Order Tracking</span><span class="pill off">offline</span></div>
+          <div class="pur">Track an order to the point it reaches the guest.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>In-venue Services</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>F&amp;B – Order Tracking</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>The selected order tracking</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getGuestOrderStatus · getGuestBill · claimTableSession</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink, sessionId&larr;session</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-030">GST-030</a>  &mdash; <i>Their queue place comes up and they are told</i></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-027" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-027</span>
+            <span class="ttl">Parking – Reserve &amp; Pay</span><span class="pill off">offline</span></div>
+          <div class="pur">Take the money, and be unambiguous about whether it worked.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>In-venue Services</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Parking – Reserve &amp; Pay</h2>
+                <small>Guest App &middot; wave 3 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every parking reserve pay</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; createParkingEntitlement · updateParkingEntitlement · listParkingFacilities</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; entitlementId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-028">GST-028</a>  &mdash; <i>It is confirmed with a facility and a bay ty</i></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-028" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-028</span>
+            <span class="ttl">Parking – Reservation Confirmed</span><span class="pill off">offline</span></div>
+          <div class="pur">Confirm it worked, and give them what they need to prove it.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>In-venue Services</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Parking – Reservation Confirmed</h2>
+                <small>Guest App &middot; wave 3 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every parking reservation confirmed</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; createParkingEntitlement · listParkingFacilities</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-012">GST-012</a>  &mdash; <i>They open their tickets</i></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-029" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-029</span>
+            <span class="ttl">Venue Info &amp; Services</span><span class="pill off">offline</span></div>
+          <div class="pur">See venue info &amp; services for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>In-venue Services</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Venue Info &amp; Services</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every venue info services</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listDiningOutlets · listDeliveryLocations</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-038" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-038</span>
+            <span class="ttl">Digital Companion Mode</span><span class="pill off">offline</span></div>
+          <div class="pur">The in-venue home: your tickets, the map, and what is near you.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>In-venue Services</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Digital Companion Mode</h2>
+                <small>Guest App &middot; wave 3 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every digital companion mode</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getTenantAppStatus · getWaitTimes · listProducts</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-070" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-070</span>
+            <span class="ttl">Reserve a Table or Cabana</span><span class="pill off">offline</span></div>
+          <div class="pur">**Staff could book a table and a guest could not.** Seven guest-callable operations with no guest surface — reservations, cabanas, and both waitlists.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>In-venue Services</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Reserve a Table or Cabana</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>The selected reserve table cabana</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; createTableReservation · updateTableReservation · bookResource · getResourceAvailability +3</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; entryId&larr;deepLink, reservationId&larr;deepLink, resourceId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-039">GST-039</a>  &mdash; <i>Profile</i> <span class="car">subjectId</span></div>
+          
+          
+        </div>
+      </div></div><div class="grp">08 — Retail · 1 screens</div><div class="stack">
+      <div id="gst-026" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-026</span>
+            <span class="ttl">Retail / Merchandise</span><span class="pill off">offline</span></div>
+          <div class="pur">Find retail / merchandise for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Retail</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Retail / Merchandise</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every retail merchandise</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getGameCard · listMerchandise · lookupMerchandise · reserveMerchandise</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; cardCode&larr;deepLink, outletId&larr;session</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div></div><div class="grp">09 — Engagement &amp; Support · 12 screens</div><div class="stack">
+      <div id="gst-030" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-030</span>
+            <span class="ttl">In-Venue Notifications</span><span class="pill off">offline</span></div>
+          <div class="pur">Work with in-venue notifications for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Engagement &amp; Support</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>In-Venue Notifications</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><span class="kind">textField</span><div class="chip">Search</div><span class="why">Implied by the form template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; claimLocationSession</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
+          
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-031">GST-031</a>  &mdash; <i>AI Concierge – Home</i> <span class="car">conversationId · outletId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-031" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-031</span>
+            <span class="ttl">AI Concierge – Home</span><span class="pill off">offline</span></div>
+          <div class="pur">The screen this app sits on. Everything else is entered from here and returns to it.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Engagement &amp; Support</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>AI Concierge – Home</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>The selected concierge home</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getGuestMenu · sendAiMessage · createAiConversation · handoverToAgent +1</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; conversationId&larr;deepLink, outletId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-032">GST-032</a>  &mdash; <i>AI Concierge – Chat</i> <span class="car">cartId · conversationId · orderId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-032" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-032</span>
+            <span class="ttl">AI Concierge – Chat</span><span class="pill off">offline</span></div>
+          <div class="pur">Add ai concierge – chat for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Engagement &amp; Support</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>AI Concierge – Chat</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>The selected concierge chat</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; createGuestFnbOrder · getGuestOrderStatus · getCart · addCartLine +4</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; cartId&larr;session, conversationId&larr;deepLink, orderId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-033">GST-033</a>  &mdash; <i>AI Concierge – Contextual Help</i> <span class="car">conversationId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-033" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-033</span>
+            <span class="ttl">AI Concierge – Contextual Help</span><span class="pill off">offline</span></div>
+          <div class="pur">Answer a question without needing a person.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Engagement &amp; Support</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>AI Concierge – Contextual Help</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><span class="kind">textField</span><div class="chip">Search</div><span class="why">Implied by the form template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; sendAiMessage</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; conversationId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-035" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-035</span>
+            <span class="ttl">Feedback &amp; Ratings</span><span class="pill off">offline</span></div>
+          <div class="pur">Work with feedback &amp; ratings for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Engagement &amp; Support</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Feedback &amp; Ratings</h2>
+                <small>Guest App &middot; wave 3 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>id</b><div class="chip">id</div></div><div class="panel"><b>subjectId</b><div class="chip">subjectId</div></div><div class="panel"><b>venueId</b><div class="chip">venueId</div></div></div><div class="side"><div class="panel"><b>relatedOrderId</b><div class="chip">relatedOrderId</div></div><div class="panel"><b>rating</b><div class="chip">rating</div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; submitReview · raiseMyCase</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
+          
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-040" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-040</span>
+            <span class="ttl">Help &amp; Support</span><span class="pill off">offline</span></div>
+          <div class="pur">Answer a question without needing a person.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Engagement &amp; Support</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Help &amp; Support</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every help support</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div><div class="panel"><span class="kind">chart</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">Implied by the dashboard template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listFaqs · listContentPages · listMyCases · raiseMyCase +1</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; caseId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-051" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-051</span>
+            <span class="ttl">Plan Your Adventure – Start</span><span class="pill off">offline</span></div>
+          <div class="pur">Start a plan for the visit — which attractions, in what order — before arriving.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Engagement &amp; Support</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Plan Your Adventure – Start</h2>
+                <small>Guest App &middot; wave 3 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every plan your adventure</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getWaitTimes · listProducts</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-052">GST-052</a>  &mdash; <i>Suggested itineraries are offered</i></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-052" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-052</span>
+            <span class="ttl">Suggested Itineraries</span><span class="pill off">offline</span></div>
+          <div class="pur">Curated plans a guest can take rather than build.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Engagement &amp; Support</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Suggested Itineraries</h2>
+                <small>Guest App &middot; wave 3 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every suggested itineraries</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listProducts · listCatalogueBundles · requestSuggestion</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; suggestionId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-053">GST-053</a>  &mdash; <i>They build their own instead</i></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-053" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-053</span>
+            <span class="ttl">Build Your Own Itinerary</span><span class="pill off">offline</span></div>
+          <div class="pur">Choose the attractions and the order yourself.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Engagement &amp; Support</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Build Your Own Itinerary</h2>
+                <small>Guest App &middot; wave 3 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every build your own</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; addCartLine · getCart · listProducts · getWaitTimes</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; cartId&larr;session</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-054">GST-054</a>  &mdash; <i>An optimised order is proposed</i></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-054" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-054</span>
+            <span class="ttl">AI Optimized Itinerary</span><span class="pill off">offline</span></div>
+          <div class="pur">Let the assistant order the day around waits and opening times.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Engagement &amp; Support</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>AI Optimized Itinerary</h2>
+                <small>Guest App &middot; wave 3 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every optimized itinerary</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getWaitTimes · listProducts · sendAiMessage · requestSuggestion</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; conversationId&larr;deepLink, suggestionId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-059">GST-059</a>  &mdash; <i>They follow it through the day</i></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-059" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-059</span>
+            <span class="ttl">Plan My Day – In Progress</span><span class="pill off">offline</span></div>
+          <div class="pur">The plan while you are in the venue, against live waits.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Engagement &amp; Support</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Plan My Day – In Progress</h2>
+                <small>Guest App &middot; wave 3 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every plan day progress</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getWaitTimes · listProducts · requestSuggestion</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; suggestionId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-068" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-068</span>
+            <span class="ttl">Help &amp; My Cases</span><span class="pill off">offline</span></div>
+          <div class="pur">**A guest could not raise a complaint.** Twelve case operations existed and every one of them was staff-side — a guest with a problem had to find some</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Engagement &amp; Support</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Help &amp; My Cases</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every help cases</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; createCase · listCases · listAiConversations</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-039">GST-039</a>  &mdash; <i>Profile</i> <span class="car">subjectId</span></div>
+          
+          
+        </div>
+      </div></div><div class="grp">10 — Support · 1 screens</div><div class="stack">
+      <div id="gst-034" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-034</span>
+            <span class="ttl">Lost &amp; Found</span><span class="pill off">offline</span></div>
+          <div class="pur">See lost &amp; found for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Support</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Lost &amp; Found</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every lost found</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listMyCases · raiseMyCase · replyToMyCase</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink, caseId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div></div><div class="grp">11 — Promotions · 1 screens</div><div class="stack">
+      <div id="gst-037" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-037</span>
+            <span class="ttl">Offers &amp; Promotions</span><span class="pill off">offline</span></div>
+          <div class="pur">Find offers &amp; promotions for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Promotions</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Offers &amp; Promotions</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Every offers promotions</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listPromotions · getPromotion · evaluatePromotions · getCouponCode</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; promotionId&larr;deepLink, code&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span><br><a href="#gst-011">GST-011</a>  &mdash; <i>Their wallet shows stored value</i></div>
+          
+          
+        </div>
+      </div></div><div class="grp">12 — System States · 2 screens</div><div class="stack">
+      <div id="gst-043" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-043</span>
+            <span class="ttl">Arabic / RTL Experience</span><span class="pill off">offline</span></div>
+          <div class="pur">Arabic / RTL Experience — the screen a person opens when they need to deal with arabic / rtl experience.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>System States</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Arabic / RTL Experience</h2>
+                <small>Guest App &middot; wave 1 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-047" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-047</span>
+            <span class="ttl">Maintenance / Upgrade Page</span><span class="pill off">offline</span></div>
+          <div class="pur">Say what is wrong in a way that tells the person whether to wait or leave.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>System States</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Maintenance / Upgrade Page</h2>
+                <small>Guest App &middot; wave 1 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>The selected maintenance upgrade</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getTenantAppStatus</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div></div><div class="grp">13 — High-Demand Access · 1 screens</div><div class="stack">
+      <div id="gst-046" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-046</span>
+            <span class="ttl">Branded Queue / Waiting Room</span><span class="pill off">offline</span></div>
+          <div class="pur">Find branded queue / waiting room for this venue.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>High-Demand Access</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Branded Queue / Waiting Room</h2>
+                <small>Guest App &middot; wave 1 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>The selected branded queue waiting</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the detail template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getWaitTimes · getWaitingGuest · joinQueue</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; entryId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-002">GST-002</a> <br><a href="#gst-003">GST-003</a>  &mdash; <i>Event &amp; Attraction Listing</i> <span class="car">eventId</span></div>
+          
+          
+        </div>
+      </div></div><div class="grp">14 — In-Venue Experience · 2 screens</div><div class="stack">
+      <div id="gst-061" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-061</span>
+            <span class="ttl">Menu Item Detail</span><span class="pill off">offline</span></div>
+          <div class="pur">Decide on a dish, choose modifiers, check allergens.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>In-Venue Experience</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Menu Item Detail</h2>
+                <small>Guest App &middot; wave 2 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Modifiers</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Constraints come from the group — minimum, maximum, required</span></div><div class="panel"><span class="kind">banner</span><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Allergens. Always present; not a field a tenant may omit (4.8.9)</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; getGuestMenu · listModifierGroups</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; outletId&larr;deepLink</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-062">GST-062</a> </div>
+          
+          
+        </div>
+      </div>
+      <div id="gst-062" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-062</span>
+            <span class="ttl">Shop &amp; Drop Collection</span><span class="pill off">offline</span></div>
+          <div class="pur">Collect shopping left earlier, using the ticket rather than a receipt.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>In-Venue Experience</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Shop &amp; Drop Collection</h2>
+                <small>Guest App &middot; wave 3 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">banner</span><div class="strip" style="height:auto;padding:6px 10px;border:0">notice</div><span class="why">Collect-by time. Usually venue close</span></div><div class="panel"><span class="kind">textField</span><div class="chip">Search</div><span class="why">Implied by the form template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; lookupShopAndDrop</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
+          
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span><br><a href="#gst-061">GST-061</a>  &mdash; <i>Menu Item Detail</i> <span class="car">outletId</span></div>
+          
+          
+        </div>
+      </div></div><div class="grp">15 — Discovery · 1 screens</div><div class="stack">
+      <div id="gst-063" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-063</span>
+            <span class="ttl">Search</span><span class="pill off">offline</span></div>
+          <div class="pur">Find something when you do not know what it is called.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Discovery</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Search</h2>
+                <small>Guest App &middot; wave 1 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Search</b><div class="chip">Search</div><span class="why">A search that returns nothing must say so differently from a search not yet run.</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; searchCatalogue</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span></div>
+          
+          
+        </div>
+      </div></div><div class="grp">16 — Marketing · 1 screens</div><div class="stack">
+      <div id="gst-065" class="scr">
+        <div>
+          <div class="hdr"><span class="code">GST-065</span>
+            <span class="ttl">Newsletter &amp; Preferences</span><span class="pill off">offline</span></div>
+          <div class="pur">What we may send you, and how.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>Guest</b><span>Marketing</span></div><nav class="nav"><i class="">What&#x27;s on</i><i class="on">My tickets</i><i class="">Food &amp; drink</i><i class="">Map</i><i class="">Help</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Newsletter &amp; Preferences</h2>
+                <small>Guest App &middot; wave 3 &middot; comfortable</small></div>
+              <div class="acts"><div class="chip">Sign in</div><div class="chip cta">Basket</div></div>
+            </div>
+            <div class="strip">offline &middot; You&#x27;re offline. Connect to the internet to book, pay, order or join a queue.</div>
+            <div class="canvas">
+              
+              <div class="two"><div class="grow"><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; recordConsent · listConsentPurposes · getMarketingSubscription · setMarketingSubscription</div>
+          <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
+          <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session</div>
+          <div><b>GOES TO</b> &middot; <a href="#gst-001">GST-001</a>  &mdash; <i>Home – Default</i> <span class="car">subjectId</span></div>
+          
+          
+        </div>
+      </div></div>
+  <div class="bottom">
+    <span>Generated by tools/derive-wireframes.py from screens/P02-guest-mobile-app.yaml — do not hand-edit</span>
+    <span>P02 · 71 screens · 16 groups</span>
+  </div>
+</div></body></html>

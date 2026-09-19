@@ -84,8 +84,8 @@
 | `SUP-006` | Knowledge Base Search | Knowledge & Responses | 3 | 2 | yes |
 | `SUP-007` | Canned Response Management | Knowledge & Responses | 3 | 2 | yes |
 | `SUP-008` | Agent Performance & SLA View | Overview | 3 | 10 | yes |
-| `SUP-009` | Customer Service Command Center | Support | 3 | 1 | yes |
-| `SUP-010` | Customer 360° Service Profile | Support | 3 | 1 | yes |
+| `SUP-009` | Customer Service Command Center | Support | 3 | 2 | yes |
+| `SUP-010` | Customer 360° Service Profile | Support | 3 | 2 | yes |
 | `SUP-011` | Unified Interaction & Communication History | Support | 3 | 1 | yes |
 | `SUP-012` | Case Creation, Classification & Intelligent Routing | Support | 3 | 1 | yes |
 | `SUP-013` | Case Investigation & Resolution Workspace | Support | 3 | 1 | yes |

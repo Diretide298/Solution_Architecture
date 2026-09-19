@@ -1,0 +1,148 @@
+id: F248
+name: 'Marketing CRM Configuration Reference v1.0 board 5: Journey Automation Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Marketing CRM Configuration Reference v1.0 board 5. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-774
+  entryPoints:
+  - Arrives at Journey Automation Center
+steps:
+- step: 1
+  screen: BO-774
+  action: Opens Journey Automation Center
+  operations: []
+  outcome: Monitor the health and value of automated customer journeys. Show active journeys, enrolled
+    guests, conversions, recovered revenue, exits, errors and upcoming actions. Compare journey performance
+    by objective, lifecycle, brand, venue, audie
+- step: 2
+  screen: BO-775
+  action: Works in Visual Journey Builder
+  operations: []
+  outcome: Create multi-step journeys through a visual no-code canvas. Provide trigger, audience, decision,
+    wait, message, offer, case, task, webhook and goal nodes. Support branches, merges, reusable subflows,
+    annotations, zoom, validation and realis
+- step: 3
+  screen: BO-774
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-776
+  action: Works in Trigger Event Catalog
+  operations: []
+  outcome: Govern the events that can start, update or stop a journey. Configure purchase, cart abandonment,
+    first visit, membership expiry, loyalty milestone, wallet top-up, birthday, reservation and case events.
+    Configuration Scope of Work | Version
+- step: 5
+  screen: BO-774
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-777
+  action: Works in Decision Logic & Timing
+  operations: []
+  outcome: Control journey branching, timing and re-entry. Build nested AND/OR conditions using guest,
+    event, segment, transaction, product, channel and engagement data. Configure waits, dates, timezones,
+    send windows, blackout periods, frequency limi
+- step: 7
+  screen: BO-774
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-778
+  action: Works in Abandoned Cart Recovery
+  operations: []
+  outcome: Configure automated recovery of incomplete ticketing and commerce transactions. Define abandonment
+    event, cart-value threshold, product/inventory checks, eligibility and recovery window. Configure
+    staged reminders across email, SMS, WhatsAp
+- step: 9
+  screen: BO-774
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-779
+  action: Works in Lifecycle Journeys
+  operations: []
+  outcome: Manage reusable membership, loyalty and wallet lifecycle automations. Provide onboarding, benefit-awareness,
+    renewal, expiry, lapse, freeze and upgrade membership journeys. Provide loyalty enrollment, tier movement,
+    milestone, reward availa
+- step: 11
+  screen: BO-774
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-780
+  action: Works in Guest Engagement Journeys
+  operations: []
+  outcome: Configure recurring guest relationship journeys. Support birthdays, anniversaries, welcome/onboarding,
+    first-visit follow-up, inactivity and re- engagement. Personalize by profile, language, interests,
+    visit history, loyalty, membership and
+- step: 13
+  screen: BO-774
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-781
+  action: Works in Cross-Sell & Service Recovery
+  operations: []
+  outcome: Coordinate revenue-growth and recovery actions after guest events. Recommend and automate eligible
+    cross-sell or upsell offers after purchase, booking or visit. Trigger reservation follow-up, survey
+    request, complaint recovery and post-case
+- step: 15
+  screen: BO-774
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-782
+  action: Works in AI Journey Optimization
+  operations: []
+  outcome: Use explainable AI to improve paths, content, offers and timing. Recommend branch order, wait
+    duration, channel, message, offer and send time with expected uplift. Display supporting evidence,
+    confidence, affected audience, risks and policy
+- step: 17
+  screen: BO-774
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-783
+  action: Works in Journey Analytics & Audit
+  operations: []
+  outcome: Measure journey behavior at node and end-goal level. Show triggered, eligible, enrolled, reached,
+    clicked, converted, exited and failed stages. Analyze node drop-off, branch performance, time-to-conversion,
+    revenue, attribution and cost. Pr
+branches:
+- at: 1
+  condition: Nothing has been set up on Journey Automation Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Marketing CRM Configuration Reference v1.0 board 5 visited
+primaryContract: unknown
+contracts:
+- unknown

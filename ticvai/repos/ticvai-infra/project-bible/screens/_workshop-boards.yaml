@@ -107,3 +107,91 @@ boards:
   WS105: Subscription Licensing AI Self Service board 8
   WS106: Subscription Licensing AI Self Service board 9
   WS107: Subscription Licensing AI Self Service board 10
+  WS108: ACCREDITATION board 1
+  WS109: ACCREDITATION board 2
+  WS110: ACCREDITATION board 3
+  WS111: ACCREDITATION board 4
+  WS112: ACCREDITATION board 5
+  WS113: ACCREDITATION board 6
+  WS114: ACCREDITATION board 7
+  WS115: ACCREDITATION board 8
+  WS116: AI Configuration Assistant board 1
+  WS117: AI Configuration Assistant board 2
+  WS118: AI Configuration Assistant board 3
+  WS119: AI Forecasting and Predictive Intelligence board 1
+  WS120: AI Forecasting and Predictive Intelligence board 2
+  WS121: AI Governance board 1
+  WS122: AI Governance board 2
+  WS123: AI Governance board 3
+  WS124: AI Governance board 4
+  WS125: Event Management Configuration Backend Structure v1.0 board 1
+  WS126: Event Management Configuration Backend Structure v1.0 board 2
+  WS127: Event Management Configuration Backend Structure v1.0 board 3
+  WS128: Event Management Configuration Backend Structure v1.0 board 4
+  WS129: Event Management Configuration Backend Structure v1.0 board 5
+  WS130: Event Management Configuration Backend Structure v1.0 board 6
+  WS131: Event Management Configuration Backend Structure v1.0 board 7
+  WS132: Event Management Configuration Backend Structure v1.0 board 8
+  WS133: Event Management Configuration Backend Structure v1.0 board 9
+  WS134: F&B Backend Structure Module Sample Reference v1.0 board 1
+  WS135: Marketing CRM Configuration Reference v1.0 board 1
+  WS136: Marketing CRM Configuration Reference v1.0 board 2
+  WS137: Marketing CRM Configuration Reference v1.0 board 3
+  WS138: Marketing CRM Configuration Reference v1.0 board 4
+  WS139: Marketing CRM Configuration Reference v1.0 board 5
+  WS140: Marketing CRM Configuration Reference v1.0 board 6
+  WS141: Marketing CRM Configuration Reference v1.0 board 7
+  WS142: Marketing CRM Configuration Reference v1.0 board 8
+  WS143: Marketing CRM Configuration Reference v1.0 board 9
+  WS144: Marketing CRM Configuration Reference v1.0 board 10
+  WS145: Marketing CRM Configuration Reference v1.0 board 11
+  WS146: Marketing CRM Configuration Reference v1.0 board 12
+  WS147: Payment Payment Orchestration board 1
+  WS148: Payment Payment Orchestration board 2
+  WS149: Payment Payment Orchestration board 3
+  WS150: Payment Payment Orchestration board 4
+  WS151: Payment Payment Orchestration board 5
+  WS152: Payment Payment Orchestration board 6
+  WS153: Payment Payment Orchestration board 7
+  WS154: Payment Payment Orchestration board 8
+  WS155: Resource Management Configuration board 1
+  WS156: Resource Management Configuration board 2
+  WS157: Resource Management Configuration board 3
+  WS158: Resource Management Configuration board 4
+  WS159: Resource Management Configuration board 5
+  WS160: Resource Management Configuration board 6
+  WS161: Resource Management Configuration board 7
+  WS162: Resource Management Configuration board 8
+  WS163: Resource Management Configuration board 9
+  WS164: Resource Management Configuration board 10
+  WS165: Seat Management Venue Mapping Reference v1.0 board 1
+  WS166: Seat Management Venue Mapping Reference v1.0 board 2
+  WS167: Seat Management Venue Mapping Reference v1.0 board 3
+  WS168: Seat Management Venue Mapping Reference v1.0 board 4
+  WS169: Seat Management Venue Mapping Reference v1.0 board 5
+  WS170: Seat Management Venue Mapping Reference v1.0 board 6
+  WS171: Seat Management Venue Mapping Reference v1.0 board 7
+  WS172: Seat Management Venue Mapping Reference v1.0 board 8
+  WS173: Seat Management Venue Mapping Reference v1.0 board 9
+  WS174: Seat Management Venue Mapping Reference v1.0 board 10
+  WS175: Seat Management Venue Mapping Reference v1.0 board 11
+  WS176: Seat Management Venue Mapping Reference v1.0 board 12
+  WS177: Seat Management Venue Mapping Reference v1.0 board 13
+  WS178: TICVAI Finance Backend Structure Reference v1.0 board 1
+  WS179: TICVAI Finance Backend Structure Reference v1.0 board 2
+  WS180: Upsell,CrossSellEngine board 1
+  WS181: Upsell,CrossSellEngine board 2
+  WS182: Upsell,CrossSellEngine board 3
+  WS183: Upsell,CrossSellEngine board 4
+  WS184: Upsell,CrossSellEngine board 5
+  WS185: Upsell,CrossSellEngine board 6
+  WS186: Wallet Configuration Backend Structure v1.0 board 1
+  WS187: Wallet Configuration Backend Structure v1.0 board 2
+  WS188: Wallet Configuration Backend Structure v1.0 board 3
+  WS189: Wallet Configuration Backend Structure v1.0 board 4
+  WS190: Wallet Configuration Backend Structure v1.0 board 5
+  WS191: Wallet Configuration Backend Structure v1.0 board 6
+  WS192: Wallet Configuration Backend Structure v1.0 board 7
+  WS193: Wallet Configuration Backend Structure v1.0 board 8
+  WS194: Wallet Configuration Backend Structure v1.0 board 9
+  WS195: Wallet Configuration Backend Structure v1.0 board 10

@@ -171,7 +171,7 @@ CREATE TABLE IF NOT EXISTS maintenance.work_order (
 -- Photo, video, document, note or signature against a work order. Evidence, not decoration —
 -- captured offline and queued Hangs off: a child of maintenance.work_order; reaches
 -- maintenance.asset through its keys; references assets.media_asset, identity.principal,
--- maintenance.work_order. Reached by: 0 operations read it and 1 write it
+-- maintenance.work_order. Reached by: 0 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS maintenance.work_order_attachment (
     id                                uuid PRIMARY KEY NOT NULL,
     work_order_id                     text NOT NULL,

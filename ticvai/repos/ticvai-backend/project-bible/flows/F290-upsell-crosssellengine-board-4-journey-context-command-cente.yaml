@@ -1,0 +1,134 @@
+id: F290
+name: 'Upsell,CrossSellEngine board 4: Journey & Context Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Upsell,CrossSellEngine board 4. **This route is read from
+    the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-669
+  entryPoints:
+  - Arrives at Journey & Context Command Center
+steps:
+- step: 1
+  screen: ADM-669
+  action: Opens Journey & Context Command Center
+  operations: []
+  outcome: Provide centralized visibility into recommendation activity across the complete customer journey.
+- step: 2
+  screen: ADM-670
+  action: Works in Customer Journey Map & Touchpoint Designer
+  operations: []
+  outcome: Allow TICVAI administrators to visually configure the customer journey and recommendation-enabled
+    touchpoints.
+- step: 3
+  screen: ADM-669
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-671
+  action: Works in Real-Time Context Rule Engine
+  operations: []
+  outcome: Determine recommendation behavior using the customer's current transactional and operational
+    context.
+- step: 5
+  screen: ADM-669
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-672
+  action: Works in Pre-Purchase & Booking Journey Recommendation Manager
+  operations: []
+  outcome: Manage recommendation behavior before transaction completion.
+- step: 7
+  screen: ADM-669
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-673
+  action: Works in Post-Purchase & Pre-Visit Recommendation Manager
+  operations: []
+  outcome: Continue the commercial journey after payment while respecting the guest's existing purchase
+    and visit plan.
+- step: 9
+  screen: ADM-669
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-674
+  action: Works in In-Venue & Location-Aware Recommendation Engine
+  operations: []
+  outcome: Support context-aware recommendations while the guest is physically visiting the venue. This
+    directly addresses the matrix's requirement for location-aware in-venue upsell/cross-sell.
+- step: 11
+  screen: ADM-669
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-675
+  action: Works in Visit State, Itinerary & Time-Aware Recommendation
+  operations: []
+  outcome: Make recommendations aware of what the customer has already done and what remains possible
+    during the visit.
+- step: 13
+  screen: ADM-669
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-676
+  action: Works in Omnichannel Recommendation Synchronization
+  operations: []
+  outcome: Coordinate recommendations across channels so customers receive a consistent experience.
+- step: 15
+  screen: ADM-669
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-677
+  action: Works in Contextual Trigger, Frequency & Experience Controls
+  operations: []
+  outcome: Control exactly when a recommendation is triggered and prevent excessive customer interaction.
+- step: 17
+  screen: ADM-669
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-678
+  action: Works in Journey Simulator, Decision Trace & AI Optimization
+  operations: []
+  outcome: Allow administrators to simulate an entire customer journey and see how recommendations change
+    over time.
+branches:
+- at: 1
+  condition: Nothing has been set up on Journey & Context Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Upsell,CrossSellEngine board 4 visited
+primaryContract: unknown
+contracts:
+- unknown

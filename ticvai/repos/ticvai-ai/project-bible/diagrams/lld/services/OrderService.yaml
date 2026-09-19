@@ -1921,6 +1921,7 @@ screens:
 - P08:BO-097 Check Out & Check In
 - P08:BO-100 Venue Home
 - P08:BO-101 Orders & Money
+- P08:BO-1146 Refund-to-Wallet Policy Configuration
 - P08:BO-130 Offline Policy & Rules Configuration
 - P08:BO-132 Offline Transaction Monitor & Sync Queue
 - P08:BO-133 Offline Alerts, Limits & Audit
@@ -1974,6 +1975,8 @@ screens:
 - P08:BO-331 Payment Reconciliation & Exception Management
 - P08:BO-332 Financial Traceability, Control & Audit Explorer
 - P08:BO-333 Order Financial Analytics & AI Reconciliation Intelligence
+- P08:BO-778 Abandoned Cart Recovery
+- P09:ADM-199 Eligibility Rule Builder
 - P09:ADM-278 Resale Marketplace Command Center
 - P09:ADM-279 Resale Eligibility Rule Configuration
 - P09:ADM-280 Resale Policy & Marketplace Settings
@@ -2014,6 +2017,7 @@ screens:
 - P09:ADM-315 Bulk, Group & Assisted Upgrade Operations
 - P09:ADM-316 Upgrade Execution, Credential Regeneration & Channel Controls
 - P09:ADM-317 Upgrade History, Exception Management & Audit Explorer
+- P09:ADM-611 Refund Policy & Rule Configuration\t118
 - P10:PTR-001 Partner Login / MFA
 - P10:PTR-002 Partner Dashboard
 - P10:PTR-005 Inventory & Allocation View

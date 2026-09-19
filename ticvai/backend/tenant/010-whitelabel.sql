@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS whitelabel.content_page (
 -- existed anywhere in 1,010 — and ADM-017 Domain & Certificate Management declared 41 operations,
 -- none of them about a domain. Verification before issuance, always. Hangs off: reaches
 -- whitelabel.tenant_config through its keys; references platform.tenant. Reached by: 4 operations
--- read it and 3 write it
+-- read it and 3 write it.
 CREATE TABLE IF NOT EXISTS whitelabel.custom_domain (
     id                                uuid PRIMARY KEY NOT NULL,
     tenant_id                         uuid NOT NULL,

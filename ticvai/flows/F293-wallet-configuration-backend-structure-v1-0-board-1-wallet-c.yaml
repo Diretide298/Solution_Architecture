@@ -1,0 +1,131 @@
+id: F293
+name: 'Wallet Configuration Backend Structure v1.0 board 1: Wallet Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Wallet Configuration Backend Structure v1.0 board 1. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-1083
+  entryPoints:
+  - Arrives at Wallet Command Center
+steps:
+- step: 1
+  screen: BO-1083
+  action: Opens Wallet Command Center
+  operations: []
+  outcome: Provide administrators with the central operational and configuration overview of all wallet
+    products across the TICVAI platform.
+- step: 2
+  screen: BO-1084
+  action: Works in Wallet Type Library
+  operations: []
+  outcome: Create and maintain reusable wallet types used throughout TICVAI.
+- step: 3
+  screen: BO-1083
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-1085
+  action: Works in Wallet Creation & Provisioning Rules
+  operations: []
+  outcome: Define how and when TICVAI automatically or manually creates a wallet.
+- step: 5
+  screen: BO-1083
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-1086
+  action: Works in Wallet Ownership & Account Association
+  operations: []
+  outcome: Configure which customer, family or organization owns and controls a wallet.
+- step: 7
+  screen: BO-1083
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-1087
+  action: Works in Wallet Currency & Monetary Configuration
+  operations: []
+  outcome: Define currencies and monetary rules applicable to wallet balances.
+- step: 9
+  screen: BO-1083
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-1088
+  action: Works in Credit & Balance Type Configuration
+  operations: []
+  outcome: Configure all value types that may be stored inside a TICVAI wallet. The attached requirements
+    explicitly call for multiple wallet credit types including Cash Credit, Bonus Credit, Redemption Tickets
+    Credit and Rides Credit.
+- step: 11
+  screen: BO-1083
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-1089
+  action: Works in Wallet Feature Profile
+  operations: []
+  outcome: Control which capabilities are available for each wallet type.
+- step: 13
+  screen: BO-1083
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-1090
+  action: Works in Wallet Lifecycle Configuration
+  operations: []
+  outcome: Govern the complete wallet lifecycle from creation through closure.
+- step: 15
+  screen: BO-1083
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-1091
+  action: Works in Wallet Numbering, Identity & Digital Credentials
+  operations: []
+  outcome: Configure how wallets are uniquely identified across TICVAI.
+- step: 17
+  screen: BO-1083
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-1092
+  action: Works in Wallet Configuration Preview, Validation & Publication
+  operations: []
+  outcome: Provide a governed final validation step before wallet configuration becomes operational.
+branches:
+- at: 1
+  condition: Nothing has been set up on Wallet Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Wallet Configuration Backend Structure v1.0 board 1 visited
+primaryContract: unknown
+contracts:
+- unknown

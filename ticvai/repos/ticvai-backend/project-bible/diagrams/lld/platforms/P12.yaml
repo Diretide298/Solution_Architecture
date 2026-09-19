@@ -27,7 +27,7 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: MarketingService
-  operationCalls: 53
+  operationCalls: 55
 - service: ReportingService
   operationCalls: 8
 - service: IdentityService
@@ -304,6 +304,7 @@ screens:
   density: compact
   operations:
   - listCustomerService
+  - listCustomerServiceProfile
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -334,6 +335,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listCustomerService
   - listCustomerServiceProfile
   states:
   - emptyFirstRun

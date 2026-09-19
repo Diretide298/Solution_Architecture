@@ -1,3 +1,4 @@
+
 platform:
   code: P10
   audience: partner
@@ -49,9 +50,9 @@ platform:
     - P17
     note: '**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake,
       the developer portal and the sign-up are outward faces of the control plane, not separate products
-      — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added
-      11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is
-      the only thing that can serve them.'
+      — but their users are not TICVAI staff, and the permission model has to hold that line. **P17
+      added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control
+      plane is the only thing that can serve them.'
     decided: 10 September 2026
 screens:
 - id: PTR-001
@@ -108,8 +109,8 @@ screens:
   gaps:
   - operation: getCurrentSession
     why: '**4 declared operations reach no component on this screen**: getCurrentSession, listMfaMethods,
-      listSsoProviders, listPartnerAgreements. Either the screen is missing what calls them, or the declaration
-      is residue.'
+      listSsoProviders, listPartnerAgreements. Either the screen is missing what calls them, or the
+      declaration is residue.'
     source: the screen's own declarations
   layout:
     template: split
@@ -184,14 +185,15 @@ screens:
   - id: confirmForceLogout
     component: confirmDialog
     trigger: Force
-    body: '**Names what `forceLogout` changes and what it leaves alone**, in the consequence rather than
-      the verb. A partner login mfa this affects should be identified in the dialog, not just counted.'
+    body: '**Names what `forceLogout` changes and what it leaves alone**, in the consequence rather
+      than the verb. A partner login mfa this affects should be identified in the dialog, not just counted.'
     provenance: contract identity.yaml POST /auth/sessions/{sessionId}/force-logout
   - id: confirmOverrideCreditLimit
     component: confirmDialog
     trigger: Override
-    body: '**Names what `overrideCreditLimit` changes and what it leaves alone**, in the consequence rather
-      than the verb. A partner login mfa this affects should be identified in the dialog, not just counted.'
+    body: '**Names what `overrideCreditLimit` changes and what it leaves alone**, in the consequence
+      rather than the verb. A partner login mfa this affects should be identified in the dialog, not
+      just counted.'
     provenance: contract orders.yaml POST /b2b-accounts/{accountId}/credit/override
   - id: confirmRevokeAllSessions
     component: confirmDialog
@@ -202,12 +204,12 @@ screens:
   states:
     loading: The partner login mfa list.
     error: Could not load. Names which read failed and leaves the partner login mfa untouched.
-    emptyFirstRun: No partner login mfa yet. Carries the create action; distinct from a filter that matched
-      nothing.
+    emptyFirstRun: No partner login mfa yet. Carries the create action; distinct from a filter that
+      matched nothing.
     emptyNoResults: The filter narrowed it and the partner login mfa are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: login
     contract: identity
@@ -265,9 +267,9 @@ screens:
     params:
     - name: accountId
       from: deepLink
-    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
-      forwarded link between partners must not open another partner''s record. If the target is gone the
-      screen says so and offers the partner''s own list. Arrives with `accountId`.'
+    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.**
+      A forwarded link between partners must not open another partner''s record. If the target is gone
+      the screen says so and offers the partner''s own list. Arrives with `accountId`.'
     preloaded:
     - CreditPosition.id
     - CreditPosition.accountId
@@ -312,14 +314,14 @@ screens:
       carries:
       - accountId
       - sessionId
-      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it
-        must carry them
+      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into
+        it must carry them
     - to: PTR-003
       trigger: Profile & Company Details
       carries:
       - principalId
-      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must carry
-        them
+      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must
+        carry them
     - to: PTR-004
       trigger: Notifications
       carries:
@@ -332,8 +334,8 @@ screens:
     18 August** — attached by module resemblance, not by what this screen does. A screen that does not
     handle money should not be able to move it (CF-87's class). **Drawn 26 August** — `Dashboards Board`
     frame `ptr-002`. **One board draws five dashboards across five platforms** — platform admin, partner,
-    support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack
-    recognised that before the package did.
+    support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the
+    pack recognised that before the package did.
   density: compact
   boardFrames:
   - Dashboards Board.dc.html#ptr-002
@@ -343,8 +345,8 @@ screens:
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   gaps:
   - operation: getOrder
-    why: '**3 declared operations reach no component on this screen**: getOrder, getOrderStatement, listOrderRefunds.
-      Either the screen is missing what calls them, or the declaration is residue.'
+    why: '**3 declared operations reach no component on this screen**: getOrder, getOrderStatement,
+      listOrderRefunds. Either the screen is missing what calls them, or the declaration is residue.'
     source: the screen's own declarations
   layout:
     template: split
@@ -438,8 +440,8 @@ screens:
   - id: confirmOverrideCreditLimit
     component: confirmDialog
     trigger: Override
-    body: '**Names what `overrideCreditLimit` changes and what it leaves alone**, in the consequence rather
-      than the verb. A partner this affects should be identified in the dialog, not just counted.'
+    body: '**Names what `overrideCreditLimit` changes and what it leaves alone**, in the consequence
+      rather than the verb. A partner this affects should be identified in the dialog, not just counted.'
     provenance: contract orders.yaml POST /b2b-accounts/{accountId}/credit/override
   - id: confirmVoidOrder
     component: confirmDialog
@@ -451,10 +453,10 @@ screens:
     loading: The partner list.
     error: Could not load. Names which read failed and leaves the partner untouched.
     emptyFirstRun: No partner yet. Carries the create action; distinct from a filter that matched nothing.
-    emptyNoResults: The filter narrowed it and the partner are still there. Names the active filter and
-      offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the partner are still there. Names the active filter
+      and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listOrders
     contract: orders
@@ -548,8 +550,9 @@ screens:
       from: PTR-001
     - name: orderId
       from: deepLink
-    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
-      it was refunded or the performance passed, says which and offers the order list rather than an error.'
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
     preloaded:
     - CreditPosition.id
     - CreditPosition.accountId
@@ -561,8 +564,8 @@ screens:
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-002
     note: '**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
-      The frame it points at now is the generated one. This screen has been designed once and is not starting
-      from nothing.'
+      The frame it points at now is the generated one. This screen has been designed once and is not
+      starting from nothing.'
   apisNote: Rebuilt 9 September 2026 from the 16 operations this screen declares, not from a workshop
     pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
     them to the ones that matter is work a person still owes this screen.
@@ -591,8 +594,8 @@ screens:
       carries:
       - accountId
       - sessionId
-      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it
-        must carry them
+      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into
+        it must carry them
     - to: PTR-002
       trigger: Partner Dashboard
       carries:
@@ -611,8 +614,8 @@ screens:
     from the screen name and its operations on 17 August, not from a requirement.
   density: compact
   pattern: listDetail
-  patternReason: '`listPrincipals` reads the population and `getPrincipal` reads one of them — list, select,
-    act'
+  patternReason: '`listPrincipals` reads the population and `getPrincipal` reads one of them — list,
+    select, act'
   purpose: What we hold about staff, and what they can change.
   layout:
     template: split
@@ -689,10 +692,10 @@ screens:
     error: Could not load. Names which read failed and leaves the profile company untouched.
     emptyFirstRun: No profile company yet. Carries the create action; distinct from a filter that matched
       nothing.
-    emptyNoResults: The filter narrowed it and the profile company are still there. Names the active filter
-      and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the profile company are still there. Names the active
+      filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: getPrincipal
     contract: identity
@@ -729,9 +732,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-003
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
+    them to the ones that matter is work a person still owes this screen.
 - id: PTR-004
   name: Notifications
   module: Access & Account
@@ -757,8 +760,8 @@ screens:
       carries:
       - accountId
       - sessionId
-      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it
-        must carry them
+      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into
+        it must carry them
     - to: PTR-002
       trigger: Partner Dashboard
       carries:
@@ -770,15 +773,15 @@ screens:
       trigger: Profile & Company Details
       carries:
       - principalId
-      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must carry
-        them
+      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must
+        carry them
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: compact
   pattern: statusTracker
-  patternReason: '`getMessageStatus` reads one record and nothing reads a population — the screen is about
-    that one thing'
+  patternReason: '`getMessageStatus` reads one record and nothing reads a population — the screen is
+    about that one thing'
   purpose: Work with notifications for this venue.
   layout:
     template: detail
@@ -830,8 +833,8 @@ screens:
       nothing.
     emptyNoResults: The filter narrowed it and the notifications are still there. Names the active filter
       and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: sendTransactionalMessage
     contract: marketing-crm
@@ -845,16 +848,16 @@ screens:
     params:
     - name: messageId
       from: deepLink
-    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
-      forwarded link between partners must not open another partner''s record. If the target is gone the
-      screen says so and offers the partner''s own list. Arrives with `messageId`.'
+    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.**
+      A forwarded link between partners must not open another partner''s record. If the target is gone
+      the screen says so and offers the partner''s own list. Arrives with `messageId`.'
   wireframe:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-004
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
+    them to the ones that matter is work a person still owes this screen.
 - id: PTR-005
   name: Inventory & Allocation View
   module: Inventory & Pricing
@@ -886,8 +889,8 @@ screens:
       carries:
       - accountId
       - sessionId
-      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it
-        must carry them
+      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into
+        it must carry them
     - to: PTR-002
       trigger: Partner Dashboard
       carries:
@@ -899,8 +902,8 @@ screens:
       trigger: Profile & Company Details
       carries:
       - principalId
-      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must carry
-        them
+      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must
+        carry them
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **createRefund removed
@@ -908,13 +911,14 @@ screens:
     handle money should not be able to move it (CF-87's class).
   density: compact
   pattern: listDetail
-  patternReason: '`listChannelCapacities` reads the population and `getChannelAllocations` reads one of
-    them — list, select, act'
+  patternReason: '`listChannelCapacities` reads the population and `getChannelAllocations` reads one
+    of them — list, select, act'
   purpose: See inventory & allocation view for this venue.
   gaps:
   - operation: getOrder
-    why: '**4 declared operations reach no component on this screen**: getOrder, getOrderStatement, listOrderRefunds,
-      listOrders. Either the screen is missing what calls them, or the declaration is residue.'
+    why: '**4 declared operations reach no component on this screen**: getOrder, getOrderStatement,
+      listOrderRefunds, listOrders. Either the screen is missing what calls them, or the declaration
+      is residue.'
     source: the screen's own declarations
   layout:
     template: split
@@ -1040,14 +1044,14 @@ screens:
       - kind: confirmDialog
         derived: true
         label: Confirm
-        notes: '**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is
-          a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a
-          dialog somebody dismisses.
+        notes: '**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480*
+          is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys
+          is a dialog somebody dismisses.
 
 
           **Added 31 August.** `confirmDialog` and `modal` were both in the component library and used
-          **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry
-          reads *always requires confirmation*.'
+          **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own
+          entry reads *always requires confirmation*.'
         provenance: carried from the previous definition
   overlays:
   - id: confirmVoidOrder
@@ -1063,8 +1067,8 @@ screens:
       matched nothing.
     emptyNoResults: The filter narrowed it and the inventory allocation are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: getChannelAllocations
     contract: catalogue
@@ -1172,8 +1176,9 @@ screens:
       from: deepLink
     - name: orderId
       from: deepLink
-    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
-      it was refunded or the performance passed, says which and offers the order list rather than an error.'
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
     preloaded:
     - ChannelAllocationSet.channelCapacityId
     - ChannelAllocationSet.capacity
@@ -1212,8 +1217,8 @@ screens:
       carries:
       - accountId
       - sessionId
-      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it
-        must carry them
+      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into
+        it must carry them
     - to: PTR-002
       trigger: Partner Dashboard
       carries:
@@ -1225,8 +1230,8 @@ screens:
       trigger: Profile & Company Details
       carries:
       - principalId
-      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must carry
-        them
+      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must
+        carry them
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
@@ -1238,8 +1243,8 @@ screens:
   gaps:
   - operation: getProduct
     why: '**5 declared operations reach no component on this screen**: getProduct, listAlternativeCodes,
-      listPriceLists, listPrices, listProductVariants. Either the screen is missing what calls them, or
-      the declaration is residue.'
+      listPriceLists, listPrices, listProductVariants. Either the screen is missing what calls them,
+      or the declaration is residue.'
     source: the screen's own declarations
   layout:
     template: split
@@ -1334,8 +1339,8 @@ screens:
       matched nothing.
     emptyNoResults: The filter narrowed it and the product catalog (b2b are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listProducts
     contract: catalogue
@@ -1429,8 +1434,8 @@ screens:
       from: deepLink
     - name: productId
       from: deepLink
-    coldEntry: '**A shared product link after the product retired.** Shows what replaced it where a successor
-      exists, and the catalogue where none does.'
+    coldEntry: '**A shared product link after the product retired.** Shows what replaced it where a
+      successor exists, and the catalogue where none does.'
     preloaded:
     - PriceList.id
     - PriceList.code
@@ -1476,8 +1481,8 @@ screens:
       carries:
       - accountId
       - sessionId
-      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it
-        must carry them
+      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into
+        it must carry them
     - to: PTR-002
       trigger: Partner Dashboard
       carries:
@@ -1489,15 +1494,15 @@ screens:
       trigger: Profile & Company Details
       carries:
       - principalId
-      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must carry
-        them
+      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must
+        carry them
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: compact
   pattern: statusTracker
-  patternReason: '`getAvailability` reads one record and nothing reads a population — the screen is about
-    that one thing'
+  patternReason: '`getAvailability` reads one record and nothing reads a population — the screen is
+    about that one thing'
   purpose: Find something when the guest does not know what it is called.
   gaps:
   - operation: getAvailability
@@ -1516,8 +1521,8 @@ screens:
       matched nothing.
     emptyNoResults: The filter narrowed it and the availability search are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: getAvailability
     contract: catalogue
@@ -1527,9 +1532,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-007
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop
+    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
+    them to the ones that matter is work a person still owes this screen.
 - id: PTR-008
   name: Booking Creation
   module: Booking & Quotes
@@ -1563,8 +1568,8 @@ screens:
       carries:
       - accountId
       - sessionId
-      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it
-        must carry them
+      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into
+        it must carry them
     - to: PTR-002
       trigger: Partner Dashboard
       carries:
@@ -1576,8 +1581,8 @@ screens:
       trigger: Profile & Company Details
       carries:
       - principalId
-      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must carry
-        them
+      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must
+        carry them
     - to: SCN-003
       trigger: A customer arrives and is admitted
       provenance: flow F10 step 3→4
@@ -1588,11 +1593,12 @@ screens:
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Cross-platform navigation
     removed 24 August**: SCN-003. **A till does not navigate to a back office and a guest app does not
-    navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather
-    than a screen pretending there is a link.'
+    navigate to either** — those are device handovers, and a flow declares them with `crossesDevice`
+    rather than a screen pretending there is a link.'
   density: compact
   pattern: listDetail
-  patternReason: '`listOrders` reads the population and `getOrder` reads one of them — list, select, act'
+  patternReason: '`listOrders` reads the population and `getOrder` reads one of them — list, select,
+    act'
   purpose: Add booking creation for this venue.
   gaps:
   - operation: getOrderStatement
@@ -1700,8 +1706,8 @@ screens:
       nothing.
     emptyNoResults: The filter narrowed it and the booking creation are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: createOrder
     contract: orders
@@ -1781,8 +1787,9 @@ screens:
     params:
     - name: orderId
       from: deepLink
-    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
-      it was refunded or the performance passed, says which and offers the order list rather than an error.'
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
     preloaded:
     - Order.id
     - Order.orderNumber
@@ -1821,8 +1828,8 @@ screens:
       carries:
       - accountId
       - sessionId
-      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it
-        must carry them
+      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into
+        it must carry them
     - to: PTR-002
       trigger: Partner Dashboard
       carries:
@@ -1834,15 +1841,15 @@ screens:
       trigger: Profile & Company Details
       carries:
       - principalId
-      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must carry
-        them
+      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must
+        carry them
   notes: 'States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August**
-    — `Seat Board 3.dc.html` frame `seat-3d`. **The frame names this screen on its own face**, which is
-    the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose
-    after three derivation attempts produced nonsense. **A board that says what it draws removes the guess
-    entirely.**'
+    — `Seat Board 3.dc.html` frame `seat-3d`. **The frame names this screen on its own face**, which
+    is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by
+    purpose after three derivation attempts produced nonsense. **A board that says what it draws removes
+    the guess entirely.**'
   density: compact
   boardFrames:
   - Seat Board 3.dc.html#seat-3d
@@ -1929,24 +1936,24 @@ screens:
       - kind: confirmDialog
         derived: true
         label: Confirm
-        notes: '**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is
-          a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a
-          dialog somebody dismisses.
+        notes: '**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480*
+          is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys
+          is a dialog somebody dismisses.
 
 
           **Added 31 August.** `confirmDialog` and `modal` were both in the component library and used
-          **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry
-          reads *always requires confirmation*.'
+          **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own
+          entry reads *always requires confirmation*.'
         provenance: carried from the previous definition
   states:
     loading: The group bulk booking list.
     error: Could not load. Names which read failed and leaves the group bulk booking untouched.
-    emptyFirstRun: No group bulk booking yet. Carries the create action; distinct from a filter that matched
-      nothing.
+    emptyFirstRun: No group bulk booking yet. Carries the create action; distinct from a filter that
+      matched nothing.
     emptyNoResults: The filter narrowed it and the group bulk booking are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: allocateBlockedSeats
     contract: seating
@@ -1972,9 +1979,9 @@ screens:
     params:
     - name: blockId
       from: deepLink
-    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
-      forwarded link between partners must not open another partner''s record. If the target is gone the
-      screen says so and offers the partner''s own list. Arrives with `blockId`.'
+    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.**
+      A forwarded link between partners must not open another partner''s record. If the target is gone
+      the screen says so and offers the partner''s own list. Arrives with `blockId`.'
     preloaded:
     - SeatBlock.id
     - SeatBlock.performanceId
@@ -1986,11 +1993,11 @@ screens:
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-009
     note: '**Drawn by Claude Design on `Seat Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
-      The frame it points at now is the generated one. This screen has been designed once and is not starting
-      from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+      The frame it points at now is the generated one. This screen has been designed once and is not
+      starting from nothing.'
+  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
+    them to the ones that matter is work a person still owes this screen.
 - id: PTR-010
   name: Cart & Quote
   module: Booking & Quotes
@@ -2016,8 +2023,8 @@ screens:
       carries:
       - accountId
       - sessionId
-      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it
-        must carry them
+      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into
+        it must carry them
     - to: PTR-002
       trigger: Partner Dashboard
       carries:
@@ -2029,15 +2036,15 @@ screens:
       trigger: Profile & Company Details
       carries:
       - principalId
-      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must carry
-        them
+      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must
+        carry them
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: compact
   pattern: listDetail
-  patternReason: '`listPromotions` reads the population and `getPromotion` reads one of them — list, select,
-    act'
+  patternReason: '`listPromotions` reads the population and `getPromotion` reads one of them — list,
+    select, act'
   purpose: Work with cart & quote for this venue.
   gaps:
   - operation: getPromotionUsage
@@ -2145,14 +2152,14 @@ screens:
       - kind: confirmDialog
         derived: true
         label: Confirm
-        notes: '**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is
-          a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a
-          dialog somebody dismisses.
+        notes: '**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480*
+          is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys
+          is a dialog somebody dismisses.
 
 
           **Added 31 August.** `confirmDialog` and `modal` were both in the component library and used
-          **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry
-          reads *always requires confirmation*.'
+          **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own
+          entry reads *always requires confirmation*.'
         provenance: carried from the previous definition
   overlays:
   - id: confirmRemoveCartLine
@@ -2164,11 +2171,12 @@ screens:
   states:
     loading: The cart quote list.
     error: Could not load. Names which read failed and leaves the cart quote untouched.
-    emptyFirstRun: No cart quote yet. Carries the create action; distinct from a filter that matched nothing.
+    emptyFirstRun: No cart quote yet. Carries the create action; distinct from a filter that matched
+      nothing.
     emptyNoResults: The filter narrowed it and the cart quote are still there. Names the active filter
       and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: evaluatePromotions
     contract: promotions
@@ -2226,9 +2234,9 @@ screens:
       from: deepLink
     - name: promotionId
       from: deepLink
-    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
-      forwarded link between partners must not open another partner''s record. If the target is gone the
-      screen says so and offers the partner''s own list. Arrives with `lineId`, `promotionId`.'
+    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.**
+      A forwarded link between partners must not open another partner''s record. If the target is gone
+      the screen says so and offers the partner''s own list. Arrives with `lineId`, `promotionId`.'
     preloaded:
     - Promotion.code
     - Promotion.name
@@ -2266,8 +2274,8 @@ screens:
       carries:
       - accountId
       - sessionId
-      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it
-        must carry them
+      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into
+        it must carry them
     - to: PTR-002
       trigger: Partner Dashboard
       carries:
@@ -2279,8 +2287,8 @@ screens:
       trigger: Profile & Company Details
       carries:
       - principalId
-      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must carry
-        them
+      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must
+        carry them
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
@@ -2293,8 +2301,8 @@ screens:
   purpose: Find quote management for this venue.
   gaps:
   - operation: listPartnerQuotes
-    why: '**1 declared operation reach no component on this screen**: listPartnerQuotes. Either the screen
-      is missing what calls them, or the declaration is residue.'
+    why: '**1 declared operation reach no component on this screen**: listPartnerQuotes. Either the
+      screen is missing what calls them, or the declaration is residue.'
     source: the screen's own declarations
   layout:
     template: split
@@ -2353,8 +2361,8 @@ screens:
     emptyFirstRun: No quote yet. Carries the create action; distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the quote are still there. Names the active filter and
       offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listPartnerAgreements
     contract: subscription
@@ -2378,9 +2386,9 @@ screens:
     params:
     - name: agreementId
       from: deepLink
-    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
-      forwarded link between partners must not open another partner''s record. If the target is gone the
-      screen says so and offers the partner''s own list. Arrives with `agreementId`.'
+    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.**
+      A forwarded link between partners must not open another partner''s record. If the target is gone
+      the screen says so and offers the partner''s own list. Arrives with `agreementId`.'
     preloaded:
     - CommissionStatement.agreementId
     - CommissionStatement.partnerName
@@ -2391,9 +2399,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-011
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
+    them to the ones that matter is work a person still owes this screen.
 - id: PTR-012
   name: Checkout / Credit Purchase
   module: Credit & Settlement
@@ -2419,8 +2427,8 @@ screens:
       carries:
       - accountId
       - sessionId
-      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it
-        must carry them
+      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into
+        it must carry them
     - to: PTR-002
       trigger: Partner Dashboard
       carries:
@@ -2432,8 +2440,8 @@ screens:
       trigger: Profile & Company Details
       carries:
       - principalId
-      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must carry
-        them
+      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must
+        carry them
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **The strongest multi-currency
@@ -2509,8 +2517,8 @@ screens:
     error: Could not load. Names which read failed and leaves the checkout credit purchase untouched.
     emptyFirstRun: No checkout credit purchase configured. Carries the create action and says what the
       platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: createPayment
     contract: orders
@@ -2532,16 +2540,16 @@ screens:
     params:
     - name: paymentId
       from: deepLink
-    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
-      forwarded link between partners must not open another partner''s record. If the target is gone the
-      screen says so and offers the partner''s own list. Arrives with `paymentId`.'
+    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.**
+      A forwarded link between partners must not open another partner''s record. If the target is gone
+      the screen says so and offers the partner''s own list. Arrives with `paymentId`.'
   wireframe:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-012
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
+    them to the ones that matter is work a person still owes this screen.
 - id: PTR-013
   name: Credit Limit & Balance
   module: Credit & Settlement
@@ -2567,8 +2575,8 @@ screens:
       carries:
       - accountId
       - sessionId
-      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it
-        must carry them
+      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into
+        it must carry them
     - to: PTR-002
       trigger: Partner Dashboard
       carries:
@@ -2580,8 +2588,8 @@ screens:
       trigger: Profile & Company Details
       carries:
       - principalId
-      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must carry
-        them
+      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must
+        carry them
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
@@ -2639,9 +2647,9 @@ screens:
   - id: confirmOverrideCreditLimit
     component: confirmDialog
     trigger: Override
-    body: '**Names what `overrideCreditLimit` changes and what it leaves alone**, in the consequence rather
-      than the verb. A credit limit balance this affects should be identified in the dialog, not just
-      counted.'
+    body: '**Names what `overrideCreditLimit` changes and what it leaves alone**, in the consequence
+      rather than the verb. A credit limit balance this affects should be identified in the dialog,
+      not just counted.'
     provenance: contract orders.yaml POST /b2b-accounts/{accountId}/credit/override
   states:
     loading: The credit limit balance list.
@@ -2650,8 +2658,8 @@ screens:
       matched nothing.
     emptyNoResults: The filter narrowed it and the credit limit balance are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: getB2bCredit
     contract: orders
@@ -2674,9 +2682,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-013
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
+    them to the ones that matter is work a person still owes this screen.
 - id: PTR-014
   name: Settlement & Payment History
   module: Reports & Settlement
@@ -2702,8 +2710,8 @@ screens:
       carries:
       - accountId
       - sessionId
-      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it
-        must carry them
+      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into
+        it must carry them
     - to: PTR-002
       trigger: Partner Dashboard
       carries:
@@ -2715,8 +2723,8 @@ screens:
       trigger: Profile & Company Details
       carries:
       - principalId
-      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must carry
-        them
+      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must
+        carry them
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
@@ -2795,10 +2803,10 @@ screens:
     error: Could not load. Names which read failed and leaves the settlement payment history untouched.
     emptyFirstRun: No settlement payment history yet. Carries the create action; distinct from a filter
       that matched nothing.
-    emptyNoResults: The filter narrowed it and the settlement payment history are still there. Names the
-      active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the settlement payment history are still there. Names
+      the active filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listSettlements
     contract: finance
@@ -2828,9 +2836,9 @@ screens:
     params:
     - name: settlementId
       from: deepLink
-    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
-      forwarded link between partners must not open another partner''s record. If the target is gone the
-      screen says so and offers the partner''s own list. Arrives with `settlementId`.'
+    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.**
+      A forwarded link between partners must not open another partner''s record. If the target is gone
+      the screen says so and offers the partner''s own list. Arrives with `settlementId`.'
     preloaded:
     - Settlement.id
     - Settlement.providerName
@@ -2841,9 +2849,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-014
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
+    them to the ones that matter is work a person still owes this screen.
 - id: PTR-015
   name: Order History
   module: Orders & Fulfilment
@@ -2870,8 +2878,8 @@ screens:
       carries:
       - accountId
       - sessionId
-      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it
-        must carry them
+      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into
+        it must carry them
     - to: PTR-002
       trigger: Partner Dashboard
       carries:
@@ -2883,8 +2891,8 @@ screens:
       trigger: Profile & Company Details
       carries:
       - principalId
-      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must carry
-        them
+      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must
+        carry them
     - to: BO-008
       trigger: Venue reconciles and invoices
       provenance: flow F10 step 5→6
@@ -2895,8 +2903,8 @@ screens:
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Cross-platform navigation
     removed 24 August**: BO-008. **A till does not navigate to a back office and a guest app does not
-    navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather
-    than a screen pretending there is a link.'
+    navigate to either** — those are device handovers, and a flow declares them with `crossesDevice`
+    rather than a screen pretending there is a link.'
   density: compact
   pattern: listDetail
   patternReason: '`listOrders` reads the population and `getOrderStatement` reads one of them — list,
@@ -3000,8 +3008,8 @@ screens:
       nothing.
     emptyNoResults: The filter narrowed it and the order history are still there. Names the active filter
       and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listOrders
     contract: orders
@@ -3083,8 +3091,9 @@ screens:
     params:
     - name: orderId
       from: deepLink
-    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
-      it was refunded or the performance passed, says which and offers the order list rather than an error.'
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
+      if it was refunded or the performance passed, says which and offers the order list rather than
+      an error.'
     preloaded:
     - OrderStatement.orderId
     - OrderStatement.orderNumber
@@ -3124,8 +3133,8 @@ screens:
       carries:
       - accountId
       - sessionId
-      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it
-        must carry them
+      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into
+        it must carry them
     - to: PTR-002
       trigger: Partner Dashboard
       carries:
@@ -3137,8 +3146,8 @@ screens:
       trigger: Profile & Company Details
       carries:
       - principalId
-      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must carry
-        them
+      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must
+        carry them
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **createRefund removed
@@ -3267,31 +3276,32 @@ screens:
       - kind: confirmDialog
         derived: true
         label: Confirm
-        notes: '**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is
-          a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a
-          dialog somebody dismisses.
+        notes: '**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480*
+          is a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys
+          is a dialog somebody dismisses.
 
 
           **Added 31 August.** `confirmDialog` and `modal` were both in the component library and used
-          **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry
-          reads *always requires confirmation*.'
+          **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own
+          entry reads *always requires confirmation*.'
         provenance: carried from the previous definition
   overlays:
   - id: confirmVoidOrder
     component: confirmDialog
     trigger: Void
     body: '**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than
-      the verb. A voucher ticket download this affects should be identified in the dialog, not just counted.'
+      the verb. A voucher ticket download this affects should be identified in the dialog, not just
+      counted.'
     provenance: contract orders.yaml POST /orders/{orderId}/voids
   states:
     loading: The voucher ticket download list.
     error: Could not load. Names which read failed and leaves the voucher ticket download untouched.
-    emptyFirstRun: No voucher ticket download yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: No voucher ticket download yet. Carries the create action; distinct from a filter
+      that matched nothing.
     emptyNoResults: The filter narrowed it and the voucher ticket download are still there. Names the
       active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: reprintOrder
     contract: orders
@@ -3403,8 +3413,8 @@ screens:
       carries:
       - accountId
       - sessionId
-      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it
-        must carry them
+      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into
+        it must carry them
     - to: PTR-002
       trigger: Partner Dashboard
       carries:
@@ -3416,8 +3426,8 @@ screens:
       trigger: Profile & Company Details
       carries:
       - principalId
-      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must carry
-        them
+      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must
+        carry them
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
@@ -3488,8 +3498,8 @@ screens:
       matched nothing.
     emptyNoResults: The filter narrowed it and the commission statement are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: getCommissionStatement
     contract: subscription
@@ -3503,9 +3513,9 @@ screens:
     params:
     - name: agreementId
       from: deepLink
-    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
-      forwarded link between partners must not open another partner''s record. If the target is gone the
-      screen says so and offers the partner''s own list. Arrives with `agreementId`.'
+    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.**
+      A forwarded link between partners must not open another partner''s record. If the target is gone
+      the screen says so and offers the partner''s own list. Arrives with `agreementId`.'
     preloaded:
     - CommissionStatement.agreementId
     - CommissionStatement.partnerName
@@ -3516,9 +3526,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-017
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
+    them to the ones that matter is work a person still owes this screen.
 - id: PTR-018
   name: Reports & Sales Performance
   module: Reports & Settlement
@@ -3544,8 +3554,8 @@ screens:
       carries:
       - accountId
       - sessionId
-      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it
-        must carry them
+      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into
+        it must carry them
     - to: PTR-002
       trigger: Partner Dashboard
       carries:
@@ -3557,8 +3567,8 @@ screens:
       trigger: Profile & Company Details
       carries:
       - principalId
-      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must carry
-        them
+      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must
+        carry them
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
@@ -3643,19 +3653,19 @@ screens:
   - id: confirmDeleteReport
     component: confirmDialog
     trigger: Delete
-    body: '**Names what `deleteReport` changes and what it leaves alone**, in the consequence rather than
-      the verb. A reports sales performance this affects should be identified in the dialog, not just
-      counted.'
+    body: '**Names what `deleteReport` changes and what it leaves alone**, in the consequence rather
+      than the verb. A reports sales performance this affects should be identified in the dialog, not
+      just counted.'
     provenance: contract reporting.yaml DELETE /reports/{reportId}
   states:
     loading: The reports sales performance list.
     error: Could not load. Names which read failed and leaves the reports sales performance untouched.
     emptyFirstRun: No reports sales performance yet. Carries the create action; distinct from a filter
       that matched nothing.
-    emptyNoResults: The filter narrowed it and the reports sales performance are still there. Names the
-      active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the reports sales performance are still there. Names
+      the active filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: runReport
     contract: reporting
@@ -3721,9 +3731,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-018
-  apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
+    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
+    them to the ones that matter is work a person still owes this screen.
 - id: PTR-019
   name: API Credentials & Integration
   module: Access & Account
@@ -3748,8 +3758,8 @@ screens:
       carries:
       - accountId
       - sessionId
-      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it
-        must carry them
+      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into
+        it must carry them
     - to: PTR-002
       trigger: Partner Dashboard
       carries:
@@ -3761,8 +3771,8 @@ screens:
       trigger: Profile & Company Details
       carries:
       - principalId
-      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must carry
-        them
+      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must
+        carry them
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Licensed on `developerApi`,
@@ -3775,8 +3785,8 @@ screens:
   pattern: listDetail
   patternReason: '`listApiClients` reads a population and nothing reads one of them; the detail is the
     row until a `get` exists'
-  purpose: API Credentials & Integration — the screen a person opens when they need to deal with api credentials
-    & integration.
+  purpose: API Credentials & Integration — the screen a person opens when they need to deal with api
+    credentials & integration.
   layout:
     template: split
     regions:
@@ -3837,9 +3847,9 @@ screens:
   - id: confirmRevokeApiCredential
     component: confirmDialog
     trigger: Revoke
-    body: '**Names what `revokeApiCredential` changes and what it leaves alone**, in the consequence rather
-      than the verb. A api credentials integration this affects should be identified in the dialog, not
-      just counted.'
+    body: '**Names what `revokeApiCredential` changes and what it leaves alone**, in the consequence
+      rather than the verb. A api credentials integration this affects should be identified in the dialog,
+      not just counted.'
     provenance: contract public-api.yaml DELETE /api-clients/{clientId}/credentials
   states:
     loading: Detail loads
@@ -3847,8 +3857,8 @@ screens:
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
     emptyNoResults: The filter narrowed it and the api credentials integration are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listApiClients
     contract: public-api
@@ -3889,9 +3899,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-019
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
+    them to the ones that matter is work a person still owes this screen.
 - id: PTR-020
   name: Sub-Agent Management
   module: Access & Account
@@ -3917,8 +3927,8 @@ screens:
       carries:
       - accountId
       - sessionId
-      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it
-        must carry them
+      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into
+        it must carry them
     - to: PTR-002
       trigger: Partner Dashboard
       carries:
@@ -3930,15 +3940,15 @@ screens:
       trigger: Profile & Company Details
       carries:
       - principalId
-      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must carry
-        them
+      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must
+        carry them
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
   density: compact
   pattern: listDetail
-  patternReason: '`listDelegatedAccess` reads a population and nothing reads one of them; the detail is
-    the row until a `get` exists'
+  patternReason: '`listDelegatedAccess` reads a population and nothing reads one of them; the detail
+    is the row until a `get` exists'
   purpose: Add sub-agent management for this venue.
   layout:
     template: split
@@ -4009,11 +4019,12 @@ screens:
   states:
     loading: The sub-agent list.
     error: Could not load. Names which read failed and leaves the sub-agent untouched.
-    emptyFirstRun: No sub-agent yet. Carries the create action; distinct from a filter that matched nothing.
+    emptyFirstRun: No sub-agent yet. Carries the create action; distinct from a filter that matched
+      nothing.
     emptyNoResults: The filter narrowed it and the sub-agent are still there. Names the active filter
       and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: createDelegatedAccess
     contract: identity
@@ -4033,9 +4044,9 @@ screens:
     params:
     - name: delegatedAccessId
       from: deepLink
-    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
-      forwarded link between partners must not open another partner''s record. If the target is gone the
-      screen says so and offers the partner''s own list. Arrives with `delegatedAccessId`.'
+    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.**
+      A forwarded link between partners must not open another partner''s record. If the target is gone
+      the screen says so and offers the partner''s own list. Arrives with `delegatedAccessId`.'
     preloaded:
     - DelegatedAccess.id
     - DelegatedAccess.principalId
@@ -4046,9 +4057,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-020
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
+    them to the ones that matter is work a person still owes this screen.
 - id: PTR-021
   name: Support & Contact
   module: Support
@@ -4074,8 +4085,8 @@ screens:
       carries:
       - accountId
       - sessionId
-      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it
-        must carry them
+      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into
+        it must carry them
     - to: PTR-002
       trigger: Partner Dashboard
       carries:
@@ -4087,8 +4098,8 @@ screens:
       trigger: Profile & Company Details
       carries:
       - principalId
-      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must carry
-        them
+      provenance: derived — PTR-003 declares entryState.params principalId, so an edge into it must
+        carry them
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
@@ -4193,10 +4204,10 @@ screens:
     error: Could not load. Names which read failed and leaves the support contact untouched.
     emptyFirstRun: No support contact yet. Carries the create action; distinct from a filter that matched
       nothing.
-    emptyNoResults: The filter narrowed it and the support contact are still there. Names the active filter
-      and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the support contact are still there. Names the active
+      filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: createCase
     contract: marketing-crm
@@ -4238,9 +4249,9 @@ screens:
     params:
     - name: caseId
       from: deepLink
-    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
-      forwarded link between partners must not open another partner''s record. If the target is gone the
-      screen says so and offers the partner''s own list. Arrives with `caseId`.'
+    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.**
+      A forwarded link between partners must not open another partner''s record. If the target is gone
+      the screen says so and offers the partner''s own list. Arrives with `caseId`.'
     preloaded:
     - CaseDetail.id
     - CaseDetail.caseNumber
@@ -4251,9 +4262,9 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-021
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
+    them to the ones that matter is work a person still owes this screen.
 - id: PTR-022
   name: Partner Management Command Center
   module: Partners
@@ -4293,8 +4304,8 @@ screens:
       carries:
       - accountId
       - sessionId
-      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it
-        must carry them
+      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into
+        it must carry them
     - to: PTR-023
       trigger: Sets up the organisation record
       provenance: flow F110 step 4→5
@@ -4324,13 +4335,13 @@ screens:
       provenance: flow F110 step 14→15
       operation: listPartner
   density: compact
+  purposeNote: Authorized administrators can identify every partner, its business relationship, current
+    status and outstanding actions from a single workspace.
   pattern: commandCentre
   patternReason: the pack gives this screen both a metric directory (§Display) and a per-row directory
     (§Each partner record should display) — counts over a population, then the population
   purpose: Provide a centralized management dashboard for all B2B, reseller, OTA and distribution partners
     across the TICVAI ecosystem.
-  purposeNote: Authorized administrators can identify every partner, its business relationship, current
-    status and outstanding actions from a single workspace.
   layout:
     template: dashboard
     regions:
@@ -4431,8 +4442,8 @@ screens:
         - PartnerManagementCommandCenterView.lastActivity
         bindsTo: PartnerManagementCommandCenterView
         operation: listPartner
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Each partner record
-          should display
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Each partner
+          record should display
     - name: contextPanel
       slot: selection
       components:
@@ -4456,8 +4467,8 @@ screens:
         - PartnerManagementCommandCenterView.integrationStatus
         - PartnerManagementCommandCenterView.lastActivity
         notes: 'The pack groups this record''s detail under its own headings: “Partner Attention Required”.'
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Each partner record
-          should display
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Each partner
+          record should display
     - name: actionBar
       slot: rowActions
       components:
@@ -4465,19 +4476,23 @@ screens:
         label: Permissions this screen separates
         notes: '**The pack separates these permissions and no action on the screen claims them yet:**
           Create Partner, Review Application, Approve, Assign Account Manager, Suspend, Open Commercial
-          Profile, View Users, View Documents, View Performance. Each needs attaching to the control it
-          gates, or the screen needs the control.'
+          Profile, View Users, View Documents, View Performance. Each needs attaching to the control
+          it gates, or the screen needs the control.'
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Authorized users
           can
   states:
     loading: The partner list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the partner untouched.
     emptyFirstRun: No partner yet. Carries the create action; distinct from a filter that matched nothing.
-    emptyNoResults: The filter narrowed it and the partner are still there. The pack's own statuses are
-      Suspended → Terminated → Archived — the state names which is selected.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the partner are still there. The pack's own statuses
+      are Suspended → Terminated → Archived — the state names which is selected.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
+  - operationId: listPartner2
+    contract: subscription
+    purpose: Partner Operations Command Center
+    trigger: onLoad
   - operationId: listPartner
     contract: subscription
     purpose: Partner Management Command Center
@@ -4486,10 +4501,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-022
+    workshopBoard: wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-022
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    5. 31 of 38 labels bound to a contract property; 48 of 55 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    5. 31 of 38 labels bound to a contract property; 48 of 55 pack bullets carried onto the screen —
+    the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
+    the contracts rather than here.
 - id: PTR-023
   name: Partner Profile & Organization Setup
   module: Partners
@@ -4511,25 +4527,25 @@ screens:
     exitTo:
     - PTR-022
     inferred: false
-    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: PTR-022
       trigger: Returns to the command centre
       provenance: flow F110 step 5→6
       operation: setPartnerProfileOrganization
   density: compact
+  purposeNote: Each external partner has one governed master organization record that can be referenced
+    by commercial, operational, finance and distribution processes.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Capture) and no display directory
     — it is settings, not a population
   purpose: Create the master business record for each external distribution partner.
-  purposeNote: Each external partner has one governed master organization record that can be referenced
-    by commercial, operational, finance and distribution processes.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: New
-      Partner. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
-      seen from the screen side rather than the contract side.'
+    why: '**The pack names 2 actions on this screen and the screen declares 1 operation.** Unserved:
+      Key Account, New Partner. Each needs an operation, or needs removing from the screen; this is
+      the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Allow internal tags such
       as
   layout:
@@ -4590,6 +4606,10 @@ screens:
       slot: publish
       components:
       - kind: primaryButton
+        label: Key Account
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Allow internal
+          tags such as
+      - kind: secondaryButton
         label: New Partner
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 7 §Allow internal
           tags such as
@@ -4598,23 +4618,22 @@ screens:
     error: Could not load. Names which read failed and leaves the partner profile organization untouched.
     emptyFirstRun: No partner profile organization configured yet. Carries the create action and says
       what the platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: setPartnerProfileOrganization
     contract: subscription
     purpose: Partner Profile & Organization Setup
     trigger: onAction
-    invalidates:
-    - setPartnerProfileOrganization
   wireframe:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-023
+    workshopBoard: wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-023
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    7. 0 of 0 labels bound to a contract property; 17 of 53 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    7. 0 of 0 labels bound to a contract property; 18 of 53 pack bullets carried onto the screen — the
+    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the
+    contracts rather than here.
 - id: PTR-024
   name: Partner Onboarding & Application Workflow
   module: Partners
@@ -4636,27 +4655,27 @@ screens:
     exitTo:
     - PTR-022
     inferred: false
-    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: PTR-022
       trigger: Returns to the command centre
       provenance: flow F110 step 3→4
       operation: listPartnerOnboardingApplication
   density: compact
+  purposeNote: New partners cannot become commercially active until the configured onboarding and approval
+    stages have been successfully completed.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Capture) and no display directory
     — it is settings, not a population
   purpose: Manage the complete journey from a new partner application through internal review and activation.
-  purposeNote: New partners cannot become commercially active until the configured onboarding and approval
-    stages have been successfully completed.
   gaps:
   - operation: null
-    why: '**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Sequential
-      approval, Parallel approval, Request More Information. Each needs an operation, or needs removing
-      from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the contract
-      side.'
-    source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 8 §Support
+    why: '**The pack names 5 actions on this screen and the screen declares 1 operation.** Unserved:
+      Product requirements, Sequential approval, Parallel approval, Rejection, Request More Information.
+      Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
+      seen from the screen side rather than the contract side.'
+    source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 8 §Operations
   layout:
     template: form
     regions:
@@ -4697,10 +4716,16 @@ screens:
       slot: publish
       components:
       - kind: primaryButton
+        label: Product requirements
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 8 §Operations
+      - kind: secondaryButton
         label: Sequential approval
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 8 §Support
       - kind: secondaryButton
         label: Parallel approval
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 8 §Support
+      - kind: secondaryButton
+        label: Rejection
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 8 §Support
       - kind: secondaryButton
         label: Request More Information
@@ -4710,8 +4735,8 @@ screens:
     error: Could not load. Names which read failed and leaves the partner onboarding application untouched.
     emptyFirstRun: No partner onboarding application configured yet. Carries the create action and says
       what the platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listPartnerOnboardingApplication
     contract: subscription
@@ -4721,10 +4746,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-024
+    workshopBoard: wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-024
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    8. 0 of 0 labels bound to a contract property; 13 of 43 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    8. 0 of 0 labels bound to a contract property; 15 of 43 pack bullets carried onto the screen — the
+    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the
+    contracts rather than here.
 - id: PTR-025
   name: Partner Contacts & User Administration
   module: Partners
@@ -4746,26 +4772,27 @@ screens:
     exitTo:
     - PTR-022
     inferred: false
-    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: PTR-022
       trigger: Returns to the command centre
       provenance: flow F110 step 13→14
       operation: listPartnerContactUser
   density: compact
+  purposeNote: Every external user accessing TICVAI on behalf of a partner is associated with a valid
+    partner account and controlled through appropriate roles and permissions.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Capture; Configure) and no display
     directory — it is settings, not a population
   purpose: Manage the individuals authorized to interact with TICVAI on behalf of each partner.
-  purposeNote: Every external user accessing TICVAI on behalf of a partner is associated with a valid
-    partner account and controlled through appropriate roles and permissions.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Password
-      policy. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
-      seen from the screen side rather than the contract side.'
-    source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support/reference
+    why: '**The pack names 9 actions on this screen and the screen declares 1 operation.** Unserved:
+      Primary Contact, Commercial, Finance, Operations, Management, Emergency Contact, Password policy,
+      SSO where available …. Each needs an operation, or needs removing from the screen; this is the
+      Phase 3 reconciliation seen from the screen side rather than the contract side.'
+    source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support
   layout:
     template: form
     regions:
@@ -4827,15 +4854,36 @@ screens:
       slot: publish
       components:
       - kind: primaryButton
+        label: Primary Contact
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support
+      - kind: secondaryButton
+        label: Commercial
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support
+      - kind: secondaryButton
+        label: Finance
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support
+      - kind: secondaryButton
+        label: Operations
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support
+      - kind: secondaryButton
+        label: Management
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support
+      - kind: secondaryButton
+        label: Emergency Contact
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support
+      - kind: secondaryButton
         label: Password policy
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support/reference
+      - kind: secondaryButton
+        label: SSO where available
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 10 §Support/reference
   states:
     loading: The partner contacts user configuration as saved.
     error: Could not load. Names which read failed and leaves the partner contacts user untouched.
-    emptyFirstRun: No partner contacts user configured yet. Carries the create action and says what the
-      platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No partner contacts user configured yet. Carries the create action and says what
+      the platform does in the meantime.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listPartnerContactUser
     contract: subscription
@@ -4845,10 +4893,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-025
+    workshopBoard: wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-025
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    10. 0 of 0 labels bound to a contract property; 18 of 52 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    10. 0 of 0 labels bound to a contract property; 26 of 52 pack bullets carried onto the screen —
+    the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
+    the contracts rather than here.
 - id: PTR-026
   name: Territory, Market & Distribution Rights
   module: Partners
@@ -4870,14 +4919,15 @@ screens:
     exitTo:
     - PTR-022
     inferred: false
-    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
   density: compact
+  purposeNote: partner is authorized to use.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Configure) and no display directory
     — it is settings, not a population
-  purpose: Define where and through what business scope a partner is authorized to distribute TICVAI products.
-  purposeNote: partner is authorized to use.
+  purpose: Define where and through what business scope a partner is authorized to distribute TICVAI
+    products.
   layout:
     template: form
     regions:
@@ -4901,8 +4951,8 @@ screens:
     error: Could not load. Names which read failed and leaves the territory market distribution untouched.
     emptyFirstRun: No territory market distribution configured yet. Carries the create action and says
       what the platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listTerritoryMarketDistribution
     contract: subscription
@@ -4912,10 +4962,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-026
+    workshopBoard: wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-026
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
     12. 0 of 0 labels bound to a contract property; 4 of 40 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the
+    contracts rather than here.
 - id: PTR-027
   name: Partner Brand, Venue & Business Scope Assignment
   module: Partners
@@ -4937,14 +4988,16 @@ screens:
     exitTo:
     - PTR-022
     inferred: false
-    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: PTR-022
       trigger: Returns to the command centre
       provenance: flow F110 step 7→8
       operation: setPartnerBrandVenue
   density: compact
+  purposeNote: Every partner is associated only with the TICVAI brands, venues and business entities
+    for which the commercial relationship has been approved.
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
@@ -4952,8 +5005,6 @@ screens:
   purpose: Determine which TICVAI business entities the partner relationship covers. This is deliberately
     separate from product assignment, which is governed through the Sales Channel and commercial configuration
     layers.
-  purposeNote: Every partner is associated only with the TICVAI brands, venues and business entities for
-    which the commercial relationship has been approved.
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -4962,8 +5013,8 @@ screens:
       it is built.'
     source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 14
   - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape
+      is a default rather than a reading. It needs a person before it is built.'
     source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 14
   layout:
     template: split
@@ -4988,23 +5039,22 @@ screens:
       matched nothing.
     emptyNoResults: The filter narrowed it and the partner brand venue are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: setPartnerBrandVenue
     contract: subscription
     purpose: Partner Brand, Venue & Business Scope Assignment
     trigger: onAction
-    invalidates:
-    - setPartnerBrandVenue
   wireframe:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-027
+    workshopBoard: wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-027
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
     14. 0 of 0 labels bound to a contract property; 0 of 26 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the
+    contracts rather than here.
 - id: PTR-028
   name: Partner Documentation & Compliance Repository
   module: Partners
@@ -5026,19 +5076,27 @@ screens:
     exitTo:
     - PTR-022
     inferred: false
-    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: PTR-022
       trigger: Returns to the command centre
       provenance: flow F110 step 9→10
       operation: listPartnerDocumentationCompliance
   density: compact
+  purposeNote: restrict commercial activity when mandatory documentation is missing or invalid.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Capture; Configure whether expiration
     should) and no display directory — it is settings, not a population
   purpose: Maintain required partner documentation and ensure that commercial accounts remain compliant.
-  purposeNote: restrict commercial activity when mandatory documentation is missing or invalid.
+  gaps:
+  - operation: null
+    why: '**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved:
+      Commercial Registration, Bank Details, Signed Agreement, API Agreement. Each needs an operation,
+      or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
+      rather than the contract side.'
+    source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 15 §Support configurable
+      documents such as
   layout:
     template: form
     regions:
@@ -5095,13 +5153,32 @@ screens:
         label: Require manual review
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 15 §Configure whether
           expiration should
+    - name: actionBar
+      slot: publish
+      components:
+      - kind: primaryButton
+        label: Commercial Registration
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 15 §Support configurable
+          documents such as
+      - kind: secondaryButton
+        label: Bank Details
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 15 §Support configurable
+          documents such as
+      - kind: secondaryButton
+        label: Signed Agreement
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 15 §Support configurable
+          documents such as
+      - kind: secondaryButton
+        label: API Agreement
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 15 §Support configurable
+          documents such as
   states:
     loading: The partner documentation compliance configuration as saved.
     error: Could not load. Names which read failed and leaves the partner documentation compliance untouched.
-    emptyFirstRun: No partner documentation compliance configured yet. Carries the create action and says
-      what the platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No partner documentation compliance configured yet. Carries the create action and
+      says what the platform does in the meantime.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listPartnerDocumentationCompliance
     contract: subscription
@@ -5111,10 +5188,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-028
+    workshopBoard: wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-028
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    15. 0 of 0 labels bound to a contract property; 15 of 39 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    15. 0 of 0 labels bound to a contract property; 19 of 39 pack bullets carried onto the screen —
+    the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
+    the contracts rather than here.
 - id: PTR-029
   name: Partner Access, Roles & Permission Profile
   module: Partners
@@ -5136,20 +5214,20 @@ screens:
     exitTo:
     - PTR-022
     inferred: false
-    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: PTR-022
       trigger: Returns to the command centre
       provenance: flow F110 step 11→12
       operation: listPartnerAccessRole
   density: compact
+  purposeNote: Partner organizations can access only the capabilities authorized by TICVAI, regardless
+    of permissions assigned to individual partner users.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Configure whether the partner
     may) and no display directory — it is settings, not a population
   purpose: Control what a partner organization is permitted to do, beyond individual-user permissions.
-  purposeNote: Partner organizations can access only the capabilities authorized by TICVAI, regardless
-    of permissions assigned to individual partner users.
   layout:
     template: form
     regions:
@@ -5234,8 +5312,8 @@ screens:
       - kind: banner
         label: Permissions this screen separates
         notes: '**The pack separates these permissions and no action on the screen claims them yet:**
-          ↓, Permanent, Temporary, Seasonal, Event-specific. Each needs attaching to the control it gates,
-          or the screen needs the control.'
+          ↓, Permanent, Temporary, Seasonal, Event-specific. Each needs attaching to the control it
+          gates, or the screen needs the control.'
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 16 §Partner Permission
           Ceiling
   states:
@@ -5243,8 +5321,8 @@ screens:
     error: Could not load. Names which read failed and leaves the partner access roles untouched.
     emptyFirstRun: No partner access roles configured yet. Carries the create action and says what the
       platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listPartnerAccessRole
     contract: subscription
@@ -5254,10 +5332,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-029
+    workshopBoard: wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-029
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    16. 0 of 0 labels bound to a contract property; 23 of 34 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    16. 0 of 0 labels bound to a contract property; 23 of 34 pack bullets carried onto the screen —
+    the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
+    the contracts rather than here.
 - id: PTR-030
   name: Partner Approval, Status & Lifecycle Management
   module: Partners
@@ -5279,15 +5358,15 @@ screens:
     exitTo:
     - PTR-022
     inferred: false
-    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
   density: compact
+  purposeNote: Partner lifecycle changes are governed, effective-dated, auditable and do not unintentionally
+    damage valid existing customer transactions.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Capture) and no display directory
     — it is settings, not a population
   purpose: Govern the complete business lifecycle of a partner after onboarding.
-  purposeNote: Partner lifecycle changes are governed, effective-dated, auditable and do not unintentionally
-    damage valid existing customer transactions.
   layout:
     template: form
     regions:
@@ -5337,23 +5416,22 @@ screens:
     error: Could not load. Names which read failed and leaves the partner approval status untouched.
     emptyFirstRun: No partner approval status configured yet. Carries the create action and says what
       the platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: approvePartnerStatuLifecycle
     contract: subscription
     purpose: Partner Approval, Status & Lifecycle Management
     trigger: onAction
-    invalidates:
-    - approvePartnerStatuLifecycle
   wireframe:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-030
+    workshopBoard: wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-030
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    18. 0 of 0 labels bound to a contract property; 15 of 42 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    18. 0 of 0 labels bound to a contract property; 15 of 42 pack bullets carried onto the screen —
+    the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
+    the contracts rather than here.
 - id: PTR-031
   name: Partner 360° Profile, Readiness & AI Review
   module: Partners
@@ -5375,9 +5453,15 @@ screens:
     exitTo:
     - PTR-022
     inferred: false
-    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
   density: compact
+  purposeNote: Before activation, authorized management can evaluate the partner's complete organizational,
+    compliance, access, commercial and technical readiness from one consolidated view. Board 1 — Final
+    Screen Register Screen Backend Screen Primary Responsibility 8.1.1 Partner Management Command Center
+    Partner portfolio & status Screen Backend Screen Primary Responsibility 8.1.2 Partner Profile &
+    Organization Setup Master partner record 8.1.3 Partner Onboarding & Application Workflow Partner
+    onboarding 8.1.4 Partner Contacts & User Administration Contacts and B2B users
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
@@ -5386,12 +5470,6 @@ screens:
     This should become one of the most useful screens for TICVAI commercial management. Board 1 established
     who the partner is and what they are authorized to access. Board 2 establishes the commercial rules
     under which that partner can transact with TICVAI.
-  purposeNote: Before activation, authorized management can evaluate the partner's complete organizational,
-    compliance, access, commercial and technical readiness from one consolidated view. Board 1 — Final
-    Screen Register Screen Backend Screen Primary Responsibility 8.1.1 Partner Management Command Center
-    Partner portfolio & status Screen Backend Screen Primary Responsibility 8.1.2 Partner Profile & Organization
-    Setup Master partner record 8.1.3 Partner Onboarding & Application Workflow Partner onboarding 8.1.4
-    Partner Contacts & User Administration Contacts and B2B users
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -5400,8 +5478,8 @@ screens:
       it is built.'
     source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 19
   - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape
+      is a default rather than a reading. It needs a person before it is built.'
     source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 19
   layout:
     template: split
@@ -5418,10 +5496,10 @@ screens:
     error: Could not load. Names which read failed and leaves the partner 360° profile untouched.
     emptyFirstRun: No partner 360° profile yet. Carries the create action; distinct from a filter that
       matched nothing.
-    emptyNoResults: The filter narrowed it and the partner 360° profile are still there. The pack's own
-      statuses are 8.1.9 Partner lifecycle governance — the state names which is selected.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the partner 360° profile are still there. The pack's
+      own statuses are 8.1.9 Partner lifecycle governance — the state names which is selected.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listPartnerProfileReadiness
     contract: subscription
@@ -5438,10 +5516,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-031
+    workshopBoard: wireframes/WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-031
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
     19. 0 of 0 labels bound to a contract property; 1 of 78 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the
+    contracts rather than here.
 - id: PTR-032
   name: Commercial Agreement Command Center
   module: Partners
@@ -5481,8 +5560,8 @@ screens:
       carries:
       - accountId
       - sessionId
-      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it
-        must carry them
+      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into
+        it must carry them
     - to: PTR-033
       trigger: Works in Agreement & Contract Terms Builder
       provenance: flow F131 step 1→2
@@ -5520,13 +5599,13 @@ screens:
       provenance: flow F131 step 17→18
       operation: listCommercialAgreement
   density: compact
+  purposeNote: Commercial management can understand the status, exposure, expiry and major commercial
+    terms of every partner agreement from one central workspace.
   pattern: commandCentre
   patternReason: the pack gives this screen both a metric directory (§Display) and a per-row directory
     (§Each agreement should show) — counts over a population, then the population
   purpose: Provide commercial and finance teams with a centralized view of all partner agreements and
     their current commercial health.
-  purposeNote: Commercial management can understand the status, exposure, expiry and major commercial
-    terms of every partner agreement from one central workspace.
   layout:
     template: dashboard
     regions:
@@ -5661,21 +5740,26 @@ screens:
       matched nothing.
     emptyNoResults: The filter narrowed it and the commercial agreement are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listCommercialAgreement
     contract: subscription
     purpose: Commercial Agreement Command Center
     trigger: onLoad
+  - operationId: listCommercialAgreementHealth
+    contract: subscription
+    purpose: Commercial Agreement 360°, Health & AI Review
+    trigger: onLoad
   wireframe:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-032
+    workshopBoard: wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-032
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    23. 30 of 38 labels bound to a contract property; 38 of 47 pack bullets carried onto the screen —
-    the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the
-    contracts rather than here.
+    23. 30 of 38 labels bound to a contract property; 38 of 47 pack bullets carried onto the screen
+    — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
+    the contracts rather than here.
 - id: PTR-033
   name: Agreement & Contract Terms Builder
   module: Partners
@@ -5697,24 +5781,25 @@ screens:
     exitTo:
     - PTR-032
     inferred: false
-    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: PTR-032
       trigger: Returns to the board's landing screen
       provenance: flow F131 step 2→3
       operation: setAgreementContractTerm
   density: compact
+  purposeNote: every governed partner relationship.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Configure; Configure/reference)
     and no display directory — it is settings, not a population
   purpose: Create the structured commercial agreement governing the partner relationship.
-  purposeNote: every governed partner relationship.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Renewal
-      Approval. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
-      seen from the screen side rather than the contract side.'
+    why: '**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved:
+      Manual Renewal, Renewal Notice Period, Renewal Approval. Each needs an operation, or needs removing
+      from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the
+      contract side.'
     source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Support
   layout:
     template: form
@@ -5804,6 +5889,12 @@ screens:
       slot: publish
       components:
       - kind: primaryButton
+        label: Manual Renewal
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Support
+      - kind: secondaryButton
+        label: Renewal Notice Period
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Support
+      - kind: secondaryButton
         label: Renewal Approval
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 25 §Support
   states:
@@ -5811,23 +5902,22 @@ screens:
     error: Could not load. Names which read failed and leaves the agreement contract terms untouched.
     emptyFirstRun: No agreement contract terms configured yet. Carries the create action and says what
       the platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: setAgreementContractTerm
     contract: subscription
     purpose: Agreement & Contract Terms Builder
     trigger: onAction
-    invalidates:
-    - setAgreementContractTerm
   wireframe:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-033
+    workshopBoard: wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-033
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    25. 0 of 0 labels bound to a contract property; 27 of 49 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    25. 0 of 0 labels bound to a contract property; 29 of 49 pack bullets carried onto the screen —
+    the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
+    the contracts rather than here.
 - id: PTR-034
   name: Partner Rate & Net Pricing Configuration
   module: Partners
@@ -5849,20 +5939,20 @@ screens:
     exitTo:
     - PTR-032
     inferred: false
-    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: PTR-032
       trigger: Returns to the board's landing screen
       provenance: flow F131 step 4→5
       operation: setPartnerRateNet
   density: compact
+  purposeNote: the authoritative calculation service.
   pattern: configEditor
-  patternReason: the pack gives this screen a configuration directory (§Configure by) and no display directory
-    — it is settings, not a population
+  patternReason: the pack gives this screen a configuration directory (§Configure by) and no display
+    directory — it is settings, not a population
   purpose: Define the commercial pricing basis available to a partner without recreating TICVAI's Pricing
     Engine.
-  purposeNote: the authoritative calculation service.
   layout:
     template: form
     regions:
@@ -5910,23 +6000,22 @@ screens:
     error: Could not load. Names which read failed and leaves the partner rate net untouched.
     emptyFirstRun: No partner rate net configured yet. Carries the create action and says what the platform
       does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: setPartnerRateNet
     contract: subscription
     purpose: Partner Rate & Net Pricing Configuration
     trigger: onAction
-    invalidates:
-    - setPartnerRateNet
   wireframe:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-034
+    workshopBoard: wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-034
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    27. 0 of 0 labels bound to a contract property; 10 of 36 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    27. 0 of 0 labels bound to a contract property; 10 of 36 pack bullets carried onto the screen —
+    the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
+    the contracts rather than here.
 - id: PTR-035
   name: Commission, Margin & Incentive Management
   module: Partners
@@ -5948,8 +6037,8 @@ screens:
     exitTo:
     - PTR-032
     inferred: false
-    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: PTR-032
       trigger: Returns to the board's landing screen
@@ -5963,9 +6052,9 @@ screens:
   purpose: Configure how partner commissions and commercial incentives are calculated.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Campaign
-      Incentive. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
-      seen from the screen side rather than the contract side.'
+    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved:
+      Campaign Incentive. Each needs an operation, or needs removing from the screen; this is the Phase
+      3 reconciliation seen from the screen side rather than the contract side.'
     source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 29 §Support
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -5974,8 +6063,8 @@ screens:
       it is built.'
     source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 29
   - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape
+      is a default rather than a reading. It needs a person before it is built.'
     source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 29
   layout:
     template: split
@@ -6000,8 +6089,8 @@ screens:
       that matched nothing.
     emptyNoResults: The filter narrowed it and the commission margin incentive are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listCommissionMarginIncentive
     contract: subscription
@@ -6011,10 +6100,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-035
+    workshopBoard: wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-035
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
     29. 0 of 0 labels bound to a contract property; 1 of 9 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the
+    contracts rather than here.
 - id: PTR-036
   name: Credit Limit & Exposure Management
   module: Partners
@@ -6036,20 +6126,20 @@ screens:
     exitTo:
     - PTR-032
     inferred: false
-    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: PTR-032
       trigger: Returns to the board's landing screen
       provenance: flow F131 step 8→9
       operation: listCreditLimitExposure
   density: compact
+  purposeNote: time visibility of available and utilized credit.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Configure) and no display directory
     — it is settings, not a population
-  purpose: Control the financial exposure TICVAI permits for partners buying on account. This should be
-    one of the strongest finance-control screens in the B2B module.
-  purposeNote: time visibility of available and utilized credit.
+  purpose: Control the financial exposure TICVAI permits for partners buying on account. This should
+    be one of the strongest finance-control screens in the B2B module.
   layout:
     template: form
     regions:
@@ -6102,10 +6192,10 @@ screens:
   states:
     loading: The credit limit exposure configuration as saved.
     error: Could not load. Names which read failed and leaves the credit limit exposure untouched.
-    emptyFirstRun: No credit limit exposure configured yet. Carries the create action and says what the
-      platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No credit limit exposure configured yet. Carries the create action and says what
+      the platform does in the meantime.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listCreditLimitExposure
     contract: subscription
@@ -6122,10 +6212,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-036
+    workshopBoard: wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-036
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    30. 0 of 0 labels bound to a contract property; 22 of 31 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    30. 0 of 0 labels bound to a contract property; 22 of 31 pack bullets carried onto the screen —
+    the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
+    the contracts rather than here.
 - id: PTR-037
   name: Deposit, Guarantee & Financial Security Management
   module: Partners
@@ -6147,24 +6238,25 @@ screens:
     exitTo:
     - PTR-032
     inferred: false
-    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: PTR-032
       trigger: Returns to the board's landing screen
       provenance: flow F131 step 10→11
       operation: listDepositGuaranteeFinancial
   density: compact
+  purposeNote: Finance can track all financial securities supporting partner exposure and automatically
+    enforce configured controls when security becomes insufficient or expires.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Manage financial security required to support partner credit or commercial access.
-  purposeNote: Finance can track all financial securities supporting partner exposure and automatically
-    enforce configured controls when security becomes insufficient or expires.
   gaps:
   - operation: null
-    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved: Security
-      Deposit. Each needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation
-      seen from the screen side rather than the contract side.'
+    why: '**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved:
+      Cash Deposit, Security Deposit, Prepayment Balance, Other Approved Security. Each needs an operation,
+      or needs removing from the screen; this is the Phase 3 reconciliation seen from the screen side
+      rather than the contract side.'
     source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Support
   layout:
     template: split
@@ -6197,7 +6289,16 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
+        label: Cash Deposit
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Support
+      - kind: secondaryButton
         label: Security Deposit
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Support
+      - kind: secondaryButton
+        label: Prepayment Balance
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Support
+      - kind: secondaryButton
+        label: Other Approved Security
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 32 §Support
   states:
     loading: The deposit guarantee financial list.
@@ -6206,8 +6307,8 @@ screens:
       that matched nothing.
     emptyNoResults: The filter narrowed it and the deposit guarantee financial are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listDepositGuaranteeFinancial
     contract: subscription
@@ -6222,10 +6323,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-037
+    workshopBoard: wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-037
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    32. 3 of 3 labels bound to a contract property; 21 of 32 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    32. 3 of 3 labels bound to a contract property; 24 of 32 pack bullets carried onto the screen —
+    the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
+    the contracts rather than here.
 - id: PTR-038
   name: Payment Terms, Billing & Account Configuration
   module: Partners
@@ -6247,19 +6349,26 @@ screens:
     exitTo:
     - PTR-032
     inferred: false
-    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: PTR-032
       trigger: Returns to the board's landing screen
       provenance: flow F131 step 12→13
       operation: setPaymentTermBilling
   density: compact
+  purposeNote: Every partner transaction can be routed to the correct approved payment and billing model
+    based on its commercial agreement.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
   purpose: Define how the partner pays TICVAI and how transactions are financially grouped.
-  purposeNote: Every partner transaction can be routed to the correct approved payment and billing model
-    based on its commercial agreement.
+  gaps:
+  - operation: null
+    why: '**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved:
+      Immediate Payment, Credit Account, Deposit Balance, Bank Transfer, Card, Prepaid Balance, Other
+      approved method. Each needs an operation, or needs removing from the screen; this is the Phase
+      3 reconciliation seen from the screen side rather than the contract side.'
+    source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Support
   layout:
     template: split
     regions:
@@ -6299,24 +6408,43 @@ screens:
       slot: rowActions
       components:
       - kind: primaryButton
+        label: Immediate Payment
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Support
+      - kind: secondaryButton
+        label: Credit Account
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Support
+      - kind: secondaryButton
+        label: Deposit Balance
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Support
+      - kind: secondaryButton
+        label: Bank Transfer
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference
+      - kind: secondaryButton
+        label: Card
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference
+      - kind: secondaryButton
         label: Payment Link
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference
+      - kind: secondaryButton
+        label: Prepaid Balance
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference
+      - kind: secondaryButton
+        label: Other approved method
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 33 §Allow/reference
   states:
     loading: The payment terms billing list.
     error: Could not load. Names which read failed and leaves the payment terms billing untouched.
     emptyFirstRun: No payment terms billing yet. Carries the create action; distinct from a filter that
       matched nothing.
-    emptyNoResults: The filter narrowed it and the payment terms billing are still there. Names the active
-      filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the payment terms billing are still there. Names the
+      active filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: setPaymentTermBilling
     contract: subscription
     purpose: Payment Terms, Billing & Account Configuration
     trigger: onAction
-    invalidates:
-    - setPaymentTermBilling
   entryState:
     preloaded:
     - PaymentTermsBillingAccountConfigurationView.currentBalance
@@ -6329,10 +6457,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-038
+    workshopBoard: wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-038
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    33. 7 of 7 labels bound to a contract property; 17 of 41 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    33. 7 of 7 labels bound to a contract property; 24 of 41 pack bullets carried onto the screen —
+    the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
+    the contracts rather than here.
 - id: PTR-039
   name: Commercial Allocation, Quota & Commitment Management
   module: Partners
@@ -6354,25 +6483,26 @@ screens:
     exitTo:
     - PTR-032
     inferred: false
-    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: PTR-032
       trigger: Returns to the board's landing screen
       provenance: flow F131 step 14→15
       operation: listCommercialAllocationQuota
   density: compact
+  purposeNote: permitted availability with central capacity management.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Define the commercial commitment of inventory to a partner. This differs from Area 4's operational
     channel allocation.
-  purposeNote: permitted availability with central capacity management.
   gaps:
   - operation: null
-    why: '**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Guaranteed
-      Allocation, On-Request Allocation, Shared Allocation, Percentage Allocation, Rolling Allocation,
-      Seasonal Allocation. Each needs an operation, or needs removing from the screen; this is the Phase
-      3 reconciliation seen from the screen side rather than the contract side.'
+    why: '**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved:
+      Guaranteed Allocation, On-Request Allocation, Shared Allocation, Fixed Quantity, Percentage Allocation,
+      Rolling Allocation, Seasonal Allocation, Take-or-pay where commercially applicable. Each needs
+      an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from
+      the screen side rather than the contract side.'
     source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support
   layout:
     template: split
@@ -6423,6 +6553,9 @@ screens:
         label: Shared Allocation
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support
       - kind: secondaryButton
+        label: Fixed Quantity
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support
+      - kind: secondaryButton
         label: Percentage Allocation
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support
       - kind: secondaryButton
@@ -6431,6 +6564,9 @@ screens:
       - kind: secondaryButton
         label: Seasonal Allocation
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support
+      - kind: secondaryButton
+        label: Take-or-pay where commercially applicable
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 35 §Support
   states:
     loading: The commercial allocation quota list.
     error: Could not load. Names which read failed and leaves the commercial allocation quota untouched.
@@ -6438,8 +6574,8 @@ screens:
       that matched nothing.
     emptyNoResults: The filter narrowed it and the commercial allocation quota are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listCommercialAllocationQuota
     contract: subscription
@@ -6457,10 +6593,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-039
+    workshopBoard: wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-039
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    35. 7 of 7 labels bound to a contract property; 25 of 45 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    35. 7 of 7 labels bound to a contract property; 27 of 45 pack bullets carried onto the screen —
+    the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
+    the contracts rather than here.
 - id: PTR-040
   name: Booking Limits, Commercial Exceptions & Approval
   module: Partners
@@ -6482,25 +6619,26 @@ screens:
     exitTo:
     - PTR-032
     inferred: false
-    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: PTR-032
       trigger: Returns to the board's landing screen
       provenance: flow F131 step 16→17
       operation: approveBookingLimitCommercial
   density: compact
+  purposeNote: Transactions outside standard partner commercial rules cannot proceed without the appropriate
+    documented exception and approval.
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Configure; Capture) and no display
     directory — it is settings, not a population
   purpose: Control transaction limits and provide a governed mechanism for commercial exceptions.
-  purposeNote: Transactions outside standard partner commercial rules cannot proceed without the appropriate
-    documented exception and approval.
   gaps:
   - operation: null
-    why: '**The pack names 3 actions on this screen and the screen declares 1 operation.** Unserved: Price
-      Exception, Allocation Exception. Each needs an operation, or needs removing from the screen; this
-      is the Phase 3 reconciliation seen from the screen side rather than the contract side.'
+    why: '**The pack names 4 actions on this screen and the screen declares 1 operation.** Unserved:
+      Price Exception, Credit Exception, Allocation Exception. Each needs an operation, or needs removing
+      from the screen; this is the Phase 3 reconciliation seen from the screen side rather than the
+      contract side.'
     source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Support
   layout:
     template: form
@@ -6569,6 +6707,9 @@ screens:
         label: Price Exception
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Support
       - kind: secondaryButton
+        label: Credit Exception
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Support
+      - kind: secondaryButton
         label: Allocation Exception
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 37 §Support
       - kind: secondaryButton
@@ -6579,23 +6720,22 @@ screens:
     error: Could not load. Names which read failed and leaves the booking limits commercial untouched.
     emptyFirstRun: No booking limits commercial configured yet. Carries the create action and says what
       the platform does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: approveBookingLimitCommercial
     contract: subscription
     purpose: Booking Limits, Commercial Exceptions & Approval
     trigger: onAction
-    invalidates:
-    - approveBookingLimitCommercial
   wireframe:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-040
+    workshopBoard: wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-040
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    37. 0 of 0 labels bound to a contract property; 21 of 39 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    37. 0 of 0 labels bound to a contract property; 22 of 39 pack bullets carried onto the screen —
+    the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
+    the contracts rather than here.
 - id: PTR-041
   name: Commercial Agreement 360°, Health & AI Review
   module: Partners
@@ -6617,25 +6757,26 @@ screens:
     exitTo:
     - PTR-032
     inferred: false
-    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
   density: compact
+  purposeNote: Management can evaluate the complete commercial relationship, financial exposure, performance
+    and upcoming risks from a single Partner Commercial 360 workspace. Board 2 — Final Screen Register
+    Screen Backend Screen Primary Responsibility
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
-  purpose: 'Give management a single consolidated view of the complete commercial relationship with a
-    partner. Board 3 manages the day-to-day operational and financial relationship with active B2B, reseller
-    and OTA partners. The three boards now form a clean lifecycle: Board 1 — Who is the partner? Onboarding
-    → Organization → Users → Territory → Compliance → Permissions → Activation Board 2 — Under what commercial
-    terms can they transact? Agreement → Rates → Commission → Credit → Security → Billing → Allocation
-    → Limits Board 3 — What happens once the partner starts doing business? Orders → Reservations → Cancellations
-    → Statements → Reconciliation → Commission Settlement → Disputes → Performance → Risk → AI Optimization
-    A key principle for Board 3 is that it should provide a Partner Operations 360° without rebuilding
-    functionality already owned by Orders, Finance, Ticketing, Payment or Channel Management.'
-  purposeNote: Management can evaluate the complete commercial relationship, financial exposure, performance
-    and upcoming risks from a single Partner Commercial 360 workspace. Board 2 — Final Screen Register
-    Screen Backend Screen Primary Responsibility
+  purpose: 'Give management a single consolidated view of the complete commercial relationship with
+    a partner. Board 3 manages the day-to-day operational and financial relationship with active B2B,
+    reseller and OTA partners. The three boards now form a clean lifecycle: Board 1 — Who is the partner?
+    Onboarding → Organization → Users → Territory → Compliance → Permissions → Activation Board 2 —
+    Under what commercial terms can they transact? Agreement → Rates → Commission → Credit → Security
+    → Billing → Allocation → Limits Board 3 — What happens once the partner starts doing business? Orders
+    → Reservations → Cancellations → Statements → Reconciliation → Commission Settlement → Disputes
+    → Performance → Risk → AI Optimization A key principle for Board 3 is that it should provide a Partner
+    Operations 360° without rebuilding functionality already owned by Orders, Finance, Ticketing, Payment
+    or Channel Management.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -6644,8 +6785,8 @@ screens:
       it is built.'
     source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 38
   - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape
+      is a default rather than a reading. It needs a person before it is built.'
     source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 38
   layout:
     template: split
@@ -6673,10 +6814,10 @@ screens:
     error: Could not load. Names which read failed and leaves the commercial agreement 360° untouched.
     emptyFirstRun: No commercial agreement 360° yet. Carries the create action; distinct from a filter
       that matched nothing.
-    emptyNoResults: The filter narrowed it and the commercial agreement 360° are still there. Names the
-      active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the commercial agreement 360° are still there. Names
+      the active filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listCommercialAgreementHealth
     contract: subscription
@@ -6693,10 +6834,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-041
+    workshopBoard: wireframes/WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-041
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    38. 0 of 0 labels bound to a contract property; 6 of 109 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    38. 0 of 0 labels bound to a contract property; 6 of 109 pack bullets carried onto the screen —
+    the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
+    the contracts rather than here.
 - id: PTR-042
   name: Partner Operations Command Center
   module: Partners
@@ -6736,8 +6878,8 @@ screens:
       carries:
       - accountId
       - sessionId
-      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into it
-        must carry them
+      provenance: derived — PTR-001 declares entryState.params accountId, sessionId, so an edge into
+        it must carry them
     - to: PTR-043
       trigger: Works in Partner Orders & Booking Management
       provenance: flow F132 step 1→2
@@ -6775,13 +6917,13 @@ screens:
       provenance: flow F132 step 17→18
       operation: listPartner2
   density: compact
+  purposeNote: Authorized users can understand current partner activity, financial exposure and operational
+    exceptions from one centralized workspace.
   pattern: commandCentre
   patternReason: the pack gives this screen both a metric directory (§Display) and a per-row directory
     (§Each partner should show) — counts over a population, then the population
   purpose: Provide commercial, operations and finance teams with one real-time view of active B2B, reseller
     and OTA business.
-  purposeNote: Authorized users can understand current partner activity, financial exposure and operational
-    exceptions from one centralized workspace.
   layout:
     template: dashboard
     regions:
@@ -6804,8 +6946,8 @@ screens:
         - Date
         - PartnerOperationsCommandCenterView.operationalStatus
         - PartnerOperationsCommandCenterView.risk
-        notes: The pack filters this screen by partner, partner type, venue, event, market, account manager
-          and 4 more — which are present is a decision the pack already made.
+        notes: The pack filters this screen by partner, partner type, venue, event, market, account
+          manager and 4 more — which are present is a decision the pack already made.
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Filter by
     - name: contentBody
       slot: headline
@@ -6879,8 +7021,8 @@ screens:
         - PartnerOperationsCommandCenterView.risk
         bindsTo: PartnerOperationsCommandCenterView
         operation: listPartner2
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Each partner should
-          show
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Each partner
+          should show
     - name: contextPanel
       slot: selection
       components:
@@ -6903,30 +7045,35 @@ screens:
         - PartnerOperationsCommandCenterView.operationalStatus
         - PartnerOperationsCommandCenterView.risk
         notes: null
-        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Each partner should
-          show
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Each partner
+          should show
   states:
     loading: The partner operations list; the counts above it resolve separately.
     error: Could not load. Names which read failed and leaves the partner operations untouched.
-    emptyFirstRun: No partner operations yet. Carries the create action; distinct from a filter that matched
-      nothing.
+    emptyFirstRun: No partner operations yet. Carries the create action; distinct from a filter that
+      matched nothing.
     emptyNoResults: The filter narrowed it and the partner operations are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listPartner2
     contract: subscription
     purpose: Partner Operations Command Center
     trigger: onLoad
+  - operationId: listPartner
+    contract: subscription
+    purpose: Partner Management Command Center
+    trigger: onLoad
   wireframe:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-042
+    workshopBoard: wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-042
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    44. 30 of 35 labels bound to a contract property; 36 of 47 pack bullets carried onto the screen —
-    the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the
-    contracts rather than here.
+    44. 30 of 35 labels bound to a contract property; 36 of 47 pack bullets carried onto the screen
+    — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
+    the contracts rather than here.
 - id: PTR-043
   name: Partner Orders & Booking Management
   module: Partners
@@ -6948,19 +7095,19 @@ screens:
     exitTo:
     - PTR-042
     inferred: false
-    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: PTR-042
       trigger: Returns to the board's landing screen
       provenance: flow F132 step 2→3
       operation: listPartnerOrderBooking
   density: compact
+  purposeNote: Operations can locate and service any partner transaction while preserving central order
+    and commercial-rule integrity.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Provide a consolidated operational view of orders created by each partner.
-  purposeNote: Operations can locate and service any partner transaction while preserving central order
-    and commercial-rule integrity.
   layout:
     template: split
     regions:
@@ -7051,12 +7198,12 @@ screens:
   states:
     loading: The partner orders booking list.
     error: Could not load. Names which read failed and leaves the partner orders booking untouched.
-    emptyFirstRun: No partner orders booking yet. Carries the create action; distinct from a filter that
-      matched nothing.
-    emptyNoResults: The filter narrowed it and the partner orders booking are still there. Names the active
-      filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No partner orders booking yet. Carries the create action; distinct from a filter
+      that matched nothing.
+    emptyNoResults: The filter narrowed it and the partner orders booking are still there. Names the
+      active filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listPartnerOrderBooking
     contract: subscription
@@ -7074,10 +7221,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-043
+    workshopBoard: wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-043
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    46. 12 of 27 labels bound to a contract property; 36 of 50 pack bullets carried onto the screen —
-    the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the
-    contracts rather than here.
+    46. 12 of 27 labels bound to a contract property; 36 of 50 pack bullets carried onto the screen
+    — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
+    the contracts rather than here.
 - id: PTR-044
   name: Reservations, Holds & Release Management
   module: Partners
@@ -7099,20 +7247,20 @@ screens:
     exitTo:
     - PTR-042
     inferred: false
-    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: PTR-042
       trigger: Returns to the board's landing screen
       provenance: flow F132 step 4→5
       operation: listReservationHoldRelease
   density: compact
-  pattern: listDetail
-  patternReason: the pack gives this screen a display directory (§Display) and no metric row
-  purpose: Manage inventory temporarily reserved by B2B partners before final confirmation. This is particularly
-    important for tour operators, corporate groups and travel-trade partners.
   purposeNote: Partner reservations and holds cannot indefinitely block sellable capacity and are automatically
     governed by configured duration, allocation and approval rules.
+  pattern: listDetail
+  patternReason: the pack gives this screen a display directory (§Display) and no metric row
+  purpose: Manage inventory temporarily reserved by B2B partners before final confirmation. This is
+    particularly important for tour operators, corporate groups and travel-trade partners.
   layout:
     template: split
     regions:
@@ -7163,10 +7311,10 @@ screens:
     error: Could not load. Names which read failed and leaves the reservations holds release untouched.
     emptyFirstRun: No reservations holds release yet. Carries the create action; distinct from a filter
       that matched nothing.
-    emptyNoResults: The filter narrowed it and the reservations holds release are still there. Names the
-      active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the reservations holds release are still there. Names
+      the active filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listReservationHoldRelease
     contract: subscription
@@ -7184,10 +7332,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-044
+    workshopBoard: wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-044
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    48. 7 of 7 labels bound to a contract property; 25 of 41 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    48. 7 of 7 labels bound to a contract property; 25 of 41 pack bullets carried onto the screen —
+    the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
+    the contracts rather than here.
 - id: PTR-045
   name: Partner Cancellations, Refunds & Amendments
   module: Partners
@@ -7209,21 +7358,21 @@ screens:
     exitTo:
     - PTR-042
     inferred: false
-    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: PTR-042
       trigger: Returns to the board's landing screen
       provenance: flow F132 step 6→7
       operation: listPartnerCancellationRefund
   density: compact
+  purposeNote: Partner booking changes are processed according to applicable commercial and product
+    policies with complete financial and inventory impact visibility.
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Manage post-booking changes according to the partner's commercial agreement and product policies.
-  purposeNote: Partner booking changes are processed according to applicable commercial and product policies
-    with complete financial and inventory impact visibility.
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -7232,8 +7381,8 @@ screens:
       it is built.'
     source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 49
   - operation: null
-    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
-      a default rather than a reading. It needs a person before it is built.'
+    why: '**The pack gives this screen no display, metric or configuration directory**, so its shape
+      is a default rather than a reading. It needs a person before it is built.'
     source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 49
   layout:
     template: split
@@ -7248,12 +7397,12 @@ screens:
   states:
     loading: The partner cancellations refunds list.
     error: Could not load. Names which read failed and leaves the partner cancellations refunds untouched.
-    emptyFirstRun: No partner cancellations refunds yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No partner cancellations refunds yet. Carries the create action; distinct from a
+      filter that matched nothing.
     emptyNoResults: The filter narrowed it and the partner cancellations refunds are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listPartnerCancellationRefund
     contract: subscription
@@ -7270,10 +7419,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-045
+    workshopBoard: wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-045
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
     49. 0 of 0 labels bound to a contract property; 0 of 34 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the
+    contracts rather than here.
 - id: PTR-046
   name: Partner Statement & Account Activity
   module: Partners
@@ -7295,20 +7445,20 @@ screens:
     exitTo:
     - PTR-042
     inferred: false
-    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: PTR-042
       trigger: Returns to the board's landing screen
       provenance: flow F132 step 8→9
       operation: listPartnerStatementAccount
   density: compact
+  purposeNote: Finance and authorized partner users can reconcile all commercial account activity against
+    a clear running balance and supporting transaction references.
   pattern: commandCentre
   patternReason: the pack gives this screen both a metric directory (§Display) and a per-row directory
     (§Each line should show) — counts over a population, then the population
   purpose: Give finance and commercial teams a complete financial statement for each partner account.
-  purposeNote: Finance and authorized partner users can reconcile all commercial account activity against
-    a clear running balance and supporting transaction references.
   layout:
     template: dashboard
     regions:
@@ -7415,10 +7565,10 @@ screens:
     error: Could not load. Names which read failed and leaves the partner statement account untouched.
     emptyFirstRun: No partner statement account yet. Carries the create action; distinct from a filter
       that matched nothing.
-    emptyNoResults: The filter narrowed it and the partner statement account are still there. Names the
-      active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoResults: The filter narrowed it and the partner statement account are still there. Names
+      the active filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listPartnerStatementAccount
     contract: subscription
@@ -7428,10 +7578,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-046
+    workshopBoard: wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-046
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    51. 20 of 20 labels bound to a contract property; 24 of 43 pack bullets carried onto the screen —
-    the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the
-    contracts rather than here.
+    51. 20 of 20 labels bound to a contract property; 24 of 43 pack bullets carried onto the screen
+    — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
+    the contracts rather than here.
 - id: PTR-047
   name: Partner Reconciliation & Exception Management
   module: Partners
@@ -7453,19 +7604,19 @@ screens:
     exitTo:
     - PTR-042
     inferred: false
-    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: PTR-042
       trigger: Returns to the board's landing screen
       provenance: flow F132 step 10→11
       operation: listPartnerReconciliationException
   density: compact
+  purposeNote: Partner operational and financial records can be reconciled systematically, with every
+    unresolved difference tracked through resolution.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Reconcile operational bookings against financial and channel records and identify discrepancies.
-  purposeNote: Partner operational and financial records can be reconciled systematically, with every
-    unresolved difference tracked through resolution.
   layout:
     template: split
     regions:
@@ -7517,12 +7668,12 @@ screens:
   states:
     loading: The partner reconciliation exception list.
     error: Could not load. Names which read failed and leaves the partner reconciliation exception untouched.
-    emptyFirstRun: No partner reconciliation exception yet. Carries the create action; distinct from a
-      filter that matched nothing.
-    emptyNoResults: The filter narrowed it and the partner reconciliation exception are still there. Names
-      the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyFirstRun: No partner reconciliation exception yet. Carries the create action; distinct from
+      a filter that matched nothing.
+    emptyNoResults: The filter narrowed it and the partner reconciliation exception are still there.
+      Names the active filter and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listPartnerReconciliationException
     contract: subscription
@@ -7540,10 +7691,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-047
+    workshopBoard: wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-047
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    52. 8 of 8 labels bound to a contract property; 15 of 39 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    52. 8 of 8 labels bound to a contract property; 15 of 39 pack bullets carried onto the screen —
+    the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
+    the contracts rather than here.
 - id: PTR-048
   name: Commission Calculation & Settlement Management
   module: Partners
@@ -7565,19 +7717,25 @@ screens:
     exitTo:
     - PTR-042
     inferred: false
-    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: PTR-042
       trigger: Returns to the board's landing screen
       provenance: flow F132 step 12→13
       operation: listCommissionCalculationSettlement
   density: compact
+  purposeNote: until relevant transactions and adjustments have been reconciled.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Display) and no metric row
   purpose: Calculate, approve and settle commission or incentive amounts owed under partner commercial
     agreements.
-  purposeNote: until relevant transactions and adjustments have been reconciled.
+  gaps:
+  - operation: null
+    why: '**The pack names 1 actions on this screen and the screen declares 1 operation.** Unserved:
+      Per Transaction. Each needs an operation, or needs removing from the screen; this is the Phase
+      3 reconciliation seen from the screen side rather than the contract side.'
+    source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 54 §Support
   layout:
     template: split
     regions:
@@ -7616,15 +7774,22 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “For each transaction”,
           “Automatically account for”, “Exception states”, “Settlement Batch”, “Important Boundary”.'
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 54 §Display
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Per Transaction
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 54 §Support
   states:
     loading: The commission calculation settlement list.
-    error: Could not load. Names which read failed and leaves the commission calculation settlement untouched.
+    error: Could not load. Names which read failed and leaves the commission calculation settlement
+      untouched.
     emptyFirstRun: No commission calculation settlement yet. Carries the create action; distinct from
       a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the commission calculation settlement are still there.
       Names the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listCommissionCalculationSettlement
     contract: subscription
@@ -7642,10 +7807,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-048
+    workshopBoard: wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-048
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    54. 8 of 8 labels bound to a contract property; 8 of 42 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    54. 8 of 8 labels bound to a contract property; 9 of 42 pack bullets carried onto the screen — the
+    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the
+    contracts rather than here.
 - id: PTR-049
   name: Partner Disputes, Cases & Service Management
   module: Partners
@@ -7667,25 +7833,25 @@ screens:
     exitTo:
     - PTR-042
     inferred: false
-    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: PTR-042
       trigger: Returns to the board's landing screen
       provenance: flow F132 step 14→15
       operation: listPartnerDisputeCase
   density: compact
+  purposeNote: Every partner dispute has a traceable owner, SLA, supporting evidence, financial context
+    and documented resolution.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Monitor) and no metric row
   purpose: Provide a structured case-management environment for partner operational and commercial disputes.
-  purposeNote: Every partner dispute has a traceable owner, SLA, supporting evidence, financial context
-    and documented resolution.
   gaps:
   - operation: null
-    why: '**The pack names 6 actions on this screen and the screen declares 1 operation.** Unserved: Booking
-      Dispute, Pricing Dispute, Ticket Issue, Allocation Issue, Finance review, Technical review. Each
-      needs an operation, or needs removing from the screen; this is the Phase 3 reconciliation seen from
-      the screen side rather than the contract side.'
+    why: '**The pack names 8 actions on this screen and the screen declares 1 operation.** Unserved:
+      Booking Dispute, Pricing Dispute, Credit Dispute, Ticket Issue, Allocation Issue, API Issue, Finance
+      review, Technical review. Each needs an operation, or needs removing from the screen; this is
+      the Phase 3 reconciliation seen from the screen side rather than the contract side.'
     source: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support
   layout:
     template: split
@@ -7726,10 +7892,16 @@ screens:
         label: Pricing Dispute
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support
       - kind: secondaryButton
+        label: Credit Dispute
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support
+      - kind: secondaryButton
         label: Ticket Issue
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support
       - kind: secondaryButton
         label: Allocation Issue
+        provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support
+      - kind: secondaryButton
+        label: API Issue
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 56 §Support
       - kind: secondaryButton
         label: Finance review
@@ -7740,12 +7912,12 @@ screens:
   states:
     loading: The partner disputes cases list.
     error: Could not load. Names which read failed and leaves the partner disputes cases untouched.
-    emptyFirstRun: No partner disputes cases yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: No partner disputes cases yet. Carries the create action; distinct from a filter
+      that matched nothing.
     emptyNoResults: The filter narrowed it and the partner disputes cases are still there. The pack's
       own statuses are Proposed → Resolved → Closed — the state names which is selected.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listPartnerDisputeCase
     contract: subscription
@@ -7761,10 +7933,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-049
+    workshopBoard: wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-049
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    56. 4 of 4 labels bound to a contract property; 25 of 45 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    56. 4 of 4 labels bound to a contract property; 27 of 45 pack bullets carried onto the screen —
+    the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
+    the contracts rather than here.
 - id: PTR-050
   name: Partner Performance Scorecard & Risk Monitoring
   module: Partners
@@ -7786,20 +7959,20 @@ screens:
     exitTo:
     - PTR-042
     inferred: false
-    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
     transitions:
     - to: PTR-042
       trigger: Returns to the board's landing screen
       provenance: flow F132 step 16→17
       operation: listPartnerPerformanceScorecard
   density: compact
+  purposeNote: Management can objectively compare partners and identify commercial, operational or financial
+    deterioration before it becomes a material issue.
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
   purpose: Create a consistent scorecard for evaluating the quality and commercial value of every partner
     relationship.
-  purposeNote: Management can objectively compare partners and identify commercial, operational or financial
-    deterioration before it becomes a material issue.
   layout:
     template: split
     regions:
@@ -7831,12 +8004,12 @@ screens:
   states:
     loading: The partner performance scorecard list.
     error: Could not load. Names which read failed and leaves the partner performance scorecard untouched.
-    emptyFirstRun: No partner performance scorecard yet. Carries the create action; distinct from a filter
-      that matched nothing.
+    emptyFirstRun: No partner performance scorecard yet. Carries the create action; distinct from a
+      filter that matched nothing.
     emptyNoResults: The filter narrowed it and the partner performance scorecard are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listPartnerPerformanceScorecard
     contract: subscription
@@ -7851,10 +8024,11 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-050
+    workshopBoard: wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-050
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
     57. 3 of 3 labels bound to a contract property; 3 of 42 pack bullets carried onto the screen — the
-    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here.
+    rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the
+    contracts rather than here.
 - id: PTR-051
   name: Partner AI Intelligence & Relationship Optimization
   module: Partners
@@ -7876,17 +8050,17 @@ screens:
     exitTo:
     - PTR-042
     inferred: false
-    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups
-      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack
+      groups its screens ten to a board behind a command centre, and that grouping is the navigation.'
   density: compact
+  purposeNote: Management receives explainable partner-level intelligence and scenario modelling that
+    supports growth, margin, allocation and risk decisions without bypassing commercial governance.
+    Board 3 — Final Screen Register Screen Backend Screen Primary Responsibility 8.3.1 Partner Operations
+    Command Center Live partner operations 8.3.2 Partner Orders & Booking Management Partner transactions
   pattern: listDetail
   patternReason: the pack gives this screen a display directory (§Analyze) and no metric row
   purpose: Provide TICVAI's AI decision-support layer across the complete partner lifecycle. This screen
     should combine information from Boards 1, 2 and 3.
-  purposeNote: Management receives explainable partner-level intelligence and scenario modelling that
-    supports growth, margin, allocation and risk decisions without bypassing commercial governance. Board
-    3 — Final Screen Register Screen Backend Screen Primary Responsibility 8.3.1 Partner Operations Command
-    Center Live partner operations 8.3.2 Partner Orders & Booking Management Partner transactions
   layout:
     template: split
     regions:
@@ -7939,13 +8113,14 @@ screens:
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 59 §Analyze
   states:
     loading: The partner intelligence relationship list.
-    error: Could not load. Names which read failed and leaves the partner intelligence relationship untouched.
+    error: Could not load. Names which read failed and leaves the partner intelligence relationship
+      untouched.
     emptyFirstRun: No partner intelligence relationship yet. Carries the create action; distinct from
       a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the partner intelligence relationship are still there.
       Names the active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is
+      no data* and sends somebody to support with the wrong question.
   apis:
   - operationId: listPartnerRelationship
     contract: subscription
@@ -7963,7 +8138,8 @@ screens:
     status: notStarted
     provenance: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-051
+    workshopBoard: wireframes/WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-051
   apisNote: Regenerated 9 September 2026 from B2B, Reseller & OTA Partner Management_Reference.pdf page
-    59. 14 of 14 labels bound to a contract property; 14 of 96 pack bullets carried onto the screen —
-    the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the
-    contracts rather than here.
+    59. 14 of 14 labels bound to a contract property; 14 of 96 pack bullets carried onto the screen
+    — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
+    the contracts rather than here.

@@ -1,0 +1,128 @@
+id: F221
+name: 'ACCREDITATION board 5: Accreditation Access Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as ACCREDITATION board 5. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-654
+  entryPoints:
+  - Arrives at Accreditation Access Command Center
+steps:
+- step: 1
+  screen: BO-654
+  action: Opens Accreditation Access Command Center
+  operations: []
+  outcome: Central operational dashboard for accreditation access permissions.
+- step: 2
+  screen: BO-655
+  action: Works in Access Profile Management
+  operations: []
+  outcome: Create reusable accreditation access profiles.
+- step: 3
+  screen: BO-654
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-656
+  action: Works in Venue & Zone Access Matrix
+  operations: []
+  outcome: Visually configure which accreditation profiles can access each venue zone.
+- step: 5
+  screen: BO-654
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-657
+  action: Works in Operational Area Permission Management
+  operations: []
+  outcome: Configure access to operational areas below the broader zone level.
+- step: 7
+  screen: BO-654
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-658
+  action: Works in Date & Time Access Rules
+  operations: []
+  outcome: Control when accreditation access is valid.
+- step: 9
+  screen: BO-654
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-659
+  action: Works in Access Schedule Management
+  operations: []
+  outcome: Create reusable schedules for accreditation permissions.
+- step: 11
+  screen: BO-654
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-660
+  action: Works in Holder Access Assignment
+  operations: []
+  outcome: Assign access permissions to an individual accreditation holder.
+- step: 13
+  screen: BO-654
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-661
+  action: Works in Temporary Access & Exception Management
+  operations: []
+  outcome: Provide controlled short-term access outside normal accreditation permissions.
+- step: 15
+  screen: BO-654
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-662
+  action: Works in Access Revocation & Suspension
+  operations: []
+  outcome: Immediately remove or temporarily disable accreditation access.
+- step: 17
+  screen: BO-654
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-663
+  action: Works in Access Rights Preview, Impact & Synchronization
+  operations: []
+  outcome: Validate accreditation access before publishing it to Access Control.
+branches:
+- at: 1
+  condition: Nothing has been set up on Accreditation Access Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on ACCREDITATION board 5 visited
+primaryContract: unknown
+contracts:
+- unknown

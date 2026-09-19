@@ -1,0 +1,135 @@
+id: F291
+name: 'Upsell,CrossSellEngine board 5: Personalization & NBO Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Upsell,CrossSellEngine board 5. **This route is read from
+    the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-679
+  entryPoints:
+  - Arrives at Personalization & NBO Command Center
+steps:
+- step: 1
+  screen: ADM-679
+  action: Opens Personalization & NBO Command Center
+  operations: []
+  outcome: Provide centralized visibility into the operation and commercial impact of personalized recommendations.
+- step: 2
+  screen: ADM-680
+  action: Works in Customer Recommendation Profile
+  operations: []
+  outcome: Provide the recommendation engine's commercially relevant customer context used for personalization.
+    This should not become another CRM profile screen. CRM remains the authoritative source of customer
+    information. Board 5 displays only the
+- step: 3
+  screen: ADM-679
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-681
+  action: Works in Customer Feature & Signal Configuration
+  operations: []
+  outcome: Control which approved data signals the AI may use when calculating personalized recommendations.
+    This is critical for governance and explainability.
+- step: 5
+  screen: ADM-679
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-682
+  action: Works in Propensity Model & Customer Intent Manager
+  operations: []
+  outcome: Calculate the likelihood that a guest will take specific commercial actions.
+- step: 7
+  screen: ADM-679
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-683
+  action: Works in Next-Best-Offer Decision Studio
+  operations: []
+  outcome: This is the core screen of Board 5. Combine all eligible candidates and determine the strongest
+    personalized recommendation.
+- step: 9
+  screen: ADM-679
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-684
+  action: Works in Personalized Ranking & Decision Policy Builder
+  operations: []
+  outcome: Configure how TICVAI converts AI scores and commercial factors into the final recommendation
+    ranking.
+- step: 11
+  screen: ADM-679
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-685
+  action: Works in Customer Preference, Fatigue & Suppression Intelligence
+  operations: []
+  outcome: Prevent personalization from becoming repetitive or intrusive. Board 4 provides general journey
+    frequency controls. Board 5 adds customer-specific behavioral suppression.
+- step: 13
+  screen: ADM-679
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-686
+  action: Works in Anonymous, Known & Identity-Transition Personalization.123
+  operations: []
+  outcome: Allow useful recommendations even when TICVAI does not yet know the customer's identity.
+- step: 15
+  screen: ADM-679
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-687
+  action: Works in AI Explainability, Confidence & Model Governance
+  operations: []
+  outcome: Make personalized AI decisions understandable and governable.
+- step: 17
+  screen: ADM-679
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-688
+  action: Works in Personalization Simulator & Next-Best-Offer Lab
+  operations: []
+  outcome: Allow administrators to simulate how TICVAI would personalize recommendations for different
+    customers before deploying changes.
+branches:
+- at: 1
+  condition: Nothing has been set up on Personalization & NBO Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Upsell,CrossSellEngine board 5 visited
+primaryContract: unknown
+contracts:
+- unknown

@@ -584,6 +584,7 @@ screens:
 - P08:BO-068 Audit Log
 - P08:BO-106 People & Access Rights
 - P08:BO-142 Store Rules, Controls & Permissions
+- P08:BO-385 Delegation Management
 - P09:ADM-001 Platform Login / MFA
 - P09:ADM-002 Platform Dashboard
 - P09:ADM-005 Tenant Directory
