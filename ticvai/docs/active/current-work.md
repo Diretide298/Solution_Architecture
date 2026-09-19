@@ -103,6 +103,83 @@ Anything above 9 on `check-package` is ours, and it gets fixed before the next c
 new tables on top of unresolved renames means renaming tables that new code already references.
 **Renames land first.** See *Phase 1, reverted* below for how to bring it back.
 
+### Re-checked 19 September — the 18 September comparison is superseded
+
+**Our schema moved from 374 tables to 556 and the overlap went down.** Everything below this
+heading was measured against 374 and should be read as history; the figures here replace it.
+
+| | 18 Sep | 19 Sep |
+|---|---:|---:|
+| their tables | 323 | 323 — same file |
+| our tables | 374 | **556** |
+| in both | 106 | **100** |
+| ours only | 268 | **456** |
+| theirs only | — | **223** |
+
+**We added 182 tables and matched six fewer.** Growth has been entirely away from their model,
+which is an argument for reconciling now rather than after the next run.
+
+#### The twelve declared table renames, resolved
+
+**Normalise the five schema prefixes first or three of the twelve answers come out wrong.**
+The Change Log states some renames before the prefix change and some after — `whitelabel.banner
+-> branding.banner` is the reverse of `branding.* -> whitelabel.*`, and taken literally it would
+**rename our tables back to `branding`, undoing their adoption of our names.**
+
+| verdict | n | |
+|---|---|---|
+| **we owe** | 3 | `sync.rejection -> sync.cross_cell_rejection` · `identity.otp_challenge -> identity.otp` · `marketing.segment -> marketing.customer_segment` |
+| already ours | 2 | `marketing.consent_purpose`, `catalogue.performance` — they moved to our name |
+| pure prefix, not a rename | 2 | `whitelabel.banner`, `whitelabel.policy` |
+| their internal churn | 5 | neither name is ours |
+
+**`orders.till_shift -> orders.pos_shift` is in the churn group**, and that matters: the standing
+to-do lists `orders.shift -> orders.pos_shift` as the one expensive rename we owe. **Their
+Change Log says the rename was from `till_shift`, a name we have never had.** That item came from
+column matching, not from their declaration. Measured today it is 11 reads, 7 writes, two services
+and 16 screens across P04/P06/P07/P08 — **confirm it with them before paying for it.**
+
+#### F&B and Retail keep their own schemas, and we already do
+
+**Decided 19 September: `catalogue` holds tickets only.** F&B and Retail are dedicated services so
+they scale and deploy apart — a flash sale on tickets must not contend with a menu read.
+
+**That separation already exists in our package.** `fnb.menu_item` sits in a 33-table `fnb` schema
+and `retail.merchandise` in a 12-table `retail` schema; their workbook calls the same two tables
+`fnb.product` and `retail.product`. **It is a naming difference, not a placement one**, which the
+readers confirm: of the 39 operations reading `catalogue.product`, **one is `fnb` and none is
+`retail`** — the other 38 are ticket domain, and six of its seven writers are `catalogue`.
+
+**So there is no split to do.** An earlier estimate of this as 55 operations and 95 screens was
+sizing work that is not needed.
+
+**What is real is two foreign keys.** `fnb.menu_item.product_variant_id` and
+`retail.merchandise.variant_id` both point at `catalogue.variant`, declared, with nothing pointing
+back. **Those two are the whole coupling**, and they are what stops F&B and Retail deploying
+independently of the ticket catalogue. Decide them before the next schema exchange.
+
+#### Wallet: we keep ours
+
+**Both sides now have a `wallet` schema and they are not the same thing.** Theirs is five runtime
+tables — `access`, `account`, `balance`, `hold`, `transaction`. Ours is 23 and is mostly the rules:
+credit types, consumption policy, funding rules, channel rules, liability.
+
+**They built the acts and we built the rules**, which is the same split found inside our own
+package on 19 September, appearing again across the boundary. Ours stands as a dedicated service
+(WalletService, 48 operations). **Their workbook is titled 16 Services and we now have 17** — tell
+them before they build against the old boundary.
+
+#### What is now closed
+
+- **The five schema prefix renames are done, not pending.** Their file already uses `platform`,
+  `catalogue`, `venuemap`, `sync`, `whitelabel` — every one our name.
+- **Clarification on the undeclared schemas is narrower**: `wallet` exists our side now. `venue`
+  (5 tables) and `pricing` (3) are still genuinely absent.
+- **28 Table Added, 27 still new to us** — only `orders.payment_link` has since appeared.
+
+---
+
+
 ### Validated, 18 September — [change-log-validation-18-september.md](change-log-validation-18-september.md)
 
 **Their Change Log is internally accurate: 654 of 654 column renames and 12 of 12 table renames land
