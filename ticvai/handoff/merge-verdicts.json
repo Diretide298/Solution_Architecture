@@ -7,6 +7,10 @@
   "KEEP OURS",
   "we give the domain its own schema; same principle they accepted for branding->whitelabel"
  ],
+ "ai.knowledge_group": [
+  "TAKE EITHER",
+  "their \"searchable knowledge base\" is our knowledge_collection; a vocabulary choice"
+ ],
  "ai.usage_policy": [
   "DECLINE",
   "ours is richer, 26 columns against their 17"
@@ -35,9 +39,37 @@
   "DECLINE",
   "the table name repeats its schema; same habit as the 645 column renames"
  ],
+ "catalogue.product_recommendation": [
+  "NO MATCH",
+  "matched catalogue.variant on noise; upsell lives in promotions for us"
+ ],
  "catalogue.product_variant": [
   "DECLINE",
   "pairs with variant_dimension; 11 inbound FKs"
+ ],
+ "catalogue.rental_rate": [
+  "COLLISION",
+  "rental domain; ours is rental.pricing_profile"
+ ],
+ "catalogue.rental_requirement": [
+  "COLLISION",
+  "rental domain; ours is rental.agreement_rules"
+ ],
+ "catalogue.rental_rule": [
+  "COLLISION",
+  "rental domain; ours is rental.operational_rules"
+ ],
+ "catalogue.upgrade_rule": [
+  "NO MATCH",
+  "matched catalogue.variant on noise; we serve upgrades by operation, not a rule table"
+ ],
+ "control.channel": [
+  "NO MATCH",
+  "matched cell_instance on noise; a sales-channel table needs its own check"
+ ],
+ "control.channel_item": [
+  "NO MATCH",
+  "matched cell_instance on noise; channel-to-item mapping"
  ],
  "fnb.dining_table": [
   "TAKE THEIRS",
@@ -67,9 +99,29 @@
   "ADDITIVE",
   "F&B/Retail stand alone; their purpose says it does not depend on Catalogue"
  ],
+ "identity.customer_extra_option": [
+  "ADDITIVE",
+  "customer extra-field choices; we have no extensible profile fields"
+ ],
+ "identity.enabled_module": [
+  "PLACEMENT",
+  "module enablement per tenant \u2014 ours is whitelabel.module_enablement"
+ ],
  "identity.otp": [
   "TAKE BODY",
   "ours is a 2-column stub; keep our name, take their columns"
+ ],
+ "identity.refresh_token": [
+  "ADDITIVE",
+  "we hold session but no refresh-token rotation record"
+ ],
+ "identity.user_access": [
+  "ADDITIVE",
+  "assigns a role to a principal in a scope \u2014 we have role_permission and delegated_access but no grant table"
+ ],
+ "identity.user_account": [
+  "DECLINE",
+  "principal is ours and covers person, service and device, which their own purpose describes"
  ],
  "inventory.stock_count": [
   "DECLINE",
@@ -91,6 +143,10 @@
   "DECLINE",
   "the table name repeats its schema; same habit as the 645 column renames"
  ],
+ "ledger.journal": [
+  "DECLINE",
+  "their journal is the header; ours is journal_entry with journal_line beneath it"
+ ],
  "maintenance.preventive_plan": [
   "TAKE THEIRS",
   "our maintenance_plan repeats the schema; theirs is more specific"
@@ -107,9 +163,33 @@
   "DECLINE",
   "customer_ repeats the marketing schema"
  ],
+ "marketing.customer_segment_rule": [
+  "DECLINE",
+  "segment_criterion is ours and customer_ repeats the schema"
+ ],
+ "marketing.journey_enrollment": [
+  "TAKE THEIRS",
+  "enrollment is the clearer word; journey_entrant reads as a person, not a state"
+ ],
+ "marketing.journey_step": [
+  "ADDITIVE",
+  "we hold journey and journey_entrant and no steps"
+ ],
  "marketing.loyalty_campaign": [
   "ADDITIVE",
   "links a campaign to loyalty bonuses; a different table, not a rename"
+ ],
+ "marketing.points_earning_rule": [
+  "SPLIT",
+  "they split earning and redemption; our loyalty_programme holds both"
+ ],
+ "marketing.points_redemption_rule": [
+  "SPLIT",
+  "they split earning and redemption; our loyalty_programme holds both"
+ ],
+ "marketing.reward": [
+  "ADDITIVE",
+  "we hold loyalty_programme, _tier and _position but no reward"
  ],
  "marketing.sla_policy": [
   "ADDITIVE",
@@ -123,6 +203,22 @@
   "ADDITIVE",
   "rental security deposit, not a till deposit"
  ],
+ "orders.payment_gateway": [
+  "COLLISION",
+  "payments domain; ours is payments.provider_connection"
+ ],
+ "orders.payment_method": [
+  "COLLISION",
+  "payments domain; ours is payments.method"
+ ],
+ "orders.payment_policy": [
+  "COLLISION",
+  "payments domain; ours is payments.payment_terms"
+ ],
+ "orders.payment_terminal": [
+  "COLLISION",
+  "payments domain; ours is payments.terminal"
+ ],
  "orders.pos_shift": [
   "TAKE THEIRS",
   "pos_ disambiguates from workforce.shift, which they also have"
@@ -135,13 +231,25 @@
   "DECLINE",
   "ours is in control with 20 columns and 19 inbound FKs"
  ],
+ "platform.cell_endpoint": [
+  "ADDITIVE",
+  "how one cell reaches another; we have no endpoint record"
+ ],
  "platform.region_setting": [
   "EITHER",
   "singular vs plural only; settle our own convention first"
  ],
+ "platform.tenant_subscription": [
+  "COLLISION",
+  "subscription domain; ours is control.subscription"
+ ],
  "reporting.report_execution": [
   "DECLINE",
   "the table name repeats its schema; same habit as the 645 column renames"
+ ],
+ "reporting.report_input": [
+  "DECLINE",
+  "parameter is the domain word"
  ],
  "reporting.report_schedule": [
   "DECLINE",
@@ -150,6 +258,10 @@
  "resources.rental_inspection": [
   "KEEP OURS",
   "we give the domain its own schema; same principle they accepted for branding->whitelabel"
+ ],
+ "resources.rental_product_mapping": [
+  "COLLISION",
+  "rental domain; ours is rental.equipment_assignment"
  ],
  "resources.resource_booking": [
   "DECLINE",
@@ -202,6 +314,10 @@
  "wallet.account": [
   "RECLASSIFY",
   "their stored-value wallet master = our wallet.wallet, not ledger.account"
+ ],
+ "whitelabel.brand_version": [
+  "EITHER",
+  "config_version vs brand_version; concede, it costs nothing"
  ],
  "whitelabel.menu_item": [
   "RECLASSIFY",
