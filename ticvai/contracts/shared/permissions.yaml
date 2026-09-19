@@ -112,6 +112,24 @@ components:
         - CREDIT_MANAGE               # partner credit limits and terms
         - CREDIT_OVERRIDE             # authorise one order beyond the limit. 2.7.39
 
+        # --- Wallet and stored value ------------------------------------------
+        - WALLET_VIEW                 # balances, lots, liability, disputes
+        - WALLET_OPERATE              # adjust, reverse, freeze, relink a credential
+        - WALLET_CONFIGURE            # wallet types, credit types, funding and risk rules
+
+        # --- Payment orchestration --------------------------------------------
+        - PAYMENT_VIEW                # methods, providers, routing, health, economics
+        - PAYMENT_CONFIGURE           # methods, routing, failover, terminals, tender rules
+        - PAYMENT_PROVIDER_MANAGE     # connect a gateway and hold its credentials
+        - PAYMENT_DISPUTE             # assemble and submit chargeback evidence
+        # **`PROVIDER_MANAGE` is separate from `CONFIGURE` because it holds keys.** Changing
+        # which acquirer a venue routes to is an operational decision; possessing the
+        # credentials that can move the money is not the same thing.
+        # **`OPERATE` touches one guest's money; `CONFIGURE` decides the rules for
+        # everybody's.** A duty manager reverses a mistaken top-up several times a week;
+        # changing the consumption order decides, for every guest at once, whether their
+        # bonus credit expires unused. Those are not the same authority.
+
         # --- Shift and cash ---------------------------------------------------
         - SHIFT_OPEN
         - SHIFT_CLOSE

@@ -114369,7 +114369,17 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listWalletTypes
+    contract: wallet
+    purpose: Wallet types in use
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: getWalletLiability
+    contract: wallet
+    purpose: What is outstanding
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1083
@@ -114531,7 +114541,19 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listWalletTypes
+    contract: wallet
+    purpose: The type library
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: createWalletType
+    contract: wallet
+    purpose: Define a type
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id032
+    - listWalletTypes
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1084
@@ -114644,7 +114666,20 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: createWalletType
+    contract: wallet
+    purpose: Provisioning rules for a type
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id032
+  - operationId: updateWalletType
+    contract: wallet
+    purpose: Change them
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id033
+    - listWalletTypes
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1085
@@ -114750,7 +114785,18 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: getWallet
+    contract: retail
+    purpose: The wallet and its owner
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: updateWalletType
+    contract: wallet
+    purpose: Ownership and association rules
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id033
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1086
@@ -114853,7 +114899,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: updateWalletType
+    contract: wallet
+    purpose: Currency and monetary limits
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id033
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1087
@@ -115015,7 +115067,26 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listCreditTypes
+    contract: wallet
+    purpose: The credit type library
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: createCreditType
+    contract: wallet
+    purpose: Define a credit type, without a release
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id035
+    - listCreditTypes
+  - operationId: updateCreditType
+    contract: wallet
+    purpose: Change one
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id036
+    - listCreditTypes
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1088
@@ -115081,7 +115152,13 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: updateWalletType
+    contract: wallet
+    purpose: Which features this wallet type has
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id033
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1089
@@ -115170,7 +115247,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: updateWalletType
+    contract: wallet
+    purpose: Lifecycle states and transitions
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id033
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1090
@@ -115277,7 +115360,20 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: updateWalletType
+    contract: wallet
+    purpose: Numbering and identity
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id033
+  - operationId: linkWalletCredential
+    contract: wallet
+    purpose: Digital credentials
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id045
+    - getWallet
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1091
@@ -115413,7 +115509,15 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: publishWalletConfiguration
+    contract: wallet
+    purpose: Validate and publish
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id038
+    - listWalletTypes
+    - listCreditTypes
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1092
@@ -115590,7 +115694,17 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: getWalletFundingRules
+    contract: wallet
+    purpose: Funding rules in force
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: listWalletTransactions
+    contract: retail
+    purpose: Recent funding
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1093
@@ -115702,7 +115816,14 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setWalletFundingRules
+    contract: wallet
+    purpose: Which methods may fund a wallet
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id034
+    - getWalletFundingRules
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1094
@@ -115826,7 +115947,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setWalletFundingRules
+    contract: wallet
+    purpose: Amounts, presets and bonus rules
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id034
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1095
@@ -115952,7 +116079,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setWalletFundingRules
+    contract: wallet
+    purpose: Channel and funding-source mapping
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id034
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1096
@@ -116064,7 +116197,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setWalletFundingRules
+    contract: wallet
+    purpose: Auto-reload on a threshold
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id034
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1097
@@ -116185,7 +116324,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setWalletFundingRules
+    contract: wallet
+    purpose: Recurring funding on a date
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id034
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1098
@@ -116314,7 +116459,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setWalletFundingRules
+    contract: wallet
+    purpose: Approval above a threshold
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id034
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1099
@@ -116432,7 +116583,15 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: reverseWalletFunding
+    contract: wallet
+    purpose: Reverse or correct a top-up
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id046
+    - listWalletTransactions
+    - listCreditLots
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1100
@@ -116579,7 +116738,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setWalletFundingRules
+    contract: wallet
+    purpose: Limits and velocity controls
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id034
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1101
@@ -116684,7 +116849,17 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listWalletTransactions
+    contract: retail
+    purpose: The funding audit trail
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: getWalletReconciliation
+    contract: wallet
+    purpose: Against the acquirer and the ledger
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1102
@@ -116825,7 +117000,17 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listCreditTypes
+    contract: wallet
+    purpose: Credit types and their balances
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: getWalletLiability
+    contract: wallet
+    purpose: Outstanding by type
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1103
@@ -116985,7 +117170,19 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: createCreditType
+    contract: wallet
+    purpose: Define a credit type
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id035
+  - operationId: updateCreditType
+    contract: wallet
+    purpose: Change one
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id036
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1104
@@ -117083,7 +117280,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: updateCreditType
+    contract: wallet
+    purpose: How this credit is issued
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id036
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1105
@@ -117150,7 +117353,14 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setCreditEligibilityRules
+    contract: wallet
+    purpose: Where it may be spent
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - listCreditTypes
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1106
@@ -117276,7 +117486,19 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setCreditConsumptionPolicy
+    contract: wallet
+    purpose: Which credit is spent first
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id037
+    - getCreditConsumptionPolicy
+  - operationId: getCreditConsumptionPolicy
+    contract: wallet
+    purpose: The order in force
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1107
@@ -117367,7 +117589,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: updateCreditType
+    contract: wallet
+    purpose: Expiry and validity
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id036
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1108
@@ -117446,7 +117674,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listCreditLots
+    contract: wallet
+    purpose: The lots behind a balance
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1109
@@ -117561,7 +117794,18 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setCreditConsumptionPolicy
+    contract: wallet
+    purpose: Split tender across credit types
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id037
+  - operationId: simulateCreditConsumption
+    contract: wallet
+    purpose: What a purchase would use
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1110
@@ -117652,7 +117896,15 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: expireCreditLots
+    contract: wallet
+    purpose: Expire, extend or forfeit
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id043
+    - listCreditLots
+    - getWalletLiability
   entryState:
     preloaded:
     - Expiring today
@@ -117736,7 +117988,18 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: simulateCreditConsumption
+    contract: wallet
+    purpose: Simulate
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+  - operationId: publishWalletConfiguration
+    contract: wallet
+    purpose: Validate and publish the rules
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id038
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1112
@@ -117912,7 +118175,12 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listSharedWallets
+    contract: wallet
+    purpose: Family and corporate structures
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Total shared wallets
@@ -118010,7 +118278,14 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: createSharedWallet
+    contract: wallet
+    purpose: Set one up
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id040
+    - listSharedWallets
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1114
@@ -118102,7 +118377,14 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setSharedWalletMembers
+    contract: wallet
+    purpose: Household members and roles
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id039
+    - listSharedWallets
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1115
@@ -118201,7 +118483,21 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setSharedWalletMembers
+    contract: wallet
+    purpose: Parent and child distribution
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id039
+  - operationId: transferWalletBalance
+    contract: retail
+    purpose: Move value between them
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id041
+    - getWallet
+    - listWalletTransactions
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1116
@@ -118295,7 +118591,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setSharedWalletMembers
+    contract: wallet
+    purpose: Allowance and budget
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id039
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1117
@@ -118421,7 +118723,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setSharedWalletMembers
+    contract: wallet
+    purpose: Spending controls per member
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id039
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1118
@@ -118511,7 +118819,18 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: createSharedWallet
+    contract: wallet
+    purpose: Corporate hierarchy
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id040
+  - operationId: listSharedWallets
+    contract: wallet
+    purpose: Existing corporate wallets
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1119
@@ -118616,7 +118935,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setSharedWalletMembers
+    contract: wallet
+    purpose: Corporate budget and policy
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id039
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1120
@@ -118707,7 +119032,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: transferWalletBalance
+    contract: retail
+    purpose: Reallocate balance
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id041
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1121
@@ -118783,7 +119114,17 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: simulateCreditConsumption
+    contract: wallet
+    purpose: Simulate a member spend
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+  - operationId: listSharedWallets
+    contract: wallet
+    purpose: Monitor the structures
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1122
@@ -118977,7 +119318,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getWalletLiability
+    contract: wallet
+    purpose: Gift card liability
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Active Gift Cards
@@ -119148,7 +119494,14 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setGiftCardProduct
+    contract: wallet
+    purpose: Denominations and validity
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - listVoucherTypes
   entryState:
     preloaded:
     - Product name
@@ -119288,7 +119641,17 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: issueGiftCard
+    contract: retail
+    purpose: Issue
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+  - operationId: activateGiftCard
+    contract: retail
+    purpose: Activate
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1125
@@ -119413,7 +119776,19 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listVoucherTypes
+    contract: wallet
+    purpose: Voucher and coupon types
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: createVoucherType
+    contract: wallet
+    purpose: Define one
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id042
+    - listVoucherTypes
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1126
@@ -119566,7 +119941,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: createVoucherType
+    contract: wallet
+    purpose: Eligibility and redemption rules
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id042
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1127
@@ -119693,7 +120074,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listVoucherTypes
+    contract: wallet
+    purpose: Benefits mapped to memberships
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1128
@@ -119815,7 +120201,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listVoucherTypes
+    contract: wallet
+    purpose: How benefits are presented
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1129
@@ -119912,7 +120303,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: expireCreditLots
+    contract: wallet
+    purpose: Gift card and voucher expiry
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id043
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1130
@@ -120010,7 +120407,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getWalletLiability
+    contract: wallet
+    purpose: Balance, liability and breakage
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Gift cards sold
@@ -120094,7 +120496,13 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: publishWalletConfiguration
+    contract: wallet
+    purpose: Validate and publish
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id038
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1132
@@ -120258,7 +120666,14 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setWalletChannelRules
+    contract: wallet
+    purpose: Where wallets are accepted
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+    invalidates: &id044
+    - getWalletFundingRules
   entryState:
     preloaded:
     - Wallet Transactions Today
@@ -120413,7 +120828,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setWalletChannelRules
+    contract: wallet
+    purpose: Channel configuration
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id044
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1134
@@ -120517,7 +120938,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setWalletChannelRules
+    contract: wallet
+    purpose: Payment and redemption policy
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id044
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1135
@@ -120656,7 +121083,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setWalletChannelRules
+    contract: wallet
+    purpose: Credential kinds accepted
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id044
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1136
@@ -120787,7 +121220,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: linkWalletCredential
+    contract: wallet
+    purpose: Bind a wearable to a wallet
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id045
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1137
@@ -120880,7 +121319,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setWalletChannelRules
+    contract: wallet
+    purpose: NFC, RFID and QR rules
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id044
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1138
@@ -120989,7 +121434,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setWalletChannelRules
+    contract: wallet
+    purpose: Authentication and PIN policy
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id044
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1139
@@ -121107,7 +121558,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setWalletChannelRules
+    contract: wallet
+    purpose: Offline and degraded mode
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id044
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1140
@@ -121206,7 +121663,18 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listPaymentTerminals
+    contract: payments
+    purpose: Terminals and acceptance points
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: setWalletChannelRules
+    contract: wallet
+    purpose: Map acceptance points
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id044
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1141
@@ -121288,7 +121756,17 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: simulateCreditConsumption
+    contract: wallet
+    purpose: Simulate a wallet transaction
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+  - operationId: listWalletTransactions
+    contract: retail
+    purpose: Monitor and audit
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1142
@@ -121471,7 +121949,17 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listWalletDisputes
+    contract: wallet
+    purpose: Open exceptions
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: listWalletTransactions
+    contract: retail
+    purpose: Recent activity
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Transfers Today
@@ -121625,7 +122113,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setWalletTransferRules
+    contract: wallet
+    purpose: Whether guests may transfer
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1144
@@ -121738,7 +122231,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setWalletTransferRules
+    contract: wallet
+    purpose: Eligibility, limits and approval
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1145
@@ -121866,6 +122364,11 @@ screens:
     contract: orders
     purpose: Set a venue's refund policy
     trigger: onAction
+  - operationId: setWalletRefundPolicy
+    contract: wallet
+    purpose: What a refund puts back, and where
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1146
@@ -121948,7 +122451,17 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setWalletRefundPolicy
+    contract: wallet
+    purpose: Restoration to the original lots
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+  - operationId: createRefund
+    contract: orders
+    purpose: Issue the refund
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1147
@@ -122040,7 +122553,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: reverseWalletFunding
+    contract: wallet
+    purpose: Reverse a transaction
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id046
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1148
@@ -122144,7 +122663,16 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: adjustWallet
+    contract: retail
+    purpose: Administrative adjustment
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id048
+    - getWallet
+    - listWalletTransactions
+    - listCreditLots
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1149
@@ -122282,7 +122810,14 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setWalletRestriction
+    contract: wallet
+    purpose: Freeze, block or restrict
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id047
+    - getWallet
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1150
@@ -122405,7 +122940,19 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listWalletDisputes
+    contract: wallet
+    purpose: The dispute queue
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: raiseWalletDispute
+    contract: wallet
+    purpose: Raise one
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - listWalletDisputes
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1151
@@ -122646,7 +123193,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setWalletRiskRules
+    contract: wallet
+    purpose: Rules in force
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Transactions Screened
@@ -122754,7 +123306,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setWalletRiskRules
+    contract: wallet
+    purpose: Risk policy
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1154
@@ -122821,7 +123378,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setWalletRiskRules
+    contract: wallet
+    purpose: Transaction scoring
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1155
@@ -122939,7 +123501,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setWalletRiskRules
+    contract: wallet
+    purpose: Velocity and behaviour
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1156
@@ -123091,7 +123658,18 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: linkWalletCredential
+    contract: wallet
+    purpose: Credential and device security
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id045
+  - operationId: listWalletDisputes
+    contract: wallet
+    purpose: Where it went wrong
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Device ID
@@ -123211,7 +123789,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setWalletRiskRules
+    contract: wallet
+    purpose: Anomaly detection rules
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Why was this flagged?
@@ -123311,7 +123894,18 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setWalletRiskRules
+    contract: wallet
+    purpose: What an automated action does
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+  - operationId: setWalletRestriction
+    contract: wallet
+    purpose: Freeze on a hit
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id047
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1159
@@ -123477,7 +124071,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listWalletDisputes
+    contract: wallet
+    purpose: Fraud cases
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Alert ID
@@ -123587,7 +124186,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: simulateCreditConsumption
+    contract: wallet
+    purpose: Test against a scenario
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Transactions Evaluated → 1,245,000
@@ -123737,7 +124341,13 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: publishWalletConfiguration
+    contract: wallet
+    purpose: Publish the rules
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id038
   entryState:
     preloaded:
     - Risk policies
@@ -123922,7 +124532,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getWalletLiability
+    contract: wallet
+    purpose: Liability at a glance
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Total Wallet Liability
@@ -124065,7 +124680,14 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setWalletAccountingMapping
+    contract: wallet
+    purpose: Credit types to ledger accounts
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id049
+    - getWalletLiability
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1164
@@ -124131,7 +124753,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getWalletReconciliation
+    contract: wallet
+    purpose: Sub-ledger against the ledger
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1165
@@ -124290,7 +124917,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: getWalletReconciliation
+    contract: wallet
+    purpose: Three sources compared
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1166
@@ -124392,7 +125024,18 @@ screens:
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getWalletReconciliation
+    contract: wallet
+    purpose: Exceptions to resolve
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: adjustWallet
+    contract: retail
+    purpose: Correct one
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id048
   entryState:
     preloaded:
     - Exception ID
@@ -124519,7 +125162,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getWalletLiability
+    contract: wallet
+    purpose: Gift card liability
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Gift Cards Issued
@@ -124609,7 +125257,13 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setWalletAccountingMapping
+    contract: wallet
+    purpose: Breakage recognition policy
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id049
   entryState:
     preloaded:
     - Original value → AED 500
@@ -124726,7 +125380,17 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listFiscalPeriods
+    contract: finance
+    purpose: The period being closed
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: getWalletLiability
+    contract: wallet
+    purpose: Closing balance
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1170
@@ -124840,7 +125504,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getWalletLiability
+    contract: wallet
+    purpose: Management reporting
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - POS
@@ -124976,7 +125645,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getWalletReconciliation
+    contract: wallet
+    purpose: Validation and audit
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Sum of Customer Wallet Balances
@@ -125206,7 +125880,13 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: publishWalletConfiguration
+    contract: wallet
+    purpose: Configuration state
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+    invalidates: *id038
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1173
@@ -125353,7 +126033,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listWalletTypes
+    contract: wallet
+    purpose: What the API exposes
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1174
@@ -125480,7 +126165,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setWalletChannelRules
+    contract: wallet
+    purpose: Integration profile
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id044
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1175
@@ -125622,7 +126313,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setWalletRiskRules
+    contract: wallet
+    purpose: Events and notifications
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1176
@@ -125757,7 +126453,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listAccessPolicies
+    contract: identity
+    purpose: API access and permissions
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1177
@@ -125849,7 +126550,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: getWalletReconciliation
+    contract: wallet
+    purpose: Synchronisation state
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1178
@@ -125990,7 +126696,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listWalletDisputes
+    contract: wallet
+    purpose: Integration exceptions
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Exception ID
@@ -126083,7 +126794,13 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: publishWalletConfiguration
+    contract: wallet
+    purpose: Governance and version control
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id038
   entryState:
     preloaded:
     - 'Cash Priority: 3 → 5'
@@ -126166,7 +126883,18 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: publishWalletConfiguration
+    contract: wallet
+    purpose: Approval and publication
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id038
+  - operationId: createApprovalRequest
+    contract: approvals
+    purpose: Send for approval
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1181
@@ -126282,7 +127010,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getWalletLiability
+    contract: wallet
+    purpose: Platform health and audit
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1182

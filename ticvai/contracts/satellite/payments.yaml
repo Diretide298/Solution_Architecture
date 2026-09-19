@@ -1,0 +1,2091 @@
+openapi: 3.1.0
+info:
+  title: TICVAI — Payment Orchestration
+  version: 1.0.0
+  x-ticvai-screen-count: 80
+  x-ticvai-tier: satellite
+  x-ticvai-module: 4 — Payments and Wallet
+  x-ticvai-platforms:
+  - P08 Venue Management
+  - P09 Platform Admin
+  description: '**`orders` takes a payment. This decides how.**
+
+    `createPayment`, `capturePayment`, `voidPayment`, `createRefund`, `payByLink` and
+    `storePaymentToken` already exist and stay where they are. They execute a transaction against a
+    provider.
+
+    **Nothing said which provider, or what happens when it is down.** That is eight boards: the
+    method catalogue, the gateway directory, routing and failover, terminals and card-present,
+    hosted checkout and tokenisation policy, mixed tender and B2B credit, reconciliation and
+    settlement configuration, and risk.
+
+    ## Why orchestration is its own context
+
+    **A payment has two failure modes and they need opposite responses.** A declined card is the
+    guest''s problem and the till should ask for another one. **A gateway that is timing out is the
+    venue''s problem and every till should already be somewhere else** — and a system that cannot
+    tell them apart will queue a hundred guests behind an outage nobody noticed.
+
+    Routing, health and failover are therefore platform state rather than transaction state, and a
+    transaction-scoped contract is the wrong place for them.
+
+    **Cost is a routing input.** The same card can often go through two acquirers at different
+    rates, and a venue processing at scale cares. `orders` has no reason to know this and should
+    not learn.
+
+    ## What it deliberately does not own
+
+    **Not the transaction.** `orders` owns payments, refunds and their statuses.
+
+    **Not the money in the ledger.** `finance` owns settlements, journals, FX and the chart of
+    accounts. This configures how reconciliation sources are read; `finance` posts the result.
+
+    **Not the terminal as a device.** `tenancy` owns device enrolment, credentials, firmware and
+    tamper state as of 19 September. A payment terminal is a device there with a payment
+    configuration here, and duplicating the register would give a venue two answers to *is this
+    terminal still trusted*.
+
+    **Not stored value.** `wallet` configures credit; `orders` moves it. Mixed tender here decides
+    only the order and combination in which tenders may be presented.
+
+    '
+servers:
+- url: https://api.ticvai.com/v1
+paths:
+  /payment-methods:
+    get:
+      operationId: listPaymentMethods
+      summary: The methods this tenant can offer, and where
+      description: 'Board 1.2. **A method is not a provider.** *Apple Pay* is a method; the acquirer
+        behind it is a routing decision, and a venue that models them as one thing cannot change
+        acquirer without re-configuring every till.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: venueId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: channel
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Payment methods
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentMethod'
+    post:
+      operationId: createPaymentMethod
+      summary: Add a payment method to the catalogue
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentMethod'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentMethod'
+  /payment-methods/{methodId}:
+    parameters:
+    - name: methodId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: updatePaymentMethod
+      summary: Change availability, fees and eligibility
+      description: 'Boards 1.4, 1.7 and 1.8. **Eligibility, fees and availability travel together
+        because they are one commercial decision.** Offering a method that costs 2.9% on a five-dirham
+        ice cream is a decision, and it is made by restricting the method below a threshold rather than
+        by removing it.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentMethod'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentMethod'
+  /payment-providers:
+    get:
+      operationId: listPaymentProviderConnections
+      summary: Gateways, PSPs and acquirers, and what each can do
+      description: 'Boards 2.2 and 2.4. **Capability mapping is the part that gets skipped and then
+        causes an incident.** Not every provider supports every method, currency, partial capture,
+        multi-capture, or refund beyond a window — and routing that does not know this will send a
+        transaction to a provider that cannot take it.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Provider connections
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentProviderConnection'
+    post:
+      operationId: createPaymentProviderConnection
+      summary: Connect a provider
+      description: '**Credentials are written and never read back.** The response carries a fingerprint
+        so somebody can confirm which key is in use without the key being retrievable from a screen.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_PROVIDER_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentProviderConnection'
+      responses:
+        '201':
+          description: Connected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentProviderConnection'
+  /payment-providers/{connectionId}/test:
+    parameters:
+    - name: connectionId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: testPaymentProviderConnection
+      summary: Prove the connection works before anybody pays through it
+      description: 'Board 3.10. **A provider configured and never tested is a provider that fails on
+        the first real transaction**, in front of a guest, at the busiest moment somebody chose to
+        switch it on.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_PROVIDER_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      responses:
+        '200':
+          description: What worked and what did not
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProviderTestResult'
+  /payment-routing-rules:
+    get:
+      operationId: listPaymentRoutingRules
+      summary: Which provider takes which transaction
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Routing rules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentRoutingRule'
+    put:
+      operationId: setPaymentRoutingRules
+      summary: Route by method, currency, venue, amount, cost or share
+      description: 'Boards 2.5 and 2.6. **Priority and load distribution are both needed and they are
+        not the same.** Priority says *this acquirer unless it cannot*; distribution says *sixty per
+        cent here, forty there* — which is how a venue keeps a second acquirer warm enough to fail over
+        to.
+
+        **A rule that would route to a provider lacking the capability is refused at configuration
+        time**, not discovered at the till.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - rules
+              properties:
+                rules:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/PaymentRoutingRule'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentRoutingRule'
+        '409':
+          description: A rule routes to a provider that cannot take it
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /payment-routing/simulate:
+    post:
+      operationId: simulatePaymentRouting
+      summary: Where would this transaction go, and why
+      description: 'Board 2.10. **The decision trace, including the rules that did not match.** Routing
+        is the configuration most likely to be subtly wrong and least likely to announce it — a
+        transaction going to the expensive acquirer still succeeds.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoutingContext'
+      responses:
+        '200':
+          description: The chosen provider and the trace
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoutingDecision'
+  /payment-failover-policy:
+    put:
+      operationId: setPaymentFailoverPolicy
+      summary: What happens when a provider fails, and when to stop trying
+      description: 'Board 2.7. **A declined card and a broken gateway need opposite responses, and this
+        is where they are told apart.** A decline is final and the till asks for another card; a
+        timeout, a 5xx or a connection refusal is retryable and should move to the next provider.
+
+        **Retrying a decline is how a guest gets charged twice** — so the retryable set is explicit
+        rather than "anything that was not a success".
+
+        **The circuit breaker is the part that protects the venue.** After a threshold of failures the
+        provider is taken out of rotation automatically, because a hundred tills each discovering the
+        outage independently is a hundred queues.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentFailoverPolicy'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentFailoverPolicy'
+  /payment-providers/health:
+    get:
+      operationId: getPaymentProviderHealth
+      summary: Authorisation rate, latency and availability, per provider
+      description: 'Board 2.8. **Authorisation rate is the number that matters and it is not an uptime
+        figure.** A provider that is up and declining 30% of cards it should be approving is worse than
+        one that is down, because nobody notices.
+
+        Compared against the provider''s own baseline, so a drop is visible before it becomes a
+        support call.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date-time
+      responses:
+        '200':
+          description: Health per provider
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProviderHealth'
+  /payment-providers/economics:
+    get:
+      operationId: getPaymentProviderEconomics
+      summary: What each provider actually costs
+      description: 'Board 2.9. **Cost per transaction is a routing input, not a finance report.** Scheme
+        fees, interchange, acquirer margin, FX spread and chargeback costs differ per provider, per
+        method and per card type, and at scale the difference pays for the orchestration.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Economics per provider
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProviderEconomics'
+  /payment-terminals:
+    get:
+      operationId: listPaymentTerminals
+      summary: Terminals, and the payment configuration on each
+      description: 'Board 3.2. **The device register is `tenancy`''s; this is the payment layer on top
+        of it.** Merchant id, terminal id, the acquirer it talks to, EMV configuration and its
+        store-and-forward state — none of which belong in a device inventory, and all of which are
+        meaningless without one.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: venueId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Terminals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentTerminal'
+    put:
+      operationId: setPaymentTerminalConfiguration
+      summary: Merchant account, acquirer, EMV and offline behaviour
+      description: 'Boards 3.3, 3.5 and 3.8. **Store-and-forward is the setting that decides whether a
+        venue can trade when the line drops**, and it is a risk decision rather than a technical one: a
+        floor limit, a cap on the total held offline, and a maximum age after which the terminal
+        refuses rather than accumulating.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentTerminal'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentTerminal'
+  /payment-terminals/{terminalId}/forwarded:
+    parameters:
+    - name: terminalId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: listStoredForwardTransactions
+      summary: What a terminal took offline and has not yet sent
+      description: 'Board 3.8. **Money the venue has taken and the platform does not know about.** Until
+        these land, the till total, the acquirer and the ledger all disagree, and a terminal that dies
+        holding them has lost real revenue.
+
+        This is the queue somebody has to be able to look at.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Held transactions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StoredForwardTransaction'
+  /hosted-checkout-config:
+    put:
+      operationId: setHostedCheckoutConfiguration
+      summary: Redirect, return and the journey back
+      description: 'Board 4.6. **The return leg is where hosted checkout goes wrong.** A guest who pays
+        on a provider''s page and closes the tab before the redirect has paid, and the platform does not
+        know — so the configuration names the webhook that settles it independently of the browser, and
+        a reconciliation window for the ones that still fall through.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HostedCheckoutConfig'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HostedCheckoutConfig'
+  /payment-authentication-policy:
+    put:
+      operationId: setPaymentAuthenticationPolicy
+      summary: 3-D Secure, tokenisation and recurring mandates
+      description: 'Board 4.8. **Strong authentication is a commercial trade as much as a security
+        one.** Challenging every transaction raises abandonment; challenging none raises fraud and moves
+        liability onto the venue. The policy states the threshold and the exemptions it will claim.
+
+        **Tokenisation and recurring mandates are here because they are the same consent.** A card
+        stored for a season pass renewal needs a mandate, and a venue that stores the token without one
+        has a renewal it cannot defend.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentAuthenticationPolicy'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentAuthenticationPolicy'
+  /mixed-tender-rules:
+    get:
+      operationId: getMixedTenderRules
+      summary: Which tenders may be combined, and in what order
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: The rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MixedTenderRules'
+    put:
+      operationId: setMixedTenderRules
+      summary: Split payment, tender sequence and restrictions
+      description: 'Boards 5.2, 5.3 and 5.7. **Sequence is not cosmetic.** Stored value before card
+        means a guest''s gift card is used up on a purchase they would happily have paid for with a
+        card; the other way round means the gift card expires. `wallet` decides the order *within*
+        stored value; this decides the order *across* tender kinds.
+
+        **A maximum number of tenders is an operational limit, not a technical one.** Six part-payments
+        at a busy till is a queue, and every one is a line in the reconciliation.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MixedTenderRules'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MixedTenderRules'
+  /b2b-credit-accounts:
+    get:
+      operationId: listB2bCreditAccounts
+      summary: On-account customers, their limits and their exposure
+      description: 'Boards 5.4 and 5.5. **`CREDIT_MANAGE` and `CREDIT_OVERRIDE` existed as permissions
+        and the account they govern did not.** A school booking on account, a tour operator with thirty
+        days'' terms, a corporate with a purchase-order requirement — each needs a limit, and the limit
+        is only useful next to current exposure.
+
+        **Exposure includes unbilled bookings, not just unpaid invoices.** A tour operator with no
+        outstanding invoices and eighty thousand of bookings next month is not within their limit; they
+        have simply not been billed yet.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: overLimitOnly
+        in: query
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Credit accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/B2bCreditAccount'
+    post:
+      operationId: createB2bCreditAccount
+      summary: Open an on-account relationship
+      tags:
+      - payments
+      x-ticvai-permission: CREDIT_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/B2bCreditAccount'
+      responses:
+        '201':
+          description: Opened
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/B2bCreditAccount'
+  /b2b-credit-accounts/{accountId}/terms:
+    parameters:
+    - name: accountId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: setB2bPaymentTerms
+      summary: Limit, terms, billing cycle and what happens at the limit
+      description: 'Board 5.5. **What happens at the limit is the decision, not the limit.** Refuse,
+        warn, or allow with an override — and a tour operator turned away at a gate with sixty children
+        is a commercial incident, so most venues want the third with an approval behind it.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: CREDIT_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/B2bPaymentTerms'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/B2bPaymentTerms'
+  /reconciliation-sources:
+    get:
+      operationId: listReconciliationSources
+      summary: The files and feeds reconciliation is run against
+      description: 'Board 7.2. **`finance.ingestSettlementFile` could read one and nothing said where
+        they come from.** Format, schedule, credentials, the field mapping and what a missing file
+        means — because a settlement file that did not arrive is indistinguishable from a day with no
+        settlements unless somebody said one was expected.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Sources
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReconciliationSource'
+    put:
+      operationId: setReconciliationSource
+      summary: Define a settlement or statement feed
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReconciliationSource'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReconciliationSource'
+  /reconciliation-rules:
+    put:
+      operationId: setReconciliationMatchingRules
+      summary: How a platform transaction is matched to a settled one
+      description: 'Board 7.3. **Exact matching is not enough and never was.** An acquirer settles net
+        of fees, rounds differently, batches across midnight and uses its own reference — so the rules
+        state a tolerance, a date window and a fallback key, and everything that still does not match
+        becomes an exception with a reason rather than a silent difference.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReconciliationMatchingRules'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReconciliationMatchingRules'
+  /merchant-accounts:
+    get:
+      operationId: listMerchantAccounts
+      summary: Merchant accounts, settlement calendars and payout routing
+      description: 'Board 7.7. **Which legal entity gets the money, and when.** A group with venues in
+        two entities settles into two bank accounts on two calendars, and a payout arriving in the wrong
+        one is an inter-entity obligation `finance` then has to unwind.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Merchant accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MerchantAccount'
+    put:
+      operationId: setMerchantAccount
+      summary: Bind a merchant account to entities, venues and a calendar
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantAccount'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MerchantAccount'
+  /payment-risk-rules:
+    put:
+      operationId: setPaymentRiskRules
+      summary: Velocity, behaviour, lists and what a hit does
+      description: 'Boards 8.2, 8.3 and 8.4. **Distinct from `wallet` risk, which watches stored value.**
+        This watches card presentation: the same card across many accounts, many cards from one device,
+        a billing country that does not match anything else about the transaction.
+
+        **Lists are a rule input, not a rule.** A blocked card is checked by a rule that says what
+        blocking does — refuse, challenge, or allow and flag — because a venue will want different
+        answers for a known chargeback abuser and a card their own fraud team is watching.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRiskRules'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentRiskRules'
+  /chargebacks/{chargebackId}/evidence:
+    parameters:
+    - name: chargebackId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: submitChargebackEvidence
+      summary: Assemble and send a representment
+      description: 'Board 8.7. **`respondToChargeback` existed and nothing assembled the case.** Winning
+        a representment is almost entirely about producing the right documents inside the scheme''s
+        deadline: the authorisation, the receipt, the terms the guest accepted, the scan proving they
+        came in, and the delivery or admission record.
+
+        **The platform holds every one of those already.** Assembling them by hand from five screens,
+        against a clock, is why venues lose disputes they should win.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_DISPUTE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChargebackEvidence'
+      responses:
+        '202':
+          description: Submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChargebackEvidence'
+  /payment-performance:
+    get:
+      operationId: getPaymentPerformance
+      summary: Authorisation rate, conversion and where payments are lost
+      description: 'Board 8.8. **Conversion at the payment step is the last and most expensive place a
+        venue loses a sale**, because everything before it has already been paid for in marketing.
+
+        Broken down by method, provider, card type, channel and 3-D Secure outcome — the five
+        dimensions along which a drop is actionable.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: groupBy
+        in: query
+        schema:
+          type: string
+          enum:
+          - method
+          - provider
+          - cardType
+          - channel
+          - authenticationOutcome
+          - venue
+      responses:
+        '200':
+          description: Performance
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentPerformanceRow'
+  /payment-configuration/simulate:
+    post:
+      operationId: simulatePaymentConfiguration
+      summary: What a guest would be offered, and what it would cost
+      description: 'Boards 1.10 and 5.10. **Eight boards of configuration that compose**, and the
+        failure is silent: a method enabled at a venue whose acquirer cannot take that currency looks
+        fine on every screen and fails at the till.
+
+        Takes a basket, a venue and a channel and returns the methods that would be offered, the
+        provider each would route to, the fees, and the findings.
+
+        '
+      tags:
+      - payments
+      x-ticvai-permission: PAYMENT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoutingContext'
+      responses:
+        '200':
+          description: Offered methods, routing and findings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentConfigurationSimulation'
+components:
+  schemas:
+    PaymentMethod:
+      type: object
+      x-ticvai-persistence: payments.method
+      description: 'Board 1.2. **A method is not a provider.**'
+      required:
+      - code
+      - name
+      - kind
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        kind:
+          type: string
+          enum:
+          - card
+          - digitalWallet
+          - bankTransfer
+          - cash
+          - storedValue
+          - giftCard
+          - voucher
+          - onAccount
+          - buyNowPayLater
+          - paymentLink
+        cardSchemes:
+          type: array
+          items:
+            type: string
+        currencies:
+          type: array
+          items:
+            type: string
+        channels:
+          type: array
+          items:
+            type: string
+        venueIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        minimumAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        maximumAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        surcharge:
+          type: object
+          nullable: true
+          properties:
+            percent:
+              type: number
+              nullable: true
+            fixed:
+              $ref: ../shared/common.yaml#/components/schemas/Money
+            disclosedToGuest:
+              type: boolean
+              default: true
+              description: '**Undisclosed surcharging is illegal in several of the markets this
+                platform sells into.** The flag exists so the answer is a configuration somebody chose
+                rather than a template nobody read.
+
+                '
+        refundable:
+          type: boolean
+          default: true
+        partialRefundSupported:
+          type: boolean
+          default: true
+        displayOrder:
+          type: integer
+          default: 0
+        scopePath:
+          type: string
+        isActive:
+          type: boolean
+          default: true
+    PaymentProviderConnection:
+      type: object
+      x-ticvai-persistence: payments.provider_connection
+      description: 'Boards 2.2 and 2.4. **Capability mapping is the part that gets skipped.**'
+      required:
+      - code
+      - providerKind
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        providerKind:
+          type: string
+          enum:
+          - gateway
+          - psp
+          - acquirer
+          - walletProvider
+          - bnplProvider
+        environment:
+          type: string
+          enum:
+          - sandbox
+          - production
+        credentialFingerprint:
+          type: string
+          readOnly: true
+          description: '**Written, never read back.** Enough to confirm which key is in use without the
+            key being retrievable from a screen.
+
+            '
+        capabilities:
+          type: object
+          properties:
+            methods:
+              type: array
+              items:
+                type: string
+            currencies:
+              type: array
+              items:
+                type: string
+            partialCapture:
+              type: boolean
+              default: false
+            multipleCapture:
+              type: boolean
+              default: false
+            refundWindowDays:
+              type: integer
+              nullable: true
+            tokenisation:
+              type: boolean
+              default: false
+            threeDSecure:
+              type: boolean
+              default: false
+            cardPresent:
+              type: boolean
+              default: false
+        merchantAccountId:
+          type: string
+          format: uuid
+          nullable: true
+        status:
+          type: string
+          enum:
+          - draft
+          - testing
+          - active
+          - degraded
+          - disabled
+        lastTestedAt:
+          type: string
+          format: date-time
+          nullable: true
+        scopePath:
+          type: string
+    ProviderTestResult:
+      type: object
+      description: 'Board 3.10. **A provider configured and never tested fails on the first real
+        transaction.**
+
+        '
+      properties:
+        connectionId:
+          type: string
+          format: uuid
+        testedAt:
+          type: string
+          format: date-time
+        checks:
+          type: array
+          items:
+            type: object
+            properties:
+              check:
+                type: string
+                enum:
+                - credentials
+                - authorise
+                - capture
+                - refund
+                - void
+                - tokenise
+                - webhook
+              passed:
+                type: boolean
+              latencyMs:
+                type: integer
+                nullable: true
+              detail:
+                type: string
+                nullable: true
+        overall:
+          type: string
+          enum:
+          - pass
+          - partial
+          - fail
+    PaymentRoutingRule:
+      type: object
+      x-ticvai-persistence: payments.routing_rule
+      description: 'Boards 2.5 and 2.6. **Priority and distribution are both needed.**'
+      required:
+      - code
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        priority:
+          type: integer
+          default: 0
+        conditions:
+          type: object
+          properties:
+            methodIds:
+              type: array
+              items:
+                type: string
+                format: uuid
+            currencies:
+              type: array
+              items:
+                type: string
+            venueIds:
+              type: array
+              items:
+                type: string
+                format: uuid
+            channels:
+              type: array
+              items:
+                type: string
+            minimumAmount:
+              $ref: ../shared/common.yaml#/components/schemas/Money
+            maximumAmount:
+              $ref: ../shared/common.yaml#/components/schemas/Money
+            cardSchemes:
+              type: array
+              items:
+                type: string
+            cardIssuerCountries:
+              type: array
+              items:
+                type: string
+        targets:
+          type: array
+          items:
+            type: object
+            properties:
+              connectionId:
+                type: string
+                format: uuid
+              sharePercent:
+                type: integer
+                nullable: true
+              rank:
+                type: integer
+        strategy:
+          type: string
+          enum:
+          - priorityOrder
+          - loadShare
+          - lowestCost
+          - highestAuthRate
+          default: priorityOrder
+        scopePath:
+          type: string
+        isActive:
+          type: boolean
+          default: true
+    RoutingContext:
+      type: object
+      required:
+      - amount
+      properties:
+        amount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        methodId:
+          type: string
+          format: uuid
+          nullable: true
+        venueId:
+          type: string
+          format: uuid
+          nullable: true
+        channel:
+          type: string
+          nullable: true
+        cardScheme:
+          type: string
+          nullable: true
+        cardIssuerCountry:
+          type: string
+          nullable: true
+        cardPresent:
+          type: boolean
+          default: false
+        customerId:
+          type: string
+          format: uuid
+          nullable: true
+    RoutingDecision:
+      type: object
+      description: 'Board 2.10. **Includes the rules that did not match**, because routing that is
+        subtly wrong still succeeds.
+
+        '
+      properties:
+        chosenConnectionId:
+          type: string
+          format: uuid
+          nullable: true
+        chosenProviderName:
+          type: string
+          nullable: true
+        estimatedCost:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        trace:
+          type: array
+          items:
+            type: object
+            properties:
+              ruleCode:
+                type: string
+              matched:
+                type: boolean
+              skippedBecause:
+                type: string
+                nullable: true
+              candidateConnectionId:
+                type: string
+                format: uuid
+                nullable: true
+        fallbackChain:
+          type: array
+          items:
+            type: string
+            format: uuid
+    PaymentFailoverPolicy:
+      type: object
+      x-ticvai-persistence: payments.failover_policy
+      description: 'Board 2.7. **A decline is final; a timeout is not. Retrying the first is how a
+        guest gets charged twice.**
+
+        '
+      properties:
+        retryableOutcomes:
+          type: array
+          items:
+            type: string
+            enum:
+            - timeout
+            - connectionRefused
+            - providerError5xx
+            - rateLimited
+            - issuerUnavailable
+          description: '**Explicit, rather than "anything that was not a success".**'
+        maxAttempts:
+          type: integer
+          default: 2
+        backoffMs:
+          type: integer
+          default: 500
+        failoverToNextProvider:
+          type: boolean
+          default: true
+        circuitBreaker:
+          type: object
+          description: '**A hundred tills each discovering an outage independently is a hundred
+            queues.**
+
+            '
+          properties:
+            failureThresholdPercent:
+              type: number
+              default: 25
+            windowSeconds:
+              type: integer
+              default: 60
+            minimumSample:
+              type: integer
+              default: 20
+            openForSeconds:
+              type: integer
+              default: 300
+            alertOnOpen:
+              type: boolean
+              default: true
+        scopePath:
+          type: string
+    ProviderHealth:
+      type: object
+      description: 'Board 2.8. **Authorisation rate is the number, and it is not uptime.**'
+      properties:
+        connectionId:
+          type: string
+          format: uuid
+        providerName:
+          type: string
+        transactions:
+          type: integer
+        authorisationRate:
+          type: number
+        baselineAuthorisationRate:
+          type: number
+          nullable: true
+        declineRate:
+          type: number
+        errorRate:
+          type: number
+        p50LatencyMs:
+          type: integer
+        p95LatencyMs:
+          type: integer
+        circuitState:
+          type: string
+          enum:
+          - closed
+          - open
+          - halfOpen
+        status:
+          type: string
+          enum:
+          - healthy
+          - degraded
+          - failing
+          - disabled
+    ProviderEconomics:
+      type: object
+      description: 'Board 2.9. **Cost per transaction is a routing input.**'
+      properties:
+        connectionId:
+          type: string
+          format: uuid
+        providerName:
+          type: string
+        transactions:
+          type: integer
+        grossVolume:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        schemeFees:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        interchange:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        acquirerMargin:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        fxSpread:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        chargebackCost:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        totalCost:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        effectiveRatePercent:
+          type: number
+    PaymentTerminal:
+      type: object
+      x-ticvai-persistence: payments.terminal
+      description: 'Board 3. **The payment layer on a `tenancy` device**, not a second device register.'
+      required:
+      - deviceId
+      properties:
+        deviceId:
+          type: string
+          format: uuid
+          description: The `tenancy.RegisteredDevice`. **Enrolment, credentials, firmware and tamper
+            state live there.**
+        merchantAccountId:
+          type: string
+          format: uuid
+          nullable: true
+        acquirerConnectionId:
+          type: string
+          format: uuid
+          nullable: true
+        terminalIdentifier:
+          type: string
+          nullable: true
+        emvConfigurationVersion:
+          type: string
+          nullable: true
+        contactlessLimit:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        pinBypassAllowed:
+          type: boolean
+          default: false
+        storeAndForward:
+          type: object
+          description: '**A risk decision, not a technical one.**'
+          properties:
+            enabled:
+              type: boolean
+              default: false
+            floorLimit:
+              $ref: ../shared/common.yaml#/components/schemas/Money
+            maximumHeldTotal:
+              $ref: ../shared/common.yaml#/components/schemas/Money
+            maximumAgeMinutes:
+              type: integer
+              nullable: true
+        status:
+          type: string
+          enum:
+          - unconfigured
+          - active
+          - offline
+          - suspended
+        scopePath:
+          type: string
+    StoredForwardTransaction:
+      type: object
+      x-ticvai-persistence: payments.stored_forward
+      description: 'Board 3.8. **Money taken that the platform does not yet know about.**'
+      properties:
+        id:
+          type: string
+          format: uuid
+        deviceId:
+          type: string
+          format: uuid
+        amount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        takenAt:
+          type: string
+          format: date-time
+        maskedPan:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum:
+          - held
+          - forwarding
+          - accepted
+          - rejected
+          - expired
+        attempts:
+          type: integer
+          default: 0
+        rejectionReason:
+          type: string
+          nullable: true
+        scopePath:
+          type: string
+    HostedCheckoutConfig:
+      type: object
+      x-ticvai-persistence: payments.hosted_checkout
+      description: 'Board 4.6. **The return leg is where hosted checkout goes wrong.**'
+      properties:
+        returnUrl:
+          type: string
+        cancelUrl:
+          type: string
+        webhookUrl:
+          type: string
+          description: '**The authoritative settle path**, because a guest who closes the tab has still
+            paid.
+
+            '
+        webhookSecretFingerprint:
+          type: string
+          readOnly: true
+        sessionTimeoutMinutes:
+          type: integer
+          default: 15
+        orphanReconciliationWindowMinutes:
+          type: integer
+          default: 60
+          description: 'For the ones that fall through both the redirect and the webhook.'
+        brandingAssetId:
+          type: string
+          format: uuid
+          nullable: true
+        scopePath:
+          type: string
+    PaymentAuthenticationPolicy:
+      type: object
+      x-ticvai-persistence: payments.authentication_policy
+      description: 'Board 4.8. **A commercial trade as much as a security one.**'
+      properties:
+        threeDSecureMode:
+          type: string
+          enum:
+          - never
+          - whenRequired
+          - aboveThreshold
+          - always
+          default: whenRequired
+        threeDSecureThreshold:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        claimedExemptions:
+          type: array
+          items:
+            type: string
+            enum:
+            - lowValue
+            - trustedBeneficiary
+            - transactionRiskAnalysis
+            - recurring
+            - merchantInitiated
+        tokenisationEnabled:
+          type: boolean
+          default: false
+        tokenRetentionMonths:
+          type: integer
+          nullable: true
+        recurringMandateRequired:
+          type: boolean
+          default: true
+          description: '**A card stored for a renewal without a mandate is a renewal the venue cannot
+            defend.**
+
+            '
+        mandateTextAssetId:
+          type: string
+          format: uuid
+          nullable: true
+        scopePath:
+          type: string
+    MixedTenderRules:
+      type: object
+      x-ticvai-persistence: payments.mixed_tender_rules
+      description: 'Boards 5.2 and 5.7. **Sequence is not cosmetic.**'
+      properties:
+        splitPaymentAllowed:
+          type: boolean
+          default: true
+        maximumTenders:
+          type: integer
+          default: 3
+        tenderOrder:
+          type: array
+          items:
+            type: string
+          description: '**Across tender kinds.** `wallet` decides the order within stored value.'
+        allowedCombinations:
+          type: array
+          items:
+            type: object
+            properties:
+              methodKinds:
+                type: array
+                items:
+                  type: string
+              allowed:
+                type: boolean
+              reason:
+                type: string
+                nullable: true
+        partialPaymentAllowed:
+          type: boolean
+          default: false
+        onPartialFailure:
+          type: string
+          enum:
+          - reverseAll
+          - keepAndRetry
+          - keepAndHold
+          default: reverseAll
+          description: '**Three tenders in, the fourth fails.** Reversing all of it is the only answer
+            that leaves the guest and the ledger in a state anybody can explain.
+
+            '
+        scopePath:
+          type: string
+    B2bCreditAccount:
+      type: object
+      x-ticvai-persistence: payments.credit_account
+      description: 'Board 5.4. **Exposure includes unbilled bookings, not just unpaid invoices.**'
+      required:
+      - organisationId
+      properties:
+        id:
+          type: string
+          format: uuid
+        organisationId:
+          type: string
+          format: uuid
+        accountCode:
+          type: string
+        creditLimit:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        outstandingInvoiced:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        outstandingUnbilled:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        availableCredit:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        status:
+          type: string
+          enum:
+          - active
+          - onHold
+          - suspended
+          - closed
+        overLimit:
+          type: boolean
+          readOnly: true
+        scopePath:
+          type: string
+    B2bPaymentTerms:
+      type: object
+      x-ticvai-persistence: payments.payment_terms
+      description: 'Board 5.5. **What happens at the limit is the decision.**'
+      properties:
+        accountId:
+          type: string
+          format: uuid
+        creditLimit:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        paymentTermDays:
+          type: integer
+          default: 30
+        billingCycle:
+          type: string
+          enum:
+          - perBooking
+          - weekly
+          - fortnightly
+          - monthly
+        purchaseOrderRequired:
+          type: boolean
+          default: false
+        depositPercent:
+          type: number
+          nullable: true
+          description: '1 September: *"partial payment/deposit is supported for bulk bookings such as
+            schools and corporates — e.g. a 20–30% deposit upfront with the balance due on or before
+            arrival."*
+
+            '
+        balanceDue:
+          type: string
+          enum:
+          - onArrival
+          - beforeArrival
+          - onTerms
+          default: beforeArrival
+        atLimit:
+          type: string
+          enum:
+          - refuse
+          - warn
+          - allowWithOverride
+          default: allowWithOverride
+        overrideApprovalRole:
+          type: string
+          nullable: true
+        scopePath:
+          type: string
+    ReconciliationSource:
+      type: object
+      x-ticvai-persistence: payments.reconciliation_source
+      description: 'Board 7.2. **A file that did not arrive looks like a day with no settlements.**'
+      required:
+      - code
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        connectionId:
+          type: string
+          format: uuid
+          nullable: true
+        transport:
+          type: string
+          enum:
+          - sftp
+          - api
+          - email
+          - manualUpload
+        format:
+          type: string
+          enum:
+          - csv
+          - fixedWidth
+          - json
+          - xml
+          - camt053
+        expectedSchedule:
+          type: string
+          nullable: true
+        expectedByTime:
+          type: string
+          nullable: true
+        alertIfMissing:
+          type: boolean
+          default: true
+        fieldMapping:
+          type: object
+          additionalProperties:
+            type: string
+        scopePath:
+          type: string
+    ReconciliationMatchingRules:
+      type: object
+      x-ticvai-persistence: payments.matching_rules
+      description: 'Board 7.3. **Exact matching was never enough.**'
+      properties:
+        primaryKey:
+          type: string
+          enum:
+          - providerReference
+          - platformReference
+          - authorisationCode
+          - retrievalReference
+        fallbackKeys:
+          type: array
+          items:
+            type: string
+        amountToleranceMinor:
+          type: integer
+          default: 0
+        dateWindowDays:
+          type: integer
+          default: 2
+          description: '**Acquirers batch across midnight.** A same-day-only match manufactures
+            exceptions every night.
+
+            '
+        netOfFees:
+          type: boolean
+          default: true
+        autoResolveBelowMinor:
+          type: integer
+          default: 0
+          description: '**Rounding differences of a fil are not worth a person.** Above this they are.'
+        scopePath:
+          type: string
+    MerchantAccount:
+      type: object
+      x-ticvai-persistence: payments.merchant_account
+      description: 'Board 7.7. **Which legal entity gets the money, and when.**'
+      required:
+      - code
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        legalEntityId:
+          type: string
+          format: uuid
+        venueIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        currency:
+          type: string
+        settlementCalendar:
+          type: string
+          enum:
+          - daily
+          - weekly
+          - monthly
+          - custom
+        settlementDelayDays:
+          type: integer
+          default: 1
+        bankAccountReference:
+          type: string
+          nullable: true
+        scopePath:
+          type: string
+    PaymentRiskRules:
+      type: object
+      x-ticvai-persistence: payments.risk_rules
+      description: 'Boards 8.2 to 8.4. **Distinct from `wallet` risk** — this watches card
+        presentation.
+
+        '
+      properties:
+        rules:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+              signal:
+                type: string
+                enum:
+                - cardAcrossAccounts
+                - accountAcrossCards
+                - deviceAcrossCards
+                - velocityCount
+                - velocityAmount
+                - issuerCountryMismatch
+                - highRiskBin
+                - listHit
+                - repeatedDecline
+              threshold:
+                type: number
+                nullable: true
+              windowMinutes:
+                type: integer
+                nullable: true
+              listCode:
+                type: string
+                nullable: true
+              action:
+                type: string
+                enum:
+                - scoreOnly
+                - challenge
+                - refuse
+                - allowAndFlag
+                - raiseCase
+        lists:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+              kind:
+                type: string
+                enum:
+                - blockCard
+                - blockBin
+                - blockEmail
+                - blockDevice
+                - allowAlways
+              entries:
+                type: integer
+                readOnly: true
+        scopePath:
+          type: string
+    ChargebackEvidence:
+      type: object
+      x-ticvai-persistence: payments.chargeback_evidence
+      description: 'Board 8.7. **The platform holds every document already.**'
+      required:
+      - chargebackId
+      properties:
+        chargebackId:
+          type: string
+          format: uuid
+        narrative:
+          type: string
+          nullable: true
+        documents:
+          type: array
+          items:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - authorisationRecord
+                - receipt
+                - termsAccepted
+                - admissionScan
+                - deliveryProof
+                - communicationLog
+                - refundPolicy
+                - other
+              assetId:
+                type: string
+                format: uuid
+              autoAssembled:
+                type: boolean
+                default: true
+        submittedAt:
+          type: string
+          format: date-time
+          nullable: true
+        deadlineAt:
+          type: string
+          format: date-time
+          nullable: true
+        outcome:
+          type: string
+          enum:
+          - pending
+          - won
+          - lost
+          - withdrawn
+          nullable: true
+        scopePath:
+          type: string
+    PaymentPerformanceRow:
+      type: object
+      description: 'Board 8.8. **The last and most expensive place a venue loses a sale.**'
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+        attempts:
+          type: integer
+        authorised:
+          type: integer
+        declined:
+          type: integer
+        errored:
+          type: integer
+        abandoned:
+          type: integer
+        authorisationRate:
+          type: number
+        conversionRate:
+          type: number
+        averageValue:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        topDeclineReason:
+          type: string
+          nullable: true
+    PaymentConfigurationSimulation:
+      type: object
+      description: 'Boards 1.10 and 5.10. **Eight boards of configuration that compose, silently.**'
+      properties:
+        offeredMethods:
+          type: array
+          items:
+            type: object
+            properties:
+              methodId:
+                type: string
+                format: uuid
+              name:
+                type: string
+              routesTo:
+                type: string
+                nullable: true
+              estimatedCost:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+              surcharge:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+        suppressedMethods:
+          type: array
+          items:
+            type: object
+            properties:
+              methodId:
+                type: string
+                format: uuid
+              reason:
+                type: string
+        findings:
+          type: array
+          items:
+            type: object
+            properties:
+              severity:
+                type: string
+                enum:
+                - blocking
+                - warning
+              message:
+                type: string

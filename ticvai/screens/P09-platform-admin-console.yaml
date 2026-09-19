@@ -58923,7 +58923,17 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listPaymentMethods
+    contract: payments
+    purpose: Methods in use
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: getPaymentPerformance
+    contract: payments
+    purpose: How they are performing
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-559
@@ -59002,7 +59012,19 @@ screens:
       own statuses are Draft — the state names which is selected.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listPaymentMethods
+    contract: payments
+    purpose: The catalogue
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: createPaymentMethod
+    contract: payments
+    purpose: Add a method
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - listPaymentMethods
   entryState:
     preloaded:
     - Credit card
@@ -59108,7 +59130,14 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: updatePaymentMethod
+    contract: payments
+    purpose: Configure a method
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id005
+    - listPaymentMethods
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-561
@@ -59173,7 +59202,13 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: updatePaymentMethod
+    contract: payments
+    purpose: Per channel and touchpoint
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id005
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-562
@@ -59267,7 +59302,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: updatePaymentMethod
+    contract: payments
+    purpose: Per venue and business unit
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id005
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-563
@@ -59337,7 +59378,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: updatePaymentMethod
+    contract: payments
+    purpose: Currencies accepted
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id005
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-564
@@ -59441,7 +59488,13 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: updatePaymentMethod
+    contract: payments
+    purpose: Eligibility and availability rules
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id005
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-565
@@ -59539,7 +59592,13 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: updatePaymentMethod
+    contract: payments
+    purpose: Fees and surcharges
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id005
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-566
@@ -59635,7 +59694,17 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: createApprovalRequest
+    contract: approvals
+    purpose: Send a change for approval
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+  - operationId: listPaymentMethods
+    contract: payments
+    purpose: What is being changed
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-567
@@ -59719,7 +59788,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: simulatePaymentConfiguration
+    contract: payments
+    purpose: What a guest would be offered
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - ↓
@@ -59886,7 +59960,17 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getPaymentProviderHealth
+    contract: payments
+    purpose: Provider health
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: listPaymentProviderConnections
+    contract: payments
+    purpose: Providers connected
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-569
@@ -59969,7 +60053,19 @@ screens:
       statuses are Draft — the state names which is selected.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listPaymentProviderConnections
+    contract: payments
+    purpose: The directory
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: createPaymentProviderConnection
+    contract: payments
+    purpose: Connect one
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id006
+    - listPaymentProviderConnections
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-570
@@ -60087,7 +60183,20 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: createPaymentProviderConnection
+    contract: payments
+    purpose: Adapter configuration
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id006
+  - operationId: testPaymentProviderConnection
+    contract: payments
+    purpose: Prove it works
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id009
+    - listPaymentProviderConnections
   entryState:
     preloaded:
     - TICVAI Adapter
@@ -60160,7 +60269,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listPaymentProviderConnections
+    contract: payments
+    purpose: Capability against method
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-572
@@ -60263,7 +60377,19 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setPaymentRoutingRules
+    contract: payments
+    purpose: Build the routing rules
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id007
+    - listPaymentRoutingRules
+  - operationId: listPaymentRoutingRules
+    contract: payments
+    purpose: Rules in force
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-573
@@ -60327,7 +60453,13 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setPaymentRoutingRules
+    contract: payments
+    purpose: Priority and load distribution
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id007
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-574
@@ -60413,7 +60545,14 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setPaymentFailoverPolicy
+    contract: payments
+    purpose: Retry, failover and circuit breaking
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - getPaymentProviderHealth
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-575
@@ -60532,7 +60671,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getPaymentProviderHealth
+    contract: payments
+    purpose: Authorisation rate and latency
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-576
@@ -60601,7 +60745,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: getPaymentProviderEconomics
+    contract: payments
+    purpose: What each provider costs
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-577
@@ -60684,7 +60833,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: simulatePaymentRouting
+    contract: payments
+    purpose: Where would this go, and why
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Provider A
@@ -60836,7 +60990,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listPaymentTerminals
+    contract: payments
+    purpose: Terminals across venues
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-579
@@ -60925,7 +61084,17 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listPaymentTerminals
+    contract: payments
+    purpose: The inventory
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: listDevices
+    contract: tenancy
+    purpose: The device register behind it
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-580
@@ -61025,7 +61194,19 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: enrolDevice
+    contract: tenancy
+    purpose: Provision the device
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+  - operationId: setPaymentTerminalConfiguration
+    contract: payments
+    purpose: Its payment configuration
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id008
+    - listPaymentTerminals
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-581
@@ -61096,7 +61277,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setDeviceAssignment
+    contract: tenancy
+    purpose: Assign it to a workstation
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-582
@@ -61174,7 +61360,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setPaymentTerminalConfiguration
+    contract: payments
+    purpose: EMV and card-present settings
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id008
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-583
@@ -61275,7 +61467,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getDeviceTelemetry
+    contract: tenancy
+    purpose: Connectivity over time
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - POS ↔ Terminal
@@ -61406,7 +61603,12 @@ screens:
       The pack's own statuses are Initiated — the state names which is selected.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listPaymentTerminals
+    contract: payments
+    purpose: Live card-present operations
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Payment ID
@@ -61509,7 +61711,18 @@ screens:
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listStoredForwardTransactions
+    contract: payments
+    purpose: What is held offline
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: setPaymentTerminalConfiguration
+    contract: payments
+    purpose: Store-and-forward limits
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id008
   entryState:
     preloaded:
     - Terminal
@@ -61596,7 +61809,17 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getDeviceTelemetry
+    contract: tenancy
+    purpose: Terminal health
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: createWorkOrder
+    contract: maintenance
+    purpose: Raise a repair
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-587
@@ -61733,7 +61956,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: testPaymentProviderConnection
+    contract: payments
+    purpose: Certify the terminal path
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id009
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-588
@@ -61895,7 +62124,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getPaymentPerformance
+    contract: payments
+    purpose: Digital payment performance
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-589
@@ -61995,7 +62229,18 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listPaymentMethods
+    contract: payments
+    purpose: Alternative methods
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: updatePaymentMethod
+    contract: payments
+    purpose: Configure one
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id005
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-590
@@ -62060,7 +62305,13 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: updatePaymentMethod
+    contract: payments
+    purpose: Digital wallet configuration
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id005
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-591
@@ -62161,7 +62412,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: createPaymentLink
+    contract: orders
+    purpose: Build a payment link
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-592
@@ -62241,7 +62497,17 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: resendPaymentLink
+    contract: orders
+    purpose: Distribute or resend
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+  - operationId: getPaymentLink
+    contract: orders
+    purpose: Its state
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-593
@@ -62342,7 +62608,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setHostedCheckoutConfiguration
+    contract: payments
+    purpose: Redirect and return
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-594
@@ -62472,7 +62743,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: inquirePaymentStatus
+    contract: orders
+    purpose: Session and transaction state
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - TICVAI Payment ID
@@ -62596,7 +62872,12 @@ screens:
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setPaymentAuthenticationPolicy
+    contract: payments
+    purpose: 3-D Secure, tokens and mandates
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Payment Instrument Reference
@@ -62689,7 +62970,17 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setHostedCheckoutConfiguration
+    contract: payments
+    purpose: Expiry and orphan recovery
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+  - operationId: inquirePaymentStatus
+    contract: orders
+    purpose: Recover a session
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Age
@@ -62790,7 +63081,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: simulatePaymentConfiguration
+    contract: payments
+    purpose: Simulate the digital path
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-598
@@ -62917,7 +63213,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getMixedTenderRules
+    contract: payments
+    purpose: Tender rules in force
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-599
@@ -63004,7 +63305,14 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setMixedTenderRules
+    contract: payments
+    purpose: Which combinations are allowed
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id010
+    - getMixedTenderRules
   entryState:
     preloaded:
     - Card ✓ ✓ ✓ ✓ ✓ ✓
@@ -63080,7 +63388,18 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setMultiPaymentSplit
+    contract: orders
+    purpose: Allocate a split payment
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+  - operationId: setMixedTenderRules
+    contract: payments
+    purpose: The sequence rules
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id010
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-601
@@ -63164,7 +63483,19 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listB2bCreditAccounts
+    contract: payments
+    purpose: On-account customers
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: createB2bCreditAccount
+    contract: payments
+    purpose: Open an account
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - listB2bCreditAccounts
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-602
@@ -63248,7 +63579,14 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setB2bPaymentTerms
+    contract: payments
+    purpose: Limit, terms and billing cycle
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - listB2bCreditAccounts
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-603
@@ -63336,7 +63674,18 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setMixedTenderRules
+    contract: payments
+    purpose: Stored value and voucher tenders
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id010
+  - operationId: getCreditConsumptionPolicy
+    contract: wallet
+    purpose: The order within stored value
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-604
@@ -63432,7 +63781,13 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setMixedTenderRules
+    contract: payments
+    purpose: Sequence and restrictions
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id010
   entryState:
     preloaded:
     - ↓
@@ -63521,7 +63876,13 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setMixedTenderRules
+    contract: payments
+    purpose: Partial payment and recovery
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id010
   entryState:
     preloaded:
     - AED 200 ✓
@@ -63612,7 +63973,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listOrderPaymentDetail
+    contract: orders
+    purpose: Trace the allocation
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-607
@@ -63727,7 +64093,17 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: simulatePaymentConfiguration
+    contract: payments
+    purpose: Simulate mixed tender
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+  - operationId: listB2bCreditAccounts
+    contract: payments
+    purpose: Credit exposure
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - ↓
@@ -63861,7 +64237,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listOrderRefunds
+    contract: orders
+    purpose: Refunds in flight
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-609
@@ -63970,7 +64351,17 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: createRefundRequest
+    contract: orders
+    purpose: Raise a refund
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+  - operationId: getRefundPolicy
+    contract: orders
+    purpose: What is eligible
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - 'Order: ORD-847291'
@@ -64154,7 +64545,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setWalletRefundPolicy
+    contract: wallet
+    purpose: Refund to wallet or original tender
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-612
@@ -64250,7 +64646,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: voidPayment
+    contract: orders
+    purpose: Void or reverse
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-613
@@ -64345,7 +64746,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: approveRefund
+    contract: orders
+    purpose: Approve above threshold
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Request
@@ -64448,7 +64854,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: inquirePaymentStatus
+    contract: orders
+    purpose: Provider status and recovery
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Provider
@@ -64528,7 +64939,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: createRefund
+    contract: orders
+    purpose: Adjustment and correction
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-616
@@ -64628,7 +65044,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listOrderPaymentDetail
+    contract: orders
+    purpose: Trace and investigate
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - ↓
@@ -64911,7 +65332,17 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listSettlements
+    contract: finance
+    purpose: Settlements to date
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: listReconciliationSources
+    contract: payments
+    purpose: Feeds and their freshness
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-619
@@ -64995,7 +65426,19 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setReconciliationSource
+    contract: payments
+    purpose: Define a settlement feed
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - listReconciliationSources
+  - operationId: ingestSettlementFile
+    contract: finance
+    purpose: Import one
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-620
@@ -65059,7 +65502,12 @@ screens:
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setReconciliationMatchingRules
+    contract: payments
+    purpose: How a match is made
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-621
@@ -65156,7 +65604,17 @@ screens:
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listSettlementExceptions
+    contract: finance
+    purpose: What did not match
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: resolveSettlementException
+    contract: finance
+    purpose: Resolve it
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Payment
@@ -65276,7 +65734,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listSettlements
+    contract: finance
+    purpose: Settlement and payout
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Settlement ID
@@ -65403,7 +65866,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getPaymentProviderEconomics
+    contract: payments
+    purpose: Fees, commission and FX
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Contracted fee
@@ -65499,7 +65967,19 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listMerchantAccounts
+    contract: payments
+    purpose: Merchant accounts and calendars
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: setMerchantAccount
+    contract: payments
+    purpose: Bind one
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - listMerchantAccounts
   entryState:
     preloaded:
     - Transaction period
@@ -65577,7 +66057,12 @@ screens:
       own statuses are Not Ready — the state names which is selected.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: recordSettlement
+    contract: finance
+    purpose: Post to the ledger
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-626
@@ -65653,7 +66138,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: getUnifiedReconciliation
+    contract: finance
+    purpose: Audit and evidence
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-627
@@ -65743,7 +66233,12 @@ screens:
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getUnifiedReconciliation
+    contract: finance
+    purpose: Forecast and trend
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Expected settlement
@@ -65920,7 +66415,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getPaymentPerformance
+    contract: payments
+    purpose: Risk and fraud at a glance
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-629
@@ -66012,7 +66512,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setPaymentRiskRules
+    contract: payments
+    purpose: Rules and decisions
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-630
@@ -66101,7 +66606,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setPaymentRiskRules
+    contract: payments
+    purpose: Velocity and behaviour
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-631
@@ -66187,7 +66697,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setPaymentRiskRules
+    contract: payments
+    purpose: Lists and signals
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-632
@@ -66315,7 +66830,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listChargebacks
+    contract: orders
+    purpose: Cases to investigate
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Case ID
@@ -66457,7 +66977,17 @@ screens:
       own statuses are Received — the state names which is selected.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listChargebacks
+    contract: orders
+    purpose: Chargebacks and disputes
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: respondToChargeback
+    contract: orders
+    purpose: Respond
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-634
@@ -66524,7 +67054,14 @@ screens:
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: submitChargebackEvidence
+    contract: payments
+    purpose: Assemble a representment
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - listChargebacks
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-635
@@ -66605,7 +67142,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getPaymentPerformance
+    contract: payments
+    purpose: Conversion and where sales are lost
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-636
@@ -66670,7 +67212,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getPaymentPerformance
+    contract: payments
+    purpose: Anomalies in payment behaviour
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-637
@@ -66759,7 +67306,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: simulatePaymentConfiguration
+    contract: payments
+    purpose: Executive simulation
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-638
@@ -67017,7 +67569,7 @@ screens:
     purpose: Change one
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id005
+    invalidates: &id011
     - listRecommendationStrategies
   wireframe:
     status: notStarted
@@ -67118,7 +67670,7 @@ screens:
     purpose: Objective and KPI
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id005
+    invalidates: *id011
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-641
@@ -67232,7 +67784,7 @@ screens:
     purpose: Declare them
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id006
+    invalidates: &id012
     - listProductRelationships
   wireframe:
     status: notStarted
@@ -67311,7 +67863,7 @@ screens:
     purpose: Placements and touchpoints
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id005
+    invalidates: *id011
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-643
@@ -67386,7 +67938,7 @@ screens:
     purpose: Channels and journey
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id005
+    invalidates: *id011
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-644
@@ -67487,14 +68039,14 @@ screens:
     purpose: Caps, fatigue and exclusions
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id007
+    invalidates: &id013
     - listRecommendationStrategies
   - operationId: updateRecommendationStrategy
     contract: promotions
     purpose: Priority and ranking
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id005
+    invalidates: *id011
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-645
@@ -67564,7 +68116,7 @@ screens:
     purpose: Commercial guardrails
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id005
+    invalidates: *id011
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-646
@@ -67962,7 +68514,7 @@ screens:
     purpose: Order it
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id006
+    invalidates: *id012
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-650
@@ -68067,7 +68619,7 @@ screens:
     purpose: Eligibility and qualification
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id005
+    invalidates: *id011
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-651
@@ -68417,7 +68969,7 @@ screens:
     purpose: Cart and checkout placements
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id005
+    invalidates: *id011
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-655
@@ -68499,7 +69051,7 @@ screens:
     purpose: Post-purchase placements
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id005
+    invalidates: *id011
   - operationId: quoteUpgrade
     contract: promotions
     purpose: Upgrade after the fact
@@ -68931,7 +69483,7 @@ screens:
     purpose: Build the relationships
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id006
+    invalidates: *id012
   entryState:
     preloaded:
     - Manual
@@ -69196,7 +69748,7 @@ screens:
     purpose: Across categories
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id006
+    invalidates: *id012
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-663
@@ -69268,7 +69820,7 @@ screens:
     purpose: Across attractions and partners
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id006
+    invalidates: *id012
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-664
@@ -69339,7 +69891,7 @@ screens:
     purpose: Exclude what is in the basket
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id005
+    invalidates: *id011
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-665
@@ -69411,7 +69963,7 @@ screens:
     purpose: Require availability
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id005
+    invalidates: *id011
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-666
@@ -69931,7 +70483,7 @@ screens:
     purpose: Context rules
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id005
+    invalidates: *id011
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-671
@@ -70015,7 +70567,7 @@ screens:
     purpose: Pre-purchase placements
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id005
+    invalidates: *id011
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-672
@@ -70098,7 +70650,7 @@ screens:
     purpose: Pre-visit placements
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id005
+    invalidates: *id011
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-673
@@ -70170,7 +70722,7 @@ screens:
     purpose: In-venue and location-aware
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id005
+    invalidates: *id011
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-674
@@ -70248,7 +70800,7 @@ screens:
     purpose: Visit state and timing
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id005
+    invalidates: *id011
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-675
@@ -70430,7 +70982,7 @@ screens:
     purpose: Triggers and frequency
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id007
+    invalidates: *id013
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-677
@@ -70783,7 +71335,7 @@ screens:
     purpose: Which signals count
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id005
+    invalidates: *id011
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-681
@@ -70966,7 +71518,7 @@ screens:
     purpose: Next-best-offer policy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id005
+    invalidates: *id011
   - operationId: explainRecommendation
     contract: promotions
     purpose: Trace a decision
@@ -71081,7 +71633,7 @@ screens:
     purpose: Ranking and decision policy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id005
+    invalidates: *id011
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-684
@@ -71176,7 +71728,7 @@ screens:
     purpose: Preference, fatigue, suppression
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id007
+    invalidates: *id013
   entryState:
     preloaded:
     - Repeated declines
@@ -72235,7 +72787,7 @@ screens:
     purpose: Pause or retire
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id005
+    invalidates: *id011
   entryState:
     preloaded:
     - ↓
