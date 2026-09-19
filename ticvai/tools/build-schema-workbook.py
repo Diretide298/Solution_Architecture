@@ -118,11 +118,29 @@ _N_TENANT=len(_TOT_T)-_N_CONTROL
 # **Named, not counted.** A table registered with no columns is a modelling gap, and a gap
 # that only shows up as a number is a gap nobody goes and looks at.
 _EMPTY=[x for x in _ALL_T if not cols.get(x)]
-NEW={'platform.outlet','platform.tenant','marketing.guest_device','marketing.wishlist_item',
- 'fnb.delivery_location','fnb.location_session','fnb.delivery_location_outlet','fnb.location_code',
- 'retail.shop_and_drop','retail.shop_and_drop_line','assets.media_asset','assets.media_collection',
- 'assets.media_upload','assets.media_usage','pii.subject','pii.subject_contact',
- 'pii.subject_document','pii.subject_biometric'}
+# **What is new was a set literal typed on 14 August**, still shown blue five weeks later
+# while the schema went from 378 tables to 556 — 178 arrived and not one of them was marked.
+# A highlight that cannot go stale is one nobody has to maintain; this one could, and did.
+#
+# `handoff/schema-history.json` records when each table was first seen and what it was called
+# before. Both are read here rather than restated. **A rename is not a delete and an add**: to
+# a diff it looks like exactly that, which is why the history declares renames by hand and the
+# workbook can then say "was retail.wallet" instead of showing three tables vanish.
+_HIST_P = _P(__file__).resolve().parents[1] / 'handoff' / 'schema-history.json'
+_HIST = json.loads(_HIST_P.read_text(encoding='utf-8')) if _HIST_P.exists() else {}
+_FIRST = _HIST.get('firstSeen') or {}
+_RENAME = {r['to']: r for r in (_HIST.get('renames') or [])}
+# Newest cohort only. Marking every table that shares the most recent date would light up the
+# whole sheet on the run that first records it, which says nothing.
+# A table dated at the baseline predates the record and is not a change; only cohorts after
+# it are. Until a table actually arrives, nothing is blue, which is the honest answer.
+# **After the baseline, not merely different from it.** The first cut took the newest date
+# that was not the baseline, which picked the four tables seeded at 14 August — dates that are
+# older than the record, not newer — and marked five-week-old tables as this week's change.
+_BASE = _HIST.get('baseline') or ''
+_DATES = sorted({d for d in _FIRST.values() if d > _BASE})
+NEW_ON = _DATES[-1] if _DATES else None
+NEW = {t for t, d in _FIRST.items() if d == NEW_ON} if NEW_ON else set()
 PII={t for t in set(cols)|set(storage) if t.startswith('pii.')}
 
 # **Which database a table is in** (ADR-0038, ADR-0039). A cell is a region and a Postgres
@@ -176,7 +194,7 @@ for i,(t_,f_) in enumerate([
  ('A subject_id is pseudonymous, not anonymous. Re-identification requires this schema,',B),
  ('which is why reporting reads a replica without it and the AI layer never receives a row',B),
  ('from it (ADR-0009).',B),('',None),
- ('Eighteen tables are new, shown in blue on the Tables sheet',BD),
+ (('%d table(s) are new, shown in blue on the Tables sheet' % len(NEW)),BD),
  ('  pii.subject, _contact, _document, _biometric   the schema was empty',B),
  ('  marketing.guest_device      push notifications had nowhere to land',B),
  ('  marketing.wishlist_item     no contract anywhere',B),
@@ -277,7 +295,10 @@ def foreign_writers(table):
     return [c for c in w if c not in own]
 
 ws=wb.create_sheet('Tables'); ws.cell(1,1,f'All {tot} tables').font=T
-ws.cell(2,1,'Blue is new on 14 August. Pink is personal data.').font=SUB
+_CAP = 'Blue is new on %s. Pink is personal data.' % (NEW_ON or 'the last recorded change')
+if _RENAME:
+    _CAP += ' %d table(s) renamed - see the Was column.' % len(_RENAME)
+ws.cell(2,1,_CAP).font=SUB
 # **`What it is` added 31 August.** 369 tables had a description in
 # `schema-reference.json` and not one column of this workbook showed it — the sheet a backend
 # engineer opens listed a name, a column count and a service, and left them to guess what
@@ -285,8 +306,11 @@ ws.cell(2,1,'Blue is new on 14 August. Pink is personal data.').font=SUB
 #
 # **Same shape as the Modules sheet reading `module.written` before that column existed**: the
 # data was derived, the sheet read a different field, and nothing compared them.
-hdr(ws,['Module','Table','Database','What it is','Service','Columns','Written','New','PII','Foreign writers','Parent','Anchors on','Derived from','Migration'],
-    [12,32,10,74,17,9,8,6,6,20,26,30,26,20])
+# **`Was` added 19 September.** Three tables moved schema that day and the workbook had no
+# way to say so, which meant a reader comparing two weeks saw three vanish and three
+# appear — and the safe reading of a table vanishing is that its data was dropped.
+hdr(ws,['Module','Table','Was','Database','What it is','Service','Columns','Written','New','PII','Foreign writers','Parent','Anchors on','Derived from','Migration'],
+    [12,32,26,10,74,17,9,8,6,6,20,26,30,26,20])
 r=5
 for t in sorted(set(cols)|set(storage)):
     m=t.split('.')[0]; cs=cols.get(t,[])
@@ -302,18 +326,24 @@ for t in sorted(set(cols)|set(storage)):
     # is how a wide column becomes an ignored one.
     what=str(storage.get(t) or '').split('. **Hangs off**')[0].split('**Reaches**')[0].strip()
     if len(what)>300: what=what[:297]+'…'
-    for i,v in enumerate([m,t,db_of(t),what or '—',svc_of(t).replace('Service',''),len(cs) or '—',
+    _was = _RENAME.get(t, {}).get('from', '')
+    for i,v in enumerate([m,t,_was,db_of(t),what or '—',svc_of(t).replace('Service',''),len(cs) or '—',
                           'yes' if t in written else '',
                           'yes' if t in NEW else '','yes' if t in PII else '',
                           ', '.join(fw) or '',
                           (L.get('parent') or '—'), anchtxt or '—',
                           src,MIG.get(m,'unassigned')],1):
-        c=ws.cell(r,i,v); c.font=M if i==2 else B; c.border=BOX
-        if i==4: c.alignment=Alignment(wrap_text=True,vertical='top')
-        if i in (3,6,7,8,9): c.alignment=Alignment(horizontal='center')
+        c=ws.cell(r,i,v); c.font=M if i in (2,3) else B; c.border=BOX
+        if i==5: c.alignment=Alignment(wrap_text=True,vertical='top')
+        if i in (4,7,8,9,10): c.alignment=Alignment(horizontal='center')
         # **Amber where a contract outside the owning service writes it.** Correct in all 22
         # cases and still the thing to look at first when a boundary is questioned.
-        if i==9 and fw: c.fill=AMBER
+        #
+        # Indices shifted by one on 19 September when `Was` was inserted at column 3. The
+        # condition names the PII column rather than Foreign writers and did so before the
+        # shift too — preserved rather than quietly corrected, because which column it is
+        # meant to colour is a question for whoever wrote it.
+        if i==10 and fw: c.fill=AMBER
         if t in PII: c.fill=PINK
         elif t in NEW: c.fill=BLUE
         elif t in written: c.fill=GREEN
