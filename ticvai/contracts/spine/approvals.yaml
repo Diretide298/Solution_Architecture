@@ -1737,6 +1737,305 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StepUpPolicy'
+  /approval-control-policies:
+    get:
+      operationId: listApprovalControlPolicies
+      summary: Segregation of duties, four-eyes and dual control
+      description: 'Approvals boards 4.8, 6.2 and 6.3. **`identity.setSegregationRules` says which roles
+        one person may not hold at once. This says which *decisions* one person may not take alone**, and
+        they are different controls that get conflated.
+
+        A cashier who may also approve refunds is a segregation problem. A refund of fifty thousand
+        approved by one person who is allowed to approve refunds is a dual-control problem, and no role
+        matrix expresses it.
+
+        **Four-eyes and dual control are distinguished.** Four-eyes means two different people; dual
+        control means two people *from different groups*, which is stronger and is what a finance
+        auditor means.
+
+        '
+      tags:
+      - approvals
+      x-ticvai-permission: APPROVAL_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Policies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApprovalControlPolicy'
+    put:
+      operationId: setApprovalControlPolicy
+      summary: Require a second, independent pair of eyes
+      tags:
+      - approvals
+      x-ticvai-permission: APPROVAL_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApprovalControlPolicy'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalControlPolicy'
+  /approval-requests/{requestId}/signature:
+    parameters:
+    - name: requestId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: signApprovalDecision
+      summary: Sign a decision, so it can be proved later
+      description: 'Approvals board 6.5. **A decision record says somebody approved; a signature proves
+        it.** For the decisions that end up in front of a regulator or a court — a licence, a safety
+        sign-off, a payment above a threshold — the difference matters, because a database row is only
+        as trustworthy as whoever can write to the database.
+
+        Signs the decision payload, not the screen. **What is signed is the request as it stood at the
+        moment of decision**, so a request edited afterwards breaks its own signature, which is the whole
+        point.
+
+        '
+      tags:
+      - approvals
+      x-ticvai-permission: APPROVAL_DECIDE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - method
+              properties:
+                method:
+                  type: string
+                  enum:
+                  - platformKey
+                  - uaePass
+                  - externalCertificate
+                  - drawnSignature
+                stepUpToken:
+                  type: string
+                  nullable: true
+      responses:
+        '201':
+          description: Signed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalSignature'
+  /approval-requests/{requestId}/record:
+    parameters:
+    - name: requestId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getApprovalRecord
+      summary: The immutable decision record, and whether it is intact
+      description: 'Approvals boards 4.10 and 6.6. **Tamper evidence, not tamper prevention.** Nothing
+        stops a sufficiently privileged person editing a row; what this does is make the edit visible,
+        by chaining each record to the one before it so a changed entry breaks every hash after it.
+
+        **Verification is part of the read.** A tamper check nobody runs is a tamper check that reports
+        the breach years late.
+
+        '
+      tags:
+      - approvals
+      x-ticvai-permission: APPROVAL_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: The record, with its integrity verdict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalRecord'
+  /approval-sla-policies:
+    put:
+      operationId: setApprovalSlaPolicy
+      summary: How long a decision may take, and what happens when it does not
+      description: 'Approvals boards 5.5 and 5.6. **`listSlaEscalationReminder` could read them and
+        nothing set them.** The policy is the pair: a target, and the reminder and breach behaviour that
+        follows — because a target with no consequence is a number in a table.
+
+        **Business hours, not elapsed hours.** A four-hour SLA starting at five in the afternoon is
+        breached by nine the next morning with nobody having done anything wrong.
+
+        '
+      tags:
+      - approvals
+      x-ticvai-permission: APPROVAL_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApprovalSlaPolicy'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalSlaPolicy'
+  /approval-delegations/availability:
+    put:
+      operationId: setApproverAvailability
+      summary: Out of office, and who decides instead
+      description: 'Approvals boards 5.3 and 5.4. **`createApprovalDelegation` names a substitute; this
+        says when it applies.** A delegation somebody has to remember to turn on and off is a delegation
+        that will be left on after the holiday, and every approval for a month goes to the wrong person.
+
+        '
+      tags:
+      - approvals
+      x-ticvai-permission: APPROVAL_DECIDE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApproverAvailability'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApproverAvailability'
+  /approval-retention:
+    put:
+      operationId: setApprovalRetentionPolicy
+      summary: How long decision records are kept, and what survives
+      description: 'Approvals board 6.7. **Approval records outlive the things they approved**, and
+        deliberately: the refund is history in ninety days and the evidence that it was authorised is
+        needed for seven years.
+
+        **Retention here can only extend, never shorten, what privacy retention would delete** — a
+        legal-hold interaction that has to be decided once rather than argued per request.
+
+        '
+      tags:
+      - approvals
+      x-ticvai-permission: APPROVAL_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApprovalRetentionPolicy'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalRetentionPolicy'
+  /approval-evidence-packages:
+    post:
+      operationId: createApprovalEvidencePackage
+      summary: Assemble what an auditor asked for
+      description: 'Approvals board 6.9. **The request is never *show me an approval*; it is *show me
+        every approval of this kind in this period, with the policy in force at the time*.** Assembling
+        that by hand from a list screen is how a two-day audit becomes a two-week one.
+
+        Includes the policy versions, not just the decisions, because an auditor''s question is whether
+        the rule was followed and the rule has changed since.
+
+        '
+      tags:
+      - approvals
+      x-ticvai-permission: APPROVAL_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - from
+              - to
+              properties:
+                from:
+                  type: string
+                  format: date-time
+                to:
+                  type: string
+                  format: date-time
+                requestKinds:
+                  type: array
+                  items:
+                    type: string
+                scopePath:
+                  type: string
+                  nullable: true
+                includePolicyVersions:
+                  type: boolean
+                  default: true
+                includeSignatures:
+                  type: boolean
+                  default: true
+      responses:
+        '202':
+          description: Being assembled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalEvidencePackage'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -1744,6 +2043,350 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
+    ApprovalControlPolicy:
+      type: object
+      x-ticvai-persistence: approvals.control_policy
+      description: 'Approvals boards 6.2 and 6.3. **Which decisions one person may not take alone** —
+        distinct from which roles one person may not hold, which is `identity.setSegregationRules`.
+
+        '
+      required:
+      - code
+      - control
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        appliesToRequestKinds:
+          type: array
+          items:
+            type: string
+        appliesAboveValue:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        control:
+          type: string
+          enum:
+          - fourEyes
+          - dualControl
+          - separationFromRequester
+          - separationFromExecutor
+          description: '**`fourEyes` is two different people; `dualControl` is two people from different
+            groups.** The second is stronger and is what a finance auditor means, and collapsing them
+            makes the stronger control unexpressible.
+
+            '
+        requiredApproverGroupIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        minimumApprovers:
+          type: integer
+          default: 2
+        requiresStepUp:
+          type: boolean
+          default: false
+        requiresSignature:
+          type: boolean
+          default: false
+        breakGlassAllowed:
+          type: boolean
+          default: false
+          description: '**Whether the control may be overridden in an emergency**, and if so it raises an
+            alert rather than passing quietly. A control with no break-glass will be worked around by
+            hand at three in the morning, which is worse.
+
+            '
+        scopePath:
+          type: string
+        isActive:
+          type: boolean
+          default: true
+    ApprovalSignature:
+      type: object
+      x-ticvai-persistence: approvals.signature
+      description: 'Approvals board 6.5. **What is signed is the request as it stood at the moment of
+        decision**, so a later edit breaks its own signature.
+
+        '
+      properties:
+        id:
+          type: string
+          format: uuid
+        requestId:
+          type: string
+          format: uuid
+        signedBy:
+          type: string
+          format: uuid
+        signedAt:
+          type: string
+          format: date-time
+        method:
+          type: string
+          enum:
+          - platformKey
+          - uaePass
+          - externalCertificate
+          - drawnSignature
+        payloadHash:
+          type: string
+        signature:
+          type: string
+        certificateSubject:
+          type: string
+          nullable: true
+        stepUpVerified:
+          type: boolean
+          default: false
+        scopePath:
+          type: string
+    ApprovalRecord:
+      type: object
+      x-ticvai-persistence: approvals.decision_record
+      description: 'Approvals boards 4.10 and 6.6. **Tamper evidence, not tamper prevention** — each
+        record chains to the one before it, so a changed entry breaks every hash after it.
+
+        '
+      properties:
+        requestId:
+          type: string
+          format: uuid
+        sequence:
+          type: integer
+        recordedAt:
+          type: string
+          format: date-time
+        decision:
+          type: string
+        decidedBy:
+          type: string
+          format: uuid
+        comment:
+          type: string
+          nullable: true
+        policyVersions:
+          type: array
+          description: '**What the rules were at the time**, because they have changed since.'
+          items:
+            type: object
+            properties:
+              policyId:
+                type: string
+                format: uuid
+              version:
+                type: integer
+        payloadHash:
+          type: string
+        previousRecordHash:
+          type: string
+          nullable: true
+        recordHash:
+          type: string
+        signatures:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApprovalSignature'
+        integrity:
+          type: string
+          readOnly: true
+          enum:
+          - intact
+          - broken
+          - unverifiable
+          description: '**Verified on read.** A tamper check nobody runs reports the breach years late.'
+        scopePath:
+          type: string
+    ApprovalSlaPolicy:
+      type: object
+      x-ticvai-persistence: approvals.sla_policy
+      description: 'Approvals boards 5.5 and 5.6. **A target with no consequence is a number in a
+        table**, so the reminder and breach behaviour are part of the policy.
+
+        '
+      required:
+      - code
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        appliesToRequestKinds:
+          type: array
+          items:
+            type: string
+        targetMinutes:
+          type: integer
+        businessHoursOnly:
+          type: boolean
+          default: true
+          description: '**A four-hour SLA starting at five in the afternoon is breached by nine the next
+            morning with nobody having done anything wrong.**
+
+            '
+        calendarId:
+          type: string
+          format: uuid
+          nullable: true
+        reminders:
+          type: array
+          items:
+            type: object
+            properties:
+              atPercentOfTarget:
+                type: integer
+              notify:
+                type: string
+                enum:
+                - approver
+                - approverManager
+                - requester
+                - escalationGroup
+        onBreach:
+          type: string
+          enum:
+          - notifyOnly
+          - escalate
+          - autoApprove
+          - autoReject
+          default: escalate
+        autoActionAllowed:
+          type: boolean
+          default: false
+          description: '**Auto-approval on breach is off unless somebody says otherwise, in writing.**
+            A queue that approves itself when nobody looks is not an approval process.
+
+            '
+        escalationGroupId:
+          type: string
+          format: uuid
+          nullable: true
+        scopePath:
+          type: string
+    ApproverAvailability:
+      type: object
+      x-ticvai-persistence: approvals.approver_availability
+      description: 'Approvals boards 5.3 and 5.4. **Dated, so nobody has to remember to turn it off.**'
+      properties:
+        principalId:
+          type: string
+          format: uuid
+        unavailableFrom:
+          type: string
+          format: date-time
+        unavailableTo:
+          type: string
+          format: date-time
+        substitutePrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        delegationId:
+          type: string
+          format: uuid
+          nullable: true
+        reason:
+          type: string
+          nullable: true
+        appliesToRequestKinds:
+          type: array
+          items:
+            type: string
+        scopePath:
+          type: string
+    ApprovalRetentionPolicy:
+      type: object
+      x-ticvai-persistence: approvals.retention_policy
+      description: 'Approvals board 6.7. **Approval records outlive what they approved.**'
+      properties:
+        id:
+          type: string
+          format: uuid
+        appliesToRequestKinds:
+          type: array
+          items:
+            type: string
+        retainYears:
+          type: integer
+        retainSignatures:
+          type: boolean
+          default: true
+        retainAttachments:
+          type: boolean
+          default: false
+        onExpiry:
+          type: string
+          enum:
+          - delete
+          - anonymise
+          - archive
+          default: archive
+        overridesPrivacyDeletion:
+          type: boolean
+          default: true
+          description: '**Can extend, never shorten, what privacy retention would delete.** The
+            interaction is decided once here instead of argued per data-subject request.
+
+            '
+        legalBasis:
+          type: string
+          nullable: true
+        scopePath:
+          type: string
+    ApprovalEvidencePackage:
+      type: object
+      x-ticvai-persistence: approvals.evidence_package
+      description: 'Approvals board 6.9. **Decisions and the policy versions behind them**, because the
+        auditor asks whether the rule was followed and the rule has changed.
+
+        '
+      properties:
+        id:
+          type: string
+          format: uuid
+        requestedBy:
+          type: string
+          format: uuid
+        requestedAt:
+          type: string
+          format: date-time
+        from:
+          type: string
+          format: date-time
+        to:
+          type: string
+          format: date-time
+        requestCount:
+          type: integer
+          readOnly: true
+        integrityFailures:
+          type: integer
+          readOnly: true
+          description: '**Counted and reported rather than quietly excluded.** A package that drops the
+            records that failed verification is the one an auditor should not be given.
+
+            '
+        status:
+          type: string
+          enum:
+          - assembling
+          - ready
+          - failed
+        assetId:
+          type: string
+          format: uuid
+          nullable: true
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+        scopePath:
+          type: string
     DraftedRecord:
       type: object
       x-ticvai-provisional: true

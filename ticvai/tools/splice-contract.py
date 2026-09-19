@@ -30,19 +30,34 @@ def main():
     paths = io.open(paths_file, encoding='utf8').read().rstrip('\n')
     schemas = io.open(schemas_file, encoding='utf8').read().rstrip('\n')
 
-    marker = '\ncomponents:\n  schemas:\n'
-    if marker not in t:
-        sys.exit('no "components:/  schemas:" marker in %s' % target)
-    head, tail = t.split(marker, 1)
+    # **`schemas:` is not always the first key under `components:`.** `approvals.yaml`
+    # opens with `securitySchemes:`, and assuming the order sent the splice looking for
+    # a marker that was never going to be there.
+    ci = t.find('\ncomponents:\n')
+    if ci < 0:
+        sys.exit('no "components:" block in %s' % target)
+    si = t.find('\n  schemas:\n', ci)
+    if si < 0:
+        sys.exit('no "  schemas:" under components: in %s' % target)
+    marker = '\n  schemas:\n'
+    # **Three regions, and the paths go in the first of them.** `paths:` ends where
+    # `components:` begins, so appending to "everything before `schemas:`" appends
+    # *inside* `components:` — which is what the first cut of this did. The YAML stayed
+    # valid, the file looked right, and thirteen operations vanished from `paths`.
+    before_components = t[:ci]
+    components_head = t[ci:si]
+    after_schemas_key = t[si + len(marker):]
 
-    clash = set(keys_at(head, 2)) & set(keys_at(paths + '\n', 2))
+    clash = set(keys_at(before_components, 2)) & set(keys_at(paths + '\n', 2))
     if clash:
         sys.exit('path key already present, refusing: %s' % ', '.join(sorted(clash)))
-    clash = set(keys_at(tail, 4)) & set(keys_at(schemas + '\n', 4))
+    clash = set(keys_at(after_schemas_key, 4)) & set(keys_at(schemas + '\n', 4))
     if clash:
         sys.exit('schema already present, refusing: %s' % ', '.join(sorted(clash)))
 
-    new = head.rstrip('\n') + '\n' + paths + '\n' + marker + schemas + '\n' + tail
+    expected = set(re.findall(r'^\s*operationId:\s*(\S+)', paths, re.M))
+    new = (before_components.rstrip('\n') + '\n' + paths + '\n'
+           + components_head + marker + schemas + '\n' + after_schemas_key)
     io.open(target, 'w', encoding='utf8').write(new)
 
     d = yaml.safe_load(io.open(target, encoding='utf8'))
@@ -52,14 +67,21 @@ def main():
     txt = io.open(target, encoding='utf8').read()
     missing = sorted(set(re.findall(r'(?<!yaml)#/components/schemas/(\w+)', txt))
                      - set((d.get('components') or {}).get('schemas') or {}))
+    # **The check that the first cut lacked, and it is the important one.** A splice can
+    # produce a file that parses, resolves every reference and has no duplicates, while
+    # putting the new operations somewhere nothing will ever read them. Verify by
+    # presence in the parsed `paths`, not by the file looking plausible.
+    landed = sorted(expected - set(ops))
     print('%s: %d paths, %d operations, %d schemas' % (
         target, len(d['paths']), len(ops), len(d['components']['schemas'])))
     if dup:
         print('  DUPLICATE operationIds: %s' % ', '.join(dup))
     if missing:
         print('  DANGLING local $refs: %s' % ', '.join(missing))
-    if not dup and not missing:
-        print('  clean')
+    if landed:
+        print('  NOT IN paths (%d): %s' % (len(landed), ', '.join(landed[:8])))
+    if not dup and not missing and not landed:
+        print('  clean — %d new operation(s) landed in paths' % len(expected))
 
 
 if __name__ == '__main__':

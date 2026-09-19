@@ -1824,7 +1824,17 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getKpiValues
+    contract: reporting
+    purpose: Live operational KPIs
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: listAlerts
+    contract: reporting
+    purpose: What needs attention
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Visitors currently on-site
@@ -1935,7 +1945,12 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getKpiValues
+    contract: reporting
+    purpose: Revenue against target
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Revenue Today
@@ -2055,7 +2070,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getKpiValues
+    contract: reporting
+    purpose: Attendance and footfall
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Total Visitors
@@ -2154,7 +2174,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getKpiValues
+    contract: reporting
+    purpose: Capacity and utilisation
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Available Capacity
@@ -2264,7 +2289,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getKpiValues
+    contract: reporting
+    purpose: Sales by channel
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Gross Sales
@@ -2411,7 +2441,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getKpiValues
+    contract: reporting
+    purpose: Membership and loyalty
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Unique Customers
@@ -2621,7 +2656,17 @@ screens:
       offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: askReportingQuestion
+    contract: reporting
+    purpose: Ask about what moved
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+  - operationId: listAnalyticsAnomalies
+    contract: reporting
+    purpose: What moved unexpectedly
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-019
@@ -2766,7 +2811,12 @@ screens:
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getAnalyticsBenchmark
+    contract: reporting
+    purpose: Site against site, normalised
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Revenue
@@ -2952,7 +3002,12 @@ screens:
       offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listDashboards
+    contract: reporting
+    purpose: The library
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Dashboard Name
@@ -3075,7 +3130,14 @@ screens:
       does in the meantime.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: createDashboard
+    contract: reporting
+    purpose: Create one
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id004
+    - listDashboards
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-022
@@ -3141,7 +3203,20 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: updateDashboard
+    contract: reporting
+    purpose: Lay it out
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id001
+    - getDashboard
+    - listDashboards
+  - operationId: getDashboard
+    contract: reporting
+    purpose: The dashboard being edited
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-023
@@ -3230,7 +3305,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getSemanticModel
+    contract: reporting
+    purpose: What a widget can be bound to
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - KPI Card
@@ -3368,7 +3448,20 @@ screens:
       the meantime.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listKpis
+    contract: reporting
+    purpose: KPIs already defined
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: createKpi
+    contract: reporting
+    purpose: Define one, for everywhere
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id006
+    - listKpis
+    - getKpiValues
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-025
@@ -3487,7 +3580,19 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setKpiTargets
+    contract: reporting
+    purpose: Targets and thresholds
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id007
+    - getKpiValues
+  - operationId: listKpis
+    contract: reporting
+    purpose: The KPI being targeted
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Target
@@ -3619,7 +3724,18 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getSemanticModel
+    contract: reporting
+    purpose: Datasets and fields to filter on
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: updateDashboard
+    contract: reporting
+    purpose: Save the filters
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id001
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-027
@@ -3705,7 +3821,13 @@ screens:
       what the platform does in the meantime.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: updateDashboard
+    contract: reporting
+    purpose: Drill-down behaviour
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id001
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-028
@@ -3794,7 +3916,13 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: updateDashboard
+    contract: reporting
+    purpose: Publish and version
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id001
   entryState:
     preloaded:
     - Version Number
@@ -3897,7 +4025,17 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getDashboard
+    contract: reporting
+    purpose: Preview
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: listAnalyticsPipelines
+    contract: reporting
+    purpose: Whether its data is fresh
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Data Last Refreshed
@@ -4049,7 +4187,17 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listReports
+    contract: reporting
+    purpose: The catalogue
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: listSeededReports
+    contract: reporting
+    purpose: What ships with the platform
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Report Name
@@ -4147,7 +4295,14 @@ screens:
       platform does in the meantime.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: createReport
+    contract: reporting
+    purpose: Create a report
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id005
+    - listReports
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-032
@@ -4240,7 +4395,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getSemanticModel
+    contract: reporting
+    purpose: Domains and datasets
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Dataset Name
@@ -4339,7 +4499,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listReportFields
+    contract: reporting
+    purpose: Fields available here
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-034
@@ -4430,7 +4595,15 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: updateReport
+    contract: reporting
+    purpose: Filters and parameters
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id002
+    - getReport
+    - listReports
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-035
@@ -4530,7 +4703,13 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: updateReport
+    contract: reporting
+    purpose: Grouping and calculations
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id002
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-036
@@ -4603,7 +4782,18 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getSemanticModel
+    contract: reporting
+    purpose: How domains relate
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: updateReport
+    contract: reporting
+    purpose: Compose across them
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id002
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-037
@@ -4698,7 +4888,13 @@ screens:
       the platform does in the meantime.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: updateReport
+    contract: reporting
+    purpose: Layout and formatting
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id002
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-038
@@ -4789,7 +4985,17 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: runReport
+    contract: reporting
+    purpose: Run it against a sample
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+  - operationId: getReportExecution
+    contract: reporting
+    purpose: How the run went
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Sample Results
@@ -4922,7 +5128,17 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: runReport
+    contract: reporting
+    purpose: Run it
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+  - operationId: getReportResult
+    contract: reporting
+    purpose: The results
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-040
@@ -5071,7 +5287,17 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listReportSchedules
+    contract: reporting
+    purpose: What runs when
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: listReportDeliveries
+    contract: reporting
+    purpose: What arrived and what did not
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Active Reports
@@ -5210,7 +5436,19 @@ screens:
       does in the meantime.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listReportSchedules
+    contract: reporting
+    purpose: Schedules
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: createReportSchedule
+    contract: reporting
+    purpose: Schedule a report
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - listReportSchedules
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-042
@@ -5282,7 +5520,19 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listReportSubscriptions
+    contract: reporting
+    purpose: Who receives what
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: createReportSubscription
+    contract: reporting
+    purpose: Add a recipient
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id003
+    - listReportSubscriptions
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-043
@@ -5403,7 +5653,13 @@ screens:
       platform does in the meantime.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: createReportSubscription
+    contract: reporting
+    purpose: Channel, format and recipients
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id003
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-044
@@ -5503,7 +5759,17 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: exportReportResult
+    contract: reporting
+    purpose: Export
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+  - operationId: getReportExport
+    contract: reporting
+    purpose: Collect the file
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Export ID
@@ -5602,7 +5868,12 @@ screens:
       does in the meantime.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listReportSubscriptions
+    contract: reporting
+    purpose: API and SFTP delivery
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Requests Today
@@ -5679,7 +5950,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAccessPolicies
+    contract: identity
+    purpose: Who may see which report
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-047
@@ -5810,7 +6086,12 @@ screens:
       own statuses are Running — the state names which is selected.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listReportDeliveries
+    contract: reporting
+    purpose: Failures and retries
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Job ID
@@ -5939,7 +6220,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listReportDeliveries
+    contract: reporting
+    purpose: What left, with what in it
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-049
@@ -6044,7 +6330,14 @@ screens:
       what the platform does in the meantime.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setApprovalRetentionPolicy
+    contract: approvals
+    purpose: Retention and archive
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - getApprovalRecord
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-050
@@ -6195,7 +6488,12 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAnalyticsAnomalies
+    contract: reporting
+    purpose: What the models noticed
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Executive Insights
@@ -6271,7 +6569,17 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: askReportingQuestion
+    contract: reporting
+    purpose: Ask in plain language
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+  - operationId: saveNaturalLanguageQuery
+    contract: reporting
+    purpose: Keep the question
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-052
@@ -6342,7 +6650,13 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: createDashboard
+    contract: reporting
+    purpose: Accept a generated dashboard
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id004
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-053
@@ -6433,7 +6747,13 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: createReport
+    contract: reporting
+    purpose: Accept a generated report
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id005
   entryState:
     preloaded:
     - Selected Dataset
@@ -6541,7 +6861,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAnalyticsAnomalies
+    contract: reporting
+    purpose: Anomalies, with severity
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - KPI
@@ -6617,7 +6942,17 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAnalyticsAnomalies
+    contract: reporting
+    purpose: Candidate causes
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: askReportingQuestion
+    contract: reporting
+    purpose: Follow the thread
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-056
@@ -6739,7 +7074,12 @@ screens:
       what the platform does in the meantime.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getKpiValues
+    contract: reporting
+    purpose: The series being forecast
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-057
@@ -6811,7 +7151,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAnalyticsAnomalies
+    contract: reporting
+    purpose: What to act on
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-058
@@ -6879,7 +7224,12 @@ screens:
       the platform does in the meantime.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAnalyticsAnomalies
+    contract: reporting
+    purpose: Past insights and their evidence
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-059
@@ -7156,7 +7506,17 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getAnalyticsUsage
+    contract: reporting
+    purpose: Estate at a glance
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: listAnalyticsPipelines
+    contract: reporting
+    purpose: Data health
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-061
@@ -7260,7 +7620,18 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listKpis
+    contract: reporting
+    purpose: The enterprise library
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: createKpi
+    contract: reporting
+    purpose: Add a KPI
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id006
   entryState:
     preloaded:
     - Executive
@@ -7352,7 +7723,18 @@ screens:
       platform does in the meantime.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setKpiTargets
+    contract: reporting
+    purpose: Targets and scorecards
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id007
+  - operationId: getKpiValues
+    contract: reporting
+    purpose: Where they stand
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-063
@@ -7435,7 +7817,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getAnalyticsBenchmark
+    contract: reporting
+    purpose: Configure the comparison basis
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Revenue per Visitor
@@ -7539,7 +7926,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAnalyticsPipelines
+    contract: reporting
+    purpose: Sources and integrations
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Source Name
@@ -7635,7 +8027,20 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getSemanticModel
+    contract: reporting
+    purpose: The catalogue
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: setSemanticModel
+    contract: reporting
+    purpose: Publish it
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - getSemanticModel
+    - listReportFields
   entryState:
     preloaded:
     - Missing relationships
@@ -7758,7 +8163,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAnalyticsPipelines
+    contract: reporting
+    purpose: Refresh and freshness
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Pipelines Running
@@ -7840,7 +8250,12 @@ screens:
       what the platform does in the meantime.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listDashboards
+    contract: reporting
+    purpose: Workspaces and embedding
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-068
@@ -7987,7 +8402,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getAnalyticsUsage
+    contract: reporting
+    purpose: Usage, runtime and cost
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Active Analytics Users

@@ -1285,8 +1285,903 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReportDefinition'
+  /kpis:
+    get:
+      operationId: listKpis
+      summary: The enterprise KPI library
+      description: 'BI boards 2.5 and 10.2. **A KPI defined per dashboard is a number that means something
+        different on every screen.** *Revenue* on the executive dashboard and *revenue* on the finance
+        dashboard have to be the same calculation or the two disagree in a meeting and neither is
+        trusted again.
+
+        So the definition is central and dashboards reference it. **The formula lives here, not in a
+        widget.**
+
+        '
+      tags:
+      - reporting
+      x-ticvai-permission: REPORT_VIEW_TENANT
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: KPI definitions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KpiDefinition'
+    post:
+      operationId: createKpi
+      summary: Define a KPI once, for everywhere
+      tags:
+      - reporting
+      x-ticvai-permission: REPORT_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KpiDefinition'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KpiDefinition'
+  /kpis/{kpiId}/targets:
+    parameters:
+    - name: kpiId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: setKpiTargets
+      summary: Targets, thresholds and what red means
+      description: 'BI boards 2.6 and 10.3. **A threshold is what turns a number into a status.** Without
+        one a dashboard shows 84% and the reader has to know whether that is good — and different readers
+        will decide differently.
+
+        Targets are per scope and per period, because a venue''s target is not the tenant''s and January
+        is not July.
+
+        '
+      tags:
+      - reporting
+      x-ticvai-permission: REPORT_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - targets
+              properties:
+                targets:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/KpiTarget'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KpiTarget'
+  /kpi-values:
+    get:
+      operationId: getKpiValues
+      summary: Current values, against target, with movement
+      description: 'BI boards 1 and 10.3. **The scorecard read.** Value, target, variance, direction and
+        freshness in one call — a dashboard assembling those from four places will render three of them
+        and spin on the fourth.
+
+        '
+      tags:
+      - reporting
+      x-ticvai-permission: REPORT_VIEW_VENUE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: kpiIds
+        in: query
+        schema:
+          type: string
+      - name: scopePath
+        in: query
+        schema:
+          type: string
+      - name: period
+        in: query
+        schema:
+          type: string
+      - name: compareTo
+        in: query
+        schema:
+          type: string
+          enum:
+          - previousPeriod
+          - samePeriodLastYear
+          - target
+          - benchmark
+      responses:
+        '200':
+          description: Values
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KpiValue'
+  /analytics-benchmarks:
+    get:
+      operationId: getAnalyticsBenchmark
+      summary: One site against another, on a like-for-like basis
+      description: 'BI boards 1.10, 7.9 and 10.4. **Comparison is only meaningful when the basis is
+        stated.** A site with a water park and one without will differ on revenue per visitor for reasons
+        that are not performance, so the benchmark carries its normalisation — per visitor, per operating
+        hour, per square metre, per staffed position.
+
+        '
+      tags:
+      - reporting
+      x-ticvai-permission: REPORT_VIEW_TENANT
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: kpiId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: scopePaths
+        in: query
+        schema:
+          type: string
+      - name: normaliseBy
+        in: query
+        schema:
+          type: string
+          enum:
+          - none
+          - perVisitor
+          - perOperatingHour
+          - perStaffedPosition
+          - perSquareMetre
+      responses:
+        '200':
+          description: Comparison
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BenchmarkRow'
+  /semantic-model:
+    get:
+      operationId: getSemanticModel
+      summary: The business data catalogue reports are built from
+      description: 'BI boards 3.3 and 10.6. **The report builder needs a vocabulary, not a schema.** A
+        person building a report thinks in *admissions*, *channel* and *guest*, and exposing tables and
+        joins to them produces reports that are wrong in ways nobody can see.
+
+        So domains, datasets, fields, their descriptions and their relationships are published as a
+        model, and `listReportFields` resolves against it.
+
+        '
+      tags:
+      - reporting
+      x-ticvai-permission: REPORT_VIEW_TENANT
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: The model
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SemanticModel'
+    put:
+      operationId: setSemanticModel
+      summary: Publish the catalogue
+      tags:
+      - reporting
+      x-ticvai-permission: REPORT_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SemanticModel'
+      responses:
+        '200':
+          description: Published
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SemanticModel'
+  /analytics-pipelines:
+    get:
+      operationId: listAnalyticsPipelines
+      summary: Data sources, refresh state and freshness
+      description: 'BI boards 10.5 and 10.7. **Freshness is the fact that decides whether a dashboard can
+        be trusted**, and it is the one most dashboards do not show. A revenue figure that stopped
+        updating at nine this morning is not a low number, it is a broken pipeline, and the two look
+        identical on a chart.
+
+        '
+      tags:
+      - reporting
+      x-ticvai-permission: REPORT_VIEW_TENANT
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Pipelines
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AnalyticsPipeline'
+  /analytics-anomalies:
+    get:
+      operationId: listAnalyticsAnomalies
+      summary: Numbers that moved more than they should have
+      description: 'BI boards 9.5 and 9.6. **Distinct from an alert rule, which fires on a threshold
+        somebody set.** An anomaly is a departure from the series'' own behaviour, which catches the
+        things nobody thought to set a threshold for — and those are the ones that matter.
+
+        Carries candidate causes, because *revenue is down 14%* is the beginning of the question rather
+        than the end of it.
+
+        '
+      tags:
+      - reporting
+      x-ticvai-permission: REPORT_VIEW_VENUE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: severity
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Anomalies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AnalyticsAnomaly'
+  /report-subscriptions:
+    get:
+      operationId: listReportSubscriptions
+      summary: Who receives what, and by which route
+      description: 'BI boards 4.3 and 4.4. **A subscription is not a schedule.** A schedule says when a
+        report runs; a subscription says who gets it, in what format, through which channel, and under
+        whose permissions — and one schedule commonly serves several subscriptions.
+
+        **The report runs under the owner''s permissions, not the recipient''s**, which is why the
+        recipient list is governed and why `REPORT_EXPORT_PII` matters here.
+
+        '
+      tags:
+      - reporting
+      x-ticvai-permission: REPORT_VIEW_VENUE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Subscriptions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReportSubscription'
+    post:
+      operationId: createReportSubscription
+      summary: Send a report to somebody, on terms
+      tags:
+      - reporting
+      x-ticvai-permission: REPORT_SCHEDULE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportSubscription'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportSubscription'
+  /report-deliveries:
+    get:
+      operationId: listReportDeliveries
+      summary: What was sent, to whom, and what failed
+      description: 'BI boards 4.8 and 4.9. **A scheduled report that silently stopped arriving is worse
+        than one that never existed**, because somebody is making decisions on the assumption it would
+        have told them.
+
+        Doubles as the compliance record: a report containing personal data that went to an address
+        outside the tenant is a fact somebody will eventually ask about.
+
+        '
+      tags:
+      - reporting
+      x-ticvai-permission: REPORT_VIEW_TENANT
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: failedOnly
+        in: query
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Deliveries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReportDelivery'
+  /analytics-usage:
+    get:
+      operationId: getAnalyticsUsage
+      summary: Which dashboards and reports are actually used, and what they cost
+      description: 'BI board 10.9. **The number that lets a BI estate be pruned.** A library of four
+        hundred reports of which thirty are opened is four hundred things to maintain and thirty that
+        matter, and nobody can tell which is which without this.
+
+        '
+      tags:
+      - reporting
+      x-ticvai-permission: REPORT_VIEW_TENANT
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: groupBy
+        in: query
+        schema:
+          type: string
+          enum:
+          - report
+          - dashboard
+          - user
+          - venue
+      responses:
+        '200':
+          description: Usage
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AnalyticsUsageRow'
+
 components:
   schemas:
+    KpiDefinition:
+      type: object
+      x-ticvai-persistence: reporting.kpi_definition
+      description: 'BI boards 2.5 and 10.2. **One definition, referenced everywhere** — otherwise
+        *revenue* means two things in the same meeting.
+
+        '
+      required:
+      - code
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        domain:
+          type: string
+          nullable: true
+        formula:
+          type: string
+          description: '**Expressed against the semantic model, not against tables.** A KPI written in
+            SQL is a KPI that breaks when the warehouse is reshaped.
+
+            '
+        unit:
+          type: string
+          enum:
+          - currency
+          - count
+          - percentage
+          - duration
+          - ratio
+          - score
+        higherIsBetter:
+          type: boolean
+          default: true
+          description: '**Refund rate and revenue both go up.** Without this the status colour is a
+            coin toss.
+
+            '
+        defaultPeriod:
+          type: string
+          nullable: true
+        owner:
+          type: string
+          format: uuid
+          nullable: true
+        scopePath:
+          type: string
+        isActive:
+          type: boolean
+          default: true
+    KpiTarget:
+      type: object
+      x-ticvai-persistence: reporting.kpi_target
+      description: 'BI board 2.6. **The threshold is what turns a number into a status.**'
+      properties:
+        kpiId:
+          type: string
+          format: uuid
+        scopePath:
+          type: string
+        period:
+          type: string
+        target:
+          type: number
+        amberAt:
+          type: number
+          nullable: true
+        redAt:
+          type: number
+          nullable: true
+        stretch:
+          type: number
+          nullable: true
+    KpiValue:
+      type: object
+      description: 'BI board 10.3. **Value, target, variance, direction and freshness in one read.**'
+      properties:
+        kpiId:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        scopePath:
+          type: string
+        period:
+          type: string
+        value:
+          type: number
+        target:
+          type: number
+          nullable: true
+        comparison:
+          type: number
+          nullable: true
+        variancePercent:
+          type: number
+          nullable: true
+        direction:
+          type: string
+          enum:
+          - up
+          - down
+          - flat
+        status:
+          type: string
+          enum:
+          - green
+          - amber
+          - red
+          - noTarget
+        asOf:
+          type: string
+          format: date-time
+        stale:
+          type: boolean
+          description: '**True when the pipeline behind it has not refreshed.** A number nobody flagged
+            as stale is a number somebody will act on.
+
+            '
+    BenchmarkRow:
+      type: object
+      description: 'BI board 10.4. **The normalisation travels with the comparison.**'
+      properties:
+        scopePath:
+          type: string
+        label:
+          type: string
+        value:
+          type: number
+        normalisedValue:
+          type: number
+          nullable: true
+        normaliseBy:
+          type: string
+        rank:
+          type: integer
+        percentile:
+          type: number
+          nullable: true
+    SemanticModel:
+      type: object
+      x-ticvai-persistence: reporting.semantic_model
+      description: 'BI boards 3.3 and 10.6. **A vocabulary, not a schema.** Exposing joins to report
+        authors produces reports that are wrong invisibly.
+
+        '
+      properties:
+        version:
+          type: integer
+        domains:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+              name:
+                type: string
+              description:
+                type: string
+                nullable: true
+              datasets:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    code:
+                      type: string
+                    name:
+                      type: string
+                    grain:
+                      type: string
+                      description: '**What one row means.** The single most common cause of a wrong
+                        report is a join that silently multiplied the grain.
+
+                        '
+                    fields:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          code:
+                            type: string
+                          label:
+                            type: string
+                          dataType:
+                            type: string
+                          aggregation:
+                            type: string
+                            nullable: true
+                          sensitive:
+                            type: boolean
+                            default: false
+                          description:
+                            type: string
+                            nullable: true
+        relationships:
+          type: array
+          items:
+            type: object
+            properties:
+              fromDataset:
+                type: string
+              toDataset:
+                type: string
+              cardinality:
+                type: string
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
+        scopePath:
+          type: string
+    AnalyticsPipeline:
+      type: object
+      x-ticvai-persistence: reporting.pipeline
+      description: 'BI board 10.7. **Freshness decides whether a dashboard can be trusted.**'
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        sourceKind:
+          type: string
+        datasets:
+          type: array
+          items:
+            type: string
+        schedule:
+          type: string
+          nullable: true
+        lastRunAt:
+          type: string
+          format: date-time
+          nullable: true
+        lastSuccessAt:
+          type: string
+          format: date-time
+          nullable: true
+        freshnessMinutes:
+          type: integer
+          nullable: true
+        expectedFreshnessMinutes:
+          type: integer
+          nullable: true
+        status:
+          type: string
+          enum:
+          - healthy
+          - degraded
+          - stale
+          - failed
+          - paused
+        lastError:
+          type: string
+          nullable: true
+        rowsLastRun:
+          type: integer
+          nullable: true
+        scopePath:
+          type: string
+    AnalyticsAnomaly:
+      type: object
+      x-ticvai-persistence: reporting.anomaly
+      description: 'BI boards 9.5 and 9.6. **A departure from the series'' own behaviour**, which catches
+        what no threshold was set for.
+
+        '
+      properties:
+        id:
+          type: string
+          format: uuid
+        kpiId:
+          type: string
+          format: uuid
+          nullable: true
+        metric:
+          type: string
+        scopePath:
+          type: string
+        detectedAt:
+          type: string
+          format: date-time
+        observed:
+          type: number
+        expected:
+          type: number
+        deviationSigma:
+          type: number
+          nullable: true
+        severity:
+          type: string
+          enum:
+          - low
+          - medium
+          - high
+        candidateCauses:
+          type: array
+          description: '**The beginning of the question, not the end of it.**'
+          items:
+            type: object
+            properties:
+              dimension:
+                type: string
+              value:
+                type: string
+              contribution:
+                type: number
+        acknowledgedBy:
+          type: string
+          format: uuid
+          nullable: true
+        acknowledgedAt:
+          type: string
+          format: date-time
+          nullable: true
+    ReportSubscription:
+      type: object
+      x-ticvai-persistence: reporting.subscription
+      description: 'BI boards 4.3 and 4.4. **Not a schedule** — one schedule serves several of these.'
+      required:
+      - reportId
+      properties:
+        id:
+          type: string
+          format: uuid
+        reportId:
+          type: string
+          format: uuid
+        scheduleId:
+          type: string
+          format: uuid
+          nullable: true
+        recipients:
+          type: array
+          items:
+            type: object
+            properties:
+              principalId:
+                type: string
+                format: uuid
+                nullable: true
+              email:
+                type: string
+                nullable: true
+              external:
+                type: boolean
+                default: false
+        channel:
+          type: string
+          enum:
+          - email
+          - sftp
+          - webhook
+          - inPlatform
+        format:
+          type: string
+          enum:
+          - pdf
+          - xlsx
+          - csv
+          - json
+        includesPersonalData:
+          type: boolean
+          default: false
+          description: '**Gates on `REPORT_EXPORT_PII` and is audited.** A report that leaves the tenant
+            with personal data in it is a fact somebody will ask about.
+
+            '
+        runsAsPrincipalId:
+          type: string
+          format: uuid
+          description: '**The report runs under the owner''s permissions, not the recipient''s.**'
+        active:
+          type: boolean
+          default: true
+        scopePath:
+          type: string
+    ReportDelivery:
+      type: object
+      x-ticvai-persistence: reporting.delivery
+      description: 'BI boards 4.8 and 4.9. **A report that silently stopped arriving is worse than one
+        that never existed.**
+
+        '
+      properties:
+        id:
+          type: string
+          format: uuid
+        subscriptionId:
+          type: string
+          format: uuid
+        reportId:
+          type: string
+          format: uuid
+        attemptedAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum:
+          - delivered
+          - failed
+          - retrying
+          - suppressed
+        recipientCount:
+          type: integer
+        failureReason:
+          type: string
+          nullable: true
+        retryCount:
+          type: integer
+          default: 0
+        containedPersonalData:
+          type: boolean
+          default: false
+        scopePath:
+          type: string
+    AnalyticsUsageRow:
+      type: object
+      description: 'BI board 10.9. **The number that lets a BI estate be pruned.**'
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+        opens:
+          type: integer
+        distinctUsers:
+          type: integer
+        lastOpenedAt:
+          type: string
+          format: date-time
+          nullable: true
+        averageRuntimeMs:
+          type: integer
+          nullable: true
+        rowsScanned:
+          type: integer
+          nullable: true
+        neverOpened:
+          type: boolean
     ReportCategory:
       type: string
       enum:
