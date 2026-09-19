@@ -83,11 +83,11 @@
    "operations": 7
   },
   {
-   "contract": "seating",
+   "contract": "identity",
    "operations": 6
   },
   {
-   "contract": "identity",
+   "contract": "seating",
    "operations": 6
   },
   {
@@ -99,15 +99,15 @@
    "operations": 4
   },
   {
-   "contract": "access",
-   "operations": 3
-  },
-  {
    "contract": "approvals",
    "operations": 3
   },
   {
    "contract": "queue",
+   "operations": 3
+  },
+  {
+   "contract": "access",
    "operations": 3
   },
   {
@@ -119,11 +119,11 @@
    "operations": 2
   },
   {
-   "contract": "finance",
+   "contract": "inventory",
    "operations": 1
   },
   {
-   "contract": "assets",
+   "contract": "finance",
    "operations": 1
   },
   {
@@ -131,7 +131,7 @@
    "operations": 1
   },
   {
-   "contract": "inventory",
+   "contract": "assets",
    "operations": 1
   }
  ],

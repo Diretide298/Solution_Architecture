@@ -1,3 +1,5 @@
+> **SUPERSEDED, 20 September.** Written at 151 of 223 rows and argued on change points. Replaced by [schema-merge-final-report-20-september.md](schema-merge-final-report-20-september.md), which re-scores all 223 on maintainability, readability, optimised access and strain on the database. 38 rows moved, almost all of them in the backend team's favour. Kept for the record.
+
 # Schema merge — our response to `TICVAI_16_Services_AND_Tables_UPDATED`
 
 > **To:** the backend team · **From:** design · **20 September 2026**

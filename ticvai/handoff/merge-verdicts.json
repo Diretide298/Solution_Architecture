@@ -100,16 +100,16 @@
   "the table name repeats its schema; same habit as the 645 column renames"
  ],
  "catalogue.membership_benefit": [
-  "DECIDE",
-  "benefits are columns on entitlement_template today \u2014 fast_track_tier, can_claim_shop_and_drop, included_value. Making them rows means a new benefit stops being a schema change. Real improvement, real migration"
+  "ADDITIVE",
+  "Decision 9: taken. Benefits are columns on entitlement_template today, so a new benefit is a schema change. Its 15 operations and 34 screens read 34 columns to get three"
  ],
  "catalogue.membership_plan": [
   "TAKE BODY",
   "our catalogue.entitlement_template is the plan \u2014 validity kind, entries, transferability, eligibility, stored value. It has no renewal rules; take those"
  ],
  "catalogue.membership_program": [
-  "DECIDE",
-  "the level above the plan, which we do not have. With membership_benefit and the accepted plan_benefit this is one question: does membership become its own three-level hierarchy, or stay entitlement_template plus product?"
+  "ADDITIVE",
+  "Decision 9: taken, the level above the plan. membership_plan stays as our entitlement_template plus their renewal rules"
  ],
  "catalogue.plan_benefit": [
   "ADDITIVE",
@@ -128,20 +128,20 @@
   "pairs with variant_dimension; 11 inbound FKs"
  ],
  "catalogue.rental_product_config": [
-  "COLLISION",
-  "rental domain; ours is rental.product and rental.inventory_model"
+  "DECLINE",
+  "our rental.inventory_model. Decision 1: rental keeps its schema. catalogue.rental_rate would put rental pricing inside the hottest table set in the system, which is the flash-sale contention argument that gave F&B and Retail their own price tables. Their layout also splits rental across CatalogueService and VenueOpsService"
  ],
  "catalogue.rental_rate": [
-  "COLLISION",
-  "rental domain; ours is rental.pricing_profile"
+  "DECLINE",
+  "our rental.pricing_profile. Decision 1: rental keeps its schema. catalogue.rental_rate would put rental pricing inside the hottest table set in the system, which is the flash-sale contention argument that gave F&B and Retail their own price tables. Their layout also splits rental across CatalogueService and VenueOpsService"
  ],
  "catalogue.rental_requirement": [
-  "COLLISION",
-  "rental domain; ours is rental.agreement_rules"
+  "DECLINE",
+  "our rental.agreement_rules. Decision 1: rental keeps its schema. catalogue.rental_rate would put rental pricing inside the hottest table set in the system, which is the flash-sale contention argument that gave F&B and Retail their own price tables. Their layout also splits rental across CatalogueService and VenueOpsService"
  ],
  "catalogue.rental_rule": [
-  "COLLISION",
-  "rental domain; ours is rental.operational_rules"
+  "DECLINE",
+  "our rental.operational_rules. Decision 1: rental keeps its schema. catalogue.rental_rate would put rental pricing inside the hottest table set in the system, which is the flash-sale contention argument that gave F&B and Retail their own price tables. Their layout also splits rental across CatalogueService and VenueOpsService"
  ],
  "catalogue.upgrade_rule": [
   "NO MATCH",
@@ -248,12 +248,12 @@
   "use of a membership benefit against its allowance"
  ],
  "identity.customer": [
-  "PLACEMENT",
-  "a guest is marketing.guest_profile plus pii.subject; identity holds principals"
+  "DECLINE",
+  "ours is marketing.guest_profile plus pii.subject. Decision 7: identity.principal carries 134 inbound foreign keys, the most connected table in the package, and their proposal adds every guest row to the table every authentication already reads. The split is also what makes a DSAR walk one subtree"
  ],
  "identity.customer_address": [
-  "PLACEMENT",
-  "pii.subject_contact holds guest contact detail"
+  "DECLINE",
+  "ours is pii.subject_contact. Decision 7: identity.principal carries 134 inbound foreign keys, the most connected table in the package, and their proposal adds every guest row to the table every authentication already reads. The split is also what makes a DSAR walk one subtree"
  ],
  "identity.customer_contact": [
   "DECLINE",
@@ -280,12 +280,12 @@
   "our whitelabel.module_enablement. Closed by whitelabel.module_setting: theirs is what is VISIBLE, enabled_module is what the tenant BOUGHT, subscription.module_listing is the catalogue. Three facts, not three homes"
  ],
  "identity.family": [
-  "PLACEMENT",
-  "our marketing.guest_relationship"
+  "DECLINE",
+  "ours is marketing.guest_relationship. Decision 7: identity.principal carries 134 inbound foreign keys, the most connected table in the package, and their proposal adds every guest row to the table every authentication already reads. The split is also what makes a DSAR walk one subtree"
  ],
  "identity.family_member": [
-  "PLACEMENT",
-  "our marketing.guest_relationship"
+  "DECLINE",
+  "ours is marketing.guest_relationship. Decision 7: identity.principal carries 134 inbound foreign keys, the most connected table in the package, and their proposal adds every guest row to the table every authentication already reads. The split is also what makes a DSAR walk one subtree"
  ],
  "identity.membership_history": [
   "ADDITIVE",
@@ -412,8 +412,8 @@
   "segment_criterion is ours and customer_ repeats the schema"
  ],
  "marketing.data_subject_request": [
-  "PLACEMENT",
-  "duplicates our platform.dsar_request \u2014 flagged 18 September, still true"
+  "DECLINE",
+  "our platform.dsar_request. Decision 11: a subject-access request spans every service. Ours is TenancyService and walks guest_link; theirs would be MarketingService, which owns one of the dozen schemas a DSAR has to reach"
  ],
  "marketing.do_not_contact": [
   "DECLINE",
@@ -440,16 +440,16 @@
   "our marketing.loyalty_programme. En-GB throughout the package - programme, organisation, authorisation, serialised. A convention, not a table"
  ],
  "marketing.loyalty_rule": [
-  "SPLIT",
-  "their earning and bonus rules; ours sit inside loyalty_programme"
+  "TAKE THEIRS",
+  "Decision 8, reversed. loyalty_programme holds no rules - it is a header. The only rules table is marketing.loyalty_tier, which is misnamed (it holds earning triggers and multipliers, not tiers) and is referenced by nothing: 0 operations, 0 screens, 0 foreign keys. Take the rule set, retire loyalty_tier, and add a real tier table so loyalty_position.tier_code points at something"
  ],
  "marketing.points_earning_rule": [
-  "SPLIT",
-  "they split earning and redemption; our loyalty_programme holds both"
+  "TAKE THEIRS",
+  "Decision 8, reversed. loyalty_programme holds no rules - it is a header. The only rules table is marketing.loyalty_tier, which is misnamed (it holds earning triggers and multipliers, not tiers) and is referenced by nothing: 0 operations, 0 screens, 0 foreign keys. Take earning, retire loyalty_tier, and add a real tier table so loyalty_position.tier_code points at something"
  ],
  "marketing.points_redemption_rule": [
-  "SPLIT",
-  "they split earning and redemption; our loyalty_programme holds both"
+  "TAKE THEIRS",
+  "Decision 8, reversed. loyalty_programme holds no rules - it is a header. The only rules table is marketing.loyalty_tier, which is misnamed (it holds earning triggers and multipliers, not tiers) and is referenced by nothing: 0 operations, 0 screens, 0 foreign keys. Take redemption, retire loyalty_tier, and add a real tier table so loyalty_position.tier_code points at something"
  ],
  "marketing.review_response": [
   "ADDITIVE",
@@ -532,28 +532,28 @@
   "we hold surcharge as a jsonb blob on payments.method. A blob cannot be scoped, versioned or approved \u2014 this is the table that blob wants to be. Belongs in payments, not orders"
  ],
  "orders.payment_gateway": [
-  "COLLISION",
-  "payments domain; ours is payments.provider_connection"
+  "DECLINE",
+  "our payments.provider_connection. Decision 2: all five are configuration, and configuration read on every checkout should not share a schema with rows written on every sale. We move orders.payment_provider, payment_token and payment_routing into payments first"
  ],
  "orders.payment_method": [
-  "COLLISION",
-  "payments domain; ours is payments.method"
+  "DECLINE",
+  "our payments.method. Decision 2: all five are configuration, and configuration read on every checkout should not share a schema with rows written on every sale. We move orders.payment_provider, payment_token and payment_routing into payments first"
  ],
  "orders.payment_method_config": [
   "TAKE THEIRS",
   "reversed on the rubric. Ours is currencies[], channels[], venue_ids[] on payments.method. Optimised access: \"which methods are live at this venue, in AED, on web\" is an array containment scan, not an index lookup. DB strain: enabling one method at one venue rewrites the whole row and every array on it. Maintainability: adding a venue to 40 methods is 40 row rewrites against 40 inserts. We already took entry_rule_point, menu_item_modifier, seat_block_item and plan_benefit for this same reason"
  ],
  "orders.payment_policy": [
-  "COLLISION",
-  "payments domain; ours is payments.payment_terms"
+  "DECLINE",
+  "our payments.payment_terms. Decision 2: all five are configuration, and configuration read on every checkout should not share a schema with rows written on every sale. We move orders.payment_provider, payment_token and payment_routing into payments first"
  ],
  "orders.payment_route": [
-  "COLLISION",
-  "payments domain; ours is payments.routing_rule"
+  "DECLINE",
+  "our payments.routing_rule, and it maps onto our duplicate orders.payment_routing as well - we collapse those two. Decision 2: all five are configuration, and configuration read on every checkout should not share a schema with rows written on every sale. We move orders.payment_provider, payment_token and payment_routing into payments first"
  ],
  "orders.payment_terminal": [
-  "COLLISION",
-  "payments domain; ours is payments.terminal"
+  "DECLINE",
+  "our payments.terminal. Decision 2: all five are configuration, and configuration read on every checkout should not share a schema with rows written on every sale. We move orders.payment_provider, payment_token and payment_routing into payments first"
  ],
  "orders.pos_shift": [
   "TAKE THEIRS",
@@ -588,16 +588,16 @@
   "singular vs plural only; settle our own convention first"
  ],
  "platform.scope": [
-  "DECIDE",
-  "was declined on 91 foreign keys, which is cost. On the rubric their name is better -- scope is the word 58 of our config profiles already address by, org_unit is generic ERP. It is the venue-schema decision in a second place and belongs inside it, not settled separately on effort"
+  "TAKE THEIRS",
+  "Decision 4. Their name, our table. platform.org_unit stays as one self-referencing hierarchy - flattening it into five typed tables makes adding a level a new table - but scope is the word 58 of our configuration profiles already address by, and org_unit appears nowhere else in our language"
  ],
  "platform.subscription_tier": [
-  "COLLISION",
-  "subscription domain; ours is control.subscription_plan with cell_tier, base_price and version"
+  "DECLINE",
+  "our control.subscription_plan. Decision 3: both move into our subscription schema, which is the same service. Theirs would put billing in TenancyService and licensing in PlatformService, so a plan lookup becomes a cross-service call"
  ],
  "platform.tenant_subscription": [
-  "COLLISION",
-  "subscription domain; ours is control.subscription"
+  "DECLINE",
+  "our control.subscription. Decision 3: both move into our subscription schema, which is the same service. Theirs would put billing in TenancyService and licensing in PlatformService, so a plan lookup becomes a cross-service call"
  ],
  "platform.tier_allowance": [
   "ADDITIVE",
@@ -612,16 +612,16 @@
   "our platform.configuration_profile is scope-addressed"
  ],
  "pricing.dynamic_price_action": [
-  "DECIDE",
-  "a pricing schema we do not have; dynamic pricing sits in catalogue and promotions for us"
+  "ADDITIVE",
+  "Decision 5: taken, its actions. We hold three guardrail columns on rental.pricing_profile and no engine. Assign the pricing schema to CatalogueService - it has no service owner today"
  ],
  "pricing.dynamic_price_condition": [
-  "DECIDE",
-  "a pricing schema we do not have; dynamic pricing sits in catalogue and promotions for us"
+  "ADDITIVE",
+  "Decision 5: taken, its conditions. We hold three guardrail columns on rental.pricing_profile and no engine. Assign the pricing schema to CatalogueService - it has no service owner today"
  ],
  "pricing.dynamic_price_rule": [
-  "DECIDE",
-  "a pricing schema we do not have; dynamic pricing sits in catalogue and promotions for us"
+  "ADDITIVE",
+  "Decision 5: taken, the rule. We hold three guardrail columns on rental.pricing_profile and no engine. Assign the pricing schema to CatalogueService - it has no service owner today"
  ],
  "queue.entry": [
   "TAKE THEIRS",
@@ -664,8 +664,8 @@
   "our rental.inspection is one row per asset per phase with a single condition. Theirs is the checklist line under it \u2014 per component, structured. Belongs in rental"
  ],
  "resources.rental_product_mapping": [
-  "COLLISION",
-  "rental domain; ours is rental.equipment_assignment"
+  "DECLINE",
+  "our rental.product.catalogue_product_id, a column. Decision 1: rental keeps its schema. catalogue.rental_rate would put rental pricing inside the hottest table set in the system, which is the flash-sale contention argument that gave F&B and Retail their own price tables. Their layout also splits rental across CatalogueService and VenueOpsService"
  ],
  "resources.resource_booking": [
   "DECLINE",
@@ -732,28 +732,28 @@
   "the request itself; we hold only sync.rejection"
  ],
  "sync.guest_link": [
-  "DECIDE",
-  "which schema owns cross-cell guest linking, sync or platform"
+  "DECLINE",
+  "Decision 10, reversed. platform.dsar_request.guest_link_id points at platform.guest_link and both are TenancyService; sync is CrossRegionService. Moving the link alone puts a DSAR fan-out across a service boundary on its hottest path. Either both go or neither does, and a DSAR is a tenancy obligation rather than a synchronisation mechanism"
  ],
  "venue.department": [
-  "DECIDE",
-  "the venue schema question, with outlet, space and zone"
+  "ADDITIVE",
+  "Decision 4. Not optional: platform.workstation.department_id references a table that does not exist"
  ],
  "venue.outlet": [
-  "DECIDE",
-  "the venue schema question \u2014 an open blocker"
+  "DECLINE",
+  "Decision 4. Each is a level of the platform.scope hierarchy, which we hold as a row rather than a table"
  ],
  "venue.space": [
-  "DECIDE",
-  "the venue schema question \u2014 an open blocker"
+  "DECLINE",
+  "Decision 4. Each is a level of the platform.scope hierarchy, which we hold as a row rather than a table"
  ],
  "venue.venue": [
-  "DECIDE",
-  "the venue schema question, with outlet, space and zone"
+  "DECLINE",
+  "Decision 4. Each is a level of the platform.scope hierarchy, which we hold as a row rather than a table"
  ],
  "venue.zone": [
-  "DECIDE",
-  "the venue schema question \u2014 an open blocker"
+  "DECLINE",
+  "Decision 4. Each is a level of the platform.scope hierarchy, which we hold as a row rather than a table"
  ],
  "venuemap.layout": [
   "DECLINE",

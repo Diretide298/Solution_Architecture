@@ -76,15 +76,15 @@
    "operations": 1
   },
   {
-   "contract": "ai",
-   "operations": 1
-  },
-  {
    "contract": "white-label",
    "operations": 1
   },
   {
    "contract": "queue",
+   "operations": 1
+  },
+  {
+   "contract": "ai",
    "operations": 1
   }
  ],

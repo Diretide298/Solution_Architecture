@@ -55,10 +55,6 @@
    "operations": 1
   },
   {
-   "contract": "tenancy",
-   "operations": 1
-  },
-  {
    "contract": "orders",
    "operations": 1
   },
@@ -67,11 +63,15 @@
    "operations": 1
   },
   {
+   "contract": "catalogue",
+   "operations": 1
+  },
+  {
    "contract": "access",
    "operations": 1
   },
   {
-   "contract": "catalogue",
+   "contract": "tenancy",
    "operations": 1
   }
  ],

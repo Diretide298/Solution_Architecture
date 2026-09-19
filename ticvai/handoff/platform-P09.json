@@ -170,11 +170,11 @@
    "operations": 12
   },
   {
-   "contract": "tenancy",
+   "contract": "finance",
    "operations": 7
   },
   {
-   "contract": "finance",
+   "contract": "tenancy",
    "operations": 7
   },
   {
@@ -194,11 +194,11 @@
    "operations": 3
   },
   {
-   "contract": "wallet",
+   "contract": "workforce",
    "operations": 2
   },
   {
-   "contract": "workforce",
+   "contract": "wallet",
    "operations": 2
   },
   {

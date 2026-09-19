@@ -26,16 +26,16 @@ cost again.
 | # | Decision | Call | Date |
 |---|---|---|---|
 | 1 | Rental domain | **keep `rental.*` and take their agreement** | 20 Sep |
-| 2 | Payments domain | — | |
-| 3 | Subscription domain | — | |
-| 4 | `venue` schema | — | |
-| 5 | `pricing` schema | — | |
-| 6 | Payroll and HR scope | — | |
-| 7 | Where a customer lives | — | |
-| 8 | Loyalty: one rules table or four | — | |
-| 9 | Membership hierarchy | — | |
-| 10 | Cross-cell guest link | — | |
-| 11 | The DSAR duplicate | — | |
+| 2 | Payments domain | **keep `payments` for config**, fix our own split first | 20 Sep |
+| 3 | Subscription domain | **consolidate into `subscription`**, decline `platform` | 20 Sep |
+| 4 | `venue` schema | **their name, our table** — `platform.scope`; take `department` | 20 Sep |
+| 5 | `pricing` schema | **take all three**, and give the schema an owner | 20 Sep |
+| 6 | Payroll and HR scope | **client question** — and payroll wants its own owner | 20 Sep |
+| 7 | Where a customer lives | **keep the three-way split** | 20 Sep |
+| 8 | Loyalty: one rules table or four | **take theirs** — ours has three faults | 20 Sep |
+| 9 | Membership hierarchy | **take it** | 20 Sep |
+| 10 | Cross-cell guest link | **reversed — keep it in `platform`** | 20 Sep |
+| 11 | The DSAR duplicate | **drop theirs** | 20 Sep |
 
 ---
 
@@ -202,3 +202,204 @@ exactly that array as a table, and we accepted it. The same argument applies to 
 nobody has made it.
 
 **This is a package-wide review, not a merge decision.** It does not block the eleven.
+
+---
+
+## 2 · Payments domain — **keep `payments` for configuration, and fix our own split first**
+
+**The argument that carried §1 does not exist here.** `payments` and `orders` are **both
+OrderService**. Nothing crosses a service boundary either way. Leading with the rental argument
+would be noticed, and would cost us credibility on everything after it.
+
+### Scored
+
+| | verdict | why |
+|---|---|---|
+| **Maintainability** | **neither, today** | we hold payments in two schemas — **6 tables in `orders`, 16 in `payments`** — which is the worst of both |
+| **Readability** | **ours** | `payments.method` against `orders.payment_method`; the prefix is doing the schema's job |
+| **Optimised access** | **ours** | payment configuration is read on every checkout and changes monthly. It wants to be small, cacheable and apart |
+| **DB strain** | **ours — lead with this** | `orders` is the highest-churn schema in the system. Config read constantly and written rarely should not share a schema with rows written on every sale; they compete for buffer cache, and every schema-wide operation treats them alike |
+
+**The boundary that justifies it:** `payments.*` is configuration and policy — methods, providers,
+routing, risk, terminals, merchant accounts. `orders.payment` is the **transaction**. That is why
+`payments` has **zero inbound foreign keys**: nothing should depend on a config table.
+
+### What we fix before asking them for anything
+
+| table | cost | |
+|---|---:|---|
+| `orders.payment_provider` → `payments` | 12 | configuration on the wrong side of our own boundary |
+| `orders.payment_token` → `payments` | 6 | same |
+| `orders.payment_routing` → **collapse into `payments.routing_rule`** | 6 | **a real duplicate** — both are "priority plus conditions decide which provider" |
+
+**Their single `orders.payment_route` maps onto both of ours.** They see one thing where we have
+two, and they are right.
+
+**`orders.payment` stays** — 12 inbound foreign keys, 63 screens, and it is the transaction, which
+is the boundary we are arguing for.
+
+**Taken from them:** `payment_method_config` (the array flip), plus `payment_fee_rule`,
+`payment_eligibility_rule`, `currency_rule` and `deposit_activity` as additive — all into
+`payments`, not `orders`.
+
+## 3 · Subscription domain — **consolidate into `subscription`, decline `platform`**
+
+`control` and `subscription` are **both PlatformService**. `platform` is **TenancyService**.
+
+### Scored
+
+| | verdict | why |
+|---|---|---|
+| **Maintainability** | **a third option** | ours is split across `control.subscription`, `control.subscription_plan` and a nine-table `subscription` schema. Theirs moves it into `platform` |
+| **Readability** | **against `control`** | **`control` holds 51 tables** — cells, migrations, releases, webhooks, invoices, and a subscription. It is a junk drawer and the name tells a developer nothing |
+| **Optimised access** | **against theirs** | their placement puts billing in TenancyService and licensing in PlatformService. **A plan lookup becomes a cross-service call** |
+| **DB strain** | tie | low-volume configuration either way |
+
+**Call: move `control.subscription` and `control.subscription_plan` into `subscription`.** 86
+change points, all ours, and it is the only option that puts one domain in one schema in one
+service. Decline `platform.tenant_subscription` and `platform.subscription_tier` on the
+cross-service split.
+
+**Taken:** `tier_allowance` — a real gap, since what a tier *includes* is currently one column,
+`subscription_plan.included_ai_tokens` — and `tier_module`, the array flip.
+
+## 4 · The `venue` schema — **take their name, keep our table, take `department`**
+
+The rubric changed this one most, because the old answer was "91 foreign keys" — which is effort,
+and effort does not count.
+
+### Scored
+
+| | verdict | why |
+|---|---|---|
+| **Maintainability** | **ours** | `platform.org_unit` is **one self-referencing hierarchy** — `level`, `parent_id`, `path`, `child_count`. Their five typed tables flatten it, so **adding a level becomes a new table** rather than a row |
+| **Readability** | **theirs** | `scope` is the word **58 of our configuration profiles already address by** (`scope_path`). `org_unit` is generic ERP vocabulary that appears nowhere else in our language |
+| **Optimised access** | tie | same rows, same indexes, same queries |
+| **DB strain** | tie | a rename moves nothing |
+
+**Call: combine.** Keep the single-table hierarchy — that is the better model and it is not close.
+**Take their name for it**: `platform.scope`, which is what every `scope_path` in the package has
+been calling it all along. Decline `venue.venue`, `outlet`, `space` and `zone`, because each is a
+level of the hierarchy we already hold as a row.
+
+**And `venue.department` is not optional.** `platform.workstation.department_id` **references a
+table that does not exist.** We have a dangling column today, and their table is it.
+
+## 5 · The `pricing` schema — **take it, and give it an owner**
+
+`pricing.dynamic_price_rule`, `_condition`, `_action`.
+
+**Correction carried from §1:** we do hold dynamic pricing — three guardrail columns on
+`rental.pricing_profile`. **A ceiling and a floor with no engine under them**, and nothing at all
+on `catalogue.price`, `games.pricing`, F&B or retail.
+
+### Scored
+
+| | verdict | why |
+|---|---|---|
+| **Maintainability** | **theirs** | a rule, its conditions and its actions as rows. Ours is three columns on one table, so a second pricing behaviour is a schema change |
+| **Readability** | **theirs** | `pricing.dynamic_price_rule` says what it is. `rental.pricing_profile.dynamic_max_increase_percent` does not |
+| **Optimised access** | **theirs** | rules are read-mostly and cacheable. Inside `catalogue` they would be read on every add-to-cart alongside ticket inventory |
+| **DB strain** | **theirs** | the F&B and Retail argument again: an engine pricing tickets, F&B, retail and rental cannot live in `catalogue` |
+
+**Call: take all three.** **`pricing` currently has no service owner** — assign it to
+CatalogueService, which already owns `price`, `price_list` and `promotions`. Leaving a schema
+unowned is how the last fifty unowned tables happened.
+
+## 6 · Payroll and HR — **still a client question, and the rubric adds one thing**
+
+Unchanged: seven payroll tables with **no requirement behind them**, and seven HR master tables
+already accepted *conditionally* on the answer.
+
+**What the rubric adds:** `workforce` is **TenancyService**. Payroll is a finance function, and
+putting payslips and salary components inside the service that manages tenants and staff rostering
+is wrong on maintainability whatever the scope answer turns out to be. **If the answer is yes,
+payroll wants its own schema and its own owner** — not thirteen more tables in `workforce`.
+
+## 7 · Where a customer lives — **keep ours; the strongest position in the file**
+
+### Scored
+
+| | verdict | why |
+|---|---|---|
+| **Maintainability** | **ours** | a subject-access export and a deletion request walk one subtree. Collapsed into `identity.customer` they walk everything |
+| **Readability** | **ours** | `identity.principal` is who can authenticate, `marketing.guest_profile` is who the guest is, `pii.subject` is the regulated data. Each name states its own governance |
+| **Optimised access** | **ours** | a marketing segment query never touches PII; an authentication check never touches marketing |
+| **DB strain** | **ours, decisively** | **`identity.principal` carries 134 inbound foreign keys — the most connected table in the package.** Their proposal adds every guest row to the table every authentication already reads |
+
+**Call: keep the three-way split.** If they have a DSAR design that works against a single
+`identity.customer` we want to see it — but the 134-foreign-key figure is what to put in front of
+them first.
+
+## 8 · Loyalty — **take their split, and correct ourselves while doing it**
+
+**We said `marketing.loyalty_programme` holds the rules of earning and burning. It does not.**
+
+    marketing.loyalty_programme   code, name, venue_id, points_liability_account_id,
+                                  points_expire_after_months, is_active        <- a header
+    marketing.loyalty_tier        trigger, points, product_kinds[], multiplier <- the rules
+                                  0 operations · 0 screens · 0 foreign keys    <- unwired
+    marketing.loyalty_position    ..., tier_code, tier_name                    <- tiers as strings
+
+**Three faults in one domain.** The programme is a header with no rules on it. The only rules
+table is **misnamed** — `loyalty_tier` holds earning triggers and multipliers, not tiers — and is
+**referenced by nothing at all**. And the tier a guest is in is two denormalised strings on their
+balance row, because there is no tier table.
+
+### Scored
+
+| | verdict |
+|---|---|
+| **Maintainability** | **theirs** — a new earning rule is an insert. Ours is a `product_kinds[]` array on an unused table |
+| **Readability** | **theirs** — `points_earning_rule` and `points_redemption_rule` say what they hold. `loyalty_tier` actively misleads |
+| **Optimised access** | **theirs** — earning rules are read on every transaction, redemption rules only on redeem. One table for both is read more often than it needs to be |
+| **DB strain** | theirs, marginally |
+
+**Call: take `points_earning_rule`, `points_redemption_rule` and `loyalty_rule`.** Retire
+`marketing.loyalty_tier` or rename it to what it is, and add a real tier table so
+`loyalty_position.tier_code` points at something. **`marketing.loyalty_points`, the ledger, was
+already accepted and remains the most serious gap here** — a balance with no history behind it.
+
+## 9 · The membership hierarchy — **take it; the array argument in its purest form**
+
+They hold `membership_program` → `membership_plan` → `membership_benefit`, joined by
+`plan_benefit`. We hold one table, `catalogue.entitlement_template`, **with the benefits as
+columns**: `fast_track_tier`, `can_claim_shop_and_drop`, `included_value`.
+
+### Scored
+
+| | verdict | why |
+|---|---|---|
+| **Maintainability** | **theirs** | **a new benefit is currently a schema change** |
+| **Readability** | **theirs** | three levels named for what they are, against one 34-column table doing all three jobs |
+| **Optimised access** | **theirs** | "which plans include fast track" is a column scan today |
+| **DB strain** | **theirs** | `entitlement_template` is read by 15 operations and 34 screens, and every one of them reads 34 columns to get three |
+
+**Call: take `membership_benefit` and `plan_benefit`, and `membership_program` as the level above.**
+`membership_plan` stays as our `entitlement_template` — already resolved — plus their renewal rules.
+
+## 10 · Cross-cell guest linking — **reversed: keep it in `platform`**
+
+**The earlier recommendation was to move `platform.guest_link` into `sync`.** On the rubric that is
+wrong.
+
+    platform.dsar_request.guest_link_id  ->  platform.guest_link
+
+Both are **TenancyService**. `sync` is **CrossRegionService**. Moving the link alone puts a DSAR
+fan-out — which walks `guest_link` to find every cell holding a guest — **across a service boundary
+on its hottest path**. On optimised access and maintainability that is worse, and readability is
+the only thing it buys.
+
+**Call: decline the move.** Either both tables go to `sync` or neither does, and a DSAR is a
+tenancy obligation rather than a synchronisation mechanism. Neither goes. `sync` keeps cell
+plumbing — `cell_connection`, `cross_cell_request`, `rejection` — which is what it says.
+
+## 11 · The DSAR duplicate — **drop theirs**
+
+`marketing.data_subject_request` against our `platform.dsar_request`.
+
+**A subject-access request spans every service.** Ours sits in TenancyService and walks
+`guest_link`; theirs would sit in **MarketingService**, which owns one of the dozen schemas a DSAR
+has to reach. On maintainability and optimised access that is not close.
+
+**Call: drop theirs.** If it carries state ours lacks, take the body.
