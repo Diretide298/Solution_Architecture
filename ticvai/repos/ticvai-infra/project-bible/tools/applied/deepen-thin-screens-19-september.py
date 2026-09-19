@@ -34,13 +34,20 @@ WIRING = {
         'ANL-021': [('getDashboard', 'reporting', 'Open one', 'onAction'),
                     ('createDashboard', 'reporting', 'Start a new one', 'onAction')],
     },
-    'screens/P06-staff-app.yaml': {
-        # Board 7.8. The list is the prompt; contacting the guest is the work, and
-        # marking one not-returned is where it ends when they do not answer.
-        'EMP-088': [('sendTransactionalMessage', 'marketing-crm',
-                     'Contact the guest about an overdue rental', 'onAction'),
-                    ('returnRental', 'rental',
-                     'Close it as returned, late or not returned at all', 'onAction')],
+    'screens/P08-venue-back-office.yaml': {
+        # Board 7.8. The list is the prompt; contacting the guest is the work.
+        #
+        # **BO-561 is the master; EMP-088 is its twin.** The first cut wrote EMP-088 and
+        # `check-screens` reported the drift — the third time in this run that a twin was
+        # edited instead of its master. `apply-rental-staff-app.py` copies it across.
+        #
+        # **`returnRental` was here and does not belong.** It takes a `bookingId`, which an
+        # overdue *list* has no way to supply, and the checker said so: *"calls operations
+        # needing bookingId and its entryState declares none — the screen cannot know what
+        # it is showing."* Closing a rental out happens on the return screens, which have
+        # the booking. Dropping it is the fix, not a workaround for the error.
+        'BO-561': [('sendTransactionalMessage', 'marketing-crm',
+                    'Contact the guest about an overdue rental', 'onAction')],
     },
     'screens/P09-platform-admin-console.yaml': {
         # Licensing board 2.5 — one of ten assessment screens, and the answers feed

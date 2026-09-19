@@ -72452,6 +72452,11 @@ screens:
     purpose: Late, and what it is accruing
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: sendTransactionalMessage
+    contract: marketing-crm
+    purpose: Contact the guest about an overdue rental
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-561
