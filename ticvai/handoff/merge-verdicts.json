@@ -276,8 +276,8 @@
   "the membership a customer holds; we have entitlement_template and no holder record"
  ],
  "identity.enabled_module": [
-  "PLACEMENT",
-  "module enablement per tenant \u2014 ours is whitelabel.module_enablement"
+  "DECLINE",
+  "our whitelabel.module_enablement. Closed by whitelabel.module_setting: theirs is what is VISIBLE, enabled_module is what the tenant BOUGHT, subscription.module_listing is the catalogue. Three facts, not three homes"
  ],
  "identity.family": [
   "PLACEMENT",
