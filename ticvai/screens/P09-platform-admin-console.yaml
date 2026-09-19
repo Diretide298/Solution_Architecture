@@ -66633,7 +66633,17 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listRecommendationStrategies
+    contract: promotions
+    purpose: Strategies in force
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: getRecommendationPerformance
+    contract: promotions
+    purpose: How they are doing
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Active Recommendation Strategies
@@ -66712,7 +66722,26 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listRecommendationStrategies
+    contract: promotions
+    purpose: The strategies
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: createRecommendationStrategy
+    contract: promotions
+    purpose: Define one
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - listRecommendationStrategies
+  - operationId: updateRecommendationStrategy
+    contract: promotions
+    purpose: Change one
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id001
+    - listRecommendationStrategies
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-640
@@ -66806,7 +66835,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: updateRecommendationStrategy
+    contract: promotions
+    purpose: Objective and KPI
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id001
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-641
@@ -66909,7 +66944,19 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listProductRelationships
+    contract: promotions
+    purpose: Ladders and cross-sells
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: setProductRelationships
+    contract: promotions
+    purpose: Declare them
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id002
+    - listProductRelationships
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-642
@@ -66981,7 +67028,13 @@ screens:
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: updateRecommendationStrategy
+    contract: promotions
+    purpose: Placements and touchpoints
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id001
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-643
@@ -67050,7 +67103,13 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: updateRecommendationStrategy
+    contract: promotions
+    purpose: Channels and journey
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id001
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-644
@@ -67145,7 +67204,20 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setRecommendationSuppression
+    contract: promotions
+    purpose: Caps, fatigue and exclusions
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id003
+    - listRecommendationStrategies
+  - operationId: updateRecommendationStrategy
+    contract: promotions
+    purpose: Priority and ranking
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id001
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-645
@@ -67209,7 +67281,13 @@ screens:
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: updateRecommendationStrategy
+    contract: promotions
+    purpose: Commercial guardrails
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id001
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-646
@@ -67273,7 +67351,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listRecommendationStrategies
+    contract: promotions
+    purpose: Policy and governance
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-647
@@ -67371,7 +67454,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: simulateRecommendationStrategy
+    contract: promotions
+    purpose: Replay against history
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-648
@@ -67497,7 +67585,12 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getRecommendationPerformance
+    contract: promotions
+    purpose: Upgrade performance
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-649
@@ -67581,7 +67674,18 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listProductRelationships
+    contract: promotions
+    purpose: The ladder
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: setProductRelationships
+    contract: promotions
+    purpose: Order it
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id002
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-650
@@ -67680,7 +67784,13 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: updateRecommendationStrategy
+    contract: promotions
+    purpose: Eligibility and qualification
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id001
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-651
@@ -67769,7 +67879,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: quoteUpgrade
+    contract: promotions
+    purpose: The price gap, and what the guest gains
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-652
@@ -67859,7 +67974,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: quoteUpgrade
+    contract: promotions
+    purpose: Ticket, experience and bundle upgrades
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Meal — ✓
@@ -67931,7 +68051,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: quoteUpgrade
+    contract: promotions
+    purpose: Membership and pass upgrades
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-654
@@ -68009,7 +68134,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: updateRecommendationStrategy
+    contract: promotions
+    purpose: Cart and checkout placements
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id001
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-655
@@ -68085,7 +68216,18 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: updateRecommendationStrategy
+    contract: promotions
+    purpose: Post-purchase placements
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id001
+  - operationId: quoteUpgrade
+    contract: promotions
+    purpose: Upgrade after the fact
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-656
@@ -68149,7 +68291,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getRecommendationPerformance
+    contract: promotions
+    purpose: Propensity and opportunity
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-657
@@ -68223,7 +68370,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: simulateRecommendationStrategy
+    contract: promotions
+    purpose: Simulate the ladder
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-658
@@ -68380,6 +68532,11 @@ screens:
     contract: promotions
     purpose: Upsell, Cross-Sell & Attach-Rate Analytics
     trigger: onLoad
+  - operationId: getRecommendationPerformance
+    contract: promotions
+    purpose: Cross-sell performance
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-659
@@ -68491,7 +68648,13 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setProductRelationships
+    contract: promotions
+    purpose: Build the relationships
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id002
   entryState:
     preloaded:
     - Manual
@@ -68574,7 +68737,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getProductAffinity
+    contract: promotions
+    purpose: The affinity matrix, measured
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-661
@@ -68662,7 +68830,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getProductAffinity
+    contract: promotions
+    purpose: Frequently bought together, with lift
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Product pairs
@@ -68740,7 +68913,13 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setProductRelationships
+    contract: promotions
+    purpose: Across categories
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id002
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-663
@@ -68806,7 +68985,13 @@ screens:
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setProductRelationships
+    contract: promotions
+    purpose: Across attractions and partners
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id002
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-664
@@ -68871,7 +69056,13 @@ screens:
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: updateRecommendationStrategy
+    contract: promotions
+    purpose: Exclude what is in the basket
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id001
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-665
@@ -68937,7 +69128,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: updateRecommendationStrategy
+    contract: promotions
+    purpose: Require availability
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id001
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-666
@@ -69001,7 +69198,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getProductAffinity
+    contract: promotions
+    purpose: Discovery and scoring
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-667
@@ -69114,7 +69316,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: simulateRecommendationStrategy
+    contract: promotions
+    purpose: Simulate cross-sell
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Recommendation generated
@@ -69248,7 +69455,12 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getRecommendationPerformance
+    contract: promotions
+    purpose: By journey stage
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-669
@@ -69333,7 +69545,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listRecommendationStrategies
+    contract: promotions
+    purpose: Touchpoints in use
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-670
@@ -69431,7 +69648,13 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: updateRecommendationStrategy
+    contract: promotions
+    purpose: Context rules
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id001
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-671
@@ -69509,7 +69732,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: updateRecommendationStrategy
+    contract: promotions
+    purpose: Pre-purchase placements
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id001
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-672
@@ -69586,7 +69815,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: updateRecommendationStrategy
+    contract: promotions
+    purpose: Pre-visit placements
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id001
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-673
@@ -69652,7 +69887,13 @@ screens:
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: updateRecommendationStrategy
+    contract: promotions
+    purpose: In-venue and location-aware
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id001
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-674
@@ -69724,7 +69965,13 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: updateRecommendationStrategy
+    contract: promotions
+    purpose: Visit state and timing
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id001
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-675
@@ -69813,7 +70060,12 @@ screens:
       there. Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listRecommendationStrategies
+    contract: promotions
+    purpose: Across channels
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Presented
@@ -69895,7 +70147,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setRecommendationSuppression
+    contract: promotions
+    purpose: Triggers and frequency
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id003
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-677
@@ -69960,7 +70218,17 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: explainRecommendation
+    contract: promotions
+    purpose: The decision trace
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+  - operationId: simulateRecommendationStrategy
+    contract: promotions
+    purpose: Simulate the journey
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-678
@@ -70086,7 +70354,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getRecommendationPerformance
+    contract: promotions
+    purpose: Personalisation performance
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-679
@@ -70152,7 +70425,17 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getGuestProfile
+    contract: marketing-crm
+    purpose: The guest behind the recommendation
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: explainRecommendation
+    contract: promotions
+    purpose: What we would offer them
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-680
@@ -70217,7 +70500,13 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: updateRecommendationStrategy
+    contract: promotions
+    purpose: Which signals count
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id001
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-681
@@ -70311,7 +70600,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getRecommendationPerformance
+    contract: promotions
+    purpose: Propensity and intent
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Model name
@@ -70389,7 +70683,18 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: updateRecommendationStrategy
+    contract: promotions
+    purpose: Next-best-offer policy
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id001
+  - operationId: explainRecommendation
+    contract: promotions
+    purpose: Trace a decision
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-683
@@ -70493,7 +70798,13 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: updateRecommendationStrategy
+    contract: promotions
+    purpose: Ranking and decision policy
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id001
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-684
@@ -70582,7 +70893,13 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setRecommendationSuppression
+    contract: promotions
+    purpose: Preference, fatigue, suppression
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id003
   entryState:
     preloaded:
     - Repeated declines
@@ -70655,7 +70972,12 @@ screens:
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: explainRecommendation
+    contract: promotions
+    purpose: Anonymous and known, side by side
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-686
@@ -70752,7 +71074,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: explainRecommendation
+    contract: promotions
+    purpose: Factors and confidence
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Model
@@ -70851,7 +71178,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: simulateRecommendationStrategy
+    contract: promotions
+    purpose: The NBO lab
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-688
@@ -71009,7 +71341,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getRecommendationPerformance
+    contract: promotions
+    purpose: The headline numbers
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-689
@@ -71114,7 +71451,12 @@ screens:
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getRecommendationPerformance
+    contract: promotions
+    purpose: By strategy and placement
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Ticket Selection
@@ -71207,7 +71549,19 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listRecommendationExperiments
+    contract: promotions
+    purpose: Experiments running
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: createRecommendationExperiment
+    contract: promotions
+    purpose: Start one
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - listRecommendationExperiments
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-691
@@ -71280,7 +71634,20 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listRecommendationExperiments
+    contract: promotions
+    purpose: Results so far
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: concludeRecommendationExperiment
+    contract: promotions
+    purpose: Declare a winner
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - listRecommendationExperiments
+    - listRecommendationStrategies
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-692
@@ -71373,7 +71740,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: getRecommendationPerformance
+    contract: promotions
+    purpose: Attributed against incremental
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-693
@@ -71471,7 +71843,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getRecommendationPerformance
+    contract: promotions
+    purpose: Model performance over time
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Model
@@ -71570,7 +71947,18 @@ screens:
       The pack's own statuses are Recommendation strategy — the state names which is selected.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listRecommendationStrategies
+    contract: promotions
+    purpose: What is deployed where
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: updateRecommendationStrategy
+    contract: promotions
+    purpose: Pause or retire
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id001
   entryState:
     preloaded:
     - ↓
@@ -71684,7 +72072,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: explainRecommendation
+    contract: promotions
+    purpose: Explainability and safety
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-696
@@ -71763,7 +72156,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: explainRecommendation
+    contract: promotions
+    purpose: Investigate one decision
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-697
@@ -71868,7 +72266,12 @@ screens:
       there. Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: simulateRecommendationStrategy
+    contract: promotions
+    purpose: Optimisation lab
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - ↓

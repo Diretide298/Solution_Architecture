@@ -206,6 +206,11 @@ components:
         # --- Digital assets ---
         - ASSET_LIBRARY_VIEW
         - ASSET_LIBRARY_MANAGE        # upload, replace, delete, amend rights
+        - ASSET_LIBRARY_APPROVE       # approve and publish an asset for use
+        - ASSET_LIBRARY_SHARE         # issue an external share link
+        # **Publishing and external sharing are the two acts that leave the building.**
+        # Board 3.7 makes a share a licence grant with an expiry; the person who uploads
+        # a photograph is not automatically the person who may send it to an agency.
 
         # --- Queue ---
         - QUEUE_VIEW

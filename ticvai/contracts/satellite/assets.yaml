@@ -477,9 +477,1065 @@ paths:
               schema:
                 type: array
                 items: { $ref: '#/components/schemas/ExpiringMedia' }
+  /media-taxonomy:
+    get:
+      operationId: getMediaTaxonomy
+      summary: The categories, metadata fields and controlled vocabularies
+      description: 'Boards 1.5 and 1.6. **A DAM without a taxonomy is a shared drive with a search box.**
+        The board counts *unclassified assets* as a headline metric, which only means anything if
+        classification is defined somewhere.
+
+        Metadata fields are per asset type — an image has dimensions, a video has a duration, a contract
+        has an expiry — so the field set is configuration rather than a fixed column list.
+
+        '
+      tags:
+      - assets
+      x-ticvai-permission: ASSET_LIBRARY_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: The taxonomy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaTaxonomy'
+    put:
+      operationId: setMediaTaxonomy
+      summary: Define categories, fields and keyword vocabularies
+      tags:
+      - assets
+      x-ticvai-permission: ASSET_LIBRARY_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-config-scope: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MediaTaxonomy'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaTaxonomy'
+  /media-assets/{assetId}/tags:
+    parameters:
+    - name: assetId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: setMediaAssetTags
+      summary: Tags and keywords, whoever or whatever supplied them
+      description: 'Boards 1.6 and 2.2. **A tag carries its origin.** An auto-tag from content
+        understanding and a tag a person typed look identical in a list and mean different things when
+        somebody is deciding whether to trust the library — so `source` and `confidence` travel with
+        every tag, and a low-confidence machine tag can be filtered out of a search without being
+        deleted.
+
+        '
+      tags:
+      - assets
+      x-ticvai-permission: ASSET_LIBRARY_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - tags
+              properties:
+                tags:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/MediaTag'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MediaTag'
+  /media-assets/{assetId}/analyse:
+    parameters:
+    - name: assetId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: analyseMediaAsset
+      summary: Auto-tag, describe and classify an asset
+      description: 'Board 2.2. **Proposes, never applies.** Auto-tagging writes suggestions with
+        confidence scores and a person or a threshold promotes them — a library that silently accepts
+        machine labels becomes a library nobody trusts the moment one is wrong in public.
+
+        '
+      tags:
+      - assets
+      x-ticvai-permission: ASSET_LIBRARY_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '202':
+          description: Queued; results arrive as proposed tags
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MediaTag'
+  /media-assets/similar:
+    get:
+      operationId: findSimilarMediaAssets
+      summary: Visually similar, near-duplicate and related assets
+      description: 'Boards 2.4 and 2.5. **Similarity and duplication are one query read two ways.** Above
+        a high threshold it is a duplicate to be merged; below it, it is a related asset to be offered.
+        Splitting them into two searches means two indexes that disagree.
+
+        '
+      tags:
+      - assets
+      x-ticvai-permission: ASSET_LIBRARY_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: assetId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: minSimilarity
+        in: query
+        schema:
+          type: number
+          default: 0.8
+      responses:
+        '200':
+          description: Similar assets, with scores
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MediaSimilarity'
+  /media-assets/{assetId}/versions:
+    parameters:
+    - name: assetId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: listMediaAssetVersions
+      summary: Every revision, and what replacing it would affect
+      description: 'Boards 2.6 and 2.7. **`replaceMediaAsset` existed and nothing said what it would
+        break.** An asset in a DAM is referenced by campaigns, tickets, screens and published pages, and
+        replacing a logo is either a routine update or a live incident depending entirely on where it is
+        used.
+
+        So the impact list is part of the version read rather than a separate report nobody opens first.
+
+        '
+      tags:
+      - assets
+      x-ticvai-permission: ASSET_LIBRARY_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Versions, with usage impact
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MediaAssetVersion'
+  /media-assets/{assetId}/renditions:
+    parameters:
+    - name: assetId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: listMediaRenditions
+      summary: The derived sizes and formats, and whether they are ready
+      description: 'Boards 2.8 and 2.9. **Delivery readiness is the fact that matters.** An asset whose
+        thumbnail has not been generated is an asset that renders as a broken image on a guest''s phone,
+        and the library showing it as *Active* is showing the wrong thing.
+
+        '
+      tags:
+      - assets
+      x-ticvai-permission: ASSET_LIBRARY_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Renditions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MediaRendition'
+    post:
+      operationId: requestMediaRendition
+      summary: Generate a size or format
+      tags:
+      - assets
+      x-ticvai-permission: ASSET_LIBRARY_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MediaRendition'
+      responses:
+        '202':
+          description: Queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaRendition'
+  /media-assets/{assetId}/rights:
+    parameters:
+    - name: assetId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: setMediaAssetRights
+      summary: Licence, permitted use and expiry
+      description: 'Boards 3.3 and 3.8. **`getExpiringRights` existed and nothing set them.** A licence
+        with a territory, a channel restriction and an end date is the difference between a photograph
+        the venue may use and one it may not, and an expiry nobody recorded is an expiry nobody honours.
+
+        **Expiry blocks distribution rather than deleting the asset.** The photograph is still evidence
+        of what was published; it is simply no longer publishable.
+
+        '
+      tags:
+      - assets
+      x-ticvai-permission: ASSET_LIBRARY_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MediaRights'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaRights'
+  /media-assets/{assetId}/approval:
+    parameters:
+    - name: assetId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: setMediaAssetApproval
+      summary: Submit, approve, reject or publish an asset
+      description: 'Boards 3.4 and 3.5. **Publication eligibility is computed, not asserted.** An asset
+        is publishable when it is approved, its rights are current, its renditions exist and its
+        classification is complete — four facts that live in four places, and a boolean somebody ticked
+        goes stale the moment any of them changes.
+
+        '
+      tags:
+      - assets
+      x-ticvai-permission: ASSET_LIBRARY_APPROVE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - state
+              properties:
+                state:
+                  type: string
+                  enum:
+                  - draft
+                  - pendingApproval
+                  - approved
+                  - rejected
+                  - published
+                  - archived
+                comment:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: Moved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaAssetApproval'
+        '409':
+          description: Not eligible to publish; the unmet conditions are listed
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /media-shares:
+    post:
+      operationId: createMediaShare
+      summary: Share assets with somebody outside the platform, on terms
+      description: 'Board 3.7. **An external share is a licence grant with a link attached**, so it
+        expires, it can be revoked, it records who opened it and it can refuse download while permitting
+        view. A share that is just a URL is an asset that has left the building permanently.
+
+        '
+      tags:
+      - assets
+      x-ticvai-permission: ASSET_LIBRARY_SHARE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MediaShare'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaShare'
+  /media-distribution:
+    get:
+      operationId: getMediaDistribution
+      summary: Where an asset is used and how it is delivered
+      description: 'Boards 4.2 and 4.5. **The usage map is what makes replacement safe.** Board 4.5 is
+        *asset replacement and propagation*, which is only possible if the platform knows every place the
+        old one appears.
+
+        '
+      tags:
+      - assets
+      x-ticvai-permission: ASSET_LIBRARY_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: assetId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Usage and delivery
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaDistribution'
+  /media-distribution/channels:
+    put:
+      operationId: setMediaDistributionChannels
+      summary: CDN, delivery URLs, fallbacks and expiry behaviour
+      description: 'Boards 4.3, 4.4 and 4.6. **The fallback is the part that keeps a page from breaking.**
+        An asset whose rights expired, whose rendition failed or whose CDN is unreachable still has to
+        render something, and deciding that at delivery time per channel is the only place it can be
+        decided once.
+
+        '
+      tags:
+      - assets
+      x-ticvai-permission: ASSET_LIBRARY_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MediaDistributionChannel'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaDistributionChannel'
+  /media-assets/bulk:
+    post:
+      operationId: bulkUpdateMediaAssets
+      summary: Retag, reclassify, move or archive many assets at once
+      description: 'Board 1.9. **The operation a library of 128 unclassified assets actually needs.**
+        Doing it one at a time is why they are unclassified.
+
+        Previewed before it is applied, because a bulk retag that matched the wrong filter is not
+        undoable by hand.
+
+        '
+      tags:
+      - assets
+      x-ticvai-permission: ASSET_LIBRARY_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - assetIds
+              properties:
+                assetIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                mode:
+                  type: string
+                  enum:
+                  - preview
+                  - apply
+                  default: preview
+                setCategoryId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                addTags:
+                  type: array
+                  items:
+                    type: string
+                removeTags:
+                  type: array
+                  items:
+                    type: string
+                archive:
+                  type: boolean
+                  default: false
+      responses:
+        '200':
+          description: What would change, or what did
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  affected:
+                    type: integer
+                  applied:
+                    type: boolean
+  /media-usage:
+    get:
+      operationId: getMediaUsageAnalytics
+      summary: Downloads, views, shares and library health
+      description: 'Boards 1.10 and 4.9. **Storage used and assets never used are the two numbers that
+        justify a DAM.** A library that only grows is a cost; one that can show which assets earn their
+        keep is an asset itself.
+
+        '
+      tags:
+      - assets
+      x-ticvai-permission: ASSET_LIBRARY_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: groupBy
+        in: query
+        schema:
+          type: string
+          enum:
+          - assetType
+          - category
+          - venue
+          - owner
+          - channel
+      responses:
+        '200':
+          description: Usage
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MediaUsageRow'
+  /media-assets/{assetId}/audit:
+    parameters:
+    - name: assetId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: listMediaAssetAudit
+      summary: Who did what to this asset, and who received it
+      description: 'Board 3.9. **Compliance evidence for a DAM is a distribution record**, not an edit
+        log — the question asked afterwards is *who had this photograph and when*, and that is answered
+        by shares and downloads rather than by metadata changes. Both are here.
+
+        '
+      tags:
+      - assets
+      x-ticvai-permission: ASSET_LIBRARY_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: The timeline
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MediaAuditRecord'
 
 components:
   schemas:
+    MediaTaxonomy:
+      type: object
+      x-ticvai-persistence: assets.taxonomy
+      description: 'Boards 1.5 and 1.6. **Metadata fields are per asset type**, because an image has
+        dimensions and a contract has an expiry.
+
+        '
+      properties:
+        categories:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              code:
+                type: string
+              name:
+                type: string
+              parentCategoryId:
+                type: string
+                format: uuid
+                nullable: true
+              applicableAssetTypes:
+                type: array
+                items:
+                  type: string
+        fields:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+              label:
+                type: string
+              dataType:
+                type: string
+              applicableAssetTypes:
+                type: array
+                items:
+                  type: string
+              mandatory:
+                type: boolean
+              allowedValues:
+                type: array
+                items:
+                  type: string
+        keywordVocabularies:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+              terms:
+                type: array
+                items:
+                  type: string
+              closed:
+                type: boolean
+                default: false
+                description: '**A closed vocabulary refuses terms not in the list.** Open vocabularies
+                  are how a library ends up with `logo`, `logos`, `Logo` and `brand-logo`.
+
+                  '
+        scopePath:
+          type: string
+    MediaTag:
+      type: object
+      x-ticvai-persistence: assets.tag
+      description: 'Board 2.2. **A tag carries its origin and confidence**, so machine labels can be
+        filtered without being deleted.
+
+        '
+      required:
+      - value
+      properties:
+        value:
+          type: string
+        vocabulary:
+          type: string
+          nullable: true
+        source:
+          type: string
+          enum:
+          - human
+          - autoTag
+          - import
+          - inherited
+          default: human
+        confidence:
+          type: number
+          nullable: true
+        accepted:
+          type: boolean
+          default: true
+          description: A proposed auto-tag below the promotion threshold sits here as false.
+        addedBy:
+          type: string
+          format: uuid
+          nullable: true
+        addedAt:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
+    MediaSimilarity:
+      type: object
+      description: 'Boards 2.4 and 2.5. **Duplicate and related are one score at two thresholds.**'
+      properties:
+        assetId:
+          type: string
+          format: uuid
+        similarity:
+          type: number
+        relation:
+          type: string
+          enum:
+          - exactDuplicate
+          - nearDuplicate
+          - variant
+          - related
+        differingFields:
+          type: array
+          items:
+            type: string
+    MediaAssetVersion:
+      type: object
+      x-ticvai-persistence: assets.asset_version
+      description: 'Boards 2.6 and 2.7. **Usage impact belongs to the version read**, because replacing a
+        logo is routine or an incident depending on where it appears.
+
+        '
+      properties:
+        assetId:
+          type: string
+          format: uuid
+        version:
+          type: integer
+        fileName:
+          type: string
+        sizeBytes:
+          type: integer
+        checksum:
+          type: string
+          nullable: true
+        createdBy:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        note:
+          type: string
+          nullable: true
+        isCurrent:
+          type: boolean
+        usageImpact:
+          type: array
+          readOnly: true
+          items:
+            type: object
+            properties:
+              surface:
+                type: string
+                enum:
+                - campaign
+                - journey
+                - ticketTemplate
+                - screen
+                - publishedPage
+                - product
+                - signage
+              referenceId:
+                type: string
+                format: uuid
+              label:
+                type: string
+              live:
+                type: boolean
+        scopePath:
+          type: string
+    MediaRendition:
+      type: object
+      x-ticvai-persistence: assets.rendition
+      description: 'Boards 2.8 and 2.9. **Readiness is the fact that matters**, not existence.'
+      required:
+      - preset
+      properties:
+        id:
+          type: string
+          format: uuid
+        preset:
+          type: string
+          description: 'e.g. `thumbnail`, `web1600`, `printCmyk`, `hls720`.'
+        format:
+          type: string
+          nullable: true
+        width:
+          type: integer
+          nullable: true
+        height:
+          type: integer
+          nullable: true
+        sizeBytes:
+          type: integer
+          nullable: true
+        status:
+          type: string
+          enum:
+          - queued
+          - processing
+          - ready
+          - failed
+        failureReason:
+          type: string
+          nullable: true
+        url:
+          type: string
+          nullable: true
+        scopePath:
+          type: string
+    MediaAssetApproval:
+      type: object
+      x-ticvai-persistence: assets.approval
+      description: 'Boards 3.4 and 3.5. **Publication eligibility is computed from four facts.**'
+      properties:
+        assetId:
+          type: string
+          format: uuid
+        state:
+          type: string
+          enum:
+          - draft
+          - pendingApproval
+          - approved
+          - rejected
+          - published
+          - archived
+        eligibility:
+          type: array
+          readOnly: true
+          items:
+            type: object
+            properties:
+              check:
+                type: string
+                enum:
+                - approved
+                - rightsCurrent
+                - renditionsReady
+                - classificationComplete
+              satisfied:
+                type: boolean
+              detail:
+                type: string
+                nullable: true
+        approvedBy:
+          type: string
+          format: uuid
+          nullable: true
+        comment:
+          type: string
+          nullable: true
+        at:
+          type: string
+          format: date-time
+        scopePath:
+          type: string
+    MediaShare:
+      type: object
+      x-ticvai-persistence: assets.share
+      description: 'Board 3.7. **A licence grant with a link attached** — revocable, expiring and logged.'
+      required:
+      - assetIds
+      - expiresAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        assetIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        recipientEmail:
+          type: string
+          nullable: true
+        recipientOrganisation:
+          type: string
+          nullable: true
+        allowDownload:
+          type: boolean
+          default: false
+        allowedRenditions:
+          type: array
+          items:
+            type: string
+        passwordProtected:
+          type: boolean
+          default: false
+        expiresAt:
+          type: string
+          format: date-time
+        revokedAt:
+          type: string
+          format: date-time
+          nullable: true
+        url:
+          type: string
+          readOnly: true
+        openedCount:
+          type: integer
+          readOnly: true
+        scopePath:
+          type: string
+    MediaDistribution:
+      type: object
+      description: 'Boards 4.2 and 4.5. **The usage map that makes replacement safe.**'
+      properties:
+        assetId:
+          type: string
+          format: uuid
+        deliveryUrls:
+          type: array
+          items:
+            type: object
+            properties:
+              channel:
+                type: string
+              rendition:
+                type: string
+              url:
+                type: string
+              cdn:
+                type: string
+                nullable: true
+        usedBy:
+          type: array
+          items:
+            type: object
+            properties:
+              surface:
+                type: string
+              referenceId:
+                type: string
+                format: uuid
+              label:
+                type: string
+              live:
+                type: boolean
+        lastDeliveredAt:
+          type: string
+          format: date-time
+          nullable: true
+    MediaDistributionChannel:
+      type: object
+      x-ticvai-persistence: assets.distribution_channel
+      description: 'Boards 4.3, 4.4 and 4.6. **The fallback keeps a page from breaking.**'
+      required:
+      - code
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        cdnBaseUrl:
+          type: string
+          nullable: true
+        signedUrls:
+          type: boolean
+          default: false
+        signedUrlTtlSeconds:
+          type: integer
+          nullable: true
+        defaultRendition:
+          type: string
+          nullable: true
+        fallbackAssetId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '**What renders when the real one cannot.** Rights expired, rendition failed, CDN
+            unreachable — three causes, one visible outcome, and one place to decide it.
+
+            '
+        onRightsExpiry:
+          type: string
+          enum:
+          - serveFallback
+          - serveNothing
+          - continueServing
+          default: serveFallback
+        scopePath:
+          type: string
+    MediaUsageRow:
+      type: object
+      description: 'Boards 1.10 and 4.9. **Assets never used is the number that justifies the library.**'
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+        assetCount:
+          type: integer
+        storageBytes:
+          type: integer
+        downloads:
+          type: integer
+        views:
+          type: integer
+        shares:
+          type: integer
+        neverUsedCount:
+          type: integer
+        unclassifiedCount:
+          type: integer
+    MediaAuditRecord:
+      type: object
+      x-ticvai-persistence: assets.audit
+      description: 'Board 3.9. **Distribution as well as edits** — the question asked afterwards is who
+        had it.
+
+        '
+      properties:
+        id:
+          type: string
+          format: uuid
+        assetId:
+          type: string
+          format: uuid
+        at:
+          type: string
+          format: date-time
+        action:
+          type: string
+          enum:
+          - uploaded
+          - updated
+          - retagged
+          - versioned
+          - approved
+          - published
+          - shared
+          - downloaded
+          - delivered
+          - archived
+          - deleted
+        actorId:
+          type: string
+          format: uuid
+          nullable: true
+        recipient:
+          type: string
+          nullable: true
+        detail:
+          type: string
+          nullable: true
+        scopePath:
+          type: string
     LocalisedText:
       x-ticvai-persistence: "none — jsonb column"
       type: object
@@ -514,6 +1570,29 @@ components:
             enum: [web, print, socialMedia, inVenue, advertising, internal]
         attributionRequired: { type: boolean, default: false }
         attributionText: { type: string, nullable: true }
+        # Added 19 September, from DAM board 3.3. The shape above tracked *what the
+        # licence is*; these four say *where it may go and who has to renew it*, which is
+        # what `setMediaAssetRights` and the distribution fallback need.
+        permittedTerritories:
+          type: array
+          items: { type: string }
+          description: >
+            ISO country or region codes. **Empty means unrestricted, which is a claim
+            rather than an absence** — an unknown territory and a worldwide licence are
+            not the same thing, and `licenceKind: unknown` is how the second is said.
+        permittedChannels:
+          type: array
+          items: { type: string }
+          description: >
+            Distribution channel codes, checked by `setMediaDistributionChannels`.
+            Narrower than `permittedUses`, which describes the medium rather than the
+            route.
+        modelReleaseHeld: { type: boolean, default: false }
+        # **A photograph of an identifiable person without a release is a legal exposure**,
+        # and the DAM is the only place that fact can sit next to the file.
+        renewalOwner: { type: string, format: uuid, nullable: true }
+        # `getExpiringRights` could always find the expiry and never say whose problem it
+        # was, so the list went to everybody and therefore to nobody.
 
     MediaAsset:
       x-ticvai-persistence: "assets.media_asset"

@@ -5682,8 +5682,1100 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ExecutivePromotionIntelligenceReportingStudioView'
+  /recommendation-strategies:
+    get:
+      operationId: listRecommendationStrategies
+      summary: The strategies deciding what gets offered where
+      description: 'Upsell board 1. **A strategy is the unit, not an individual recommendation.** The
+        board asks for objectives, placements, channels, ranking, suppression and guardrails — six things
+        that only make sense together, and configuring them per placement would produce a venue with
+        forty inconsistent answers to *what should we offer at checkout*.
+
+        '
+      tags:
+      - recommendations
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: status
+        in: query
+        schema:
+          type: string
+      - name: placement
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Strategies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecommendationStrategy'
+    post:
+      operationId: createRecommendationStrategy
+      summary: Define objective, placements, ranking and guardrails
+      description: 'Upsell boards 1.3 and 1.8. **The objective and the guardrail are stated together
+        because one without the other is dangerous.** *Maximise attach revenue* with no cap produces a
+        checkout with nine upsells; a cap with no objective produces a recommender optimising nothing.
+
+        '
+      tags:
+      - recommendations
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecommendationStrategy'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationStrategy'
+  /recommendation-strategies/{strategyId}:
+    parameters:
+    - name: strategyId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: updateRecommendationStrategy
+      summary: Change a strategy
+      tags:
+      - recommendations
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecommendationStrategy'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationStrategy'
+  /product-relationships:
+    get:
+      operationId: listProductRelationships
+      summary: Upgrade ladders, cross-sells, affinities and substitutes
+      description: 'Upsell boards 2.2, 3.2 and 3.3. **One table, because they are one kind of fact.** An
+        upgrade ladder is an ordered relationship between two products; a cross-sell is an unordered one;
+        an affinity is a measured one. Splitting them into three stores means three answers to *what goes
+        with this*.
+
+        **Affinity is measured, the rest are declared**, and the distinction is on the row — a merchandiser
+        needs to know whether the platform inferred a pairing or somebody chose it.
+
+        '
+      tags:
+      - recommendations
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: productId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: kind
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Relationships
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductRelationship'
+    put:
+      operationId: setProductRelationships
+      summary: Declare what upgrades to, pairs with or replaces what
+      tags:
+      - recommendations
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - relationships
+              properties:
+                relationships:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ProductRelationship'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductRelationship'
+  /product-affinity:
+    get:
+      operationId: getProductAffinity
+      summary: What is actually bought together
+      description: 'Upsell boards 3.3 and 3.4. **Measured from baskets, not declared.** *Frequently bought
+        together* is a fact about what happened, and a merchandiser''s intuition about what should pair
+        is a different and equally useful fact — this is the first, and `setProductRelationships` is the
+        second.
+
+        Support and lift are both returned. **A pair with high support and no lift is two popular products
+        and not a relationship**, which is the mistake a raw co-occurrence count invites.
+
+        '
+      tags:
+      - recommendations
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: productId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: minLift
+        in: query
+        schema:
+          type: number
+          default: 1.2
+      - name: windowDays
+        in: query
+        schema:
+          type: integer
+          default: 90
+      responses:
+        '200':
+          description: Affinities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductAffinity'
+  /recommendations/explain:
+    post:
+      operationId: explainRecommendation
+      summary: Why this was offered, and what was suppressed
+      description: 'Upsell boards 4.10 and 6.9. **The decision trace, including what did not make the
+        list.** A merchandiser asking *why are we not offering the parking upsell* is asking about a
+        suppression, and a response that only names the winners cannot answer them.
+
+        '
+      tags:
+      - recommendations
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecommendationContext'
+      responses:
+        '200':
+          description: The trace
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationTrace'
+  /recommendations/outcomes:
+    post:
+      operationId: recordRecommendationOutcome
+      summary: Shown, clicked, accepted or dismissed
+      description: 'Upsell board 6.5. **Without this there is no attribution and no learning.** A
+        recommender that cannot see its own outcomes is a rule engine somebody has to tune by intuition.
+
+        **Impressions matter as much as conversions.** Acceptance rate needs a denominator, and the
+        denominator is what was shown — which only this records.
+
+        '
+      tags:
+      - recommendations
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecommendationOutcome'
+      responses:
+        '202':
+          description: Recorded
+  /upgrade-offers:
+    post:
+      operationId: quoteUpgrade
+      summary: What upgrading this order or ticket would cost
+      description: 'Upsell boards 2.4, 2.5 and 2.6. **The price difference, not the new price.** A guest
+        upgrading from standard to VIP pays the gap, and computing that gap needs the original paid
+        amount, the current price of the target and the venue''s policy on whether a price rise since
+        purchase is the guest''s problem.
+
+        **Post-purchase upgrades are the same operation** (board 2.8). A guest upgrading in the car park
+        on the day is doing what a guest upgrading at checkout did, later.
+
+        '
+      tags:
+      - recommendations
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - targetProductId
+              properties:
+                orderId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                ticketId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                membershipId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                targetProductId:
+                  type: string
+                  format: uuid
+                quantity:
+                  type: integer
+                  default: 1
+      responses:
+        '200':
+          description: The upgrade quote
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpgradeQuote'
+        '409':
+          description: '**Not an eligible upgrade path**, or the target is unavailable. Named, because
+            *no* and *sold out* need different words at a counter.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+  /recommendation-experiments:
+    get:
+      operationId: listRecommendationExperiments
+      summary: A/B tests on placements and strategies
+      tags:
+      - recommendations
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Experiments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecommendationExperiment'
+    post:
+      operationId: createRecommendationExperiment
+      summary: Split traffic between strategies
+      description: 'Upsell boards 6.3 and 6.4. **The allocation is fixed at creation and the winner is
+        declared explicitly.** An experiment whose split drifts is not an experiment, and one that is
+        never concluded runs forever at half efficiency.
+
+        **Incrementality, not conversion** (board 6.5). A recommendation shown to a guest who would have
+        bought anyway converted and added nothing, and only a holdout group can tell the difference.
+
+        '
+      tags:
+      - recommendations
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecommendationExperiment'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationExperiment'
+  /recommendation-experiments/{experimentId}/conclude:
+    parameters:
+    - name: experimentId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: concludeRecommendationExperiment
+      summary: Declare a winner and roll it out
+      tags:
+      - recommendations
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - winningVariant
+              properties:
+                winningVariant:
+                  type: string
+                rolloutPercent:
+                  type: integer
+                  default: 100
+                note:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: Concluded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationExperiment'
+  /recommendation-performance:
+    get:
+      operationId: getRecommendationPerformance
+      summary: Impressions, acceptance, revenue and incremental lift
+      description: 'Upsell boards 6.1, 6.2 and 6.5. **Attributed revenue and incremental revenue are
+        reported apart**, because the first flatters and the second is true. A strategy that shows an
+        offer next to something the guest already intended to buy will attribute well and add nothing.
+
+        '
+      tags:
+      - recommendations
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: groupBy
+        in: query
+        schema:
+          type: string
+          enum:
+          - strategy
+          - placement
+          - channel
+          - product
+          - experiment
+      responses:
+        '200':
+          description: Performance
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecommendationPerformance'
+  /recommendation-suppressions:
+    put:
+      operationId: setRecommendationSuppression
+      summary: Fatigue limits, frequency caps and hard exclusions
+      description: 'Upsell boards 1.7 and 5.7. **Fatigue is the reason a good recommender stops working.**
+        A guest offered the same parking upsell at every touchpoint for three visits has learned to
+        ignore the slot, and no ranking change recovers that.
+
+        Hard exclusions are separate from caps: *never offer alcohol to a guest in a family segment* is
+        not a frequency question.
+
+        '
+      tags:
+      - recommendations
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecommendationSuppression'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationSuppression'
+  /recommendation-simulations:
+    post:
+      operationId: simulateRecommendationStrategy
+      summary: Replay a strategy against history before it goes live
+      description: 'Upsell boards 1.10, 2.10, 3.10 and 4.10 — **four boards ask for a simulator, which is
+        the pack telling us something.** Recommendation changes are invisible until they are live and
+        then affect every guest at once, so the only safe way to evaluate one is against baskets that
+        already happened.
+
+        '
+      tags:
+      - recommendations
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - strategy
+              properties:
+                strategy:
+                  $ref: '#/components/schemas/RecommendationStrategy'
+                fromDate:
+                  type: string
+                  format: date
+                toDate:
+                  type: string
+                  format: date
+                sampleSize:
+                  type: integer
+                  default: 10000
+      responses:
+        '200':
+          description: What it would have done
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationPerformance'
+
 components:
   schemas:
+    RecommendationStrategy:
+      type: object
+      x-ticvai-persistence: promotions.recommendation_strategy
+      description: 'Upsell board 1. **Objective, placement, ranking and guardrail in one record**, because
+        any one of them alone produces a recommender that is either aimless or dangerous.
+
+        '
+      required:
+      - code
+      - name
+      - objective
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        objective:
+          type: string
+          enum:
+          - attachRevenue
+          - averageOrderValue
+          - upgradeRate
+          - visitFrequency
+          - inventoryBalance
+          - guestSatisfaction
+        kinds:
+          type: array
+          items:
+            type: string
+            enum:
+            - upsell
+            - upgrade
+            - crossSell
+            - bundle
+            - nextBestOffer
+            - reactivation
+        placements:
+          type: array
+          items:
+            type: string
+            enum:
+            - productPage
+            - cart
+            - checkout
+            - postPurchase
+            - preVisitEmail
+            - inVenueApp
+            - kiosk
+            - pos
+            - signage
+            - callCentre
+        channels:
+          type: array
+          items:
+            type: string
+        maxRecommendations:
+          type: integer
+          default: 3
+          description: '**A guardrail before it is a layout choice.** Nine upsells at checkout is not a
+            denser page, it is an abandoned basket.
+
+            '
+        minConfidence:
+          type: number
+          nullable: true
+        rankingWeights:
+          type: object
+          additionalProperties:
+            type: number
+          description: Propensity, margin, inventory pressure, affinity, recency.
+        requireAvailability:
+          type: boolean
+          default: true
+        excludeInBasket:
+          type: boolean
+          default: true
+        guardrails:
+          type: object
+          properties:
+            maxDiscountPercent:
+              type: number
+              nullable: true
+            minMarginPercent:
+              type: number
+              nullable: true
+            neverRecommendCategoryIds:
+              type: array
+              items:
+                type: string
+                format: uuid
+            requireHumanApproval:
+              type: boolean
+              default: false
+        status:
+          type: string
+          enum:
+          - draft
+          - active
+          - paused
+          - retired
+        effectiveFrom:
+          type: string
+          format: date
+          nullable: true
+        effectiveTo:
+          type: string
+          format: date
+          nullable: true
+        scopePath:
+          type: string
+    ProductRelationship:
+      type: object
+      x-ticvai-persistence: promotions.product_relationship
+      description: 'Upsell boards 2.2 and 3.2. **Declared, and distinguishable from measured affinity.**'
+      required:
+      - fromProductId
+      - toProductId
+      - kind
+      properties:
+        id:
+          type: string
+          format: uuid
+        fromProductId:
+          type: string
+          format: uuid
+        toProductId:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          enum:
+          - upgradesTo
+          - downgradesTo
+          - crossSell
+          - accessory
+          - substitute
+          - requires
+          - incompatibleWith
+        ladderPosition:
+          type: integer
+          nullable: true
+          description: '**For upgrade ladders only.** Standard → Premium → VIP is ordered, and an
+            unordered set cannot answer *what is the next step up*.
+
+            '
+        source:
+          type: string
+          enum:
+          - declared
+          - measured
+          - aiProposed
+          default: declared
+        strength:
+          type: number
+          nullable: true
+        effectiveFrom:
+          type: string
+          format: date
+          nullable: true
+        effectiveTo:
+          type: string
+          format: date
+          nullable: true
+        scopePath:
+          type: string
+    ProductAffinity:
+      type: object
+      description: 'Upsell boards 3.3 and 3.4. **Support and lift together**, because high support with no
+        lift is two popular products rather than a relationship.
+
+        '
+      properties:
+        fromProductId:
+          type: string
+          format: uuid
+        toProductId:
+          type: string
+          format: uuid
+        basketsTogether:
+          type: integer
+        support:
+          type: number
+        confidence:
+          type: number
+        lift:
+          type: number
+        windowDays:
+          type: integer
+        computedAt:
+          type: string
+          format: date-time
+    RecommendationContext:
+      type: object
+      description: '**One shape for runtime, explanation and simulation**, so all three see the same
+        inputs.
+
+        '
+      required:
+      - placement
+      properties:
+        guestId:
+          type: string
+          format: uuid
+          nullable: true
+        anonymousId:
+          type: string
+          nullable: true
+          description: 'Board 5.8. **Most guests at a kiosk are not signed in.**'
+        placement:
+          type: string
+        channel:
+          type: string
+          nullable: true
+        venueId:
+          type: string
+          format: uuid
+          nullable: true
+        basket:
+          type: array
+          items:
+            type: object
+            properties:
+              productId:
+                type: string
+                format: uuid
+              quantity:
+                type: integer
+        orderId:
+          type: string
+          format: uuid
+          nullable: true
+        visitState:
+          type: string
+          enum:
+          - prePurchase
+          - purchased
+          - preVisit
+          - inVenue
+          - postVisit
+          nullable: true
+        locationScopePath:
+          type: string
+          nullable: true
+        at:
+          type: string
+          format: date-time
+          nullable: true
+        strategyId:
+          type: string
+          format: uuid
+          nullable: true
+    Recommendation:
+      type: object
+      description: '**Ranked, priced and explainable.** An offer with no reason attached cannot be
+        defended by the person presenting it.
+
+        '
+      properties:
+        recommendationId:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        kind:
+          type: string
+        rank:
+          type: integer
+        score:
+          type: number
+        confidence:
+          type: number
+          nullable: true
+        price:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        priceDifference:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        reason:
+          type: string
+          description: 'Shown to the guest — *"guests who booked this also visited"*.'
+        factors:
+          type: array
+          description: Shown to staff and analysts, not to the guest.
+          items:
+            type: object
+            properties:
+              factor:
+                type: string
+              contribution:
+                type: number
+        strategyId:
+          type: string
+          format: uuid
+        experimentVariant:
+          type: string
+          nullable: true
+    RecommendationTrace:
+      type: object
+      description: 'Boards 4.10 and 6.9. **Includes what was suppressed**, because that is usually the
+        question.
+
+        '
+      properties:
+        strategyId:
+          type: string
+          format: uuid
+        candidatesConsidered:
+          type: integer
+        returned:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recommendation'
+        suppressed:
+          type: array
+          items:
+            type: object
+            properties:
+              productId:
+                type: string
+                format: uuid
+              score:
+                type: number
+                nullable: true
+              suppressedBy:
+                type: string
+                enum:
+                - alreadyInBasket
+                - unavailable
+                - consent
+                - eligibility
+                - frequencyCap
+                - fatigue
+                - hardExclusion
+                - guardrail
+                - belowConfidence
+                - rankCutoff
+              detail:
+                type: string
+                nullable: true
+    RecommendationOutcome:
+      type: object
+      x-ticvai-persistence: promotions.recommendation_outcome
+      description: 'Board 6.5. **Impressions as well as conversions** — acceptance rate needs a
+        denominator.
+
+        '
+      required:
+      - recommendationId
+      - outcome
+      properties:
+        recommendationId:
+          type: string
+          format: uuid
+        outcome:
+          type: string
+          enum:
+          - shown
+          - clicked
+          - accepted
+          - dismissed
+          - expired
+        at:
+          type: string
+          format: date-time
+        orderId:
+          type: string
+          format: uuid
+          nullable: true
+        value:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        holdout:
+          type: boolean
+          default: false
+          description: '**The control group.** Without it there is attribution and no incrementality.'
+        scopePath:
+          type: string
+    UpgradeQuote:
+      type: object
+      description: 'Upsell board 2.4. **The gap, not the new price.**'
+      properties:
+        quoteId:
+          type: string
+          format: uuid
+        fromProductId:
+          type: string
+          format: uuid
+        toProductId:
+          type: string
+          format: uuid
+        originalPaid:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        targetCurrentPrice:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        difference:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        priceProtectionApplied:
+          type: boolean
+          default: false
+          description: '**Whether a price rise since purchase is charged to the guest.** A venue policy,
+            and one the guest will ask about.
+
+            '
+        valuePoints:
+          type: array
+          items:
+            type: string
+          description: What the guest gains — the reason to say yes, in their words.
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+    RecommendationExperiment:
+      type: object
+      x-ticvai-persistence: promotions.recommendation_experiment
+      description: 'Boards 6.3 and 6.4. **Fixed allocation, explicit conclusion, and a holdout.**'
+      required:
+      - code
+      - variants
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        placement:
+          type: string
+          nullable: true
+        variants:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              strategyId:
+                type: string
+                format: uuid
+                nullable: true
+              allocationPercent:
+                type: integer
+        holdoutPercent:
+          type: integer
+          default: 5
+        primaryMetric:
+          type: string
+        minimumSampleSize:
+          type: integer
+          nullable: true
+        startedAt:
+          type: string
+          format: date-time
+          nullable: true
+        endedAt:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          type: string
+          enum:
+          - draft
+          - running
+          - concluded
+          - abandoned
+        winningVariant:
+          type: string
+          nullable: true
+        scopePath:
+          type: string
+    RecommendationPerformance:
+      type: object
+      description: 'Board 6.5. **Attributed and incremental reported apart** — the first flatters.'
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+        impressions:
+          type: integer
+        clicks:
+          type: integer
+        accepted:
+          type: integer
+        acceptanceRate:
+          type: number
+        attributedRevenue:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        incrementalRevenue:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        holdoutAcceptanceRate:
+          type: number
+          nullable: true
+        lift:
+          type: number
+          nullable: true
+    RecommendationSuppression:
+      type: object
+      x-ticvai-persistence: promotions.recommendation_suppression
+      description: 'Boards 1.7 and 5.7. **Fatigue is why a good recommender stops working.**'
+      properties:
+        scopePath:
+          type: string
+        maxImpressionsPerProductPerDay:
+          type: integer
+          nullable: true
+        maxImpressionsPerGuestPerSession:
+          type: integer
+          nullable: true
+        cooldownAfterDismissDays:
+          type: integer
+          nullable: true
+        cooldownAfterAcceptDays:
+          type: integer
+          nullable: true
+        hardExclusions:
+          type: array
+          items:
+            type: object
+            properties:
+              segmentId:
+                type: string
+                format: uuid
+                nullable: true
+              categoryId:
+                type: string
+                format: uuid
+                nullable: true
+              productId:
+                type: string
+                format: uuid
+                nullable: true
+              reason:
+                type: string
     DraftedRecord:
       type: object
       x-ticvai-provisional: true
