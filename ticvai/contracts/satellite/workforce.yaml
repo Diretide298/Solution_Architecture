@@ -613,6 +613,348 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ShiftSwap'
+  /shift-templates:
+    get:
+      operationId: listShiftTemplates
+      summary: Named shift patterns a rota is built from
+      description: 'Resource board 3.7. **`createRotaAssignment` placed one person in one slot and
+        nothing described the slot.** A rota built assignment by assignment is a rota typed out every
+        week; a template — early, late, split, double, on-call — is the unit a manager actually thinks
+        in.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Templates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ShiftTemplate'
+    put:
+      operationId: setShiftTemplate
+      summary: Define a shift pattern, its breaks and its qualifications
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShiftTemplate'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShiftTemplate'
+  /staffing-rules:
+    put:
+      operationId: setStaffingRules
+      summary: Minimum cover, working-hour limits and overtime
+      description: 'Resource boards 4.3 and 3.9. **Minimum staffing is a safety rule before it is a
+        cost rule.** A ride that requires two operators cannot run with one, and a rota that allows it
+        has produced a closure or an incident.
+
+        **Working-hour limits are law in most markets**, and a system that lets a manager roster
+        somebody for fourteen hours has made the venue liable rather than the manager.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StaffingRules'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffingRules'
+  /staffing-coverage:
+    get:
+      operationId: getStaffingCoverage
+      summary: Where the rota is short, and by how much
+      description: 'Resource board 4.4. **The gap is the product.** A rota screen showing who is on
+        shows nothing a manager cannot see; a screen showing that the north gate is one short at
+        fourteen hundred on Saturday is the reason the system exists.
+
+        Computed against minimum staffing and the qualifications each position requires — a position
+        filled by somebody not qualified for it is still a gap.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: from
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: venueId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Coverage and its gaps
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StaffingCoverage'
+  /leave-requests:
+    get:
+      operationId: listLeaveRequests
+      summary: Leave, absence and their effect on cover
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: status
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Leave requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LeaveRequest'
+    post:
+      operationId: requestLeave
+      summary: Ask for time off, against the cover it would cost
+      description: 'Resource board 3.8. **Approving leave without seeing the resulting gap is how a
+        venue discovers in July that four supervisors booked the same week.**
+
+        The response carries the coverage impact, so the approver sees it before deciding rather than
+        after.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveRequest'
+      responses:
+        '201':
+          description: Requested, with the coverage impact
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequest'
+  /labour-cost:
+    get:
+      operationId: getLabourCost
+      summary: Rostered and actual labour cost against budget
+      description: 'Resource board 4.9. **Rostered cost and actual cost diverge every single day**, and
+        the difference is overtime, no-shows and cover. A venue that only sees one of them cannot
+        explain its payroll.
+
+        Compared against budget per venue, department and period, because that is the granularity a
+        general manager is held to.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: from
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: groupBy
+        in: query
+        schema:
+          type: string
+          enum:
+          - venue
+          - department
+          - role
+          - day
+          - person
+      responses:
+        '200':
+          description: Cost against budget
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LabourCostRow'
+  /workforce-compliance:
+    get:
+      operationId: validateWorkforceCompliance
+      summary: Where the rota breaks a rule
+      description: 'Resource board 4.8. **Expired qualifications, exceeded hours, missed breaks,
+        under-age rostering and minimum-rest breaches** — checked against the rota before it is
+        published rather than discovered in an inspection.
+
+        **A lapsed lifeguard certificate is a safety failure, not a data-quality one**, which is the
+        line `resources` already takes on qualifications; this is where it reaches the rota.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Breaches and warnings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkforceComplianceFinding'
+  /shift-marketplace:
+    get:
+      operationId: listOpenShifts
+      summary: Shifts offered back, and who may take them
+      description: 'Resource board 4.6. **`requestShiftSwap` needed a counterparty and there was
+        nowhere to find one.** An open-shift marketplace lets somebody release a shift and somebody
+        qualified pick it up, which is how a gap gets filled at nine on a Friday night without a
+        manager ringing round.
+
+        **Eligibility is enforced, not advisory.** A shift requiring a lifeguard qualification is not
+        offered to somebody without one.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: true
+      responses:
+        '200':
+          description: Open shifts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OpenShift'
+    post:
+      operationId: claimOpenShift
+      summary: Pick up a released shift
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - openShiftId
+              properties:
+                openShiftId:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: Claimed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenShift'
+        '409':
+          description: Already taken, not eligible, or it would breach a working-hour rule
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+
 components:
   securitySchemes:
     bearerAuth:
@@ -620,6 +962,362 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
+    ShiftTemplate:
+      type: object
+      x-ticvai-persistence: workforce.shift_template
+      description: 'Resource board 3.7. **The unit a manager actually thinks in.**'
+      required:
+      - code
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        kind:
+          type: string
+          enum:
+          - early
+          - late
+          - middle
+          - split
+          - double
+          - night
+          - onCall
+          - overtime
+        startsAt:
+          type: string
+        endsAt:
+          type: string
+        breaks:
+          type: array
+          items:
+            type: object
+            properties:
+              afterMinutes:
+                type: integer
+              minutes:
+                type: integer
+              paid:
+                type: boolean
+                default: false
+        requiredQualifications:
+          type: array
+          items:
+            type: string
+        roleCode:
+          type: string
+          nullable: true
+        costCentre:
+          type: string
+          nullable: true
+        hourlyRate:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        scopePath:
+          type: string
+    StaffingRules:
+      type: object
+      x-ticvai-persistence: workforce.staffing_rules
+      description: 'Resource board 4.3. **A safety rule before it is a cost rule.**'
+      properties:
+        minimumCover:
+          type: array
+          items:
+            type: object
+            properties:
+              positionCode:
+                type: string
+              label:
+                type: string
+              venueId:
+                type: string
+                format: uuid
+                nullable: true
+              attractionId:
+                type: string
+                format: uuid
+                nullable: true
+              minimumHeadcount:
+                type: integer
+              requiredQualifications:
+                type: array
+                items:
+                  type: string
+              appliesWhenOpen:
+                type: boolean
+                default: true
+              blocksOperation:
+                type: boolean
+                default: true
+                description: '**A ride requiring two operators cannot run with one.** Where this is
+                  true the attraction closes rather than running short.
+
+                  '
+        maximumHoursPerDay:
+          type: integer
+          nullable: true
+        maximumHoursPerWeek:
+          type: integer
+          nullable: true
+        minimumRestHours:
+          type: integer
+          nullable: true
+        maximumConsecutiveDays:
+          type: integer
+          nullable: true
+        overtime:
+          type: object
+          properties:
+            allowed:
+              type: boolean
+              default: true
+            afterHoursPerWeek:
+              type: integer
+              nullable: true
+            rateMultiplier:
+              type: number
+              nullable: true
+            requiresApproval:
+              type: boolean
+              default: true
+        minimumAgeForNightShift:
+          type: integer
+          nullable: true
+        scopePath:
+          type: string
+    StaffingCoverage:
+      type: object
+      description: 'Resource board 4.4. **The gap is the product.**'
+      properties:
+        date:
+          type: string
+          format: date
+        venueId:
+          type: string
+          format: uuid
+        positionCode:
+          type: string
+        label:
+          type: string
+        from:
+          type: string
+        to:
+          type: string
+        required:
+          type: integer
+        rostered:
+          type: integer
+        qualified:
+          type: integer
+          description: '**A position filled by somebody not qualified for it is still a gap.**'
+        gap:
+          type: integer
+        severity:
+          type: string
+          enum:
+          - covered
+          - tight
+          - short
+          - blocking
+        openShiftIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+    LeaveRequest:
+      type: object
+      x-ticvai-persistence: workforce.leave_request
+      description: 'Resource board 3.8. **Approving leave without seeing the gap is how four
+        supervisors book the same week.**
+
+        '
+      required:
+      - principalId
+      - from
+      - to
+      - kind
+      properties:
+        id:
+          type: string
+          format: uuid
+        principalId:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          enum:
+          - annual
+          - sick
+          - unpaid
+          - parental
+          - compassionate
+          - training
+          - timeOffInLieu
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+        halfDay:
+          type: boolean
+          default: false
+        reason:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum:
+          - requested
+          - approved
+          - rejected
+          - cancelled
+          - taken
+        coverageImpact:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/StaffingCoverage'
+        approvalRequestId:
+          type: string
+          format: uuid
+          nullable: true
+        scopePath:
+          type: string
+    LabourCostRow:
+      type: object
+      description: 'Resource board 4.9. **Rostered and actual diverge every day.**'
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+        rosteredHours:
+          type: number
+        actualHours:
+          type: number
+        overtimeHours:
+          type: number
+        rosteredCost:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        actualCost:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        budget:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        variance:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        variancePercent:
+          type: number
+        headcount:
+          type: integer
+    WorkforceComplianceFinding:
+      type: object
+      description: 'Resource board 4.8. **Checked before the rota is published, not in an inspection.**'
+      properties:
+        code:
+          type: string
+          enum:
+          - expiredQualification
+          - missingQualification
+          - exceededDailyHours
+          - exceededWeeklyHours
+          - insufficientRest
+          - missedBreak
+          - consecutiveDaysExceeded
+          - underAgeNightShift
+          - belowMinimumCover
+        severity:
+          type: string
+          enum:
+          - breach
+          - warning
+        principalId:
+          type: string
+          format: uuid
+          nullable: true
+        principalName:
+          type: string
+          nullable: true
+        date:
+          type: string
+          format: date
+          nullable: true
+        detail:
+          type: string
+        rotaAssignmentIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+    OpenShift:
+      type: object
+      x-ticvai-persistence: workforce.open_shift
+      description: 'Resource board 4.6. **How a gap gets filled at nine on a Friday without a manager
+        ringing round.**
+
+        '
+      properties:
+        id:
+          type: string
+          format: uuid
+        rotaAssignmentId:
+          type: string
+          format: uuid
+          nullable: true
+        shiftTemplateId:
+          type: string
+          format: uuid
+          nullable: true
+        venueId:
+          type: string
+          format: uuid
+        positionCode:
+          type: string
+        from:
+          type: string
+          format: date-time
+        to:
+          type: string
+          format: date-time
+        releasedBy:
+          type: string
+          format: uuid
+          nullable: true
+        reason:
+          type: string
+          nullable: true
+        requiredQualifications:
+          type: array
+          items:
+            type: string
+        eligiblePrincipalCount:
+          type: integer
+          readOnly: true
+        incentiveRateMultiplier:
+          type: number
+          nullable: true
+        status:
+          type: string
+          enum:
+          - open
+          - claimed
+          - pendingApproval
+          - filled
+          - expired
+          - withdrawn
+        claimedBy:
+          type: string
+          format: uuid
+          nullable: true
+        claimedAt:
+          type: string
+          format: date-time
+          nullable: true
+        scopePath:
+          type: string
     TrainingRecord:
       type: object
       x-ticvai-persistence: workforce.training_record

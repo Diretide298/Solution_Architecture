@@ -58229,7 +58229,17 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listCreditTypes
+    contract: wallet
+    purpose: The credit type library
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: createCreditType
+    contract: wallet
+    purpose: Define one
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-415
@@ -58400,7 +58410,12 @@ screens:
       offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setWalletFundingRules
+    contract: wallet
+    purpose: Top-up rules
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-417
@@ -58472,7 +58487,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setWalletFundingRules
+    contract: wallet
+    purpose: Top-up bonus rules
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-418
@@ -58616,7 +58636,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: updateCreditType
+    contract: wallet
+    purpose: Bonus validity and expiry
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-420
@@ -64368,7 +64393,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: certifyIntegration
+    contract: public-api
+    purpose: Integration certification
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - RFID Tap
@@ -64665,7 +64695,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getGameCard
+    contract: games
+    purpose: Identify the customer
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - ↓
@@ -64752,7 +64787,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getWallet
+    contract: retail
+    purpose: Balance summary
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Card Status
@@ -64823,7 +64863,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: topUpWallet
+    contract: retail
+    purpose: Self-service top-up
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-488
@@ -65050,7 +65095,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listPrizes
+    contract: games
+    purpose: Prize discovery
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-491
@@ -65124,7 +65174,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listGameplayTransactions
+    contract: games
+    purpose: Transaction history
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-492
@@ -65738,7 +65793,7 @@ screens:
     purpose: Pooled, serialised or hybrid
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id037
+    invalidates: &id059
     - getRentalProduct
     - getRentalAvailability
   wireframe:
@@ -68062,7 +68117,12 @@ screens:
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getRentalAvailability
+    contract: rental
+    purpose: Availability forecast
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Forecast Demand
@@ -68553,7 +68613,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listDynamicPricingStrategy
+    contract: catalogue
+    purpose: Dynamic pricing
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-528
@@ -68804,7 +68869,7 @@ screens:
     purpose: Grace, late fee and extension pricing
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id039
+    invalidates: &id061
     - listRentalPricingProfiles
   wireframe:
     status: notStarted
@@ -71037,7 +71102,7 @@ screens:
     purpose: Extend it
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id038
+    invalidates: &id060
     - getRentalBooking
     - getRentalAvailability
   wireframe:
@@ -71480,7 +71545,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listOverdueRentals
+    contract: rental
+    purpose: Operational alerts
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Rentals due next hour
@@ -73203,7 +73273,12 @@ screens:
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getDueMaintenance
+    contract: maintenance
+    purpose: Predictive maintenance
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Assets at Risk
@@ -73432,7 +73507,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getKpiValues
+    contract: reporting
+    purpose: Rental revenue
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Gross Rental Revenue
@@ -73891,7 +73971,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getAnalyticsBenchmark
+    contract: reporting
+    purpose: Location and channel performance
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-590
@@ -73964,7 +74049,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listDemandBookingCurve
+    contract: catalogue
+    purpose: Demand forecast
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Expected Rentals
@@ -74152,7 +74242,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: askReportingQuestion
+    contract: reporting
+    purpose: Ask about rentals
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - ↓
@@ -74243,7 +74338,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listTenants
+    contract: subscription
+    purpose: Provisioning in flight
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-594
@@ -74356,7 +74456,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: getGoLiveReadiness
+    contract: subscription
+    purpose: Setup progress
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-595
@@ -74452,7 +74557,12 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getGoLiveReadiness
+    contract: subscription
+    purpose: The guided plan
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Status
@@ -74528,7 +74638,12 @@ screens:
       offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: generateConfiguration
+    contract: ai
+    purpose: Draft the configuration
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-597
@@ -74596,7 +74711,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: generateConfiguration
+    contract: ai
+    purpose: Review and accept a draft
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-598
@@ -74677,7 +74797,12 @@ screens:
       offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getTenantConfig
+    contract: white-label
+    purpose: Manual configuration
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-599
@@ -74750,7 +74875,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setVenueSettings
+    contract: tenancy
+    purpose: Venue and calendar setup
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-600
@@ -74835,7 +74965,17 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setPrices
+    contract: catalogue
+    purpose: Product and pricing setup
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+  - operationId: setChannelListing
+    contract: subscription
+    purpose: Sales channels
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-601
@@ -74944,7 +75084,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: configureWorkstation
+    contract: tenancy
+    purpose: POS, payment and access setup
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-602
@@ -75005,7 +75150,14 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: runGoLiveValidation
+    contract: subscription
+    purpose: Configuration health
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id028
+    - getGoLiveReadiness
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-603
@@ -75086,7 +75238,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: getGoLiveReadiness
+    contract: subscription
+    purpose: Handoff to go-live
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-604
@@ -75200,7 +75357,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getGoLiveReadiness
+    contract: subscription
+    purpose: Readiness at a glance
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-605
@@ -75270,7 +75432,13 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: runGoLiveValidation
+    contract: subscription
+    purpose: Run the plan
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id028
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-606
@@ -75338,7 +75506,13 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: runGoLiveValidation
+    contract: subscription
+    purpose: Ticketing and product checks
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id028
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-607
@@ -75406,7 +75580,13 @@ screens:
       own statuses are ✓ Passed — the state names which is selected.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: runGoLiveValidation
+    contract: subscription
+    purpose: Sales channel tests
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id028
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-608
@@ -75475,7 +75655,13 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: runGoLiveValidation
+    contract: subscription
+    purpose: Payment and financial checks
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id028
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-609
@@ -75543,7 +75729,13 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: runGoLiveValidation
+    contract: subscription
+    purpose: Ticket, QR and access checks
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id028
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-610
@@ -75621,7 +75813,13 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: runGoLiveValidation
+    contract: subscription
+    purpose: User, security and integration checks
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id028
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-611
@@ -75689,7 +75887,13 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: runGoLiveValidation
+    contract: subscription
+    purpose: Communication and journey checks
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id028
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-612
@@ -75771,7 +75975,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: getGoLiveReadiness
+    contract: subscription
+    purpose: Blockers and warnings
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-613
@@ -75839,7 +76048,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getGoLiveReadiness
+    contract: subscription
+    purpose: Final sign-off
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-614
@@ -75940,7 +76154,17 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAccreditationApplications
+    contract: accreditation
+    purpose: Applications in flight
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: listAccreditationHolders
+    contract: accreditation
+    purpose: Holders by status
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-615
@@ -76038,7 +76262,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAccreditationApplications
+    contract: accreditation
+    purpose: The directory
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Application ID
@@ -76110,7 +76339,14 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: createAccreditationApplication
+    contract: accreditation
+    purpose: Start an application
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - listAccreditationApplications
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-617
@@ -76175,7 +76411,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: createForm
+    contract: marketing-crm
+    purpose: Build the application form
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-618
@@ -76239,7 +76480,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAccreditationProgrammes
+    contract: accreditation
+    purpose: Categories within a programme
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-619
@@ -76308,7 +76554,14 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: createAccreditationProgramme
+    contract: accreditation
+    purpose: Set up a programme
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id030
+    - listAccreditationProgrammes
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-620
@@ -76377,7 +76630,14 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setAccreditationRequirements
+    contract: accreditation
+    purpose: Applicant types
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id029
+    - listAccreditationProgrammes
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-621
@@ -76442,7 +76702,13 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setAccreditationRequirements
+    contract: accreditation
+    purpose: The requirements matrix
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id029
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-622
@@ -76534,7 +76800,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAccreditationApplications
+    contract: accreditation
+    purpose: Intake monitor
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Applications today
@@ -76614,7 +76885,13 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: createAccreditationProgramme
+    contract: accreditation
+    purpose: Publish the rules
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id030
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-624
@@ -76774,7 +77051,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAccreditationHolders
+    contract: accreditation
+    purpose: The holder directory
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Holder ID
@@ -76846,7 +77128,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getAccreditationHolder
+    contract: accreditation
+    purpose: One holder
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-626
@@ -76910,7 +77197,15 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: updateAccreditationHolder
+    contract: accreditation
+    purpose: Identity and verification
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id031
+    - getAccreditationHolder
+    - listAccreditationHolders
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-627
@@ -76973,7 +77268,13 @@ screens:
       offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: updateAccreditationHolder
+    contract: accreditation
+    purpose: Photo management
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id031
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-628
@@ -77037,7 +77338,14 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: submitAccreditationDocument
+    contract: accreditation
+    purpose: The document repository
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - getAccreditationHolder
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-629
@@ -77101,7 +77409,14 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: verifyAccreditationDocument
+    contract: accreditation
+    purpose: Verify a document
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - getAccreditationHolder
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-630
@@ -77165,7 +77480,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAccreditationIdentityConflicts
+    contract: accreditation
+    purpose: Possible duplicates
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-631
@@ -77229,7 +77549,13 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: updateAccreditationHolder
+    contract: accreditation
+    purpose: Organisation and affiliation
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id031
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-632
@@ -77293,7 +77619,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getAccreditationHolder
+    contract: accreditation
+    purpose: Completeness and compliance
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-633
@@ -77367,7 +77698,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listAccreditationAudit
+    contract: accreditation
+    purpose: Profile history
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-634
@@ -77530,7 +77866,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAccreditationApplications
+    contract: accreditation
+    purpose: The review queue
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Application ID
@@ -77602,7 +77943,20 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: decideAccreditationApplication
+    contract: accreditation
+    purpose: Decide
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id032
+    - listAccreditationApplications
+    - listAccreditationHolders
+  - operationId: listAccreditationApplications
+    contract: accreditation
+    purpose: The application
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-636
@@ -77749,7 +78103,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setVisualWorkflow
+    contract: approvals
+    purpose: Approval rules and conditions
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-638
@@ -77813,7 +78172,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setApprovalMatrix
+    contract: approvals
+    purpose: Reviewer assignment
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-639
@@ -77877,7 +78241,13 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: decideAccreditationApplication
+    contract: accreditation
+    purpose: Reject or return
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id032
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-640
@@ -77941,7 +78311,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: escalateApprovalRequest
+    contract: approvals
+    purpose: Escalate an exception
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-641
@@ -78083,7 +78458,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAccreditationAudit
+    contract: accreditation
+    purpose: Decision history
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-643
@@ -78267,7 +78647,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAccreditationCredentials
+    contract: accreditation
+    purpose: Credentials issued
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-645
@@ -78331,7 +78716,14 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: issueAccreditationCredential
+    contract: accreditation
+    purpose: Generate a credential
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id034
+    - listAccreditationCredentials
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-646
@@ -78400,7 +78792,14 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setBadgeTemplate
+    contract: accreditation
+    purpose: Credential media
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id033
+    - listBadgeTemplates
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-647
@@ -78464,7 +78863,18 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listBadgeTemplates
+    contract: accreditation
+    purpose: Badge designs
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: setBadgeTemplate
+    contract: accreditation
+    purpose: Design one
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id033
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-648
@@ -78528,7 +78938,19 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: createBadgePrintJob
+    contract: accreditation
+    purpose: Queue for printing
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - listBadgePrintJobs
+  - operationId: listBadgePrintJobs
+    contract: accreditation
+    purpose: The print queue
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-649
@@ -78592,7 +79014,13 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: issueAccreditationCredential
+    contract: accreditation
+    purpose: Digital and mobile credentials
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id034
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-650
@@ -78656,7 +79084,13 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: issueAccreditationCredential
+    contract: accreditation
+    purpose: NFC and RFID encoding
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id034
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-651
@@ -78946,7 +79380,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAccessProfiles
+    contract: accreditation
+    purpose: Access at a glance
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-654
@@ -79026,7 +79465,19 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listAccessProfiles
+    contract: accreditation
+    purpose: Profiles
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: setAccessProfile
+    contract: accreditation
+    purpose: Define one
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id035
+    - listAccessProfiles
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-655
@@ -79090,7 +79541,13 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setAccessProfile
+    contract: accreditation
+    purpose: Venue and zone matrix
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id035
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-656
@@ -79154,7 +79611,13 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setAccessProfile
+    contract: accreditation
+    purpose: Operational area permissions
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id035
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-657
@@ -79218,7 +79681,13 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setAccessProfile
+    contract: accreditation
+    purpose: Date and time rules
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id035
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-658
@@ -79282,7 +79751,13 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setAccessProfile
+    contract: accreditation
+    purpose: Schedule by event phase
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id035
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-659
@@ -79373,7 +79848,14 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setHolderAccess
+    contract: accreditation
+    purpose: Assign profiles to a holder
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id036
+    - getAccreditationHolder
   entryState:
     preloaded:
     - Holder
@@ -79445,7 +79927,13 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setHolderAccess
+    contract: accreditation
+    purpose: Temporary access and exceptions
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id036
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-661
@@ -79509,7 +79997,15 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setAccreditationStatus
+    contract: accreditation
+    purpose: Revoke or suspend
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id037
+    - listAccreditationHolders
+    - listAccreditationAudit
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-662
@@ -79573,7 +80069,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: previewAccessImpact
+    contract: accreditation
+    purpose: Who this change would affect
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-663
@@ -79673,7 +80174,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAccreditationHolders
+    contract: accreditation
+    purpose: Lifecycle at a glance
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-664
@@ -79747,7 +80253,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setAccreditationStatus
+    contract: accreditation
+    purpose: Move through the workflow
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id037
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-665
@@ -79811,7 +80323,14 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setAccreditationValidity
+    contract: accreditation
+    purpose: Validity periods
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id038
+    - listAccreditationHolders
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-666
@@ -79875,7 +80394,13 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: createAccreditationProgramme
+    contract: accreditation
+    purpose: Event and venue assignment
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id030
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-667
@@ -79939,7 +80464,13 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setAccessProfile
+    contract: accreditation
+    purpose: Multi-venue accreditation
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id035
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-668
@@ -80013,7 +80544,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setAccreditationValidity
+    contract: accreditation
+    purpose: Temporary and seasonal
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id038
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-669
@@ -80093,7 +80630,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setAccreditationStatus
+    contract: accreditation
+    purpose: Suspend and reactivate
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id037
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-670
@@ -80157,7 +80700,13 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setAccreditationStatus
+    contract: accreditation
+    purpose: Revoke
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id037
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-671
@@ -80221,7 +80770,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAccreditationHolders
+    contract: accreditation
+    purpose: Expiring soon
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-672
@@ -80285,7 +80839,13 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setAccreditationValidity
+    contract: accreditation
+    purpose: Expiry and renewal rules
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id038
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-673
@@ -80405,7 +80965,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setAccreditationNotificationRules
+    contract: accreditation
+    purpose: Notifications at a glance
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Delivery success rate
@@ -80492,7 +81057,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setAccreditationNotificationRules
+    contract: accreditation
+    purpose: Notification rules
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-675
@@ -80563,7 +81133,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setAccreditationNotificationRules
+    contract: accreditation
+    purpose: Expiry and renewal scheduling
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-676
@@ -80627,7 +81202,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listMessageTemplates
+    contract: marketing-crm
+    purpose: Template library
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-677
@@ -80710,7 +81290,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setLocalizationBrandingCustomer
+    contract: marketing-crm
+    purpose: Channel, language and branding
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-678
@@ -80774,7 +81359,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: sendTransactionalMessage
+    contract: marketing-crm
+    purpose: Bulk communication
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-679
@@ -80838,7 +81428,14 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: importAccreditationHolders
+    contract: accreditation
+    purpose: Bulk import a roster
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id039
+    - listAccreditationHolders
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-680
@@ -80933,7 +81530,13 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: importAccreditationHolders
+    contract: accreditation
+    purpose: Validation and processing
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+    invalidates: *id039
   entryState:
     preloaded:
     - Import batch ID
@@ -81015,7 +81618,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listAccreditationHolders
+    contract: accreditation
+    purpose: Export
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-682
@@ -81079,7 +81687,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAccreditationAudit
+    contract: accreditation
+    purpose: Import and export audit
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-683
@@ -81204,7 +81817,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAccreditationHolders
+    contract: accreditation
+    purpose: The executive view
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Tenant
@@ -81276,7 +81894,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAccreditationHolders
+    contract: accreditation
+    purpose: Status and portfolio
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-685
@@ -81373,7 +81996,12 @@ screens:
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAccreditationAccessActivity
+    contract: accreditation
+    purpose: Utilisation
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Accreditations issued
@@ -81445,7 +82073,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAccreditationAccessActivity
+    contract: accreditation
+    purpose: Access activity
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-687
@@ -81509,7 +82142,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getKpiValues
+    contract: reporting
+    purpose: Trend and comparison
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-688
@@ -81573,7 +82211,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAccreditationAudit
+    contract: accreditation
+    purpose: Audit reporting
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-689
@@ -81668,7 +82311,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listAccreditationAudit
+    contract: accreditation
+    purpose: The immutable log
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-690
@@ -81732,7 +82380,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listApiClients
+    contract: public-api
+    purpose: API management
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-691
@@ -81809,7 +82462,12 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listWebhookSubscriptions
+    contract: public-api
+    purpose: Webhooks
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-692
@@ -81873,7 +82531,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAccreditationAudit
+    contract: accreditation
+    purpose: Integration audit
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-693
@@ -81948,7 +82611,12 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listEvents
+    contract: catalogue
+    purpose: The event catalogue
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-694
@@ -82015,7 +82683,19 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listEventTypes
+    contract: catalogue
+    purpose: Event types
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: setEventType
+    contract: catalogue
+    purpose: Define behaviour
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - listEventTypes
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-695
@@ -82083,7 +82763,14 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: cloneEvent
+    contract: catalogue
+    purpose: Clone, choosing what comes with it
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - listEvents
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-696
@@ -82159,7 +82846,14 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setEventSchedule
+    contract: catalogue
+    purpose: The schedule
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id040
+    - listEvents
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-697
@@ -82238,7 +82932,13 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setEventSchedule
+    contract: catalogue
+    purpose: Dynamic duration and turnaround
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id040
   entryState:
     preloaded:
     - Target vs Actual
@@ -82309,7 +83009,15 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: rescheduleEvent
+    contract: catalogue
+    purpose: Move or cancel, and treat the tickets
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id045
+    - listEvents
+    - getSeatInventory
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-699
@@ -82385,7 +83093,12 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listSpaces
+    contract: catalogue
+    purpose: Spaces at this venue
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-700
@@ -82452,7 +83165,14 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setSpace
+    contract: catalogue
+    purpose: Define a space
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id041
+    - listSpaces
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-701
@@ -82534,7 +83254,13 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setSpace
+    contract: catalogue
+    purpose: Space access rules
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id041
   entryState:
     preloaded:
     - AI Proposal
@@ -82614,7 +83340,14 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setEventCapacityProfile
+    contract: catalogue
+    purpose: Capacity at a glance
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+    invalidates: &id042
+    - getSeatInventory
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-703
@@ -82681,7 +83414,13 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setEventCapacityProfile
+    contract: catalogue
+    purpose: The capacity profile
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id042
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-704
@@ -82748,7 +83487,13 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setEventCapacityProfile
+    contract: catalogue
+    purpose: Seating mode
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id042
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-705
@@ -82828,7 +83573,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setEventRegistration
+    contract: catalogue
+    purpose: Registration at a glance
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-706
@@ -82895,7 +83645,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setEventRegistration
+    contract: catalogue
+    purpose: Attendee data and form
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-707
@@ -82977,7 +83732,17 @@ screens:
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setEventRegistration
+    contract: catalogue
+    purpose: Participant categories
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+  - operationId: listAccessProfiles
+    contract: accreditation
+    purpose: The passes they map to
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - AI Proposal
@@ -83049,7 +83814,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setEventRegistration
+    contract: catalogue
+    purpose: Admission and entry policy
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-709
@@ -83137,7 +83907,12 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getEventResourcePlan
+    contract: catalogue
+    purpose: The resource plan
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-710
@@ -83204,7 +83979,14 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setEventResourcePlan
+    contract: catalogue
+    purpose: What the event needs
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id043
+    - getEventResourcePlan
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-711
@@ -83270,7 +84052,21 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setEventResourcePlan
+    contract: catalogue
+    purpose: Staff and roles
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id043
+  - operationId: createRotaAssignment
+    contract: workforce
+    purpose: Roster them
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id055
+    - listRotaAssignments
+    - getStaffingCoverage
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-712
@@ -83349,7 +84145,13 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setEventResourcePlan
+    contract: catalogue
+    purpose: Contractors and external workforce
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id043
   entryState:
     preloaded:
     - Contracted → Scheduled → Delivered → Verified
@@ -83434,7 +84236,19 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setShiftTemplate
+    contract: workforce
+    purpose: Event shifts
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id054
+    - listShiftTemplates
+  - operationId: getStaffingCoverage
+    contract: workforce
+    purpose: Where it is short
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - AI Proposal
@@ -83517,7 +84331,13 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setEventResourcePlan
+    contract: catalogue
+    purpose: Deployment by location
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id043
   entryState:
     preloaded:
     - Target vs Actual
@@ -83604,7 +84424,14 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setEventLifecycleState
+    contract: catalogue
+    purpose: Lifecycle at a glance
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+    invalidates: &id044
+    - listEvents
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-716
@@ -83671,7 +84498,13 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setEventLifecycleState
+    contract: catalogue
+    purpose: Move through the lifecycle
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id044
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-717
@@ -83738,7 +84571,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: createApprovalRequest
+    contract: approvals
+    purpose: Raise a change request
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-718
@@ -83805,7 +84643,13 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: rescheduleEvent
+    contract: catalogue
+    purpose: Cancellation workflow
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id045
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-719
@@ -83887,7 +84731,13 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: rescheduleEvent
+    contract: catalogue
+    purpose: How tickets and customers are treated
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id045
   entryState:
     preloaded:
     - AI Proposal
@@ -83970,7 +84820,19 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setSessionTemplate
+    contract: catalogue
+    purpose: Slot templates
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id046
+    - listSessionTemplates
+  - operationId: listSessionTemplates
+    contract: catalogue
+    purpose: Templates in use
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-721
@@ -84037,7 +84899,17 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setPrepaidMinutePackage
+    contract: catalogue
+    purpose: Prepaid minute packages
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+  - operationId: listCreditTypes
+    contract: wallet
+    purpose: The credit type behind them
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-722
@@ -84116,7 +84988,13 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setSessionTemplate
+    contract: catalogue
+    purpose: Peak, off-peak and super prime
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id046
   entryState:
     preloaded:
     - Target vs Actual
@@ -84187,7 +85065,13 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setSessionTemplate
+    contract: catalogue
+    purpose: Walk-in policy
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id046
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-724
@@ -84259,7 +85143,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listSessionTemplates
+    contract: catalogue
+    purpose: Sessions running
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-725
@@ -84327,7 +85216,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: assignSessionMedia
+    contract: catalogue
+    purpose: Attach photos to participants
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-726
@@ -84435,7 +85329,12 @@ screens:
       offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listOutlets
+    contract: tenancy
+    purpose: F&B outlets
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-727
@@ -84573,7 +85472,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listMenus
+    contract: fnb
+    purpose: Menus
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-729
@@ -84649,7 +85553,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listMenus
+    contract: fnb
+    purpose: Menu items
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-730
@@ -84714,7 +85623,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listKitchenTickets
+    contract: fnb
+    purpose: Kitchen operations
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-731
@@ -84790,7 +85704,12 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listOutlets
+    contract: tenancy
+    purpose: Outlet configuration
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Terminal Outlet Type Cashier Payment Printer Status
@@ -84858,7 +85777,12 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getKpiValues
+    contract: reporting
+    purpose: F&B performance
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-733
@@ -85556,7 +86480,7 @@ screens:
     purpose: Link without merging
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id028
+    invalidates: &id047
     - getGuestRelationships
     - getGuestProfile
   wireframe:
@@ -85637,7 +86561,7 @@ screens:
     purpose: Corporate, school and group links
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id028
+    invalidates: *id047
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-742
@@ -86796,7 +87720,7 @@ screens:
     purpose: Build a rule-based audience
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id029
+    invalidates: &id048
     - listSegments
     - getAudienceOverlap
   - operationId: previewSegment
@@ -86965,7 +87889,7 @@ screens:
     purpose: Behavioural conditions
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id029
+    invalidates: *id048
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-757
@@ -87042,7 +87966,7 @@ screens:
     purpose: Membership, loyalty and wallet conditions
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id029
+    invalidates: *id048
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-758
@@ -87119,7 +88043,7 @@ screens:
     purpose: Demographic and geographic conditions
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id029
+    invalidates: *id048
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-759
@@ -87197,7 +88121,7 @@ screens:
     purpose: Value and engagement bands
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id029
+    invalidates: *id048
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-760
@@ -87354,7 +88278,7 @@ screens:
     purpose: Convert a predictive audience into a segment
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id029
+    invalidates: *id048
   - operationId: previewSegment
     contract: marketing-crm
     purpose: Threshold simulation
@@ -95418,7 +96342,7 @@ screens:
     purpose: Submit, activate, suspend or retire
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id030
+    invalidates: &id049
     - getResource
     - listResources
     - getResourceAuditTrail
@@ -95855,7 +96779,7 @@ screens:
     purpose: Define one
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id035
+    invalidates: &id057
     - listResourcePackages
   - operationId: updateResourcePackage
     contract: resources
@@ -96084,7 +97008,7 @@ screens:
     purpose: Move it through its lifecycle
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id030
+    invalidates: *id049
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-863
@@ -96195,7 +97119,7 @@ screens:
     purpose: Create a reservation from a free slot
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id032
+    invalidates: &id051
     - getResourceCalendar
     - listResourceBookings
     - getResourceAvailability
@@ -96204,7 +97128,7 @@ screens:
     purpose: Block a period
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id033
+    invalidates: &id052
     - listResourceBlocks
     - getResourceCalendar
   wireframe:
@@ -96470,7 +97394,7 @@ screens:
     purpose: Operating hours and working pattern
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id031
+    invalidates: &id050
     - getResourceSchedule
     - getResourceAvailability
   wireframe:
@@ -96586,7 +97510,7 @@ screens:
     purpose: Slot length and booking limits
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id031
+    invalidates: *id050
   - operationId: getResourceSchedule
     contract: resources
     purpose: The current slots
@@ -96747,13 +97671,13 @@ screens:
     purpose: Reserve in advance
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id032
+    invalidates: *id051
   - operationId: updateResourceBooking
     contract: resources
     purpose: Move or resize it
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id034
+    invalidates: &id053
     - getResourceCalendar
     - listResourceBookings
   wireframe:
@@ -96862,7 +97786,7 @@ screens:
     purpose: Create the series
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id032
+    invalidates: *id051
   - operationId: cancelResourceBooking
     contract: resources
     purpose: Cancel an occurrence or the series
@@ -96974,7 +97898,7 @@ screens:
     purpose: Block a window
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id033
+    invalidates: *id052
   - operationId: releaseResourceBlock
     contract: resources
     purpose: Put it back into service
@@ -97090,7 +98014,7 @@ screens:
     purpose: Fill each requirement
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id036
+    invalidates: &id058
     - getResourceCalendar
     - listResourceBookings
   entryState:
@@ -97178,7 +98102,7 @@ screens:
     purpose: Drag to reassign, extend or shorten
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id034
+    invalidates: *id053
   - operationId: getResourceCalendar
     contract: resources
     purpose: The grid being dragged on
@@ -97303,7 +98227,12 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listPrincipals
+    contract: identity
+    purpose: The staff directory
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-873
@@ -97418,7 +98347,17 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: getPrincipal
+    contract: identity
+    purpose: One person
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: listResources
+    contract: resources
+    purpose: Them as a bookable resource
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-874
@@ -97485,7 +98424,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setResourceQualifications
+    contract: resources
+    purpose: Skills and competencies
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-875
@@ -97580,7 +98524,17 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setResourceQualifications
+    contract: resources
+    purpose: Certification and expiry
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+  - operationId: validateWorkforceCompliance
+    contract: workforce
+    purpose: What has lapsed
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-876
@@ -97666,7 +98620,17 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setResourceQualifications
+    contract: resources
+    purpose: Qualification rules
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+  - operationId: suggestResources
+    contract: resources
+    purpose: Who qualifies
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-877
@@ -97797,7 +98761,17 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: getResourceSchedule
+    contract: resources
+    purpose: Availability and working pattern
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: setResourceSchedule
+    contract: resources
+    purpose: Set it
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-878
@@ -97878,7 +98852,18 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listShiftTemplates
+    contract: workforce
+    purpose: Shift templates
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: setShiftTemplate
+    contract: workforce
+    purpose: Define one
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id054
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-879
@@ -97974,7 +98959,20 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listLeaveRequests
+    contract: workforce
+    purpose: Leave and absence
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: requestLeave
+    contract: workforce
+    purpose: Request time off
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - listLeaveRequests
+    - getStaffingCoverage
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-880
@@ -98071,7 +99069,15 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setStaffingRules
+    contract: workforce
+    purpose: Overtime and working-hour rules
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: &id056
+    - getStaffingCoverage
+    - validateWorkforceCompliance
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-881
@@ -98200,7 +99206,12 @@ screens:
       Names the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listRotaAssignments
+    contract: workforce
+    purpose: Rota synchronisation
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Connected systems
@@ -98312,7 +99323,17 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listRotaAssignments
+    contract: workforce
+    purpose: The roster
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: getStaffingCoverage
+    contract: workforce
+    purpose: Where it is short
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-883
@@ -98413,7 +99434,13 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: createRotaAssignment
+    contract: workforce
+    purpose: Roster a position
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id055
   entryState:
     preloaded:
     - Name
@@ -98492,7 +99519,13 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: setStaffingRules
+    contract: workforce
+    purpose: Minimum staffing and cover
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id056
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-885
@@ -98559,7 +99592,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getStaffingCoverage
+    contract: workforce
+    purpose: Gaps, by severity
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-886
@@ -98627,7 +99665,20 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listOpenShifts
+    contract: workforce
+    purpose: The shift marketplace
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: claimOpenShift
+    contract: workforce
+    purpose: Pick one up
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - listOpenShifts
+    - getStaffingCoverage
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-887
@@ -98726,7 +99777,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAttendance
+    contract: workforce
+    purpose: Live attendance
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Scheduled today
@@ -98853,7 +99909,23 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: recordAttendance
+    contract: workforce
+    purpose: Check in or out
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - listAttendance
+    - getLabourCost
+  - operationId: amendAttendance
+    contract: workforce
+    purpose: Correct an exception
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
+    - listAttendance
+    - getLabourCost
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-889
@@ -98943,7 +100015,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: validateWorkforceCompliance
+    contract: workforce
+    purpose: Where the rota breaks a rule
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Employee
@@ -99039,7 +100116,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getLabourCost
+    contract: workforce
+    purpose: Cost against budget
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Budget
@@ -99124,7 +100206,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getStaffingCoverage
+    contract: workforce
+    purpose: What the planner is optimising
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-892
@@ -99453,7 +100540,7 @@ screens:
     purpose: Build a combination
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id035
+    invalidates: *id057
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-895
@@ -99728,7 +100815,7 @@ screens:
     purpose: Assign at the counter
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id036
+    invalidates: *id058
   - operationId: suggestResources
     contract: resources
     purpose: What is free and suitable
@@ -99815,7 +100902,7 @@ screens:
     purpose: Allocate against the requirement
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id036
+    invalidates: *id058
   - operationId: getResourceAllocationPolicy
     contract: resources
     purpose: The strategy in force
@@ -99898,7 +100985,7 @@ screens:
     purpose: Change the strategy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id040
+    invalidates: &id062
     - getResourceAllocationPolicy
   wireframe:
     status: notStarted
@@ -100338,7 +101425,7 @@ screens:
     purpose: Pooled, serialised or hybrid
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id037
+    invalidates: *id059
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-904
@@ -100764,7 +101851,7 @@ screens:
     purpose: Keep it longer
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id038
+    invalidates: *id060
   - operationId: returnRental
     contract: rental
     purpose: Take it back and settle
@@ -100883,7 +101970,7 @@ screens:
     purpose: Grace period and late fees
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id039
+    invalidates: *id061
   entryState:
     preloaded:
     - Required
@@ -101001,7 +102088,7 @@ screens:
     purpose: Take it out of service
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id033
+    invalidates: *id052
   - operationId: createWorkOrder
     contract: maintenance
     purpose: Raise the repair
@@ -101280,7 +102367,7 @@ screens:
     purpose: Retire or archive it
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id030
+    invalidates: *id049
   - operationId: getAssetHistory
     contract: maintenance
     purpose: Its life so far
@@ -101455,7 +102542,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getEventResourcePlan
+    contract: catalogue
+    purpose: Event resource plans
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Upcoming events
@@ -101564,7 +102656,13 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: setEventResourcePlan
+    contract: catalogue
+    purpose: What an event needs
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id043
   entryState:
     preloaded:
     - Event
@@ -101669,7 +102767,17 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listSpaces
+    contract: catalogue
+    purpose: Venue and space allocation
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: bookResource
+    contract: resources
+    purpose: Book the space
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Capacity
@@ -101744,7 +102852,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: allocateResources
+    contract: resources
+    purpose: Equipment allocation
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-916
@@ -101863,7 +102976,13 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: createRotaAssignment
+    contract: workforce
+    purpose: Staff allocation
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates: *id055
   entryState:
     preloaded:
     - Name
@@ -101979,7 +103098,17 @@ screens:
       data* and sends somebody to support with the wrong question.
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis: []
+  apis:
+  - operationId: listResourcePackages
+    contract: resources
+    purpose: Template library
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: createResourcePackage
+    contract: resources
+    purpose: Save a template
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-918
@@ -102188,7 +103317,12 @@ screens:
       filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getEventResourcePlan
+    contract: catalogue
+    purpose: Cost estimate
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Budget
@@ -102262,7 +103396,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getResourceCalendar
+    contract: resources
+    purpose: Conflicts across events
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-921
@@ -102335,7 +103474,17 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getEventResourcePlan
+    contract: catalogue
+    purpose: Readiness gate
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: createApprovalRequest
+    contract: approvals
+    purpose: Send for approval
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-922
@@ -103866,7 +105015,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: raiseMyCase
+    contract: marketing-crm
+    purpose: Raise a request
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-938
@@ -104017,7 +105171,17 @@ screens:
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listApprovalRequests
+    contract: approvals
+    purpose: Approvals on mobile
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
+  - operationId: decideApprovalRequest
+    contract: approvals
+    purpose: Decide
+    trigger: onAction
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-940
@@ -104207,7 +105371,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getGameplaySyncStatus
+    contract: games
+    purpose: Offline sync state
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-942
@@ -104646,7 +105815,12 @@ screens:
       active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listDemandBookingCurve
+    contract: catalogue
+    purpose: Forecast accuracy
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-946
@@ -104856,7 +106030,7 @@ screens:
     purpose: Change it
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id040
+    invalidates: *id062
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-948
@@ -105195,7 +106369,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listAnalyticsPipelines
+    contract: reporting
+    purpose: Integration and data health
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - System
@@ -105333,7 +106512,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: getResourceUtilisation
+    contract: resources
+    purpose: Executive resource view
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-952
@@ -105625,7 +106809,7 @@ screens:
     contract: seating
     purpose: Section type, set at the section level
     trigger: onAction
-    invalidates: &id041
+    invalidates: &id063
     - getSeatMap
   wireframe:
     status: notStarted
@@ -105784,7 +106968,7 @@ screens:
     contract: seating
     purpose: Standing areas
     trigger: onAction
-    invalidates: *id041
+    invalidates: *id063
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-957
@@ -105862,7 +107046,7 @@ screens:
     contract: seating
     purpose: Suites and boxes
     trigger: onAction
-    invalidates: *id041
+    invalidates: *id063
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-958
@@ -105939,7 +107123,7 @@ screens:
     contract: seating
     purpose: Stage and focal point
     trigger: onAction
-    invalidates: *id041
+    invalidates: *id063
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-959
@@ -106016,7 +107200,7 @@ screens:
     contract: seating
     purpose: Entrances, exits and aisles
     trigger: onAction
-    invalidates: *id041
+    invalidates: *id063
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-960
@@ -106093,7 +107277,7 @@ screens:
     contract: seating
     purpose: Amenities and obstructions
     trigger: onAction
-    invalidates: *id041
+    invalidates: *id063
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-961
@@ -106178,7 +107362,7 @@ screens:
     contract: seating
     purpose: Save this map as a template
     trigger: onAction
-    invalidates: &id043
+    invalidates: &id065
     - listSeatMapTemplates
   - operationId: validateSeatMap
     contract: seating
@@ -106188,7 +107372,7 @@ screens:
     contract: seating
     purpose: Publish
     trigger: onAction
-    invalidates: &id042
+    invalidates: &id064
     - listSeatMaps
     - getSeatMap
   wireframe:
@@ -107048,7 +108232,7 @@ screens:
     contract: seating
     purpose: Publish
     trigger: onAction
-    invalidates: *id042
+    invalidates: *id064
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-972
@@ -107240,7 +108424,7 @@ screens:
     contract: seating
     purpose: Add to the library
     trigger: onAction
-    invalidates: *id043
+    invalidates: *id065
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-974
@@ -107643,7 +108827,7 @@ screens:
     purpose: Block seats temporarily
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id044
+    invalidates: &id066
     - listSeatHoldPools
     - getSeatInventory
     - getSeatAvailability
@@ -107729,7 +108913,7 @@ screens:
     purpose: Scheduled release
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id046
+    invalidates: &id068
     - listSeatHoldPools
     - getSeatInventory
     - getSeatAvailability
@@ -107906,7 +109090,7 @@ screens:
     contract: seating
     purpose: Publish or roll back
     trigger: onAction
-    invalidates: *id042
+    invalidates: *id064
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-982
@@ -109785,7 +110969,7 @@ screens:
     purpose: Define one
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id045
+    invalidates: &id067
     - listSeatHoldTypes
   wireframe:
     status: notStarted
@@ -109870,7 +111054,7 @@ screens:
     purpose: Create a pool
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id044
+    invalidates: *id066
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1005
@@ -109947,7 +111131,7 @@ screens:
     purpose: Which rule applies where
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id045
+    invalidates: *id067
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1006
@@ -110025,7 +111209,7 @@ screens:
     purpose: Expiration rules
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id045
+    invalidates: *id067
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1007
@@ -110103,7 +111287,7 @@ screens:
     purpose: Automatic release
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id046
+    invalidates: *id068
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1008
@@ -110181,7 +111365,7 @@ screens:
     purpose: Release, convert or reassign
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id046
+    invalidates: *id068
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1009
@@ -110346,7 +111530,7 @@ screens:
     purpose: Priority between kinds
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id045
+    invalidates: *id067
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1011
@@ -110617,7 +111801,7 @@ screens:
     purpose: Kill a seat, with a reason
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id047
+    invalidates: &id069
     - getSeatRules
     - getSeatInventory
   wireframe:
@@ -110698,7 +111882,7 @@ screens:
     purpose: Buffer seats around a sale
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id047
+    invalidates: *id069
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1015
@@ -110776,7 +111960,7 @@ screens:
     purpose: Companion pairing
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id047
+    invalidates: *id069
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1016
@@ -110854,7 +112038,7 @@ screens:
     purpose: Wheelchair companion rules
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id047
+    invalidates: *id069
   - operationId: getAccessibleSeating
     contract: seating
     purpose: The spaces being paired
@@ -110942,7 +112126,7 @@ screens:
     purpose: Define it
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id048
+    invalidates: &id070
     - getAccessibleSeating
     - validateSeatCompliance
   wireframe:
@@ -111023,7 +112207,7 @@ screens:
     purpose: Routes to each space
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id048
+    invalidates: *id070
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1019
@@ -111102,7 +112286,7 @@ screens:
     purpose: Who may buy them
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id048
+    invalidates: *id070
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1020
@@ -111180,7 +112364,7 @@ screens:
     purpose: Flexible spacing and density
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id047
+    invalidates: *id069
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1021
@@ -111608,7 +112792,7 @@ screens:
     purpose: Find the best block
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id049
+    invalidates: &id071
     - listGroupSeatRequests
     - getSeatInventory
   wireframe:
@@ -111688,7 +112872,7 @@ screens:
     purpose: Allocate in bulk
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id049
+    invalidates: *id071
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1027
@@ -111928,7 +113112,7 @@ screens:
     purpose: Release on cancellation
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id046
+    invalidates: *id068
   - operationId: listGroupSeatRequests
     contract: seating
     purpose: The booking being changed
@@ -112283,7 +113467,7 @@ screens:
     purpose: What "best seat" means here
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id050
+    invalidates: &id072
     - getSeatRecommendationRules
   wireframe:
     status: notStarted
@@ -112362,7 +113546,7 @@ screens:
     purpose: Best value weighting
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id050
+    invalidates: *id072
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1035
@@ -112440,7 +113624,7 @@ screens:
     purpose: Closest to stage
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id050
+    invalidates: *id072
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1036
@@ -112518,7 +113702,7 @@ screens:
     purpose: Family together
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id050
+    invalidates: *id072
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1037
@@ -112597,7 +113781,7 @@ screens:
     purpose: Accessible recommendations
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id050
+    invalidates: *id072
   - operationId: getAccessibleSeating
     contract: seating
     purpose: The accessible inventory
@@ -112838,7 +114022,7 @@ screens:
     purpose: Scoring and governance
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id050
+    invalidates: *id072
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1041
@@ -116604,7 +117788,7 @@ screens:
     purpose: Define a type
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id051
+    invalidates: &id073
     - listWalletTypes
   wireframe:
     status: notStarted
@@ -116724,13 +117908,13 @@ screens:
     purpose: Provisioning rules for a type
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id051
+    invalidates: *id073
   - operationId: updateWalletType
     contract: wallet
     purpose: Change them
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id052
+    invalidates: &id074
     - listWalletTypes
   wireframe:
     status: notStarted
@@ -116848,7 +118032,7 @@ screens:
     purpose: Ownership and association rules
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id052
+    invalidates: *id074
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1086
@@ -116957,7 +118141,7 @@ screens:
     purpose: Currency and monetary limits
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id052
+    invalidates: *id074
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1087
@@ -117130,14 +118314,14 @@ screens:
     purpose: Define a credit type, without a release
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id054
+    invalidates: &id076
     - listCreditTypes
   - operationId: updateCreditType
     contract: wallet
     purpose: Change one
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id055
+    invalidates: &id077
     - listCreditTypes
   wireframe:
     status: notStarted
@@ -117210,7 +118394,7 @@ screens:
     purpose: Which features this wallet type has
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id052
+    invalidates: *id074
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1089
@@ -117305,7 +118489,7 @@ screens:
     purpose: Lifecycle states and transitions
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id052
+    invalidates: *id074
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1090
@@ -117418,13 +118602,13 @@ screens:
     purpose: Numbering and identity
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id052
+    invalidates: *id074
   - operationId: linkWalletCredential
     contract: wallet
     purpose: Digital credentials
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id064
+    invalidates: &id086
     - getWallet
   wireframe:
     status: notStarted
@@ -117567,7 +118751,7 @@ screens:
     purpose: Validate and publish
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id057
+    invalidates: &id079
     - listWalletTypes
     - listCreditTypes
   wireframe:
@@ -117874,7 +119058,7 @@ screens:
     purpose: Which methods may fund a wallet
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id053
+    invalidates: &id075
     - getWalletFundingRules
   wireframe:
     status: notStarted
@@ -118005,7 +119189,7 @@ screens:
     purpose: Amounts, presets and bonus rules
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id053
+    invalidates: *id075
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1095
@@ -118137,7 +119321,7 @@ screens:
     purpose: Channel and funding-source mapping
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id053
+    invalidates: *id075
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1096
@@ -118255,7 +119439,7 @@ screens:
     purpose: Auto-reload on a threshold
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id053
+    invalidates: *id075
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1097
@@ -118382,7 +119566,7 @@ screens:
     purpose: Recurring funding on a date
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id053
+    invalidates: *id075
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1098
@@ -118517,7 +119701,7 @@ screens:
     purpose: Approval above a threshold
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id053
+    invalidates: *id075
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1099
@@ -118641,7 +119825,7 @@ screens:
     purpose: Reverse or correct a top-up
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id065
+    invalidates: &id087
     - listWalletTransactions
     - listCreditLots
   wireframe:
@@ -118796,7 +119980,7 @@ screens:
     purpose: Limits and velocity controls
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id053
+    invalidates: *id075
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1101
@@ -119228,13 +120412,13 @@ screens:
     purpose: Define a credit type
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id054
+    invalidates: *id076
   - operationId: updateCreditType
     contract: wallet
     purpose: Change one
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id055
+    invalidates: *id077
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1104
@@ -119338,7 +120522,7 @@ screens:
     purpose: How this credit is issued
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id055
+    invalidates: *id077
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1105
@@ -119544,7 +120728,7 @@ screens:
     purpose: Which credit is spent first
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id056
+    invalidates: &id078
     - getCreditConsumptionPolicy
   - operationId: getCreditConsumptionPolicy
     contract: wallet
@@ -119647,7 +120831,7 @@ screens:
     purpose: Expiry and validity
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id055
+    invalidates: *id077
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1108
@@ -119852,7 +121036,7 @@ screens:
     purpose: Split tender across credit types
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id056
+    invalidates: *id078
   - operationId: simulateCreditConsumption
     contract: wallet
     purpose: What a purchase would use
@@ -119954,7 +121138,7 @@ screens:
     purpose: Expire, extend or forfeit
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id062
+    invalidates: &id084
     - listCreditLots
     - getWalletLiability
   entryState:
@@ -120051,7 +121235,7 @@ screens:
     purpose: Validate and publish the rules
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id057
+    invalidates: *id079
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1112
@@ -120336,7 +121520,7 @@ screens:
     purpose: Set one up
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id059
+    invalidates: &id081
     - listSharedWallets
   wireframe:
     status: notStarted
@@ -120435,7 +121619,7 @@ screens:
     purpose: Household members and roles
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id058
+    invalidates: &id080
     - listSharedWallets
   wireframe:
     status: notStarted
@@ -120541,13 +121725,13 @@ screens:
     purpose: Parent and child distribution
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id058
+    invalidates: *id080
   - operationId: transferWalletBalance
     contract: retail
     purpose: Move value between them
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id060
+    invalidates: &id082
     - getWallet
     - listWalletTransactions
   wireframe:
@@ -120649,7 +121833,7 @@ screens:
     purpose: Allowance and budget
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id058
+    invalidates: *id080
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1117
@@ -120781,7 +121965,7 @@ screens:
     purpose: Spending controls per member
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id058
+    invalidates: *id080
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1118
@@ -120877,7 +122061,7 @@ screens:
     purpose: Corporate hierarchy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id059
+    invalidates: *id081
   - operationId: listSharedWallets
     contract: wallet
     purpose: Existing corporate wallets
@@ -120993,7 +122177,7 @@ screens:
     purpose: Corporate budget and policy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id058
+    invalidates: *id080
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1120
@@ -121090,7 +122274,7 @@ screens:
     purpose: Reallocate balance
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id060
+    invalidates: *id082
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1121
@@ -121839,7 +123023,7 @@ screens:
     purpose: Define one
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id061
+    invalidates: &id083
     - listVoucherTypes
   wireframe:
     status: notStarted
@@ -121999,7 +123183,7 @@ screens:
     purpose: Eligibility and redemption rules
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id061
+    invalidates: *id083
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1127
@@ -122361,7 +123545,7 @@ screens:
     purpose: Gift card and voucher expiry
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id062
+    invalidates: *id084
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1130
@@ -122554,7 +123738,7 @@ screens:
     purpose: Validate and publish
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id057
+    invalidates: *id079
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1132
@@ -122724,7 +123908,7 @@ screens:
     purpose: Where wallets are accepted
     trigger: onLoad
     provenance: board reading, 19 September 2026
-    invalidates: &id063
+    invalidates: &id085
     - getWalletFundingRules
   entryState:
     preloaded:
@@ -122886,7 +124070,7 @@ screens:
     purpose: Channel configuration
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id063
+    invalidates: *id085
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1134
@@ -122996,7 +124180,7 @@ screens:
     purpose: Payment and redemption policy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id063
+    invalidates: *id085
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1135
@@ -123141,7 +124325,7 @@ screens:
     purpose: Credential kinds accepted
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id063
+    invalidates: *id085
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1136
@@ -123278,7 +124462,7 @@ screens:
     purpose: Bind a wearable to a wallet
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id064
+    invalidates: *id086
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1137
@@ -123377,7 +124561,7 @@ screens:
     purpose: NFC, RFID and QR rules
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id063
+    invalidates: *id085
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1138
@@ -123492,7 +124676,7 @@ screens:
     purpose: Authentication and PIN policy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id063
+    invalidates: *id085
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1139
@@ -123616,7 +124800,7 @@ screens:
     purpose: Offline and degraded mode
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id063
+    invalidates: *id085
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1140
@@ -123726,7 +124910,7 @@ screens:
     purpose: Map acceptance points
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id063
+    invalidates: *id085
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1141
@@ -124611,7 +125795,7 @@ screens:
     purpose: Reverse a transaction
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id065
+    invalidates: *id087
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1148
@@ -124721,7 +125905,7 @@ screens:
     purpose: Administrative adjustment
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id067
+    invalidates: &id089
     - getWallet
     - listWalletTransactions
     - listCreditLots
@@ -124868,7 +126052,7 @@ screens:
     purpose: Freeze, block or restrict
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id066
+    invalidates: &id088
     - getWallet
   wireframe:
     status: notStarted
@@ -125079,7 +126263,12 @@ screens:
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
-  apis: []
+  apis:
+  - operationId: listWalletDisputes
+    contract: wallet
+    purpose: Operations audit trail
+    trigger: onLoad
+    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1152
@@ -125716,7 +126905,7 @@ screens:
     purpose: Credential and device security
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id064
+    invalidates: *id086
   - operationId: listWalletDisputes
     contract: wallet
     purpose: Where it went wrong
@@ -125957,7 +127146,7 @@ screens:
     purpose: Freeze on a hit
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id066
+    invalidates: *id088
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1159
@@ -126399,7 +127588,7 @@ screens:
     purpose: Publish the rules
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id057
+    invalidates: *id079
   entryState:
     preloaded:
     - Risk policies
@@ -126738,7 +127927,7 @@ screens:
     purpose: Credit types to ledger accounts
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id068
+    invalidates: &id090
     - getWalletLiability
   wireframe:
     status: notStarted
@@ -127087,7 +128276,7 @@ screens:
     purpose: Correct one
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id067
+    invalidates: *id089
   entryState:
     preloaded:
     - Exception ID
@@ -127315,7 +128504,7 @@ screens:
     purpose: Breakage recognition policy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id068
+    invalidates: *id090
   entryState:
     preloaded:
     - Original value → AED 500
@@ -127938,7 +129127,7 @@ screens:
     purpose: Configuration state
     trigger: onLoad
     provenance: board reading, 19 September 2026
-    invalidates: *id057
+    invalidates: *id079
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1173
@@ -128223,7 +129412,7 @@ screens:
     purpose: Integration profile
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id063
+    invalidates: *id085
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1175
@@ -128852,7 +130041,7 @@ screens:
     purpose: Governance and version control
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id057
+    invalidates: *id079
   entryState:
     preloaded:
     - 'Cash Priority: 3 → 5'
@@ -128941,7 +130130,7 @@ screens:
     purpose: Approval and publication
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id057
+    invalidates: *id079
   - operationId: createApprovalRequest
     contract: approvals
     purpose: Send for approval

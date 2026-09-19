@@ -151,6 +151,18 @@ components:
         - TURNSTILE_MODE_SET          # entry, re-entry, crossover, exit, free, closed
         - TICKET_LOOKUP               # read-only validity check, no admission
 
+        # --- Accreditation ----------------------------------------------------
+        - ACCREDITATION_VIEW
+        - ACCREDITATION_APPLY         # submit an application or a document
+        - ACCREDITATION_APPROVE       # decide an application, verify a document
+        - ACCREDITATION_ISSUE         # produce, encode and replace a credential
+        - ACCREDITATION_MANAGE        # amend a holder, assign access, suspend, revoke
+        - ACCREDITATION_CONFIGURE     # programmes, requirements, access profiles, badges
+        # **Six, because accreditation separates duties more sharply than anything else in
+        # the platform.** The person who prints a badge must not be the person who decided
+        # what it opens, and neither should be the person who wrote the access profile.
+        # 3.3.31 asks for segregation of duties; this is where it is most load-bearing.
+
         # --- Reporting --------------------------------------------------------
         - REPORT_VIEW_OWN             # self-scoped. Not resolved against the tree
         - REPORT_VIEW_WORKSTATION

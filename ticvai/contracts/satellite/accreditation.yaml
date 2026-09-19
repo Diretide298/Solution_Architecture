@@ -1,0 +1,1924 @@
+openapi: 3.1.0
+info:
+  title: TICVAI — Accreditation
+  version: 1.0.0
+  x-ticvai-screen-count: 79
+  x-ticvai-tier: satellite
+  x-ticvai-module: 3 — Admission and Access
+  x-ticvai-platforms:
+  - P11 Accreditation Portal
+  - P08 Venue Management
+  description: '**Accreditation is the opposite of ticketing, and that is why it cannot live in it.**
+
+    A ticket is bought by anyone, is valid for one occasion, and grants entry. **An accreditation is
+    applied for, vetted, and granted to a named person for a period, and what it grants is a set of
+    places and times that differs for every holder.** A journalist, a contractor, a performer''s
+    driver and a sponsor''s guest all hold one and none of them may go where the others may.
+
+    ## Why it is its own context
+
+    **The application is a workflow, not a purchase.** It is submitted with documents, checked
+    against requirements that differ by applicant type, reviewed by a person, and approved or
+    rejected with a reason and a right of resubmission. `orders` has no shape for any of that.
+
+    **The credential is not the accreditation.** A badge is reprinted, reissued, lost and encoded
+    onto NFC; the accreditation behind it survives all of that. Conflating them means a lost badge
+    is a lost accreditation, and a re-vetting every time somebody drops one.
+
+    **Access is per holder, not per product.** `access` grants entry on an entitlement somebody
+    bought; here the access profile is assembled from the person''s role, their organisation, the
+    zones they need, the dates they hold and any temporary exception — and it changes without any
+    transaction.
+
+    ## What it deliberately does not own
+
+    **Not the scan.** `access.validateEntry` admits people at gates and turnstiles. This decides
+    what an accreditation permits; that enforces it in the moment.
+
+    **Not the approval machinery.** `approvals` owns workflows, matrices, delegation, SLA and the
+    tamper-evident decision record. Accreditation review routes through it rather than growing a
+    second one.
+
+    **Not the identity.** `identity` owns principals and sessions. An accreditation holder is a
+    subject who may never sign in to anything.
+
+    '
+servers:
+- url: https://api.ticvai.com/v1
+paths:
+  /accreditation-programmes:
+    get:
+      operationId: listAccreditationProgrammes
+      summary: Programmes, their categories and their applicant types
+      description: 'Boards 1.5, 1.6 and 1.7. **A programme is the thing an application is made
+        against** — a season, a tournament, a venue''s standing contractor scheme — and it carries the
+        categories within it and the applicant types eligible for each.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Programmes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccreditationProgramme'
+    post:
+      operationId: createAccreditationProgramme
+      summary: Define a programme, its categories and its window
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccreditationProgramme'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationProgramme'
+  /accreditation-requirements:
+    put:
+      operationId: setAccreditationRequirements
+      summary: What each applicant type must supply and pass
+      description: 'Board 1.8 — the requirements matrix. **Different applicant types are vetted
+        differently, and pretending otherwise is why accreditation systems collapse into one enormous
+        form.** A contractor needs insurance and a safety induction; a journalist needs a press card;
+        a performer''s child needs a guardian.
+
+        **A requirement states whether it blocks submission or blocks approval**, and those are not
+        the same. A missing photograph should not stop somebody applying at midnight; a missing
+        background check must stop them being approved.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccreditationRequirements'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationRequirements'
+  /accreditation-applications:
+    get:
+      operationId: listAccreditationApplications
+      summary: Applications, by state and programme
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: programmeId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        schema:
+          type: string
+      - name: applicantType
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Applications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccreditationApplication'
+    post:
+      operationId: createAccreditationApplication
+      summary: Apply, or apply on behalf of somebody
+      description: 'Board 1.3. **Most accreditations are applied for by an organisation on behalf of
+        its people**, not by the people themselves, and a model that assumes self-service leaves a
+        production company entering sixty forms by hand.
+
+        Guest-callable so an applicant can complete their own, and staff-callable so a coordinator can
+        submit a roster.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_APPLY
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccreditationApplication'
+      responses:
+        '201':
+          description: Submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationApplication'
+  /accreditation-applications/{applicationId}/decide:
+    parameters:
+    - name: applicationId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: decideAccreditationApplication
+      summary: Approve, reject, return for more, or escalate
+      description: 'Boards 3.2 and 3.6. **Rejection must carry a reason and a route back.** An
+        application refused with no explanation produces a phone call at best and a person turning up
+        at a gate at worst, and *"resubmit"* without saying what to change is the same thing slower.
+
+        Routes through `approvals` where the programme configures a workflow — the matrix, delegation,
+        SLA and the tamper-evident record all already exist there.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_APPROVE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - decision
+              properties:
+                decision:
+                  type: string
+                  enum:
+                  - approve
+                  - reject
+                  - returnForInformation
+                  - escalate
+                reason:
+                  type: string
+                  nullable: true
+                missingRequirements:
+                  type: array
+                  items:
+                    type: string
+                accessProfileId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                validFrom:
+                  type: string
+                  format: date
+                  nullable: true
+                validTo:
+                  type: string
+                  format: date
+                  nullable: true
+      responses:
+        '200':
+          description: Decided
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationApplication'
+  /accreditation-holders:
+    get:
+      operationId: listAccreditationHolders
+      summary: Everybody accredited, and what state they are in
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: programmeId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: organisationId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        schema:
+          type: string
+      - name: expiringWithinDays
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Holders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccreditationHolder'
+  /accreditation-holders/{holderId}:
+    parameters:
+    - name: holderId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getAccreditationHolder
+      summary: One holder — identity, documents, access and history
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: The holder
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationHolder'
+    put:
+      operationId: updateAccreditationHolder
+      summary: Amend identity, affiliation or contact details
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccreditationHolder'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationHolder'
+  /accreditation-documents:
+    post:
+      operationId: submitAccreditationDocument
+      summary: Supply a document against a requirement
+      description: 'Boards 2.5 and 2.6. **A document is submitted against a named requirement**, not
+        into a folder. Otherwise a verification queue is a pile of files somebody has to open to find
+        out what each one is for.
+
+        Carries its own expiry, because an insurance certificate valid until March accredits somebody
+        until March whatever the programme says.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_APPLY
+      x-ticvai-guest-callable: true
+      x-ticvai-audience:
+      - staff
+      - guest
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccreditationDocument'
+      responses:
+        '201':
+          description: Submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationDocument'
+  /accreditation-documents/{documentId}/verify:
+    parameters:
+    - name: documentId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: verifyAccreditationDocument
+      summary: Accept or refuse a submitted document
+      description: 'Board 2.6. **The verifier is recorded and so is the refusal reason**, because a
+        document refused for being unreadable and one refused for being the wrong document need
+        different things from the applicant.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_APPROVE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - outcome
+              properties:
+                outcome:
+                  type: string
+                  enum:
+                  - verified
+                  - rejected
+                  - illegible
+                  - wrongDocument
+                  - expired
+                reason:
+                  type: string
+                  nullable: true
+                expiresAt:
+                  type: string
+                  format: date
+                  nullable: true
+      responses:
+        '200':
+          description: Verified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationDocument'
+  /accreditation-identity-conflicts:
+    get:
+      operationId: listAccreditationIdentityConflicts
+      summary: People who may already be accredited under another record
+      description: 'Board 2.7. **The same person accredited twice with different access is the failure
+        this exists to prevent** — one badge revoked and the other still opening doors.
+
+        Uses `marketing-crm`''s identity resolution rules rather than a second matcher, because two
+        matchers means two answers to whether two people are the same.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Conflicts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccreditationIdentityConflict'
+  /accreditation-credentials:
+    get:
+      operationId: listAccreditationCredentials
+      summary: Badges and digital credentials issued
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: holderId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Credentials
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccreditationCredential'
+    post:
+      operationId: issueAccreditationCredential
+      summary: Produce a badge, a mobile credential, or both
+      description: 'Boards 4.2, 4.6 and 4.7. **The credential is not the accreditation.** Issuing a
+        second one because the first was lost does not re-vet anybody, and revoking one does not
+        revoke the access — `revokeAccreditation` does that.
+
+        Encoding for NFC or RFID happens here because the encoded identifier has to be recorded
+        against the credential, or a reader presents an id nothing can resolve.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_ISSUE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccreditationCredential'
+      responses:
+        '201':
+          description: Issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationCredential'
+  /accreditation-credentials/{credentialId}/replace:
+    parameters:
+    - name: credentialId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: replaceAccreditationCredential
+      summary: Reissue after loss, damage or a name change
+      description: 'Board 4.9. **The old credential is invalidated in the same act.** A replacement
+        issued without revoking the original is two live badges for one person, and the lost one is
+        the one somebody else is holding.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_ISSUE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - reason
+              properties:
+                reason:
+                  type: string
+                  enum:
+                  - lost
+                  - stolen
+                  - damaged
+                  - nameChange
+                  - photoChange
+                  - accessChange
+                chargeFee:
+                  type: boolean
+                  default: false
+      responses:
+        '201':
+          description: Replaced
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationCredential'
+  /badge-templates:
+    get:
+      operationId: listBadgeTemplates
+      summary: Badge designs, and what prints on each
+      description: 'Board 4.4. **A badge is a security artefact as much as a printed card.** Which
+        zones are shown, what colour the stripe is, whether the photograph is on it and what a
+        security officer is meant to check at a glance are all design decisions with operational
+        consequences.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Templates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BadgeTemplate'
+    put:
+      operationId: setBadgeTemplate
+      summary: Design a badge
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BadgeTemplate'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadgeTemplate'
+  /badge-print-jobs:
+    get:
+      operationId: listBadgePrintJobs
+      summary: The print queue, and what failed
+      description: 'Board 4.5. **Badge printing fails in the middle of a batch and the operator needs
+        to know which ones landed.** Reprinting the whole run wastes stock and produces duplicates
+        that then have to be destroyed and accounted for.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_ISSUE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Print jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BadgePrintJob'
+    post:
+      operationId: createBadgePrintJob
+      summary: Queue badges for printing
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_ISSUE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BadgePrintJob'
+      responses:
+        '201':
+          description: Queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadgePrintJob'
+  /accreditation-access-profiles:
+    get:
+      operationId: listAccessProfiles
+      summary: Named bundles of zones, dates and times
+      description: 'Boards 5.2 and 5.3. **A profile is how an estate stays governable.** Fifty
+        photographers each given zones by hand is fifty chances to give somebody the pitch; one
+        *Photographer* profile changed once is fifty people updated.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Access profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccessProfile'
+    put:
+      operationId: setAccessProfile
+      summary: Define which zones, on which dates, at which times
+      description: 'Boards 5.4, 5.5 and 5.6. **Zone, date and time are three dimensions and all three
+        are needed.** A contractor with access to the plant room has it during the build, not during
+        the show; a caterer has the concourse at half-time and not during a set.
+
+        **Changing a profile changes live access**, so the response carries how many holders it
+        affects and `previewAccessImpact` shows it before the change is made.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessProfile'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessProfile'
+  /accreditation-access-profiles/preview:
+    post:
+      operationId: previewAccessImpact
+      summary: Who this change would affect, and how
+      description: 'Board 5.10. **An access change is the one configuration change that can lock people
+        out of a live event**, and there is no undo fast enough once a shift has started.
+
+        Shows holders gaining access, holders losing it, and any who would be left with none.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessProfile'
+      responses:
+        '200':
+          description: The impact
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessImpact'
+  /accreditation-holders/{holderId}/access:
+    parameters:
+    - name: holderId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      operationId: setHolderAccess
+      summary: Assign profiles, and any exception on top
+      description: 'Boards 5.7 and 5.8. **The exception is where the real work happens.** A journalist
+        who needs the tunnel for one match, a contractor who needs the roof for one morning — granted
+        on top of the profile, time-boxed, with a reason and an approver.
+
+        **An exception with no end is a profile change nobody reviewed.**
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HolderAccess'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HolderAccess'
+  /accreditation-holders/{holderId}/status:
+    parameters:
+    - name: holderId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: setAccreditationStatus
+      summary: Suspend, reactivate, revoke or expire an accreditation
+      description: 'Boards 6.7, 6.8 and 6.9. **Suspension and revocation differ in whether the person
+        comes back**, and the difference has to be in the record — a suspended contractor returns after
+        a safety briefing, a revoked one does not return at all.
+
+        **Revocation invalidates every credential immediately and pushes to the gates**, because a
+        badge revoked in a database and live at a turnstile is worse than no system.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - status
+              - reason
+              properties:
+                status:
+                  type: string
+                  enum:
+                  - active
+                  - suspended
+                  - revoked
+                  - expired
+                  - archived
+                reason:
+                  type: string
+                effectiveFrom:
+                  type: string
+                  format: date-time
+                  nullable: true
+                reviewAt:
+                  type: string
+                  format: date
+                  nullable: true
+      responses:
+        '200':
+          description: Changed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationHolder'
+  /accreditation-validity:
+    put:
+      operationId: setAccreditationValidity
+      summary: Validity periods, renewal windows and expiry behaviour
+      description: 'Boards 6.3 and 6.10. **Expiry is the control that keeps an accreditation estate
+        honest**, and it is the one most often configured as *never*. A venue whose contractor badges
+        do not expire has a list of people with access that grows and never shrinks.
+
+        Renewal opens a window rather than extending silently — the point of an expiry is that somebody
+        looks again.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccreditationValidity'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationValidity'
+  /accreditation-notifications:
+    put:
+      operationId: setAccreditationNotificationRules
+      summary: Who is told what, and when
+      description: 'Boards 7.2 and 7.3. **Expiry notices go to the organisation as well as the
+        holder.** A freelance photographer will ignore an email; the agency that books them will not.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_CONFIGURE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccreditationNotificationRules'
+      responses:
+        '200':
+          description: Set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationNotificationRules'
+  /accreditation-imports:
+    post:
+      operationId: importAccreditationHolders
+      summary: Load a roster supplied by an organisation
+      description: 'Boards 7.7 and 7.8. **This is how large events actually happen.** A broadcaster
+        sends a spreadsheet of two hundred names a week before, and the alternative to importing it is
+        two hundred forms typed by somebody at midnight.
+
+        Validated whole and reported row by row, with the same identity-conflict check applied as for a
+        single application — a bulk import is exactly where the same person gets accredited twice.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_MANAGE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - assetId
+              - programmeId
+              properties:
+                assetId:
+                  type: string
+                  format: uuid
+                programmeId:
+                  type: string
+                  format: uuid
+                organisationId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                defaultAccessProfileId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                mode:
+                  type: string
+                  enum:
+                  - validateOnly
+                  - commit
+                  default: validateOnly
+      responses:
+        '200':
+          description: What it found, and what it wrote
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationImportResult'
+  /accreditation-access-activity:
+    get:
+      operationId: listAccreditationAccessActivity
+      summary: Where accredited people actually went
+      description: 'Board 8.4. **The difference between granted access and used access is the whole of
+        the annual review.** A profile granting eight zones where holders only ever enter two is a
+        profile that should grant two.
+
+        Reads scans from `access`; this is the accreditation-shaped view of them.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: holderId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: zoneId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: deniedOnly
+        in: query
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Activity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccreditationAccessEvent'
+  /accreditation-audit:
+    get:
+      operationId: listAccreditationAudit
+      summary: The immutable record of who granted what to whom
+      description: 'Board 8.7. **Accreditation is the part of a venue most likely to be examined after
+        an incident**, and the question is always the same: who gave this person access to that place,
+        when, and on whose authority.
+
+        Chained the same way `approvals` chains its decision records, and verified on read.
+
+        '
+      tags:
+      - accreditation
+      x-ticvai-permission: ACCREDITATION_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: holderId
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date-time
+      responses:
+        '200':
+          description: The audit trail
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccreditationAuditRecord'
+components:
+  schemas:
+    AccreditationProgramme:
+      type: object
+      x-ticvai-persistence: accreditation.programme
+      description: 'Boards 1.5 and 1.6. **The thing an application is made against.**'
+      required:
+      - code
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        venueIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        eventIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        categories:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+              name:
+                type: string
+              defaultAccessProfileId:
+                type: string
+                format: uuid
+                nullable: true
+              quota:
+                type: integer
+                nullable: true
+                description: '**A cap on how many may be accredited in this category.** Without one,
+                  a category is a promise nobody counted.
+
+                  '
+        applicantTypes:
+          type: array
+          items:
+            type: string
+        applicationsOpenAt:
+          type: string
+          format: date-time
+          nullable: true
+        applicationsCloseAt:
+          type: string
+          format: date-time
+          nullable: true
+        approvalWorkflowId:
+          type: string
+          format: uuid
+          nullable: true
+        status:
+          type: string
+          enum:
+          - draft
+          - open
+          - closed
+          - archived
+        scopePath:
+          type: string
+    AccreditationRequirements:
+      type: object
+      x-ticvai-persistence: accreditation.requirements
+      description: 'Board 1.8. **Blocking submission and blocking approval are not the same.**'
+      properties:
+        programmeId:
+          type: string
+          format: uuid
+        rows:
+          type: array
+          items:
+            type: object
+            properties:
+              applicantType:
+                type: string
+              categoryCode:
+                type: string
+                nullable: true
+              requirementCode:
+                type: string
+              label:
+                type: string
+              kind:
+                type: string
+                enum:
+                - document
+                - field
+                - photo
+                - backgroundCheck
+                - training
+                - declaration
+                - payment
+              blocksSubmission:
+                type: boolean
+                default: false
+              blocksApproval:
+                type: boolean
+                default: true
+              expiryMonths:
+                type: integer
+                nullable: true
+        scopePath:
+          type: string
+    AccreditationApplication:
+      type: object
+      x-ticvai-persistence: accreditation.application
+      description: 'Board 1.3. **Usually submitted by an organisation on behalf of its people.**'
+      required:
+      - programmeId
+      properties:
+        id:
+          type: string
+          format: uuid
+        reference:
+          type: string
+        programmeId:
+          type: string
+          format: uuid
+        categoryCode:
+          type: string
+          nullable: true
+        applicantType:
+          type: string
+        submittedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        organisationId:
+          type: string
+          format: uuid
+          nullable: true
+        subject:
+          type: object
+          additionalProperties: true
+          description: Name, date of birth, nationality, contact — shaped by the requirements matrix.
+        requirementStatus:
+          type: array
+          readOnly: true
+          items:
+            type: object
+            properties:
+              requirementCode:
+                type: string
+              satisfied:
+                type: boolean
+              documentId:
+                type: string
+                format: uuid
+                nullable: true
+        status:
+          type: string
+          enum:
+          - draft
+          - submitted
+          - underReview
+          - informationRequested
+          - approved
+          - rejected
+          - withdrawn
+          - expired
+        decisionReason:
+          type: string
+          nullable: true
+        approvalRequestId:
+          type: string
+          format: uuid
+          nullable: true
+        holderId:
+          type: string
+          format: uuid
+          nullable: true
+        submittedAt:
+          type: string
+          format: date-time
+          nullable: true
+        decidedAt:
+          type: string
+          format: date-time
+          nullable: true
+        scopePath:
+          type: string
+    AccreditationHolder:
+      type: object
+      x-ticvai-persistence: accreditation.holder
+      description: '**A subject who may never sign in to anything.** `identity` owns principals; this
+        owns accredited people.
+
+        '
+      required:
+      - id
+      - fullName
+      properties:
+        id:
+          type: string
+          format: uuid
+        subjectId:
+          type: string
+          format: uuid
+          nullable: true
+        accreditationNumber:
+          type: string
+        fullName:
+          type: string
+        photoAssetId:
+          type: string
+          format: uuid
+          nullable: true
+        dateOfBirth:
+          type: string
+          format: date
+          nullable: true
+        nationality:
+          type: string
+          nullable: true
+        identityDocumentVerified:
+          type: boolean
+          default: false
+        organisationId:
+          type: string
+          format: uuid
+          nullable: true
+        affiliationRole:
+          type: string
+          nullable: true
+        programmeId:
+          type: string
+          format: uuid
+        categoryCode:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum:
+          - active
+          - suspended
+          - revoked
+          - expired
+          - archived
+        validFrom:
+          type: string
+          format: date
+          nullable: true
+        validTo:
+          type: string
+          format: date
+          nullable: true
+        completenessPercent:
+          type: integer
+          readOnly: true
+        scopePath:
+          type: string
+    AccreditationDocument:
+      type: object
+      x-ticvai-persistence: accreditation.document
+      description: 'Board 2.5. **Submitted against a named requirement, not into a folder.**'
+      required:
+      - requirementCode
+      - assetId
+      properties:
+        id:
+          type: string
+          format: uuid
+        holderId:
+          type: string
+          format: uuid
+          nullable: true
+        applicationId:
+          type: string
+          format: uuid
+          nullable: true
+        requirementCode:
+          type: string
+        assetId:
+          type: string
+          format: uuid
+        submittedAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum:
+          - submitted
+          - verified
+          - rejected
+          - expired
+        verifiedBy:
+          type: string
+          format: uuid
+          nullable: true
+        verifiedAt:
+          type: string
+          format: date-time
+          nullable: true
+        rejectionReason:
+          type: string
+          nullable: true
+        expiresAt:
+          type: string
+          format: date
+          nullable: true
+          description: '**An insurance certificate valid until March accredits somebody until March**,
+            whatever the programme says.
+
+            '
+        scopePath:
+          type: string
+    AccreditationIdentityConflict:
+      type: object
+      description: 'Board 2.7. **One badge revoked and the other still opening doors.**'
+      properties:
+        id:
+          type: string
+          format: uuid
+        holderIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        score:
+          type: number
+        matchedOn:
+          type: array
+          items:
+            type: string
+        differingAccess:
+          type: boolean
+        status:
+          type: string
+          enum:
+          - pending
+          - merged
+          - rejected
+    AccreditationCredential:
+      type: object
+      x-ticvai-persistence: accreditation.credential
+      description: 'Board 4. **Not the accreditation** — reissuing one re-vets nobody.'
+      required:
+      - holderId
+      - kind
+      properties:
+        id:
+          type: string
+          format: uuid
+        holderId:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          enum:
+          - printedBadge
+          - mobileCredential
+          - nfcCard
+          - rfidCard
+          - wristband
+        serialNumber:
+          type: string
+          nullable: true
+        encodedIdentifier:
+          type: string
+          nullable: true
+        badgeTemplateId:
+          type: string
+          format: uuid
+          nullable: true
+        issuedAt:
+          type: string
+          format: date-time
+        issuedBy:
+          type: string
+          format: uuid
+        activatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          type: string
+          enum:
+          - pendingPrint
+          - issued
+          - active
+          - lost
+          - replaced
+          - revoked
+          - expired
+        replacesCredentialId:
+          type: string
+          format: uuid
+          nullable: true
+        replacementCount:
+          type: integer
+          default: 0
+        scopePath:
+          type: string
+    BadgeTemplate:
+      type: object
+      x-ticvai-persistence: accreditation.badge_template
+      description: 'Board 4.4. **A security artefact as much as a printed card.**'
+      required:
+      - code
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        size:
+          type: string
+          nullable: true
+        showPhoto:
+          type: boolean
+          default: true
+        showZones:
+          type: boolean
+          default: true
+        colourStripe:
+          type: string
+          nullable: true
+          description: '**What a security officer checks at a glance.** The stripe is the control that
+            works at ten metres in the dark.
+
+            '
+        showOrganisation:
+          type: boolean
+          default: true
+        showValidity:
+          type: boolean
+          default: true
+        backgroundAssetId:
+          type: string
+          format: uuid
+          nullable: true
+        securityFeatures:
+          type: array
+          items:
+            type: string
+        scopePath:
+          type: string
+    BadgePrintJob:
+      type: object
+      x-ticvai-persistence: accreditation.print_job
+      description: 'Board 4.5. **Printing fails mid-batch and the operator needs to know which landed.**'
+      properties:
+        id:
+          type: string
+          format: uuid
+        credentialIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        printerDeviceId:
+          type: string
+          format: uuid
+          nullable: true
+        queuedAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum:
+          - queued
+          - printing
+          - completed
+          - partiallyFailed
+          - failed
+        printed:
+          type: integer
+          readOnly: true
+        failed:
+          type: integer
+          readOnly: true
+        failures:
+          type: array
+          items:
+            type: object
+            properties:
+              credentialId:
+                type: string
+                format: uuid
+              reason:
+                type: string
+        scopePath:
+          type: string
+    AccessProfile:
+      type: object
+      x-ticvai-persistence: accreditation.access_profile
+      description: 'Board 5.2. **How an estate stays governable.**'
+      required:
+      - code
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        zoneIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        venueIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        operationalAreas:
+          type: array
+          items:
+            type: string
+        schedule:
+          type: array
+          description: '**Zone, date and time are three dimensions and all three are needed.**'
+          items:
+            type: object
+            properties:
+              zoneId:
+                type: string
+                format: uuid
+                nullable: true
+              daysOfWeek:
+                type: array
+                items:
+                  type: string
+              dateFrom:
+                type: string
+                format: date
+                nullable: true
+              dateTo:
+                type: string
+                format: date
+                nullable: true
+              from:
+                type: string
+                nullable: true
+              to:
+                type: string
+                nullable: true
+              eventPhase:
+                type: string
+                nullable: true
+                enum:
+                - build
+                - rehearsal
+                - doorsOpen
+                - liveShow
+                - breakdown
+        escortRequired:
+          type: boolean
+          default: false
+        holderCount:
+          type: integer
+          readOnly: true
+        scopePath:
+          type: string
+    AccessImpact:
+      type: object
+      description: 'Board 5.10. **There is no undo fast enough once a shift has started.**'
+      properties:
+        holdersAffected:
+          type: integer
+        gainingAccess:
+          type: integer
+        losingAccess:
+          type: integer
+        leftWithNoAccess:
+          type: array
+          items:
+            type: object
+            properties:
+              holderId:
+                type: string
+                format: uuid
+              name:
+                type: string
+        zonesAdded:
+          type: array
+          items:
+            type: string
+        zonesRemoved:
+          type: array
+          items:
+            type: string
+    HolderAccess:
+      type: object
+      x-ticvai-persistence: accreditation.holder_access
+      description: 'Boards 5.7 and 5.8. **An exception with no end is a profile change nobody
+        reviewed.**
+
+        '
+      properties:
+        holderId:
+          type: string
+          format: uuid
+        accessProfileIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        exceptions:
+          type: array
+          items:
+            type: object
+            properties:
+              zoneId:
+                type: string
+                format: uuid
+              grant:
+                type: boolean
+              from:
+                type: string
+                format: date-time
+              to:
+                type: string
+                format: date-time
+              reason:
+                type: string
+              approvedBy:
+                type: string
+                format: uuid
+                nullable: true
+        effectiveZones:
+          type: array
+          readOnly: true
+          items:
+            type: string
+            format: uuid
+        scopePath:
+          type: string
+    AccreditationValidity:
+      type: object
+      x-ticvai-persistence: accreditation.validity
+      description: 'Board 6.3. **The control most often configured as never.**'
+      properties:
+        programmeId:
+          type: string
+          format: uuid
+        validityKind:
+          type: string
+          enum:
+          - eventDuration
+          - fixedPeriod
+          - seasonal
+          - rolling
+          - permanent
+        validityMonths:
+          type: integer
+          nullable: true
+        renewalWindowDays:
+          type: integer
+          nullable: true
+        renewalRequiresReverification:
+          type: boolean
+          default: true
+          description: '**The point of an expiry is that somebody looks again.**'
+        onExpiry:
+          type: string
+          enum:
+          - revokeAccess
+          - gracePeriod
+          - autoRenew
+          default: revokeAccess
+        gracePeriodDays:
+          type: integer
+          nullable: true
+        scopePath:
+          type: string
+    AccreditationNotificationRules:
+      type: object
+      x-ticvai-persistence: accreditation.notification_rules
+      description: 'Board 7.2. **Notices go to the organisation as well as the holder.**'
+      properties:
+        programmeId:
+          type: string
+          format: uuid
+        rules:
+          type: array
+          items:
+            type: object
+            properties:
+              event:
+                type: string
+                enum:
+                - applicationReceived
+                - informationRequested
+                - approved
+                - rejected
+                - credentialReady
+                - expiringSoon
+                - expired
+                - suspended
+                - revoked
+              daysBefore:
+                type: integer
+                nullable: true
+              recipients:
+                type: array
+                items:
+                  type: string
+                  enum:
+                  - holder
+                  - organisation
+                  - sponsor
+                  - accreditationTeam
+              channels:
+                type: array
+                items:
+                  type: string
+              templateId:
+                type: string
+                format: uuid
+                nullable: true
+        scopePath:
+          type: string
+    AccreditationImportResult:
+      type: object
+      description: 'Board 7.8. **A bulk import is exactly where the same person gets accredited
+        twice.**
+
+        '
+      properties:
+        rowsRead:
+          type: integer
+        created:
+          type: integer
+        updated:
+          type: integer
+        rejected:
+          type: integer
+        identityConflicts:
+          type: integer
+        rows:
+          type: array
+          items:
+            type: object
+            properties:
+              row:
+                type: integer
+              name:
+                type: string
+              outcome:
+                type: string
+              detail:
+                type: string
+                nullable: true
+        committed:
+          type: boolean
+    AccreditationAccessEvent:
+      type: object
+      description: 'Board 8.4. **Granted access against used access is the whole of the annual
+        review.**
+
+        '
+      properties:
+        at:
+          type: string
+          format: date-time
+        holderId:
+          type: string
+          format: uuid
+        holderName:
+          type: string
+        zoneId:
+          type: string
+          format: uuid
+        zoneName:
+          type: string
+        credentialId:
+          type: string
+          format: uuid
+          nullable: true
+        outcome:
+          type: string
+          enum:
+          - admitted
+          - denied
+          - escorted
+        deniedReason:
+          type: string
+          nullable: true
+    AccreditationAuditRecord:
+      type: object
+      x-ticvai-persistence: accreditation.audit
+      description: 'Board 8.7. **Who gave this person access to that place, when, and on whose
+        authority.**
+
+        '
+      properties:
+        id:
+          type: string
+          format: uuid
+        at:
+          type: string
+          format: date-time
+        holderId:
+          type: string
+          format: uuid
+          nullable: true
+        action:
+          type: string
+        actorPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+        previousValue:
+          nullable: true
+        newValue:
+          nullable: true
+        reason:
+          type: string
+          nullable: true
+        approvalRequestId:
+          type: string
+          format: uuid
+          nullable: true
+        previousRecordHash:
+          type: string
+          nullable: true
+        recordHash:
+          type: string
+        integrity:
+          type: string
+          readOnly: true
+          enum:
+          - intact
+          - broken
+          - unverifiable
+        scopePath:
+          type: string
