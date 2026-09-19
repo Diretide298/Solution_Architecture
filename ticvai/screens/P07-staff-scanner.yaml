@@ -600,6 +600,14 @@ screens:
     offline: '**Same loop, different truth. Amber says so.** Was a separate screen until 18 August, and
       the screen already had an `offline` state — two places describing one condition is two places to
       disagree.'
+    admitted: '**Green, and gone in 1.5 seconds.** The absorbed SCN-004. Shows what was admitted and against
+      which right; at a gate doing 40 a minute this is the state the device is in most of the time.'
+    denied: Denied with the reason and the time of the previous scan. **The reason matters more than the
+      refusal** — a steward has to explain it to somebody standing in front of them. The absorbed SCN-005.
+    overrideRequired: A supervisor override, which requires a permission a steward may not hold, and records
+      who, why and when. The absorbed SCN-006.
+    blocked: Blacklisted or otherwise barred. **No override is offered on the device** — this is not a
+      judgement a steward makes at a lane. The absorbed SCN-010.
   apis:
   - operationId: listScans
     contract: access

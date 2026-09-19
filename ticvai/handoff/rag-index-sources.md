@@ -86,29 +86,19 @@ declared in `events/`, and `catalogue.productPublished` is no longer the only mo
 **None of them is AI-specific and that was the argument for writing them** — each is a fact the
 owning service should publish anyway, and other consumers want them. 29 events are now declared.
 
-## What is still missing: six of the eleven text fields
+## The six missing text fields, closed
 
-**The tables all exist. Six of them do not have the column this file says to embed.** Checked
-against `handoff/schema-reference.json`:
+**All eleven sources now have every column they name.** Six declared a field the schema did
+not have, which is not a silent failure but a missing source — an index built on a column
+that does not exist embeds a name and nothing else. Added to the contracts on 19 September:
 
-| Source | Declared | Present | Absent |
-|---|---|---|---|
-| `whitelabel.policy` | title, body | `body` | **`title`** |
-| `catalogue.entitlement_template` | name, description | `name` | **`description`** |
-| `retail.merchandise` | name, description | `name` | **`description`** |
-| `maintenance.inspection_template` | name, instructions | `name` | **`instructions`** |
-| `marketing.case` | subject, resolution | `subject` | **`resolution`** |
-| `assets.media_asset` | title, extractedText | `title` | **`extractedText`** |
+| Source | Column added | Why it is the one that mattered |
+|---|---|---|
+| `marketing.case` | **`resolution`** | The source whose whole value is how the last complaint was resolved could only embed a subject line |
+| `assets.media_asset` | **`extractedText`** | The generic path for anything a tenant uploads — a PDF nobody can search is a PDF nobody reads |
+| `maintenance.inspection_template` | **`instructions`** | The staff-assistant source that matters most; a technician isolating a chiller is asking a safety question |
+| `whitelabel.policy` | `title` | The heading a refund question retrieves against |
+| `catalogue.entitlement_template` | `description` | "Can I leave and come back" is answered here, and a name cannot answer it |
+| `retail.merchandise` | `description` | Guest-app search |
 
-**These are contract gaps, not errors in this file, and two of them are load-bearing.**
-`marketing.case` has no `resolution` column, so the source whose whole value is "how was the
-last one resolved" can only embed the subject line. `assets.media_asset` has no
-`extractedText`, so the generic path for anything a tenant uploads has nothing to index until
-extraction has somewhere to write.
-
-The other four are prose the contract describes but never gave a field:
-`maintenance.inspection_template.instructions` is the staff-assistant source that matters most
-and is the clearest of the four.
-
-**Indexing a column that does not exist is not a silent failure — it is a missing source.**
-Until the contracts declare these six, those sources index their name and nothing else.
+Each was prose the contract already described and never gave a field.

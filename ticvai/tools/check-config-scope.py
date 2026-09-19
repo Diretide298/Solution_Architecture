@@ -69,6 +69,17 @@ IS_CONFIG = re.compile(
     r"Config|Setting|Policy|Rule|Template|Toggle|Enablement|Mapping|Threshold|"
     r"AdmissionRules|WorkstationProfile|"
     r"Layout|Board|Denomination|Programme|Definition|Dashboard|"
+    # **Widened 19 September** for ten operations that carried a scope the rules could not
+    # see. A *Type* is the clearest case: a credit type, a wallet type, an attraction type
+    # and an event type are each a thing a venue defines once and everything else resolves
+    # against, which is the distinction this list exists to draw. A taxonomy and an
+    # attribute model are the same shape — a vocabulary, not a record written against it.
+    #
+    # `Kpi`, `PaymentMethod` and `RecommendationStrategy` are named rather than matched by
+    # a noun, because each is a single settled term and widening to `Method` or `Strategy`
+    # would sweep in acts that merely end that way.
+    r"Type|Taxonomy|AttributeModel|Kpi|PaymentMethod|RecommendationStrategy|"
+    r"RentalProduct|"
     # **Narrowed back on the same day it was widened.** `Campaign`, `Collection`, `Category` and
     # `Resource` caught content and records rather than configuration — a marketing campaign is a
     # thing a venue *makes*, not a setting it *holds*, and demanding a config scope on one is

@@ -1,10 +1,12 @@
 from_table,from_column,to_table,edge_kind,how,cross_schema,required
 access.access_point,venue_id,platform.org_unit,reference,declared,yes,yes
 access.blacklist,added_by_principal_id,identity.principal,reference,declared,yes,yes
+access.entitlement,order_id,orders.sales_order,reference,precedent,yes,
 access.entitlement,order_line_id,orders.order_line,reference,convention,yes,yes
 access.entitlement,product_id,catalogue.product,reference,convention,yes,yes
 access.entitlement,subject_id,pii.subject,reference,convention,yes,yes
 access.entitlement,supersedes_entitlement_id,access.entitlement,reference,convention,,yes
+access.entitlement,venue_id,platform.org_unit,reference,precedent,yes,
 access.entitlement,via appendEntitlementToMedia,orders.order_line,ambient,lineage,yes,
 access.entitlement,via appendEntitlementToMedia,orders.payment,ambient,lineage,yes,
 access.entitlement,via appendEntitlementToMedia,orders.sales_order,ambient,lineage,yes,
@@ -183,6 +185,7 @@ catalogue.published_bundle,venue_id,platform.org_unit,reference,declared,yes,yes
 catalogue.session_template,space_id,catalogue.space,reference,convention,,yes
 catalogue.space,parent_space_id,catalogue.space,reference,convention,,yes
 catalogue.space,resource_id,resources.resource,reference,convention,yes,yes
+catalogue.space,venue_id,platform.org_unit,reference,precedent,yes,
 catalogue.space,venue_map_zone_id,seating.zone,reference,convention,yes,yes
 catalogue.variant,product_id,catalogue.product,reference,declared,,yes
 catalogue.variant_dimension,product_id,catalogue.product,reference,declared,,yes
@@ -481,6 +484,7 @@ inventory.purchase_order,deliver_to_location_id,fnb.delivery_location,reference,
 inventory.purchase_order,raised_by_principal_id,identity.principal,reference,declared,yes,yes
 inventory.purchase_order,requisition_id,inventory.requisition,reference,declared,,yes
 inventory.purchase_order,supplier_id,inventory.supplier,reference,declared,,yes
+inventory.purchase_order,venue_id,platform.org_unit,reference,precedent,yes,
 inventory.purchase_order_line,item_id,inventory.item,reference,declared,,yes
 inventory.purchase_order_line,purchase_order_id,inventory.purchase_order,child,declared,,yes
 inventory.quotation,requisition_id,inventory.requisition,reference,declared,,yes
@@ -516,6 +520,7 @@ ledger.account_mapping,venue_id,platform.org_unit,reference,declared,yes,yes
 ledger.cost_center,venue_id,platform.org_unit,reference,declared,yes,yes
 ledger.deposit,booking_id,resources.booking,reference,declared,yes,yes
 ledger.deposit,liability_account_id,ledger.account,reference,convention,,yes
+ledger.deposit,order_id,orders.sales_order,reference,precedent,yes,
 ledger.deposit,subject_id,pii.subject,reference,declared,yes,yes
 ledger.deposit,via recordDeposit,ledger.posting,ambient,lineage,,
 ledger.deposit,via settleDeposit,ledger.posting,ambient,lineage,,
@@ -528,6 +533,7 @@ ledger.fx_rate,region_id,platform.org_unit,reference,declared,yes,yes
 ledger.fx_rate,set_by_principal_id,identity.principal,reference,convention,yes,yes
 ledger.inter_entity_obligation,entitlement_id,access.entitlement,reference,declared,yes,yes
 ledger.inter_entity_obligation,from_legal_entity_id,ledger.legal_entity,reference,convention,,yes
+ledger.inter_entity_obligation,order_id,orders.sales_order,reference,precedent,yes,
 ledger.inter_entity_obligation,to_legal_entity_id,ledger.legal_entity,reference,convention,,yes
 ledger.journal_entry,approved_by_principal_id,identity.principal,reference,declared,yes,yes
 ledger.journal_entry,fiscal_period_id,ledger.fiscal_period,reference,declared,,yes
@@ -547,6 +553,7 @@ ledger.journal_entry,via createRefund,platform.outbox,ambient,lineage,yes,
 ledger.journal_line,account_id,ledger.account,reference,convention,,yes
 ledger.journal_line,cost_center_id,ledger.cost_center,reference,convention,,yes
 ledger.journal_line,journal_entry_id,ledger.journal_entry,reference,declared,,yes
+ledger.journal_line,venue_id,platform.org_unit,reference,precedent,yes,
 ledger.posting,account_id,ledger.account,reference,declared,,yes
 ledger.posting,cost_center_id,ledger.cost_center,reference,declared,,yes
 ledger.posting,journal_entry_id,ledger.journal_entry,reference,declared,,yes
@@ -607,6 +614,7 @@ maintenance.work_order_attachment,work_order_id,maintenance.work_order,child,dec
 marketing.agent_availability,principal_id,identity.principal,reference,declared,yes,yes
 marketing.attribution_touch,campaign_id,marketing.campaign,reference,declared,,yes
 marketing.attribution_touch,journey_id,marketing.journey,reference,declared,,yes
+marketing.attribution_touch,order_id,orders.sales_order,reference,precedent,yes,
 marketing.attribution_touch,subject_id,pii.subject,reference,declared,yes,yes
 marketing.audience_activation,approval_request_id,approvals.request,reference,convention,yes,yes
 marketing.audience_activation,segment_id,marketing.segment,reference,convention,,yes
@@ -676,8 +684,10 @@ marketing.journey_entrant,subject_id,pii.subject,reference,convention,yes,yes
 marketing.kiosk_assist_session,cart_id,orders.cart,reference,declared,yes,yes
 marketing.kiosk_assist_session,device_id,platform.device,reference,declared,yes,yes
 marketing.kiosk_assist_session,staff_principal_id,identity.principal,reference,declared,yes,yes
+marketing.kiosk_assist_session,venue_id,platform.org_unit,reference,precedent,yes,
 marketing.lost_item,last_seen_point_id,venuemap.point,reference,convention,yes,yes
 marketing.lost_item,reported_by_subject_id,pii.subject,reference,convention,yes,yes
+marketing.lost_item,venue_id,platform.org_unit,reference,precedent,yes,
 marketing.loyalty_position,programme_id,marketing.loyalty_programme,reference,declared,,yes
 marketing.loyalty_position,subject_id,pii.subject,reference,declared,yes,yes
 marketing.loyalty_position,via redeemLoyaltyPoints,orders.stored_value_authorisation,ambient,lineage,yes,
@@ -705,6 +715,7 @@ marketing.subscription,guest_id,queue.waiting_guest,reference,convention,yes,yes
 marketing.suppression,suppressed_by_principal_id,identity.principal,reference,declared,yes,yes
 marketing.touch_point,campaign_id,marketing.campaign,reference,declared,,yes
 marketing.touch_point,journey_id,marketing.journey,reference,declared,,yes
+marketing.touch_point,order_id,orders.sales_order,reference,precedent,yes,
 marketing.touch_point,subject_id,pii.subject,reference,declared,yes,yes
 marketing.wishlist_item,performance_id,catalogue.performance,reference,declared,yes,
 marketing.wishlist_item,subject_id,pii.subject,reference,declared,yes,yes
@@ -735,6 +746,7 @@ orders.chargeback,payment_id,orders.payment,reference,declared,,yes
 orders.chargeback,provider_id,ai.provider,reference,declared,yes,yes
 orders.credit_override,authorised_by_principal_id,identity.principal,reference,convention,yes,yes
 orders.credit_override,b2b_credit_id,orders.b2b_credit,reference,declared,,yes
+orders.credit_override,order_id,orders.sales_order,reference,precedent,,
 orders.deposit_box,cashier_principal_id,identity.principal,reference,declared,yes,yes
 orders.deposit_box,closed_by_principal_id,identity.principal,reference,convention,yes,yes
 orders.deposit_box,shift_id,orders.shift,reference,declared,,yes
@@ -743,6 +755,7 @@ orders.deposit_box,workstation_id,platform.workstation,reference,declared,yes,ye
 orders.donation_line,campaign_id,catalogue.donation_campaign,reference,declared,yes,yes
 orders.donation_line,order_id,orders.sales_order,reference,declared,,yes
 orders.group_booking,leader_subject_id,pii.subject,reference,convention,yes,yes
+orders.group_booking,order_id,orders.sales_order,reference,precedent,,
 orders.invitation,cost_center_id,ledger.cost_center,reference,declared,yes,yes
 orders.invitation,issued_by_principal_id,identity.principal,reference,convention,yes,yes
 orders.invitation,offered_by_principal_id,identity.principal,reference,convention,yes,yes
@@ -780,6 +793,7 @@ orders.payment,order_id,orders.sales_order,reference,declared,,yes
 orders.payment,via capturePayment,platform.outbox,ambient,lineage,yes,
 orders.payment,via inquirePaymentStatus,platform.outbox,ambient,lineage,yes,
 orders.payment_link,issued_by_principal_id,identity.principal,reference,convention,yes,yes
+orders.payment_link,order_id,orders.sales_order,reference,precedent,,
 orders.payment_link,reservation_id,retail.reservation,reference,convention,yes,yes
 orders.payment_provider,via setPaymentProvider,orders.payment_routing,ambient,lineage,,
 orders.payment_routing,fallback_provider_id,ai.provider,reference,convention,yes,yes
@@ -868,6 +882,7 @@ platform.sale_board_page,sale_board_id,platform.sale_board,child,declared,,yes
 platform.sale_board_tile,page_id,platform.sale_board_page,reference,declared,,yes
 platform.tenant,home_region_id,platform.org_unit,reference,declared,,yes
 platform.venue_settings,org_unit_id,platform.org_unit,reference,declared,,yes
+platform.venue_settings,venue_id,platform.org_unit,reference,precedent,,
 platform.wallet_authorisation,authorisation_id,platform.wallet_authorisation,reference,convention,,yes
 platform.wallet_authorisation,fx_rate_id,ledger.fx_rate,reference,convention,yes,yes
 platform.wallet_authorisation,guest_link_id,platform.guest_link,reference,declared,,yes
@@ -901,6 +916,7 @@ promotions.coupon_code,redeemed_order_id,orders.sales_order,reference,declared,y
 promotions.product_relationship,from_product_id,rental.product,reference,convention,yes,yes
 promotions.product_relationship,to_product_id,rental.product,reference,convention,yes,yes
 promotions.promotion,venue_id,platform.org_unit,reference,declared,yes,yes
+promotions.recommendation_outcome,order_id,orders.sales_order,reference,precedent,yes,
 promotions.upsell_rule,suggested_bundle_id,promotions.bundle,reference,declared,,yes
 promotions.voucher,batch_id,promotions.voucher_batch,reference,declared,,yes
 promotions.voucher_batch,venue_id,platform.org_unit,reference,declared,yes,yes
@@ -922,6 +938,7 @@ rental.blackout,location_id,inventory.location,reference,convention,yes,yes
 rental.blackout,product_id,rental.product,reference,convention,,yes
 rental.booking,deposit_authorisation_id,games.authorisation,reference,convention,yes,yes
 rental.booking,location_id,inventory.location,reference,convention,yes,yes
+rental.booking,order_id,orders.sales_order,reference,precedent,yes,
 rental.booking,product_id,rental.product,reference,convention,,yes
 rental.booking,return_location_id,inventory.location,reference,convention,yes,yes
 rental.category,default_deposit_policy_id,rental.deposit_policy,reference,convention,,yes
@@ -943,11 +960,13 @@ rental.override,approval_request_id,approvals.request,reference,convention,yes,y
 rental.override,booking_id,rental.booking,reference,convention,,yes
 rental.pricing_profile,customer_segment_id,marketing.segment,reference,convention,yes,yes
 rental.pricing_profile,product_id,rental.product,reference,convention,,yes
+rental.pricing_profile,venue_id,platform.org_unit,reference,precedent,yes,
 rental.product,catalogue_product_id,rental.product,reference,convention,,yes
 rental.product,category_id,rental.category,reference,convention,,yes
 rental.product,image_asset_id,maintenance.asset,reference,convention,yes,yes
 rental.product,resource_type_id,resources.resource_type,reference,convention,yes,yes
 rental.product,tenant_id,control.tenant,reference,convention,yes,yes
+rental.product,venue_id,platform.org_unit,reference,precedent,yes,
 rental.settlement,booking_id,rental.booking,reference,convention,,yes
 reporting.alert,acknowledged_by_principal_id,identity.principal,reference,convention,yes,yes
 reporting.alert,rule_id,approvals.rule,reference,declared,yes,yes
@@ -957,6 +976,7 @@ reporting.dashboard,via createDashboard,reporting.dashboard_tile,ambient,lineage
 reporting.dashboard,via updateDashboard,reporting.dashboard_tile,ambient,lineage,,
 reporting.dashboard_tile,dashboard_id,reporting.dashboard,child,declared,,yes
 reporting.dashboard_tile,report_id,reporting.report_definition,reference,declared,,yes
+reporting.delivery,report_id,reporting.report_definition,reference,precedent,,
 reporting.delivery,subscription_id,marketing.subscription,reference,convention,yes,yes
 reporting.execution,report_id,reporting.report_definition,reference,declared,,yes
 reporting.execution,requested_by_principal_id,identity.principal,reference,declared,yes,yes
@@ -981,20 +1001,24 @@ reporting.schedule,report_id,reporting.report_definition,reference,declared,,yes
 reporting.schedule,via createReportSchedule,reporting.schedule_recipient,ambient,lineage,,
 reporting.schedule,via updateReportSchedule,reporting.schedule_recipient,ambient,lineage,,
 reporting.schedule_recipient,principal_id,identity.principal,reference,declared,yes,yes
+reporting.subscription,report_id,reporting.report_definition,reference,precedent,,
 reporting.subscription,runs_as_principal_id,identity.principal,reference,convention,yes,yes
 reporting.subscription,schedule_id,reporting.schedule,reference,convention,,yes
 resources.booking,deposit_authorisation_id,platform.wallet_authorisation,reference,convention,yes,yes
+resources.booking,order_id,orders.sales_order,reference,precedent,yes,
 resources.booking,recurrence_group_id,orders.group_booking,reference,convention,yes,yes
 resources.booking,resource_id,resources.resource,reference,declared,,yes
 resources.booking,subject_id,pii.subject,reference,declared,yes,yes
 resources.qualification,document_asset_id,maintenance.asset,reference,convention,yes,yes
 resources.resource,parent_resource_id,resources.resource,reference,convention,,yes
 resources.resource,principal_id,identity.principal,reference,declared,yes,yes
+resources.resource,venue_id,platform.org_unit,reference,precedent,yes,
 resources.resource_audit,resource_id,resources.resource,child,convention,,yes
 resources.resource_block,resource_id,resources.resource,child,convention,,yes
 resources.resource_category,parent_category_id,rental.category,reference,convention,yes,yes
 resources.resource_dependency,target_resource_id,resources.resource,child,convention,,yes
 resources.resource_dependency,target_resource_type_id,resources.resource_type,reference,convention,,yes
+resources.resource_dependency,venue_id,platform.org_unit,reference,precedent,yes,
 resources.resource_relation,resource_id,resources.resource,child,convention,,yes
 resources.resource_requirement,category_id,rental.category,reference,convention,yes,yes
 resources.resource_requirement,resource_id,resources.resource,child,convention,,yes
@@ -1037,11 +1061,14 @@ retail.shop_and_drop_line,drop_id,retail.shop_and_drop,child,declared,,yes
 retail.shop_and_drop_line,merchandise_id,retail.merchandise,reference,declared,,yes
 retail.shop_and_drop_line,shop_and_drop_id,retail.shop_and_drop,child,declared,,yes
 retail.store_rule,outlet_id,platform.outlet,reference,convention,yes,yes
+retail.store_rule,venue_id,platform.org_unit,reference,precedent,yes,
 seating.accessible,seat_map_id,seating.seat_map,reference,convention,,yes
+seating.group_request,order_id,orders.sales_order,reference,precedent,yes,
 seating.group_request,performance_id,catalogue.performance,reference,convention,yes,yes
 seating.hold_pool,hold_type_id,seating.hold_type,reference,convention,,yes
 seating.hold_pool,performance_id,catalogue.performance,reference,convention,yes,yes
 seating.import_job,seat_map_id,seating.seat_map,reference,declared,,yes
+seating.reassignment,order_id,orders.sales_order,reference,precedent,yes,
 seating.recommendation_rules,performance_id,catalogue.performance,reference,convention,yes,yes
 seating.recommendation_rules,seat_map_id,seating.seat_map,reference,convention,,yes
 seating.seat,category_id,rental.category,reference,convention,yes,yes
@@ -1087,6 +1114,7 @@ venuemap.import_job,map_id,venuemap.map,reference,declared,,yes
 venuemap.import_job,via importVenueGeometry,venuemap.path,ambient,lineage,,
 venuemap.import_job,via importVenueGeometry,venuemap.point,ambient,lineage,,
 venuemap.map,base_asset_id,maintenance.asset,reference,convention,yes,yes
+venuemap.map,venue_id,platform.org_unit,reference,precedent,yes,
 venuemap.map,via setPathClosure,venuemap.path,ambient,lineage,,
 venuemap.path,from_point_id,venuemap.point,reference,convention,,yes
 venuemap.path,map_id,venuemap.map,reference,declared,,yes
@@ -1144,10 +1172,13 @@ workforce.attendance,access_point_id,access.access_point,reference,declared,yes,
 workforce.attendance,amended_by_principal_id,identity.principal,reference,convention,yes,yes
 workforce.attendance,assignment_id,workforce.rota_assignment,reference,declared,,yes
 workforce.attendance,principal_id,identity.principal,reference,declared,yes,yes
+workforce.attendance,venue_id,platform.org_unit,reference,precedent,yes,
 workforce.leave_request,approval_request_id,approvals.request,reference,convention,yes,yes
 workforce.leave_request,principal_id,identity.principal,reference,convention,yes,yes
 workforce.open_shift,rota_assignment_id,workforce.rota_assignment,reference,convention,,yes
 workforce.open_shift,shift_template_id,workforce.shift_template,reference,convention,,yes
+workforce.open_shift,venue_id,platform.org_unit,reference,precedent,yes,
+workforce.rota_assignment,department_id,platform.org_unit,reference,precedent,yes,
 workforce.rota_assignment,principal_id,identity.principal,reference,declared,yes,yes
 workforce.rota_assignment,required_role_id,identity.role,reference,convention,yes,yes
 workforce.rota_assignment,venue_id,platform.org_unit,reference,declared,yes,yes
